@@ -25,18 +25,14 @@
  */
 package org.ow2.proactive.resourcemanager.selection;
 
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.security.Permission;
-import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.security.auth.Subject;
 
@@ -60,6 +56,7 @@ import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.Subjects;
 
 
 public class SelectionManagerTest {
@@ -91,7 +88,7 @@ public class SelectionManagerTest {
         Criteria criteria = new Criteria(2);
         criteria.setTopology(TopologyDescriptor.ARBITRARY);
 
-        Subject subject = createUser("admin");
+        Subject subject = Subjects.create("admin");
         NodeSet nodes = selectionManager.selectNodes(criteria, new Client(subject, false));
 
         assertEquals(1, nodes.size());
@@ -156,12 +153,6 @@ public class SelectionManagerTest {
                 }
             }
         };
-    }
-
-    private Subject createUser(String userPrincipal) {
-        Set<Principal> principals = new HashSet<>();
-        principals.add(new UserNamePrincipal(userPrincipal));
-        return new Subject(false, principals, emptySet(), emptySet());
     }
 
     private SelectionManager createSelectionManager(final RMCore rmCore) {

@@ -365,11 +365,13 @@ public class TaskLauncher implements InitActive {
     }
 
     private boolean isNodeShuttingDown() {
+        Thread shutdownHookThead = new Thread();
         try {
-            Runtime.getRuntime().addShutdownHook(new Thread());
+            Runtime.getRuntime().addShutdownHook(shutdownHookThead);
         } catch (IllegalStateException e) {
             return true;
         }
+        Runtime.getRuntime().removeShutdownHook(shutdownHookThead);
         return false;
     }
 

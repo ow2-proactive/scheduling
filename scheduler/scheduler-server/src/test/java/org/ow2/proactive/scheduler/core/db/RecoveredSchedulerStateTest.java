@@ -37,6 +37,7 @@ import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -76,13 +77,13 @@ public class RecoveredSchedulerStateTest {
         Vector<InternalJob> result = new Vector<>(count);
 
         for (int i = 0; i < count; i++) {
-            result.add(createJob(jobStatus));
+            result.add(createJob(jobStatus, i));
         }
 
         return result;
     }
 
-    public InternalJob createJob(JobStatus jobStatus) {
+    public InternalJob createJob(JobStatus jobStatus, int id) {
         InternalTaskFlowJob job = new InternalTaskFlowJob("MyJob",
                                                           JobPriority.HIGH,
                                                           OnTaskError.CANCEL_JOB,
@@ -91,6 +92,8 @@ public class RecoveredSchedulerStateTest {
         InternalScriptTask internalScriptTask = new InternalScriptTask(job);
 
         job.addTasks(ImmutableList.<InternalTask> of(internalScriptTask));
+
+        job.setId(JobIdImpl.makeJobId("" + id));
 
         JobInfoImpl jobInfo = (JobInfoImpl) job.getJobInfo();
         jobInfo.setStatus(jobStatus);

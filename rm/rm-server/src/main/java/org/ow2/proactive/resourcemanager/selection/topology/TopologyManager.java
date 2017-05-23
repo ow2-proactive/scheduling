@@ -26,7 +26,15 @@
 package org.ow2.proactive.resourcemanager.selection.topology;
 
 import java.net.InetAddress;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -41,8 +49,17 @@ import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger;
-import org.ow2.proactive.topology.descriptor.*;
+import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
+import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.MultipleHostsExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
+import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
+import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
+
+import com.google.common.annotations.VisibleForTesting;
 
 
 /**
@@ -69,11 +86,17 @@ public class TopologyManager {
 
     /**
      * Constructs new instance of the topology descriptor.
-     * @throws ClassNotFoundException when pinger class specified 
+     * @throws ClassNotFoundException when the pinger class specified
      * in the RM configuration file is not found
      */
     @SuppressWarnings(value = "unchecked")
     public TopologyManager() throws ClassNotFoundException {
+        this((Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER.getValueAsString()));
+    }
+
+    @VisibleForTesting
+    public TopologyManager(Class<? extends Pinger> pingerClass) {
+        this.pingerClass = pingerClass;
         handlers.put(ArbitraryTopologyDescriptor.class, new ArbitraryTopologyHandler());
         handlers.put(BestProximityDescriptor.class, new BestProximityHandler());
         handlers.put(ThresholdProximityDescriptor.class, new TresholdProximityHandler());
@@ -81,8 +104,6 @@ public class TopologyManager {
         handlers.put(SingleHostExclusiveDescriptor.class, new SingleHostExclusiveHandler());
         handlers.put(MultipleHostsExclusiveDescriptor.class, new MultipleHostsExclusiveHandler());
         handlers.put(DifferentHostsExclusiveDescriptor.class, new DifferentHostsExclusiveHandler());
-
-        pingerClass = (Class<? extends Pinger>) Class.forName(PAResourceManagerProperties.RM_TOPOLOGY_PINGER.getValueAsString());
     }
 
     /**
@@ -187,8 +208,9 @@ public class TopologyManager {
                 if (!topology.knownHost(host)) {
                     logger.warn("Topology info does not exist for node " + node.getNodeInformation().getURL());
                 } else {
-                    nodesOnHost.get(host).remove(node);
-                    if (nodesOnHost.get(host).isEmpty()) {
+                    Set<Node> nodes = nodesOnHost.get(host);
+                    nodes.remove(node);
+                    if (nodes.isEmpty()) {
                         // no more nodes on the host
                         topology.removeHostTopology(node.getVMInformation().getHostName(), host);
                         nodesOnHost.remove(host);
@@ -548,16 +570,29 @@ public class TopologyManager {
                 this.nodesNumber = nodesNumber;
             }
 
+            @Override
+            public int hashCode() {
+                final int prime = 31;
+                int result = 1;
+                result = prime * result + ((address == null) ? 0 : address.hashCode());
+                return result;
+            }
+
+            @Override
             public boolean equals(Object obj) {
-                if (obj instanceof Host) {
-                    Host host = (Host) obj;
-                    if (address == null && host.address == null) {
-                        return true;
-                    } else if (address != null && host.address != null) {
-                        return address.equals(host.address);
-                    }
-                }
-                return false;
+                if (this == obj)
+                    return true;
+                if (obj == null)
+                    return false;
+                if (!(obj instanceof Host))
+                    return false;
+                Host other = (Host) obj;
+                if (address == null) {
+                    if (other.address != null)
+                        return false;
+                } else if (!address.equals(other.address))
+                    return false;
+                return true;
             }
 
             public int compareTo(Host host) {
@@ -576,6 +611,7 @@ public class TopologyManager {
                     return nodesDiff;
                 }
             }
+
         }
     }
 

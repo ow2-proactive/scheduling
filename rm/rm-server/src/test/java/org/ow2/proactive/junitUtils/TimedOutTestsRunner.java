@@ -23,23 +23,28 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.webapp;
+package org.ow2.proactive.junitUtils;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.ByteArrayInputStream;
-
-import org.junit.Test;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.InitializationError;
 
 
-public class PortalConfigurationTest {
+/**
+ * JUnit custom runner which use TimedOutTestsListener to print full thread dump into System.err
+ * in case a test is failed due to timeout.
+ * @author ActiveEon Team
+ * @since 4/12/17
+ */
+public class TimedOutTestsRunner extends BlockJUnit4ClassRunner {
 
-    @Test
-    public void testFileProperty_Overrode_BySystemProperty() throws Exception {
-        System.setProperty("propSys", "eulav");
-        PortalConfiguration.load(new ByteArrayInputStream("prop=value\npropSys=value".getBytes()));
+    public TimedOutTestsRunner(Class<?> _class) throws InitializationError {
+        super(_class);
+    }
 
-        assertEquals("value", PortalConfiguration.getProperties().getProperty("prop"));
-        assertEquals("eulav", PortalConfiguration.getProperties().getProperty("propSys"));
+    @Override
+    public void run(RunNotifier notifier) {
+        notifier.addListener(new TimedOutTestsListener());
+        super.run(notifier);
     }
 }

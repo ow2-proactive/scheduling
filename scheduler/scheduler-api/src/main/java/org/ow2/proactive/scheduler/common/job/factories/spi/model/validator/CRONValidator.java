@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 import it.sauronsoftware.cron4j.InvalidPatternException;
@@ -38,7 +39,7 @@ public class CRONValidator implements Validator<String> {
     }
 
     @Override
-    public String validate(String parameterValue) throws ValidationException {
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         try {
             (new Predictor(parameterValue)).nextMatchingDate();
         } catch (InvalidPatternException e) {

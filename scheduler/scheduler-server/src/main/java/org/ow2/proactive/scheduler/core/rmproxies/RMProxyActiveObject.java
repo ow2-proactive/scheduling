@@ -27,10 +27,8 @@ package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
@@ -68,12 +66,7 @@ public class RMProxyActiveObject {
 
     protected ResourceManager rm;
 
-    /**
-     * list of nodes and clean script being executed
-     */
-    private Map<Node, ScriptResult<?>> nodeScriptResult = new ConcurrentHashMap<>();
-
-    private Map<Node, TaskId> nodesTaskId = new ConcurrentHashMap<>();
+    private Map<NodeSet, TaskId> nodesTaskId = new ConcurrentHashMap<>();
 
     public RMProxyActiveObject() {
     }
@@ -165,9 +158,8 @@ public class RMProxyActiveObject {
             if (cleaningScript == null) {
                 releaseNodes(nodes);
             } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript)) {
-                for (Node node : nodes) {
-                    handleCleaningScript(node, cleaningScript, variables, genericInformation, taskId);
-                }
+                handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId);
+
             } else {
                 TaskLogger.getInstance().error(taskId,
                                                "Unauthorized clean script: " + System.getProperty("line.separator") +
@@ -179,35 +171,38 @@ public class RMProxyActiveObject {
 
     /**
      * Execute the given script on the given node.
-     * Also register a callback on {@link #cleanCallBack(Future)} method when script has returned.
-     * @param node           the node on which to start the script
+     * Also register a callback on {@link #cleanCallBack(Future, NodeSet)} method when script has returned.
+     * @param nodes           the nodeset on which to start the script
      * @param cleaningScript the script to be executed
      * @param variables
      * @param genericInformation
      */
-    private void handleCleaningScript(Node node, Script<?> cleaningScript, VariablesMap variables,
+    private void handleCleaningScript(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
             Map<String, String> genericInformation, TaskId taskId) {
+        TaskLogger instance = TaskLogger.getInstance();
         try {
-            this.nodesTaskId.put(node, taskId);
-            ScriptHandler handler = ScriptLoader.createHandler(node);
+            this.nodesTaskId.put(nodes, taskId);
+            ScriptHandler handler = ScriptLoader.createHandler(nodes.get(0));
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
             ScriptResult<?> future = handler.handle(cleaningScript);
             try {
-                PAEventProgramming.addActionOnFuture(future, "cleanCallBack");
+                PAEventProgramming.addActionOnFuture(future, "cleanCallBack", nodes);
             } catch (IllegalArgumentException e) {
                 //TODO - linked to PROACTIVE-936 -> IllegalArgumentException is raised if method name is unknown
                 //should be replaced by checked exception
-                logger.error("ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
-                             e);
+                instance.error(taskId,
+                               "ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
+                               e);
             }
-            this.nodeScriptResult.put(node, future);
-            logger.info("Cleaning Script started on node" + node.getNodeInformation().getURL());
+            instance.info(taskId, "Cleaning Script started on node " + nodes.get(0).getNodeInformation().getURL());
 
         } catch (Exception e) {
             //if active object cannot be created or script has failed
-            logger.error("", e);
-            releaseNode(node);
+            instance.error(taskId,
+                           "Error while starting cleaning script for task " + taskId + " on " + nodes.get(0),
+                           e);
+            releaseNodes(nodes);
         }
     }
 
@@ -215,40 +210,31 @@ public class RMProxyActiveObject {
      * Called when a script has returned (call is made as an active object call)
      * <p>
      * Check the nodes to release and release the one that have to (clean script has returned)
-     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(Node, Script, Map, Map,TaskId)}
+     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map,TaskId)}
      */
     @ImmediateService
-    public synchronized void cleanCallBack(Future<ScriptResult<?>> future) {
-        Iterator<Entry<Node, ScriptResult<?>>> iterator = nodeScriptResult.entrySet().iterator();
-        NodeSet ns = new NodeSet();
-        while (iterator.hasNext()) {
-            Entry<Node, ScriptResult<?>> entry = iterator.next();
-            if (!PAFuture.isAwaited(entry.getValue())) { // !awaited = arrived
-                String nodeUrl = entry.getKey().getNodeInformation().getURL();
-                ScriptResult<?> sResult = null;
-                TaskId taskId = nodesTaskId.get(entry.getKey());
-                try {
-                    sResult = future.get();
-                } catch (Exception e) {
-                    logger.error("Exception occurred while executing cleaning script on node " + nodeUrl + ":", e);
-                }
-                printCleaningScriptInformations(nodeUrl, sResult, taskId);
-                ns.add(entry.getKey());
-                iterator.remove();
-            }
+    public synchronized void cleanCallBack(Future<ScriptResult<?>> future, NodeSet nodes) {
+
+        String nodeUrl = nodes.get(0).getNodeInformation().getURL();
+        ScriptResult<?> sResult = null;
+        TaskId taskId = nodesTaskId.get(nodes);
+        try {
+            sResult = future.get();
+        } catch (Exception e) {
+            logger.error("Exception occurred while executing cleaning script on node " + nodeUrl + ":", e);
         }
-        if (ns.size() > 0) {
-            releaseNodes(ns);
-        }
+        printCleaningScriptInformations(nodes, sResult, taskId);
+        releaseNodes(nodes);
     }
 
-    private void printCleaningScriptInformations(String nodeUrl, ScriptResult<?> sResult, TaskId taskId) {
+    private void printCleaningScriptInformations(NodeSet nodes, ScriptResult<?> sResult, TaskId taskId) {
         if (logger.isInfoEnabled()) {
             TaskLogger instance = TaskLogger.getInstance();
+            String nodeUrl = nodes.get(0).getNodeInformation().getURL();
             if (sResult.errorOccured()) {
                 instance.error(taskId, "Exception while running cleaning script on " + nodeUrl, sResult.getException());
             } else {
-                instance.info(taskId, "Cleaning script successful, node freed : " + nodeUrl);
+                instance.info(taskId, "Cleaning script successful.");
             }
             if (sResult.getOutput() != null && !sResult.getOutput().isEmpty()) {
                 instance.info(taskId, "Cleaning script output on node " + nodeUrl + ":");

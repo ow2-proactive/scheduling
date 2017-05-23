@@ -25,7 +25,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -35,7 +37,6 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 
 
@@ -83,6 +84,7 @@ public class SessionStoreTest {
 
         assertNotNull(session.getScheduler());
         assertNotNull(session.getRM());
+        assertEquals("login", session.getUserName());
     }
 
     @Test
@@ -99,6 +101,7 @@ public class SessionStoreTest {
 
         assertNotNull(session.getRM());
         assertNotNull(session.getScheduler());
+        assertEquals("login", session.getUserName());
     }
 
     @Test

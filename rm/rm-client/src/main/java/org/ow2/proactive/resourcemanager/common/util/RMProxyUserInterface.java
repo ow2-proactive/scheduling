@@ -30,11 +30,18 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.management.*;
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MBeanInfo;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -171,9 +178,13 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return target.nodeIsAvailable(arg0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @ImmediateService
     @Override
-    public BooleanWrapper setNodeAvailable(String nodeUrl) {
-        return target.setNodeAvailable(nodeUrl);
+    public Set<String> setNodesAvailable(Set<String> nodeUrls) {
+        return target.setNodesAvailable(nodeUrls);
     }
 
     /**
@@ -308,6 +319,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets) {
         return this.target.executeScript(script, scriptEngine, targetType, targets);
+    }
+
+    @Override
+    public StringWrapper getCurrentUser() {
+        return this.target.getCurrentUser();
     }
 
 }

@@ -26,6 +26,7 @@
 package functionaltests.utils;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
@@ -295,17 +296,28 @@ public class RMTHelper {
     private static TestNode createNode(String nodeName, Map<String, String> vmParameters, List<String> vmOptions,
             int pnpPort) throws IOException, NodeException, InterruptedException {
 
-        if (pnpPort <= 0) {
-            pnpPort = findFreePort();
-        }
-        String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
-        vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
-        JVMProcessImpl nodeProcess = createJvmProcess(StartNode.class.getName(),
-                                                      Collections.singletonList(nodeName),
-                                                      vmParameters,
-                                                      vmOptions);
-        return createNode(nodeName, nodeUrl, nodeProcess);
-
+        boolean exceptionOccurredWhileCreatingNode = false;
+        NodeException lastException = null;
+        int numberOfAttempts = 0;
+        do {
+            try {
+                if (pnpPort <= 0) {
+                    pnpPort = findFreePort();
+                }
+                String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
+                vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
+                JVMProcessImpl nodeProcess = createJvmProcess(StartNode.class.getName(),
+                                                              Collections.singletonList(nodeName),
+                                                              vmParameters,
+                                                              vmOptions);
+                return createNode(nodeName, nodeUrl, nodeProcess);
+            } catch (NodeException e) {
+                exceptionOccurredWhileCreatingNode = true;
+                lastException = e;
+                numberOfAttempts++;
+            }
+        } while (exceptionOccurredWhileCreatingNode && numberOfAttempts < 20);
+        throw lastException;
     }
 
     public static TestNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
@@ -331,10 +343,57 @@ public class RMTHelper {
         throw toThrow == null ? new NodeException("unable to create the node " + nodeName) : toThrow;
     }
 
+    public static String testClasspath() {
+        return (getRmHome() + File.separator + "dist" + File.separator + "lib" + File.separator + "*") +
+               File.pathSeparatorChar + getRmHome() + File.separator + "addons" + File.separator + "*" +
+               filterClassPath(System.getProperty("java.class.path"));
+    }
+
+    private static String getRmHome() {
+        return PAResourceManagerProperties.RM_HOME.getValueAsString();
+    }
+
+    private static String filterClassPath(String classPath) {
+        Set<String> distLibJars = findJarsNamesInPath(getRmHome() + File.separator + "dist" + File.separator + "lib");
+        Set<String> addonsJars = findJarsNamesInPath(getRmHome() + File.separator + "addons");
+        List<String> pathList = Arrays.asList(classPath.split("" + File.pathSeparatorChar));
+        StringBuilder builder = new StringBuilder();
+        for (String pathElement : pathList) {
+            if (pathElement.endsWith(".so") || pathElement.endsWith(".dll") || pathElement.endsWith(".lib") ||
+                pathElement.endsWith(".dylib")) {
+                continue;
+            } else if (distLibJars.contains(new File(pathElement).getName())) {
+                continue;
+            } else if (addonsJars.contains(new File(pathElement).getName())) {
+                continue;
+            } else {
+                builder.append(File.pathSeparatorChar);
+                builder.append(pathElement);
+            }
+        }
+        return builder.toString();
+    }
+
+    private static Set<String> findJarsNamesInPath(String path) {
+        File[] jarArray = new File(path).listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".jar");
+            }
+        });
+        HashSet<String> jarNames = new HashSet<>();
+        for (File jar : jarArray) {
+            jarNames.add(jar.getName());
+        }
+        return jarNames;
+    }
+
     public static JVMProcessImpl createJvmProcess(String className, List<String> parameters,
             Map<String, String> vmParameters, List<String> vmOptions) throws IOException {
         JVMProcessImpl nodeProcess = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         nodeProcess.setClassname(className);
+
+        nodeProcess.setClasspath(testClasspath());
 
         ArrayList<String> jvmParameters = new ArrayList<>();
 
@@ -371,6 +430,7 @@ public class RMTHelper {
             jvmParameters.addAll(vmOptions);
         }
         jvmParameters.addAll(setup.getJvmParametersAsList());
+        jvmParameters.add("-Xmx256m");
         nodeProcess.setJvmOptions(jvmParameters);
         nodeProcess.setParameters(parameters);
         nodeProcess.startProcess();

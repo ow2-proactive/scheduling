@@ -50,6 +50,10 @@ public class TaskVariable extends JobVariable implements Serializable {
         //Empty constructor
     }
 
+    public TaskVariable(String name, String value) {
+        this(name, value, null, false);
+    }
+
     public TaskVariable(String name, String value, String model, boolean isJobInherited) {
         super(name, value, model);
         this.jobInherited = isJobInherited;

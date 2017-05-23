@@ -1188,16 +1188,26 @@ public abstract class InternalJob extends JobState {
         jobInfo.setToBeRemoved();
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof InternalJob) {
-            return getId().equals(((InternalJob) o).getId());
-        }
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        return result;
+    }
 
-        return false;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (!(obj instanceof InternalJob))
+            return false;
+        InternalJob other = (InternalJob) obj;
+        if (!getId().equals(other.getId()))
+            return false;
+        return true;
     }
 
     /**
@@ -1260,6 +1270,14 @@ public abstract class InternalJob extends JobState {
 
     public void setTaskFlowJob(Job taskFlowJob) {
         this.taskFlowJob = taskFlowJob;
+    }
+
+    public long getScheduledTimeForRemoval() {
+        return this.jobInfo.getScheduledTimeForRemoval();
+    }
+
+    public void setScheduledTimeForRemoval(long scheduledTimeForRemoval) {
+        this.jobInfo.setScheduledTimeForRemoval(scheduledTimeForRemoval);
     }
 
 }

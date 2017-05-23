@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
@@ -81,6 +82,10 @@ public interface StudioInterface {
     @GET
     @Path("connected")
     boolean isConnected(@HeaderParam("sessionid") String sessionId);
+
+    @GET
+    @Path("currentuser")
+    String currentUser(@HeaderParam("sessionid") String sessionId);
 
     @GET
     @Path("workflows")
@@ -180,9 +185,10 @@ public interface StudioInterface {
      * @return the result of job validation
      */
     @POST
-    @Path("validate")
+    @Path("{path:validate}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    JobValidationData validate(MultipartFormDataInput multipart);
+    @Produces("application/json")
+    JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart);
 
     /**
      * Submits a job to the scheduler
@@ -195,6 +201,26 @@ public interface StudioInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
+            PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
+     * Submit a job to job planner
+     * @param sessionId a valid session id
+     * @param pathSegment variables string
+     * @param jobContentXmlString job content in xml string
+     * @return true if the job is submitted successfully, false otherwise
+     * @throws JobCreationRestException
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     * @throws IOException
+     */
+    @POST
+    @Path("{path:plannings}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    String submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            Map<String, String> jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
 
     @GET

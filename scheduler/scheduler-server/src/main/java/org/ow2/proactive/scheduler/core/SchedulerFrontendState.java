@@ -880,10 +880,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /**
      * Dispatch the job state updated event
      * 
-     * @param owner
-     *            the owner of this job
-     * @param notification
-     *            the data to send to every client
+     * @param job
+     *            the job state
      */
     private void dispatchJobUpdatedFullData(JobState job) {
         try {
@@ -1039,7 +1037,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     public synchronized void jobSubmitted(JobState job) {
         ClientJobState storedJobState = new ClientJobState(job);
         jobsMap.put(job.getId(), storedJobState);
-        sState.getPendingJobs().add(storedJobState);
+        sState.update(storedJobState);
         dispatchJobSubmitted(job);
     }
 
@@ -1049,8 +1047,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         js.update(notification.getData());
         switch (notification.getEventType()) {
             case JOB_PENDING_TO_RUNNING:
-                sState.getPendingJobs().remove(js);
-                sState.getRunningJobs().add(js);
+                sState.pendingToRunning(js);
                 break;
             case JOB_PAUSED:
             case JOB_IN_ERROR:
@@ -1061,20 +1058,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case TASK_SKIPPED:
                 break;
             case JOB_PENDING_TO_FINISHED:
-                sState.getPendingJobs().remove(js);
-                sState.getFinishedJobs().add(js);
+                sState.pendingToFinished(js);
                 // set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 break;
             case JOB_RUNNING_TO_FINISHED:
-                sState.getRunningJobs().remove(js);
-                sState.getFinishedJobs().add(js);
+                sState.runningToFinished(js);
                 // set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 break;
             case JOB_REMOVE_FINISHED:
                 // removing jobs from the global list : this job is no more managed
-                sState.getFinishedJobs().remove(js);
+                sState.removeFinished(js);
                 jobsMap.remove(js.getId());
                 jobs.remove(notification.getData().getJobId());
                 break;
@@ -1101,6 +1096,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case TASK_RUNNING_TO_FINISHED:
             case TASK_WAITING_FOR_RESTART:
             case TASK_IN_ERROR:
+            case TASK_SKIPPED:
+            case TASK_REPLICATED:
+            case TASK_IN_ERROR_TO_FINISHED:
                 dispatchTaskStateUpdated(owner, notification);
                 break;
             case TASK_PROGRESS:
@@ -1128,6 +1126,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                             notification.getEventType());
         }
+    }
+
+    public String getCurrentUser() throws NotConnectedException {
+        UniqueID id = checkAccess();
+
+        UserIdentificationImpl ident = identifications.get(id).getUser();
+        // renew session for this user
+        renewUserSession(id, ident);
+        return ident.getUsername();
     }
 
     synchronized List<SchedulerUserInfo> getUsers() {

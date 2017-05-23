@@ -28,8 +28,21 @@ package org.ow2.proactive.resourcemanager.selection;
 import java.io.File;
 import java.io.Serializable;
 import java.security.Permission;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -105,13 +118,13 @@ public abstract class SelectionManager {
      * Loads authorized selection scripts.
      */
     public void updateAuthorizedScriptsSignatures() {
-        String dirName = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsString();
+        String dirName = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR.getValueAsStringOrNull();
         if (dirName != null && dirName.length() > 0) {
             dirName = PAResourceManagerProperties.getAbsolutePath(dirName);
             File folder = new File(dirName);
 
             if (folder.exists() && folder.isDirectory()) {
-                logger.info("The resource manager will accept only selection scripts from " + dirName);
+                logger.debug("The resource manager will accept only selection scripts from " + dirName);
                 long currentTime = System.currentTimeMillis();
                 long configuredAuthorizedScriptLoadPeriod = getConfiguredAuthorizedScriptLoadPeriod();
                 if (currentTime - lastAuthorizedFolderLoadingTime > configuredAuthorizedScriptLoadPeriod) {
@@ -144,7 +157,7 @@ public abstract class SelectionManager {
     private long getConfiguredAuthorizedScriptLoadPeriod() {
         long configuredAuthorizedScriptLoadPeriod = DEFAULT_AUTHORIZED_SCRIPT_LOAD_PERIOD;
         if (PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.isSet()) {
-            configuredAuthorizedScriptLoadPeriod = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsInt();
+            configuredAuthorizedScriptLoadPeriod = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD.getValueAsLong();
         }
         return configuredAuthorizedScriptLoadPeriod;
     }
@@ -206,11 +219,9 @@ public abstract class SelectionManager {
 
     private NodeSet doSelectNodes(Criteria criteria, Client client) {
         boolean hasScripts = criteria.getScripts() != null && criteria.getScripts().size() > 0;
-        if (logger.isInfoEnabled()) {
-            logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
-        }
         boolean loggerIsDebugEnabled = logger.isDebugEnabled();
         if (loggerIsDebugEnabled) {
+            logger.debug(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology());
             if (hasScripts) {
                 logger.debug("Selection scripts:");
                 for (SelectionScript s : criteria.getScripts()) {
@@ -338,12 +349,17 @@ public abstract class SelectionManager {
 
         if (logger.isInfoEnabled()) {
             String extraNodes = selectedNodes.getExtraNodes() != null && selectedNodes.getExtraNodes().size() > 0
-                                                                                                                  ? "and " +
+                                                                                                                  ? " and " +
                                                                                                                     selectedNodes.getExtraNodes()
                                                                                                                                  .size() +
                                                                                                                     " extra nodes"
                                                                                                                   : "";
-            logger.info(client + " will get " + selectedNodes.size() + " nodes " + extraNodes);
+            logger.info(client + " requested " + criteria.getSize() + " nodes with " + criteria.getTopology() +
+                        " and will get " + selectedNodes.size() + " nodes " + extraNodes + " [freeNodes:" +
+                        freeNodes.size() + ";filteredNodes:" + filteredNodes.size() + ";reordered after policy:" +
+                        afterPolicyNodes.size() + ";selection script present:" + hasScripts +
+                        ";nodes filtered by selection script:" + matchedNodes.size() + ";selectedNodes:" +
+                        selectedNodes.size() + "]");
         }
 
         if (loggerIsDebugEnabled) {
@@ -409,7 +425,7 @@ public abstract class SelectionManager {
         try {
             // launching
             Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
-                                                                                       PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsInt(),
+                                                                                       PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsLong(),
                                                                                        TimeUnit.MILLISECONDS);
             int index = 0;
 
@@ -510,7 +526,7 @@ public abstract class SelectionManager {
     public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes,
             final Map<String, Serializable> bindings) {
         // TODO: add a specific timeout for script execution
-        final int timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsInt();
+        final long timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
         final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
 
         // Execute the script on each selected node

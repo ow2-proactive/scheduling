@@ -27,22 +27,53 @@ package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.ow2.proactive_grid_cloud_portal.scheduler.ValidationUtil.validateJobDescriptor;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.SequenceInputStream;
+import java.io.Serializable;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -59,6 +90,9 @@ import org.dozer.DozerBeanMapper;
 import org.dozer.Mapper;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -71,11 +105,36 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
-import org.ow2.proactive.scheduler.common.*;
-import org.ow2.proactive.scheduler.common.exception.*;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
+import org.ow2.proactive.scheduler.common.Page;
+import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.exception.ConnectionException;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
-import org.ow2.proactive.scheduler.common.task.*;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
@@ -89,10 +148,31 @@ import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobUsageData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerStatusData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.LogForwardingRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
 import org.ow2.proactive_grid_cloud_portal.scheduler.util.WorkflowVariablesTransformer;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
@@ -140,6 +220,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private HttpServletRequest httpServletRequest;
 
     private final WorkflowVariablesTransformer workflowVariablesTransformer = new WorkflowVariablesTransformer();
+
+    private final ValidationUtil jobValidator = new ValidationUtil();
 
     /**
      * Returns the ids of the current jobs under a list of string.
@@ -2259,6 +2341,50 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return filePath;
     }
 
+    @Consumes(MediaType.APPLICATION_JSON)
+    @POST
+    @Path("{path:plannings}")
+    @Produces("application/json")
+    @Override
+    public String submitPlannings(@HeaderParam("sessionid") String sessionId,
+            @PathParam("path") PathSegment pathSegment, Map<String, String> jobContentXmlString)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
+
+        checkAccess(sessionId, "plannings");
+
+        Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+        if (jobContentXmlString == null || jobContentXmlString.size() != 1) {
+            throw new JobCreationRestException("Cannot find job body: code " + HttpURLConnection.HTTP_BAD_REQUEST);
+        }
+
+        Map<String, Object> requestBody = new HashMap<>(2);
+        requestBody.put("variables", jobVariables);
+        requestBody.put("xmlContentString", jobContentXmlString.entrySet().iterator().next().getValue());
+
+        Response response = null;
+        try {
+            ResteasyClient client = new ResteasyClientBuilder().build();
+            ResteasyWebTarget target = client.target(PortalConfiguration.JOBPLANNER_URL.getValueAsString());
+            response = target.request()
+                             .header("sessionid", sessionId)
+                             .post(Entity.entity(requestBody, "application/json"));
+
+            if (HttpURLConnection.HTTP_OK != response.getStatus()) {
+                throw new IOException(String.format("Cannot access resource %s: code %d",
+                                                    PortalConfiguration.JOBPLANNER_URL.getValueAsString(),
+                                                    response.getStatus()));
+            }
+            return response.readEntity(String.class);
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+
+    }
+
     /**
      * Pushes a file from the local file system into the given DataSpace
      * 
@@ -2841,8 +2967,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("logins/sessionid/{sessionId}")
     @Produces("application/json")
-    public String getLoginFromSessionId(@PathParam("sessionId") String sessionId)
-            throws SchedulerRestException, LoginException, NotConnectedRestException {
+    public String getLoginFromSessionId(@PathParam("sessionId") String sessionId) {
         if (sessionId != null && sessionStore.exists(sessionId)) {
             return sessionStore.get(sessionId).getUserName();
         }
@@ -3028,7 +3153,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public byte[] getCreateCredential(@MultipartForm LoginForm multipart)
             throws LoginException, SchedulerRestException {
         try {
-            String url = PortalConfiguration.getProperties().getProperty(PortalConfiguration.scheduler_url);
+            String url = PortalConfiguration.SCHEDULER_URL.getValueAsString();
 
             SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
             PublicKey pubKey = auth.getPublicKey();
@@ -3118,7 +3243,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public JobValidationData validate(MultipartFormDataInput multipart) {
+    public JobValidationData validate(PathSegment pathSegment, MultipartFormDataInput multipart) {
         File tmpFile = null;
         try {
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
@@ -3131,7 +3256,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             tmpFile = File.createTempFile("valid-job", "d");
             IOUtils.copy(is, new FileOutputStream(tmpFile));
 
-            return validateJobDescriptor(tmpFile);
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            return jobValidator.validateJobDescriptor(tmpFile, jobVariables);
         } catch (IOException e) {
             JobValidationData validation = new JobValidationData();
             validation.setErrorMessage("Cannot read from the job validation request.");
@@ -3141,6 +3268,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if (tmpFile != null) {
                 tmpFile.delete();
             }
+        }
+    }
+
+    @Override
+    public JobValidationData validateFromUrl(String sessionId, String url, PathSegment pathSegment)
+            throws NotConnectedRestException {
+
+        File tmpWorkflowFile = null;
+        try {
+            checkAccess(sessionId);
+            String jobXml = downloadWorkflowContent(sessionId, url);
+            tmpWorkflowFile = File.createTempFile("job", "d");
+            IOUtils.write(jobXml, new FileOutputStream(tmpWorkflowFile));
+
+            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+
+            return jobValidator.validateJobDescriptor(tmpWorkflowFile, jobVariables);
+
+        } catch (JobCreationRestException | IOException e) {
+            JobValidationData validation = new JobValidationData();
+            validation.setErrorMessage("Error while reading workflow at url: " + url);
+            validation.setStackTrace(getStackTrace(e));
+            return validation;
+        } finally {
+            FileUtils.deleteQuietly(tmpWorkflowFile);
         }
     }
 
@@ -3242,7 +3394,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 @Override
                 public void onDisconnect(@SuppressWarnings("rawtypes") WebSocketEvent event) {
                     try {
-                        logger.info("#### websocket disconnected，remove listener ####");
+                        logger.info("#### websocket disconnected remove listener ####");
                         scheduler.removeEventListener();
                     } catch (Exception e) {
                         logger.error(e);
@@ -3281,7 +3433,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws JobCreationRestException, IOException {
         if (StringUtils.isBlank(workflowUrl))
             throw new JobCreationRestException("Cannot create workflow without url");
-        HttpResourceDownloader httpResourceDownloader = new HttpResourceDownloader();
+        HttpResourceDownloader httpResourceDownloader = HttpResourceDownloader.getInstance();
         return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
     }
 
@@ -3475,6 +3627,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new JobCreationRestException(e);
         }
         return null;
+    }
+
+    @GET
+    @Override
+    @Path("configuration/portal")
+    @Produces("application/json")
+    public Map<Object, Object> getPortalConfiguration(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
+        try {
+            final Scheduler s = checkAccess(sessionId, "GET configuration/portal");
+            return s.getPortalConfiguration();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
     }
 
 }

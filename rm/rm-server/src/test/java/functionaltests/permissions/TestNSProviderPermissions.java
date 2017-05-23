@@ -70,7 +70,7 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
 
     ResourceManager user;
 
-    static String nsName = "ns";
+    static String nsName = "TestNSNodesPermissions";
 
     @Test
     public void testNodeProviderMe() throws Exception {
@@ -185,6 +185,7 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         // admin can remove foreign node
         admin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+
         admin.removeNodeSource(nsName, true).getBooleanValue();
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
     }
@@ -231,6 +232,9 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         // nsadmin can remove node3 as ns admin
         nsadmin.removeNode(node3.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+
+        nsadmin.removeNodeSource(nsName, true).getBooleanValue();
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
     }
 
     @Test
@@ -257,7 +261,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
         // admin can remove anything
         admin.removeNode(node1.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        admin.removeNodeSource(nsName, false);
+
+        admin.removeNodeSource(nsName, true);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
     }
 

@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
@@ -127,10 +128,16 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
     @Override
     public T parseAndValidate(String parameterValue)
             throws ConversionException, ValidationException, ModelSyntaxException {
+        return parseAndValidate(parameterValue, null);
+    }
+
+    @Override
+    public T parseAndValidate(String parameterValue, ModelValidatorContext context)
+            throws ConversionException, ValidationException, ModelSyntaxException {
         if (parameterValue == null) {
             throw new ConversionException(parameterValue, getClassType());
         }
         Converter<T> converter = createConverter(model);
-        return createValidator(model, converter).validate(converter.convert(parameterValue));
+        return createValidator(model, converter).validate(converter.convert(parameterValue), context);
     }
 }

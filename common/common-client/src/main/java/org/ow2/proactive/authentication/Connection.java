@@ -207,7 +207,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      *          contain any path element,<br>
      *          or the given URL, unchanged.
      */
-    public static String normalize(String url) {
+    public static URI normalize(String url) {
         if (url == null || url.trim().equals("")) {
             try {
                 RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
@@ -223,11 +223,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
             url = "//" + url;
         }
 
-        String[] elements = url.split("/", -2);
-        if (elements.length == 3 && !url.endsWith("/")) {
-            url += "/";
-        }
-        return url;
+        return URI.create(url);
     }
 
     /**

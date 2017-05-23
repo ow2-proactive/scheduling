@@ -30,7 +30,6 @@ import static com.google.common.base.Throwables.getStackTraceAsString;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -71,8 +70,8 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
     @Override
     public void configure(Object... parameters) {
         super.configure(parameters);
-        if (parameters != null && parameters.length >= 3) {
-            this.command = parameters[3].toString();
+        if (parameters != null && parameters.length >= 4) {
+            this.command = parameters[4].toString();
         }
     }
 
@@ -82,12 +81,13 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
      * Starts a PA runtime on remote host using a custom script, register it
      * manually in the nodesource.
      *
-     * @param host
-     *            hostname of the node on which a node should be started
+     * @param host The host on which one the node will be started
+     * @param nbNodes number of nodes to deploy
+     * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws org.ow2.proactive.resourcemanager.exception.RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes) throws RMException {
+    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
 
         final String nodeName = this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
 
@@ -109,7 +109,6 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         String filledCommand = replaceProperties(command, localProperties);
         filledCommand = replaceProperties(filledCommand, System.getProperties());
 
-        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      filledCommand,

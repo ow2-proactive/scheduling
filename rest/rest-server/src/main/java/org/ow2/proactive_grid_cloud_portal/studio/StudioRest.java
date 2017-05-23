@@ -30,7 +30,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -117,6 +120,15 @@ public class StudioRest implements StudioInterface {
             return true;
         } catch (NotConnectedRestException e) {
             return false;
+        }
+    }
+
+    @Override
+    public String currentUser(@HeaderParam("sessionid") String sessionId) {
+        try {
+            return getUserName(sessionId);
+        } catch (NotConnectedRestException e) {
+            return null;
         }
     }
 
@@ -301,8 +313,8 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobValidationData validate(MultipartFormDataInput multipart) {
-        return scheduler().validate(multipart);
+    public JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart) {
+        return scheduler().validate(pathSegment, multipart);
     }
 
     @Override
@@ -310,6 +322,13 @@ public class StudioRest implements StudioInterface {
             MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException {
         return scheduler().submit(sessionId, pathSegment, multipart);
+    }
+
+    @Override
+    public String submitPlannings(String sessionId, PathSegment pathSegment, Map<String, String> jobContentXmlString)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
+        return scheduler().submitPlannings(sessionId, pathSegment, jobContentXmlString);
     }
 
     @Override

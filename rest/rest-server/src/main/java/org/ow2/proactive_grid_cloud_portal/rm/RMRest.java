@@ -197,6 +197,14 @@ public class RMRest implements RMRestInterface {
         return session.getSessionId();
     }
 
+    @Override
+    public String getLoginFromSessionId(String sessionId) {
+        if (sessionId != null && sessionStore.exists(sessionId)) {
+            return sessionStore.get(sessionId).getUserName();
+        }
+        return "";
+    }
+
     /**
      * Returns the state of the Resource Manager
      * @param sessionId a valid session id

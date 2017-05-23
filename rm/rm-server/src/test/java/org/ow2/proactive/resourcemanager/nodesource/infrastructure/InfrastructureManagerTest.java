@@ -27,8 +27,6 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;

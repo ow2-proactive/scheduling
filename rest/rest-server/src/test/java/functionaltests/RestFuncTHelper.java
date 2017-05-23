@@ -27,17 +27,11 @@ package functionaltests;
 
 import static com.jayway.awaitility.Awaitility.await;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -62,6 +56,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 
+import com.google.common.collect.Sets;
 import com.jayway.awaitility.Duration;
 
 import functionaltests.utils.ProcessStreamReader;
@@ -140,13 +135,13 @@ public class RestFuncTHelper {
 
         // Connect a scheduler client
         SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url,
-                                                                                     TimeUnit.SECONDS.toMillis(60));
+                                                                                     TimeUnit.SECONDS.toMillis(120));
         schedulerPublicKey = schedAuth.getPublicKey();
         Credentials schedCred = RestFuncTUtils.createCredentials("admin", "admin", schedulerPublicKey);
         scheduler = schedAuth.login(schedCred);
 
         // Connect a rm client
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(url, TimeUnit.SECONDS.toMillis(60));
+        RMAuthentication rmAuth = RMConnection.waitAndJoin(url, TimeUnit.SECONDS.toMillis(120));
         Credentials rmCredentials = getRmCredentials();
         rm = rmAuth.login(rmCredentials);
 
@@ -249,7 +244,42 @@ public class RestFuncTHelper {
     private static String getClassPath() throws Exception {
         return (getRmHome() + File.separator + "dist" + File.separator + "lib" + File.separator + "*") +
                File.pathSeparatorChar + getRmHome() + File.separator + "addons" + File.separator + "*" +
-               File.pathSeparatorChar + System.getProperty("java.class.path");
+               filterClassPath(System.getProperty("java.class.path"));
+    }
+
+    private static String filterClassPath(String classPath) throws Exception {
+        Set<String> distLibJars = findJarsNamesInPath(getRmHome() + File.separator + "dist" + File.separator + "lib");
+        Set<String> addonsJars = findJarsNamesInPath(getRmHome() + File.separator + "addons");
+        List<String> pathList = Arrays.asList(classPath.split("" + File.pathSeparatorChar));
+        StringBuilder builder = new StringBuilder();
+        for (String pathElement : pathList) {
+            if (pathElement.endsWith(".so") || pathElement.endsWith(".dll") || pathElement.endsWith(".lib") ||
+                pathElement.endsWith(".dylib")) {
+                continue;
+            } else if (distLibJars.contains(new File(pathElement).getName())) {
+                continue;
+            } else if (addonsJars.contains(new File(pathElement).getName())) {
+                continue;
+            } else {
+                builder.append(File.pathSeparatorChar);
+                builder.append(pathElement);
+            }
+        }
+        return builder.toString();
+    }
+
+    private static Set<String> findJarsNamesInPath(String path) {
+        File[] jarArray = new File(path).listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".jar");
+            }
+        });
+        HashSet<String> jarNames = new HashSet<>();
+        for (File jar : jarArray) {
+            jarNames.add(jar.getName());
+        }
+        return jarNames;
     }
 
     public static String getRestServerUrl() {

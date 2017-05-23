@@ -60,7 +60,7 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
     }
 
     @Override
-    public void validateJob(File jobFile) throws JobValidationException {
+    public File validateJob(File jobFile) throws JobValidationException {
         String findSchemaByNamespaceUsed;
         try {
             findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(jobFile);
@@ -71,11 +71,13 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
             throw new JobValidationException(true, e);
         }
 
+        return jobFile;
     }
 
     @Override
-    public void validateJob(TaskFlowJob job) throws JobValidationException {
+    public TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException {
         // validate any job
+        return job;
     }
 
     private String findSchemaByNamespaceUsed(File file)

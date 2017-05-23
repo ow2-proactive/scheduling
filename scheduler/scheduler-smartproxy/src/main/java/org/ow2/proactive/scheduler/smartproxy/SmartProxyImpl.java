@@ -496,8 +496,9 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
                 throw e;
             } finally {
                 jobTracker.setTaskTransferring(jobId, t_name, false);
-                jobTracker.removeAwaitedTask(jobId, t_name);
             }
+            // task is removed from the job tracker only if the transfer is successful
+            jobTracker.removeAwaitedTask(jobId, t_name);
 
             log.debug("Finished copying files from " + sourceUrl + " to " + destUrl);
             // ok we can remove the task
@@ -810,6 +811,16 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
             throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
             JobCreationException {
         return schedulerProxy.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+    }
+
+    @Override
+    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+        return schedulerProxy.getPortalConfiguration();
+    }
+
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+        return schedulerProxy.getCurrentUser();
     }
 
 }

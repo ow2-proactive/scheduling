@@ -170,17 +170,17 @@ public class StaxJobFactory extends JobFactory {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
             //validate content using the proper XML schema
-            validate(file);
+            File updatedFile = validate(file);
             //set relative path
-            relativePathRoot = file.getParentFile().getAbsolutePath();
+            relativePathRoot = updatedFile.getParentFile().getAbsolutePath();
             //create and get XML STAX reader
             XMLStreamReader xmlsr;
             // use the server side property to accept encoding
             if (PASchedulerProperties.FILE_ENCODING.isSet()) {
-                xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(file),
+                xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(updatedFile),
                                                               PASchedulerProperties.FILE_ENCODING.getValueAsString());
             } else {
-                xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(file));
+                xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(updatedFile));
             }
             //Dependencies
             Map<String, ArrayList<String>> dependencies = new HashMap<>();
@@ -208,7 +208,7 @@ public class StaxJobFactory extends JobFactory {
     /*
      * Validate the given job descriptor
      */
-    private void validate(File file) throws VerifierConfigurationException, JobCreationException {
+    private File validate(File file) throws VerifierConfigurationException, JobCreationException {
         Map<String, JobValidatorService> factories;
         try {
             factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
@@ -217,22 +217,26 @@ public class StaxJobFactory extends JobFactory {
             throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
         }
 
+        File updatedFile = file;
+
         try {
 
             for (JobValidatorService factory : factories.values()) {
-                factory.validateJob(file);
+                updatedFile = factory.validateJob(updatedFile);
             }
         } catch (JobValidationException e) {
             throw e;
         } catch (Exception e) {
             throw new JobValidationException(true, e);
         }
+
+        return updatedFile;
     }
 
     /*
      * Validate the given job descriptor
      */
-    private void validate(TaskFlowJob job) throws VerifierConfigurationException, JobCreationException {
+    private TaskFlowJob validate(TaskFlowJob job) throws VerifierConfigurationException, JobCreationException {
 
         Map<String, JobValidatorService> factories;
         try {
@@ -241,16 +245,20 @@ public class StaxJobFactory extends JobFactory {
             throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
         }
 
+        TaskFlowJob updatedJob = job;
+
         try {
 
             for (JobValidatorService factory : factories.values()) {
-                factory.validateJob(job);
+                updatedJob = factory.validateJob(updatedJob);
             }
         } catch (JobValidationException e) {
             throw e;
         } catch (Exception e) {
             throw new JobValidationException(e);
         }
+
+        return updatedJob;
     }
 
     /**

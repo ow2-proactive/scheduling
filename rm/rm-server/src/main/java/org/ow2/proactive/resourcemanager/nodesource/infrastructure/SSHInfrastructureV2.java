@@ -118,12 +118,14 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using SSH, register it manually in the
      * nodesource.
      * 
-     * @param host
-     *            hostname of the node on which a node should be started
+     * @param host The host on which one the node will be started
+     * @param nbNodes number of nodes to deploy
+     * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(final InetAddress host, final int nbNodes) throws RMException {
+    public void startNodeImpl(final InetAddress host, final int nbNodes, final List<String> depNodeURLs)
+            throws RMException {
         String fs = this.targetOSObj.fs;
         // we set the java security policy file
         ArrayList<String> sb = new ArrayList<>();
@@ -212,7 +214,6 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
         final String msg = "deploy on " + host;
 
-        final List<String> depNodeURLs = new ArrayList<>(nbNodes);
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, msg, super.nodeTimeOut));
         addTimeouts(depNodeURLs);
@@ -303,19 +304,19 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * Configures the Infrastructure
      *
      * @param parameters
-     *            parameters[3] : ssh server port parameters[4] : ssh username
-     *            parameters[5] : ssh password parameters[6] : ssh private key
-     *            parameters[7] : optional ssh options file parameters[8] : java
-     *            path on the remote machines parameters[9] : Scheduling path on
-     *            remote machines parameters[10] : target OS' type (Linux,
-     *            Windows or Cygwin) parameters[11] : extra java options
+     *            parameters[4] : ssh server port parameters[5] : ssh username
+     *            parameters[6] : ssh password parameters[7] : ssh private key
+     *            parameters[8] : optional ssh options file parameters[9] : java
+     *            path on the remote machines parameters[10] : Scheduling path on
+     *            remote machines parameters[11] : target OS' type (Linux,
+     *            Windows or Cygwin) parameters[12] : extra java options
      * @throws IllegalArgumentException
      *             configuration failed
      */
     @Override
     public void configure(Object... parameters) {
         super.configure(parameters);
-        int index = 3;
+        int index = 4;
         if (parameters == null || parameters.length < 12) {
             throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
         }

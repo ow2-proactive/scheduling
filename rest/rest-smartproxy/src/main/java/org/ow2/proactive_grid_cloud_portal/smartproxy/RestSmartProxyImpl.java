@@ -369,8 +369,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
                 throw e;
             } finally {
                 jobTracker.setTaskTransferring(jobId, taskName, false);
-                jobTracker.removeAwaitedTask(jobId, taskName);
             }
+            // task is removed from the job tracker only if the transfer is successful
+            jobTracker.removeAwaitedTask(jobId, taskName);
         }
 
     }
@@ -590,6 +591,16 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
             throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
             JobCreationException {
         return ((ISchedulerClient) _getScheduler()).copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+    }
+
+    @Override
+    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+        return _getScheduler().getPortalConfiguration();
+    }
+
+    @Override
+    public String getCurrentUser() throws NotConnectedException {
+        return ((ISchedulerClient) _getScheduler()).getCurrentUser();
     }
 
 }

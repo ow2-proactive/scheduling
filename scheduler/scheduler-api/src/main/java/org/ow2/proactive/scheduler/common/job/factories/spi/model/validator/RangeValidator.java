@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 import com.google.common.collect.Range;
@@ -51,7 +52,7 @@ public class RangeValidator<T extends Comparable<T>> implements Validator<T> {
     }
 
     @Override
-    public T validate(T parameterValue) throws ValidationException {
+    public T validate(T parameterValue, ModelValidatorContext context) throws ValidationException {
         if (!range.contains(parameterValue)) {
             throw new ValidationException("Expected value should be in range " + range.toString() + ", received " +
                                           parameterValue);
