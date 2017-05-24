@@ -34,6 +34,8 @@ import javax.management.*;
 public class SigarDatabaseEventsExposer {
     public void registerMBeans(MBeanServer mbs) throws MalformedObjectNameException, NotCompliantMBeanException,
             InstanceAlreadyExistsException, MBeanRegistrationException {
+
+        // Example of Use: ./proactive-node -Dsigar.fileevents=/tmp,/tmp/test/#.txt -Dsigar.databaseevents.url=jdbc:mysql://localhost:32768/test -Dsigar.databaseevents.user=root -Dsigar.databaseevents.password=proactive -Dsigar.databaseevents.tables=proactive,a -r pnp://172.20.10.2:64738/
         String dbUrl = System.getProperty("sigar.databaseevents.url");
         String dbUser = System.getProperty("sigar.databaseevents.user");
         String dbPassword = System.getProperty("sigar.databaseevents.password");

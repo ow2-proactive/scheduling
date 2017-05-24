@@ -3,6 +3,8 @@ dependencies {
     compile 'org.jvnet.winp:winp:1.24'
     compile 'net.java.dev.jna:jna:4.1.0'
     compile 'commons-io:commons-io:2.5'
+    compile 'org.mariadb.jdbc:mariadb-java-client:2.0.1'
+
 
     compile 'commons-cli:commons-cli:1.3.1'
     compile 'sigar:sigar:1.7.0-proactive'

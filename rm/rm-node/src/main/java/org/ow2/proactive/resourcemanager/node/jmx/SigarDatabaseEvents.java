@@ -68,8 +68,9 @@ public class SigarDatabaseEvents implements SigarDatabaseEventxMXBean {
             stmt.close();
             return count;
         } catch (Exception e) {
-            throw new SigarException("Unable to run the DB Query: " + e.getMessage());
+            e.printStackTrace();
             // TODO            connection.close();
         }
+        return -1;
     }
 }
