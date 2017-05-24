@@ -94,6 +94,12 @@ public class RMStateCaching {
             try {
                 if (rm == null) {
                     rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
+
+                    if (cred_path != null && !(new File(cred_path)).exists()) {
+                        logger.error("Credentials path set in " + PortalConfiguration.RM_CACHE_CREDENTIALS.getKey() +
+                                     " but file " + cred_path + " does not exist");
+                    }
+
                     if (cred_path != null && new File(cred_path).exists()) {
                         Credentials cred = Credentials.getCredentials(cred_path);
                         rm.init(url, cred);
@@ -104,6 +110,7 @@ public class RMStateCaching {
                     }
                 }
             } catch (Exception e) {
+                logger.warn("Could not connect to resource manager at " + url + " retrying in 8 seconds", e);
                 if (rm != null) {
                     PAActiveObject.terminateActiveObject(rm, true);
                     rm = null;

@@ -117,6 +117,11 @@ public class SchedulerStateListener {
             try {
                 scheduler = PAActiveObject.newActive(SchedulerProxyUserInterface.class, new Object[] {});
 
+                if (cred_path != null && !(new File(cred_path)).exists()) {
+                    logger.error("Credentials path set in " + PortalConfiguration.SCHEDULER_CACHE_CREDENTIALS.getKey() +
+                                 " but file " + cred_path + " does not exist");
+                }
+
                 // check is we use a credential file
                 if (cred_path != null && (new File(cred_path)).exists()) {
                     Credentials credential = Credentials.getCredentials(cred_path);
