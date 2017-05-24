@@ -1037,7 +1037,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     public synchronized void jobSubmitted(JobState job) {
         ClientJobState storedJobState = new ClientJobState(job);
         jobsMap.put(job.getId(), storedJobState);
-        sState.getPendingJobs().add(storedJobState);
+        sState.update(storedJobState);
         dispatchJobSubmitted(job);
     }
 
@@ -1047,8 +1047,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         js.update(notification.getData());
         switch (notification.getEventType()) {
             case JOB_PENDING_TO_RUNNING:
-                sState.getPendingJobs().remove(js);
-                sState.getRunningJobs().add(js);
+                sState.pendingToRunning(js);
                 break;
             case JOB_PAUSED:
             case JOB_IN_ERROR:
@@ -1059,20 +1058,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             case TASK_SKIPPED:
                 break;
             case JOB_PENDING_TO_FINISHED:
-                sState.getPendingJobs().remove(js);
-                sState.getFinishedJobs().add(js);
+                sState.pendingToFinished(js);
                 // set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 break;
             case JOB_RUNNING_TO_FINISHED:
-                sState.getRunningJobs().remove(js);
-                sState.getFinishedJobs().add(js);
+                sState.runningToFinished(js);
                 // set this job finished, user can get its result
                 jobs.get(notification.getData().getJobId()).setFinished(true);
                 break;
             case JOB_REMOVE_FINISHED:
                 // removing jobs from the global list : this job is no more managed
-                sState.getFinishedJobs().remove(js);
+                sState.removeFinished(js);
                 jobsMap.remove(js.getId());
                 jobs.remove(notification.getData().getJobId());
                 break;
