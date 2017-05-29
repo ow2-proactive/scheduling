@@ -59,9 +59,108 @@ escape_lhs_sed ()
 
 }
 
+compute-version ()
+{
+    echo $(ls $1/dist/lib/scheduler-server-*.jar | sed "s/^$(escape_lhs_sed $1/dist/lib/scheduler-server-)\(.*\)\.jar$/\1/g")
+
+}
+
+reuse_accounts()
+{
+    echo "Retrieving private/public keys from previous scheduler installation"
+    /bin/cp $OLD_PADIR/config/authentication/keys/*.key $AUTH_ROOT/keys/
+
+    echo "Retrieving accounts from previous scheduler installation"
+    /bin/cp $OLD_PADIR/config/authentication/login.cfg $OLD_PADIR/config/authentication/group.cfg $AUTH_ROOT/
+
+    echo "Retrieving credential files from previous scheduler installation"
+    /bin/cp $OLD_PADIR/config/authentication/*.cred $AUTH_ROOT/
+
+    echo "Retrieving keystore files from previous scheduler installation"
+    /bin/cp $OLD_PADIR/config/web/keystore $PA_ROOT/default/config/web/
+    if [ -f $OLD_PADIR/config/web/truststore ]; then
+        /bin/cp $OLD_PADIR/config/web/truststore $PA_ROOT/default/config/web/
+    fi
+
+    # configure watcher account
+    sed "s/scheduler\.cache\.password=.*/scheduler.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/^.*scheduler\.cache\.credential=.*$/scheduler.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/rm\.cache\.password=.*/rm.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/^.*rm\.cache\.credential=.*$/rm.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+}
+
+ask_admin_password()
+{
+    ADMIN_PWD_ENTERED=false
+    while  ! $ADMIN_PWD_ENTERED ; do
+        read -s -p "Enter ProActive \"admin\" account password: " ADMIN_PWD
+        echo ""
+        read -s -p "Retype \"admin\" account password: " ADMIN_PWD2
+        echo ""
+        if [[ "$ADMIN_PWD" == "$ADMIN_PWD2" ]]; then
+                ADMIN_PWD_ENTERED=true
+        else
+                ADMIN_PWD_ENTERED=false
+                echo "Passwords don't match."
+
+        fi
+    done
+
+}
+generate_new_accounts()
+{
+    # generate random password for internal scheduler accounts
+    echo "Generating random password for internal scheduler accounts."
+    RM_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
+    SCHED_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
+    WATCHER_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
+
+    ask_admin_password
+
+    # generate new private/public key pair
 
 
-echo "This will install the ProActive scheduler as a service."
+    echo "Generating New Private/Public key pair for the scheduler"
+    $PA_ROOT/default/tools/proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
+
+
+    $PA_ROOT/default/tools/proactive-users -U -l admin -p "$ADMIN_PWD"
+    $PA_ROOT/default/tools/proactive-users -U -l rm -p "$RM_PWD"
+    $PA_ROOT/default/tools/proactive-users -U -l scheduler -p "$SCHED_PWD"
+    $PA_ROOT/default/tools/proactive-users -U -l watcher -p "$WATCHER_PWD"
+
+    echo "Generating credential files for ProActive System accounts"
+
+    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l admin -p "$ADMIN_PWD" -o $AUTH_ROOT/admin_user.cred
+    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l scheduler -p "$SCHED_PWD" -o $AUTH_ROOT/scheduler.cred
+    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l rm -p "$RM_PWD" -o $AUTH_ROOT/rm.cred
+    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l watcher -p "$WATCHER_PWD" -o $AUTH_ROOT/watcher.cred
+
+    ( cd $PA_ROOT/default && zip -f dist/lib/rm-node-*.jar config/authentication/rm.cred )
+    ( cd $PA_ROOT/default/dist && zip -f war/rest/node.jar lib/rm-node-*.jar )
+
+    # configure watcher account
+    sed "s/scheduler\.cache\.password=.*/scheduler.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/^.*scheduler\.cache\.credential=.*$/scheduler.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/rm\.cache\.password=.*/rm.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+    sed "s/^.*rm\.cache\.credential=.*$/rm.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+
+    # removing test accounts
+
+    $PA_ROOT/default/tools/proactive-users -D -l demo
+    $PA_ROOT/default/tools/proactive-users -D -l user
+    $PA_ROOT/default/tools/proactive-users -D -l guest
+    $PA_ROOT/default/tools/proactive-users -D -l test
+    $PA_ROOT/default/tools/proactive-users -D -l radmin
+    $PA_ROOT/default/tools/proactive-users -D -l nsadmin
+    $PA_ROOT/default/tools/proactive-users -D -l provider
+    $PA_ROOT/default/tools/proactive-users -D -l test_executor
+
+}
+
+NEW_VERSION=$(compute-version $INSTALL_PADIR)
+
+echo "This will install the ProActive scheduler $NEW_VERSION as a service."
 echo "Once the installer is started, it must process until the end otherwise the installation may be corrupted."
 
 
@@ -128,7 +227,10 @@ else
     # checking the previous installation
     if [ -h "$PA_ROOT/default" ]; then
         OLD_PADIR=$(readlink "$PA_ROOT/default")
+        ln -s -f $OLD_PADIR "$PA_ROOT/previous"
         rm -f $PA_ROOT/default
+    elif [ -h "$PA_ROOT/previous" ]; then
+        OLD_PADIR=$(readlink "$PA_ROOT/previous")
     fi
 fi
 
@@ -172,61 +274,16 @@ chown -R $USER:$GROUP $PA_ROOT/$PA_FOLDER_NAME
 
 echo "ProActive use internal system accounts which should be modified in a production environment."
 
-if confirm "Do you want to modify the internal accounts credentials? [Y/n]" ; then
-
-    # generate random password for internal scheduler accounts
-    echo "Generating random password for internal scheduler accounts."
-    RM_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
-    SCHED_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
-    WATCHER_PWD=$(date +%s | sha256sum | base64 | head -c 32 ; echo)
-
-    ADMIN_PWD_ENTERED=false
-    while  ! $ADMIN_PWD_ENTERED ; do
-        read -s -p "Enter ProActive \"admin\" account password: " ADMIN_PWD
-        echo ""
-        read -s -p "Retype \"admin\" account password: " ADMIN_PWD2
-        echo ""
-        if [[ "$ADMIN_PWD" == "$ADMIN_PWD2" ]]; then
-                ADMIN_PWD_ENTERED=true
-        else
-                ADMIN_PWD_ENTERED=false
-                echo "Passwords don't match."
-
-        fi
-    done
-
-    # generate new private/public key pair
-
-    if [[ "$OLD_PADIR" != "" ]]; then
-        echo "Retrieving private key from previous scheduler installation"
-        cp "$OLD_PADIR/config/authentication/keys/*.key" $AUTH_ROOT/keys/
-    else
-        echo "Generating New Private/Public key pair for the scheduler"
-        $PA_ROOT/default/tools/proactive-key-gen -p "$AUTH_ROOT/keys/priv.key" -P "$AUTH_ROOT/keys/pub.key"
+if [[ "$OLD_PADIR" != "" ]]; then
+{
+    if confirm "Do you want to reuse accounts from the previous version $OLD_PADIR ? [Y/n]" ; then
+        reuse_accounts
+    elif confirm "Do you want to regenerate the internal accounts ? [Y/n]" ; then
+        generate_new_accounts
     fi
-
-
-
-    $PA_ROOT/default/tools/proactive-users.sh -U -l admin -p "$ADMIN_PWD"
-    $PA_ROOT/default/tools/proactive-users.sh -U -l rm -p "$RM_PWD"
-    $PA_ROOT/default/tools/proactive-users.sh -U -l scheduler -p "$SCHED_PWD"
-    $PA_ROOT/default/tools/proactive-users.sh -U -l watcher -p "$WATCHER_PWD"
-
-    echo "Generating credential files for ProActive System accounts"
-
-    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l admin -p "$ADMIN_PWD" -o $AUTH_ROOT/admin_user.cred
-    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l scheduler -p "$SCHED_PWD" -o $AUTH_ROOT/scheduler.cred
-    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l rm -p "$RM_PWD" -o $AUTH_ROOT/rm.cred
-    $PA_ROOT/default/tools/proactive-create-cred  -F $AUTH_ROOT/keys/pub.key -l watcher -p "$WATCHER_PWD" -o $AUTH_ROOT/watcher.cred
-
-    ( cd $PA_ROOT/default && zip -f dist/lib/rm-node-*.jar config/authentication/rm.cred )
-    ( cd $PA_ROOT/default/dist && zip -f war/rest/node.jar lib/rm-node-*.jar )
-
-    # configure watcher account
-    sed "s/scheduler\.cache\.password=.*/scheduler.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-    sed "s/scheduler\.cache\.credential=.*/scheduler.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-    sed "s/rm\.cache\.password=.*/rm.cache.password=/g"  -i "$PA_ROOT/default/config/web/settings.ini"
-    sed "s/rm\.cache\.credential=.*/rm.cache.credential=$(escape_rhs_sed $AUTH_ROOT/watcher.cred)/g"  -i "$PA_ROOT/default/config/web/settings.ini"
+}
+elif confirm "Do you want to regenerate the internal accounts ? [Y/n]" ; then
+    generate_new_accounts
 fi
 
 echo "ProActive can integrate with Linux PAM (Pluggable Authentication Modules) to authenticate users of the linux system."
@@ -241,16 +298,7 @@ if confirm "Do you want to set PAM integration for ProActive scheduler? [y/N] " 
      echo "Groups must still be configured for each user in the $AUTH_ROOT/group.cfg file."
 fi
 
-# removing test accounts
 
-$PA_ROOT/default/tools/proactive-users.sh -D -l demo
-$PA_ROOT/default/tools/proactive-users.sh -D -l user
-$PA_ROOT/default/tools/proactive-users.sh -D -l guest
-$PA_ROOT/default/tools/proactive-users.sh -D -l test
-$PA_ROOT/default/tools/proactive-users.sh -D -l radmin
-$PA_ROOT/default/tools/proactive-users.sh -D -l nsadmin
-$PA_ROOT/default/tools/proactive-users.sh -D -l provider
-$PA_ROOT/default/tools/proactive-users.sh -D -l test_executor
 
 # Configuration of the service script
 
@@ -350,8 +398,6 @@ sed -e "s/^PROTOCOL=.*/PROTOCOL=$PROTOCOL/g" -i "/etc/init.d/proactive-scheduler
 
 if [[ "$PROTOCOL" == "https" ]]; then
     sed -e "s/^web\.https=.*/web.https=true/g" -i "$PA_ROOT/default/config/web/settings.ini"
-    sed -e "s/http:/https:/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
-    sed -e "s/http:/https:/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
     if $SELF_SIGNED; then
         sed -e "s/^#web\.https\.keystore=\(.*\)/web.https.keystore=\1/g" -i "$PA_ROOT/default/config/web/settings.ini"
         sed -e "s/^#web\.https\.keystore\.password=\(.*\)/web.https.keystore.password=\1/g" -i "$PA_ROOT/default/config/web/settings.ini"
@@ -374,8 +420,14 @@ if [[ "$PROTOCOL" == "https" ]]; then
 else
     sed -e "s/^web\.http\.port=.*/web.http.port=$PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
 fi
-sed -e "s/:8080/:${PORT}/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
-sed -e "s/:8080/:${PORT}/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
+
+for file in $( find dist/war -name 'application.properties' ); do
+    sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/$file"
+done
+
+sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
+sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"
+
 sed -e "s/^NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"
 sed -e "s/^PA_ROOT=.*/PA_ROOT=$(escape_rhs_sed "$PA_ROOT")/g" -i "/etc/init.d/proactive-scheduler"
 
@@ -445,6 +497,14 @@ if which git > /dev/null 2>&1; then
     git init
     git config user.email "support@activeeon.com"
     git config user.name "proactive"
+    echo '
+authentication/*.cred
+authentication/login.cfg
+authentication/group.cfg
+authentication/keys/*.key
+web/keystore
+web/truststore
+    ' > .gitignore
     git add -A .
     git commit -m "Initial Commit for $PA_FOLDER_NAME"
     git tag -a "root" -m "Root commit"
@@ -502,13 +562,21 @@ else
 fi
 
 if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
-   # display the list of addons in the new installation
-   echo ""
-   echo "Here is the list of JAR files in the new installation 'addons' folder."
-   echo "If there are duplicates, you need to manually remove outdated versions."
-   echo ""
 
-   ls -l $PA_ROOT/default/addons/*.jar
+
+    if [[ "$OLD_PADIR" != "" ]]; then
+        OLD_VERSION=$(compute-version $OLD_PADIR)
+        if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
+           rm -f  $PA_ROOT/default/addons/*$OLD_VERSION.jar
+        fi
+    fi
+    # display the list of addons in the new installation
+    echo ""
+    echo "Here is the list of JAR files in the new installation 'addons' folder."
+    echo "If there are duplicates, you need to manually remove outdated versions."
+    echo ""
+
+    ls -l $PA_ROOT/default/addons/*.jar
 fi
 
 if [[ "$OLD_PADIR" != "" ]]; then
@@ -526,6 +594,8 @@ echo "Resource Manager credentials are used by remote ProActive Agents to regist
 echo "If you plan to use ProActive Agents, please replace in their respective \"schedworker\" folder the following files taken from the server installation:"
 ls $PA_ROOT/default/config/authentication/rm.cred
 ls $PA_ROOT/default/dist/lib/rm-node*.jar
+
+systemctl daemon-reload
 
 if  ! $CONFLICT ; then
     if confirm "Do you want to start the scheduler service now? [Y/n] " ; then
