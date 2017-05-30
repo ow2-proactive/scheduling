@@ -167,6 +167,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Max number of threads in the core for cleaning nodes after computations */
     RM_CLEANING_MAX_THREAD_NUMBER("pa.rm.cleaning.maxthreadnumber", PropertyType.INTEGER, "5"),
 
+    /** Max number of lines stored from the infrastructure processes output */
+    RM_INFRASTRUCTURE_PROCESS_OUTPUT_MAX_LINES("pa.rm.infrastructure.process.output.maxlines", PropertyType.INTEGER, "2000"),
+
     /** Path to the Resource Manager credentials for adding local nodes */
     RM_CREDS("pa.rm.credentials", PropertyType.STRING, "config/authentication/rm.cred"),
 

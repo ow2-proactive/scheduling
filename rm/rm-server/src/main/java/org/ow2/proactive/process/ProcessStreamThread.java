@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 
 public class ProcessStreamThread extends Thread {
@@ -47,6 +48,10 @@ public class ProcessStreamThread extends Thread {
 
     private final boolean saveOutput;
 
+    private final int maxLines = PAResourceManagerProperties.RM_INFRASTRUCTURE_PROCESS_OUTPUT_MAX_LINES.getValueAsInt();
+
+    private volatile long storedLines = 0;
+
     private List<String> output;
 
     public ProcessStreamThread(InputStream stream, String outputPrefix, boolean printOutput, boolean saveOutput) {
@@ -56,7 +61,7 @@ public class ProcessStreamThread extends Thread {
         this.printOutput = printOutput;
         this.saveOutput = saveOutput;
         if (saveOutput) {
-            output = new ArrayList<>();
+            output = new ArrayList<>(maxLines);
         }
     }
 
@@ -69,9 +74,10 @@ public class ProcessStreamThread extends Thread {
                 if (printOutput) {
                     System.out.println(outputLine);
                 }
-                if (saveOutput) {
+                if (saveOutput && storedLines < maxLines) {
                     synchronized (output) {
                         output.add(line);
+                        storedLines++;
                     }
                 }
             }
