@@ -35,6 +35,7 @@ import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -44,6 +45,7 @@ import org.mockito.stubbing.Answer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.runtime.VMInformation;
+import org.ow2.proactive.junitUtils.TimedOutTestsRunner;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -68,6 +70,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.python.google.common.collect.ImmutableSet;
 
 
+@RunWith(TimedOutTestsRunner.class)
 public class LiveJobsTest {
 
     private LiveJobs liveJobs;
@@ -84,7 +87,7 @@ public class LiveJobsTest {
         liveJobs = new LiveJobs(dbManager, listener);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testPriorityConflict() throws Exception {
         TreeSet<JobPriority> scheduled = createTreeSet(JobPriority.LOW);
         TreeSet<JobPriority> notScheduled = createTreeSet(JobPriority.HIGHEST);
@@ -141,12 +144,12 @@ public class LiveJobsTest {
         return new TreeSet<>(ImmutableSet.copyOf(priorities));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testGetRunningTasksEmpty() {
         assertThat(liveJobs.getRunningTasks().isEmpty(), is(true));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testJobSubmitted() {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -158,7 +161,7 @@ public class LiveJobsTest {
         Mockito.verify(listener, Mockito.times(1)).jobSubmitted(Matchers.any(ClientJobState.class));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testFinishInErrorTask() throws UnknownTaskException, UnknownJobException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -197,7 +200,7 @@ public class LiveJobsTest {
         assertThat(internalTask.getStatus(), is(TaskStatus.FINISHED));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testFinishInErrorTaskDoesNotFinishPausedTask() throws UnknownTaskException, UnknownJobException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -216,7 +219,7 @@ public class LiveJobsTest {
         assertThat(internalTask.getStatus(), is(TaskStatus.PAUSED));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testFinishInErrorTaskDoesNotFinishPendingTask() throws UnknownTaskException, UnknownJobException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -235,7 +238,7 @@ public class LiveJobsTest {
         assertThat(internalTask.getStatus(), is(TaskStatus.PENDING));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testPauseJob() {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -251,7 +254,7 @@ public class LiveJobsTest {
         assertThat(liveJobs.pauseJob(id), is(true));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testUpdateStartAt() {
         String startAt = "2017-07-07T00:00:00+01:00";
         InternalJob job = new InternalTaskFlowJob("test-name",
@@ -268,7 +271,7 @@ public class LiveJobsTest {
         assertThat(liveJobs.updateStartAt(id, startAt), is(true));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testResumeUnstartedJob() {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -284,7 +287,7 @@ public class LiveJobsTest {
         assertThat(liveJobs.resumeJob(id), is(false));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testResumeStartedJob() throws UnknownJobException, UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -302,7 +305,7 @@ public class LiveJobsTest {
         assertThat(liveJobs.resumeJob(id), is(true));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testLockJobsToSchedule() throws UnknownJobException, UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -320,7 +323,7 @@ public class LiveJobsTest {
         assertThat(liveJobs.lockJobsToSchedule().size(), is(1));
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalStateException.class, timeout = 60000)
     public void testRestartTaskOnNodeFailureRunningExceptionExpectedBecauseNotLockedTask()
             throws UnknownJobException, UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
@@ -339,7 +342,7 @@ public class LiveJobsTest {
         liveJobs.restartTaskOnNodeFailure(internalTask);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testRestartTaskOnNodeRunningDecreasingExecution() throws UnknownJobException, UnknownTaskException {
 
         PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.updateProperty("5");
@@ -373,7 +376,7 @@ public class LiveJobsTest {
         Mockito.verify(dbManager, Mockito.times(1)).taskRestarted(job, internalTask, null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testRestartTaskOnNodeRunning0ExecutionsLeft() throws UnknownJobException, UnknownTaskException {
 
         PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.updateProperty("0");
@@ -404,7 +407,7 @@ public class LiveJobsTest {
         Mockito.verify(dbManager, Mockito.times(0)).taskRestarted(job, internalTask, null);
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testCanPingTask() throws UnknownJobException, UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -427,7 +430,7 @@ public class LiveJobsTest {
         assertThat(liveJobs.canPingTask(liveJobs.getRunningTasks().iterator().next()), is(true));
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testTaskTerminatedWithResultSuspendTaskOnError() throws UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -465,7 +468,7 @@ public class LiveJobsTest {
 
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testTaskTerminatedWithResultSuspendTaskOnErrorLastExecution() throws UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -503,7 +506,7 @@ public class LiveJobsTest {
 
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testTaskTerminatedWithResultPauseJobOnError() throws UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -556,7 +559,7 @@ public class LiveJobsTest {
 
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testTaskTerminatedWithResultCancelJobOnError() throws UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
@@ -593,7 +596,7 @@ public class LiveJobsTest {
 
     }
 
-    @Test
+    @Test(timeout = 60000)
     public void testTaskTerminatedWithResultContinueJobOnError() throws UnknownTaskException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
