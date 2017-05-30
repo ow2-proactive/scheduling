@@ -32,9 +32,10 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -77,7 +78,7 @@ public class DataSpaceServiceStarter implements Serializable {
 
     private static final String DEFAULT_LOCAL_SCRATCH = DEFAULT_LOCAL + File.separator + "scratch";
 
-    private static HashMap<String, HashSet<String>> spacesConfigurations = new HashMap<>();
+    private static Map<String, HashSet<String>> spacesConfigurations = new ConcurrentHashMap<>();
 
     /**
      * Naming service
@@ -308,6 +309,17 @@ public class DataSpaceServiceStarter implements Serializable {
 
         spacesConfigurations.get(appID).add(spaceConf.getName());
         logger.debug("Space " + name + " for appid = " + appID + " with urls = " + finalurls + " registered");
+
+    }
+
+    public void removeSpace(String applicationId) {
+        try {
+            namingService.unregisterApplication(applicationId);
+        } catch (Exception e) {
+        }
+
+        spacesConfigurations.remove(applicationId);
+        logger.debug("Data Spaces for appid = " + applicationId + " unregistered");
 
     }
 

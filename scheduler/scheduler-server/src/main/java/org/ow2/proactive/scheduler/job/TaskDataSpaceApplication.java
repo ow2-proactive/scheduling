@@ -209,10 +209,7 @@ public class TaskDataSpaceApplication implements Serializable {
     }
 
     public void terminateDataSpaceApplication() {
-        try {
-            namingService.unregisterApplication(applicationId);
-        } catch (Exception e) {
-        }
+        DataSpaceServiceStarter.getDataSpaceServiceStarter().removeSpace(applicationId);
     }
 
     /**
