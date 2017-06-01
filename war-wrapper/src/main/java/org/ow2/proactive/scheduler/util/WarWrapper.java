@@ -113,6 +113,9 @@ public enum WarWrapper {
         SchedulerStarter.setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
         schedHome = System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey());
 
+        PASchedulerProperties.SCHEDULER_HOME.updateProperty(schedHome);
+        CentralPAPropertyRepository.PA_HOME.setValue(schedHome);
+
         SchedulerStarter.setPropIfNotAlreadySet(PASchedulerProperties.SCHEDULER_HOME.getKey(), schedHome);
         SchedulerStarter.setPropIfNotAlreadySet(PAResourceManagerProperties.RM_HOME.getKey(), schedHome);
         SchedulerStarter.setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
