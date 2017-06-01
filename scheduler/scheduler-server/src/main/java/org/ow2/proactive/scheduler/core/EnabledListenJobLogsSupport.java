@@ -87,7 +87,9 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     synchronized void cleanLoggers(JobId jobId) {
         jobsToBeLogged.remove(jobId);
         jlogger.debug(jobId, "cleaning loggers");
-        lfs.removeAllAppenders(Log4JTaskLogs.getLoggerName(jobId));
+        String loggerName = Log4JTaskLogs.getLoggerName(jobId);
+        lfs.removeAllAppenders(loggerName);
+        lfs.removeLogger(loggerName);
     }
 
     @Override

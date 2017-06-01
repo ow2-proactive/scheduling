@@ -25,22 +25,15 @@
  */
 package org.ow2.proactive.scheduler.common.util.logforwarder;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Hashtable;
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.Category;
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.RootLogger;
 
 
 public class LoggingEventProcessor {
-
-    public static final Logger logger = Logger.getLogger(LoggingEventProcessor.class);
 
     NoWarningHierarchy h = new NoWarningHierarchy();
 
@@ -50,6 +43,9 @@ public class LoggingEventProcessor {
 
     public void removeAllAppenders(String loggerName) {
         h.getLogger(loggerName).removeAllAppenders();
+    }
+
+    public void removeLogger(String loggerName) {
         h.removeLogger(loggerName);
     }
 
@@ -68,29 +64,12 @@ public class LoggingEventProcessor {
 
     private static class NoWarningHierarchy extends Hierarchy {
 
-        private Hashtable loggersTable;
-
         public NoWarningHierarchy() {
             super(new RootLogger(Level.ALL));
-
-            initLoggersTable();
-        }
-
-        private void initLoggersTable() {
-            try {
-                Field ht = Hierarchy.class.getDeclaredField("ht");
-                ht.setAccessible(true);
-                loggersTable = (Hashtable) ht.get(this);
-
-            } catch (Exception e) {
-                logger.warn("Unable to access Log4J logger table, logger removal will be disabled", e);
-            }
         }
 
         public void removeLogger(String loggerName) {
-            if (loggersTable != null) {
-                loggersTable.remove(loggerName);
-            }
+            Log4JRemover.removeLogger(loggerName, this);
         }
 
         @Override
