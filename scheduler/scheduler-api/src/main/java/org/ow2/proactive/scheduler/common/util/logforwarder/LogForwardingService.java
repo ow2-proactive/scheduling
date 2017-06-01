@@ -105,6 +105,7 @@ public final class LogForwardingService {
      */
     public final synchronized void terminate() throws LogForwardingException {
         this.loggingEventProcessor.removeAllAppenders();
+        this.loggingEventProcessor.shutdown();
         this.serverConnection = null;
         this.initialized = false;
         this.provider.terminateServer();
