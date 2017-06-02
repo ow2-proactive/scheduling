@@ -93,8 +93,7 @@ public class TaskLogger {
     private Logger createLog4jLogger(TaskId taskId) {
         LogLog.setQuietMode(true); // error about log should not be logged
 
-        Logger tempLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + taskId.getJobId() + "." +
-                                             taskId.value());
+        Logger tempLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + taskId.toString());
         tempLogger.setLevel(Log4JTaskLogs.STDOUT_LEVEL);
         tempLogger.setAdditivity(false);
 

@@ -33,6 +33,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Appender;
@@ -170,5 +172,18 @@ public class TaskLoggerTest {
 
         assertEquals(logAppender.getName(), new TaskLoggerRelativePathGenerator(taskId).getFileName());
 
+    }
+
+    @Test
+    public void multipleRemoveLoggers() throws Exception {
+        List<TaskLogger> loggers = new ArrayList<>(1000);
+        for (int i = 0; i < 1000; i++) {
+            loggers.add(new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", i), "myhost"));
+        }
+
+        for (int i = 0; i < 1000; i++) {
+            loggers.get(i).close();
+            assertNull(LogManager.exists(loggers.get(i).getName()));
+        }
     }
 }
