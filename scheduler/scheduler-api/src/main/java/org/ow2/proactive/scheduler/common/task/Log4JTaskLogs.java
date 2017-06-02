@@ -57,7 +57,7 @@ public class Log4JTaskLogs implements TaskLogs {
     private static final long serialVersionUID = 1L;
 
     /** Prefix for job logger */
-    public static final String JOB_LOGGER_PREFIX = "logger.scheduler.";
+    public static final String JOB_LOGGER_PREFIX = "schedulerloggers";
 
     public static final String MDC_JOB_ID = "job.id";
 
