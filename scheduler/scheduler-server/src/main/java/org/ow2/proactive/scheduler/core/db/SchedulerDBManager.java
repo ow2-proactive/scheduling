@@ -853,19 +853,20 @@ public class SchedulerDBManager {
         });
     }
 
-    public InternalJob loadJobWithTasksIfNotRemoved(final JobId id) {
-        return executeReadOnlyTransaction(new SessionWork<InternalJob>() {
+    public List<InternalJob> loadJobWithTasksIfNotRemoved(final JobId... jobIds) {
+        return executeReadOnlyTransaction(new SessionWork<List<InternalJob>>() {
             @Override
-            public InternalJob doInTransaction(Session session) {
+            public List<InternalJob> doInTransaction(Session session) {
                 Query jobQuery = session.getNamedQuery("loadJobDataIfNotRemoved").setReadOnly(true);
 
-                List<InternalJob> result = new ArrayList<>();
-                batchLoadJobs(session, false, jobQuery, Collections.singletonList(jobId(id)), result);
-                if (result.isEmpty()) {
-                    return null;
-                } else {
-                    return result.get(0);
+                List<Long> ids = new ArrayList<>(jobIds.length);
+                for (JobId jobId : jobIds) {
+                    ids.add(jobId(jobId));
                 }
+
+                List<InternalJob> result = new ArrayList<>();
+                batchLoadJobs(session, false, jobQuery, ids, result);
+                return result;
             }
 
         });

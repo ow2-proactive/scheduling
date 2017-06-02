@@ -26,7 +26,9 @@
 package org.ow2.proactive.scheduler.task;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -34,8 +36,10 @@ import java.io.StringWriter;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -52,11 +56,20 @@ public class TaskLoggerTest {
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
+    private TaskLogger taskLogger;
+
+    @After
+    public void removeLogger() {
+        if (taskLogger != null) {
+            taskLogger.close();
+            assertNull(LogManager.exists(taskLogger.getName()));
+        }
+    }
+
     @Test
     public void printAndGetLogs() throws Exception {
 
-        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L),
-                                               "myhost");
+        taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L), "myhost");
 
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
@@ -71,8 +84,7 @@ public class TaskLoggerTest {
 
     @Test
     public void logStreaming() throws Exception {
-        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L),
-                                               "myhost");
+        taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L), "myhost");
 
         final StringWriter stringAppender = new StringWriter();
         AppenderProvider stringAppenderProvider = new AppenderProvider() {
@@ -99,8 +111,7 @@ public class TaskLoggerTest {
 
     @Test
     public void getStoredLogs() throws Exception {
-        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L),
-                                               "myhost");
+        taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L), "myhost");
 
         final StringWriter stringAppender = new StringWriter();
         AppenderProvider stringAppenderProvider = new AppenderProvider() {
@@ -122,7 +133,7 @@ public class TaskLoggerTest {
     @Test
     public void logPattern() throws Exception {
         TaskId taskId = TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L);
-        TaskLogger taskLogger = new TaskLogger(taskId, "myhost");
+        taskLogger = new TaskLogger(taskId, "myhost");
 
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
@@ -147,7 +158,7 @@ public class TaskLoggerTest {
     public void createFileAppenderTest() throws Exception {
         JobId jobid = new JobIdImpl(1000, "job");
         TaskId taskId = TaskIdImpl.createTaskId(jobid, "task", 42L);
-        TaskLogger taskLogger = new TaskLogger(taskId, "myhost");
+        taskLogger = new TaskLogger(taskId, "myhost");
 
         File logFolder = tempFolder.newFolder("logfolder");
 

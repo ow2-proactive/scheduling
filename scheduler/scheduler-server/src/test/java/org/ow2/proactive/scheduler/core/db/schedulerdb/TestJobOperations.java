@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,7 +51,9 @@ public class TestJobOperations extends BaseSchedulerDBTest {
 
         InternalJob job = defaultSubmitJob(jobDef, "user1");
 
-        job = dbManager.loadJobWithTasksIfNotRemoved(job.getId());
+        List<InternalJob> jobs = dbManager.loadJobWithTasksIfNotRemoved(job.getId());
+        Assert.assertEquals(1, jobs.size());
+        job = jobs.get(0);
         Assert.assertEquals(3, job.getTasks().size());
         Assert.assertEquals("user1", job.getOwner());
         Assert.assertEquals(3, job.getJobInfo().getTotalNumberOfTasks());
@@ -61,9 +64,9 @@ public class TestJobOperations extends BaseSchedulerDBTest {
         Assert.assertEquals(JobPriority.HIGHEST, job.getJobInfo().getPriority());
 
         dbManager.removeJob(job.getId(), System.currentTimeMillis(), false);
-        Assert.assertNull(dbManager.loadJobWithTasksIfNotRemoved(job.getId()));
+        Assert.assertTrue(dbManager.loadJobWithTasksIfNotRemoved(job.getId()).isEmpty());
 
-        Assert.assertNull(dbManager.loadJobWithTasksIfNotRemoved(JobIdImpl.makeJobId("123456789")));
+        Assert.assertTrue(dbManager.loadJobWithTasksIfNotRemoved(JobIdImpl.makeJobId("123456789")).isEmpty());
     }
 
     @Test

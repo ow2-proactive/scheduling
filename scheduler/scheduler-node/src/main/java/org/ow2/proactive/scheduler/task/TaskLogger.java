@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
+import org.ow2.proactive.scheduler.common.util.logforwarder.Log4JRemover;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.common.util.logforwarder.appenders.AsyncAppenderWithStorage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.util.LoggingOutputStream;
@@ -72,13 +73,18 @@ public class TaskLogger {
 
     private final AtomicBoolean loggersActivated = new AtomicBoolean(false);
 
+    private final Logger taskLogger;
+
+    private final String name;
+
     public TaskLogger(TaskId taskId, String hostname) {
         logger.debug("Create task logger");
 
         this.taskId = taskId;
         this.hostname = hostname;
 
-        Logger taskLogger = createLog4jLogger(taskId);
+        taskLogger = createLog4jLogger(taskId);
+        name = taskLogger.getName();
 
         outputSink = new PrintStream(new LoggingOutputStream(taskLogger, Log4JTaskLogs.STDOUT_LEVEL), true);
         errorSink = new PrintStream(new LoggingOutputStream(taskLogger, Log4JTaskLogs.STDERR_LEVEL), true);
@@ -87,18 +93,18 @@ public class TaskLogger {
     private Logger createLog4jLogger(TaskId taskId) {
         LogLog.setQuietMode(true); // error about log should not be logged
 
-        Logger taskLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + taskId.getJobId() + "." +
+        Logger tempLogger = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + taskId.getJobId() + "." +
                                              taskId.value());
-        taskLogger.setLevel(Log4JTaskLogs.STDOUT_LEVEL);
-        taskLogger.setAdditivity(false);
+        tempLogger.setLevel(Log4JTaskLogs.STDOUT_LEVEL);
+        tempLogger.setAdditivity(false);
 
         resetLogContextForImmediateService();
 
-        taskLogger.removeAllAppenders();
+        tempLogger.removeAllAppenders();
 
         taskLogAppender = new AsyncAppenderWithStorage(getLogMaxSize(taskId));
-        taskLogger.addAppender(taskLogAppender);
-        return taskLogger;
+        tempLogger.addAppender(taskLogAppender);
+        return tempLogger;
     }
 
     private int getLogMaxSize(TaskId taskId) {
@@ -114,6 +120,10 @@ public class TaskLogger {
             }
         }
         return logMaxSize;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public TaskLogs getLogs() {
@@ -215,6 +225,9 @@ public class TaskLogger {
                 if (taskLogAppender != null) {
                     taskLogAppender.close();
                 }
+
+                taskLogger.removeAllAppenders();
+                Log4JRemover.removeLogger(name);
                 logger.debug("Task logger closed");
             }
         }
