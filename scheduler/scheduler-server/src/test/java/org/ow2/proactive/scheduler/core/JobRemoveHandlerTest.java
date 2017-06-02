@@ -28,6 +28,9 @@ package org.ow2.proactive.scheduler.core;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -85,7 +88,7 @@ public class JobRemoveHandlerTest {
         Mockito.when(infrastructure.getDBManager()).thenReturn(dbManager);
         Mockito.when(infrastructure.getRMProxiesManager()).thenReturn(rmProxiesManager);
         Mockito.when(rmProxiesManager.getRmUrl()).thenReturn(null);
-        Mockito.when(dbManager.loadJobWithTasksIfNotRemoved(jobId)).thenReturn(job);
+        Mockito.when(dbManager.loadJobWithTasksIfNotRemoved(jobId)).thenReturn(Collections.singletonList(job));
         Mockito.when(job.getJobInfo()).thenReturn(jobInfo);
         service = new SchedulingService(infrastructure, listener, null, policyClassName, schedulingMethod);
         jobRemoveHandler = new JobRemoveHandler(service, jobId);
@@ -105,7 +108,7 @@ public class JobRemoveHandlerTest {
 
     @Test
     public void testJobAlreadyRemoved() {
-        Mockito.when(dbManager.loadJobWithTasksIfNotRemoved(jobId)).thenReturn(null);
+        Mockito.when(dbManager.loadJobWithTasksIfNotRemoved(jobId)).thenReturn(new ArrayList<InternalJob>());
         boolean removed = jobRemoveHandler.call();
         assertThat(removed, is(false));
     }
