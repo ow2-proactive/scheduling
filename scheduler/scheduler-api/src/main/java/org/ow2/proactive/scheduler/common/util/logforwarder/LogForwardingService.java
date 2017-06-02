@@ -68,7 +68,7 @@ public final class LogForwardingService {
     }
 
     public void removeLogger(String loggerName) {
-        loggingEventProcessor.removeAllAppenders(loggerName);
+        loggingEventProcessor.removeLogger(loggerName);
     }
 
     /**
