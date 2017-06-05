@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.common.util.logforwarder;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.LogManager;
@@ -76,12 +77,36 @@ public class Log4JRemover {
 
             Object key = categoryKeyConstructor.newInstance(name);
 
+            Logger logger;
             synchronized (ht) {
-                ht.remove(key);
+                // remove the logger entry and inside all its parents reference
+                logger = (Logger) ht.remove(key);
+                if (logger != null) {
+                    String parentLogger = null;
+                    while ((parentLogger = getParentLogger(name)) != null) {
+                        key = categoryKeyConstructor.newInstance(parentLogger);
+                        Vector categoryEntries = (Vector) ht.get(key);
+                        categoryEntries.remove(logger);
+                        if (categoryEntries.isEmpty()) {
+                            // remove the parent category if empty
+                            ht.remove(key);
+                        }
+                        name = parentLogger;
+                    }
+                }
             }
 
         } catch (Exception e) {
             logger.warn("Unable to access Log4J logger table, logger removal will be disabled", e);
         }
+    }
+
+    private static String getParentLogger(String loggerName) {
+        if (loggerName.indexOf(".") >= 0) {
+            return loggerName.substring(0, loggerName.lastIndexOf("."));
+        } else {
+            return null;
+        }
+
     }
 }

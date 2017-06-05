@@ -46,6 +46,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -185,5 +186,6 @@ public class TaskLoggerTest {
             loggers.get(i).close();
             assertNull(LogManager.exists(loggers.get(i).getName()));
         }
+        assertNull(LogManager.exists(Log4JTaskLogs.getLoggerName("" + 1000)));
     }
 }

@@ -864,7 +864,7 @@ public class SchedulerDBManager {
                     ids.add(jobId(jobId));
                 }
 
-                List<InternalJob> result = new ArrayList<>();
+                List<InternalJob> result = new ArrayList<>(jobIds.length);
                 batchLoadJobs(session, false, jobQuery, ids, result);
                 return result;
             }
