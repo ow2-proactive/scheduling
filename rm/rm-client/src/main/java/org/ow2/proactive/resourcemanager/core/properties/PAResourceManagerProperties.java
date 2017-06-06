@@ -167,6 +167,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Max number of threads in the core for cleaning nodes after computations */
     RM_CLEANING_MAX_THREAD_NUMBER("pa.rm.cleaning.maxthreadnumber", PropertyType.INTEGER, "5"),
 
+    /** Maximum node history period in seconds (Default: disabled) */
+    RM_HISTORY_MAX_PERIOD("pa.rm.history.maxperiod", PropertyType.INTEGER),
+
+    /** Frequency of node history removal (cron expression) */
+    RM_HISTORY_REMOVAL_CRONPERIOD("pa.rm.history.removal.cronperiod", PropertyType.STRING, "*/10 * * * *"),
+
     /** Max number of lines stored from the infrastructure processes output */
     RM_INFRASTRUCTURE_PROCESS_OUTPUT_MAX_LINES("pa.rm.infrastructure.process.output.maxlines", PropertyType.INTEGER, "2000"),
 

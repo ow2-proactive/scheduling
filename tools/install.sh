@@ -376,14 +376,15 @@ NB_NODES=$(trim "$NB_NODES")
 
 echo "The ProActive server can automatically remove from its database old jobs. This feature also remove the associated job logs from the file system."
 
-if confirm "Do you want to enable automatic job removal? [Y/n] " ; then
-     read -e -p "Remove jobs older than (in days) [30]: " -i "30" JOB_CLEANUP_DAYS
+if confirm "Do you want to enable automatic job/node history removal? [Y/n] " ; then
+     read -e -p "Remove history older than (in days) [30]: " -i "30" JOB_CLEANUP_DAYS
      JOB_CLEANUP_DAYS=$(trim "$JOB_CLEANUP_DAYS")
      JOB_CLEANUP_SECONDS=$((JOB_CLEANUP_DAYS*24*3600))
 
      # Configure the scheduler to remove jobs
      sed "s/pa\.scheduler\.core\.automaticremovejobdelay=.*/pa.scheduler.core.automaticremovejobdelay=$JOB_CLEANUP_SECONDS/g"  -i "$PA_ROOT/default/config/scheduler/settings.ini"
      sed "s/pa\.scheduler\.job\.removeFromDataBase=.*/pa.scheduler.job.removeFromDataBase=true/g"  -i "$PA_ROOT/default/config/scheduler/settings.ini"
+     sed "s/^#pa\.rm\.history\.maxperiod=.*/pa.rm.history.maxperiod=$JOB_CLEANUP_SECONDS/g"  -i "$PA_ROOT/default/config/rm/settings.ini"
 
      # Cleanup extra log files older than the given period
      if [[ $(grep -c "$PA_ROOT/default/logs" /etc/crontab) == 0 ]]; then
