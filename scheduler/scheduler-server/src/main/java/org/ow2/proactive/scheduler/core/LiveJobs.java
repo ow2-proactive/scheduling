@@ -346,7 +346,9 @@ class LiveJobs {
     void unlockJobsToSchedule(Collection<JobDescriptor> jobDescriptors) {
         for (JobDescriptor desc : jobDescriptors) {
             JobData jobData = checkJobAccess(desc.getJobId());
-            jobData.unlock();
+            if (jobData != null) {
+                jobData.unlock();
+            }
         }
     }
 
@@ -466,7 +468,10 @@ class LiveJobs {
     }
 
     void taskStarted(InternalJob job, InternalTask task, TaskLauncher launcher) {
-        checkJobAccess(job.getId());
+        JobData jobData = checkJobAccess(job.getId());
+        if (jobData == null) {
+            throw new IllegalStateException("Job " + job.getId() + " does not exist");
+        }
         if (runningTasksData.containsKey(TaskIdWrapper.wrap(task.getId()))) {
             throw new IllegalStateException("Task is already started");
         }
@@ -1054,7 +1059,8 @@ class LiveJobs {
     private JobData checkJobAccess(JobId jobId) {
         JobData jobData = jobs.get(jobId);
         if (jobData == null) {
-            throw new IllegalArgumentException("Unknown job: " + jobId);
+            logger.warn("Job " + jobId + " does not exist or has been removed.");
+            return null;
         }
         if (!jobData.jobLock.isHeldByCurrentThread()) {
             throw new IllegalThreadStateException("Thread doesn't hold lock for job " + jobId);
