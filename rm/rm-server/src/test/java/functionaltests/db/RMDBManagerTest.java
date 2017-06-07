@@ -27,15 +27,24 @@ package functionaltests.db;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.security.auth.AuthPermission;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.MutableInteger;
+import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.core.history.LockHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
@@ -49,7 +58,29 @@ import com.google.common.collect.Sets;
  */
 public class RMDBManagerTest {
 
+    private static final String NODE_SOURCE_NAME_BASE = "NodeSourceName";
+
+    private static final String NODE_SOURCE_POLICY = "PolicyType";
+
+    private static final String NODE_NAME_BASE = "RMNodeData";
+
+    private static final String NODE_URL = "pnp://XXX.XXX.X.XXX:ZZZZZ/";
+
+    private static final NodeState NODE_STATE_BASE = NodeState.FREE;
+
+    private static final long STATE_CHANGE_TIME_BASE = 1234;
+
+    private static final UniqueID OWNER_ID = new UniqueID("ownerId");
+
+    private static final String PERMISSION_NAME = "read,write";
+
     private RMDBManager dbManager;
+
+    private NodeSourceData nodeSourceData;
+
+    private Client owner;
+
+    private Permission permission;
 
     @Before
     public void setUp() {
@@ -57,6 +88,11 @@ public class RMDBManagerTest {
         PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.updateProperty("10000");
 
         dbManager = RMDBManager.createInMemoryRMDBManager();
+        addNodeSourceData();
+
+        owner = new Client();
+        owner.setId(OWNER_ID);
+        permission = new AuthPermission(PERMISSION_NAME);
     }
 
     @After
@@ -136,6 +172,167 @@ public class RMDBManagerTest {
             }
 
             entries.put(nodeSourceName, i);
+        }
+        return entries;
+    }
+
+    @Test
+    public void testAddRMNodeData() {
+
+        RMNodeData d = addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
+
+        Collection<RMNodeData> allNodes = dbManager.getAllNodes();
+        assertThat(allNodes).hasSize(1);
+
+        for (RMNodeData node : allNodes) {
+            assertThat(node.getName()).isEqualTo(NODE_NAME_BASE);
+            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getState()).isEqualTo(NODE_STATE_BASE);
+            assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
+            assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+        }
+    }
+
+    @Test
+    public void testUpdateRMNodeData() {
+
+        RMNodeData rmNodeData = addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
+        rmNodeData.setState(NodeState.BUSY);
+        rmNodeData.setStateChangeTime(5678);
+        dbManager.updateNode(rmNodeData);
+
+        Collection<RMNodeData> allNodes = dbManager.getAllNodes();
+        assertThat(allNodes).hasSize(1);
+
+        for (RMNodeData node : allNodes) {
+            assertThat(node.getName()).startsWith(NODE_NAME_BASE);
+            assertThat(node.getName()).isEqualTo(NODE_NAME_BASE);
+            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getState()).isEqualTo(NodeState.BUSY);
+            assertThat(node.getStateChangeTime()).isEqualTo(5678);
+            assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+        }
+    }
+
+    @Test
+    public void testAddAllRMNodeData() {
+
+        Map<String, RMNodeData> rmNodeDataEntries = addNRMNodeData(10);
+
+        Collection<RMNodeData> allNodes = dbManager.getAllNodes();
+        assertThat(allNodes).hasSize(10);
+
+        for (RMNodeData node : allNodes) {
+            assertThat(node.getName()).startsWith(NODE_NAME_BASE);
+            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getState()).isEqualTo(NODE_STATE_BASE);
+            assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
+            assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+        }
+    }
+
+    @Test
+    public void testRemoveRMNodeData() {
+
+        addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
+        dbManager.removeNode(NODE_NAME_BASE);
+
+        Collection<RMNodeData> allNodes = dbManager.getAllNodes();
+        assertThat(allNodes).hasSize(0);
+    }
+
+    @Test
+    public void testGetRMNodeDataByNodeSource() {
+
+        RMNodeData rmNodeData1 = addRMNodeData(NODE_NAME_BASE + "1", NODE_STATE_BASE);
+
+        // Add another RMNodeData with another NodeSourceData
+        RMNodeData rmNodeData2 = new RMNodeData(NODE_NAME_BASE + "2",
+                                                NODE_URL,
+                                                null,
+                                                null,
+                                                NODE_STATE_BASE,
+                                                STATE_CHANGE_TIME_BASE);
+        NodeSourceData newNodeSourceData = new NodeSourceData();
+        newNodeSourceData.setName("anotherNodeSourceName");
+        newNodeSourceData.setPolicyType("aPolicyType");
+        dbManager.addNodeSource(newNodeSourceData);
+        rmNodeData2.setNodeSource(newNodeSourceData);
+        dbManager.addNode(rmNodeData2);
+
+        Collection<RMNodeData> nodes = dbManager.getNodesByNodeSource(nodeSourceData.getName());
+
+        assertThat(nodes).hasSize(1);
+
+        for (RMNodeData node : nodes) {
+            assertThat(node).isEqualTo(rmNodeData1);
+        }
+    }
+
+    @Test
+    public void testAddDeployingNode() {
+
+        addRMNodeData(NODE_NAME_BASE, NodeState.DEPLOYING);
+
+        Collection<RMNodeData> allNodes = dbManager.getAllNodes();
+        assertThat(allNodes).hasSize(1);
+
+        for (RMNodeData node : allNodes) {
+            assertThat(node.getName()).isEqualTo(NODE_NAME_BASE);
+            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getState()).isEqualTo(NodeState.DEPLOYING);
+            assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
+            assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+        }
+    }
+
+    @Test
+    public void testRemoveDeployingNode() {
+
+        addRMNodeData(NODE_NAME_BASE + "1", NODE_STATE_BASE);
+        addRMNodeData(NODE_NAME_BASE + "2", NodeState.DEPLOYING);
+        addRMNodeData(NODE_NAME_BASE + "3", NODE_STATE_BASE);
+
+        dbManager.removeNode(NODE_NAME_BASE + "2");
+
+        Collection<RMNodeData> allNodes = dbManager.getAllNodes();
+        assertThat(allNodes).hasSize(2);
+
+        for (RMNodeData node : allNodes) {
+            assertThat(node.getName()).startsWith(NODE_NAME_BASE);
+            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            // no more deploying nodes should be returned
+            assertThat(node.getState()).isNotEqualTo(NodeState.DEPLOYING);
+            assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
+            assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+        }
+    }
+
+    private void addNodeSourceData() {
+        nodeSourceData = new NodeSourceData();
+        nodeSourceData.setName(NODE_SOURCE_NAME_BASE);
+        nodeSourceData.setPolicyType(NODE_SOURCE_POLICY);
+        dbManager.addNodeSource(nodeSourceData);
+    }
+
+    private RMNodeData addRMNodeData(String nodeName, NodeState state) {
+        RMNodeData rmNodeData = new RMNodeData(nodeName, NODE_URL, owner, permission, state, STATE_CHANGE_TIME_BASE);
+        rmNodeData.setNodeSource(nodeSourceData);
+        dbManager.addNode(rmNodeData);
+        return rmNodeData;
+    }
+
+    private Map<String, RMNodeData> addNRMNodeData(int nbEntries) {
+        Map<String, RMNodeData> entries = new HashMap<>();
+
+        for (int i = 0; i < nbEntries; i++) {
+            RMNodeData rmNodeData = addRMNodeData(NODE_NAME_BASE + i, NODE_STATE_BASE);
+            entries.put(NODE_NAME_BASE + i, rmNodeData);
         }
         return entries;
     }
