@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -115,6 +116,8 @@ public class TestVariablesPropagation extends SchedulerFunctionalTestWithCustomC
         schedulerHelper.waitForEventTaskFinished(id, "t2");
         log("Wait for event t3 finished");
         schedulerHelper.waitForEventTaskFinished(id, "t3");
+        log("Wait for event t4 finished (walltime)");
+        schedulerHelper.waitForEventTaskFinished(id, "t4");
 
         //task result for t1
         TaskResult tr1 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t1");
@@ -122,6 +125,10 @@ public class TestVariablesPropagation extends SchedulerFunctionalTestWithCustomC
         TaskResult tr2 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t2");
         //task result for t3
         TaskResult tr3 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t3");
+        //task result for t4
+        TaskResult tr4 = schedulerHelper.getSchedulerInterface().getTaskResult(id, "t4");
+
+        Assert.assertTrue(tr4.hadException());
 
         //check result j1
         assertEquals(variableValue,
@@ -132,5 +139,8 @@ public class TestVariablesPropagation extends SchedulerFunctionalTestWithCustomC
         //check result j3
         assertEquals(variableValue,
                      SerializationUtil.deserializeVariableMap(tr3.getPropagatedVariables()).get(variableName));
+        //check result j4
+        assertEquals(variableValue,
+                     SerializationUtil.deserializeVariableMap(tr4.getPropagatedVariables()).get(variableName));
     }
 }
