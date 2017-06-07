@@ -36,6 +36,17 @@
 				</parameters>
 			</javaExecutable>
 		</task>
+		<task name="t4" walltime="5" maxNumberOfExecution="1">
+			<depends>
+				<task ref="Groovy_Task"/>
+			</depends>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="120"/>
+					<parameter name="number" value="0"/>
+				</parameters>
+			</javaExecutable>
+		</task>
         <task name="Groovy_Task">
           <description>
             <![CDATA[ The simplest task, ran by a groovy engine. ]]>
