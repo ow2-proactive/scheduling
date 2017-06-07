@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -154,6 +155,8 @@ public class TaskLauncher implements InitActive {
 
         TaskDataspaces dataspaces = null;
 
+        TaskContext context = null;
+
         try {
             addShutdownHook();
             // lock the cache space cleaning mechanism
@@ -166,18 +169,18 @@ public class TaskLauncher implements InitActive {
 
             progressFileReader.start(dataspaces.getScratchFolder(), taskId);
 
-            TaskContext context = new TaskContext(executableContainer,
-                                                  initializer,
-                                                  previousTasksResults,
-                                                  new NodeDataSpacesURIs(dataspaces.getScratchURI(),
-                                                                         dataspaces.getCacheURI(),
-                                                                         dataspaces.getInputURI(),
-                                                                         dataspaces.getOutputURI(),
-                                                                         dataspaces.getUserURI(),
-                                                                         dataspaces.getGlobalURI()),
-                                                  progressFileReader.getProgressFile().toString(),
-                                                  getHostname(),
-                                                  decrypter);
+            context = new TaskContext(executableContainer,
+                                      initializer,
+                                      previousTasksResults,
+                                      new NodeDataSpacesURIs(dataspaces.getScratchURI(),
+                                                             dataspaces.getCacheURI(),
+                                                             dataspaces.getInputURI(),
+                                                             dataspaces.getOutputURI(),
+                                                             dataspaces.getUserURI(),
+                                                             dataspaces.getGlobalURI()),
+                                      progressFileReader.getProgressFile().toString(),
+                                      getHostname(),
+                                      decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
 
@@ -205,7 +208,7 @@ public class TaskLauncher implements InitActive {
 
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
-                    taskResult = getWalltimedTaskResult(taskStopwatchForFailures);
+                    taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
                     sendResultToScheduler(terminateNotification, taskResult);
                     return;
                 case KILLED_MANUALLY:
@@ -227,7 +230,7 @@ public class TaskLauncher implements InitActive {
 
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
-                    taskResult = getWalltimedTaskResult(taskStopwatchForFailures);
+                    taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
                     sendResultToScheduler(terminateNotification, taskResult);
                     break;
                 case KILLED_MANUALLY:
@@ -236,10 +239,13 @@ public class TaskLauncher implements InitActive {
                 default:
                     logger.info("Failed to execute task", taskFailure);
                     taskFailure.printStackTrace(taskLogger.getErrorSink());
+                    Map<String, byte[]> serializedVariables = extractVariablesFromContext(context);
                     taskResult = new TaskResultImpl(taskId,
                                                     taskFailure,
                                                     taskLogger.getLogs(),
                                                     taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+                    taskResult.setPropagatedVariables(serializedVariables);
+
                     sendResultToScheduler(terminateNotification, taskResult);
             }
         } finally {
@@ -257,6 +263,18 @@ public class TaskLauncher implements InitActive {
                 terminate();
             }
         }
+    }
+
+    private Map<String, byte[]> extractVariablesFromContext(TaskContext context) {
+        if (context != null) {
+            try {
+                return SerializationUtil.serializeVariableMap(taskContextVariableExtractor.extractVariables(context,
+                                                                                                            false));
+            } catch (Exception e) {
+                e.printStackTrace(taskLogger.getErrorSink());
+            }
+        }
+        return null;
     }
 
     private TaskKiller replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(boolean isRunAsUser) {
@@ -283,19 +301,25 @@ public class TaskLauncher implements InitActive {
         }
     }
 
-    private TaskResultImpl getWalltimedTaskResult(Stopwatch taskStopwatchForFailures) {
+    private TaskResultImpl getWalltimedTaskResult(TaskContext context, Stopwatch taskStopwatchForFailures) {
         String message = "Walltime of " + initializer.getWalltime() + " ms reached on task " + taskId.getReadableName();
 
-        return getTaskResult(taskStopwatchForFailures, new WalltimeExceededException(message));
+        return getTaskResult(context, taskStopwatchForFailures, new WalltimeExceededException(message));
     }
 
-    private TaskResultImpl getTaskResult(Stopwatch taskStopwatchForFailures, SchedulerException exception) {
+    private TaskResultImpl getTaskResult(TaskContext context, Stopwatch taskStopwatchForFailures,
+            SchedulerException exception) {
         taskLogger.getErrorSink().println(exception.getMessage());
 
-        return new TaskResultImpl(taskId,
-                                  exception,
-                                  taskLogger.getLogs(),
-                                  taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+        Map<String, byte[]> serializedVariables = extractVariablesFromContext(context);
+
+        TaskResultImpl result = new TaskResultImpl(taskId,
+                                                   exception,
+                                                   taskLogger.getLogs(),
+                                                   taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+
+        result.setPropagatedVariables(serializedVariables);
+        return result;
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)

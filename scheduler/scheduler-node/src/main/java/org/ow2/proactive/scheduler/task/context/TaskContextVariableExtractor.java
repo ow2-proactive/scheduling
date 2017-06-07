@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -42,6 +43,9 @@ import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariables
 
 
 public class TaskContextVariableExtractor implements Serializable {
+
+    private static final Logger logger = Logger.getLogger(TaskContextVariableExtractor.class);
+
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
 
     public Map<String, String> extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(
@@ -57,7 +61,7 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     public Map<String, Serializable> extractVariables(TaskContext taskContext, boolean useTaskVariables)
-            throws Exception {
+            throws IOException, ClassNotFoundException {
         return extractVariables(taskContext, (TaskResult) null, useTaskVariables);
     }
 
@@ -75,7 +79,7 @@ public class TaskContextVariableExtractor implements Serializable {
 
     @SuppressWarnings("squid:S134")
     public Map<String, Serializable> extractVariables(TaskContext taskContext, TaskResult taskResult,
-            boolean useTaskVariables) throws Exception {
+            boolean useTaskVariables) throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables = new HashMap<>();
 
         // job variables from workflow definition
@@ -104,8 +108,9 @@ public class TaskContextVariableExtractor implements Serializable {
             if (taskResult != null && taskResult.getPropagatedVariables() != null) {
                 variables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
             }
-        } catch (Exception e) {
-            throw new Exception("Could not deserialize variables", e);
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Could not deserialize variables", e);
+            throw e;
         }
 
         // variables from current job/task context
