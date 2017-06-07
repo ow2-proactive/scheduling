@@ -800,7 +800,7 @@ public class RMCoreTest {
     }
 
     private RMCore createRmCore(ImmutableMap<String, RMNode> allNodes, List<RMNode> freeNodes) {
-        return new RMCore(null, null, allNodes, null, Mockito.mock(RMMonitoringImpl.class), null, freeNodes, null);
+        return new RMCore(null, null, allNodes, null, Mockito.mock(RMMonitoringImpl.class), null, freeNodes, dbManager);
     }
 
     /**
