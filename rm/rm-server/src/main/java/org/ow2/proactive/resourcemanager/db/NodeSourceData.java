@@ -44,7 +44,8 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 @Entity
 @NamedQueries({ @NamedQuery(name = "deleteNodeSourceDataByName", query = "delete from NodeSourceData where name=:name"),
                 @NamedQuery(name = "deleteAllNodeSourceData", query = "delete from NodeSourceData"),
-                @NamedQuery(name = "getNodeSourceData", query = "from NodeSourceData") })
+                @NamedQuery(name = "getNodeSourceData", query = "from NodeSourceData"),
+                @NamedQuery(name = "getNodeSourceDataByName", query = "from NodeSourceData where name=:name") })
 @Table(name = "NodeSourceData")
 public class NodeSourceData implements Serializable {
 

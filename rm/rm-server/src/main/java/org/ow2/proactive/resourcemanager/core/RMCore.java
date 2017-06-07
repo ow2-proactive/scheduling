@@ -87,6 +87,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
+import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -551,6 +552,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // resetting owner here
         rmNode.setFree();
 
+        // persist the state change to the database
+        persistUpdatedRMNode(rmNode);
+
         // an eligible node is a node that is free and not locked
         if (!rmNode.isLocked()) {
             this.eligibleNodes.add(rmNode);
@@ -595,6 +599,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
         rmNode.setToRemove();
+
+        // persist the state change to the database
+        persistUpdatedRMNode(rmNode);
 
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
@@ -733,6 +740,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         rmnode.setConfiguring(rmnode.getProvider());
+
+        // save the information of this new node in DB, in particular its state
+        persistNewRMNode(rmnode);
+
         //we add the configuring node to the collection to be able to ping it
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
 
@@ -1559,6 +1570,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
         rmNode.setBusy(owner);
+
+        // persist the state change to the database
+        persistUpdatedRMNode(rmNode);
+
         this.eligibleNodes.remove(rmNode);
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, owner.getName()));
@@ -1583,6 +1598,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
 
             rmNode.setDown();
+
+            // persist the state change to the database
+            persistUpdatedRMNode(rmNode);
+
             // create the event
             this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                                                                  previousNodeState,
@@ -2153,6 +2172,26 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public StringWrapper getCurrentUser() {
         return new StringWrapper(caller.getName());
+    }
+
+    /**
+     * Add the information of the given node to the database.
+     * @param rmNode the node to add to the database
+     */
+    private void persistNewRMNode(RMNode rmNode) {
+        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+        NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
+        rmNodeData.setNodeSource(nodeSourceData);
+        dbManager.addNode(rmNodeData);
+    }
+
+    /**
+     * Update the information of the given node in database.
+     * @param rmNode the node to update in database
+     */
+    private void persistUpdatedRMNode(RMNode rmNode) {
+        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+        dbManager.updateNode(rmNodeData);
     }
 
 }

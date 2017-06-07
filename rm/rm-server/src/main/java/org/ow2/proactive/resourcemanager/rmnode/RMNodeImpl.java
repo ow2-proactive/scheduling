@@ -111,10 +111,14 @@ public class RMNodeImpl extends AbstractRMNode {
      * @param nodeAccessPermission the permissions associated with the Node.
      */
     public RMNodeImpl(Node node, NodeSource nodeSource, Client provider, Permission nodeAccessPermission) {
+        this(node, nodeSource, provider, nodeAccessPermission, NodeState.FREE);
+    }
 
+    public RMNodeImpl(Node node, NodeSource nodeSource, Client provider, Permission nodeAccessPermission,
+            NodeState state) {
         super(nodeSource, node.getNodeInformation().getName(), node.getNodeInformation().getURL(), provider);
 
-        changeState(NodeState.FREE);
+        changeState(state);
 
         this.hostName = node.getNodeInformation().getVMInformation().getHostName();
         this.jmxUrls = new String[JMXTransportProtocol.values().length];
