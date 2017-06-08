@@ -70,7 +70,6 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.python.google.common.collect.ImmutableSet;
 
 
-@RunWith(TimedOutTestsRunner.class)
 public class LiveJobsTest {
 
     private LiveJobs liveJobs;

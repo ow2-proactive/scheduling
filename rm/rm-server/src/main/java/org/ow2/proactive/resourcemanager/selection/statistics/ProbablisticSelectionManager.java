@@ -29,6 +29,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -105,7 +106,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
         try {
             // finding intersection
-            HashMap<RMNode, Probability> intersectionMap = new HashMap<>();
+            HashMap<RMNode, Probability> intersectionMap = new LinkedHashMap<>();
             for (RMNode rmnode : nodes) {
                 boolean intersection = true;
                 double intersectionProbability = 1;
