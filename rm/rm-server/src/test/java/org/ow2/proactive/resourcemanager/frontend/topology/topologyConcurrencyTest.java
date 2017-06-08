@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import java.net.InetAddress;
 import java.rmi.dgc.VMID;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -43,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
@@ -50,6 +52,8 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
+import org.ow2.proactive.utils.NodeSet;
 
 
 /**
@@ -98,13 +102,22 @@ public class topologyConcurrencyTest {
             calls.add(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
-                    int index = j - (j % collisionSize);
-                    NodeImpl node = new NodeImpl(runtime, baseUrl + index);
-                    if ((j % (collisionSize / 2)) == 0) {
-                        manager.addNode(node);
-                    } else {
-                        // more remove than add, to try to reproduce empty list problems
-                        manager.removeNode(node);
+                    try {
+                        int index = j - (j % collisionSize);
+                        Node node = new NodeImpl(runtime, baseUrl + index);
+                        if ((j % (collisionSize / 2)) == 0) {
+                            manager.addNode(node);
+                        } else {
+                            // more remove than add, to try to reproduce empty list problems
+                            manager.removeNode(node);
+                        }
+                        // launch some selections on the node just added or removed to trigger ConcurrentModficationExceptions if any
+                        NodeSet set = manager.getHandler(TopologyDescriptor.SINGLE_HOST)
+                                             .select(1, Collections.singletonList(node));
+                        System.out.println(set);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
                     }
                     return true;
                 }
@@ -123,8 +136,17 @@ public class topologyConcurrencyTest {
             calls.add(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
-                    int index = j;
-                    manager.removeNode(new NodeImpl(runtime, baseUrl + index));
+                    try {
+                        int index = j;
+                        Node node = new NodeImpl(runtime, baseUrl + index);
+                        manager.removeNode(node);
+                        NodeSet set = manager.getHandler(TopologyDescriptor.SINGLE_HOST)
+                                             .select(1, Collections.singletonList(node));
+                        System.out.println(set);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return false;
+                    }
                     return true;
                 }
             });
