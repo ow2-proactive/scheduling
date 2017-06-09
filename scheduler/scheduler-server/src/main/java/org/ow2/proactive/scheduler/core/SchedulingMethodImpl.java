@@ -289,18 +289,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     /**
-     * Checks if there is a conflict between the free nodes known by the scheduling loop and the actual free resources in the resource manager
-     */
-    private boolean conflictInFreeNodes(Set<String> freeResourcesKnown) {
-        RMState rmState = getRMProxiesManager().getRmProxy().getState();
-        Set<String> actualFreeResources = rmState.getFreeNodes();
-        if (!actualFreeResources.equals(freeResourcesKnown)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Extract the n first compatible tasks from the first argument list,
      * and return them according that the extraction is stopped when the maxResource number is reached.<br>
      * Two tasks are compatible if and only if they have the same list of selection script and
