@@ -82,6 +82,10 @@ class RunningTaskData {
         return ++pingAttempts;
     }
 
+    public int getPingAttempts() {
+        return pingAttempts;
+    }
+
     /**
      * @return Nodes that were used to run this particular instance of the task
      *  (those in {@link InternalTask#getExecuterInformation()} could have changed in case of restarts)
