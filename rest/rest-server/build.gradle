@@ -35,7 +35,7 @@ dependencies {
     compile 'commons-codec:commons-codec:1.10'
 
     compile 'com.netiq:websockify:1.7-proactive'
-    compile 'io.netty:netty:3.10.4.Final'
+    compile 'io.netty:netty:3.10.6.Final'
 
     compile 'org.atmosphere:atmosphere-runtime:2.3.4'
 

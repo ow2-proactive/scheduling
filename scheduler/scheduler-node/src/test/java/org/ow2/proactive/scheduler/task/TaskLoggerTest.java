@@ -26,20 +26,27 @@
 package org.ow2.proactive.scheduler.task;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.task.Log4JTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -52,11 +59,20 @@ public class TaskLoggerTest {
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
 
+    private TaskLogger taskLogger;
+
+    @After
+    public void removeLogger() {
+        if (taskLogger != null) {
+            taskLogger.close();
+            assertNull(LogManager.exists(taskLogger.getName()));
+        }
+    }
+
     @Test
     public void printAndGetLogs() throws Exception {
 
-        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L),
-                                               "myhost");
+        taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L), "myhost");
 
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
@@ -71,8 +87,7 @@ public class TaskLoggerTest {
 
     @Test
     public void logStreaming() throws Exception {
-        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L),
-                                               "myhost");
+        taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L), "myhost");
 
         final StringWriter stringAppender = new StringWriter();
         AppenderProvider stringAppenderProvider = new AppenderProvider() {
@@ -99,8 +114,7 @@ public class TaskLoggerTest {
 
     @Test
     public void getStoredLogs() throws Exception {
-        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L),
-                                               "myhost");
+        taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L), "myhost");
 
         final StringWriter stringAppender = new StringWriter();
         AppenderProvider stringAppenderProvider = new AppenderProvider() {
@@ -122,7 +136,7 @@ public class TaskLoggerTest {
     @Test
     public void logPattern() throws Exception {
         TaskId taskId = TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L);
-        TaskLogger taskLogger = new TaskLogger(taskId, "myhost");
+        taskLogger = new TaskLogger(taskId, "myhost");
 
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
@@ -147,7 +161,7 @@ public class TaskLoggerTest {
     public void createFileAppenderTest() throws Exception {
         JobId jobid = new JobIdImpl(1000, "job");
         TaskId taskId = TaskIdImpl.createTaskId(jobid, "task", 42L);
-        TaskLogger taskLogger = new TaskLogger(taskId, "myhost");
+        taskLogger = new TaskLogger(taskId, "myhost");
 
         File logFolder = tempFolder.newFolder("logfolder");
 
@@ -159,5 +173,19 @@ public class TaskLoggerTest {
 
         assertEquals(logAppender.getName(), new TaskLoggerRelativePathGenerator(taskId).getFileName());
 
+    }
+
+    @Test
+    public void multipleRemoveLoggers() throws Exception {
+        List<TaskLogger> loggers = new ArrayList<>(1000);
+        for (int i = 0; i < 1000; i++) {
+            loggers.add(new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", i), "myhost"));
+        }
+
+        for (int i = 0; i < 1000; i++) {
+            loggers.get(i).close();
+            assertNull(LogManager.exists(loggers.get(i).getName()));
+        }
+        assertNull(LogManager.exists(Log4JTaskLogs.getLoggerName("" + 1000)));
     }
 }

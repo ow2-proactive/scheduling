@@ -55,6 +55,8 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 
 import com.google.common.collect.Maps;
 
+import it.sauronsoftware.cron4j.Scheduler;
+
 
 public class RMDBManager {
 
@@ -65,6 +67,8 @@ public class RMDBManager {
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
+
+    private Scheduler houseKeepingScheduler;
 
     private static final class LazyHolder {
 
@@ -119,6 +123,18 @@ public class RMDBManager {
         return new RMDBManager(config, true, true);
     }
 
+    public void startHouseKeeping() {
+        houseKeepingScheduler = new Scheduler();
+        if (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.isSet() &&
+            PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0 &&
+            PAResourceManagerProperties.RM_HISTORY_REMOVAL_CRONPERIOD.isSet()) {
+            String cronExpr = PAResourceManagerProperties.RM_HISTORY_REMOVAL_CRONPERIOD.getValueAsString();
+            houseKeepingScheduler.schedule(cronExpr, new HousekeepingRunner());
+            houseKeepingScheduler.start();
+        }
+
+    }
+
     /**
      * Used only for testing purposes of the hibernate config needs to be changed.
      * RMDBManager.getInstance() should be used in most of cases.
@@ -169,6 +185,9 @@ public class RMDBManager {
                     updateRmAliveTime();
                 }
             }, periodInMilliseconds, periodInMilliseconds);
+
+            // Start house keeping of node history
+            startHouseKeeping();
 
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed", ex);
@@ -347,6 +366,48 @@ public class RMDBManager {
         });
     }
 
+    public void deleteOldNodeHistory() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
+            @Override
+            public Void doInTransaction(Session session) {
+                if (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.isSet() &&
+                    PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0) {
+                    long oldestTime = System.currentTimeMillis() -
+                                      (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() * 1000);
+
+                    int nbEntriesDeleted = session.createSQLQuery("delete from NodeHistory where startTime<:minTime")
+                                                  .setParameter("minTime", oldestTime)
+                                                  .executeUpdate();
+                    if (nbEntriesDeleted > 0) {
+                        logger.info("HOUSEKEEPING of NodeHistory performed, deleted " + nbEntriesDeleted + " entries");
+                    }
+                }
+                return null;
+            }
+        });
+    }
+
+    public void deleteOldUserHistory() {
+        executeReadWriteTransaction(new SessionWork<Void>() {
+            @Override
+            public Void doInTransaction(Session session) {
+                if (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.isSet() &&
+                    PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() > 0) {
+                    long oldestTime = System.currentTimeMillis() -
+                                      (PAResourceManagerProperties.RM_HISTORY_MAX_PERIOD.getValueAsLong() * 1000);
+
+                    int nbEntriesDeleted = session.createSQLQuery("delete from UserHistory where startTime<:minTime")
+                                                  .setParameter("minTime", oldestTime)
+                                                  .executeUpdate();
+                    if (nbEntriesDeleted > 0) {
+                        logger.info("HOUSEKEEPING of UserHistory performed, deleted " + nbEntriesDeleted + " entries");
+                    }
+                }
+                return null;
+            }
+        });
+    }
+
     /**
      * Removes all entries from LockHistory table.
      */
@@ -490,4 +551,12 @@ public class RMDBManager {
         });
     }
 
+    private class HousekeepingRunner implements Runnable {
+
+        @Override
+        public void run() {
+            getInstance().deleteOldNodeHistory();
+            getInstance().deleteOldUserHistory();
+        }
+    }
 }

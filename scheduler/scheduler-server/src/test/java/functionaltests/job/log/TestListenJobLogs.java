@@ -258,6 +258,8 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
 
         PAActiveObject.terminateActiveObject(communicationObject1, true);
         PAActiveObject.terminateActiveObject(communicationObject2, true);
+
+        logForwardingService.removeLogger(loggerName);
     }
 
     public class TestAppender extends AppenderSkeleton {

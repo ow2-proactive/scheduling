@@ -34,7 +34,8 @@ import org.apache.log4j.spi.RootLogger;
 
 
 public class LoggingEventProcessor {
-    Hierarchy h = new NoWarningHierarchy();
+
+    NoWarningHierarchy h = new NoWarningHierarchy();
 
     public void addAppender(String loggerName, Appender appender) {
         h.getLogger(loggerName).addAppender(appender);
@@ -44,8 +45,17 @@ public class LoggingEventProcessor {
         h.getLogger(loggerName).removeAllAppenders();
     }
 
+    public void removeLogger(String loggerName) {
+        h.removeLogger(loggerName);
+    }
+
     public void removeAllAppenders() {
         h.getRootLogger().removeAllAppenders();
+    }
+
+    public void shutdown() {
+        h.shutdown();
+        h.clear();
     }
 
     public void processEvent(LoggingEvent event) {
@@ -53,8 +63,13 @@ public class LoggingEventProcessor {
     }
 
     private static class NoWarningHierarchy extends Hierarchy {
+
         public NoWarningHierarchy() {
             super(new RootLogger(Level.ALL));
+        }
+
+        public void removeLogger(String loggerName) {
+            Log4JRemover.removeLogger(loggerName, this);
         }
 
         @Override
