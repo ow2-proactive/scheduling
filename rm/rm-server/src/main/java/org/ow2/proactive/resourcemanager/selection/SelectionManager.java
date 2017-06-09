@@ -59,6 +59,7 @@ import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
+import org.ow2.proactive.resourcemanager.selection.topology.TopologyNodesFilter;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -92,10 +93,13 @@ public abstract class SelectionManager {
     // the policy for arranging nodes
     private SelectionPolicy selectionPolicy;
 
+    private TopologyNodesFilter topologyNodesFilter;
+
     public SelectionManager() {
     }
 
     public SelectionManager(RMCore rmcore) {
+        this.topologyNodesFilter = new TopologyNodesFilter();
         this.rmcore = rmcore;
         this.scriptExecutorThreadPool = Executors.newFixedThreadPool(PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt(),
                                                                      new NamedThreadFactory("Selection manager threadpool"));
@@ -263,10 +267,16 @@ public abstract class SelectionManager {
 
             // arranging nodes for script execution
             List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
-
             if (criteria.getTopology().isTopologyBased()) {
-                // run scripts on all available nodes
-                matchedNodes = runScripts(arrangedNodes, criteria);
+
+                List<RMNode> arrangedFilteredNodes = topologyNodesFilter.filterNodes(criteria, arrangedNodes);
+
+                if (arrangedFilteredNodes.isEmpty()) {
+                    matchedNodes = new ArrayList<>();
+                } else {
+                    // run scripts on all available nodes
+                    matchedNodes = runScripts(arrangedFilteredNodes, criteria);
+                }
             } else {
                 // run scripts not on all nodes, but always on missing number of nodes
                 // until required node set is found
