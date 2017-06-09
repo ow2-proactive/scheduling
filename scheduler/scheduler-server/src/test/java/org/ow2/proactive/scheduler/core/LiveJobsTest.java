@@ -34,6 +34,7 @@ import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -200,6 +201,7 @@ public class LiveJobsTest {
         assertThat(internalTask.getStatus(), is(TaskStatus.FINISHED));
     }
 
+    @Ignore
     @Test(timeout = 60000)
     public void testFinishInErrorTaskDoesNotFinishPausedTask() throws UnknownTaskException, UnknownJobException {
         InternalJob job = new InternalTaskFlowJob("test-name",
