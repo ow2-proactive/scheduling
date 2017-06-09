@@ -110,7 +110,7 @@ public class TerminationDataTest {
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
         RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, null);
-        terminationData.addTaskData(null, taskData, true, null);
+        terminationData.addTaskData(null, taskData, TerminationData.TerminationStatus.NORMAL, null);
         assertThat(terminationData.isEmpty(), is(false));
         assertThat(terminationData.taskTerminated(jobId, "task-name"), is(true));
     }
@@ -133,7 +133,7 @@ public class TerminationDataTest {
     }
 
     @Test
-    public void testHandleTerminationForTaskNotNormalTermination() throws IOException, ClassNotFoundException {
+    public void testHandleTerminationForTaskAbortedTermination() throws IOException, ClassNotFoundException {
         InternalJob job = new InternalTaskFlowJob("test-name",
                                                   JobPriority.NORMAL,
                                                   OnTaskError.CANCEL_JOB,
@@ -146,9 +146,28 @@ public class TerminationDataTest {
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
         RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, launcher);
-        terminationData.addTaskData(null, taskData, false, null);
+        terminationData.addTaskData(null, taskData, TerminationData.TerminationStatus.ABORTED, null);
         terminationData.handleTermination(service);
         Mockito.verify(launcher, Mockito.times(1)).kill();
+    }
+
+    @Test
+    public void testHandleTerminationForTaskNodeFailureTermination() throws IOException, ClassNotFoundException {
+        InternalJob job = new InternalTaskFlowJob("test-name",
+                                                  JobPriority.NORMAL,
+                                                  OnTaskError.CANCEL_JOB,
+                                                  "description");
+        JobId jobId = new JobIdImpl(666, "readableName");
+        InternalTask internalTask = new InternalScriptTask(job);
+        TaskId taskId = TaskIdImpl.createTaskId(jobId, "task-name", 777L);
+        internalTask.setId(taskId);
+        internalTask.setName("task-name");
+        internalTask.setStatus(TaskStatus.RUNNING);
+        internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
+        RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, launcher);
+        terminationData.addTaskData(null, taskData, TerminationData.TerminationStatus.NODEFAILED, null);
+        terminationData.handleTermination(service);
+        Mockito.verify(launcher, Mockito.times(0)).kill();
     }
 
     @Test
@@ -166,7 +185,7 @@ public class TerminationDataTest {
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
         RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, launcher);
-        terminationData.addTaskData(null, taskData, true, null);
+        terminationData.addTaskData(null, taskData, TerminationData.TerminationStatus.NORMAL, null);
         terminationData.handleTermination(service);
         Mockito.verify(proxiesManager, Mockito.times(1)).getUserRMProxy("user", null);
         Mockito.verify(rmProxy, Mockito.times(1)).releaseNodes(org.mockito.Matchers.any(NodeSet.class),

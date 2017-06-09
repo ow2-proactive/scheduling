@@ -412,7 +412,7 @@ class LiveJobs {
             }
 
             TerminationData result = TerminationData.newTerminationData();
-            result.addTaskData(jobData.job, taskData, false, null);
+            result.addTaskData(jobData.job, taskData, TerminationData.TerminationStatus.NODEFAILED, null);
 
             restartTaskOnNodeFailure(task, jobData, result);
 
@@ -541,7 +541,10 @@ class LiveJobs {
                 throw new IllegalStateException("No information for: " + taskId);
             }
 
-            TerminationData terminationData = createAndFillTerminationData(result, taskData, jobData.job, true);
+            TerminationData terminationData = createAndFillTerminationData(result,
+                                                                           taskData,
+                                                                           jobData.job,
+                                                                           TerminationData.TerminationStatus.NORMAL);
 
             boolean errorOccurred = result.hadException();
             if (errorOccurred) {
@@ -623,9 +626,9 @@ class LiveJobs {
     }
 
     private TerminationData createAndFillTerminationData(TaskResultImpl result, RunningTaskData taskData,
-            InternalJob job, boolean normalTermination) {
+            InternalJob job, TerminationData.TerminationStatus status) {
         TerminationData terminationData = TerminationData.newTerminationData();
-        terminationData.addTaskData(job, taskData, normalTermination, result);
+        terminationData.addTaskData(job, taskData, status, result);
         return terminationData;
     }
 
@@ -676,7 +679,7 @@ class LiveJobs {
                                                        task.getExecuterInformation().getLauncher());
 
             TerminationData terminationData = TerminationData.newTerminationData();
-            terminationData.addTaskData(job, data, false, taskResult);
+            terminationData.addTaskData(job, data, TerminationData.TerminationStatus.ABORTED, taskResult);
 
             tlogger.debug(taskId, "result added to job " + job.getId());
             //to be done before terminating the task, once terminated it is not running anymore..
@@ -761,7 +764,10 @@ class LiveJobs {
                                                                         task,
                                                                         new TaskRestartedException("Aborted by user"),
                                                                         new SimpleTaskLogs("", "Aborted by user"));
-            TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job, false);
+            TerminationData terminationData = createAndFillTerminationData(taskResult,
+                                                                           taskData,
+                                                                           jobData.job,
+                                                                           TerminationData.TerminationStatus.ABORTED);
 
             task.decreaseNumberOfExecutionLeft();
 
@@ -811,7 +817,10 @@ class LiveJobs {
                                                                         new TaskPreemptedException("Preempted by admin"),
                                                                         new SimpleTaskLogs("", "Preempted by admin"));
 
-            TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job, false);
+            TerminationData terminationData = createAndFillTerminationData(taskResult,
+                                                                           taskData,
+                                                                           jobData.job,
+                                                                           TerminationData.TerminationStatus.ABORTED);
 
             long waitTime = restartDelay * 1000L;
             restartTaskOnError(jobData, task, TaskStatus.PENDING, taskResult, waitTime, terminationData);
@@ -847,7 +856,10 @@ class LiveJobs {
                                                                         new SimpleTaskLogs("",
                                                                                            "The task has been manually killed."));
 
-            TerminationData terminationData = createAndFillTerminationData(taskResult, taskData, jobData.job, false);
+            TerminationData terminationData = createAndFillTerminationData(taskResult,
+                                                                           taskData,
+                                                                           jobData.job,
+                                                                           TerminationData.TerminationStatus.ABORTED);
 
             if (onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                 endJob(jobData,
@@ -962,7 +974,7 @@ class LiveJobs {
                 i.remove();
                 //remove previous read progress
                 taskData.getTask().setProgress(0);
-                terminationData.addTaskData(job, taskData, false, taskResult);
+                terminationData.addTaskData(job, taskData, TerminationData.TerminationStatus.ABORTED, taskResult);
             }
         }
 
