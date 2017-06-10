@@ -119,6 +119,8 @@ public enum WarWrapper {
         SchedulerStarter.setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
         SchedulerStarter.setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
                                                 schedHome + "/config/network/server.ini");
+
+        CentralPAPropertyRepository.PA_HOME.setValue(schedHome);
     }
 
     /**

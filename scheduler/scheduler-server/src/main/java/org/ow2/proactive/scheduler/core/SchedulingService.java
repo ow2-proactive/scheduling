@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.core;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -488,11 +489,13 @@ public class SchedulingService {
     }
 
     public void scheduleJobRemove(JobId jobId, long at) {
-        InternalJob job = infrastructure.getDBManager().loadJobWithTasksIfNotRemoved(jobId);
+        List<InternalJob> tempJobs = infrastructure.getDBManager().loadJobWithTasksIfNotRemoved(jobId);
         boolean shouldRemoveFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
 
-        if (job != null) {
-            infrastructure.getDBManager().scheduleJobForRemoval(job.getJobInfo().getJobId(), at, shouldRemoveFromDb);
+        if (tempJobs.size() == 1) {
+            infrastructure.getDBManager().scheduleJobForRemoval(tempJobs.get(0).getJobInfo().getJobId(),
+                                                                at,
+                                                                shouldRemoveFromDb);
         }
     }
 
@@ -976,7 +979,8 @@ public class SchedulingService {
     }
 
     void getProgressAndPingTaskNode(RunningTaskData taskData) {
-        if (!jobs.canPingTask(taskData)) {
+        if (!jobs.canPingTask(taskData) ||
+            taskData.getPingAttempts() > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
             return;
         }
 
@@ -1043,18 +1047,29 @@ public class SchedulingService {
             List<Long> longList = new ArrayList<>(jobIdList.size());
             for (JobId jobId : jobIdList) {
                 TerminationData terminationData = jobs.removeJob(jobId);
+                ServerJobAndTaskLogs.remove(jobId);
                 submitTerminationDataHandler(terminationData);
-                InternalJob job = getInfrastructure().getDBManager().loadJobWithTasksIfNotRemoved(jobId);
+            }
+            List<InternalJob> jobsFromDB;
+            if (!jobIdList.isEmpty()) {
+                jobsFromDB = getInfrastructure().getDBManager()
+                                                .loadJobWithTasksIfNotRemoved(jobIdList.toArray(new JobId[0]));
+            } else {
+                jobsFromDB = Collections.emptyList();
+            }
+
+            for (InternalJob job : jobsFromDB) {
                 if (job != null) {
                     job.setRemovedTime(System.currentTimeMillis());
-                    ServerJobAndTaskLogs.remove(jobId);
                     getListener().jobStateUpdated(job.getOwner(),
                                                   new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
                                                                                 new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
-                    wakeUpSchedulingThread();
+                    getListener().jobUpdatedFullData(job);
                 }
-                longList.add(jobId.longValue());
+                longList.add(job.getId().longValue());
             }
+
+            wakeUpSchedulingThread();
             return longList;
         }
 
@@ -1069,21 +1084,25 @@ public class SchedulingService {
         @Override
         public void run() {
             long timeNow = System.currentTimeMillis();
-            List<JobId> jobIdList = getInfrastructure().getDBManager().getJobsToRemove(timeNow);
+            try {
+                List<JobId> jobIdList = getInfrastructure().getDBManager().getJobsToRemove(timeNow);
 
-            // remove from the memory context
-            long inMemoryTimeStart = System.currentTimeMillis();
-            List<Long> longJobIdList = removeFromContext(jobIdList);
-            long inMemoryTimeStop = System.currentTimeMillis();
+                // remove from the memory context
+                long inMemoryTimeStart = System.currentTimeMillis();
+                List<Long> longJobIdList = removeFromContext(jobIdList);
+                long inMemoryTimeStop = System.currentTimeMillis();
 
-            // set the removedTime and also remove if required by the JOB_REMOVE_FROM_DB setting
-            long dbTimeStart = System.currentTimeMillis();
-            removeFromDB(longJobIdList);
-            long dbTimeStop = System.currentTimeMillis();
+                // set the removedTime and also remove if required by the JOB_REMOVE_FROM_DB setting
+                long dbTimeStart = System.currentTimeMillis();
+                removeFromDB(longJobIdList);
+                long dbTimeStop = System.currentTimeMillis();
 
-            logger.info("HOUSEKEEPING of jobs " + longJobIdList + " performed (Hibernate context removal took " +
-                        (inMemoryTimeStop - inMemoryTimeStart) + " ms" + " and db removal took " +
-                        (dbTimeStop - dbTimeStart) + " ms)");
+                logger.info("HOUSEKEEPING of jobs " + longJobIdList + " performed (Hibernate context removal took " +
+                            (inMemoryTimeStop - inMemoryTimeStart) + " ms" + " and db removal took " +
+                            (dbTimeStop - dbTimeStart) + " ms)");
+            } catch (Throwable e) {
+                logger.error("Error performing HOUSEKEEPING of jobs", e);
+            }
         }
     }
 

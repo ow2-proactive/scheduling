@@ -64,23 +64,23 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
     private void initPortalConfiguration(ServletContextEvent event) {
         File portalConfigurationFile = findConfigurationFile(event.getServletContext(),
-                                                             File.separator + "config" + File.separator + "web" +
-                                                                                        File.separator +
-                                                                                        "settings.ini");
+                                                             PortalConfiguration.PA_WEB_PROPERTIES_RELATIVE_FILEPATH);
         System.setProperty(PortalConfiguration.PA_WEB_PROPERTIES_FILEPATH, portalConfigurationFile.getAbsolutePath());
-        PortalConfiguration.loadProperties(PortalConfiguration.PA_WEB_PROPERTIES_FILEPATH);
+        System.setProperty(PortalConfiguration.REST_HOME.getKey(),
+                           PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+        PortalConfiguration.loadProperties(portalConfigurationFile.getAbsolutePath());
     }
 
-    private File findConfigurationFile(ServletContext servletContext, String configurationFileName) {
-        File configurationFile = findConfigurationFileInWebInf(servletContext, configurationFileName);
+    private File findConfigurationFile(ServletContext servletContext, String configurationRelativePath) {
+        File configurationFile = findConfigurationFileInWebInf(servletContext, configurationRelativePath);
         if (configurationFile == null || !configurationFile.exists()) {
-            return new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + configurationFileName);
+            return new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString(), configurationRelativePath);
         }
         return configurationFile;
     }
 
     private File findConfigurationFileInWebInf(ServletContext servletContext, String configurationFileName) {
-        String pathToConfigurationFile = servletContext.getRealPath("WEB-INF" + configurationFileName);
+        String pathToConfigurationFile = servletContext.getRealPath("WEB-INF/" + configurationFileName);
         if (pathToConfigurationFile == null) {
             return null;
         }

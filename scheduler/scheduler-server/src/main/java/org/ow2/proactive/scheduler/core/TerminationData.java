@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.ow2.proactive.scheduler.core.TerminationData.TerminationStatus.ABORTED;
+import static org.ow2.proactive.scheduler.core.TerminationData.TerminationStatus.NODEFAILED;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -65,16 +68,16 @@ final class TerminationData {
 
         private final RunningTaskData taskData;
 
-        private final boolean normalTermination;
-
         private final TaskResultImpl taskResult;
 
         private final InternalJob internalJob;
 
-        TaskTerminationData(InternalJob internalJob, RunningTaskData taskData, boolean normalTermination,
+        private final TerminationStatus terminationStatus;
+
+        TaskTerminationData(InternalJob internalJob, RunningTaskData taskData, TerminationStatus terminationStatus,
                 TaskResultImpl taskResult) {
             this.taskData = taskData;
-            this.normalTermination = normalTermination;
+            this.terminationStatus = terminationStatus;
             this.taskResult = taskResult;
             this.internalJob = internalJob;
         }
@@ -83,6 +86,12 @@ final class TerminationData {
             return taskData.getLauncher() != null;
         }
 
+    }
+
+    public enum TerminationStatus {
+        NORMAL,
+        ABORTED,
+        NODEFAILED
     }
 
     static class TaskRestartData {
@@ -128,10 +137,10 @@ final class TerminationData {
         jobsToTerminate.add(jobId);
     }
 
-    void addTaskData(InternalJob jobData, RunningTaskData taskData, boolean normalTermination,
+    void addTaskData(InternalJob jobData, RunningTaskData taskData, TerminationStatus terminationStatus,
             TaskResultImpl taskResult) {
         tasksToTerminate.put(TaskIdWrapper.wrap(taskData.getTask().getId()),
-                             new TaskTerminationData(jobData, taskData, normalTermination, taskResult));
+                             new TaskTerminationData(jobData, taskData, terminationStatus, taskResult));
     }
 
     void addRestartData(TaskId taskId, long waitTime) {
@@ -230,7 +239,7 @@ final class TerminationData {
             logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
         }
         try {
-            if (!taskToTerminate.normalTermination) {
+            if (taskToTerminate.terminationStatus == ABORTED) {
                 taskData.getLauncher().kill();
             }
         } catch (Throwable t) {
@@ -248,10 +257,13 @@ final class TerminationData {
             RMProxiesManager proxiesManager = service.getInfrastructure().getRMProxiesManager();
             proxiesManager.getUserRMProxy(taskData.getUser(), taskData.getCredentials())
                           .releaseNodes(taskData.getNodes(),
-                                        taskData.getTask().getCleaningScript(),
+                                        taskToTerminate.terminationStatus != NODEFAILED ? taskData.getTask()
+                                                                                                  .getCleaningScript()
+                                                                                        : null,
                                         variables,
                                         genericInformation,
                                         taskToTerminate.taskData.getTask().getId());
+
         } catch (Throwable t) {
             logger.info("Failed to release nodes for task '" + taskData.getTask().getId() + "'", t);
         }
@@ -267,7 +279,7 @@ final class TerminationData {
 
         variablesMap.setScopeMap(taskData.getTask().getScopeVariables());
 
-        if (!taskToTerminate.normalTermination || taskResult == null) {
+        if (taskToTerminate.terminationStatus == ABORTED || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();
             if (iDependences != null) {
                 Set<TaskId> parentIds = new HashSet<>(iDependences.size());

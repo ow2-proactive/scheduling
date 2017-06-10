@@ -11,6 +11,8 @@ if "%OS%"=="Windows_NT" setlocal
 @rem Add default JVM options here. You can also use JAVA_OPTS and ${optsEnvironmentVar} to pass JVM options to this script.
 set DEFAULT_JVM_OPTS=${defaultJvmOpts}
 
+set JAVA_OPTS=%JAVA_OPTS% -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+AggressiveOpts -XX:+ExitOnOutOfMemoryError -XX:-UseGCOverheadLimit
+
 set DIRNAME=%~dp0
 if "%DIRNAME%" == "" set DIRNAME=.\
 

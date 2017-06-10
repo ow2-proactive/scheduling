@@ -67,6 +67,10 @@ public final class LogForwardingService {
         loggingEventProcessor.removeAllAppenders(loggerName);
     }
 
+    public void removeLogger(String loggerName) {
+        loggingEventProcessor.removeLogger(loggerName);
+    }
+
     /**
      * Instantiate the LogForwardingProvider specified by providerClassname value,
      * and create and start the log server.
@@ -105,6 +109,7 @@ public final class LogForwardingService {
      */
     public final synchronized void terminate() throws LogForwardingException {
         this.loggingEventProcessor.removeAllAppenders();
+        this.loggingEventProcessor.shutdown();
         this.serverConnection = null;
         this.initialized = false;
         this.provider.terminateServer();

@@ -33,6 +33,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 
+import java.util.Collections;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -320,7 +321,8 @@ public class SchedulingServiceTest {
 
     @Test
     public void testScheduleJobRemoveShouldUseHousekeepingButAlreadyRemoved() {
-        Mockito.when(schedulerDBManager.loadJobWithTasksIfNotRemoved(any(JobId.class))).thenReturn(null);
+        Mockito.when(schedulerDBManager.loadJobWithTasksIfNotRemoved(any(JobId.class)))
+               .thenReturn(Collections.<InternalJob> emptyList());
 
         JobId jobId = JobIdImpl.makeJobId("42");
         schedulingService.scheduleJobRemove(jobId, 42);
@@ -332,7 +334,8 @@ public class SchedulingServiceTest {
     public void testScheduleJobRemoveShouldUseHousekeeping() {
         JobId jobId = JobIdImpl.makeJobId("42");
         InternalJob mockedInternalJob = createMockedInternalJob(jobId);
-        Mockito.when(schedulerDBManager.loadJobWithTasksIfNotRemoved(any(JobId.class))).thenReturn(mockedInternalJob);
+        Mockito.when(schedulerDBManager.loadJobWithTasksIfNotRemoved(any(JobId.class)))
+               .thenReturn(Collections.singletonList(mockedInternalJob));
 
         schedulingService.scheduleJobRemove(jobId, 42);
 

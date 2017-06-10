@@ -43,7 +43,7 @@ public enum PortalConfiguration implements PACommonProperties {
 
     SCHEDULER_CACHE_LOGIN("scheduler.cache.login", PropertyType.STRING, "watcher"),
 
-    SCHEDULER_CACHE_PASSWORD("scheduler.cache.password", PropertyType.STRING, "w_pwd"),
+    SCHEDULER_CACHE_PASSWORD("scheduler.cache.password", PropertyType.STRING),
 
     SCHEDULER_CACHE_CREDENTIALS("scheduler.cache.credential", PropertyType.STRING),
 
@@ -56,7 +56,7 @@ public enum PortalConfiguration implements PACommonProperties {
 
     RM_CACHE_LOGIN("rm.cache.login", PropertyType.STRING, "watcher"),
 
-    RM_CACHE_PASSWORD("rm.cache.password", PropertyType.STRING, "w_pwd"),
+    RM_CACHE_PASSWORD("rm.cache.password", PropertyType.STRING),
 
     RM_CACHE_CREDENTIALS("rm.cache.credential", PropertyType.STRING),
 
