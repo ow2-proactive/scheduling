@@ -141,7 +141,7 @@ public class JobContent implements Serializable {
             return false;
         JobContent other = (JobContent) obj;
         if (other.getJobId().equals(this.getJobId()))
-            return false;
-        return true;
+            return true;
+        return false;
     }
 }
