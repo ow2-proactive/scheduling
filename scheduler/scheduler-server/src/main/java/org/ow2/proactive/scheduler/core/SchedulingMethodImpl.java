@@ -155,6 +155,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         //get job Descriptor list with eligible jobs (running and pending)
         Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
 
+        Map<JobId, JobDescriptor> toUnlock = jobMap;
+
         if (logger.isDebugEnabled()) {
             logger.debug("jobs selected to be scheduled : " + jobMap);
         }
@@ -192,6 +194,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             if (logger.isDebugEnabled()) {
                 logger.debug("eligible tasks : " + taskRetrievedFromPolicy);
             }
+
+            schedulingService.unlockJobsToSchedule(toUnlock.values());
+            toUnlock = null;
 
             while (!taskRetrievedFromPolicy.isEmpty()) {
 
@@ -284,7 +289,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             return numberOfTaskStarted;
         } finally {
-            schedulingService.unlockJobsToSchedule(jobMap.values());
+            if (toUnlock != null) {
+                schedulingService.unlockJobsToSchedule(toUnlock.values());
+            }
         }
     }
 
@@ -529,7 +536,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
 
             NodeSet nodes = new NodeSet();
+            LiveJobs.JobData jobData = null;
             try {
+                jobData = schedulingService.lockJob(job.getId());
 
                 // create launcher
                 launcher = task.createLauncher(node);
@@ -570,6 +579,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     //miam miam
                 }
                 throw t;
+            } finally {
+                jobData.unlock();
             }
 
         }
