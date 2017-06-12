@@ -986,7 +986,8 @@ public class SchedulingService {
     }
 
     void getProgressAndPingTaskNode(RunningTaskData taskData) {
-        if (!jobs.canPingTask(taskData)) {
+        if (!jobs.canPingTask(taskData) ||
+            taskData.getPingAttempts() > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
             return;
         }
 
