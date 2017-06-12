@@ -190,7 +190,10 @@ public class RRDSigarDataStore extends RRDDataStore {
                     logger.trace("Cannot read attribute " + attrName + " for object " + objectName + ": " +
                                  e.getMessage());
                 }
-
+            } catch (UnsupportedOperationException e) {
+                if (logger.isTraceEnabled()) {
+                    logger.warn("Cannot read attribute " + attrName + " for object " + objectName);
+                }
             } catch (Exception e) {
                 logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
 
