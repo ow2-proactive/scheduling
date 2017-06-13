@@ -30,8 +30,6 @@ import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -60,21 +58,23 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")
     private int maxNodes = DEFAULT_NODE_NUMBER;
 
-    // number of nodes which can still be acquired
-    private AtomicInteger acquiredNodes;
-
-    private AtomicInteger lostNodes;
-
-    private AtomicInteger handledNodes;
-
-    private AtomicBoolean commandLineStarted;
-
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     private int nodeTimeout = DEFAULT_TIMEOUT;
 
     @Configurable(description = "Additional ProActive properties")
     private String paProperties = "";
 
+    // key to retrieve the number of nodes which can still be acquired
+    private static final String NB_ACQUIRED_NODES_KEY = "nbAcquiredNodes";
+
+    private static final String NB_LOST_NODES_KEY = "nbLostNodes";
+
+    private static final String NB_HANDLED_NODES_KEY = "nbHandledNodes";
+
+    private static final String COMMAND_LINE_STARTED_KEY = "commandLineStarted";
+
+    // FIX-ME the process is not saved in the runtimeVariables. In case the infrastructure is recreated from the
+    // persisted runtime variables, we need to handle the process manually.
     private transient ProcessExecutor processExecutor;
 
     public LocalInfrastructure() {
@@ -92,7 +92,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireNode() {
-        if (this.commandLineStarted.compareAndSet(false, true)) {
+        if (compareAndSetCommandLineStarted(false, true)) {
             this.nodeSource.executeInParallel(new Runnable() {
                 public void run() {
                     LocalInfrastructure.this.startNodeProcess();
@@ -104,8 +104,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private void startNodeProcess() {
-        acquiredNodes.set(0);
-        lostNodes.set(0);
+        reinitializeAcquiredAndLostNodes();
 
         String baseNodeName = "local-" + this.nodeSource.getName();
         OperatingSystem os = OperatingSystem.UNIX;
@@ -140,7 +139,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         clb.setPaProperties(paPropList);
         clb.setNodeName(baseNodeName);
-        clb.setNumberOfNodes(handledNodes.get());
+        clb.setNumberOfNodes(getHandledNodes());
         try {
             clb.setCredentialsValueAndNullOthers(new String(this.credentials.getBase64()));
         } catch (KeyException e) {
@@ -158,8 +157,8 @@ public class LocalInfrastructure extends InfrastructureManager {
         // The printed cmd with obfuscated credentials
         final String obfuscatedCmd = Joiner.on(' ').join(cmd);
 
-        List<String> depNodeURLs = new ArrayList<>(handledNodes.get());
-        final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseNodeName, handledNodes.get());
+        List<String> depNodeURLs = new ArrayList<>(getHandledNodes());
+        final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseNodeName, getHandledNodes());
         try {
             depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                          obfuscatedCmd,
@@ -249,8 +248,8 @@ public class LocalInfrastructure extends InfrastructureManager {
      *            the cause
      */
     private void createLostNodes(String baseName, String message, Throwable e) {
-        List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseName, handledNodes.get());
-        for (int nodeIndex = 0; nodeIndex < handledNodes.get(); nodeIndex++) {
+        List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(baseName, getHandledNodes());
+        for (int nodeIndex = 0; nodeIndex < getHandledNodes(); nodeIndex++) {
             String name = createdNodeNames.get(nodeIndex);
             String lf = System.lineSeparator();
             String url = super.addDeployingNode(name,
@@ -263,17 +262,17 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private boolean allNodesAcquiredOrLost() {
-        return (acquiredNodes.get() + lostNodes.get()) == handledNodes.get();
+        return (getAcquiredNodes() + getLostNodes()) == getHandledNodes();
     }
 
     private boolean allNodesLost() {
-        return lostNodes.get() == handledNodes.get();
+        return getLostNodes() == getHandledNodes();
     }
 
     private void cleanProcess() {
         if (processExecutor != null) {
             processExecutor.killProcess();
-            commandLineStarted.set(false);
+            setCommandLineStarted(false);
             processExecutor = null;
         }
     }
@@ -297,11 +296,6 @@ public class LocalInfrastructure extends InfrastructureManager {
             throw new IllegalArgumentException("Cannot determine max node");
         }
 
-        this.acquiredNodes = new AtomicInteger(0);
-        this.lostNodes = new AtomicInteger(0);
-        this.commandLineStarted = new AtomicBoolean(false);
-        this.handledNodes = new AtomicInteger(maxNodes);
-
         try {
             this.nodeTimeout = Integer.parseInt(args[index++].toString());
         } catch (Exception e) {
@@ -316,12 +310,12 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
-        this.lostNodes.incrementAndGet();
+        incrementLostNodes();
     }
 
     @Override
     protected void notifyAcquiredNode(Node arg0) throws RMException {
-        this.acquiredNodes.incrementAndGet();
+        incrementAcquiredNodes();
     }
 
     @Override
@@ -331,19 +325,19 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         if (!this.nodeSource.getDownNodes().contains(node)) {
             // the node was manually removed
-            handledNodes.decrementAndGet();
+            decrementHandledNodes();
         }
 
-        int remainingNodesCount = this.acquiredNodes.decrementAndGet();
+        int remainingNodesCount = decrementAndGetAcquiredNodes();
         // If there is no remaining node, kill the JVM process
-        if (remainingNodesCount == 0 && commandLineStarted.get()) {
+        if (remainingNodesCount == 0 && getCommandLineStarted()) {
             shutDown();
         }
     }
 
     @Override
     public void onDownNodeReconnection(Node node) {
-        acquiredNodes.incrementAndGet();
+        incrementAcquiredNodes();
     }
 
     @Override
@@ -351,7 +345,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         if (processExecutor != null) {
             processExecutor.killProcess();
         }
-        commandLineStarted.set(false);
+        setCommandLineStarted(false);
         // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
         logger.info("Process associated with node source " + nodeSource.getName() + " destroyed");
     }
@@ -359,6 +353,132 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public String toString() {
         return "Local Infrastructure";
+    }
+
+    @Override
+    protected void initializeRuntimeVariables() {
+        runtimeVariables.put(NB_ACQUIRED_NODES_KEY, 0);
+        runtimeVariables.put(NB_LOST_NODES_KEY, 0);
+        runtimeVariables.put(COMMAND_LINE_STARTED_KEY, false);
+        runtimeVariables.put(NB_HANDLED_NODES_KEY, maxNodes);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private int getAcquiredNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY);
+            }
+        });
+    }
+
+    private int getLostNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_LOST_NODES_KEY);
+            }
+        });
+    }
+
+    private int getHandledNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_HANDLED_NODES_KEY);
+            }
+        });
+    }
+
+    private void incrementAcquiredNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY) + 1;
+                runtimeVariables.put(NB_ACQUIRED_NODES_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private void incrementLostNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_LOST_NODES_KEY) + 1;
+                runtimeVariables.put(NB_LOST_NODES_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private int decrementAndGetAcquiredNodes() {
+        return setRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                int updated = (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY) - 1;
+                runtimeVariables.put(NB_ACQUIRED_NODES_KEY, updated);
+                return updated;
+            }
+        });
+    }
+
+    private void decrementHandledNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_HANDLED_NODES_KEY) - 1;
+                runtimeVariables.put(NB_HANDLED_NODES_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private void reinitializeAcquiredAndLostNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(NB_ACQUIRED_NODES_KEY, 0);
+                runtimeVariables.put(NB_LOST_NODES_KEY, 0);
+                return null;
+            }
+        });
+    }
+
+    private boolean getCommandLineStarted() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return (boolean) runtimeVariables.get(COMMAND_LINE_STARTED_KEY);
+            }
+        });
+    }
+
+    private void setCommandLineStarted(final boolean isCommandLineStarted) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(COMMAND_LINE_STARTED_KEY, isCommandLineStarted);
+                return null;
+            }
+        });
+    }
+
+    private boolean compareAndSetCommandLineStarted(final boolean expected, final boolean updated) {
+        return setRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                boolean commandLineStarted = (boolean) runtimeVariables.get(COMMAND_LINE_STARTED_KEY);
+                if (commandLineStarted == expected) {
+                    runtimeVariables.put(COMMAND_LINE_STARTED_KEY, updated);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
     }
 
 }

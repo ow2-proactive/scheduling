@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
@@ -70,7 +69,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
     @Configurable(fileBrowser = true, description = "A script that removes a node (parameters: host name and node url")
     protected File removalScript;
 
-    private final AtomicInteger numberOfRemovalThread = new AtomicInteger(0);
+    private static final String NB_REMOVAL_THREAD_KEY = "numberOfRemovalThread";
 
     /**
      * Configures the Infrastructure
@@ -128,7 +127,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
 
         final String nodeName = "SCR-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         final String commandLine = interpreter + " " + deploymentScript.getAbsolutePath() + " " + host.getHostName() +
-                                   " " + nodeName + " " + this.nodeSource.getName() + " " + rmUrl + " " + nbNodes;
+                                   " " + nodeName + " " + this.nodeSource.getName() + " " + getRmUrl() + " " + nbNodes;
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
@@ -216,7 +215,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
     protected void killNodeImpl(Node node, InetAddress h) {
         final Node n = node;
         final InetAddress host = h;
-        numberOfRemovalThread.incrementAndGet();
+        incrementNbRemovalThread();
         this.nodeSource.executeInParallel(new Runnable() {
             public void run() {
                 try {
@@ -249,7 +248,7 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
                 } catch (Exception e) {
                     logger.trace("An exception occurred during node removal", e);
                 }
-                numberOfRemovalThread.decrementAndGet();
+                decrementNbRemovalThread();
             }
         });
     }
@@ -278,8 +277,48 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
         deploymentScript.delete();
 
         // checking if we need to delete the removal script
-        if (this.numberOfRemovalThread.get() <= 0) {
+        if (getNbRemovalThread() <= 0) {
             removalScript.delete();
         }
     }
+
+    @Override
+    protected void initializeRuntimeVariables() {
+        super.initializeRuntimeVariables();
+        runtimeVariables.put(NB_REMOVAL_THREAD_KEY, 0);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private int getNbRemovalThread() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_REMOVAL_THREAD_KEY);
+            }
+        });
+    }
+
+    private void incrementNbRemovalThread() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_REMOVAL_THREAD_KEY) + 1;
+                runtimeVariables.put(NB_REMOVAL_THREAD_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private void decrementNbRemovalThread() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_REMOVAL_THREAD_KEY) - 1;
+                runtimeVariables.put(NB_REMOVAL_THREAD_KEY, updated);
+                return null;
+            }
+        });
+    }
+
 }

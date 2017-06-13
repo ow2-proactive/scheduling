@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.db;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,12 +34,12 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.security.auth.Subject;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
 @Entity
@@ -60,6 +61,11 @@ public class NodeSourceData implements Serializable {
     private Object[] policyParameters;
 
     private Client provider;
+
+    /**
+     * name of the variable --> value of the variable
+     */
+    private Map<String, Object> infrastructureVariables;
 
     public NodeSourceData() {
     }
@@ -132,4 +138,15 @@ public class NodeSourceData implements Serializable {
     public void setProvider(Client provider) {
         this.provider = provider;
     }
+
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Map<String, Object> getInfrastructureVariables() {
+        return infrastructureVariables;
+    }
+
+    public void setInfrastructureVariables(Map<String, Object> infrastructureVariables) {
+        this.infrastructureVariables = infrastructureVariables;
+    }
+
 }

@@ -68,4 +68,9 @@ public class LSFInfrastructure extends BatchJobInfrastructure {
         return "bsub";
     }
 
+    @Override
+    protected void initializeRuntimeVariables() {
+        super.initializeRuntimeVariables();
+    }
+
 }

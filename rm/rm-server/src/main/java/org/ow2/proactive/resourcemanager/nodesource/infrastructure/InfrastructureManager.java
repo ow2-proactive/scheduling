@@ -30,13 +30,14 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -45,6 +46,8 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
@@ -83,31 +86,88 @@ public abstract class InfrastructureManager implements Serializable {
     /** manager's node source */
     protected NodeSource nodeSource;
 
-    /** deploying nodes list */
-    private final Map<String, RMDeployingNode> deployingNodes = new ConcurrentHashMap<>();
+    /** key to retrieve the deploying nodes list: Map<String, RMDeployingNode> */
+    private static final String DEPLOYING_NODES_KEY = "infrastructureManagerDeployingNodes";
 
-    private final Map<String, RMDeployingNode> lostNodes = new ConcurrentHashMap<>();
+    /** key to retrieve the lost nodes list: Map<String, RMDeployingNode> */
+    private static final String LOST_NODES_KEY = "infrastructureManagerLostNodes";
 
     /**
-     * node list, miror of nodesource.getAliveNodes(), to implement random
+     * key to retrieve node list, miror of nodesource.getAliveNodes(), to implement random
      * access
      */
-    private Hashtable<String, Node> acquiredNodes = new Hashtable<>();
+    private static final String ACQUIRED_NODES_KEY = "infrastructureManagerAcquiredNodes";
 
-    private final ReentrantLock nodeAcquisitionLock = new ReentrantLock();
+    private static final String USING_DEPLOYING_NODES_KEY = "usingDeployingNodes";
 
-    // shared fields, needs to be volatile not to cache it
-    private volatile boolean usingDeployingNodes = false;
-
-    // shutdown marker
-    private volatile boolean shutdown = false;
+    // key to retrieve the shutdown marker
+    private static final String SHUTDOWN_FLAG_KEY = "infrastructureManagerShutdown";
 
     // used to timeout the nodes
     private transient Timer timeouter = null;
 
-    protected String rmUrl;
+    private static final String RM_URL_KEY = "infrastructureManagerRmUrl";
+
+    /**
+     * Store information about the running infrastructure. The map holds the name of monitored information and its
+     * value. The variables stored in this map should allow the full recovery of an infrastructure state.
+     * All accesses to this map must be synchronized.
+     */
+    protected Map<String, Object> runtimeVariables = new HashMap<>();
+
+    private ReadWriteLock reentrantLock = new ReentrantReadWriteLock();
+
+    /** Use this lock to wrap a read access to runtime variables */
+    protected Lock readLock = reentrantLock.readLock();
+
+    /** Use this lock to wrap a write access to runtime variables */
+    protected Lock writeLock = reentrantLock.writeLock();
+
+    /**
+     * Database manager, used to persist the runtime variables.
+     */
+    private RMDBManager dbManager;
 
     public InfrastructureManager() {
+    }
+
+    /**
+     * Acquire the read lock and call the handle method of the handler given in parameter.
+     * @return the value returned by the handle method
+     */
+    protected <T> T getRuntimeVariable(RuntimeVariablesHandler<T> t) {
+        T variable = null;
+        readLock.lock();
+        try {
+            variable = t.handle();
+        } catch (RuntimeException e) {
+            logger.error("Exception while getting runtime variable: " + e.getMessage());
+            throw e;
+        } finally {
+            readLock.unlock();
+        }
+        return variable;
+    }
+
+    /**
+     * Acquire the write lock, and then:
+     * 1) call the handle method of the handler given in parameter
+     * 2) call the method that persist in database the runtime variables.
+     * @return the return value of the handle method
+     */
+    protected <T> T setRuntimeVariable(RuntimeVariablesHandler<T> t) {
+        T variable = null;
+        writeLock.lock();
+        try {
+            variable = t.handle();
+            persistInfrastructureVariables();
+        } catch (RuntimeException e) {
+            logger.error("Exception while setting runtime variable: " + e.getMessage());
+            throw e;
+        } finally {
+            writeLock.unlock();
+        }
+        return variable;
     }
 
     /**
@@ -119,7 +179,18 @@ public abstract class InfrastructureManager implements Serializable {
      */
     public void setNodeSource(NodeSource nodeSource) {
         this.nodeSource = nodeSource;
-        this.rmUrl = nodeSource.getRegistrationURL();
+        // we do not set this variable using the setRuntimeVariable method because we do not want to persist
+        // at this time: the node source has not been persisted yet.
+        writeLock.lock();
+        try {
+            runtimeVariables.put(RM_URL_KEY, nodeSource.getRegistrationURL());
+        } catch (RuntimeException e) {
+            logger.error("Exception while putting RM URL in runtime variables: " + e.getMessage());
+            throw e;
+        } finally {
+            writeLock.unlock();
+        }
+
     }
 
     /**
@@ -129,25 +200,28 @@ public abstract class InfrastructureManager implements Serializable {
      */
     public ArrayList<RMDeployingNode> getDeployingNodes() {
         ArrayList<RMDeployingNode> result;
-        synchronized (deployingNodes) {
-            Collection<RMDeployingNode> rmDeployingNodes = this.deployingNodes.values();
-            Collection<RMDeployingNode> rmLostNodes = this.lostNodes.values();
+        readLock.lock();
+        try {
+            Collection<RMDeployingNode> rmDeployingNodes = valuesDeployingNodes();
+            Collection<RMDeployingNode> rmLostNodes = valuesLostNodes();
             result = new ArrayList<>(rmDeployingNodes.size() + rmLostNodes.size());
             result.addAll(rmDeployingNodes);
             result.addAll(rmLostNodes);
+        } catch (RuntimeException e) {
+            logger.error("Exception while getting deploying and lost nodes: " + e.getMessage());
+            throw e;
+        } finally {
+            readLock.unlock();
         }
         return result;
     }
 
     public RMDeployingNode getDeployingNode(String nodeUrl) {
-        RMDeployingNode deployingNode;
 
-        synchronized (deployingNodes) {
-            deployingNode = deployingNodes.get(nodeUrl);
-        }
+        RMDeployingNode deployingNode = getDeployingNodeFromRuntimeVariables(nodeUrl);
 
         if (deployingNode == null) {
-            return lostNodes.get(nodeUrl);
+            return getLostNodeFromRuntimeVariables(nodeUrl);
         }
 
         return deployingNode;
@@ -163,13 +237,21 @@ public abstract class InfrastructureManager implements Serializable {
     public final boolean internalRemoveDeployingNode(String pnUrl) {
         RMDeployingNode pn = null;
         boolean isLost = false;
-        synchronized (deployingNodes) {
-            pn = this.deployingNodes.remove(pnUrl);
+
+        writeLock.lock();
+        try {
+            pn = removeDeployingNode(pnUrl);
             if (pn == null) {
-                pn = this.lostNodes.remove(pnUrl);
+                pn = removeLostNode(pnUrl);
                 isLost = true;
             }
+        } catch (RuntimeException e) {
+            logger.error("Exception while removing deploying node: " + e.getMessage());
+            throw e;
+        } finally {
+            writeLock.unlock();
         }
+
         // if such a deploying or lost node exists
         if (pn != null) {
             String url = pn.getNodeURL();
@@ -197,12 +279,15 @@ public abstract class InfrastructureManager implements Serializable {
      * @throws RMException
      */
     public final void internalRemoveNode(Node node) throws RMException {
+        writeLock.lock();
         try {
-            this.acquiredNodes.remove(node.getNodeInformation().getName());
+            getAcquiredNodesMap().remove(node.getNodeInformation().getName());
         } catch (Exception e) {
             logger.warn("Exception occurred while removing node " + node);
+        } finally {
+            this.removeNode(node);
+            writeLock.unlock();
         }
-        this.removeNode(node);
     }
 
     /**
@@ -247,7 +332,7 @@ public abstract class InfrastructureManager implements Serializable {
         // if implementation doesn't use deploying nodes, we just execute
         // factory method and return
 
-        if (!usingDeployingNodes) {
+        if (!isUsingDeployingNode()) {
             this.notifyAcquiredNode(node);
             return null;
         }
@@ -255,8 +340,10 @@ public abstract class InfrastructureManager implements Serializable {
         RMDeployingNode pn;
         // we build the url of the associated deploying node
         String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
-        synchronized (nodeAcquisitionLock) {
-            pn = this.deployingNodes.remove(deployingNodeURL);
+
+        writeLock.lock();
+        try {
+            pn = removeDeployingNode(deployingNodeURL);
             // if a deploying node with this name exists, one runs the
             // implementation callback
             if (pn != null) {
@@ -267,7 +354,7 @@ public abstract class InfrastructureManager implements Serializable {
                 this.notifyAcquiredNode(node);
                 // if everything went well with the new node, caching it
                 try {
-                    this.acquiredNodes.put(node.getNodeInformation().getName(), node);
+                    putAcquiredNode(node.getNodeInformation().getName(), node);
                 } catch (Exception e) {
                     // if an exception occurred, we don't want to discard the
                     // node registration
@@ -278,6 +365,11 @@ public abstract class InfrastructureManager implements Serializable {
                 logger.warn("Not expected node registered, discarding it: " + url);
                 throw new RMException("Not expected node registered, discarding it: " + url);
             }
+        } catch (RuntimeException e) {
+            logger.error("Exception while changing deploying node to acquired node: " + e.getMessage());
+            throw e;
+        } finally {
+            writeLock.unlock();
         }
 
         return pn;
@@ -325,7 +417,17 @@ public abstract class InfrastructureManager implements Serializable {
      *             if the parameters are invalid
      */
     public final void internalConfigure(Object... parameters) {
-        this.configure(parameters);
+        writeLock.lock();
+        try {
+            internalInitializeRuntimeVariables();
+            initializeRuntimeVariables();
+            this.configure(parameters);
+        } catch (RuntimeException e) {
+            logger.error("Exception while initializing runtime variables and configuring infrastructure: " + e.getMessage());
+            throw e;
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
@@ -334,14 +436,14 @@ public abstract class InfrastructureManager implements Serializable {
      * implementation thanks to the method {@link #shutDown()}
      */
     public final void internalShutDown() {
-        this.shutdown = true;
+        setShutdownFlag(true);
         // first removing deploying nodes
-        for (String dnUrl : this.deployingNodes.keySet()) {
+        for (String dnUrl : keySetDeployingNodes()) {
             this.internalRemoveDeployingNode(dnUrl);
         }
         // no need to remove lost nodes, implementation is notified
         // at the timeout of the deploying node
-        this.deployingNodes.clear();
+        clearDeployingNodes();
         // delegating the call to the implementation
         this.shutDown();
 
@@ -363,6 +465,9 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Adds information required to deploy nodes in the future. Do not initiate
      * a real nodes deployment/acquisition as it's up to the policy.
+     * The runtime variables of an infrastructure should not be explicitly persisted in this method as the link with
+     * the node source is not properly set at the time of calling this method. They will be persisted at the end of the
+     * initialization in RMCore#createNodeSource
      *
      * @param parameters
      *            of the infrastructure manager
@@ -440,6 +545,31 @@ public abstract class InfrastructureManager implements Serializable {
     protected void shutDown() {
     }
 
+    /**
+     * First fetch the {@link NodeSourceData} associated to this infrastructure, then update the information related to
+     * the infrastructure, and then update in database the {@link NodeSourceData}.
+     */
+    public void persistInfrastructureVariables() {
+        readLock.lock();
+        try {
+            if (dbManager == null) {
+                setRmDbManager(RMDBManager.getInstance());
+            }
+            NodeSourceData nodeSource = dbManager.getNodeSource(this.nodeSource.getName());
+            nodeSource.setInfrastructureVariables(runtimeVariables);
+            dbManager.updateNodeSource(nodeSource);
+        } catch (RuntimeException e) {
+            logger.error("Exception while persisting runtime variables: " + e.getMessage());
+            throw e;
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    protected void setRmDbManager(RMDBManager dbManager) {
+        this.dbManager = dbManager;
+    }
+
     // **********************************************************************************************\\
     // **************************************** API methods
     // *****************************************\\
@@ -477,7 +607,7 @@ public abstract class InfrastructureManager implements Serializable {
                              e);
             }
         }
-        result.setRmURL(this.rmUrl);
+        result.setRmURL(getRmUrl());
         if (this.nodeSource != null) {
             String nsName = this.nodeSource.getName();
             result.setSourceName(nsName);
@@ -515,12 +645,12 @@ public abstract class InfrastructureManager implements Serializable {
     protected final String addDeployingNode(String name, String command, String description, final long timeout) {
         checkName(name);
         checkTimeout(timeout);
-        if (shutdown) {
+        if (getShutdownFlag()) {
             throw new UnsupportedOperationException("The infrastructure manager is shuting down.");
         }
         // if the user calls this method, we use the require nodes/timeout
         // mecanism
-        usingDeployingNodes = true;
+        setUsingDeployingNodes(true);
         NodeSource nsStub = this.nodeSource.getStub();
         RMDeployingNode deployingNode = RMDeployingNodeAccessor.getDefault().newRMDeployingNode(name,
                                                                                                 nsStub,
@@ -528,7 +658,7 @@ public abstract class InfrastructureManager implements Serializable {
                                                                                                 nsStub.getAdministrator(),
                                                                                                 description);
         final String deployingNodeUrl = deployingNode.getNodeURL();
-        this.deployingNodes.put(deployingNodeUrl, deployingNode);
+        putDeployingNode(deployingNodeUrl, deployingNode);
 
         nodeSource.setDeploying(deployingNode);
         // The value for 'deployingNode' is retrieved before calling 'nodeSource.setDeploying'
@@ -570,7 +700,7 @@ public abstract class InfrastructureManager implements Serializable {
      *         managed by the IM anymore.
      */
     protected final boolean updateDeployingNodeDescription(String toUpdateURL, String newDescription) {
-        RMDeployingNode pn = this.deployingNodes.get(toUpdateURL);
+        RMDeployingNode pn = getDeployingNodeFromRuntimeVariables(toUpdateURL);
         if (pn != null) {
             NodeState previousState = pn.getState();
             RMDeployingNodeAccessor.getDefault().setDescription(pn, newDescription);
@@ -600,11 +730,17 @@ public abstract class InfrastructureManager implements Serializable {
         RMDeployingNode deployingNode;
         // we need to atomically move the node from the deploying collection to
         // the lost one.
-        synchronized (deployingNodes) {
-            deployingNode = this.deployingNodes.remove(toUpdateURL);
+        writeLock.lock();
+        try {
+            deployingNode = removeDeployingNode(toUpdateURL);
             if (deployingNode != null) {
-                this.lostNodes.put(toUpdateURL, deployingNode);
+                putLostNode(toUpdateURL, deployingNode);
             }
+        } catch (RuntimeException e) {
+            logger.error("Exception while moving a node from deploying to lost: " + e.getMessage());
+            throw e;
+        } finally {
+            writeLock.unlock();
         }
 
         if (deployingNode != null) {
@@ -655,8 +791,9 @@ public abstract class InfrastructureManager implements Serializable {
      *         otherwise.
      */
     protected final boolean checkNodeIsAcquiredAndDo(String nodeName, Runnable toRunWhenOK, Runnable toRunWhenKO) {
-        synchronized (nodeAcquisitionLock) {
-            if (this.acquiredNodes.containsKey(nodeName)) {
+        writeLock.lock();
+        try {
+            if (containsKeyAcquiredNode(nodeName)) {
                 checkNodePostAction(toRunWhenOK,
                                     "An exception occurred while running implementation's code whereas the node " +
                                                  nodeName + " was found.");
@@ -667,6 +804,11 @@ public abstract class InfrastructureManager implements Serializable {
                                                  nodeName + " was not found.");
                 return false;
             }
+        } catch (RuntimeException e) {
+            logger.error("Exception while checking acquired node and doing post action: " + e.getMessage());
+            throw e;
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -728,7 +870,7 @@ public abstract class InfrastructureManager implements Serializable {
                                                "\" is forbidden");
         }
         String pnURL = this.buildDeployingNodeURL(name);
-        if (this.deployingNodes.containsKey(pnURL) || this.lostNodes.containsKey(pnURL)) {
+        if (containsKeyDeployingNode(pnURL) || containsKeyLostNode(pnURL)) {
             throw new IllegalArgumentException(RMDeployingNode.class.getSimpleName() + " with the same name (\"" +
                                                name + "\") has already been created");
         }
@@ -766,31 +908,50 @@ public abstract class InfrastructureManager implements Serializable {
      */
     public RMDeployingNode update(RMDeployingNode rmNode) {
         String nodeUrl = rmNode.getNodeURL();
-
-        if (rmNode.isLost() && lostNodes.containsKey(nodeUrl)) {
-            return lostNodes.put(nodeUrl, rmNode);
-        } else if (deployingNodes.containsKey(nodeUrl)) {
-            return deployingNodes.put(nodeUrl, rmNode);
+        RMDeployingNode previousDeployingNode;
+        if (rmNode.isLost() && containsKeyLostNode(nodeUrl)) {
+            previousDeployingNode = putLostNode(nodeUrl, rmNode);
+        } else if (containsKeyDeployingNode(nodeUrl)) {
+            previousDeployingNode = putDeployingNode(nodeUrl, rmNode);
         } else {
-            return null;
+            previousDeployingNode = null;
         }
+        return previousDeployingNode;
     }
 
     void addDeployingNode(RMDeployingNode node) {
-        deployingNodes.put(node.getNodeURL(), node);
+        putDeployingNode(node.getNodeURL(), node);
     }
 
     void addLostNode(RMDeployingNode node) {
-        lostNodes.put(node.getNodeURL(), node);
+        putLostNode(node.getNodeURL(), node);
     }
 
     Map<String, RMDeployingNode> getDeployingNodesDeployingState() {
-        return deployingNodes;
+        return getDeployingNodesMap();
     }
 
     Map<String, RMDeployingNode> getDeployingNodesLostState() {
-        return lostNodes;
+        return getLostNodesMap();
     }
+
+    private void internalInitializeRuntimeVariables() {
+        runtimeVariables.put(DEPLOYING_NODES_KEY, new HashMap<String, RMDeployingNode>());
+        runtimeVariables.put(LOST_NODES_KEY, new HashMap<String, RMDeployingNode>());
+        runtimeVariables.put(ACQUIRED_NODES_KEY, new HashMap<String, Node>());
+        runtimeVariables.put(USING_DEPLOYING_NODES_KEY, false);
+        runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
+        runtimeVariables.put(RM_URL_KEY, "");
+    }
+
+    /**
+     * This method should initialize a value in the runtime variables map for all the runtime variables that will be
+     * used in the class. It is called at initialization time of the infrastructure, just before the
+     * {@link InfrastructureManager#configure(Object...)} method.
+     *
+     * This method runs with the write lock acquired.
+     */
+    protected abstract void initializeRuntimeVariables();
 
     /**
      * Helper nested class. Used not to expose methods that should be package
@@ -852,4 +1013,211 @@ public abstract class InfrastructureManager implements Serializable {
          */
         protected abstract void setLost(RMDeployingNode pn);
     }
+
+    /**
+     * Interface that allows handling the runtime variables through a functional point of view.
+     * This allows protecting sensitive actions within one locked block.
+     *
+     * @param <T> the type of the retrieved variable if so.
+     */
+    protected interface RuntimeVariablesHandler<T> {
+
+        /**
+         * Typically, handles a sequence of actions involving the runtime variables.
+         *
+         * @return the manipulated variable.
+         */
+        T handle();
+
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private Map<String, RMDeployingNode> getDeployingNodesMap() {
+        return (Map<String, RMDeployingNode>) runtimeVariables.get(DEPLOYING_NODES_KEY);
+    }
+
+    private RMDeployingNode getDeployingNodeFromRuntimeVariables(final String nodeUrl) {
+        return getRuntimeVariable(new RuntimeVariablesHandler<RMDeployingNode>() {
+            @Override
+            public RMDeployingNode handle() {
+                return getDeployingNodesMap().get(nodeUrl);
+            }
+        });
+    }
+
+    private RMDeployingNode putDeployingNode(final String nodeUrl, final RMDeployingNode deployingNode) {
+        return setRuntimeVariable(new RuntimeVariablesHandler<RMDeployingNode>() {
+            @Override
+            public RMDeployingNode handle() {
+                return getDeployingNodesMap().put(nodeUrl, deployingNode);
+            }
+        });
+    }
+
+    private RMDeployingNode removeDeployingNode(final String nodeUrl) {
+        return setRuntimeVariable(new RuntimeVariablesHandler<RMDeployingNode>() {
+            @Override
+            public RMDeployingNode handle() {
+                return getDeployingNodesMap().remove(nodeUrl);
+            }
+        });
+    }
+
+    private boolean containsKeyDeployingNode(final String nodeUrl) {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return getDeployingNodesMap().containsKey(nodeUrl);
+            }
+        });
+    }
+
+    private Collection<String> keySetDeployingNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Collection<String>>() {
+            @Override
+            public Collection<String> handle() {
+                return getDeployingNodesMap().keySet();
+            }
+        });
+    }
+
+    private void clearDeployingNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                getDeployingNodesMap().clear();
+                return null;
+            }
+        });
+    }
+
+    private Collection<RMDeployingNode> valuesDeployingNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Collection<RMDeployingNode>>() {
+            @Override
+            public Collection<RMDeployingNode> handle() {
+                return getDeployingNodesMap().values();
+            }
+        });
+    }
+
+    private Map<String, RMDeployingNode> getLostNodesMap() {
+        return (Map<String, RMDeployingNode>) runtimeVariables.get(LOST_NODES_KEY);
+    }
+
+    private RMDeployingNode getLostNodeFromRuntimeVariables(final String nodeUrl) {
+        return getRuntimeVariable(new RuntimeVariablesHandler<RMDeployingNode>() {
+            @Override
+            public RMDeployingNode handle() {
+                return getLostNodesMap().get(nodeUrl);
+            }
+        });
+    }
+
+    private RMDeployingNode putLostNode(final String nodeUrl, final RMDeployingNode deployingNode) {
+        return setRuntimeVariable(new RuntimeVariablesHandler<RMDeployingNode>() {
+            @Override
+            public RMDeployingNode handle() {
+                return getLostNodesMap().put(nodeUrl, deployingNode);
+            }
+        });
+    }
+
+    private RMDeployingNode removeLostNode(final String nodeUrl) {
+        return setRuntimeVariable(new RuntimeVariablesHandler<RMDeployingNode>() {
+            @Override
+            public RMDeployingNode handle() {
+                return getLostNodesMap().remove(nodeUrl);
+            }
+        });
+    }
+
+    private boolean containsKeyLostNode(final String nodeUrl) {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return getLostNodesMap().containsKey(nodeUrl);
+            }
+        });
+    }
+
+    private Collection<RMDeployingNode> valuesLostNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Collection<RMDeployingNode>>() {
+            @Override
+            public Collection<RMDeployingNode> handle() {
+                return getLostNodesMap().values();
+            }
+        });
+    }
+
+    private Map<String, Node> getAcquiredNodesMap() {
+        return (Map<String, Node>) runtimeVariables.get(ACQUIRED_NODES_KEY);
+    }
+
+    private void putAcquiredNode(final String nodeUrl, final Node deployingNode) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                getAcquiredNodesMap().put(nodeUrl, deployingNode);
+                return null;
+            }
+        });
+    }
+
+    private boolean containsKeyAcquiredNode(final String nodeUrl) {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return getAcquiredNodesMap().containsKey(nodeUrl);
+            }
+        });
+    }
+
+    private boolean getShutdownFlag() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return (Boolean) runtimeVariables.get(SHUTDOWN_FLAG_KEY);
+            }
+        });
+    }
+
+    private void setShutdownFlag(final boolean isShutdown) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
+                return null;
+            }
+        });
+    }
+
+    public boolean isUsingDeployingNode() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return (boolean) runtimeVariables.get(USING_DEPLOYING_NODES_KEY);
+            }
+        });
+    }
+
+    private void setUsingDeployingNodes(final boolean isUsingDeployingNodes) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(USING_DEPLOYING_NODES_KEY, isUsingDeployingNodes);
+                return null;
+            }
+        });
+    }
+
+    protected String getRmUrl() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<String>() {
+            @Override
+            public String handle() {
+                return (String) runtimeVariables.get(RM_URL_KEY);
+            }
+        });
+    }
+
 }
