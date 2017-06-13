@@ -26,11 +26,18 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
+import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 
 
@@ -42,14 +49,29 @@ public class InfrastructureManagerTest {
 
     private TestingInfrastructureManager infrastructureManager;
 
+    @Mock
+    private NodeSource nodeSource;
+
+    @Mock
+    private RMDBManager dbManager;
+
+    @Mock
+    private NodeSourceData nodeSourceData;
+
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
         infrastructureManager = new TestingInfrastructureManager();
+        infrastructureManager.internalConfigure();
+        infrastructureManager.setRmDbManager(dbManager);
+        infrastructureManager.setNodeSource(nodeSource);
+        when(nodeSource.getName()).thenReturn("NodeSource#1");
+        when(dbManager.getNodeSource(anyString())).thenReturn(nodeSourceData);
     }
 
     @Test
     public void testGetDeployingNodeUnknownNode() {
-        RMDeployingNode rmNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode rmNode = new RMDeployingNode("deploying", nodeSource, "command", null);
 
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(0);
         assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
@@ -61,7 +83,7 @@ public class InfrastructureManagerTest {
 
     @Test
     public void testGetDeployingNodeDeployingStateKnow() {
-        RMDeployingNode rmNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode rmNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         infrastructureManager.addDeployingNode(rmNode);
 
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
@@ -74,9 +96,9 @@ public class InfrastructureManagerTest {
 
     @Test
     public void testGetDeployingNodeLostStateKnow() {
-        RMDeployingNode deployingNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode deployingNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         infrastructureManager.addDeployingNode(deployingNode);
-        RMDeployingNode lostNode = new RMDeployingNode("lost", null, "command", null);
+        RMDeployingNode lostNode = new RMDeployingNode("lost", nodeSource, "command", null);
         lostNode.setLost();
         infrastructureManager.addLostNode(lostNode);
 
@@ -94,9 +116,9 @@ public class InfrastructureManagerTest {
 
     @Test
     public void testGetDeployingNodeConflictingUrls() {
-        RMDeployingNode deployingNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode deployingNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         infrastructureManager.addDeployingNode(deployingNode);
-        RMDeployingNode lostNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode lostNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         lostNode.setLost();
         infrastructureManager.addLostNode(lostNode);
 
@@ -111,7 +133,7 @@ public class InfrastructureManagerTest {
 
     @Test
     public void testUpdateUnknownNode() {
-        RMDeployingNode rmNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode rmNode = new RMDeployingNode("deploying", nodeSource, "command", null);
 
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(0);
         assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
@@ -125,13 +147,13 @@ public class InfrastructureManagerTest {
 
     @Test
     public void testUpdateDeployingNodeKnown() {
-        RMDeployingNode rmNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode rmNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         infrastructureManager.addDeployingNode(rmNode);
 
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
         assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
 
-        RMDeployingNode rmNode2 = new RMDeployingNode("deploying", null, "command2", null);
+        RMDeployingNode rmNode2 = new RMDeployingNode("deploying", nodeSource, "command2", null);
 
         RMDeployingNode oldRmNode = infrastructureManager.update(rmNode2);
 
@@ -143,16 +165,16 @@ public class InfrastructureManagerTest {
 
     @Test
     public void testUpdateLostNodeKnown() {
-        RMDeployingNode deployingNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode deployingNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         infrastructureManager.addDeployingNode(deployingNode);
-        RMDeployingNode lostNode = new RMDeployingNode("lost", null, "command", null);
+        RMDeployingNode lostNode = new RMDeployingNode("lost", nodeSource, "command", null);
         lostNode.setLost();
         infrastructureManager.addLostNode(lostNode);
 
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
         assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
 
-        RMDeployingNode lostNode2 = new RMDeployingNode("lost", null, "command2", null);
+        RMDeployingNode lostNode2 = new RMDeployingNode("lost", nodeSource, "command2", null);
         lostNode2.setLost();
 
         RMDeployingNode oldRmNode = infrastructureManager.update(lostNode2);
@@ -166,16 +188,16 @@ public class InfrastructureManagerTest {
 
     @Test
     public void testUpdateLostNodeKnownConflictingUrls() {
-        RMDeployingNode deployingNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode deployingNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         infrastructureManager.addDeployingNode(deployingNode);
-        RMDeployingNode lostNode = new RMDeployingNode("deploying", null, "command", null);
+        RMDeployingNode lostNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         lostNode.setLost();
         infrastructureManager.addLostNode(lostNode);
 
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
         assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
 
-        RMDeployingNode lostNode2 = new RMDeployingNode("deploying", null, "command2", null);
+        RMDeployingNode lostNode2 = new RMDeployingNode("deploying", nodeSource, "command2", null);
         lostNode2.setLost();
 
         RMDeployingNode oldRmNode = infrastructureManager.update(lostNode2);
@@ -217,6 +239,11 @@ public class InfrastructureManagerTest {
 
         @Override
         protected void notifyAcquiredNode(Node node) throws RMException {
+
+        }
+
+        @Override
+        protected void initializeRuntimeVariables() {
 
         }
 

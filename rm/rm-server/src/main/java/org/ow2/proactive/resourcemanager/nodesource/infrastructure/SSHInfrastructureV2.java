@@ -104,13 +104,13 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     @Configurable(description = "Linux, Cygwin or Windows depending on the operating system of the remote hosts")
     protected String targetOs = "Linux";
 
-    protected OperatingSystem targetOSObj;
-
     @Configurable(description = "Options for the java command launching the node on the remote hosts")
     protected String javaOptions;
 
-    /** Shutdown flag */
-    protected volatile boolean shutdown;
+    private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
+
+    /** key of the shutdown flag */
+    private static final String SHUTDOWN_FLAG_KEY = "shutdownFlag";
 
     /**
      * Internal node acquisition method
@@ -126,7 +126,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      */
     public void startNodeImpl(final InetAddress host, final int nbNodes, final List<String> depNodeURLs)
             throws RMException {
-        String fs = this.targetOSObj.fs;
+        String fs = getTargetOSObj().fs;
         // we set the java security policy file
         ArrayList<String> sb = new ArrayList<>();
         final boolean containsSpace = schedulingPath.contains(" ");
@@ -169,7 +169,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         if (this.javaOptions != null && !this.javaOptions.trim().isEmpty()) {
             sb.add(this.javaOptions.trim());
         }
-        CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
+        CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
         clb.setJavaPath(this.javaPath);
         clb.setRmHome(this.schedulingPath);
         clb.setPaProperties(sb);
@@ -252,7 +252,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             Future<Void> deployResult = deployService.submit(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    while (!shutdown && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
+                    while (!getShutdownFlag() && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
                         if (anyTimedOut(depNodeURLs)) {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }
@@ -367,12 +367,15 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         if (parameters[index] == null) {
             throw new IllegalArgumentException("Target OS parameter cannot be null");
         }
-        this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[index++].toString());
-        if (this.targetOSObj == null) {
+        setTargetOsObj(OperatingSystem.getOperatingSystem(parameters[index++].toString()));
+        if (getTargetOSObj() == null) {
             throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
         }
 
         this.javaOptions = parameters[index++].toString();
+
+        // shutdown flag
+        setShutdownFlag(false);
     }
 
     @Override
@@ -406,6 +409,53 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     @Override
     public void shutDown() {
-        this.shutdown = true;
+        setShutdownFlag(true);
     }
+
+    @Override
+    protected void initializeRuntimeVariables() {
+        runtimeVariables.put(TARGET_OS_OBJ_KEY, null);
+        runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private OperatingSystem getTargetOSObj() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<OperatingSystem>() {
+            @Override
+            public OperatingSystem handle() {
+                return (OperatingSystem) runtimeVariables.get(TARGET_OS_OBJ_KEY);
+            }
+        });
+    }
+
+    private void setTargetOsObj(final OperatingSystem os) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(TARGET_OS_OBJ_KEY, os);
+                return null;
+            }
+        });
+    }
+
+    private boolean getShutdownFlag() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return (boolean) runtimeVariables.get(SHUTDOWN_FLAG_KEY);
+            }
+        });
+    }
+
+    private void setShutdownFlag(final boolean isShutdown) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
+                return null;
+            }
+        });
+    }
+
 }

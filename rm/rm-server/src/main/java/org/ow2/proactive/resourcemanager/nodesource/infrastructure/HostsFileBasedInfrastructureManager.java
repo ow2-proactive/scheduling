@@ -32,12 +32,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -69,22 +67,25 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     /**
      * map of free hosts with the number of nodes to deploy on each host
      */
-    private ConcurrentHashMap<InetAddress, Integer> freeHosts = new ConcurrentHashMap<>();
+    private static final String FREE_HOSTS_KEY = "freeHosts";
 
     /**
      * The set of nodes for which one the registerAcquiredNode has been run.
      */
-    private Hashtable<String, InetAddress> registeredNodes = new Hashtable<>();
+    private static final String REGISTERED_NODES_KEY = "registeredNodes";
 
     /**
      * Nodes previously removed
      */
-    final ConcurrentHashMap<InetAddress, AtomicInteger> removedNodes = new ConcurrentHashMap<>();
+    private static final String REMOVED_HOSTS_KEY = "removedHosts";
 
     /**
      * To notify the control loop of the deploying node timeout
      */
-    protected ConcurrentHashMap<String, Boolean> pnTimeout = new ConcurrentHashMap<>();
+    private static final String PN_TIMEOUT_KEY = "pnTimeout";
+
+    protected HostsFileBasedInfrastructureManager() {
+    }
 
     /**
      * Acquire one node per available host
@@ -92,7 +93,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Override
     public void acquireAllNodes() {
 
-        while (freeHosts.size() > 0) {
+        while (getFreeHostsSize() > 0) {
             acquireNode();
         }
 
@@ -106,16 +107,17 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         final InetAddress tmpHost;
         final int nbNodes;
 
-        if (freeHosts.size() == 0) {
+        if (getFreeHostsSize() == 0) {
             logger.info("Attempting to acquire nodes while all hosts are already deployed.");
             return;
         }
-        Iterator<Map.Entry<InetAddress, Integer>> iterator = freeHosts.entrySet().iterator();
+        Iterator<Map.Entry<InetAddress, Integer>> iterator = getFreeHostsEntrySetIterator();
         final Map.Entry<InetAddress, Integer> tmpEntry = iterator.next();
         iterator.remove();
         tmpHost = tmpEntry.getKey();
         nbNodes = tmpEntry.getValue();
-        logger.info("Acquiring a new node. #freeHosts:" + freeHosts.size() + " #registered: " + registeredNodes.size());
+        logger.info("Acquiring a new node. #freeHosts:" + getFreeHostsSize() + " #registered: " +
+                    getRegisteredNodesSize());
 
         this.nodeSource.executeInParallel(new Runnable() {
             public void run() {
@@ -123,14 +125,14 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                     startNodeImplWithRetries(tmpHost, nbNodes, maxDeploymentFailure);
 
                     //node acquisition went well for host so we update the threshold
-                    logger.debug("Node acquisition ended. #freeHosts:" + freeHosts.size() + " #registered: " +
-                                 registeredNodes.size());
+                    logger.debug("Node acquisition ended. #freeHosts:" + getFreeHostsSize() + " #registered: " +
+                                 getRegisteredNodesSize());
 
                 } catch (Exception e) {
 
                     String description = "Could not acquire node on host " + tmpHost +
                                          ". NS's state refreshed regarding last checked exception: #freeHosts:" +
-                                         freeHosts.size() + " #registered: " + registeredNodes.size();
+                                         getFreeHostsSize() + " #registered: " + getRegisteredNodesSize();
                     logger.error(description, e);
                     return;
                 }
@@ -224,7 +226,20 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             try {
                 InetAddress addr = InetAddress.getByName(host);
 
-                this.freeHosts.putIfAbsent(addr, num);
+                // do not use the setRuntimeVariable method here because we cannot persist the variable yet: we need
+                // the configuration to be over for that
+                writeLock.lock();
+                try {
+                    Integer retrieved = getFreeHosts().get(addr);
+                    if (retrieved == null) {
+                        getFreeHosts().put(addr, num);
+                    }
+                } catch (RuntimeException e) {
+                    logger.error("Exception while manipulating free nodes data structure: " + e.getMessage());
+                    throw e;
+                } finally {
+                    writeLock.unlock();
+                }
 
             } catch (UnknownHostException ex) {
                 throw new RuntimeException("Unknown host: " + host, ex);
@@ -239,7 +254,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
-        this.pnTimeout.put(pnURL, new Boolean(true));
+        putPnTimeout(pnURL, Boolean.TRUE);
     }
 
     /**
@@ -248,10 +263,10 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Override
     protected void notifyAcquiredNode(Node node) throws RMException {
         String nodeName = node.getNodeInformation().getName();
-        this.registeredNodes.put(nodeName, node.getVMInformation().getInetAddress());
+        putRegisteredNodes(nodeName, node.getVMInformation().getInetAddress());
         if (logger.isDebugEnabled()) {
-            logger.debug("New expected node registered: #freeHosts:" + freeHosts.size() + " #registered: " +
-                         registeredNodes.size());
+            logger.debug("New expected node registered: #freeHosts:" + getFreeHostsSize() + " #registered: " +
+                         getRegisteredNodesSize());
         }
     }
 
@@ -260,29 +275,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     @Override
     public void removeNode(Node node) {
-        InetAddress host = null;
-        String nodeName = node.getNodeInformation().getName();
-        if ((host = registeredNodes.remove(nodeName)) != null) {
-            logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " +
-                         this.getClass().getSimpleName());
-            // remember the node removed
-            removedNodes.putIfAbsent(host, new AtomicInteger(0));
-            removedNodes.get(host).incrementAndGet();
-            if (!registeredNodes.containsValue(host)) {
-                try {
-                    this.killNodeImpl(node, host);
-                } catch (Exception e) {
-                    logger.trace("An exception occurred during node removal", e);
-                }
-                // in case all nodes relative to this host were removed kill the JVM
-                freeHosts.putIfAbsent(host, removedNodes.remove(host).intValue());
-            }
-            logger.info("Node " + nodeName + " removed. #freeHosts:" + freeHosts.size() + " #registered nodes: " +
-                        registeredNodes.size());
-
-        } else {
-            logger.error("Node " + nodeName + " is not known as a node belonging to this infrastructure manager");
-        }
+        atomicRemoveNode(node);
     }
 
     @Override
@@ -293,17 +286,17 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         // like most of the other methods of this class...
         // See https://github.com/ow2-proactive/scheduling/issues/2811
 
-        AtomicInteger nbNodesRemoved = removedNodes.get(host);
+        Integer nbNodesRemoved = getRemovedNode(host);
 
         if (nbNodesRemoved != null) {
-            nbNodesRemoved.decrementAndGet();
-            registeredNodes.put(node.getNodeInformation().getName(), host);
+            decrementRemovedNodes(host);
+            putRegisteredNodes(node.getNodeInformation().getName(), host);
         }
     }
 
     protected boolean anyTimedOut(List<String> nodesUrl) {
         for (String nodeUrl : nodesUrl) {
-            if (pnTimeout.get(nodeUrl)) {
+            if (getPnTimeout(nodeUrl)) {
                 return true;
             }
         }
@@ -312,13 +305,13 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     protected void removeTimeouts(List<String> nodesUrl) {
         for (String nodeUrl : nodesUrl) {
-            pnTimeout.remove(nodeUrl);
+            removePnTimeout(nodeUrl);
         }
     }
 
     protected void addTimeouts(List<String> nodesUrl) {
         for (String pnUrl : nodesUrl) {
-            this.pnTimeout.put(pnUrl, false);
+            putPnTimeout(pnUrl, false);
         }
     }
 
@@ -373,6 +366,56 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     }
 
+    @Override
+    protected void initializeRuntimeVariables() {
+        runtimeVariables.put(FREE_HOSTS_KEY, new HashMap<InetAddress, Integer>());
+        runtimeVariables.put(REGISTERED_NODES_KEY, new HashMap<String, InetAddress>());
+        runtimeVariables.put(REMOVED_HOSTS_KEY, new HashMap<InetAddress, Integer>());
+        runtimeVariables.put(PN_TIMEOUT_KEY, new HashMap<String, Boolean>());
+    }
+
+    private void atomicRemoveNode(final Node node) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                String nodeName = node.getNodeInformation().getName();
+                InetAddress host = getRegisteredNodes().remove(nodeName);
+                if (host != null) {
+                    logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " +
+                                 this.getClass().getSimpleName());
+                    // remember the node removed
+                    Integer retrieved = getRemovedHosts().get(host);
+                    if (retrieved == null) {
+                        retrieved = 0;
+                    }
+                    getRemovedHosts().put(host, ++retrieved);
+
+                    // in case all nodes relative to this host were removed kill the JVM
+                    if (!getRegisteredNodes().containsValue(host)) {
+                        try {
+                            killNodeImpl(node, host);
+                        } catch (Exception e) {
+                            logger.trace("An exception occurred during node removal", e);
+                        }
+                        // set the free hosts again
+                        int value = getRemovedHosts().remove(host);
+                        Integer retrievedNbFreeHosts = getFreeHosts().get(host);
+                        if (retrievedNbFreeHosts == null) {
+                            getFreeHosts().put(host, value);
+                        }
+                    }
+                    logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() +
+                                " #registered nodes: " + getRegisteredNodesSize());
+
+                } else {
+                    logger.error("Node " + nodeName +
+                                 " is not known as a node belonging to this infrastructure manager");
+                }
+                return null;
+            }
+        });
+    }
+
     /**
      * Launch the node on the host passed as parameter
      * @param host The host on which one the node will be started
@@ -390,4 +433,122 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * @throws RMException if a problem occurred while removing
      */
     protected abstract void killNodeImpl(Node node, InetAddress host) throws RMException;
+
+    // Below are wrapper methods around the runtime variables map
+
+    private Map<InetAddress, Integer> getFreeHosts() {
+        return (Map<InetAddress, Integer>) runtimeVariables.get(FREE_HOSTS_KEY);
+    }
+
+    private int getFreeHostsSize() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return getFreeHosts().size();
+            }
+        });
+    }
+
+    private void putIfAbsentFreeHosts(final InetAddress inetAddress, final Integer value) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                Integer retrieved = getFreeHosts().get(inetAddress);
+                if (retrieved == null) {
+                    getFreeHosts().put(inetAddress, value);
+                }
+                return null;
+            }
+        });
+    }
+
+    private Iterator<Map.Entry<InetAddress, Integer>> getFreeHostsEntrySetIterator() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Iterator<Map.Entry<InetAddress, Integer>>>() {
+            @Override
+            public Iterator<Map.Entry<InetAddress, Integer>> handle() {
+                return getFreeHosts().entrySet().iterator();
+            }
+        });
+    }
+
+    private Map<String, InetAddress> getRegisteredNodes() {
+        return (Map<String, InetAddress>) runtimeVariables.get(REGISTERED_NODES_KEY);
+    }
+
+    private int getRegisteredNodesSize() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return getRegisteredNodes().size();
+            }
+        });
+    }
+
+    private void putRegisteredNodes(final String nodeName, final InetAddress inetAddress) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                getRegisteredNodes().put(nodeName, inetAddress);
+                return null;
+            }
+        });
+    }
+
+    private Map<InetAddress, Integer> getRemovedHosts() {
+        return (Map<InetAddress, Integer>) runtimeVariables.get(REMOVED_HOSTS_KEY);
+    }
+
+    private int getRemovedNode(final InetAddress inetAddress) {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return getRemovedHosts().get(inetAddress);
+            }
+        });
+    }
+
+    private void decrementRemovedNodes(final InetAddress inetAddress) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = getRemovedHosts().get(inetAddress) - 1;
+                getRemovedHosts().put(inetAddress, updated);
+                return null;
+            }
+        });
+    }
+
+    private Map<String, Boolean> getPnTimeoutMap() {
+        return (Map<String, Boolean>) runtimeVariables.get(PN_TIMEOUT_KEY);
+    }
+
+    private Boolean getPnTimeout(final String key) {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return getPnTimeoutMap().get(key);
+            }
+        });
+    }
+
+    private void putPnTimeout(final String key, final Boolean value) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                getPnTimeoutMap().put(key, value);
+                return null;
+            }
+        });
+    }
+
+    private void removePnTimeout(final String key) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                getPnTimeoutMap().remove(key);
+                return null;
+            }
+        });
+    }
+
 }
