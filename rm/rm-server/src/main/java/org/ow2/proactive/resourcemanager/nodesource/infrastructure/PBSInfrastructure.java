@@ -86,4 +86,9 @@ public class PBSInfrastructure extends BatchJobInfrastructure {
         logger.debug("no jobID retrieved from submit command output: " + output);
         return null;
     }
+
+    @Override
+    protected void initializeRuntimeVariables() {
+        super.initializeRuntimeVariables();
+    }
 }

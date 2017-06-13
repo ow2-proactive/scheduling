@@ -1188,6 +1188,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new RuntimeException("Cannot create node source " + data.getName(), e);
         }
 
+        // Infrastructure has been configured and linked to the node source, so we can now persist the runtime
+        // variables of the infrastructure for the first time (they have been initialized during the creation of the
+        // infrastructure, in its configuration.
+        im.persistInfrastructureVariables();
+
         // Adding access to the core for node source and policy.
         // In order to do it node source and policy active objects are added to the clients list.
         // They will be removed from this list when node source is unregistered.

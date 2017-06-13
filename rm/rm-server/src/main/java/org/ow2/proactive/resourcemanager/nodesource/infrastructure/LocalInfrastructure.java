@@ -61,24 +61,29 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")
     private int maxNodes = DEFAULT_NODE_NUMBER;
 
-    // number of nodes which can still be acquired
-    private AtomicInteger acquiredNodes;
-
-    private AtomicInteger lostNodes;
-
-    private AtomicInteger handledNodes;
-
-    /**
-     * Index of deployment, if startNode is called multiple times, each time a new process will be created.
-     * The index is used to prevent conflicts in nodes urls
-     */
-    private AtomicInteger index;
-
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
     private long nodeTimeout = DEFAULT_TIMEOUT;
 
     @Configurable(description = "Additional ProActive properties")
     private String paProperties = "";
+
+    /**
+     * key to retrieve the number of nodes which are acquired in the persisted
+     * infrastructure variables
+     */
+    private static final String NB_ACQUIRED_NODES_KEY = "nbAcquiredNodes";
+
+    private static final String NB_LOST_NODES_KEY = "nbLostNodes";
+
+    private static final String NB_HANDLED_NODES_KEY = "nbHandledNodes";
+
+    private static final String COMMAND_LINE_STARTED_KEY = "commandLineStarted";
+
+    /**
+     * Index of deployment, if startNode is called multiple times, each time a new process will be created.
+     * The index is used to prevent conflicts in nodes urls
+     */
+    private static final String INDEX_KEY = "index";
 
     /**
      * A map containing process executors, associated with their corresponding deployment node urls.
@@ -118,8 +123,8 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     private void startNodeProcess(int numberOfNodes) {
 
-        this.handledNodes.addAndGet(numberOfNodes);
-        int currentIndex = index.getAndIncrement();
+        addHandledNodes(numberOfNodes);
+        int currentIndex = getIndex();
         String baseNodeName = "local-" + this.nodeSource.getName() + "-" + currentIndex;
         OperatingSystem os = OperatingSystem.UNIX;
         // assuming no cygwin, windows or the "others"...
@@ -281,11 +286,11 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private boolean allNodesAcquiredOrLost() {
-        return (acquiredNodes.get() + lostNodes.get()) == handledNodes.get();
+        return (getAcquiredNodes() + getLostNodes()) == getHandledNodes();
     }
 
     private boolean allNodesLost(int numberOfNodes) {
-        return lostNodes.get() == numberOfNodes;
+        return getLostNodes() == numberOfNodes;
     }
 
     private void cleanProcess(ProcessExecutor processExecutor) {
@@ -314,11 +319,6 @@ public class LocalInfrastructure extends InfrastructureManager {
             throw new IllegalArgumentException("Cannot determine max node");
         }
 
-        this.acquiredNodes = new AtomicInteger(0);
-        this.lostNodes = new AtomicInteger(0);
-        this.handledNodes = new AtomicInteger(0);
-        this.index = new AtomicInteger(0);
-
         try {
             this.nodeTimeout = Integer.parseInt(args[index++].toString());
         } catch (Exception e) {
@@ -333,12 +333,12 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
-        this.lostNodes.incrementAndGet();
+        incrementLostNodes();
     }
 
     @Override
     protected void notifyAcquiredNode(Node arg0) throws RMException {
-        this.acquiredNodes.incrementAndGet();
+        incrementAcquiredNodes();
     }
 
     @Override
@@ -348,10 +348,10 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         if (!this.nodeSource.getDownNodes().contains(node)) {
             // the node was manually removed
-            handledNodes.decrementAndGet();
+            decrementHandledNodes();
         }
 
-        int remainingNodesCount = this.acquiredNodes.decrementAndGet();
+        int remainingNodesCount = decrementAndGetAcquiredNodes();
         // If there is no remaining node, kill the JVM process
         if (remainingNodesCount == 0) {
             shutDown();
@@ -360,7 +360,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void onDownNodeReconnection(Node node) {
-        acquiredNodes.incrementAndGet();
+        incrementAcquiredNodes();
     }
 
     @Override
@@ -376,6 +376,108 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public String toString() {
         return "Local Infrastructure";
+    }
+
+    @Override
+    protected void initializeRuntimeVariables() {
+        runtimeVariables.put(NB_ACQUIRED_NODES_KEY, 0);
+        runtimeVariables.put(NB_LOST_NODES_KEY, 0);
+        runtimeVariables.put(COMMAND_LINE_STARTED_KEY, false);
+        runtimeVariables.put(NB_HANDLED_NODES_KEY, 0);
+        runtimeVariables.put(INDEX_KEY, 0);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private int getAcquiredNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY);
+            }
+        });
+    }
+
+    private int getLostNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_LOST_NODES_KEY);
+            }
+        });
+    }
+
+    private void incrementAcquiredNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY) + 1;
+                runtimeVariables.put(NB_ACQUIRED_NODES_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private void incrementLostNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_LOST_NODES_KEY) + 1;
+                runtimeVariables.put(NB_LOST_NODES_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private int decrementAndGetAcquiredNodes() {
+        return setRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                int updated = (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY) - 1;
+                runtimeVariables.put(NB_ACQUIRED_NODES_KEY, updated);
+                return updated;
+            }
+        });
+    }
+
+    private int getHandledNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_HANDLED_NODES_KEY);
+            }
+        });
+    }
+
+    private void decrementHandledNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_HANDLED_NODES_KEY) - 1;
+                runtimeVariables.put(NB_HANDLED_NODES_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private void addHandledNodes(final int numberOfNodes) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NB_HANDLED_NODES_KEY) + numberOfNodes;
+                runtimeVariables.put(NB_HANDLED_NODES_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private int getIndex() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(INDEX_KEY);
+            }
+        });
     }
 
 }

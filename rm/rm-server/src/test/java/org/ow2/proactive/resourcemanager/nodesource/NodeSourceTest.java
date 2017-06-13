@@ -28,11 +28,13 @@ package org.ow2.proactive.resourcemanager.nodesource;
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.security.Permission;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +76,7 @@ public class NodeSourceTest {
         PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.updateProperty("false");
 
         infrastructureManager = mock(InfrastructureManager.class);
+        when(infrastructureManager.isUsingDeployingNode()).thenReturn(false);
 
         NodeSourcePolicy nodeSourcePolicy = mock(NodeSourcePolicy.class);
 
