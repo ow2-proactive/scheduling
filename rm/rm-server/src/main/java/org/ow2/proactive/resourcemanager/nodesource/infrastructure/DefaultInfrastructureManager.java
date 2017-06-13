@@ -46,7 +46,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     protected static Logger logger = Logger.getLogger(DefaultInfrastructureManager.class);
 
     /** registered nodes number */
-    protected int nodesCount = 0;
+    private static final String NODES_COUNT_KEY = "nodesCount";
 
     /**
      * Proactive default constructor.
@@ -99,7 +99,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
                     }
                 });
             }
-            nodesCount--;
+            decrementNodesCount();
         } catch (Exception e) {
             throw new RMException(e);
         }
@@ -149,7 +149,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void notifyAcquiredNode(Node node) throws RMException {
-        nodesCount++;
+        incrementNodesCount();
     }
 
     /**
@@ -166,6 +166,35 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void shutDown() {
+    }
+
+    @Override
+    protected void initializeRuntimeVariables() {
+        runtimeVariables.put(NODES_COUNT_KEY, 0);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private void incrementNodesCount() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NODES_COUNT_KEY) + 1;
+                runtimeVariables.put(NODES_COUNT_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private void decrementNodesCount() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) runtimeVariables.get(NODES_COUNT_KEY) - 1;
+                runtimeVariables.put(NODES_COUNT_KEY, updated);
+                return null;
+            }
+        });
     }
 
 }

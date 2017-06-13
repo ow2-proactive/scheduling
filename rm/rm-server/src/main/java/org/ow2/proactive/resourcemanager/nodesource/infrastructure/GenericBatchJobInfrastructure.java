@@ -48,8 +48,8 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
     @Configurable(fileBrowser = true, description = "Absolute path to the\nclass file of the implementation")
     protected String implementationFile;
 
-    // the actual implementation of the infrastructure
-    private BatchJobInfrastructure implementation;
+    // key to retrieve the actual implementation of the infrastructure
+    private static final String BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY = "implementation";
 
     @Override
     public void configure(Object... parameters) {
@@ -99,7 +99,7 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
             FileToBytesConverter.convertByteArrayToFile(implemtationClassfile, classFile);
             URLClassLoader cl = new URLClassLoader(new URL[] { f.toURL() }, this.getClass().getClassLoader());
             Class<? extends BatchJobInfrastructure> implementationClass = (Class<? extends BatchJobInfrastructure>) cl.loadClass(this.implementationClassname);
-            this.implementation = implementationClass.newInstance();
+            setBatchJobInfrastructure(implementationClass.newInstance());
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Class " + this.implementationClassname + " does not exist", e);
         } catch (MalformedURLException e) {
@@ -116,13 +116,13 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
 
     @Override
     protected String extractSubmitOutput(String output) {
-        return implementation.extractSubmitOutput(output);
+        return getBatchJobInfrastructure().extractSubmitOutput(output);
     }
 
     @Override
     protected String getBatchinJobSystemName() {
-        if (implementation != null) {
-            return implementation.getBatchinJobSystemName();
+        if (getBatchJobInfrastructure() != null) {
+            return getBatchJobInfrastructure().getBatchinJobSystemName();
         } else {
             return "GENERIC";
         }
@@ -130,12 +130,39 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
 
     @Override
     protected String getDeleteJobCommand() {
-        return implementation.getDeleteJobCommand();
+        return getBatchJobInfrastructure().getDeleteJobCommand();
     }
 
     @Override
     protected String getSubmitJobCommand() {
-        return implementation.getSubmitJobCommand();
+        return getBatchJobInfrastructure().getSubmitJobCommand();
+    }
+
+    @Override
+    protected void initializeRuntimeVariables() {
+        super.initializeRuntimeVariables();
+        runtimeVariables.put(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY, null);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private BatchJobInfrastructure getBatchJobInfrastructure() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<BatchJobInfrastructure>() {
+            @Override
+            public BatchJobInfrastructure handle() {
+                return (BatchJobInfrastructure) runtimeVariables.get(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY);
+            }
+        });
+    }
+
+    private void setBatchJobInfrastructure(final BatchJobInfrastructure batchJobInfrastructure) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY, batchJobInfrastructure);
+                return null;
+            }
+        });
     }
 
 }

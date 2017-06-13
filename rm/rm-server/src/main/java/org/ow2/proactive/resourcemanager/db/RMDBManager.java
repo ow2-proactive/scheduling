@@ -298,14 +298,34 @@ public class RMDBManager {
     }
 
     public NodeSourceData getNodeSource(final String sourceName) {
-        return executeReadTransaction(new SessionWork<NodeSourceData>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public NodeSourceData doInTransaction(Session session) {
-                Query query = session.getNamedQuery("getNodeSourceDataByName").setParameter("name", sourceName);
-                return (NodeSourceData) query.uniqueResult();
-            }
-        });
+        try {
+            return executeReadTransaction(new SessionWork<NodeSourceData>() {
+                @Override
+                @SuppressWarnings("unchecked")
+                public NodeSourceData doInTransaction(Session session) {
+                    Query query = session.getNamedQuery("getNodeSourceDataByName").setParameter("name", sourceName);
+                    return (NodeSourceData) query.uniqueResult();
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occured while getting a node source from name '" + sourceName + "'");
+        }
+    }
+
+    public boolean updateNodeSource(final NodeSourceData nodeSourceData) {
+        try {
+            return executeReadWriteTransaction(new SessionWork<Boolean>() {
+                @Override
+                public Boolean doInTransaction(Session session) {
+                    logger.info("Updating a node source " + nodeSourceData.getName() + " in database");
+                    session.update(nodeSourceData);
+                    return true;
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occured while updating a node source '" + nodeSourceData.getName() +
+                                       "'");
+        }
     }
 
     public void removeNodeSource(final String sourceName) {
