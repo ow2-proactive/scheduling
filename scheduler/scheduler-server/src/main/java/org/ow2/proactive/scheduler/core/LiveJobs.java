@@ -82,7 +82,7 @@ class LiveJobs {
 
     private static final TaskResultCreator taskResultCreator = TaskResultCreator.getInstance();
 
-    private static class JobData {
+    public static class JobData {
 
         final InternalJob job;
 
@@ -1041,7 +1041,7 @@ class LiveJobs {
         }
     }
 
-    private JobData lockJob(JobId jobId) {
+    public JobData lockJob(JobId jobId) {
         JobData jobData = jobs.get(jobId);
         if (jobData == null) {
             jlogger.info(jobId, "does not exist");
