@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -89,7 +90,7 @@ public abstract class InternalJob extends JobState {
     protected static final Logger LOGGER = Logger.getLogger(InternalJob.class);
 
     /** List of every tasks in this job. */
-    protected Map<TaskId, InternalTask> tasks = new HashMap<>();
+    protected Map<TaskId, InternalTask> tasks = new ConcurrentHashMap<>();
 
     /** Informations (that can be modified) about job execution */
     protected JobInfoImpl jobInfo = new JobInfoImpl();
@@ -224,7 +225,7 @@ public abstract class InternalJob extends JobState {
      * @return true if the task has been correctly added to the job, false if
      *         not.
      */
-    public boolean addTask(InternalTask task) {
+    public synchronized boolean addTask(InternalTask task) {
 
         int taskId = tasks.size();
         task.setId(TaskIdImpl.createTaskId(getId(), task.getName(), taskId));
