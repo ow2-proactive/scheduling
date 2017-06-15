@@ -262,10 +262,13 @@ public class CommandSet {
                                                                           .opt("lj")
                                                                           .longOpt("listjobs")
                                                                           .description("Retrieve a list of jobs managed by the Scheduler. " +
-                                                                                       "If specified the latest 'x' number of " +
-                                                                                       "jobs or 'z' maximum number of jobs starting from 'y'th job.")
+                                                                                       "If specified the latest 'x' number of jobs or 'z' maximum number of jobs starting from 'y'th job.")
+                                                                          //Example: to return the five last jobs, >./proactive-client -lj limit=5."To return the list of z jobs from index y, >./proactive-client -lj from=y limit=z ")
+                                                                          .numOfArgs(3)
                                                                           .hasOptionalArg(true)
+                                                                          //.hasArgs(true)
                                                                           .argNames("[latest=x |(from=y limit=z)]")
+                                                                          .jsCommand("listjobs(x)")
                                                                           .commandClass(ListJobCommand.class)
                                                                           .entry();
 
@@ -283,20 +286,22 @@ public class CommandSet {
                                                                                       .entry();
 
     public static final CommandSet.Entry JS_LIST_ALL = CommandSetEntryBuilder.newInstance()
+                                                                             .opt("lj")
                                                                              .description("Retrieve a list of all jobs.")
                                                                              .jsCommand("listjobs()")
                                                                              .commandClass(ListJobCommand.class)
                                                                              .entry();
 
     public static final CommandSet.Entry JS_LIST_LATEST = CommandSetEntryBuilder.newInstance()
-                                                                                .description("Retrieves a list of the latest 'x' number of jobs.")
+                                                                                .opt("lj")
+                                                                                .description("Retrieves a list of the latest 'x' number of jobs.") // Example: to return the five last jobs, >listjobs(5)
                                                                                 .jsCommand("listjobs(x)")
                                                                                 .commandClass(ListJobCommand.class)
                                                                                 .entry();
 
     public static final CommandSet.Entry JS_LIST_FROM = CommandSetEntryBuilder.newInstance()
                                                                               .description("Retrieves the list of 'y' (maximum) number " +
-                                                                                           "of jobs, starting from the x'th job.")
+                                                                                           "of jobs, starting from the latest x'th job.")
                                                                               .jsCommand("listjobs(x, y)")
                                                                               .commandClass(ListJobCommand.class)
                                                                               .entry();
