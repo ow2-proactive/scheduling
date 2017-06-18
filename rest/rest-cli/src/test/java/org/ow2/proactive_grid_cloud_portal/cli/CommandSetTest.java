@@ -28,6 +28,8 @@ package org.ow2.proactive_grid_cloud_portal.cli;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
@@ -38,86 +40,92 @@ import org.junit.runners.Parameterized;
 
 import com.google.common.collect.ImmutableList;
 
-
 /**
- * The class is in charge to test that all {@link org.ow2.proactive_grid_cloud_portal.cli.CommandSet.Entry}
- * defined in {@link CommandSet} class have their number of expected parameters that match the number of
- * tokens used the argNames.
+ * The class is in charge to test that all
+ * {@link org.ow2.proactive_grid_cloud_portal.cli.CommandSet.Entry} defined in
+ * {@link CommandSet} class have their number of expected parameters that match
+ * the number of tokens used the argNames.
  */
 @RunWith(Parameterized.class)
 public class CommandSetTest {
 
-    private CommandSet.Entry entry;
+	private CommandSet.Entry entry;
 
-    // field used by reflection with Junit
-    private String testName;
+	// field used by reflection with Junit
+	private String testName;
 
-    public CommandSetTest(CommandSet.Entry entry, String testName) {
-        this.entry = entry;
-        this.testName = testName;
-    }
+	public CommandSetTest(CommandSet.Entry entry, String testName) {
+		this.entry = entry;
+		this.testName = testName;
+	}
 
-    @Test
-    public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
-        int nbArgsBasedOnName = Option.UNINITIALIZED;
+	@Test
+	public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
+		int nbArgsBasedOnName = Option.UNINITIALIZED;
+		String regex = "\\[.*\\]";
+		Pattern pattern = Pattern.compile(regex);
+		String optionalArgNames = "";
+		int optionals = 0;
 
-        if (entry.argNames() != null) {
-            String argNames = entry.argNames();
+		if (entry.argNames() != null) {
+			String argNames = entry.argNames();
+			Matcher matcher = pattern.matcher(argNames);
 
-            if (entry.hasOptionalArg()) {
-                // argNames description of optional arguments is assumed to start with '['
-                argNames = argNames.substring(0, argNames.indexOf("["));
-            }
+			while (matcher.find()) {
+				optionals = matcher.group().split(" ").length;
+				optionalArgNames = matcher.group();
+			}
 
-            if (!argNames.trim().isEmpty()) {
-                nbArgsBasedOnName = argNames.split(" ").length;
-            }
+			if (!argNames.trim().isEmpty()) {
+				nbArgsBasedOnName = argNames.split(" ").length;
+				nbArgsBasedOnName = nbArgsBasedOnName - optionals;
+			}
 
-            if (argNames.contains("...")) {
-                nbArgsBasedOnName = Option.UNLIMITED_VALUES;
-            }
-        }
+			if (argNames.contains("...") && !optionalArgNames.contains("|") && !optionalArgNames.contains("...")) {
+				nbArgsBasedOnName = Option.UNLIMITED_VALUES;
+			}
 
-        Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
-                            entry.numOfArgs(),
-                            nbArgsBasedOnName);
-    }
+		}
 
-    @Parameterized.Parameters(name = "{1}")
-    public static Collection<Object[]> data() throws IllegalAccessException {
-        List<CommandSet.Entry> availableCommands = getAvailableCommands();
+		Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
+				entry.numOfArgs(), nbArgsBasedOnName);
+	}
 
-        Object[][] result = new Object[availableCommands.size()][2];
+	@Parameterized.Parameters(name = "{1}")
+	public static Collection<Object[]> data() throws IllegalAccessException {
+		List<CommandSet.Entry> availableCommands = getAvailableCommands();
 
-        for (int i = 0; i < availableCommands.size(); i++) {
-            CommandSet.Entry command = availableCommands.get(i);
-            String name = command.longOpt();
+		Object[][] result = new Object[availableCommands.size()][2];
 
-            if (name == null) {
-                name = command.jsCommand();
-            }
+		for (int i = 0; i < availableCommands.size(); i++) {
+			CommandSet.Entry command = availableCommands.get(i);
+			String name = command.longOpt();
 
-            result[i][0] = command;
-            result[i][1] = "testThatArgNamesMatchNumberOfArgsForOption" + name;
-        }
+			if (name == null) {
+				name = command.jsCommand();
+			}
 
-        return ImmutableList.copyOf(result);
-    }
+			result[i][0] = command;
+			result[i][1] = "testThatArgNamesMatchNumberOfArgsForOption" + name;
+		}
 
-    private static ImmutableList<CommandSet.Entry> getAvailableCommands() throws IllegalAccessException {
-        Class<CommandSet> commandSetClass = CommandSet.class;
+		return ImmutableList.copyOf(result);
+	}
 
-        Field[] declaredFields = commandSetClass.getFields();
+	private static ImmutableList<CommandSet.Entry> getAvailableCommands() throws IllegalAccessException {
+		Class<CommandSet> commandSetClass = CommandSet.class;
 
-        ImmutableList.Builder<CommandSet.Entry> builder = ImmutableList.builder();
+		Field[] declaredFields = commandSetClass.getFields();
 
-        for (Field field : declaredFields) {
-            if (field.getType().isAssignableFrom(CommandSet.Entry.class)) {
-                builder.add((CommandSet.Entry) field.get(null));
-            }
-        }
+		ImmutableList.Builder<CommandSet.Entry> builder = ImmutableList.builder();
 
-        return builder.build();
-    }
+		for (Field field : declaredFields) {
+			if (field.getType().isAssignableFrom(CommandSet.Entry.class)) {
+				builder.add((CommandSet.Entry) field.get(null));
+			}
+		}
+
+		return builder.build();
+	}
 
 }
