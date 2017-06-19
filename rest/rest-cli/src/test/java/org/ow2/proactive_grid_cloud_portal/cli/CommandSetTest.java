@@ -40,6 +40,7 @@ import org.junit.runners.Parameterized;
 
 import com.google.common.collect.ImmutableList;
 
+
 /**
  * The class is in charge to test that all
  * {@link org.ow2.proactive_grid_cloud_portal.cli.CommandSet.Entry} defined in
@@ -49,83 +50,84 @@ import com.google.common.collect.ImmutableList;
 @RunWith(Parameterized.class)
 public class CommandSetTest {
 
-	private CommandSet.Entry entry;
+    private CommandSet.Entry entry;
 
-	// field used by reflection with Junit
-	private String testName;
+    // field used by reflection with Junit
+    private String testName;
 
-	public CommandSetTest(CommandSet.Entry entry, String testName) {
-		this.entry = entry;
-		this.testName = testName;
-	}
+    public CommandSetTest(CommandSet.Entry entry, String testName) {
+        this.entry = entry;
+        this.testName = testName;
+    }
 
-	@Test
-	public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
-		int nbArgsBasedOnName = Option.UNINITIALIZED;
-		String regex = "\\[.*\\]";
-		Pattern pattern = Pattern.compile(regex);
-		String optionalArgNames = "";
-		int optionals = 0;
+    @Test
+    public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
+        int nbArgsBasedOnName = Option.UNINITIALIZED;
+        String regex = "\\[.*\\]";
+        Pattern pattern = Pattern.compile(regex);
+        String optionalArgNames = "";
+        int optionals = 0;
 
-		if (entry.argNames() != null) {
-			String argNames = entry.argNames();
-			Matcher matcher = pattern.matcher(argNames);
+        if (entry.argNames() != null) {
+            String argNames = entry.argNames();
+            Matcher matcher = pattern.matcher(argNames);
 
-			while (matcher.find()) {
-				optionals = matcher.group().split(" ").length;
-				optionalArgNames = matcher.group();
-			}
+            while (matcher.find()) {
+                optionals = matcher.group().split(" ").length;
+                optionalArgNames = matcher.group();
+            }
 
-			if (!argNames.trim().isEmpty()) {
-				nbArgsBasedOnName = argNames.split(" ").length;
-				nbArgsBasedOnName = nbArgsBasedOnName - optionals;
-			}
+            if (!argNames.trim().isEmpty()) {
+                nbArgsBasedOnName = argNames.split(" ").length;
+                nbArgsBasedOnName = nbArgsBasedOnName - optionals;
+            }
 
-			if (argNames.contains("...") && !optionalArgNames.contains("|") && !optionalArgNames.contains("...")) {
-				nbArgsBasedOnName = Option.UNLIMITED_VALUES;
-			}
+            if (argNames.contains("...") && !optionalArgNames.contains("|") && !optionalArgNames.contains("...")) {
+                nbArgsBasedOnName = Option.UNLIMITED_VALUES;
+            }
 
-		}
+        }
 
-		Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
-				entry.numOfArgs(), nbArgsBasedOnName);
-	}
+        Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
+                            entry.numOfArgs(),
+                            nbArgsBasedOnName);
+    }
 
-	@Parameterized.Parameters(name = "{1}")
-	public static Collection<Object[]> data() throws IllegalAccessException {
-		List<CommandSet.Entry> availableCommands = getAvailableCommands();
+    @Parameterized.Parameters(name = "{1}")
+    public static Collection<Object[]> data() throws IllegalAccessException {
+        List<CommandSet.Entry> availableCommands = getAvailableCommands();
 
-		Object[][] result = new Object[availableCommands.size()][2];
+        Object[][] result = new Object[availableCommands.size()][2];
 
-		for (int i = 0; i < availableCommands.size(); i++) {
-			CommandSet.Entry command = availableCommands.get(i);
-			String name = command.longOpt();
+        for (int i = 0; i < availableCommands.size(); i++) {
+            CommandSet.Entry command = availableCommands.get(i);
+            String name = command.longOpt();
 
-			if (name == null) {
-				name = command.jsCommand();
-			}
+            if (name == null) {
+                name = command.jsCommand();
+            }
 
-			result[i][0] = command;
-			result[i][1] = "testThatArgNamesMatchNumberOfArgsForOption" + name;
-		}
+            result[i][0] = command;
+            result[i][1] = "testThatArgNamesMatchNumberOfArgsForOption" + name;
+        }
 
-		return ImmutableList.copyOf(result);
-	}
+        return ImmutableList.copyOf(result);
+    }
 
-	private static ImmutableList<CommandSet.Entry> getAvailableCommands() throws IllegalAccessException {
-		Class<CommandSet> commandSetClass = CommandSet.class;
+    private static ImmutableList<CommandSet.Entry> getAvailableCommands() throws IllegalAccessException {
+        Class<CommandSet> commandSetClass = CommandSet.class;
 
-		Field[] declaredFields = commandSetClass.getFields();
+        Field[] declaredFields = commandSetClass.getFields();
 
-		ImmutableList.Builder<CommandSet.Entry> builder = ImmutableList.builder();
+        ImmutableList.Builder<CommandSet.Entry> builder = ImmutableList.builder();
 
-		for (Field field : declaredFields) {
-			if (field.getType().isAssignableFrom(CommandSet.Entry.class)) {
-				builder.add((CommandSet.Entry) field.get(null));
-			}
-		}
+        for (Field field : declaredFields) {
+            if (field.getType().isAssignableFrom(CommandSet.Entry.class)) {
+                builder.add((CommandSet.Entry) field.get(null));
+            }
+        }
 
-		return builder.build();
-	}
+        return builder.build();
+    }
 
 }
