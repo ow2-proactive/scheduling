@@ -32,9 +32,7 @@ import java.util.Map;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.RestConstants;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
@@ -46,8 +44,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 public class ListJobCommand extends AbstractCommand implements Command {
 
     private String[] filterings;
-
-    private boolean offsetFlag = false;
 
     private int offset = -1;
 
@@ -87,7 +83,6 @@ public class ListJobCommand extends AbstractCommand implements Command {
 
     private void setOffset(int offset) {
         this.offset = offset;
-        this.offsetFlag = true;
     }
 
     private void printJobsList(int index, int offset, ApplicationContext currentContext)
@@ -106,8 +101,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
         currentContext.getDevice().writeLine("%s", StringUtility.jobsAsString(jobs));
     }
 
-    private int getNumberOfJobs(int index, int offset, ApplicationContext currentContext)
-            throws NotConnectedRestException, PermissionRestException {
+    private int getNumberOfJobs(int index, int offset, ApplicationContext currentContext) throws Exception {
         return currentContext.getRestClient()
                              .getScheduler()
                              .jobs(currentContext.getSessionId(), index, offset)
