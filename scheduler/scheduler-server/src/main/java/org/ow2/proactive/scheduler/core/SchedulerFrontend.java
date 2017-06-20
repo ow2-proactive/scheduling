@@ -349,7 +349,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 metricsMonitorScheduler.schedule(cronExpr,
                                                  new JobsMemoryMonitorRunner(dbManager.getSessionFactory()
                                                                                       .getStatistics(),
-                                                                             frontendState.getStateInternally()));
+                                                                             frontendState.getState()));
                 metricsMonitorScheduler.start();
             }
 

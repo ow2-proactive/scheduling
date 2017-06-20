@@ -210,6 +210,16 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     }
 
     /**
+     * Returns the total number of jobs.
+     *
+     * @return the total number of jobs.
+     */
+    @Override
+    public int getTotalNbJobs() {
+        return jobs.size();
+    }
+
+    /**
      * Sets the list of connected users to the given users value.
      *
      * @param users the list of connected users to set.
