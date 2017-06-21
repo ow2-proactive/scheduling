@@ -409,7 +409,7 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * called by the node source at configuration time. Shifts the parameter
      * array once done to let implementation only care about their own
-     * configurable parameters.
+     * configurable parameters. This method acquires the write lock to manipulate runtime variables.
      *
      * @param parameters
      *            the parameters of the infrastructure manager
@@ -423,7 +423,8 @@ public abstract class InfrastructureManager implements Serializable {
             initializeRuntimeVariables();
             this.configure(parameters);
         } catch (RuntimeException e) {
-            logger.error("Exception while initializing runtime variables and configuring infrastructure: " + e.getMessage());
+            logger.error("Exception while initializing runtime variables and configuring infrastructure: " +
+                         e.getMessage());
             throw e;
         } finally {
             writeLock.unlock();
@@ -556,8 +557,10 @@ public abstract class InfrastructureManager implements Serializable {
                 setRmDbManager(RMDBManager.getInstance());
             }
             NodeSourceData nodeSource = dbManager.getNodeSource(this.nodeSource.getName());
-            nodeSource.setInfrastructureVariables(runtimeVariables);
-            dbManager.updateNodeSource(nodeSource);
+            if (nodeSource != null) {
+                nodeSource.setInfrastructureVariables(runtimeVariables);
+                dbManager.updateNodeSource(nodeSource);
+            }
         } catch (RuntimeException e) {
             logger.error("Exception while persisting runtime variables: " + e.getMessage());
             throw e;

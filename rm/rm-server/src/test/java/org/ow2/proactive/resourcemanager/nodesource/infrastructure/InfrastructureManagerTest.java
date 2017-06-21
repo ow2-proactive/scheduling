@@ -26,8 +26,12 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -208,6 +212,21 @@ public class InfrastructureManagerTest {
         assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
         assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode.getNodeURL())).isSameAs(lostNode2);
         assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode2.getNodeURL())).isSameAs(lostNode2);
+    }
+
+    @Test
+    public void testPersistInfrastructureVariables() {
+        infrastructureManager.persistInfrastructureVariables();
+        verify(nodeSourceData, times(1) ).setInfrastructureVariables(anyMap());
+        verify(dbManager, times(1) ).updateNodeSource(eq(nodeSourceData));
+    }
+
+    @Test
+    public void testDoNotPersistInfrastructureVariablesWhenCannotFindNodeSource() {
+        when(dbManager.getNodeSource(anyString())).thenReturn(null);
+        infrastructureManager.persistInfrastructureVariables();
+        verify(nodeSourceData, times(0) ).setInfrastructureVariables(anyMap());
+        verify(dbManager, times(0) ).updateNodeSource(eq(nodeSourceData));
     }
 
     private static final class TestingInfrastructureManager extends InfrastructureManager {
