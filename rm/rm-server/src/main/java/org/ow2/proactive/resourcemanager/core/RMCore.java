@@ -1188,11 +1188,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new RuntimeException("Cannot create node source " + data.getName(), e);
         }
 
-        // Infrastructure has been configured and linked to the node source, so we can now persist the runtime
-        // variables of the infrastructure for the first time (they have been initialized during the creation of the
-        // infrastructure, in its configuration.
-        im.persistInfrastructureVariables();
-
         // Adding access to the core for node source and policy.
         // In order to do it node source and policy active objects are added to the clients list.
         // They will be removed from this list when node source is unregistered.
@@ -1698,7 +1693,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             //remove down nodes handled by the source
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
-            nodeSource.shutdown(caller);
+            // here we need the shutdown to be completed before the node source is removed from the database
+            // so we must ensure that the next call is blocking
+            PAFuture.waitFor(nodeSource.shutdown(caller));
             dbManager.removeNodeSource(sourceName);
 
             return new BooleanWrapper(true);

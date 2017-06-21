@@ -329,6 +329,9 @@ public class RMDBManager {
     }
 
     public void removeNodeSource(final String sourceName) {
+        final Collection<RMNodeData> relatedNodes = getNodesByNodeSource(sourceName);
+        logger.info("Removing nodes linked to the node source " + sourceName + " from the database");
+        removeNodes(relatedNodes);
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -406,6 +409,26 @@ public class RMDBManager {
         } catch (RuntimeException e) {
             throw new RuntimeException("Exception occured while removing node '" + nodeName + "' in the database: " +
                                        e.getMessage());
+        }
+    }
+
+    private void removeNodes(final Collection<RMNodeData> nodes) {
+        try {
+            executeReadWriteTransaction(new SessionWork<Void>() {
+                @Override
+                public Void doInTransaction(Session session) {
+                    for (RMNodeData nodeData : nodes) {
+                        logger.info("Removing the node " + nodeData.getName() + " from the database");
+                        session.getNamedQuery("deleteRMNodeDataByName")
+                               .setParameter("name", nodeData.getName())
+                               .executeUpdate();
+                    }
+                    return null;
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occured while removing " + nodes.size() +
+                                       " nodes from the database: " + e.getMessage());
         }
     }
 

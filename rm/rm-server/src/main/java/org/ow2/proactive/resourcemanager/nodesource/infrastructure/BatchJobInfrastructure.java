@@ -924,8 +924,8 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         });
     }
 
-    private void atomicRemovePnTimeoutAndJob(final String nodeName, final String dnURL, final Process p, final String id)
-            throws RMException {
+    private void atomicRemovePnTimeoutAndJob(final String nodeName, final String dnURL, final Process p,
+            final String id) throws RMException {
         setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
             @Override
             public Void handle() {
