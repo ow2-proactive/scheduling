@@ -286,7 +286,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         // like most of the other methods of this class...
         // See https://github.com/ow2-proactive/scheduling/issues/2811
 
-        Integer nbNodesRemoved = getRemovedNode(host);
+        Integer nbNodesRemoved = getRemovedNodesNumberPerHost(host);
 
         if (nbNodesRemoved != null) {
             decrementRemovedNodes(host);
@@ -384,11 +384,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                     logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " +
                                  this.getClass().getSimpleName());
                     // remember the node removed
-                    Integer retrieved = getRemovedHosts().get(host);
-                    if (retrieved == null) {
-                        retrieved = 0;
-                    }
-                    getRemovedHosts().put(host, ++retrieved);
+                    addRemovedHost(host);
 
                     // in case all nodes relative to this host were removed kill the JVM
                     if (!getRegisteredNodes().containsValue(host)) {
@@ -398,11 +394,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                             logger.trace("An exception occurred during node removal", e);
                         }
                         // set the free hosts again
-                        int value = getRemovedHosts().remove(host);
-                        Integer retrievedNbFreeHosts = getFreeHosts().get(host);
-                        if (retrievedNbFreeHosts == null) {
-                            getFreeHosts().put(host, value);
-                        }
+                        addFreeHosts(host);
                     }
                     logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() +
                                 " #registered nodes: " + getRegisteredNodesSize());
@@ -414,6 +406,22 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                 return null;
             }
         });
+    }
+
+    private void addFreeHosts(InetAddress host) {
+        int value = getRemovedHosts().remove(host);
+        Integer retrievedNbFreeHosts = getFreeHosts().get(host);
+        if (retrievedNbFreeHosts == null) {
+            getFreeHosts().put(host, value);
+        }
+    }
+
+    private void addRemovedHost(InetAddress host) {
+        Integer retrieved = getRemovedHosts().get(host);
+        if (retrieved == null) {
+            retrieved = 0;
+        }
+        getRemovedHosts().put(host, ++retrieved);
     }
 
     /**
@@ -498,7 +506,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         return (Map<InetAddress, Integer>) runtimeVariables.get(REMOVED_HOSTS_KEY);
     }
 
-    private int getRemovedNode(final InetAddress inetAddress) {
+    private int getRemovedNodesNumberPerHost(final InetAddress inetAddress) {
         return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
             @Override
             public Integer handle() {

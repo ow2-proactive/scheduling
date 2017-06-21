@@ -367,15 +367,13 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         if (parameters[index] == null) {
             throw new IllegalArgumentException("Target OS parameter cannot be null");
         }
-        setTargetOsObj(OperatingSystem.getOperatingSystem(parameters[index++].toString()));
-        if (getTargetOSObj() == null) {
+        OperatingSystem targetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
+        if (targetOs == null) {
             throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
         }
+        runtimeVariables.put(TARGET_OS_OBJ_KEY, targetOs);
 
         this.javaOptions = parameters[index++].toString();
-
-        // shutdown flag
-        setShutdownFlag(false);
     }
 
     @Override
@@ -414,6 +412,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     @Override
     protected void initializeRuntimeVariables() {
+        super.initializeRuntimeVariables();
         runtimeVariables.put(TARGET_OS_OBJ_KEY, null);
         runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
     }
@@ -425,16 +424,6 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             @Override
             public OperatingSystem handle() {
                 return (OperatingSystem) runtimeVariables.get(TARGET_OS_OBJ_KEY);
-            }
-        });
-    }
-
-    private void setTargetOsObj(final OperatingSystem os) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                runtimeVariables.put(TARGET_OS_OBJ_KEY, os);
-                return null;
             }
         });
     }

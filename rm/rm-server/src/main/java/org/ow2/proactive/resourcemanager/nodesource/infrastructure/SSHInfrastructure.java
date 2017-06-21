@@ -323,10 +323,11 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             this.schedulingPath = parameters[index++].toString();
             // target OS
             if (parameters[index] != null) {
-                setTargetOsObj(OperatingSystem.getOperatingSystem(parameters[index++].toString()));
-                if (getTargetOSObj() == null) {
+                OperatingSystem targetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
+                if (targetOs == null) {
                     throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
                 }
+                runtimeVariables.put(TARGET_OS_OBJ_KEY, targetOs);
             } else {
                 throw new IllegalArgumentException("Target OS parameter cannot be null");
             }
@@ -338,7 +339,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
-                setCredentials(Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                runtimeVariables.put(CREDENTIALS_KEY, Credentials.getCredentialsBase64((byte[]) parameters[index++]));
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
@@ -384,6 +385,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
     @Override
     protected void initializeRuntimeVariables() {
+        super.initializeRuntimeVariables();
         runtimeVariables.put(CREDENTIALS_KEY, null);
         runtimeVariables.put(TARGET_OS_OBJ_KEY, null);
         runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
@@ -400,31 +402,11 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         });
     }
 
-    private void setCredentials(final Credentials credentials) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                runtimeVariables.put(CREDENTIALS_KEY, credentials);
-                return null;
-            }
-        });
-    }
-
     private OperatingSystem getTargetOSObj() {
         return getRuntimeVariable(new RuntimeVariablesHandler<OperatingSystem>() {
             @Override
             public OperatingSystem handle() {
                 return (OperatingSystem) runtimeVariables.get(TARGET_OS_OBJ_KEY);
-            }
-        });
-    }
-
-    private void setTargetOsObj(final OperatingSystem os) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                runtimeVariables.put(TARGET_OS_OBJ_KEY, os);
-                return null;
             }
         });
     }
