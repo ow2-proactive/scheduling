@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.db;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -79,6 +80,7 @@ public class NodeSourceData implements Serializable {
         this.policyType = policyType;
         this.policyParameters = policyParameters;
         this.provider = provider;
+        this.infrastructureVariables = new HashMap<>();
     }
 
     @Id
