@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,6 +36,7 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.StringUtils;
 import org.ow2.proactive.utils.ObjectArrayFormatter;
+import org.ow2.proactive.utils.ObjectByteConverter;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.cli.json.MBeanInfoView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
@@ -231,13 +233,15 @@ public final class StringUtility {
     }
 
     public static String jobResultAsString(String id,
-            org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData jobResult) {
+            org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData jobResult)
+            throws IOException, ClassNotFoundException {
         StringBuilder buffer = new StringBuilder();
         buffer.append(String.format("%s result:\n", id));
         Map<String, TaskResultData> allResults = jobResult.getAllResults();
-        for (String taskName : allResults.keySet()) {
-            buffer.append(String.format(taskName + " : " +
-                                        ObjectUtility.object(allResults.get(taskName).getSerializedValue())))
+        for (Map.Entry<String, TaskResultData> entry : allResults.entrySet()) {
+            buffer.append(String.format(entry.getKey() + " : " +
+                                        ObjectUtility.object(ObjectByteConverter.base64StringToByteArray(entry.getValue()
+                                                                                                              .getSerializedValue()))))
                   .append('\n');
         }
         return buffer.toString();
@@ -388,7 +392,7 @@ public final class StringUtility {
         return row;
     }
 
-    public static String taskResultsAsString(List<TaskResultData> results) {
+    public static String taskResultsAsString(List<TaskResultData> results) throws IOException, ClassNotFoundException {
         StringBuffer buf = new StringBuffer();
         for (TaskResultData currentResult : results) {
             buf.append(taskResultAsString(currentResult.getId().getReadableName(), currentResult));
@@ -398,8 +402,12 @@ public final class StringUtility {
     }
 
     public static String taskResultAsString(String id,
-            org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData taskResult) {
-        return String.format("%s result: %s", id, ObjectUtility.object(taskResult.getSerializedValue()).toString());
+            org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData taskResult)
+            throws IOException, ClassNotFoundException {
+        return String.format("%s result: %s",
+                             id,
+                             ObjectUtility.object(ObjectByteConverter.base64StringToByteArray(taskResult.getSerializedValue()))
+                                          .toString());
     }
 
     public static String statsAsString(Map<String, String> stats) {

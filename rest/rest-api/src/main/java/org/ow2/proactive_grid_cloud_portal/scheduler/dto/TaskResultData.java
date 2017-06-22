@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -36,17 +35,23 @@ public class TaskResultData {
 
     private TaskIdData id;
 
-    private byte[] serializedValue;
+    private String serializedValue;
 
-    private byte[] serializedException;
+    private String value;
+
+    private String serializedException;
 
     private String exceptionMessage;
 
     private Map<String, String> metadata;
 
-    private Map<String, byte[]> propagatedVariables;
+    private Map<String, String> propagatedVariables;
+
+    private Map<String, String> serializedPropagatedVariables;
 
     private TaskLogsData output;
+
+    private boolean isRaw;
 
     public TaskIdData getId() {
         return id;
@@ -56,19 +61,19 @@ public class TaskResultData {
         this.id = id;
     }
 
-    public byte[] getSerializedValue() {
+    public String getSerializedValue() {
         return serializedValue;
     }
 
-    public void setSerializedValue(byte[] serializedValue) {
+    public void setSerializedValue(String serializedValue) {
         this.serializedValue = serializedValue;
     }
 
-    public byte[] getSerializedException() {
+    public String getSerializedException() {
         return serializedException;
     }
 
-    public void setSerializedException(byte[] serializedException) {
+    public void setSerializedException(String serializedException) {
         this.serializedException = serializedException;
     }
 
@@ -88,11 +93,19 @@ public class TaskResultData {
         this.exceptionMessage = exceptionMessage;
     }
 
-    public Map<String, byte[]> getPropagatedVariables() {
+    public Map<String, String> getSerializedPropagatedVariables() {
+        return serializedPropagatedVariables;
+    }
+
+    public void setSerializedPropagatedVariables(Map<String, String> serializedPropagatedVariables) {
+        this.serializedPropagatedVariables = serializedPropagatedVariables;
+    }
+
+    public Map<String, String> getPropagatedVariables() {
         return propagatedVariables;
     }
 
-    public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {
+    public void setPropagatedVariables(Map<String, String> propagatedVariables) {
         this.propagatedVariables = propagatedVariables;
     }
 
@@ -104,10 +117,27 @@ public class TaskResultData {
         this.output = output;
     }
 
+    public boolean isRaw() {
+        return isRaw;
+    }
+
+    public void setRaw(boolean isRaw) {
+        this.isRaw = isRaw;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
     @Override
     public String toString() {
-        return "TaskResultData{" + "id=" + id + ", serializedValue=" + Arrays.toString(serializedValue) +
-               ", serializedException=" + Arrays.toString(serializedException) + ", exception=" + exceptionMessage +
-               ", metadata=" + metadata + ", output=" + output + '}';
+        return "TaskResultData{" + "id=" + id + ", serializedValue=" + serializedValue + ", value=" + value +
+               ", serializedException=" + serializedException + ", exception=" + exceptionMessage + ", metadata=" +
+               metadata + ", output=" + output + ", propagatedVariables=" + propagatedVariables +
+               ", serializedPropagatedVariables=" + serializedPropagatedVariables + ", isRaw=" + isRaw + '}';
     }
 }

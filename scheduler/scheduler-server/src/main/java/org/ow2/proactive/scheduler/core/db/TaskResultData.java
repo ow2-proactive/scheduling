@@ -62,6 +62,8 @@ public class TaskResultData {
 
     private byte[] serializedException;
 
+    private Boolean isRaw;
+
     private String previewerClassName;
 
     private Map<String, byte[]> propagatedVariables;
@@ -79,7 +81,8 @@ public class TaskResultData {
                                                    getSerializedException(),
                                                    getLogs(),
                                                    getMetadata(),
-                                                   getPropagatedVariables());
+                                                   getPropagatedVariables(),
+                                                   isRaw());
 
         result.setPreviewerClassName(getPreviewerClassName());
         FlowActionData actionData = getFlowAction();
@@ -105,6 +108,7 @@ public class TaskResultData {
         resultData.setSerializedException(result.getSerializedException());
         resultData.setSerializedValue(result.getSerializedValue());
         resultData.setResultTime(System.currentTimeMillis());
+        resultData.setRaw(result.isRaw());
 
         FlowAction flowAction = result.getAction();
         if (flowAction != null) {
@@ -218,5 +222,17 @@ public class TaskResultData {
 
     public void setPropagatedVariables(Map<String, byte[]> executionVariables) {
         this.propagatedVariables = executionVariables;
+    }
+
+    @Column(name = "RAW", nullable = true)
+    public Boolean isRaw() {
+        if (isRaw == null) {
+            return false;
+        }
+        return isRaw;
+    }
+
+    public void setRaw(Boolean isRaw) {
+        this.isRaw = isRaw;
     }
 }
