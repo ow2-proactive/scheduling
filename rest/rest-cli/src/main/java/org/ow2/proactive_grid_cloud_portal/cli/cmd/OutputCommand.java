@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 import java.io.File;
 import java.util.Stack;
 
+import org.ow2.proactive.utils.ObjectByteConverter;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
@@ -53,7 +54,8 @@ public class OutputCommand extends AbstractCommand implements Command {
             if (result instanceof String) {
                 FileUtility.writeStringToFile(outFile, (String) result);
             } else if (result instanceof TaskResultData) {
-                FileUtility.writeByteArrayToFile(((TaskResultData) result).getSerializedValue(), outFile);
+                FileUtility.writeByteArrayToFile(ObjectByteConverter.base64StringToByteArray(((TaskResultData) result).getSerializedValue()),
+                                                 outFile);
             } else {
                 FileUtility.writeObjectToFile(result, outFile);
             }

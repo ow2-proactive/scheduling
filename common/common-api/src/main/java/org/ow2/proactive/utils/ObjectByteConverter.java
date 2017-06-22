@@ -30,9 +30,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+
+import org.apache.commons.codec.binary.Base64;
 
 
 /**
@@ -70,6 +75,9 @@ public final class ObjectByteConverter {
     public static final byte[] objectToByteArray(Object obj, boolean compress) throws IOException {
         ByteArrayOutputStream baos = null;
         ObjectOutputStream oos = null;
+        if (obj == null) {
+            return null;
+        }
         try {
             baos = new ByteArrayOutputStream();
             oos = new ObjectOutputStream(baos);
@@ -139,6 +147,9 @@ public final class ObjectByteConverter {
      */
     public static Object byteArrayToObject(byte[] input, boolean uncompress)
             throws IOException, ClassNotFoundException {
+        if (input == null) {
+            return null;
+        }
         if (uncompress) {
             // Uncompress the bytes
             Inflater decompressor = new Inflater();
@@ -181,6 +192,48 @@ public final class ObjectByteConverter {
                 bais.close();
             }
         }
+    }
+
+    public static String serializableToBase64String(Serializable input) throws IOException {
+        return byteArrayToBase64String(objectToByteArray(input));
+    }
+
+    public static String byteArrayToBase64String(byte[] input) {
+        if (input == null) {
+            return null;
+        }
+        return new String(Base64.encodeBase64(input));
+    }
+
+    public static byte[] base64StringToByteArray(String input) {
+        if (input == null) {
+            return null;
+        }
+        return Base64.decodeBase64(input);
+    }
+
+    public static Serializable base64StringToSerializable(String input) throws IOException, ClassNotFoundException {
+        if (input == null) {
+            return null;
+        }
+        return (Serializable) byteArrayToObject(base64StringToByteArray(input));
+    }
+
+    public static Map<String, byte[]> mapOfBase64StringToByteArray(Map<String, String> input) {
+        HashMap<String, byte[]> answer = new HashMap<>(input.size());
+        for (Map.Entry<String, String> entry : input.entrySet()) {
+            answer.put(entry.getKey(), base64StringToByteArray(entry.getValue()));
+        }
+        return answer;
+    }
+
+    public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input)
+            throws IOException, ClassNotFoundException {
+        HashMap<String, Serializable> answer = new HashMap<>(input.size());
+        for (Map.Entry<String, byte[]> entry : input.entrySet()) {
+            answer.put(entry.getKey(), (Serializable) byteArrayToObject(entry.getValue()));
+        }
+        return answer;
     }
 
 }

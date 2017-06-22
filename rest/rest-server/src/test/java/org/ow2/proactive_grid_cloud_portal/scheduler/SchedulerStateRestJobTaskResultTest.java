@@ -65,7 +65,8 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
                                                                                             1),
                                                                     null,
                                                                     new byte[0],
-                                                                    null);
+                                                                    null,
+                                                                    false);
         when(mockOfScheduler.getTaskResult("42", "mytask")).thenReturn(taskResultWithException);
 
         String exceptionStackTrace = (String) restInterface.valueOfTaskResult(sessionId, "42", "mytask");
@@ -80,7 +81,8 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
                                                                                             1),
                                                                     null,
                                                                     new byte[0],
-                                                                    null);
+                                                                    null,
+                                                                    false);
         JobResultImpl jobResultWithException = new JobResultImpl();
         jobResultWithException.addTaskResult("mytask", taskResultWithException, false);
         when(mockOfScheduler.getJobResult("42")).thenReturn(jobResultWithException);

@@ -23,34 +23,42 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.utils;
+package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.Serializable;
 
+import org.apache.log4j.Logger;
+import org.dozer.DozerConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
 
 
-public class ObjectUtility {
+/**
+ * @author ActiveEon Team
+ * @since 16/06/2017
+ */
+public class SerializableToStringCustomConverter extends DozerConverter<Serializable, String> {
 
-    public static Object object(byte[] bytes) throws IOException, ClassNotFoundException {
-        if (bytes == null) {
-            return "[NULL]";
-        }
-        Object answer;
-        try {
-            answer = ObjectByteConverter.byteArrayToObject(bytes);
-        } catch (ClassNotFoundException cnfe) {
-            return String.format("[De-serialization error : %s]", cnfe.getMessage());
-        } catch (IOException ioe) {
-            return String.format("[De-serialization error : %s]", ioe.getMessage());
-        }
-        if (answer instanceof byte[]) {
-            return "[RAW DATA]";
-        }
-        return answer;
+    private static final Logger logger = Logger.getLogger(SerializableToStringCustomConverter.class);
 
+    public SerializableToStringCustomConverter() {
+        super(Serializable.class, String.class);
     }
 
+    @Override
+    public String convertTo(Serializable source, String destination) {
+        if (source == null) {
+            return null;
+        }
+        try {
+            return source.toString();
+        } catch (Exception e) {
+            logger.error("Error when converting result to json", e);
+            return null;
+        }
+    }
+
+    @Override
+    public byte[] convertFrom(String source, Serializable destination) {
+        return null;
+    }
 }

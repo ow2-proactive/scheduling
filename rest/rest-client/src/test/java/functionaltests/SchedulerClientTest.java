@@ -29,6 +29,7 @@ import static functionaltests.RestFuncTHelper.getRestServerUrl;
 import static functionaltests.jobs.SimpleJob.TEST_JOB;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
@@ -68,6 +69,7 @@ import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.task.exceptions.TaskException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.proactive.utils.ObjectByteConverter;
 
 import com.google.common.io.Files;
 
@@ -75,6 +77,7 @@ import functionaltests.jobs.ErrorTask;
 import functionaltests.jobs.LogTask;
 import functionaltests.jobs.MetadataTask;
 import functionaltests.jobs.NonTerminatingJob;
+import functionaltests.jobs.RawTask;
 import functionaltests.jobs.SimpleJob;
 import functionaltests.jobs.VariableTask;
 
@@ -136,7 +139,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                      ErrorTask.class,
                                      LogTask.class,
                                      VariableTask.class,
-                                     MetadataTask.class);
+                                     MetadataTask.class,
+                                     RawTask.class);
         JobId jobId = submitJob(job, client);
         JobResult result = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
         // job result
@@ -170,7 +174,10 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // task result simple
         TaskResult tResSimple = result.getResult(getTaskNameForClass(SimpleJob.class));
         Assert.assertNotNull(tResSimple.value());
+        Assert.assertNotNull(tResSimple.getSerializedValue());
         Assert.assertEquals(new StringWrapper(TEST_JOB), tResSimple.value());
+        Assert.assertEquals(new StringWrapper(TEST_JOB),
+                            ObjectByteConverter.byteArrayToObject(tResSimple.getSerializedValue()));
 
         // task result with error
         TaskResult tResError = result.getResult(getTaskNameForClass(ErrorTask.class));
@@ -189,12 +196,23 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // task result with variables
         TaskResult tResVar = result.getResult(getTaskNameForClass(VariableTask.class));
         Assert.assertNotNull(tResVar.getPropagatedVariables());
+        Map<String, Serializable> vars = tResVar.getVariables();
+        System.out.println(vars);
         Assert.assertTrue(tResVar.getPropagatedVariables().containsKey(VariableTask.MYVAR));
+        Assert.assertEquals("myvalue", vars.get(VariableTask.MYVAR));
 
         // task result with metadata
         TaskResult tMetaVar = result.getResult(getTaskNameForClass(MetadataTask.class));
         Assert.assertNotNull(tMetaVar.getMetadata());
         Assert.assertTrue(tMetaVar.getMetadata().containsKey(MetadataTask.MYVAR));
+
+        // task result with raw result
+
+        TaskResult tResRaw = result.getResult(getTaskNameForClass(RawTask.class));
+        Assert.assertNotNull(tResRaw.value());
+        Assert.assertNotNull(tResRaw.getSerializedValue());
+        Assert.assertEquals(TEST_JOB.getBytes(), tResRaw.value());
+        Assert.assertEquals(TEST_JOB.getBytes(), tResRaw.getSerializedValue());
 
     }
 
