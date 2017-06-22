@@ -32,9 +32,7 @@ import java.util.Map;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.RestConstants;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractIModeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
@@ -47,14 +45,9 @@ public class ListJobCommand extends AbstractCommand implements Command {
 
     private String[] filterings;
 
-    private boolean offsetFlag = false;
-
     private int offset = -1;
 
     private int beginIndex = 0;
-
-    public ListJobCommand() {
-    }
 
     public ListJobCommand(String... filtering) {
         this.filterings = filtering;
@@ -64,52 +57,22 @@ public class ListJobCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         try {
-            if (isIteractiveMode(currentContext)) {
-                int numOfJobsPerPage = getNumOfJobsPerPage(currentContext);
-                int numOfJobs = getNumberOfJobs(beginIndex, offset, currentContext);
-                if (numOfJobs < numOfJobsPerPage) {
-                    printJobsList(beginIndex, numOfJobs, currentContext);
-                } else {
-                    int pages = (numOfJobs / numOfJobsPerPage) + ((numOfJobs % numOfJobsPerPage) == 0 ? 0 : 1);
-                    int iterCount = 0;
-                    boolean hasQuit = false;
-                    // all pages except the last one
-                    for (; iterCount < pages - 1; iterCount++) {
-                        printJobsList(beginIndex + (iterCount * numOfJobsPerPage), numOfJobsPerPage, currentContext);
-                        String response = readLine(currentContext,
-                                                   "Page(%d/%d). Press ENTER to continue. 'q' to quit. ",
-                                                   (iterCount + 1),
-                                                   pages);
-                        if ("q".equalsIgnoreCase(response)) {
-                            hasQuit = true;
-                            break;
-                        }
-                    }
-                    if (!hasQuit) {
-                        // last page
-                        printJobsList(beginIndex + (iterCount * numOfJobsPerPage),
-                                      numOfJobs - (iterCount * numOfJobsPerPage),
-                                      currentContext);
-                    }
-                }
-            } else {
-                printJobsList(beginIndex, (offsetFlag) ? offset : RestConstants.DFLT_PAGINATION_SIZE, currentContext);
-            }
+            int numOfJobs = getNumberOfJobs(beginIndex, offset, currentContext);
+            printJobsList(beginIndex, numOfJobs, currentContext);
         } catch (Exception e) {
             handleError("An error occurred while retrieving job list:", e, currentContext);
         }
+
     }
 
     private void processFilteringOps() {
         if (filterings != null) {
             try {
                 for (String nameValue : filterings) {
-                    if (nameValue.startsWith("latest=")) {
+                    if (nameValue.startsWith("latest=") || nameValue.startsWith("limit=")) {
                         setOffset(valueAsInt(nameValue));
                     } else if (nameValue.startsWith("from=")) {
                         beginIndex = valueAsInt(nameValue);
-                    } else if (nameValue.startsWith("limit=")) {
-                        setOffset(valueAsInt(nameValue));
                     }
                 }
             } catch (Exception e) {
@@ -120,14 +83,9 @@ public class ListJobCommand extends AbstractCommand implements Command {
 
     private void setOffset(int offset) {
         this.offset = offset;
-        this.offsetFlag = true;
     }
 
-    private static boolean isIteractiveMode(ApplicationContext currentContext) {
-        return currentContext.getProperty(AbstractIModeCommand.IMODE, Boolean.TYPE) != null;
-    }
-
-    private static void printJobsList(int index, int offset, ApplicationContext currentContext)
+    private void printJobsList(int index, int offset, ApplicationContext currentContext)
             throws PermissionRestException, NotConnectedRestException, IOException {
         RestMapPage<Long, ArrayList<UserJobData>> page = currentContext.getRestClient()
                                                                        .getScheduler()
@@ -143,8 +101,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
         currentContext.getDevice().writeLine("%s", StringUtility.jobsAsString(jobs));
     }
 
-    private static int getNumberOfJobs(int index, int offset, ApplicationContext currentContext)
-            throws NotConnectedRestException, PermissionRestException {
+    private int getNumberOfJobs(int index, int offset, ApplicationContext currentContext) throws Exception {
         return currentContext.getRestClient()
                              .getScheduler()
                              .jobs(currentContext.getSessionId(), index, offset)
@@ -152,32 +109,8 @@ public class ListJobCommand extends AbstractCommand implements Command {
                              .size();
     }
 
-    private static Integer valueAsInt(String nameValue) {
+    private Integer valueAsInt(String nameValue) {
         return Integer.valueOf(nameValue.split("=")[1]);
     }
 
-    private static int getNumOfJobsPerPage(ApplicationContext currentContext) {
-        int columns = currentContext.getDevice().getWidth();
-        int lines = currentContext.getDevice().getHeight();
-        int numOfJobsPerPage = 0;
-        if (lines > 0) {
-            if (columns < 81) {
-                /*
-                 * 5 => 2 lines for table headers, 1 blank after, 1 for user
-                 * opt, 1 blank before 2 => requires two lines per job
-                 */
-                numOfJobsPerPage = (lines - 5) / 2;
-            } else {
-                /*
-                 * 4 => 1 lines for table headers, ...
-                 */
-                numOfJobsPerPage = lines - 4;
-            }
-        }
-        if (numOfJobsPerPage < 1) {
-            // if terminal height, width not available
-            numOfJobsPerPage = RestConstants.DFLT_PAGINATION_SIZE;
-        }
-        return numOfJobsPerPage;
-    }
 }

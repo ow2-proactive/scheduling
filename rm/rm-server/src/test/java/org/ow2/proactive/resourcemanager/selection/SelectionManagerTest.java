@@ -27,7 +27,11 @@ package org.ow2.proactive.resourcemanager.selection;
 
 import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.security.Permission;
@@ -57,6 +61,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.Subjects;
+
+import com.google.common.collect.Lists;
 
 
 public class SelectionManagerTest {
@@ -135,6 +141,22 @@ public class SelectionManagerTest {
         Client mockedClient = mock(Client.class);
         NodeSet nodeSet = selectionManager.selectNodes(crit, mockedClient);
         assertEquals(10, nodeSet.size());
+    }
+
+    @Test
+    public void testRunScriptsWillNotBeCalled() {
+        RMCore rmCore = newMockedRMCore(2);
+        SelectionManager selectionManager = createSelectionManager(rmCore);
+        Criteria crit = new Criteria(2);
+        crit.setTopology(TopologyDescriptor.SINGLE_HOST);
+        SelectionScript selectWhatever = new SelectionScript();
+        crit.setScripts(Lists.newArrayList(selectWhatever));
+        crit.setBlackList(null);
+        crit.setBestEffort(false);
+        Client mockedClient = mock(Client.class);
+        selectionManager.selectNodes(crit, mockedClient);
+        verify(rmCore, never()).setBusyNode(anyString(), any(Client.class));
+
     }
 
     private SecurityManager securityManagerRejectingUser() {

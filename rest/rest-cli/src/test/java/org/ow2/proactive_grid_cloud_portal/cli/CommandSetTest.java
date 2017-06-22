@@ -28,6 +28,8 @@ package org.ow2.proactive_grid_cloud_portal.cli;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
@@ -40,9 +42,10 @@ import com.google.common.collect.ImmutableList;
 
 
 /**
- * The class is in charge to test that all {@link org.ow2.proactive_grid_cloud_portal.cli.CommandSet.Entry}
- * defined in {@link CommandSet} class have their number of expected parameters that match the number of
- * tokens used the argNames.
+ * The class is in charge to test that all
+ * {@link org.ow2.proactive_grid_cloud_portal.cli.CommandSet.Entry} defined in
+ * {@link CommandSet} class have their number of expected parameters that match
+ * the number of tokens used the argNames.
  */
 @RunWith(Parameterized.class)
 public class CommandSetTest {
@@ -60,22 +63,29 @@ public class CommandSetTest {
     @Test
     public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
         int nbArgsBasedOnName = Option.UNINITIALIZED;
+        String regex = "\\[.*\\]";
+        Pattern pattern = Pattern.compile(regex);
+        String optionalArgNames = "";
+        int optionals = 0;
 
         if (entry.argNames() != null) {
             String argNames = entry.argNames();
+            Matcher matcher = pattern.matcher(argNames);
 
-            if (entry.hasOptionalArg()) {
-                // argNames description of optional arguments is assumed to start with '['
-                argNames = argNames.substring(0, argNames.indexOf("["));
+            while (matcher.find()) {
+                optionals = matcher.group().split(" ").length;
+                optionalArgNames = matcher.group();
             }
 
             if (!argNames.trim().isEmpty()) {
                 nbArgsBasedOnName = argNames.split(" ").length;
+                nbArgsBasedOnName = nbArgsBasedOnName - optionals;
             }
 
-            if (argNames.contains("...")) {
+            if (argNames.contains("...") && !optionalArgNames.contains("|") && !optionalArgNames.contains("...")) {
                 nbArgsBasedOnName = Option.UNLIMITED_VALUES;
             }
+
         }
 
         Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
