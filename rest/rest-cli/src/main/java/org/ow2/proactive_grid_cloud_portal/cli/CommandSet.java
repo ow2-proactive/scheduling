@@ -262,10 +262,10 @@ public class CommandSet {
                                                                           .opt("lj")
                                                                           .longOpt("listjobs")
                                                                           .description("Retrieve a list of jobs managed by the Scheduler.If specified the latest 'x' number of jobs or 'z' maximum number of jobs starting from 'y'th job.") //Example: to return the five last jobs, >./proactive-client -lj limit=5. To return the list of z jobs from index y, >./proactive-client -lj from=y limit=z ")
-                                                                          .numOfArgs(0)
+                                                                          .numOfArgs(1)
                                                                           .hasOptionalArg(true)
                                                                           .hasArgs(true)
-                                                                          .argNames("[latest=x |(from=y limit=z)]")
+                                                                          .argNames("jobs [latest=x |(from=y limit=z)]")
                                                                           .jsCommand("listjobs(x)")
                                                                           .commandClass(ListJobCommand.class)
                                                                           .entry();
