@@ -361,6 +361,13 @@ public class SchedulingService {
     }
 
     /*
+     * Should be called only by scheduling method impl when job scheduling starts
+     */
+    public LiveJobs.JobData lockJob(JobId jid) {
+        return jobs.lockJob(jid);
+    }
+
+    /*
      * Should be called only by scheduling method impl after job scheduling finished
      */
     public void unlockJobsToSchedule(Collection<JobDescriptor> jobDescriptors) {
@@ -979,7 +986,8 @@ public class SchedulingService {
     }
 
     void getProgressAndPingTaskNode(RunningTaskData taskData) {
-        if (!jobs.canPingTask(taskData)) {
+        if (!jobs.canPingTask(taskData) ||
+            taskData.getPingAttempts() > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
             return;
         }
 

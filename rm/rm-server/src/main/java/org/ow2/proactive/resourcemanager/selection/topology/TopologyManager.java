@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -77,6 +78,8 @@ public class TopologyManager {
 
     // hosts distances
     private final TopologyImpl topology = new TopologyImpl();
+
+    private ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     // this hash map allows to quickly find nodes on a single host (much faster than from the topology).
     private HashMap<InetAddress, Set<Node>> nodesOnHost = new HashMap<>();
@@ -134,17 +137,20 @@ public class TopologyManager {
      * Updates the topology for new node. Executes the pinger on new node when this node belongs
      * to unknow host.
      */
-    public synchronized void addNode(Node node) {
-        if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
-            // do not do anything if topology disabled
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Adding Node " + node.getNodeInformation().getURL() + " to topology");
-        }
+    public void addNode(Node node) {
+        try {
+            rwLock.writeLock().lock();
 
-        InetAddress host = node.getVMInformation().getInetAddress();
-        synchronized (topology) {
+            if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
+                // do not do anything if topology disabled
+                return;
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Adding Node " + node.getNodeInformation().getURL() + " to topology");
+            }
+
+            InetAddress host = node.getVMInformation().getInetAddress();
+
             if (topology.knownHost(host)) {
                 // host topology is already known
                 if (logger.isDebugEnabled()) {
@@ -154,22 +160,17 @@ public class TopologyManager {
                 nodesOnHost.get(host).add(node);
                 return;
             }
-        }
 
-        // lock the current node while pinging
-        synchronized (node.getNodeInformation().getURL().intern()) {
             // unknown host => start pinging process
             NodeSet toPing = new NodeSet();
             HashMap<InetAddress, Long> hostsTopology = new HashMap<>();
 
-            synchronized (topology) {
-                // adding one node from each host
-                for (InetAddress h : nodesOnHost.keySet()) {
-                    // always have at least one node on each host
-                    if (nodesOnHost.get(h) != null && !nodesOnHost.get(h).isEmpty()) {
-                        toPing.add(nodesOnHost.get(h).iterator().next());
-                        hostsTopology.put(h, Long.MAX_VALUE);
-                    }
+            // adding one node from each host
+            for (InetAddress h : nodesOnHost.keySet()) {
+                // always have at least one node on each host
+                if (nodesOnHost.get(h) != null && !nodesOnHost.get(h).isEmpty()) {
+                    toPing.add(nodesOnHost.get(h).iterator().next());
+                    hostsTopology.put(h, Long.MAX_VALUE);
                 }
             }
 
@@ -177,47 +178,49 @@ public class TopologyManager {
                 hostsTopology = pingNode(node, toPing);
             }
 
-            synchronized (topology) {
-                topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
-                Set<Node> nodesList = new LinkedHashSet<>();
-                nodesList.add(node);
-                nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Node " + node.getNodeInformation().getURL() + " added.");
-            }
+            topology.addHostTopology(node.getVMInformation().getHostName(), host, hostsTopology);
+            Set<Node> nodesList = new LinkedHashSet<>();
+            nodesList.add(node);
+            nodesOnHost.put(node.getVMInformation().getInetAddress(), nodesList);
+        } finally {
+            rwLock.writeLock().unlock();
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Node " + node.getNodeInformation().getURL() + " added.");
+        }
+
     }
 
     /**
      * Node is removed or down. Method removes corresponding topology information.
      */
     public void removeNode(Node node) {
-        if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
-            // do not do anything if topology disabled
-            return;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Removing Node " + node.getNodeInformation().getURL() + " from topology");
-        }
+        try {
+            rwLock.writeLock().lock();
+            if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {
+                // do not do anything if topology disabled
+                return;
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Removing Node " + node.getNodeInformation().getURL() + " from topology");
+            }
 
-        // if the node we're trying to remove is in process of pinging => wait
-        synchronized (node.getNodeInformation().getURL().intern()) {
-            synchronized (topology) {
-                InetAddress host = node.getVMInformation().getInetAddress();
-                if (!topology.knownHost(host)) {
-                    logger.warn("Topology info does not exist for node " + node.getNodeInformation().getURL());
-                } else {
-                    Set<Node> nodes = nodesOnHost.get(host);
-                    nodes.remove(node);
-                    if (nodes.isEmpty()) {
-                        // no more nodes on the host
-                        topology.removeHostTopology(node.getVMInformation().getHostName(), host);
-                        nodesOnHost.remove(host);
-                    }
+            InetAddress host = node.getVMInformation().getInetAddress();
+            if (!topology.knownHost(host)) {
+                logger.warn("Topology info does not exist for node " + node.getNodeInformation().getURL());
+            } else {
+                Set<Node> nodes = nodesOnHost.get(host);
+                nodes.remove(node);
+                if (nodes.isEmpty()) {
+                    // no more nodes on the host
+                    topology.removeHostTopology(node.getVMInformation().getHostName(), host);
+                    nodesOnHost.remove(host);
                 }
             }
+        } finally {
+            rwLock.writeLock().unlock();
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("Node " + node.getNodeInformation().getURL() + " removed.");
         }
@@ -263,12 +266,15 @@ public class TopologyManager {
     }
 
     public Set<Node> getNodesOnHost(InetAddress addr) {
-        synchronized (topology) {
+        try {
+            rwLock.readLock().lock();
             if (nodesOnHost.get(addr) != null) {
                 return new LinkedHashSet<>(nodesOnHost.get(addr));
             } else {
                 return null;
             }
+        } finally {
+            rwLock.readLock().unlock();
         }
     }
 
@@ -281,8 +287,11 @@ public class TopologyManager {
             throw new TopologyException("Topology is disabled");
         }
 
-        synchronized (topology) {
+        try {
+            rwLock.readLock().lock();
             return (Topology) ((TopologyImpl) topology).clone();
+        } finally {
+            rwLock.readLock().unlock();
         }
     }
 
@@ -332,12 +341,15 @@ public class TopologyManager {
     private class BestProximityHandler extends TopologyHandler {
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            synchronized (topology) {
+            try {
+                rwLock.readLock().lock();
                 BestProximityDescriptor descriptor = (BestProximityDescriptor) topologyDescriptor;
                 // HAC is very efficient algorithm but it does not guarantee the complete solution
                 logger.info("Running clustering algorithm in order to find closest nodes");
                 HAC hac = new HAC(topology, null, descriptor.getDistanceFunction(), Long.MAX_VALUE);
                 return new NodeSet(hac.select(number, matchedNodes));
+            } finally {
+                rwLock.readLock().unlock();
             }
         }
     }
@@ -354,11 +366,14 @@ public class TopologyManager {
     private class TresholdProximityHandler extends TopologyHandler {
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            synchronized (topology) {
+            try {
+                rwLock.readLock().lock();
                 ThresholdProximityDescriptor descriptor = (ThresholdProximityDescriptor) topologyDescriptor;
                 logger.info("Running clustering algorithm in order to find closest nodes");
                 HAC hac = new HAC(topology, null, descriptor.getDistanceFunction(), descriptor.getThreshold());
                 return new NodeSet(hac.select(number, matchedNodes));
+            } finally {
+                rwLock.readLock().unlock();
             }
         }
     }
@@ -369,34 +384,39 @@ public class TopologyManager {
     private class SingleHostHandler extends TopologyHandler {
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            if (number <= 0 || matchedNodes.size() == 0) {
-                return new NodeSet();
-            }
-            if (number > matchedNodes.size()) {
-                // cannot select more than matchedNodes.size()
-                number = matchedNodes.size();
-            }
-
-            NodeSet result = new NodeSet();
-            for (InetAddress host : nodesOnHost.keySet()) {
-                if (nodesOnHost.get(host).size() >= number) {
-                    // found the host with required capacity
-                    // checking that all nodes are free
-                    for (Node nodeOnHost : nodesOnHost.get(host)) {
-                        if (matchedNodes.contains(nodeOnHost)) {
-                            result.add(nodeOnHost);
-                            if (result.size() == number) {
-                                // found enough nodes on the same host
-                                return result;
-                            }
-                        } else {
-                            continue;
-                        }
-                    }
-                    result.clear();
+            try {
+                rwLock.readLock().lock();
+                if (number <= 0 || matchedNodes.size() == 0) {
+                    return new NodeSet();
                 }
+                if (number > matchedNodes.size()) {
+                    // cannot select more than matchedNodes.size()
+                    number = matchedNodes.size();
+                }
+
+                NodeSet result = new NodeSet();
+                for (InetAddress host : nodesOnHost.keySet()) {
+                    if (nodesOnHost.get(host).size() >= number) {
+                        // found the host with required capacity
+                        // checking that all nodes are free
+                        for (Node nodeOnHost : nodesOnHost.get(host)) {
+                            if (matchedNodes.contains(nodeOnHost)) {
+                                result.add(nodeOnHost);
+                                if (result.size() == number) {
+                                    // found enough nodes on the same host
+                                    return result;
+                                }
+                            } else {
+                                continue;
+                            }
+                        }
+                        result.clear();
+                    }
+                }
+                return select(number - 1, matchedNodes);
+            } finally {
+                rwLock.readLock().unlock();
             }
-            return select(number - 1, matchedNodes);
         }
     }
 
@@ -413,19 +433,24 @@ public class TopologyManager {
     private class SingleHostExclusiveHandler extends TopologyHandler {
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            if (number <= 0 || matchedNodes.size() == 0) {
-                return new NodeSet();
-            }
-
-            List<InetAddress> sortedByNodesNumber = new LinkedList<>(nodesOnHost.keySet());
-
-            Collections.sort(sortedByNodesNumber, new Comparator<InetAddress>() {
-                public int compare(InetAddress host, InetAddress host2) {
-                    return nodesOnHost.get(host).size() - nodesOnHost.get(host2).size();
+            try {
+                rwLock.readLock().lock();
+                if (number <= 0 || matchedNodes.size() == 0) {
+                    return new NodeSet();
                 }
-            });
 
-            return selectRecursively(number, sortedByNodesNumber, matchedNodes);
+                List<InetAddress> sortedByNodesNumber = new LinkedList<>(nodesOnHost.keySet());
+
+                Collections.sort(sortedByNodesNumber, new Comparator<InetAddress>() {
+                    public int compare(InetAddress host, InetAddress host2) {
+                        return nodesOnHost.get(host).size() - nodesOnHost.get(host2).size();
+                    }
+                });
+                return selectRecursively(number, sortedByNodesNumber, matchedNodes);
+
+            } finally {
+                rwLock.readLock().unlock();
+            }
         }
 
         private NodeSet selectRecursively(int number, List<InetAddress> hostsSortedByNodesNumber,
@@ -489,40 +514,45 @@ public class TopologyManager {
 
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            if (number <= 0 || matchedNodes.size() == 0) {
-                return new NodeSet();
-            }
-
-            // first we need to understand which hosts have busy nodes and filter them out
-            // building a map from matched nodes: host -> "number of matched nodes"
-            HashMap<InetAddress, Integer> matchedHosts = new HashMap<>();
-            for (Node matchedNode : matchedNodes) {
-                InetAddress host = matchedNode.getVMInformation().getInetAddress();
-                if (matchedHosts.containsKey(host)) {
-                    matchedHosts.put(host, matchedHosts.get(host) + 1);
-                } else {
-                    matchedHosts.put(host, 1);
+            try {
+                rwLock.readLock().lock();
+                if (number <= 0 || matchedNodes.size() == 0) {
+                    return new NodeSet();
                 }
-            }
 
-            // freeHosts contains hosts sorted by nodes number and allows
-            // to quickly find a host with given number of nodes (or closest if it is not in the tree)
-            TreeSet<Host> freeHosts = new TreeSet<>();
-            // if a host in matchedHosts map has the same number of nodes
-            // as in nodesOnHost map it means there no busy nodes on this host
-            for (InetAddress matchedHost : matchedHosts.keySet()) {
-                if (!nodesOnHost.containsKey(matchedHost)) {
-                    // should not be here
-                    throw new TopologyException("Inconsitent topology state");
+                // first we need to understand which hosts have busy nodes and filter them out
+                // building a map from matched nodes: host -> "number of matched nodes"
+                HashMap<InetAddress, Integer> matchedHosts = new HashMap<>();
+                for (Node matchedNode : matchedNodes) {
+                    InetAddress host = matchedNode.getVMInformation().getInetAddress();
+                    if (matchedHosts.containsKey(host)) {
+                        matchedHosts.put(host, matchedHosts.get(host) + 1);
+                    } else {
+                        matchedHosts.put(host, 1);
+                    }
                 }
-                if (nodesOnHost.get(matchedHost).size() == matchedHosts.get(matchedHost)) {
-                    // host has no busy nodes
-                    freeHosts.add(new Host(matchedHost, matchedHosts.get(matchedHost)));
-                }
-            }
 
-            // selecting nodes recursively taking on each step the host closest to the required node number
-            return selectRecursively(number, freeHosts);
+                // freeHosts contains hosts sorted by nodes number and allows
+                // to quickly find a host with given number of nodes (or closest if it is not in the tree)
+                TreeSet<Host> freeHosts = new TreeSet<>();
+                // if a host in matchedHosts map has the same number of nodes
+                // as in nodesOnHost map it means there no busy nodes on this host
+                for (InetAddress matchedHost : matchedHosts.keySet()) {
+                    if (!nodesOnHost.containsKey(matchedHost)) {
+                        // should not be here
+                        throw new TopologyException("Inconsitent topology state");
+                    }
+                    if (nodesOnHost.get(matchedHost).size() == matchedHosts.get(matchedHost)) {
+                        // host has no busy nodes
+                        freeHosts.add(new Host(matchedHost, matchedHosts.get(matchedHost)));
+                    }
+                }
+
+                // selecting nodes recursively taking on each step the host closest to the required node number
+                return selectRecursively(number, freeHosts);
+            } finally {
+                rwLock.readLock().unlock();
+            }
         }
 
         private NodeSet selectRecursively(int number, TreeSet<Host> freeHosts) {
@@ -625,62 +655,67 @@ public class TopologyManager {
     private class DifferentHostsExclusiveHandler extends TopologyHandler {
         @Override
         public NodeSet select(int number, List<Node> matchedNodes) {
-            if (number <= 0 || matchedNodes.size() == 0) {
-                return new NodeSet();
-            }
+            try {
+                rwLock.readLock().lock();
+                if (number <= 0 || matchedNodes.size() == 0) {
+                    return new NodeSet();
+                }
 
-            // create the map of free hosts: nodes_number -> list of hosts
-            HashMap<Integer, List<InetAddress>> hostsMap = new HashMap<>();
-            for (InetAddress host : nodesOnHost.keySet()) {
-                boolean busyNode = false;
-                for (Node nodeOnHost : nodesOnHost.get(host)) {
-                    // TODO: this is n^2 complexity. Change it as in MultipleHostsExclusiveHandler
-                    if (!matchedNodes.contains(nodeOnHost)) {
-                        busyNode = true;
-                        break;
+                // create the map of free hosts: nodes_number -> list of hosts
+                HashMap<Integer, List<InetAddress>> hostsMap = new HashMap<>();
+                for (InetAddress host : nodesOnHost.keySet()) {
+                    boolean busyNode = false;
+                    for (Node nodeOnHost : nodesOnHost.get(host)) {
+                        // TODO: this is n^2 complexity. Change it as in MultipleHostsExclusiveHandler
+                        if (!matchedNodes.contains(nodeOnHost)) {
+                            busyNode = true;
+                            break;
+                        }
+                    }
+                    if (!busyNode) {
+                        int nodesNumber = nodesOnHost.get(host).size();
+                        if (!hostsMap.containsKey(nodesNumber)) {
+                            hostsMap.put(nodesNumber, new LinkedList<InetAddress>());
+                        }
+                        hostsMap.get(nodesNumber).add(host);
                     }
                 }
-                if (!busyNode) {
-                    int nodesNumber = nodesOnHost.get(host).size();
-                    if (!hostsMap.containsKey(nodesNumber)) {
-                        hostsMap.put(nodesNumber, new LinkedList<InetAddress>());
-                    }
-                    hostsMap.get(nodesNumber).add(host);
+
+                // if empty => no entirely free hosts
+                if (hostsMap.size() == 0) {
+                    return new NodeSet();
                 }
-            }
 
-            // if empty => no entirely free hosts
-            if (hostsMap.size() == 0) {
-                return new NodeSet();
-            }
+                // sort by nodes number and accumulate the result
+                List<Integer> sortedCapacities = new LinkedList<>(hostsMap.keySet());
+                Collections.sort(sortedCapacities);
 
-            // sort by nodes number and accumulate the result
-            List<Integer> sortedCapacities = new LinkedList<>(hostsMap.keySet());
-            Collections.sort(sortedCapacities);
-
-            NodeSet result = new NodeSet();
-            for (Integer i : sortedCapacities) {
-                for (InetAddress host : hostsMap.get(i)) {
-                    Set<Node> hostNodes = nodesOnHost.get(host);
-                    int nbNodes = hostNodes.size();
-                    if (nbNodes > 0) {
-                        result.add(hostNodes.iterator().next());
-                        if (nbNodes > 1) {
-                            List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes, 1, nbNodes));
-                            if (result.getExtraNodes() == null) {
-                                result.setExtraNodes(new LinkedList<Node>());
+                NodeSet result = new NodeSet();
+                for (Integer i : sortedCapacities) {
+                    for (InetAddress host : hostsMap.get(i)) {
+                        Set<Node> hostNodes = nodesOnHost.get(host);
+                        int nbNodes = hostNodes.size();
+                        if (nbNodes > 0) {
+                            result.add(hostNodes.iterator().next());
+                            if (nbNodes > 1) {
+                                List<Node> newExtraNodes = new LinkedList<>(subListLHS(hostNodes, 1, nbNodes));
+                                if (result.getExtraNodes() == null) {
+                                    result.setExtraNodes(new LinkedList<Node>());
+                                }
+                                result.getExtraNodes().addAll(newExtraNodes);
                             }
-                            result.getExtraNodes().addAll(newExtraNodes);
-                        }
-                        if (--number <= 0) {
-                            // found required node set
-                            return result;
+                            if (--number <= 0) {
+                                // found required node set
+                                return result;
+                            }
                         }
                     }
                 }
+                // best effort: return less than needed
+                return result;
+            } finally {
+                rwLock.readLock().unlock();
             }
-            // best effort: return less than needed
-            return result;
         }
     }
 }
