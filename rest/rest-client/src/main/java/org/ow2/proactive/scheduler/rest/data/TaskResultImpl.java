@@ -25,8 +25,7 @@
  */
 package org.ow2.proactive.scheduler.rest.data;
 
-import static org.ow2.proactive_grid_cloud_portal.utils.ObjectUtility.object;
-
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +35,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.utils.ObjectByteConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.TaskRestException;
 
@@ -59,16 +59,19 @@ public class TaskResultImpl implements TaskResult {
 
     private Map<String, String> metadata = new HashMap<>();
 
+    private boolean isRaw;
+
     public TaskResultImpl(TaskId id, TaskResultData d) {
         this.id = id;
-        this.serializedValue = d.getSerializedValue();
+        this.serializedValue = ObjectByteConverter.base64StringToByteArray(d.getSerializedValue());
         this.metadata = d.getMetadata();
         this.exceptionMessage = d.getExceptionMessage();
-        this.serializedException = d.getSerializedException();
-        this.propagatedVariables = d.getPropagatedVariables();
+        this.serializedException = ObjectByteConverter.base64StringToByteArray(d.getSerializedException());
+        this.propagatedVariables = ObjectByteConverter.mapOfBase64StringToByteArray(d.getSerializedPropagatedVariables());
         if (d.getOutput() != null) {
             this.taskLogs = new SimpleTaskLogs(d.getOutput().getStdoutLogs(), d.getOutput().getStderrLogs());
         }
+        this.isRaw = d.isRaw();
 
     }
 
@@ -83,9 +86,9 @@ public class TaskResultImpl implements TaskResult {
             return null;
         }
         try {
-            Throwable unserializedException = (Throwable) object(serializedException);
+            Throwable unserializedException = (Throwable) ObjectByteConverter.byteArrayToObject(serializedException);
             return unserializedException;
-        } catch (ClassCastException e) {
+        } catch (ClassCastException | IOException | ClassNotFoundException e) {
             // If an error occurs during deserialization, a string is returned
             // in that case return the custom made server-side exception
             return new TaskRestException(exceptionMessage);
@@ -104,6 +107,16 @@ public class TaskResultImpl implements TaskResult {
     @Override
     public Map<String, byte[]> getPropagatedVariables() {
         return propagatedVariables;
+    }
+
+    @Override
+    public Map<String, Serializable> getVariables() throws IOException, ClassNotFoundException {
+        return ObjectByteConverter.mapOfByteArrayToSerializable(propagatedVariables);
+    }
+
+    @Override
+    public boolean isRaw() {
+        return isRaw;
     }
 
     @Override
@@ -136,8 +149,22 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public Serializable value() throws Throwable {
-        return (null == value) ? ((null == serializedValue) ? null : (Serializable) object(serializedValue)) : value;
+        if (value == null) {
+            if (serializedValue == null) {
+                return null;
+            } else if (isRaw) {
+                return serializedValue;
+            } else {
+                return (Serializable) ObjectByteConverter.byteArrayToObject(serializedValue);
+            }
+        } else {
+            return value;
+        }
+    }
 
+    @Override
+    public Serializable getValue() throws Throwable {
+        return value();
     }
 
 }

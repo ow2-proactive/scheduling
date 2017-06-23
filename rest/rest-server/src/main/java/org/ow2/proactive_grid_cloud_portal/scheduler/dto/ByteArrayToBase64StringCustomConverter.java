@@ -23,34 +23,35 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.utils;
+package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-
+import org.dozer.DozerConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
 
 
-public class ObjectUtility {
+/**
+ * @author ActiveEon Team
+ * @since 16/06/2017
+ */
+public class ByteArrayToBase64StringCustomConverter extends DozerConverter<byte[], String> {
 
-    public static Object object(byte[] bytes) throws IOException, ClassNotFoundException {
-        if (bytes == null) {
-            return "[NULL]";
-        }
-        Object answer;
-        try {
-            answer = ObjectByteConverter.byteArrayToObject(bytes);
-        } catch (ClassNotFoundException cnfe) {
-            return String.format("[De-serialization error : %s]", cnfe.getMessage());
-        } catch (IOException ioe) {
-            return String.format("[De-serialization error : %s]", ioe.getMessage());
-        }
-        if (answer instanceof byte[]) {
-            return "[RAW DATA]";
-        }
-        return answer;
-
+    public ByteArrayToBase64StringCustomConverter() {
+        super(byte[].class, String.class);
     }
 
+    @Override
+    public String convertTo(byte[] source, String destination) {
+        if (source == null) {
+            return null;
+        }
+        return ObjectByteConverter.byteArrayToBase64String(source);
+    }
+
+    @Override
+    public byte[] convertFrom(String source, byte[] destination) {
+        if (source == null) {
+            return null;
+        }
+        return ObjectByteConverter.base64StringToByteArray(source);
+    }
 }

@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -70,6 +71,13 @@ public interface TaskResult extends Serializable {
     Serializable value() throws Throwable;
 
     /**
+     * Get the value of the task. Returns null if an exception occurred during the task execution
+     *
+     * @return the value of the task.
+     */
+    Serializable getValue() throws Throwable;
+
+    /**
      * Get the serialized value of the task.
      *
      * @return the value of the task, null if an exception occurred.
@@ -113,6 +121,22 @@ public interface TaskResult extends Serializable {
      */
     TaskLogs getOutput();
 
+    /**
+     * Return the content of propagated variables, in byte array format
+     * @return a map of byte arrays
+     */
     Map<String, byte[]> getPropagatedVariables();
+
+    /**
+     * Returns the deserialized version of the propagated variables
+     * @return a map of variables
+     */
+    Map<String, Serializable> getVariables() throws IOException, ClassNotFoundException;
+
+    /**
+     * Returns true if this result contains raw data (i.e. a byte array) instead of an object
+     * @return result object type
+     */
+    boolean isRaw();
 
 }

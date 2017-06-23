@@ -23,34 +23,23 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.utils;
+package functionaltests.jobs;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import static functionaltests.jobs.SimpleJob.TEST_JOB;
 
-import org.ow2.proactive.utils.ObjectByteConverter;
+import java.io.Serializable;
+import java.nio.charset.Charset;
+
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
-public class ObjectUtility {
+public class RawTask extends JavaExecutable {
 
-    public static Object object(byte[] bytes) throws IOException, ClassNotFoundException {
-        if (bytes == null) {
-            return "[NULL]";
-        }
-        Object answer;
-        try {
-            answer = ObjectByteConverter.byteArrayToObject(bytes);
-        } catch (ClassNotFoundException cnfe) {
-            return String.format("[De-serialization error : %s]", cnfe.getMessage());
-        } catch (IOException ioe) {
-            return String.format("[De-serialization error : %s]", ioe.getMessage());
-        }
-        if (answer instanceof byte[]) {
-            return "[RAW DATA]";
-        }
-        return answer;
-
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
+        return TEST_JOB.getBytes();
     }
 
 }
