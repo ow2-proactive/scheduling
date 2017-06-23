@@ -212,8 +212,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         TaskResult tResRaw = result.getResult(getTaskNameForClass(RawTask.class));
         Assert.assertNotNull(tResRaw.value());
         Assert.assertNotNull(tResRaw.getSerializedValue());
-        Assert.assertEquals(TEST_JOB.getBytes(), tResRaw.value());
-        Assert.assertEquals(TEST_JOB.getBytes(), tResRaw.getSerializedValue());
+        Assert.assertArrayEquals(TEST_JOB.getBytes(), (byte[]) tResRaw.value());
+        Assert.assertArrayEquals(TEST_JOB.getBytes(), tResRaw.getSerializedValue());
 
     }
 
@@ -228,8 +228,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     private void checkJobInfo(JobInfo jobInfo) {
         Assert.assertNotNull(jobInfo);
-        Assert.assertEquals(5, jobInfo.getTotalNumberOfTasks());
-        Assert.assertEquals(5, jobInfo.getNumberOfFinishedTasks());
+        Assert.assertEquals(6, jobInfo.getTotalNumberOfTasks());
+        Assert.assertEquals(6, jobInfo.getNumberOfFinishedTasks());
         Assert.assertEquals(1, jobInfo.getNumberOfFaultyTasks());
     }
 
