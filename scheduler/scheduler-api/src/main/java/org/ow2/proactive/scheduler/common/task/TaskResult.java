@@ -71,10 +71,9 @@ public interface TaskResult extends Serializable {
     Serializable value() throws Throwable;
 
     /**
-     * Get the value of the task. Throw the exception if the task generate
+     * Get the value of the task. Returns null if an exception occurred during the task execution
      *
      * @return the value of the task.
-     * @throws Throwable If the value has generate an exception.
      */
     Serializable getValue() throws Throwable;
 

@@ -81,7 +81,7 @@
 		<field custom-converter=
 					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.SerializableToStringCustomConverter">
 			<a>value</a>
-			<b>value</b>
+			<b get-method="getValue">value</b>
 		</field>
 		<field custom-converter=
 					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.ByteArrayToBase64StringCustomConverter">

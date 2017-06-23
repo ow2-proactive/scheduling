@@ -280,7 +280,7 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public Serializable getValue() throws Throwable {
-        return value();
+        return value;
     }
 
     /**
