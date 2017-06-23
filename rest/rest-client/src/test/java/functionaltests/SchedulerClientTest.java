@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -358,7 +359,10 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
         client.removeEventListener();
         // should return immediately
-        client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
+        JobResult result = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
+        TaskResult tresult = result.getResult(getTaskName(NonTerminatingJob.class));
+        Assert.assertTrue(tresult.hadException());
+        Assert.assertTrue(tresult.getException() instanceof TaskAbortedException);
     }
 
     @Test(timeout = MAX_WAIT_TIME)
