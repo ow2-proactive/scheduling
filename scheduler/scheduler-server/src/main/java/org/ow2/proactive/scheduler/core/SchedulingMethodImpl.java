@@ -63,6 +63,8 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
+import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -106,9 +108,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private TaskTerminateNotification terminateNotification;
 
+    private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
+
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
-
+        this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
         terminateNotification = new TerminateNotification(schedulingService);
         terminateNotification = PAActiveObject.turnActive(terminateNotification,
                                                           TaskTerminateNotification.class.getName(),
@@ -318,6 +322,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         int neededResource = 0;
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
+            if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+                boolean result = checkEligibleTaskDescriptorScript.containsAPIBinding(etd);
+                if (result) {
+                    //skip here
+                    return neededResource;
+                }
+            }
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
             InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
