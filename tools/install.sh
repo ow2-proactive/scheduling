@@ -227,6 +227,7 @@ else
     # checking the previous installation
     if [ -h "$PA_ROOT/default" ]; then
         OLD_PADIR=$(readlink "$PA_ROOT/default")
+        rm -f $PA_ROOT/previous
         ln -s -f $OLD_PADIR "$PA_ROOT/previous"
         rm -f $PA_ROOT/default
     elif [ -h "$PA_ROOT/previous" ]; then
@@ -422,8 +423,11 @@ else
     sed -e "s/^web\.http\.port=.*/web.http.port=$PORT/g" -i "$PA_ROOT/default/config/web/settings.ini"
 fi
 
-for file in $( find dist/war -name 'application.properties' ); do
+for file in $( find $PA_ROOT/default/dist/war -name 'application.properties' ); do
     sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/$file"
+    if $SELF_SIGNED; then
+        sed -e "s/web\.https\.allow_any_certificate=.*/web.https.allow_any_certificate=true/g" -i "$PA_ROOT/default/$file"
+    fi
 done
 
 sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
@@ -432,9 +436,7 @@ sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}:/
 sed -e "s/^NB_NODES=.*/NB_NODES=$NB_NODES/g"  -i "/etc/init.d/proactive-scheduler"
 sed -e "s/^PA_ROOT=.*/PA_ROOT=$(escape_rhs_sed "$PA_ROOT")/g" -i "/etc/init.d/proactive-scheduler"
 
-if confirm "Start ProActive Nodes in a single JVM process (y) or multiple JVM Processes (n)? [Y/n] " ; then
-    sed -e "s/^SINGLE_JVM=.*/SINGLE_JVM=true/g" -i "/etc/init.d/proactive-scheduler"
-fi
+sed -e "s/^SINGLE_JVM=.*/SINGLE_JVM=true/g" -i "/etc/init.d/proactive-scheduler"
 
 echo "Here are the network interfaces available on your machine and the interface which will be automatically selected by ProActive: "
 
@@ -568,7 +570,7 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
     if [[ "$OLD_PADIR" != "" ]]; then
         OLD_VERSION=$(compute-version $OLD_PADIR)
         if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
-           rm -f  $PA_ROOT/default/addons/*$OLD_VERSION.jar
+           rm -f  $PA_ROOT/default/addons/*$OLD_VERSION*.jar
         fi
     fi
     # display the list of addons in the new installation
@@ -578,10 +580,6 @@ if ls $PA_ROOT/default/addons/*.jar > /dev/null 2>&1; then
     echo ""
 
     ls -l $PA_ROOT/default/addons/*.jar
-fi
-
-if [[ "$OLD_PADIR" != "" ]]; then
-    ln -s -f $OLD_PADIR "$PA_ROOT/previous"
 fi
 
 chown -R $USER:$GROUP $PA_ROOT/$PA_FOLDER_NAME
