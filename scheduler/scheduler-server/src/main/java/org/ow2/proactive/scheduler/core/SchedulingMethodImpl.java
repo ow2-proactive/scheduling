@@ -325,7 +325,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
                 boolean result = checkEligibleTaskDescriptorScript.containsAPIBinding(etd);
                 if (result) {
-                    //skip here
+                    //skip task here
                     return neededResource;
                 }
             }

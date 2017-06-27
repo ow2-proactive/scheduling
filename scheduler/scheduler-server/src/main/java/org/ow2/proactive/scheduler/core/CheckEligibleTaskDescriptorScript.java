@@ -38,39 +38,38 @@ import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 public class CheckEligibleTaskDescriptorScript {
 
     /**
-     * Check weather the task is trying to bind using the scheduler api
+     * Check whether or not the task is asking for the api binding
      * @param etd an eligible task descriptor
-     * @return true if one of the etd scripts is using the api
+     * @return true if one of the prescript, the postscript or the internal script is using the api
      */
 
     public boolean containsAPIBinding(EligibleTaskDescriptor etd) {
-        if (!etd.getInternal().getPreScript().getScript().contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) &&
-            !etd.getInternal().getPreScript().getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) &&
-            !etd.getInternal().getPreScript().getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME) &&
-            !etd.getInternal().getPostScript().getScript().contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) &&
-            !etd.getInternal().getPostScript().getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) &&
-            !etd.getInternal().getPostScript().getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME) &&
-            !etd.getInternal().getFlowScript().getScript().contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) &&
-            !etd.getInternal().getFlowScript().getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) &&
-            !etd.getInternal().getFlowScript().getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME)) {
-            if (etd.getInternal() instanceof InternalScriptTask) {
-                if (!((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript()
-                                                                                             .getScript()
-                                                                                             .contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) &&
-                    !((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript()
-                                                                                             .getScript()
-                                                                                             .contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) &&
-                    !((ScriptExecutableContainer) etd.getInternal()
-                                                     .getExecutableContainer()).getScript()
-                                                                               .getScript()
-                                                                               .contains(SchedulerConstants.DS_USER_API_BINDING_NAME))
-                    return false;
-                else
-                    return true;
-            }
-            return false;
-        } else {
-            return true;
-        }
+        return (etd.getInternal()
+                   .getPreScript()
+                   .getScript()
+                   .contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
+                etd.getInternal().getPreScript().getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
+                etd.getInternal().getPreScript().getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME) ||
+                etd.getInternal()
+                   .getPostScript()
+                   .getScript()
+                   .contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
+                etd.getInternal().getPostScript().getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
+                etd.getInternal().getPostScript().getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME)) ||
+               ((etd.getInternal() instanceof InternalScriptTask) && (isInternalScriptContainsApiBinding(etd)));
+
+    }
+
+    private boolean isInternalScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+        return ((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript()
+                                                                                       .getScript()
+                                                                                       .contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
+               ((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript()
+                                                                                       .getScript()
+                                                                                       .contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
+               ((ScriptExecutableContainer) etd.getInternal()
+                                               .getExecutableContainer()).getScript()
+                                                                         .getScript()
+                                                                         .contains(SchedulerConstants.DS_USER_API_BINDING_NAME);
     }
 }
