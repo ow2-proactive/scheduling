@@ -215,7 +215,7 @@ public class TaskProActiveDataspacesTest {
         }
 
         TaskProActiveDataspaces taskProActiveDataspaces = new TaskProActiveDataspaces();
-        taskProActiveDataspaces.handleResults(builder.build());
+        taskProActiveDataspaces.handleResultsWhileTransferringFile(builder.build());
 
         verify(mock, times(nbFutures)).get();
     }
