@@ -63,8 +63,6 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
-import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
-import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -323,7 +321,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
             if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-                boolean result = checkEligibleTaskDescriptorScript.containsAPIBinding(etd);
+                boolean result = checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd);
                 if (result) {
                     //skip task here
                     return neededResource;

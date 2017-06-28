@@ -29,6 +29,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
+import org.ow2.proactive.scripting.Script;
 
 
 /**
@@ -40,36 +41,53 @@ public class CheckEligibleTaskDescriptorScript {
     /**
      * Check whether or not the task is asking for the api binding
      * @param etd an eligible task descriptor
-     * @return true if one of the prescript, the postscript or the internal script is using the api
+     * @return true if at least one of the pre script, the post script, the flow script, the environment script or the internal script contains the api binding
      */
 
-    public boolean containsAPIBinding(EligibleTaskDescriptor etd) {
-        return (etd.getInternal()
-                   .getPreScript()
-                   .getScript()
-                   .contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
-                etd.getInternal().getPreScript().getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
-                etd.getInternal().getPreScript().getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME) ||
-                etd.getInternal()
-                   .getPostScript()
-                   .getScript()
-                   .contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
-                etd.getInternal().getPostScript().getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
-                etd.getInternal().getPostScript().getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME)) ||
-               ((etd.getInternal() instanceof InternalScriptTask) && (isInternalScriptContainsApiBinding(etd)));
+    public boolean isTaskContainsAPIBinding(EligibleTaskDescriptor etd) {
+        return (isPrePostFlowEnvironmentScriptContainsApiBinding(etd) ||
+                ((etd.getInternal() instanceof InternalScriptTask) && (isInternalScriptContainsApiBinding(etd))));
 
     }
 
     private boolean isInternalScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return ((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript()
-                                                                                       .getScript()
-                                                                                       .contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
-               ((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript()
-                                                                                       .getScript()
-                                                                                       .contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
-               ((ScriptExecutableContainer) etd.getInternal()
-                                               .getExecutableContainer()).getScript()
-                                                                         .getScript()
-                                                                         .contains(SchedulerConstants.DS_USER_API_BINDING_NAME);
+        return ((etd.getInternal().getExecutableContainer() != null) &&
+                (((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript() != null) &&
+                isScriptContainsApiBinding(((ScriptExecutableContainer) etd.getInternal()
+                                                                           .getExecutableContainer()).getScript()));
+
+    }
+
+    private boolean isPresScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+        return ((etd.getInternal().getPreScript() != null) &&
+                isScriptContainsApiBinding(etd.getInternal().getPreScript()));
+    }
+
+    private boolean isPostScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+        return ((etd.getInternal().getPostScript() != null) &&
+                isScriptContainsApiBinding(etd.getInternal().getPostScript()));
+    }
+
+    private boolean isFlowScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+        return ((etd.getInternal().getFlowScript() != null) &&
+                isScriptContainsApiBinding(etd.getInternal().getFlowScript()));
+
+    }
+
+    private boolean isEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+        return (etd.getInternal().getForkEnvironment() != null) &&
+               (etd.getInternal().getForkEnvironment().getEnvScript() != null) &&
+               isScriptContainsApiBinding((etd.getInternal().getForkEnvironment().getEnvScript()));
+    }
+
+    private boolean isScriptContainsApiBinding(Script script) {
+        return script.getScript().contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
+               script.getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
+               script.getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME);
+    }
+
+    private boolean isPrePostFlowEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+        return (isPresScriptContainsApiBinding(etd) || isPostScriptContainsApiBinding(etd) ||
+                isFlowScriptContainsApiBinding(etd) || isEnvironmentScriptContainsApiBinding(etd));
     }
 }
