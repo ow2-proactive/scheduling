@@ -117,7 +117,7 @@ public class TestDataspaceConcurrentKilling extends SchedulerFunctionalTestWithC
         for (int i = 0; i < NB_TASKS; i++) {
             ScriptTask st = new ScriptTask();
             st.setName(TASK_NAME + i);
-            st.setScript(new TaskScript(new SimpleScript("new File(\"" + FILE_NAME + i +
+            st.setScript(new TaskScript(new SimpleScript("new File(localspace, \"" + FILE_NAME + i +
                                                          "\").createNewFile(); java.lang.Thread.sleep(1000)",
                                                          "groovy")));
             st.addOutputFiles(FILE_NAME + i, OutputAccessMode.TransferToUserSpace);
