@@ -64,6 +64,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.appenders.MultipleFileAppender;
@@ -267,17 +268,18 @@ public abstract class SelectionManager {
 
             // arranging nodes for script execution
             List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
+            List<RMNode> arrangedFilteredNodes = arrangedNodes;
             if (criteria.getTopology().isTopologyBased()) {
+                arrangedFilteredNodes = topologyNodesFilter.filterNodes(criteria, arrangedNodes);
+            }
 
-                List<RMNode> arrangedFilteredNodes = topologyNodesFilter.filterNodes(criteria, arrangedNodes);
-
-                if (arrangedFilteredNodes.isEmpty()) {
-                    matchedNodes = new ArrayList<>();
-                } else {
-                    // run scripts on all available nodes
-                    matchedNodes = runScripts(arrangedFilteredNodes, criteria);
-                }
+            if (arrangedFilteredNodes.isEmpty()) {
+                matchedNodes = new LinkedList<>();
+            } else if (electedToRunOnAllNodes(criteria)) {
+                // run scripts on all available nodes
+                matchedNodes = runScripts(arrangedFilteredNodes, criteria);
             } else {
+
                 // run scripts not on all nodes, but always on missing number of nodes
                 // until required node set is found
                 matchedNodes = new LinkedList<>();
@@ -294,21 +296,22 @@ public abstract class SelectionManager {
                         numberOfNodesForScriptExecution = PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt();
                     }
 
-                    List<RMNode> subset = arrangedNodes.subList(0,
-                                                                Math.min(numberOfNodesForScriptExecution,
-                                                                         arrangedNodes.size()));
+                    List<RMNode> subset = arrangedFilteredNodes.subList(0,
+                                                                        Math.min(numberOfNodesForScriptExecution,
+                                                                                 arrangedFilteredNodes.size()));
                     matchedNodes.addAll(runScripts(subset, criteria));
                     // removing subset of arrangedNodes
                     subset.clear();
 
-                    if (arrangedNodes.size() == 0) {
+                    if (arrangedFilteredNodes.size() == 0) {
                         break;
                     }
                 }
+                if (loggerIsDebugEnabled) {
+                    logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
+                }
             }
-            if (loggerIsDebugEnabled) {
-                logger.debug(matchedNodes.size() + " nodes found after scripts execution for " + client);
-            }
+
         } else {
             matchedNodes = new LinkedList<>();
             for (RMNode node : afterPolicyNodes) {
@@ -379,6 +382,12 @@ public abstract class SelectionManager {
         }
 
         return selectedNodes;
+    }
+
+    private static boolean electedToRunOnAllNodes(Criteria criteria) {
+        return criteria.getTopology().isTopologyBased() &&
+               !criteria.getTopology().toString().equals(TopologyDescriptor.SINGLE_HOST.toString()) &&
+               !criteria.getTopology().toString().equals(TopologyDescriptor.SINGLE_HOST_EXCLUSIVE.toString());
     }
 
     /**

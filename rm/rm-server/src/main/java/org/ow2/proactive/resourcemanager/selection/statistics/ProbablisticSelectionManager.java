@@ -207,10 +207,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
                 assert (probability.value() >= 0 && probability.value() <= 1);
             }
 
-            if (scriptResult == null || scriptResult != null && scriptResult.errorOccured()) {
-                // error during script execution
-            } else if (!scriptResult.getResult()) {
-                // script failed
+            if (scriptResult == null || scriptResult.errorOccured() || !scriptResult.getResult()) {
+                // error during script execution or script returned false
                 if (script.isDynamic()) {
                     probability.decrease();
                 } else {

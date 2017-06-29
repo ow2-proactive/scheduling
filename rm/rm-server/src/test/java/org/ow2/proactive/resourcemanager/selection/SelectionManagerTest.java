@@ -177,7 +177,7 @@ public class SelectionManagerTest {
         };
     }
 
-    private SelectionManager createSelectionManager(final RMCore rmCore) {
+    public static SelectionManager createSelectionManager(final RMCore rmCore) {
         return new SelectionManager(rmCore) {
             @Override
             public List<RMNode> arrangeNodesForScriptExecution(List<RMNode> nodes, List<SelectionScript> scripts) {
@@ -197,7 +197,7 @@ public class SelectionManagerTest {
         };
     }
 
-    private TopologyHandler selectAllTopology() {
+    public static TopologyHandler selectAllTopology() {
         return new TopologyHandler() {
             @Override
             public NodeSet select(int number, List<Node> matchedNodes) {
@@ -206,11 +206,11 @@ public class SelectionManagerTest {
         };
     }
 
-    private RMCore newMockedRMCore() {
+    public static RMCore newMockedRMCore() {
         return newMockedRMCore(0);
     }
 
-    private RMCore newMockedRMCore(int nbNodes) {
+    public static RMCore newMockedRMCore(int nbNodes) {
         RMCore mockedRMCore = Mockito.mock(RMCore.class);
         TopologyManager mockedTopologyManager = Mockito.mock(TopologyManager.class);
         when(mockedTopologyManager.getHandler(Matchers.any(TopologyDescriptor.class))).thenReturn(selectAllTopology());
@@ -227,11 +227,11 @@ public class SelectionManagerTest {
         return mockedRMCore;
     }
 
-    private RMNode createMockedNode(String nodeUser) {
+    public static RMNode createMockedNode(String nodeUser) {
         return createMockeNode(nodeUser, "", "");
     }
 
-    private RMNode createMockeNode(String nodeUser, String nodeName, String nodeUrl) {
+    public static RMNode createMockeNode(String nodeUser, String nodeName, String nodeUrl) {
         RMNode rmNode = mock(RMNode.class);
         NodeInformation mockedNodeInformation = mock(NodeInformation.class);
         Node node = mock(Node.class);
@@ -241,6 +241,7 @@ public class SelectionManagerTest {
         when(rmNode.getNodeName()).thenReturn(nodeName);
         when(rmNode.getNodeSource()).thenReturn(new NodeSource());
         when(rmNode.getNode()).thenReturn(node);
+        when(rmNode.getNodeURL()).thenReturn(nodeUrl);
         when(rmNode.getUserPermission()).thenReturn(new PrincipalPermission("permissions",
                                                                             singleton(new UserNamePrincipal(nodeUser))));
         return rmNode;
