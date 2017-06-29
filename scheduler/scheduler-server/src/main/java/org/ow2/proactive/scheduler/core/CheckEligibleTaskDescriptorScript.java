@@ -77,7 +77,7 @@ public class CheckEligibleTaskDescriptorScript {
     private boolean isEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
         return (etd.getInternal().getForkEnvironment() != null) &&
                (etd.getInternal().getForkEnvironment().getEnvScript() != null) &&
-               isScriptContainsApiBinding((etd.getInternal().getForkEnvironment().getEnvScript()));
+               isScriptContainsApiBinding(etd.getInternal().getForkEnvironment().getEnvScript());
     }
 
     private boolean isScriptContainsApiBinding(Script script) {

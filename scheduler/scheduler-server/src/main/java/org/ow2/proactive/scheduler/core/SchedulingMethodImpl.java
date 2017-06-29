@@ -31,6 +31,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -319,10 +320,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
         int neededResource = 0;
         if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-            for (int i = 0; i < bagOfTasks.size(); i++) {
-                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(bagOfTasks.get(i))) {
+            Iterator<EligibleTaskDescriptor> it = bagOfTasks.iterator();
+            EligibleTaskDescriptor etd;
+            while (it.hasNext()) {
+                etd = it.next();
+                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd)) {
                     //skip task here
-                    bagOfTasks.remove(i);
+                    it.remove();
                 }
             }
         }
