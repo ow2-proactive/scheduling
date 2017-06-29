@@ -26,6 +26,8 @@
 package org.ow2.proactive.scheduler.core;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Before;
@@ -84,8 +86,7 @@ public class CheckEligibleTaskDescriptorScriptTest {
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(true, result);
+        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
@@ -97,8 +98,7 @@ public class CheckEligibleTaskDescriptorScriptTest {
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(false, result);
+        assertFalse(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
@@ -111,8 +111,7 @@ public class CheckEligibleTaskDescriptorScriptTest {
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(true, result);
+        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
@@ -125,8 +124,7 @@ public class CheckEligibleTaskDescriptorScriptTest {
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(true, result);
+        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
@@ -140,8 +138,7 @@ public class CheckEligibleTaskDescriptorScriptTest {
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(true, result);
+        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
@@ -154,8 +151,7 @@ public class CheckEligibleTaskDescriptorScriptTest {
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(true, result);
+        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
@@ -167,8 +163,7 @@ public class CheckEligibleTaskDescriptorScriptTest {
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(true, result);
+        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
@@ -180,22 +175,20 @@ public class CheckEligibleTaskDescriptorScriptTest {
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(false, result);
+        assertFalse(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
     public void testForkEnvironmentNull() throws InvalidScriptException {
         fe = null;
-        Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(false, result);
+        assertFalse(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
     public void testScriptExecutableContainerNull() throws InvalidScriptException {
         sec = null;
         Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
-        assertEquals(false, result);
+        assertFalse(result);
     }
 
     private SimpleScript scriptWithApiBindingClient() throws InvalidScriptException {

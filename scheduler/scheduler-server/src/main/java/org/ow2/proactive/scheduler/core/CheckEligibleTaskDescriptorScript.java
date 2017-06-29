@@ -45,32 +45,32 @@ public class CheckEligibleTaskDescriptorScript {
      */
 
     public boolean isTaskContainsAPIBinding(EligibleTaskDescriptor etd) {
-        return (isPrePostFlowEnvironmentScriptContainsApiBinding(etd) ||
-                ((etd.getInternal() instanceof InternalScriptTask) && (isInternalScriptContainsApiBinding(etd))));
+        return isPrePostFlowEnvironmentScriptContainsApiBinding(etd) ||
+               ((etd.getInternal() instanceof InternalScriptTask) && (isInternalScriptContainsApiBinding(etd)));
 
     }
 
     private boolean isInternalScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return ((etd.getInternal().getExecutableContainer() != null) &&
-                (((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript() != null) &&
-                isScriptContainsApiBinding(((ScriptExecutableContainer) etd.getInternal()
-                                                                           .getExecutableContainer()).getScript()));
+        return (etd.getInternal().getExecutableContainer() != null) &&
+               (((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript() != null) &&
+               isScriptContainsApiBinding(((ScriptExecutableContainer) etd.getInternal()
+                                                                          .getExecutableContainer()).getScript());
 
     }
 
     private boolean isPresScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return ((etd.getInternal().getPreScript() != null) &&
-                isScriptContainsApiBinding(etd.getInternal().getPreScript()));
+        return (etd.getInternal().getPreScript() != null) &&
+               isScriptContainsApiBinding(etd.getInternal().getPreScript());
     }
 
     private boolean isPostScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return ((etd.getInternal().getPostScript() != null) &&
-                isScriptContainsApiBinding(etd.getInternal().getPostScript()));
+        return (etd.getInternal().getPostScript() != null) &&
+               isScriptContainsApiBinding(etd.getInternal().getPostScript());
     }
 
     private boolean isFlowScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return ((etd.getInternal().getFlowScript() != null) &&
-                isScriptContainsApiBinding(etd.getInternal().getFlowScript()));
+        return (etd.getInternal().getFlowScript() != null) &&
+               isScriptContainsApiBinding(etd.getInternal().getFlowScript());
 
     }
 
@@ -87,7 +87,7 @@ public class CheckEligibleTaskDescriptorScript {
     }
 
     private boolean isPrePostFlowEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return (isPresScriptContainsApiBinding(etd) || isPostScriptContainsApiBinding(etd) ||
-                isFlowScriptContainsApiBinding(etd) || isEnvironmentScriptContainsApiBinding(etd));
+        return isPresScriptContainsApiBinding(etd) || isPostScriptContainsApiBinding(etd) ||
+               isFlowScriptContainsApiBinding(etd) || isEnvironmentScriptContainsApiBinding(etd);
     }
 }

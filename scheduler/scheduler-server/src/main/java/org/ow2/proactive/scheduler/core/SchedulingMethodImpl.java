@@ -318,15 +318,16 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             throw new IllegalArgumentException("The two given lists must not be null !");
         }
         int neededResource = 0;
-        if (maxResource > 0 && !bagOfTasks.isEmpty()) {
-            EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
-            if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-                boolean result = checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd);
-                if (result) {
+        if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+            for (int i = 0; i < bagOfTasks.size(); i++) {
+                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(bagOfTasks.get(i))) {
                     //skip task here
-                    return neededResource;
+                    bagOfTasks.remove(i);
                 }
             }
+        }
+        if (maxResource > 0 && !bagOfTasks.isEmpty()) {
+            EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
             InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
