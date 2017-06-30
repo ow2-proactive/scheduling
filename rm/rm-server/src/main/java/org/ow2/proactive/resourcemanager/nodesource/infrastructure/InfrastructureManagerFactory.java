@@ -29,11 +29,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 
 
 /**
@@ -78,6 +78,22 @@ public class InfrastructureManagerFactory {
             throw new RuntimeException(e);
         }
         return im;
+    }
+
+    /**
+     * Creates a new infrastructure manager and recovers its state thanks to
+     * the variables contained in {@param infrastructureVariables}.
+     *
+     * @param infrastructureType a full class name of an infrastructure manager
+     * @param infrastructureParameters parameters for nodes acquisition
+     * @param infrastructureVariables runtime variable values of the infrastructure to recover
+     * @return recovered infrastructure manager
+     */
+    public static InfrastructureManager recreate(String infrastructureType, Object[] infrastructureParameters,
+            Map<String, Object> infrastructureVariables) {
+        InfrastructureManager infrastructure = create(infrastructureType, infrastructureParameters);
+        infrastructure.recoverRuntimeVariables(infrastructureVariables);
+        return infrastructure;
     }
 
     /**

@@ -336,6 +336,11 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     @Override
+    public void onDownNode(String nodeName, String nodeUrl) {
+        decrementAndGetAcquiredNodes();
+    }
+
+    @Override
     public void onDownNodeReconnection(Node node) {
         incrementAcquiredNodes();
     }

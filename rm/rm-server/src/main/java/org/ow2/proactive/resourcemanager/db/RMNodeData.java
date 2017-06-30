@@ -41,6 +41,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
+import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -65,6 +66,9 @@ public class RMNodeData implements Serializable {
     /** client taken the node for computations */
     private Client owner;
 
+    /** client registered the node in the resource manager */
+    private Client provider;
+
     /** Node access permission */
     private Permission userPermission;
 
@@ -77,6 +81,16 @@ public class RMNodeData implements Serializable {
     /** Node Source containing the node **/
     private NodeSourceData nodeSource;
 
+    /** Name of the machine hosting the node */
+    private String hostname;
+
+    /** the jmx protocols that can be used */
+    private String[] jmxUrls;
+
+    /** Name identifying the JVM in which the node runs,
+      * e.g. following the pattern: pnp://192.168.1.104:59357/PA_JVM[0-9]* */
+    private String jvmName;
+
     /**
      * Create an instance of {@link RMNodeData} and populate its fields with the content of a node.
      * @param rmNode the object to take the values from
@@ -86,9 +100,13 @@ public class RMNodeData implements Serializable {
         RMNodeData rmNodeData = new RMNodeData(rmNode.getNodeName(),
                                                rmNode.getNodeURL(),
                                                rmNode.getOwner(),
+                                               rmNode.getProvider(),
                                                rmNode.getUserPermission(),
                                                rmNode.getState(),
-                                               rmNode.getStateChangeTime());
+                                               rmNode.getStateChangeTime(),
+                                               rmNode.getHostName(),
+                                               rmNode.getJmxUrls(),
+                                               rmNode.getDescriptorVMName());
         return rmNodeData;
     }
 
@@ -96,14 +114,18 @@ public class RMNodeData implements Serializable {
         // Required empty constructor
     }
 
-    public RMNodeData(String name, String nodeUrl, Client owner, Permission permission, NodeState state,
-            long stateChangeTime) {
+    public RMNodeData(String name, String nodeUrl, Client owner, Client provider, Permission permission,
+            NodeState state, long stateChangeTime, String hostName, String[] jmxUrls, String jvmName) {
         this.name = name;
         this.nodeUrl = nodeUrl;
         this.owner = owner;
+        this.provider = provider;
         this.userPermission = permission;
         this.state = state;
         this.stateChangeTime = stateChangeTime;
+        this.hostname = hostName;
+        this.jmxUrls = jmxUrls;
+        this.jvmName = jvmName;
     }
 
     @Id
@@ -134,6 +156,16 @@ public class RMNodeData implements Serializable {
 
     public void setOwner(Client owner) {
         this.owner = owner;
+    }
+
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Client getProvider() {
+        return provider;
+    }
+
+    public void setProvider(Client provider) {
+        this.provider = provider;
     }
 
     @Column(length = Integer.MAX_VALUE)
@@ -172,6 +204,45 @@ public class RMNodeData implements Serializable {
 
     public void setNodeSource(NodeSourceData nodeSource) {
         this.nodeSource = nodeSource;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public String[] getJmxUrls() {
+        return jmxUrls;
+    }
+
+    public void setJmxUrls(String[] jmxUrls) {
+        this.jmxUrls = jmxUrls;
+    }
+
+    public String getJvmName() {
+        return jvmName;
+    }
+
+    public void setJvmName(String jvmName) {
+        this.jvmName = jvmName;
+    }
+
+    /**
+     * Say whether the current node data structure reflects a particular
+     * instance of {@link Node}.
+     * @param node the node to compare to
+     * @return true if the node data has the same name and url as the given node
+     */
+    public boolean equalsToNode(Node node) {
+        if (node == null) {
+            return false;
+        }
+        return node.getNodeInformation().getName().equals(name) && node.getNodeInformation().getURL().equals(nodeUrl);
     }
 
     @Override

@@ -194,6 +194,15 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
+     * Copy all the runtime variables map given in parameter to the runtime
+     * variables map of this infrastructure.
+     * @param runtimeVariablesToUpdate the runtime variables to recover.
+     */
+    public void recoverRuntimeVariables(Map<String, Object> runtimeVariablesToUpdate) {
+        runtimeVariables.putAll(runtimeVariablesToUpdate);
+    }
+
+    /**
      * To retrieve nodes whose registration status is deploying or lost.
      *
      * @return nodes whose registration status is deploying or lost.
@@ -282,34 +291,38 @@ public abstract class InfrastructureManager implements Serializable {
         writeLock.lock();
         try {
             getAcquiredNodesMap().remove(node.getNodeInformation().getName());
+            this.removeNode(node);
         } catch (Exception e) {
             logger.warn("Exception occurred while removing node " + node);
         } finally {
-            this.removeNode(node);
             writeLock.unlock();
         }
     }
 
     /**
-     * This method is called by the system when a Node is detected as DOWN.
-     *
-     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
-     *
-     * @throws RMException if any problems occurred.
-     */
-    public void internalNotifyDownNode(Node proactiveProgrammingNode) throws RMException {
-        notifyDownNode(proactiveProgrammingNode);
-    }
-
-    /**
      * The default behavior is to remove the node from the infrastructure manager.
+     * Then this method calls the {@link InfrastructureManager#onDownNode(String, String)} hook.
      *
      * @param proactiveProgrammingNode the ProActive Programming Node that is down.
-     *
-     * @throws RMException if any problems occurred.
      */
     public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
-        internalRemoveNode(proactiveProgrammingNode);
+        String nodeName = proactiveProgrammingNode.getNodeInformation().getName();
+        String nodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
+        internalNotifyDownNode(nodeName, nodeUrl);
+    }
+
+    public void internalNotifyDownNode(String nodeName, String nodeUrl) {
+        writeLock.lock();
+        try {
+            // if the node was previously sane, we need to remove it
+            getAcquiredNodesMap().remove(nodeName);
+            // trigger the onDownNode hook
+            this.onDownNode(nodeName, nodeUrl);
+        } catch (Exception e) {
+            logger.warn("Exception occurred while removing node " + nodeName);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
@@ -888,6 +901,35 @@ public abstract class InfrastructureManager implements Serializable {
      */
     private String buildDeployingNodeURL(String pnName) {
         return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
+    }
+
+    /**
+     * Look for a {@link RMNode} in data structures holding lost and deploying
+     * nodes. It does not look into the acquired nodes because this data
+     * structure holds instances of {@link Node} and thus has no information
+     * about the acquired {@link RMNode}.
+     *
+     * @param nodeUrl
+     * @return a lost or deploying {@link RMNode} that could be found using the given URL, or null
+     */
+    public RMNode searchForNotAcquiredRmNode(String nodeUrl) {
+        if (containsKeyLostNode(nodeUrl)) {
+            return getLostNodeFromRuntimeVariables(nodeUrl);
+        }
+        if (containsKeyDeployingNode(nodeUrl)) {
+            return getDeployingNodeFromRuntimeVariables(nodeUrl);
+        }
+        return null;
+    }
+
+    /**
+     * Called by the system every time a node is DOWN.
+     *
+     * @param nodeName the name of the node that is down.
+     * @param nodeUrl the URL of the node that is down.
+     */
+    public void onDownNode(String nodeName, String nodeUrl) {
+        // to be overridden by children
     }
 
     /**

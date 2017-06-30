@@ -74,7 +74,8 @@ public class TestRM {
                                configurationFile == null && startedConfiguration.equals(DEFAULT_CONFIGURATION));
     }
 
-    public synchronized void start(String configurationFile, int pnpPort, String... jvmArgs) throws Exception {
+    public synchronized void start(String configurationFile, int pnpPort, String classpath, String... jvmArgs)
+            throws Exception {
         if (configurationFile == null) {
             configurationFile = DEFAULT_CONFIGURATION;
         }
@@ -118,7 +119,7 @@ public class TestRM {
         commandLine.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false);
 
         commandLine.add("-cp");
-        commandLine.add(testClasspath());
+        commandLine.add(classpath);
         commandLine.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add("-Djava.awt.headless=true"); // For Mac builds
@@ -152,17 +153,6 @@ public class TestRM {
 
     public String getUrl() {
         return "pnp://localhost:" + pnpPort + "/";
-    }
-
-    private static String testClasspath() {
-        String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
-                                                  File.separator + "*";
-        if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
-            // required by windows otherwise wildcard is expanded
-            classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
-        }
-        return classpathToLibFolderWithWildcard;
     }
 
     public synchronized RMAuthentication getAuth() {

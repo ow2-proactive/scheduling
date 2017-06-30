@@ -279,6 +279,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     @Override
+    public void onDownNode(String nodename, String nodeUrl) {
+        atomicRemoveDownNode(nodename, nodeUrl);
+    }
+
+    @Override
     public void onDownNodeReconnection(Node node) {
         InetAddress host = node.getNodeInformation().getVMInformation().getInetAddress();
 
@@ -399,6 +404,24 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                     logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() +
                                 " #registered nodes: " + getRegisteredNodesSize());
 
+                } else {
+                    logger.error("Node " + nodeName +
+                                 " is not known as a node belonging to this infrastructure manager");
+                }
+                return null;
+            }
+        });
+    }
+
+    private void atomicRemoveDownNode(final String nodeName, final String nodeUrl) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                InetAddress host = getRegisteredNodes().remove(nodeName);
+                if (host != null) {
+                    logger.debug("Removing node " + nodeUrl + " from " + this.getClass().getSimpleName());
+                    // remember the node removed
+                    addRemovedHost(host);
                 } else {
                     logger.error("Node " + nodeName +
                                  " is not known as a node belonging to this infrastructure manager");
