@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.selection.statistics;
 
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -40,6 +42,7 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
+import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -94,7 +97,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @return candidates node list for script execution
      */
     @Override
-    public List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes, List<SelectionScript> scripts) {
+    public List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes, List<SelectionScript> scripts,
+            Map<String, Serializable> bindings) {
 
         long startTime = System.currentTimeMillis();
         boolean scriptSpecified = scripts != null && scripts.size() > 0;
@@ -111,7 +115,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
                 boolean intersection = true;
                 double intersectionProbability = 1;
                 for (SelectionScript script : scripts) {
-                    String digest = new String(script.digest());
+                    SelectionScript scriptWithReplacedBindings = replaceBindings(script, bindings);
+                    String digest = new String(scriptWithReplacedBindings.digest());
                     if (probabilities.containsKey(digest) &&
                         probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
                         double probability = probabilities.get(digest).get(rmnode.getNodeURL()).value();
@@ -164,15 +169,17 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @return true if script will pass on the node
      */
     @Override
-    public synchronized boolean isPassed(SelectionScript script, RMNode rmnode) {
+    public synchronized boolean isPassed(SelectionScript script, Map<String, Serializable> bindings, RMNode rmnode) {
         String digest;
+        SelectionScript scriptWithReplacedBindings = replaceBindings(script, bindings);
         try {
-            digest = new String(script.digest());
+            digest = new String(scriptWithReplacedBindings.digest());
             if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
                 Probability p = probabilities.get(digest).get(rmnode.getNodeURL());
-                String scriptType = script.isDynamic() ? "dynamic" : "static";
+                String scriptType = scriptWithReplacedBindings.isDynamic() ? "dynamic" : "static";
                 if (logger.isDebugEnabled())
-                    logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " known " + scriptType + " script");
+                    logger.debug(rmnode.getNodeURL() + " : " + scriptWithReplacedBindings.hashCode() + " known " +
+                                 scriptType + " script");
                 return p.value() == 1;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -180,7 +187,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
         }
 
         if (logger.isDebugEnabled())
-            logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " unknown script");
+            logger.debug(rmnode.getNodeURL() + " : " + scriptWithReplacedBindings.hashCode() + " unknown script");
         return false;
     }
 
@@ -194,13 +201,15 @@ public class ProbablisticSelectionManager extends SelectionManager {
      * @return whether node is selected
      */
     @Override
-    public synchronized boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
-            RMNode rmnode) {
+    public synchronized boolean processScriptResult(SelectionScript script, Map<String, Serializable> bindings,
+            ScriptResult<Boolean> scriptResult, RMNode rmnode) {
 
         boolean result = false;
 
+        SelectionScript scriptWithReplacedBindings = replaceBindings(script, bindings);
+
         try {
-            String digest = new String(script.digest());
+            String digest = new String(scriptWithReplacedBindings.digest());
             Probability probability = new Probability(Probability.defaultValue());
             if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
                 probability = probabilities.get(digest).get(rmnode.getNodeURL());
@@ -209,7 +218,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
             if (scriptResult == null || scriptResult.errorOccured() || !scriptResult.getResult()) {
                 // error during script execution or script returned false
-                if (script.isDynamic()) {
+                if (scriptWithReplacedBindings.isDynamic()) {
                     probability.decrease();
                 } else {
                     probability = Probability.ZERO;
@@ -217,7 +226,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
             } else {
                 // script passed
                 result = true;
-                if (script.isDynamic()) {
+                if (scriptWithReplacedBindings.isDynamic()) {
                     probability.increase();
                 } else {
                     probability = Probability.ONE;
@@ -230,7 +239,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
                     String oldest = digestQueue.poll();
                     probabilities.remove(oldest);
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Removing the script: " + script.hashCode() +
+                        logger.debug("Removing the script: " + scriptWithReplacedBindings.hashCode() +
                                      " from the data base because the limit is reached");
                     }
                 }
@@ -241,7 +250,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug(rmnode.getNodeURL() + " : script " + script.hashCode() + ", probability " + probability);
+                logger.debug(rmnode.getNodeURL() + " : script " + scriptWithReplacedBindings.hashCode() +
+                             ", probability " + probability);
             }
 
             probabilities.get(digest).put(rmnode.getNodeURL().intern(), probability);
@@ -258,6 +268,25 @@ public class ProbablisticSelectionManager extends SelectionManager {
      */
     public Logger getLogger() {
         return logger;
+    }
+
+    private SelectionScript replaceBindings(SelectionScript script, Map<String, Serializable> bindings) {
+        String scriptContent = script.getScript();
+        if (bindings != null) {
+            for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
+                scriptContent = scriptContent.replace(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        try {
+            return new SelectionScript(scriptContent,
+                                       script.getEngineName(),
+                                       script.getParameters(),
+                                       script.isDynamic());
+        } catch (InvalidScriptException e) {
+            logger.warn("Error when replacing bindings of script (revert to use original script):" +
+                        System.lineSeparator() + script.toString(), e);
+            return script;
+        }
     }
 
 }

@@ -175,8 +175,8 @@ public abstract class SelectionManager {
      * @param scripts - set of selection scripts
      * @return collection of arranged nodes
      */
-    public abstract List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes,
-            List<SelectionScript> scripts);
+    public abstract List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes, List<SelectionScript> scripts,
+            Map<String, Serializable> bindings);
 
     /**
      * Predicts script execution result. Allows to avoid duplicate script execution 
@@ -186,7 +186,7 @@ public abstract class SelectionManager {
      * @param rmnode - target node
      * @return true if script will pass on the node 
      */
-    public abstract boolean isPassed(SelectionScript script, RMNode rmnode);
+    public abstract boolean isPassed(SelectionScript script, Map<String, Serializable> bindings, RMNode rmnode);
 
     /**
      * Processes script result and updates knowledge base of 
@@ -197,8 +197,8 @@ public abstract class SelectionManager {
      * @param rmnode - node on which script has been executed
      * @return whether node is selected
      */
-    public abstract boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
-            RMNode rmnode);
+    public abstract boolean processScriptResult(SelectionScript script, Map<String, Serializable> bindings,
+            ScriptResult<Boolean> scriptResult, RMNode rmnode);
 
     public NodeSet selectNodes(Criteria criteria, Client client) {
 
@@ -267,7 +267,9 @@ public abstract class SelectionManager {
             checkAuthorizedScripts(criteria.getScripts());
 
             // arranging nodes for script execution
-            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes, criteria.getScripts());
+            List<RMNode> arrangedNodes = arrangeNodesForScriptExecution(afterPolicyNodes,
+                                                                        criteria.getScripts(),
+                                                                        criteria.getBindings());
             List<RMNode> arrangedFilteredNodes = arrangedNodes;
             if (criteria.getTopology().isTopologyBased()) {
                 arrangedFilteredNodes = topologyNodesFilter.filterNodes(criteria, arrangedNodes);
