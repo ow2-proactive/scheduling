@@ -1164,6 +1164,20 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean isConnected();
 
     /**
+     * Return the name of the current Policy
+     * @return the name of the current policy.
+     */
+
+    String getCurrentPolicy() throws NotConnectedException, PermissionException;
+
+    /**
+     *  get job Descriptor list with eligible jobs (running and pending)
+     * @return a Map of eligible jobs.
+     */
+
+    Map getJobsToSchedule() throws NotConnectedException, PermissionException;
+
+    /**
      * This method renew the connection lease without other side effect.
      * 
      * @throws NotConnectedException

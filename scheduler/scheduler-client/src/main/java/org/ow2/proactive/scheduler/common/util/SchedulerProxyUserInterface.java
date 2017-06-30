@@ -216,6 +216,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.getCurrentPolicy();
+    }
+
+    @Override
+    public Map getJobsToSchedule() throws NotConnectedException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.getJobsToSchedule();
+    }
+
+    @Override
     public void renewSession() throws NotConnectedException {
         checkSchedulerConnection();
         uischeduler.renewSession();

@@ -310,6 +310,22 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException{
+        if (schedulerProxy == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return schedulerProxy.getCurrentPolicy();
+    }
+
+    @Override
+    public Map getJobsToSchedule() throws NotConnectedException, PermissionException{
+        if (schedulerProxy == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return schedulerProxy.getJobsToSchedule();
+    }
+
+    @Override
     protected Scheduler _getScheduler() {
         return schedulerProxy;
     }

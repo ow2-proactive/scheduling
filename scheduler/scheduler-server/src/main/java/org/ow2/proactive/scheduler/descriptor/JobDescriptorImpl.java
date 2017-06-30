@@ -66,7 +66,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public static final Logger logger = Logger.getLogger(JobDescriptorImpl.class);
 
-    private InternalJob internalJob;
+    private transient InternalJob internalJob;
 
     /** List that knows which task has children and which have not */
     private Set<TaskId> hasChildren = new HashSet<>();

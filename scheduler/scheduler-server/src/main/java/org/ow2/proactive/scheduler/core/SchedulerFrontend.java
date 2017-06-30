@@ -128,6 +128,7 @@ import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -876,6 +877,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public boolean isConnected() {
         return frontendState.isConnected();
+    }
+
+    @Override
+    public String getCurrentPolicy() {
+        return policyFullName;
+    }
+
+    @Override
+    public Map getJobsToSchedule() {
+        Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
+        schedulingService.unlockJobsToSchedule(jobMap.values());
+        return jobMap;
     }
 
     /**

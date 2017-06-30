@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -1124,6 +1125,16 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     @Override
     public boolean linkResourceManager(String rmURL) throws NotConnectedException, PermissionException {
         return getScheduler().linkResourceManager(rmURL);
+    }
+
+    @Override
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException {
+        return getScheduler().getCurrentPolicy();
+    }
+
+    @Override
+    public Map getJobsToSchedule() throws NotConnectedException, PermissionException {
+        return getJobsToSchedule();
     }
 
     @Override

@@ -47,6 +47,7 @@ public abstract class ClientBase implements ISchedulerClient {
 
     }
 
+
     @Override
     public boolean changePolicy(String arg0) throws NotConnectedException, PermissionException {
         throw newUnsupportedOperationException();

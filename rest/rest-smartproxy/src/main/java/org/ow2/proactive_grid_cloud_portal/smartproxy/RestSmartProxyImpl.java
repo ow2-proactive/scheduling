@@ -142,6 +142,16 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException{
+        return _getScheduler().getCurrentPolicy();
+    }
+
+    @Override
+    public Map getJobsToSchedule() throws NotConnectedException, PermissionException{
+        return _getScheduler().getJobsToSchedule();
+    }
+
+    @Override
     protected ISchedulerClient _getScheduler() {
         checkInitialized();
         return restSchedulerClient;

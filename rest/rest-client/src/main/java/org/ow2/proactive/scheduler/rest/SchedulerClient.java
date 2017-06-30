@@ -431,6 +431,16 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException {
+        return getCurrentPolicy();
+    }
+
+    @Override
+    public Map getJobsToSchedule()throws NotConnectedException, PermissionException {
+        return getJobsToSchedule();
+    }
+
+    @Override
     public boolean kill() throws NotConnectedException, PermissionException {
         boolean isKilled = false;
         try {

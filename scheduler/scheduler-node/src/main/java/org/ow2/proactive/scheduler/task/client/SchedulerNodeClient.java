@@ -485,6 +485,18 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
+    public String getCurrentPolicy()throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.getCurrentPolicy();
+    }
+
+    @Override
+    public Map getJobsToSchedule()throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.getJobsToSchedule();
+    }
+
+    @Override
     public void renewSession() throws NotConnectedException {
         client.renewSession();
     }

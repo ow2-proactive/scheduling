@@ -30,6 +30,7 @@ import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -87,11 +88,21 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireAllNodes() {
-        this.acquireNode();
+        startNode(maxNodes);
     }
 
     @Override
     public void acquireNode() {
+        startNode(1);
+    }
+
+    @Override
+    public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
+        startNode(n);
+    }
+
+    private void startNode(int n) {
+        this.handledNodes = new AtomicInteger(n);
         if (this.commandLineStarted.compareAndSet(false, true)) {
             this.nodeSource.executeInParallel(new Runnable() {
                 public void run() {
@@ -300,7 +311,6 @@ public class LocalInfrastructure extends InfrastructureManager {
         this.acquiredNodes = new AtomicInteger(0);
         this.lostNodes = new AtomicInteger(0);
         this.commandLineStarted = new AtomicBoolean(false);
-        this.handledNodes = new AtomicInteger(maxNodes);
 
         try {
             this.nodeTimeout = Integer.parseInt(args[index++].toString());
