@@ -26,7 +26,7 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import static org.ow2.proactive.resourcemanager.common.event.RMEventType.NODE_STATE_CHANGED;
-import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION;
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_RECOVERY;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -249,7 +249,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private RMDBManager dbManager;
 
-    private NodesLockRestorationManager nodesLockRestorationManager;
+    private NodesRecoveryManager nodesRecoveryManager;
 
     /**
      * ProActive Empty constructor
@@ -396,9 +396,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             clientPinger.ping();
 
-            initNodesRestorationManager();
+            initiateRecoveryIfRequired();
 
-            restoreNodeSources();
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
         } catch (NodeException e) {
@@ -414,21 +413,27 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    void initNodesRestorationManager() {
-        nodesLockRestorationManager = getNodesLockRestorationManagerBuilder().apply(this);
+    void initiateRecoveryIfRequired() {
+        nodesRecoveryManager = getNodesRecoveryManagerBuilder().apply(this);
 
-        if (RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
-            nodesLockRestorationManager.initialize();
+        // the recovery property is enabled by default
+        if (RM_NODES_RECOVERY.getValueAsBoolean()) {
+            logger.info("Starting RM nodes recovery");
+            nodesRecoveryManager.initialize();
+            restoreNodeSources();
+            for (NodeSource nodeSource : nodeSources.values()) {
+                restoreNodes(nodeSource);
+            }
         } else {
-            logger.info("Nodes lock restoration is disabled");
+            logger.info("RM nodes recovery is disabled");
         }
     }
 
-    Function<RMCore, NodesLockRestorationManager> getNodesLockRestorationManagerBuilder() {
-        return new Function<RMCore, NodesLockRestorationManager>() {
+    Function<RMCore, NodesRecoveryManager> getNodesRecoveryManagerBuilder() {
+        return new Function<RMCore, NodesRecoveryManager>() {
             @Override
-            public NodesLockRestorationManager apply(RMCore rmCore) {
-                return new NodesLockRestorationManager(rmCore);
+            public NodesRecoveryManager apply(RMCore rmCore) {
+                return new NodesRecoveryManager(rmCore);
             }
         };
     }
@@ -446,7 +451,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             } else {
                 try {
                     logger.info("Restoring node source " + nodeSourceDataName);
-                    createNodeSource(nodeSourceData);
+                    createNodeSource(nodeSourceData, true);
                 } catch (Throwable t) {
                     logger.error(t.getMessage(), t);
                     brokenNodeSources.add(nodeSourceDataName);
@@ -455,6 +460,59 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         return true;
+    }
+
+    private void restoreNodes(NodeSource nodeSource) {
+
+        int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
+        Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSource.getName());
+        logger.info("There are " + nodesData.size() + " nodes to recover for the node source " + nodeSource.getName());
+        nodeSource.setNbNodesToRecover(nodesData.size());
+
+        // for each node found in database, try to lookup node or recreate is as down
+        for (RMNodeData rmNodeData : nodesData) {
+            String nodeUrl = rmNodeData.getNodeUrl();
+            RMNode rmnode = null;
+            Node node = null;
+
+            try {
+                logger.info("Trying to lookup a node to recover: " + nodeUrl);
+                node = nodeSource.lookupNode(nodeUrl, lookUpTimeout);
+            } catch (Exception e) {
+                logger.warn("Node to recover could not be looked up at URL: " + nodeUrl);
+                node = null;
+            }
+
+            if (node != null) {
+                // the node has been successfully looked up, we compare its
+                // information to the node data retrieved in database.
+                if (rmNodeData.equalsToNode(node)) {
+                    logger.info("Node to recover could successfully be looked up at URL: " + nodeUrl);
+                    rmnode = nodeSource.internalAddNodeAfterRecovery(node, rmNodeData);
+                    this.allNodes.put(rmnode.getNodeURL(), rmnode);
+                } else {
+                    logger.warn("The node that has been looked up does not have the same information as the node to recover: " +
+                                node.getNodeInformation().getName() + " is not equal to " + rmNodeData.getName() +
+                                " or " + node.getNodeInformation().getURL() + " is not equal to " +
+                                rmNodeData.getNodeUrl());
+                }
+            } else {
+                logger.info("Recreating a node to recover at URL: " + nodeUrl);
+
+                // if the node to recover was in deploying state then we have
+                // nothing to do as it is going to be redeployed
+                if (!rmNodeData.getState().equals(NodeState.DEPLOYING)) {
+                    // inform the node source that this recreated node is down
+                    nodeSource.detectedPingedDownNodeAfterRecovery(rmNodeData.getName(), nodeUrl);
+                }
+            }
+            // we must add the recreated to to the eligible data
+            // structure if we want it to be usable by a task
+            if (isEligible(rmnode)) {
+                eligibleNodes.add(rmnode);
+            }
+        }
+        nodeSource.resetNbNodesToRecover();
     }
 
     /**
@@ -1147,7 +1205,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         boolean added = dbManager.addNodeSource(nodeSourceData);
 
         try {
-            return createNodeSource(nodeSourceData);
+            return createNodeSource(nodeSourceData, false);
         } catch (RuntimeException ex) {
             logger.error(ex.getMessage(), ex);
             if (added) {
@@ -1157,15 +1215,22 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    protected BooleanWrapper createNodeSource(NodeSourceData data) {
+    protected BooleanWrapper createNodeSource(NodeSourceData data, boolean isRecovery) {
 
         //checking that nsname doesn't contain invalid characters and doesn't exist yet
         checkNodeSourceName(data.getName());
 
         logger.info("Creating a node source : " + data.getName());
 
-        InfrastructureManager im = InfrastructureManagerFactory.create(data.getInfrastructureType(),
-                                                                       data.getInfrastructureParameters());
+        InfrastructureManager im;
+
+        if (!isRecovery) {
+            im = InfrastructureManagerFactory.create(data.getInfrastructureType(), data.getInfrastructureParameters());
+        } else {
+            im = InfrastructureManagerFactory.recreate(data.getInfrastructureType(),
+                                                       data.getInfrastructureParameters(),
+                                                       data.getInfrastructureVariables());
+        }
 
         NodeSourcePolicy policy = NodeSourcePolicyFactory.create(data.getPolicyType(),
                                                                  data.getInfrastructureType(),
@@ -1237,7 +1302,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
-        if (nodeSources.size() == 0) {
+        if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean() || nodeSources.size() == 0) {
             finalizeShutdown();
         } else {
             for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
@@ -2168,7 +2233,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     public boolean setDeploying(RMNode rmNode) {
-        nodesLockRestorationManager.handle(rmNode);
+        nodesRecoveryManager.restoreLocks(rmNode);
         return true;
     }
 
@@ -2203,6 +2268,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private void persistUpdatedRMNode(RMNode rmNode) {
         RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
         dbManager.updateNode(rmNodeData);
+    }
+
+    private boolean isEligible(RMNode node) {
+        if (node != null && node.isFree() && !node.isLocked()) {
+            return true;
+        }
+        return false;
     }
 
 }

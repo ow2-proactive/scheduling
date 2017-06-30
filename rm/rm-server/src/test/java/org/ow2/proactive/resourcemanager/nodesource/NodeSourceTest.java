@@ -99,7 +99,7 @@ public class NodeSourceTest {
 
         nodeSource.detectedPingedDownNode(node.getNodeInformation().getURL());
 
-        verify(infrastructureManager).internalNotifyDownNode(any(Node.class));
+        verify(infrastructureManager).notifyDownNode(any(Node.class));
     }
 
     @Test

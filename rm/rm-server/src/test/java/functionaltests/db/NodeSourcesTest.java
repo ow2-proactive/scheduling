@@ -131,17 +131,6 @@ public class NodeSourcesTest extends ProActiveTest {
     }
 
     @Test
-    public void testAddNodeSourceWithNullInfrastructureVariables() {
-        dbManager.addNodeSource(createNodeSource());
-
-        Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
-        assertThat(nodeSources).hasSize(1);
-
-        NodeSourceData nodeSource = nodeSources.iterator().next();
-        assertThat(nodeSource.getInfrastructureVariables()).isNull();
-    }
-
-    @Test
     public void testAddNodeSourceWithVariousObjectsInInfrastructureVariables() {
         NodeSourceData nodeSourceData = createNodeSource();
         Map<String, Object> infrastructureVariables = new HashMap<>();

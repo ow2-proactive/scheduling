@@ -655,7 +655,7 @@ public class RMTHelper {
         if (!rm.isStartedWithSameConfiguration(configurationFile)) {
             killRM();
             log("Starting RM");
-            rm.start(configurationFile, pnpPort, jvmArgs);
+            rm.start(configurationFile, pnpPort, testClasspath(), jvmArgs);
             currentTestConfiguration = configurationFile;
         }
         return rm.getUrl();

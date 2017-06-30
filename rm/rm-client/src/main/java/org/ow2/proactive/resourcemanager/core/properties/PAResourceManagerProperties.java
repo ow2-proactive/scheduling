@@ -247,7 +247,25 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * The approach is best effort and Node hostname is not considered.
      * As a result, Nodes are not necessarily locked on the same host.
      */
-    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true");
+    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true"),
+
+    /**
+     * Defines if the nodes should be kept when the resource manager exits.
+     * This property is defaulted to false as shutting down the RM should
+     * clean also its nodes.
+     */
+    RM_PRESERVE_NODES_ON_EXIT("pa.rm.preserve.nodes.on.exit", PropertyType.BOOLEAN, "false"),
+
+    /**
+     * Defines whether the node recovery mechanism is enabled on RM startup.
+     * If set to {@code true}, it indicates that the node states and the node
+     * source infrastructure states should be reloaded from database.
+     * This flag is only taken into account if the database cleaner indicators
+     * ({@link PAResourceManagerProperties#RM_DB_HIBERNATE_DROPDB} and
+     * {@link PAResourceManagerProperties#RM_DB_HIBERNATE_DROPDB_NODESOURCES})
+     * are not set to {@code true}.
+     */
+    RM_NODES_RECOVERY("pa.rm.nodes.recovery", PropertyType.BOOLEAN, "true");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
