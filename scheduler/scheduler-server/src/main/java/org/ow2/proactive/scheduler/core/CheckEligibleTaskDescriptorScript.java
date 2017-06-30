@@ -52,6 +52,7 @@ public class CheckEligibleTaskDescriptorScript {
 
     private boolean isInternalScriptContainsApiBinding(EligibleTaskDescriptor etd) {
         return (etd.getInternal().getExecutableContainer() != null) &&
+               (etd.getInternal().getExecutableContainer() instanceof ScriptExecutableContainer) &&
                (((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript() != null) &&
                isScriptContainsApiBinding(((ScriptExecutableContainer) etd.getInternal()
                                                                           .getExecutableContainer()).getScript());

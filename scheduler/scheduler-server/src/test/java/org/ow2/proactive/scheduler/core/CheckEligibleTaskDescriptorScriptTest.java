@@ -181,12 +181,16 @@ public class CheckEligibleTaskDescriptorScriptTest {
     @Test
     public void testForkEnvironmentNull() throws InvalidScriptException {
         fe = null;
+        Mockito.when(etd.getInternal()).thenReturn(it);
+        Mockito.when(it.getForkEnvironment()).thenReturn(fe);
         assertFalse(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
 
     @Test
     public void testScriptExecutableContainerNull() throws InvalidScriptException {
         sec = null;
+        Mockito.when(etd.getInternal()).thenReturn(ist);
+        Mockito.when(ist.getExecutableContainer()).thenReturn(sec);
         Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
         assertFalse(result);
     }
