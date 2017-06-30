@@ -170,6 +170,14 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             sb.add(this.javaOptions.trim());
         }
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
+
+        final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean();
+        if (deployNodesInDetachedMode) {
+            // if we do not want to kill the nodes when the RM exits or
+            // restarts, then we should launch
+            clb.setDetached();
+        }
+
         clb.setJavaPath(this.javaPath);
         clb.setRmHome(this.schedulingPath);
         clb.setPaProperties(sb);
@@ -256,9 +264,15 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                         if (anyTimedOut(depNodeURLs)) {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }
-                        if (chan.getExitStatus() != -1) { // -1 means process is
-                                                              // still running
-                            throw new IllegalStateException("The jvm process of the node has exited prematurely");
+                        // we check the exit status of the session only in the
+                        // case where we link the current process to the one
+                        // that spawns the nodes. Otherwise, we let the two
+                        // processes live completely independently
+                        if (!deployNodesInDetachedMode) {
+                            if (chan.getExitStatus() != -1) { // -1 means process is
+                                // still running
+                                throw new IllegalStateException("The jvm process of the node has exited prematurely");
+                            }
                         }
                         try {
                             Thread.sleep(1000);

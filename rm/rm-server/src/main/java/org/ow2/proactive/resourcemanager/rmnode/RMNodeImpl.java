@@ -129,6 +129,24 @@ public class RMNodeImpl extends AbstractRMNode {
     }
 
     /**
+     * A constructor of {@link RMNodeImpl} that already has all the
+     * configuration information.
+     */
+    public RMNodeImpl(Node node, NodeSource nodeSource, String nodeName, String nodeUrl, Client provider,
+            String hostName, String[] jmxUrls, String jvmName, Permission nodeAccessPermission, NodeState state) {
+        super(nodeSource, nodeName, nodeUrl, provider);
+
+        changeState(state);
+
+        this.hostName = hostName;
+        this.jmxUrls = jmxUrls;
+        this.jvmName = jvmName;
+        this.node = node;
+        this.nodeAccessPermission = nodeAccessPermission;
+        this.scriptStatus = new HashMap<>();
+    }
+
+    /**
      * @see org.ow2.proactive.resourcemanager.rmnode.RMNode#getNode()
      */
     @Override
@@ -422,6 +440,11 @@ public class RMNodeImpl extends AbstractRMNode {
     @Override
     public String getJMXUrl(JMXTransportProtocol protocol) {
         return jmxUrls[protocol.ordinal()];
+    }
+
+    @Override
+    public String[] getJmxUrls() {
+        return jmxUrls;
     }
 
     @Override

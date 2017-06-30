@@ -31,8 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.concurrent.Executors;
 
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
@@ -50,41 +49,38 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
-import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.ow2.proactive.utils.Criteria;
-import org.ow2.proactive.utils.NodeSet;
 
-import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SSHInfrastructureHelper;
 
 
+/**
+ * For convenience, public static members of this class are also used in
+ * {@link functionaltests.nodesrecovery.RecoverSSHInfrastructureV2Test}.
+ */
 public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
-    private static int port;
+    public static int port;
 
-    private static SshServer sshd;
+    public static SshServer sshd;
 
-    private static String javaExePath;
+    public static String javaExePath;
 
-    private static Object[] infraParams;
+    public static Object[] infraParams;
 
-    private static Object[] policyParameters;
+    public static Object[] policyParameters;
 
-    private static String nsname = "testSSHInfra";
+    public static String nsname = "testSSHInfra";
 
-    private static int NB_NODES = 3;
+    public static int NB_NODES = 3;
 
     private ResourceManager resourceManager;
 
@@ -103,6 +99,8 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                          StaticPolicy.class.getName(),
                                          policyParameters);
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
+
+        Thread.sleep(10000);
 
         RMTHelper.log("Checking scheduler state after node source creation");
         RMState s = resourceManager.getState();
@@ -129,16 +127,6 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
-        if (OsUtils.isUNIX()) {
-            sshd.setShellFactory(new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" },
-                                                         EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr)));
-        } else {
-            sshd.setShellFactory(new ProcessShellFactory(new String[] { "cmd.exe " },
-                                                         EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
-                                                                    ProcessShellFactory.TtyOptions.ICrNl,
-                                                                    ProcessShellFactory.TtyOptions.ONlCr)));
-        }
-
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
         userAuthFactories.add(new UserAuthPassword.Factory());
         sshd.setUserAuthFactories(userAuthFactories);
@@ -153,6 +141,13 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         sshd.setCommandFactory(new ScpCommandFactory(new CommandFactory() {
             @Override
             public Command createCommand(String command) {
+                String[] splitCommand = SSHInfrastructureHelper.splitCommand(command);
+                StringBuilder rebuiltCommand = new StringBuilder();
+                for (String commandPiece : splitCommand) {
+                    rebuiltCommand.append(commandPiece).append(" ");
+                }
+                rebuiltCommand.trimToSize();
+
                 EnumSet<ProcessShellFactory.TtyOptions> ttyOptions;
                 if (OsUtils.isUNIX()) {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr);
@@ -161,7 +156,15 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                             ProcessShellFactory.TtyOptions.ICrNl,
                                             ProcessShellFactory.TtyOptions.ONlCr);
                 }
-                return new ProcessShellFactory(splitCommand(command), ttyOptions).create();
+
+                if (OsUtils.isUNIX()) {
+                    return new ProcessShellFactory(new String[] { "/bin/sh", "-c", rebuiltCommand.toString() },
+                                                   ttyOptions).create();
+                } else {
+                    return new ProcessShellFactory(new String[] { rebuiltCommand.toString() }, ttyOptions).create();
+                }
+
+                //return new ProcessShellFactory(SSHInfrastructureHelper.splitCommand(command), ttyOptions).create();
             }
         }));
 
@@ -197,12 +200,4 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         }
     }
 
-    private static String[] splitCommand(String command) {
-        List<String> list = new ArrayList<>();
-        Matcher m = Pattern.compile("([^\\\\\"]\\S*|\\\\\".+?\\\\\")\\s*").matcher(command);
-        while (m.find()) {
-            list.add(m.group(1).replaceAll("\\\\\"", ""));
-        }
-        return list.toArray(new String[list.size()]);
-    }
 }

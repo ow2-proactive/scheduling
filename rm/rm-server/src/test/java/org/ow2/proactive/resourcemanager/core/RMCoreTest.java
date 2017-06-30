@@ -62,7 +62,6 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
@@ -81,7 +80,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 
 public class RMCoreTest {
@@ -122,6 +120,8 @@ public class RMCoreTest {
     private RMNode mockedFreeButLockedNode;
 
     private NodesLockRestorationManager nodesLockRestorationManager;
+
+    private NodesRecoveryManager nodesRecoveryManager;
 
     private HashMap<String, NodeSource> nodeSources;
 
@@ -350,7 +350,7 @@ public class RMCoreTest {
     public void testNodesRestorationManagerHandleInSetDeploying() {
         verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class));
         rmCore.setDeploying(mockedBusyNode);
-        verify(nodesLockRestorationManager).handle(Mockito.any(RMNode.class));
+        verify(nodesRecoveryManager).restoreLocks(Mockito.any(RMNode.class));
     }
 
     @Test
@@ -621,28 +621,6 @@ public class RMCoreTest {
     }
 
     @Test
-    public void testInitNodesLockRestorationManagerDisabled() {
-        PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.updateProperty("false");
-        populateRMCore();
-
-        assertThat(nodesLockRestorationManager).isNotNull();
-        assertThat(nodesLockRestorationManager.isInitialized()).isFalse();
-
-        verify(nodesLockRestorationManager, never()).initialize();
-    }
-
-    @Test
-    public void testInitNodesLockRestorationManagerEnabled() {
-        PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.updateProperty("true");
-        populateRMCore();
-
-        assertThat(nodesLockRestorationManager).isNotNull();
-        assertThat(nodesLockRestorationManager.isInitialized()).isTrue();
-
-        verify(nodesLockRestorationManager).initialize();
-    }
-
-    @Test
     public void testInternalLockNodeWithNodeNotLocked() {
         verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
 
@@ -884,21 +862,20 @@ public class RMCoreTest {
 
         rmCore = spy(rmCore);
 
-        nodesLockRestorationManager = null;
+        nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
+        nodesLockRestorationManager = spy(nodesLockRestorationManager);
 
-        doReturn(new Function<RMCore, NodesLockRestorationManager>() {
+        doReturn(new Function<RMCore, NodesRecoveryManager>() {
             @Override
-            public NodesLockRestorationManager apply(RMCore rmCore) {
-                nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
-                nodesLockRestorationManager = spy(nodesLockRestorationManager);
+            public NodesRecoveryManager apply(RMCore rmCore) {
+                nodesRecoveryManager = new NodesRecoveryManager(rmCore);
+                nodesRecoveryManager = spy(nodesRecoveryManager);
 
-                doReturn(Maps.newHashMap()).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
-
-                return nodesLockRestorationManager;
+                return nodesRecoveryManager;
             }
-        }).when(rmCore).getNodesLockRestorationManagerBuilder();
+        }).when(rmCore).getNodesRecoveryManagerBuilder();
 
-        rmCore.initNodesRestorationManager();
+        rmCore.initiateRecoveryIfRequired();
     }
 
     private void configureRMNode(MockedRMNodeParameters param) {
