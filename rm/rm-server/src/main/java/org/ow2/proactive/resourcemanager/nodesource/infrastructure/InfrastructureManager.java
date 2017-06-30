@@ -108,6 +108,8 @@ public abstract class InfrastructureManager implements Serializable {
 
     private static final String RM_URL_KEY = "infrastructureManagerRmUrl";
 
+    private static final String NB_DOWN_NODES_KEY = "infrastructureManagerNbDownNodes";
+
     /**
      * Store information about the running infrastructure. The map holds the name of monitored information and its
      * value. The variables stored in this map should allow the full recovery of an infrastructure state.
@@ -191,6 +193,15 @@ public abstract class InfrastructureManager implements Serializable {
             writeLock.unlock();
         }
 
+    }
+
+    /**
+     * Copy all the runtime variables map given in parameter to the runtime
+     * variables map of this infrastructure.
+     * @param runtimeVariablesToUpdate the runtime variables to recover.
+     */
+    public void recoverRuntimeVariables(Map<String, Object> runtimeVariablesToUpdate) {
+        runtimeVariables.putAll(runtimeVariablesToUpdate);
     }
 
     /**
@@ -282,34 +293,38 @@ public abstract class InfrastructureManager implements Serializable {
         writeLock.lock();
         try {
             getAcquiredNodesMap().remove(node.getNodeInformation().getName());
+            this.removeNode(node);
         } catch (Exception e) {
             logger.warn("Exception occurred while removing node " + node);
         } finally {
-            this.removeNode(node);
             writeLock.unlock();
         }
     }
 
     /**
-     * This method is called by the system when a Node is detected as DOWN.
-     *
-     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
-     *
-     * @throws RMException if any problems occurred.
-     */
-    public void internalNotifyDownNode(Node proactiveProgrammingNode) throws RMException {
-        notifyDownNode(proactiveProgrammingNode);
-    }
-
-    /**
      * The default behavior is to remove the node from the infrastructure manager.
+     * Then this method calls the {@link InfrastructureManager#onDownNode(String, String)} hook.
      *
      * @param proactiveProgrammingNode the ProActive Programming Node that is down.
-     *
-     * @throws RMException if any problems occurred.
      */
     public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
-        internalRemoveNode(proactiveProgrammingNode);
+        String nodeName = proactiveProgrammingNode.getNodeInformation().getName();
+        String nodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
+        internalNotifyDownNode(nodeName, nodeUrl);
+    }
+
+    public void internalNotifyDownNode(String nodeName, String nodeUrl) {
+        writeLock.lock();
+        try {
+            // if the node was previously sane, we need to remove it
+            getAcquiredNodesMap().remove(nodeName);
+            // trigger the onDownNode hook
+            this.onDownNode(nodeName, nodeUrl);
+        } catch (Exception e) {
+            logger.warn("Exception occurred while removing node " + nodeName);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
@@ -437,7 +452,7 @@ public abstract class InfrastructureManager implements Serializable {
      * implementation thanks to the method {@link #shutDown()}
      */
     public final void internalShutDown() {
-        setShutdownFlag(true);
+        setInfraShutdownFlag(true);
         // first removing deploying nodes
         for (String dnUrl : keySetDeployingNodes()) {
             this.internalRemoveDeployingNode(dnUrl);
@@ -648,7 +663,7 @@ public abstract class InfrastructureManager implements Serializable {
     protected final String addDeployingNode(String name, String command, String description, final long timeout) {
         checkName(name);
         checkTimeout(timeout);
-        if (getShutdownFlag()) {
+        if (getInfraShutdownFlag()) {
             throw new UnsupportedOperationException("The infrastructure manager is shuting down.");
         }
         // if the user calls this method, we use the require nodes/timeout
@@ -891,6 +906,36 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
+     * Look for a {@link RMNode} in data structures holding lost and deploying
+     * nodes. It does not look into the acquired nodes because this data
+     * structure holds instances of {@link Node} and thus has no information
+     * about the acquired {@link RMNode}.
+     *
+     * @param nodeUrl
+     * @return a lost or deploying {@link RMNode} that could be found using the given URL, or null
+     */
+    public RMNode searchForNotAcquiredRmNode(String nodeUrl) {
+        if (containsKeyLostNode(nodeUrl)) {
+            return getLostNodeFromRuntimeVariables(nodeUrl);
+        }
+        if (containsKeyDeployingNode(nodeUrl)) {
+            return getDeployingNodeFromRuntimeVariables(nodeUrl);
+        }
+        return null;
+    }
+
+    /**
+     * Called by the system every time a node is DOWN. The default is to
+     * increment the number of down nodes.
+     *
+     * @param nodeName the name of the node that is down.
+     * @param nodeUrl the URL of the node that is down.
+     */
+    public void onDownNode(String nodeName, String nodeUrl) {
+        incrementNbDownNodes();
+    }
+
+    /**
      * Called by the system every time a node that is DOWN reconnects
      * and changes its status to FREE or BUSY.
      *
@@ -945,6 +990,7 @@ public abstract class InfrastructureManager implements Serializable {
         runtimeVariables.put(USING_DEPLOYING_NODES_KEY, false);
         runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
         runtimeVariables.put(RM_URL_KEY, "");
+        runtimeVariables.put(NB_DOWN_NODES_KEY, 0);
     }
 
     /**
@@ -1176,7 +1222,7 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private boolean getShutdownFlag() {
+    private boolean getInfraShutdownFlag() {
         return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
@@ -1185,7 +1231,7 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private void setShutdownFlag(final boolean isShutdown) {
+    protected void setInfraShutdownFlag(final boolean isShutdown) {
         setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
             @Override
             public Void handle() {
@@ -1219,6 +1265,36 @@ public abstract class InfrastructureManager implements Serializable {
             @Override
             public String handle() {
                 return (String) runtimeVariables.get(RM_URL_KEY);
+            }
+        });
+    }
+
+    protected int getNbDownNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_DOWN_NODES_KEY);
+            }
+        });
+    }
+
+    protected void resetNbDownNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(NB_DOWN_NODES_KEY, 0);
+                return null;
+            }
+        });
+    }
+
+    protected void incrementNbDownNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int nb = (int) runtimeVariables.get(NB_DOWN_NODES_KEY);
+                runtimeVariables.put(NB_DOWN_NODES_KEY, ++nb);
+                return null;
             }
         });
     }

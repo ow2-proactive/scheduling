@@ -356,6 +356,11 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     @Override
+    public String[] getJmxUrls() {
+        return null;
+    }
+
+    @Override
     public boolean isProtectedByToken() {
         return false;
     }

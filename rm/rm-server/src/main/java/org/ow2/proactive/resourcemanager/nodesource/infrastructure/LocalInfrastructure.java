@@ -315,6 +315,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         try {
             this.maxNodes = Integer.parseInt(args[index++].toString());
+            runtimeVariables.put(NB_HANDLED_NODES_KEY, maxNodes);
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot determine max node");
         }
@@ -355,6 +356,29 @@ public class LocalInfrastructure extends InfrastructureManager {
         // If there is no remaining node, kill the JVM process
         if (remainingNodesCount == 0) {
             shutDown();
+        }
+    }
+
+    @Override
+    public void onDownNode(String nodeName, String nodeUrl) {
+        super.onDownNode(nodeName, nodeUrl);
+        decrementAndGetAcquiredNodes();
+        logger.info("Node source " + nodeSource.getName() + " has " + getNbDownNodes() + " down nodes, and there are " +
+                    nodeSource.getNbNodesToRecover() + " nodes to recover");
+        // All the nodes are down, we are going to redeploy the node source
+        if (getNbDownNodes() == nodeSource.getNbNodesToRecover()) {
+            logger.info("All nodes of node source " + nodeSource.getName() +
+                        " are detected down, redeploy node source");
+            // we are going to redeploy the nodes, so we need to indicate
+            // that the command line needs to be started again
+            setCommandLineStarted(false);
+            // in case the RM was shut down properly, the shutdown flag has
+            // been saved in database as true, we must reset it to redeploy
+            setInfraShutdownFlag(false);
+            // trigger deployment
+            nodeSource.activate();
+            // reset internal counters
+            resetNbDownNodes();
         }
     }
 

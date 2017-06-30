@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
@@ -74,7 +73,8 @@ public class TestRM {
                                configurationFile == null && startedConfiguration.equals(DEFAULT_CONFIGURATION));
     }
 
-    public synchronized void start(String configurationFile, int pnpPort, String... jvmArgs) throws Exception {
+    public synchronized void start(String configurationFile, int pnpPort, String classpath, String... jvmArgs)
+            throws Exception {
         if (configurationFile == null) {
             configurationFile = DEFAULT_CONFIGURATION;
         }
@@ -118,7 +118,7 @@ public class TestRM {
         commandLine.add(CentralPAPropertyRepository.PA_RUNTIME_PING.getCmdLine() + false);
 
         commandLine.add("-cp");
-        commandLine.add(testClasspath());
+        commandLine.add(classpath);
         commandLine.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add("-Djava.awt.headless=true"); // For Mac builds
@@ -129,8 +129,12 @@ public class TestRM {
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
-        processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller("TEST_RM",
-                                                                                     processBuilder.environment());
+
+        if (!PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()) {
+            processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller("TEST_RM",
+                                                                                         processBuilder.environment());
+        }
+
         rmProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(), "[RM output]: ");
@@ -145,24 +149,15 @@ public class TestRM {
             System.out.println("Destroying RM process.");
             rmProcess.destroy();
             rmProcess.waitFor();
-            processTreeKiller.kill();
+            if (!PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()) {
+                processTreeKiller.kill();
+            }
             rmProcess = null;
         }
     }
 
     public String getUrl() {
         return "pnp://localhost:" + pnpPort + "/";
-    }
-
-    private static String testClasspath() {
-        String home = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        String classpathToLibFolderWithWildcard = home + File.separator + "dist" + File.separator + "lib" +
-                                                  File.separator + "*";
-        if (OperatingSystem.getOperatingSystem().equals(OperatingSystem.windows)) {
-            // required by windows otherwise wildcard is expanded
-            classpathToLibFolderWithWildcard = "\"" + classpathToLibFolderWithWildcard + "\"";
-        }
-        return classpathToLibFolderWithWildcard;
     }
 
     public synchronized RMAuthentication getAuth() {

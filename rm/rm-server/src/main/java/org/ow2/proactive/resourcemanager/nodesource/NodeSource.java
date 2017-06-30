@@ -43,21 +43,26 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
@@ -146,6 +151,9 @@ public class NodeSource implements InitActive, RunActive {
     // user can get nodes for running computations
     // level is configured by ns admin at the moment of ns creation
     private AccessType nodeUserAccessType;
+
+    // when recovering a node source, this variable tracks the recovered nodes
+    private int nbNodesToRecover;
 
     static {
         try {
@@ -273,6 +281,30 @@ public class NodeSource implements InitActive, RunActive {
         RMDeployingNode rmDeployingNode = infrastructureManager.internalRegisterAcquiredNode(node);
         nodes.put(nodeUrl, node);
         return rmDeployingNode;
+    }
+
+    /**
+     * Recover the internal data structure of the node source so that
+     * recovered nodes and RMnodes are linked again to the node source.
+     * @return the {@link RMNode} that could be recovered.
+     */
+    public RMNode internalAddNodeAfterRecovery(Node node, RMNodeData rmNodeData) {
+        RMNode recoveredRmNode;
+        String nodeUrl = node.getNodeInformation().getURL();
+        // the infrastructure manager is up to date already because it was
+        // saved in database, contrarily to the node source internal data structures
+        RMNode rmNode = infrastructureManager.searchForNotAcquiredRmNode(nodeUrl);
+        if (rmNode != null) {
+            // Deploying or lost RMNodes can be directly found in the saved infrastructure.
+            recoveredRmNode = rmNode;
+        } else {
+            // the node is acquired in the infrastructure. We can recreate the
+            // RMNode representation on top of it and save it in the node source
+            recoveredRmNode = buildRMNodeAfterRecovery(node, rmNodeData);
+        }
+        // we finally put back the node in the data structure of the node source
+        nodes.put(nodeUrl, node);
+        return recoveredRmNode;
     }
 
     /**
@@ -418,6 +450,26 @@ public class NodeSource implements InitActive, RunActive {
         return rmnode;
     }
 
+    /**
+     * Rebuild a RMNode from a node that could be looked up again after a
+     * recovery of the RM. This builder configures nothing for the node
+     * because it is configured already as it suppoesed to be recovered from
+     * the database.
+     * @return the expected RMNode
+     */
+    private RMNode buildRMNodeAfterRecovery(Node node, RMNodeData rmNodeData) {
+        return new RMNodeImpl(node,
+                              stub,
+                              node.getNodeInformation().getName(),
+                              node.getNodeInformation().getURL(),
+                              rmNodeData.getProvider(),
+                              rmNodeData.getHostname(),
+                              rmNodeData.getJmxUrls(),
+                              rmNodeData.getJvmName(),
+                              rmNodeData.getUserPermission(),
+                              rmNodeData.getState());
+    }
+
     public boolean setNodeAvailable(RMNode node) {
         Node proactiveProgrammingNode = node.getNode();
         String proactiveProgrammingNodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
@@ -441,6 +493,18 @@ public class NodeSource implements InitActive, RunActive {
 
     public boolean setDeploying(RMDeployingNode deployingNode) {
         return rmcore.setDeploying(deployingNode);
+    }
+
+    public int getNbNodesToRecover() {
+        return nbNodesToRecover;
+    }
+
+    public void resetNbNodesToRecover() {
+        this.nbNodesToRecover = 0;
+    }
+
+    public void setNbNodesToRecover(int nbNodesToRecover) {
+        this.nbNodesToRecover = nbNodesToRecover;
     }
 
     /**
@@ -467,7 +531,7 @@ public class NodeSource implements InitActive, RunActive {
      * @return node if it was successfully obtained, null otherwise
      * @throws Exception if node was not looked up
      */
-    private Node lookupNode(String nodeUrl, long timeout) throws Exception {
+    public Node lookupNode(String nodeUrl, long timeout) throws Exception {
         Future<Node> futureNode = threadPoolHolder.submit(INTERNAL_POOL, new NodeLocator(nodeUrl));
         return futureNode.get(timeout, TimeUnit.MILLISECONDS);
     }
@@ -711,13 +775,27 @@ public class NodeSource implements InitActive, RunActive {
             downNodes.put(nodeUrl, downNode);
             try {
                 RMCore.topologyManager.removeNode(downNode);
-                infrastructureManager.internalNotifyDownNode(downNode);
+                infrastructureManager.notifyDownNode(downNode);
             } catch (RMException e) {
                 logger.error("Error while removing down node: " + nodeUrl, e);
             }
         }
 
         rmcore.setDownNode(nodeUrl);
+    }
+
+    /**
+     * Marks node as down after a recovery, so that no finding the node in the
+     * usual data structure of the node source is not an exceptional behavior
+     */
+    public void detectedPingedDownNodeAfterRecovery(String nodeName, String nodeUrl) {
+        // the node source should not have the node in its node list, because
+        // after a recovery, it should have nothing in its data structures but
+        // just in case the data structure is in a bad shape too, we remove
+        // the node from the sane nodes.
+        nodes.remove(nodeUrl);
+        // trigger infrastructure hook
+        infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl);
     }
 
     /**

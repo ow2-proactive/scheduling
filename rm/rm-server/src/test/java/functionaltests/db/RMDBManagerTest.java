@@ -34,8 +34,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.management.JMX;
 import javax.security.auth.AuthPermission;
 
+import org.jruby.ir.targets.JVM;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,13 +74,23 @@ public class RMDBManagerTest {
 
     private static final UniqueID OWNER_ID = new UniqueID("ownerId");
 
+    private static final UniqueID PROVIDER_ID = new UniqueID("providerId");
+
     private static final String PERMISSION_NAME = "read,write";
+
+    private static final String HOSTNAME = "localhost";
+
+    private static final String[] JMX_URLS = new String[] { "url1", "url2" };
+
+    private static final String JVM_NAME = "pnp://192.168.1.104:59357/PA_JVM0123456789";
 
     private RMDBManager dbManager;
 
     private NodeSourceData nodeSourceData;
 
     private Client owner;
+
+    private Client provider;
 
     private Permission permission;
 
@@ -92,6 +104,8 @@ public class RMDBManagerTest {
 
         owner = new Client();
         owner.setId(OWNER_ID);
+        provider = new Client();
+        provider.setId(PROVIDER_ID);
         permission = new AuthPermission(PERMISSION_NAME);
     }
 
@@ -190,7 +204,12 @@ public class RMDBManagerTest {
             assertThat(node.getState()).isEqualTo(NODE_STATE_BASE);
             assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getProvider().getId()).isEqualTo(PROVIDER_ID);
             assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+            assertThat(node.getHostname()).isEqualTo(HOSTNAME);
+            assertThat(node.getJmxUrls()[0]).isEqualTo(JMX_URLS[0]);
+            assertThat(node.getJmxUrls()[1]).isEqualTo(JMX_URLS[1]);
+            assertThat(node.getJvmName()).isEqualTo(JVM_NAME);
         }
     }
 
@@ -212,7 +231,12 @@ public class RMDBManagerTest {
             assertThat(node.getState()).isEqualTo(NodeState.BUSY);
             assertThat(node.getStateChangeTime()).isEqualTo(5678);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getProvider().getId()).isEqualTo(PROVIDER_ID);
             assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+            assertThat(node.getHostname()).isEqualTo(HOSTNAME);
+            assertThat(node.getJmxUrls()[0]).isEqualTo(JMX_URLS[0]);
+            assertThat(node.getJmxUrls()[1]).isEqualTo(JMX_URLS[1]);
+            assertThat(node.getJvmName()).isEqualTo(JVM_NAME);
         }
     }
 
@@ -230,7 +254,12 @@ public class RMDBManagerTest {
             assertThat(node.getState()).isEqualTo(NODE_STATE_BASE);
             assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getProvider().getId()).isEqualTo(PROVIDER_ID);
             assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+            assertThat(node.getHostname()).isEqualTo(HOSTNAME);
+            assertThat(node.getJmxUrls()[0]).isEqualTo(JMX_URLS[0]);
+            assertThat(node.getJmxUrls()[1]).isEqualTo(JMX_URLS[1]);
+            assertThat(node.getJvmName()).isEqualTo(JVM_NAME);
         }
     }
 
@@ -254,8 +283,12 @@ public class RMDBManagerTest {
                                                 NODE_URL,
                                                 null,
                                                 null,
+                                                null,
                                                 NODE_STATE_BASE,
-                                                STATE_CHANGE_TIME_BASE);
+                                                STATE_CHANGE_TIME_BASE,
+                                                HOSTNAME,
+                                                JMX_URLS,
+                                                JVM_NAME);
         NodeSourceData newNodeSourceData = new NodeSourceData();
         newNodeSourceData.setName("anotherNodeSourceName");
         newNodeSourceData.setPolicyType("aPolicyType");
@@ -273,6 +306,40 @@ public class RMDBManagerTest {
     }
 
     @Test
+    public void testGetSeveralRMNodeDataByNodeSource() {
+
+        RMNodeData rmNodeData1 = addRMNodeData(NODE_NAME_BASE + "1", NODE_STATE_BASE);
+
+        // Add another RMNodeData with another NodeSourceData
+        RMNodeData rmNodeData2 = new RMNodeData(NODE_NAME_BASE + "2",
+                                                NODE_URL,
+                                                null,
+                                                null,
+                                                null,
+                                                NODE_STATE_BASE,
+                                                STATE_CHANGE_TIME_BASE,
+                                                HOSTNAME,
+                                                JMX_URLS,
+                                                JVM_NAME);
+        NodeSourceData newNodeSourceData = new NodeSourceData();
+        newNodeSourceData.setName("anotherNodeSourceName");
+        newNodeSourceData.setPolicyType("aPolicyType");
+        dbManager.addNodeSource(newNodeSourceData);
+        rmNodeData2.setNodeSource(newNodeSourceData);
+        dbManager.addNode(rmNodeData2);
+
+        RMNodeData rmNodeData3 = addRMNodeData(NODE_NAME_BASE + "3", NODE_STATE_BASE);
+
+        Collection<RMNodeData> nodes = dbManager.getNodesByNodeSource(nodeSourceData.getName());
+
+        assertThat(nodes).hasSize(2);
+
+        for (RMNodeData node : nodes) {
+            assertThat(node).isAnyOf(rmNodeData1, rmNodeData3);
+        }
+    }
+
+    @Test
     public void testAddDeployingNode() {
 
         addRMNodeData(NODE_NAME_BASE, NodeState.DEPLOYING);
@@ -286,7 +353,12 @@ public class RMDBManagerTest {
             assertThat(node.getState()).isEqualTo(NodeState.DEPLOYING);
             assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getProvider().getId()).isEqualTo(PROVIDER_ID);
             assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+            assertThat(node.getHostname()).isEqualTo(HOSTNAME);
+            assertThat(node.getJmxUrls()[0]).isEqualTo(JMX_URLS[0]);
+            assertThat(node.getJmxUrls()[1]).isEqualTo(JMX_URLS[1]);
+            assertThat(node.getJvmName()).isEqualTo(JVM_NAME);
         }
     }
 
@@ -309,7 +381,12 @@ public class RMDBManagerTest {
             assertThat(node.getState()).isNotEqualTo(NodeState.DEPLOYING);
             assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
+            assertThat(node.getProvider().getId()).isEqualTo(PROVIDER_ID);
             assertThat(node.getUserPermission().getName()).isEqualTo(PERMISSION_NAME);
+            assertThat(node.getHostname()).isEqualTo(HOSTNAME);
+            assertThat(node.getJmxUrls()[0]).isEqualTo(JMX_URLS[0]);
+            assertThat(node.getJmxUrls()[1]).isEqualTo(JMX_URLS[1]);
+            assertThat(node.getJvmName()).isEqualTo(JVM_NAME);
         }
     }
 
@@ -321,7 +398,16 @@ public class RMDBManagerTest {
     }
 
     private RMNodeData addRMNodeData(String nodeName, NodeState state) {
-        RMNodeData rmNodeData = new RMNodeData(nodeName, NODE_URL, owner, permission, state, STATE_CHANGE_TIME_BASE);
+        RMNodeData rmNodeData = new RMNodeData(nodeName,
+                                               NODE_URL,
+                                               owner,
+                                               provider,
+                                               permission,
+                                               state,
+                                               STATE_CHANGE_TIME_BASE,
+                                               HOSTNAME,
+                                               JMX_URLS,
+                                               JVM_NAME);
         rmNodeData.setNodeSource(nodeSourceData);
         dbManager.addNode(rmNodeData);
         return rmNodeData;

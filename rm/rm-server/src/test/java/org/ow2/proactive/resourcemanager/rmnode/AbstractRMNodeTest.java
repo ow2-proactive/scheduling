@@ -324,6 +324,11 @@ public class AbstractRMNodeTest {
         }
 
         @Override
+        public String[] getJmxUrls() {
+            return null;
+        }
+
+        @Override
         public boolean isProtectedByToken() {
             return false;
         }
