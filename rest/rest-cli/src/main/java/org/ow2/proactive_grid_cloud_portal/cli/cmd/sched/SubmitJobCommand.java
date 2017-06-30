@@ -26,10 +26,14 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_FILE_EMPTY;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URLConnection;
 import java.util.Map;
 
@@ -38,8 +42,6 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-
-import com.google.common.collect.Maps;
 
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
@@ -61,10 +63,17 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         File jobFile = new File(pathname);
-        if (!jobFile.exists()) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
-        }
         try {
+            // check that file is not empty
+            if (!checkFileNotEmpty(pathname)) {
+                writeLine(currentContext, "File " + pathname + " is empty ");
+                throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
+            }
+
+            if (!jobFile.exists()) {
+                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
+            }
+
             String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
             JobIdData jobId;
             if (APPLICATION_XML.getMimeType().equals(contentType)) {
@@ -83,9 +92,24 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
                         e,
                         currentContext);
         }
+
     }
 
     private Map<String, String> map(String variables) {
         return jobKeyValueTransformer.transformVariablesToMap(variables);
+    }
+
+    private Boolean checkFileNotEmpty(String pathname) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(pathname));
+            if (br.readLine() == null) {
+                return false;
+            } else
+                return true;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
+        }
     }
 }
