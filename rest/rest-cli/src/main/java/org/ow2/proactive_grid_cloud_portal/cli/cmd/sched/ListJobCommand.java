@@ -62,7 +62,6 @@ public class ListJobCommand extends AbstractCommand implements Command {
         } catch (Exception e) {
             handleError("An error occurred while retrieving job list:", e, currentContext);
         }
-
     }
 
     private void processFilteringOps() {
