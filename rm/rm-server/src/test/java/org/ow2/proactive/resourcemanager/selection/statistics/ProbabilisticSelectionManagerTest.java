@@ -28,9 +28,11 @@ package org.ow2.proactive.resourcemanager.selection.statistics;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -95,17 +97,21 @@ public class ProbabilisticSelectionManagerTest {
         for (int i = 0; i < nbNodes; i++) {
             // we increase the probability for each node, lowest node has the min number of true results
             for (int j = 0; j < i + 1; j++) {
-                selectionManager.processScriptResult(script, new ScriptResult<>(true), freeNodes.get(i));
+                selectionManager.processScriptResult(script,
+                                                     Collections.EMPTY_MAP,
+                                                     new ScriptResult<>(true),
+                                                     freeNodes.get(i));
             }
         }
 
         List<RMNode> arrangedNodes = selectionManager.arrangeNodesForScriptExecution(freeNodes,
-                                                                                     Collections.singletonList(script));
+                                                                                     Collections.singletonList(script),
+                                                                                     Collections.EMPTY_MAP);
 
         // nodes are expected to be sorted in reverse order
         for (int i = 0; i < nbNodes; i++) {
             Assert.assertEquals("mocked-node-" + (nbNodes - i), arrangedNodes.get(i).getNodeName());
-            Assert.assertFalse(selectionManager.isPassed(script, arrangedNodes.get(i)));
+            Assert.assertFalse(selectionManager.isPassed(script, Collections.EMPTY_MAP, arrangedNodes.get(i)));
         }
     }
 
@@ -120,12 +126,16 @@ public class ProbabilisticSelectionManagerTest {
         for (int i = 0; i < nbNodes; i++) {
             // we decrease the probability for each node, lowest node has the max number of false results
             for (int j = i; j < nbNodes; j++) {
-                selectionManager.processScriptResult(script, new ScriptResult<>(false), freeNodes.get(i));
+                selectionManager.processScriptResult(script,
+                                                     Collections.EMPTY_MAP,
+                                                     new ScriptResult<>(false),
+                                                     freeNodes.get(i));
             }
         }
 
         List<RMNode> arrangedNodes = selectionManager.arrangeNodesForScriptExecution(freeNodes,
-                                                                                     Collections.singletonList(script));
+                                                                                     Collections.singletonList(script),
+                                                                                     Collections.EMPTY_MAP);
 
         // list is supposed to be empty because of dynamicity != 0
         Assert.assertEquals(0, arrangedNodes.size());
@@ -145,12 +155,16 @@ public class ProbabilisticSelectionManagerTest {
             for (int i = 0; i < nbNodes; i++) {
                 // we decrease the probability for each node, lowest node has the max number of false results
                 for (int j = i; j < nbNodes; j++) {
-                    selectionManager.processScriptResult(script, new ScriptResult<>(false), freeNodes.get(i));
+                    selectionManager.processScriptResult(script,
+                                                         Collections.EMPTY_MAP,
+                                                         new ScriptResult<>(false),
+                                                         freeNodes.get(i));
                 }
             }
 
             List<RMNode> arrangedNodes = selectionManager.arrangeNodesForScriptExecution(freeNodes,
-                                                                                         Collections.singletonList(script));
+                                                                                         Collections.singletonList(script),
+                                                                                         Collections.EMPTY_MAP);
 
             // list is supposed to contain all nodes because of dynamicity == 0
             Assert.assertEquals(freeNodes.size(), arrangedNodes.size());
@@ -158,7 +172,7 @@ public class ProbabilisticSelectionManagerTest {
             // nodes are expected to be sorted in reverse order
             for (int i = 0; i < nbNodes; i++) {
                 Assert.assertEquals("mocked-node-" + (nbNodes - i), arrangedNodes.get(i).getNodeName());
-                Assert.assertFalse(selectionManager.isPassed(script, arrangedNodes.get(i)));
+                Assert.assertFalse(selectionManager.isPassed(script, Collections.EMPTY_MAP, arrangedNodes.get(i)));
             }
         } finally {
             PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.updateProperty("300000");
@@ -180,13 +194,15 @@ public class ProbabilisticSelectionManagerTest {
                 // we decrease the probability for each node, lowest node has the max number of script exceptions
                 for (int j = i; j < nbNodes; j++) {
                     selectionManager.processScriptResult(script,
+                                                         Collections.EMPTY_MAP,
                                                          new ScriptResult<Boolean>(new IllegalArgumentException("amistake")),
                                                          freeNodes.get(i));
                 }
             }
 
             List<RMNode> arrangedNodes = selectionManager.arrangeNodesForScriptExecution(freeNodes,
-                                                                                         Collections.singletonList(script));
+                                                                                         Collections.singletonList(script),
+                                                                                         Collections.EMPTY_MAP);
 
             // list is supposed to contain all nodes because of dynamicity == 0
             Assert.assertEquals(freeNodes.size(), arrangedNodes.size());
@@ -194,7 +210,7 @@ public class ProbabilisticSelectionManagerTest {
             // nodes are expected to be sorted in reverse order
             for (int i = 0; i < nbNodes; i++) {
                 Assert.assertEquals("mocked-node-" + (nbNodes - i), arrangedNodes.get(i).getNodeName());
-                Assert.assertFalse(selectionManager.isPassed(script, arrangedNodes.get(i)));
+                Assert.assertFalse(selectionManager.isPassed(script, Collections.EMPTY_MAP, arrangedNodes.get(i)));
             }
         } finally {
             PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.updateProperty("300000");
@@ -212,18 +228,56 @@ public class ProbabilisticSelectionManagerTest {
         for (int i = 0; i < nbNodes; i++) {
             // we increase the probability for each node, but it should not change the result for static scripts
             for (int j = 0; j < i + 1; j++) {
-                selectionManager.processScriptResult(script, new ScriptResult<>(true), freeNodes.get(i));
+                selectionManager.processScriptResult(script,
+                                                     Collections.EMPTY_MAP,
+                                                     new ScriptResult<>(true),
+                                                     freeNodes.get(i));
             }
         }
 
         List<RMNode> arrangedNodes = selectionManager.arrangeNodesForScriptExecution(freeNodes,
-                                                                                     Collections.singletonList(script));
+                                                                                     Collections.singletonList(script),
+                                                                                     Collections.EMPTY_MAP);
 
         // nodes are expected to be sorted in initial order
         for (int i = 0; i < nbNodes; i++) {
             Assert.assertEquals("mocked-node-" + (i + 1), arrangedNodes.get(i).getNodeName());
-            Assert.assertTrue(selectionManager.isPassed(script, arrangedNodes.get(i)));
+            Assert.assertTrue(selectionManager.isPassed(script, Collections.EMPTY_MAP, arrangedNodes.get(i)));
         }
+    }
+
+    @Test
+    public void testVariableBindings() throws Exception {
+        SelectionScript script = new SelectionScript("variables.get(\"TOTO\")", "groovy", false);
+        ManagerObjects managerObjects = new ManagerObjects(1).invoke();
+        SelectionManager selectionManager = managerObjects.getSelectionManager();
+        ArrayList<RMNode> freeNodes = managerObjects.getFreeNodes();
+        Map<String, Serializable> bindings = Collections.singletonMap("TOTO", (Serializable) "value");
+        selectionManager.processScriptResult(script,
+                                             Collections.singletonMap("TOTO", (Serializable) "value"),
+                                             new ScriptResult<>(true),
+                                             freeNodes.get(0));
+
+        Assert.assertTrue(selectionManager.isPassed(script,
+                                                    Collections.singletonMap("TOTO", (Serializable) "value"),
+                                                    freeNodes.get(0)));
+        Assert.assertFalse(selectionManager.isPassed(script,
+                                                     Collections.singletonMap("TOTO", (Serializable) "differentValue"),
+                                                     freeNodes.get(0)));
+        Assert.assertFalse(selectionManager.isPassed(script,
+                                                     Collections.<String, Serializable> emptyMap(),
+                                                     freeNodes.get(0)));
+
+        selectionManager.processScriptResult(script,
+                                             Collections.singletonMap("TOTO", (Serializable) "differentValue"),
+                                             new ScriptResult<>(true),
+                                             freeNodes.get(0));
+        Assert.assertTrue(selectionManager.isPassed(script,
+                                                    Collections.singletonMap("TOTO", (Serializable) "differentValue"),
+                                                    freeNodes.get(0)));
+        Assert.assertTrue(selectionManager.isPassed(script,
+                                                    Collections.singletonMap("TOTO", (Serializable) "value"),
+                                                    freeNodes.get(0)));
     }
 
     private class ManagerObjects {

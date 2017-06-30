@@ -34,9 +34,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.Serializable;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.security.auth.Subject;
 
@@ -180,18 +182,19 @@ public class SelectionManagerTest {
     public static SelectionManager createSelectionManager(final RMCore rmCore) {
         return new SelectionManager(rmCore) {
             @Override
-            public List<RMNode> arrangeNodesForScriptExecution(List<RMNode> nodes, List<SelectionScript> scripts) {
+            public List<RMNode> arrangeNodesForScriptExecution(List<RMNode> nodes, List<SelectionScript> scripts,
+                    Map<String, Serializable> bindings) {
                 return nodes;
             }
 
             @Override
-            public boolean isPassed(SelectionScript script, RMNode rmnode) {
+            public boolean isPassed(SelectionScript script, Map<String, Serializable> bindings, RMNode rmnode) {
                 return false;
             }
 
             @Override
-            public boolean processScriptResult(SelectionScript script, ScriptResult<Boolean> scriptResult,
-                    RMNode rmnode) {
+            public boolean processScriptResult(SelectionScript script, Map<String, Serializable> bindings,
+                    ScriptResult<Boolean> scriptResult, RMNode rmnode) {
                 return false;
             }
         };
