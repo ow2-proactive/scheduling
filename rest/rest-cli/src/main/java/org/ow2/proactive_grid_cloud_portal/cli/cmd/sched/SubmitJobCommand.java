@@ -36,6 +36,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
@@ -51,27 +53,34 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private final JobKeyValueTransformer jobKeyValueTransformer;
 
-    public SubmitJobCommand(String... params) {
-
+    public SubmitJobCommand(String... params) throws CLIException {
+        if (params == null || params.length == 0) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
+        }
         this.pathname = params[0];
         if (params.length > 1) {
             this.variables = params[1];
         }
         this.jobKeyValueTransformer = new JobKeyValueTransformer();
+
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
         File jobFile = new File(pathname);
         try {
-            // check that file is not empty
-            if (!checkFileNotEmpty(pathname)) {
-                writeLine(currentContext, "File " + pathname + " is empty ");
-                throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
+            if (!checkFilePathValid(pathname)) {
+                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
             }
 
             if (!jobFile.exists()) {
                 throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
+            }
+
+            // check that file is not empty
+            if (!checkFileNotEmpty(pathname)) {
+                writeLine(currentContext, "File " + pathname + " is empty ");
+                throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
             }
 
             String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
@@ -101,15 +110,35 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private Boolean checkFileNotEmpty(String pathname) {
         try {
-            BufferedReader br = new BufferedReader(new FileReader(pathname));
-            if (br.readLine() == null) {
+            BufferedReader reader = new BufferedReader(new FileReader(pathname));
+            if (reader.readLine() == null) {
                 return false;
             } else
                 return true;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return false;
         }
     }
+
+    private Boolean checkFileExists(String pathname) {
+        File f = new File(pathname);
+        if (f.exists() && !f.isDirectory()) {
+            return true;
+        } else
+            return false;
+    }
+
+    private Boolean checkFilePathValid(String pathname) {
+        String regex = "^(\\/)?([^\\/\\\u0000]+(\\/)?)+\\.xml";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(pathname);
+
+        if (matcher.find()) {
+            return true;
+        }
+
+        return false;
+    }
+
 }
