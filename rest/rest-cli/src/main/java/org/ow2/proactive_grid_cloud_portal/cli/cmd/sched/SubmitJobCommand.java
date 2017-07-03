@@ -67,22 +67,9 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        File jobFile = new File(pathname);
         try {
-            if (!checkFilePathValid(pathname)) {
-                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
-            }
-
-            if (!jobFile.exists()) {
-                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
-            }
-
-            // check that file is not empty
-            if (!checkFileNotEmpty(pathname)) {
-                writeLine(currentContext, "File " + pathname + " is empty ");
-                throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
-            }
-
+            validateFilePath(currentContext);
+            File jobFile = new File(pathname);
             String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
             JobIdData jobId;
             if (APPLICATION_XML.getMimeType().equals(contentType)) {
@@ -104,6 +91,22 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     }
 
+    private void validateFilePath(ApplicationContext currentContext) {
+        if (!checkFilePathValid(pathname)) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
+        }
+
+        if (!checkFileExists(pathname)) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
+        }
+
+        if (!checkFileNotEmpty(pathname)) {
+            writeLine(currentContext, "File " + pathname + " is empty ");
+            throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
+        }
+
+    }
+
     private Map<String, String> map(String variables) {
         return jobKeyValueTransformer.transformVariablesToMap(variables);
     }
@@ -111,7 +114,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     private Boolean checkFileNotEmpty(String pathname) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(pathname));
-            if (reader.readLine() == null) {
+            if (checkFileExists(pathname) && reader.readLine() == null) {
                 return false;
             } else
                 return true;
@@ -122,8 +125,8 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     private Boolean checkFileExists(String pathname) {
-        File f = new File(pathname);
-        if (f.exists() && !f.isDirectory()) {
+        File file = new File(pathname);
+        if (file.exists() && !file.isDirectory()) {
             return true;
         } else
             return false;
