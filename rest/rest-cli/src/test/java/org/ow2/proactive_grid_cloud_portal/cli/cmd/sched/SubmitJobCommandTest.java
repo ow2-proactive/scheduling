@@ -48,106 +48,112 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 
+
 public class SubmitJobCommandTest {
-	@Mock
-	private ApplicationContext currentContextMock;
+    @Mock
+    private ApplicationContext currentContextMock;
 
-	@Mock
-	private SchedulerRestClient schedulerRestClientMock;
+    @Mock
+    private SchedulerRestClient schedulerRestClientMock;
 
-	@Mock
-	private SchedulerRestInterface schedulerRestInterfaceMock;
+    @Mock
+    private SchedulerRestInterface schedulerRestInterfaceMock;
 
-	@Mock
-	private AbstractDevice deviceMock;
+    @Mock
+    private AbstractDevice deviceMock;
 
-	@Mock
-	private File jobFileMock;
+    @Mock
+    private File jobFileMock;
 
-	@Mock
-	private JobKeyValueTransformer jobKeyValueTransormerMock;
+    @Mock
+    private JobKeyValueTransformer jobKeyValueTransormerMock;
 
-	@Mock
-	private JobIdData jobIdDataMock;
+    @Mock
+    private JobIdData jobIdDataMock;
 
-	@Mock
-	private FileInputStream fileInputStreamMock;
+    @Mock
+    private FileInputStream fileInputStreamMock;
 
-	private Stack<Exception> stack;
+    private Stack<Exception> stack;
 
-	private String[] params;
+    private String[] params;
 
-	@Before
-	public void init() {
-		stack = new Stack<Exception>();
-		MockitoAnnotations.initMocks(this);
+    @Before
+    public void init() {
+        stack = new Stack<Exception>();
+        MockitoAnnotations.initMocks(this);
 
-		Mockito.when(currentContextMock.getSessionId()).thenReturn("sessionid");
-		Mockito.when(currentContextMock.getDevice()).thenReturn(deviceMock);
-		Mockito.when(currentContextMock.getRestClient()).thenReturn(schedulerRestClientMock);
-		Mockito.when(schedulerRestClientMock.getScheduler()).thenReturn(schedulerRestInterfaceMock);
-		Mockito.when(currentContextMock.resultStack()).thenReturn(stack);
-	}
+        Mockito.when(currentContextMock.getSessionId()).thenReturn("sessionid");
+        Mockito.when(currentContextMock.getDevice()).thenReturn(deviceMock);
+        Mockito.when(currentContextMock.getRestClient()).thenReturn(schedulerRestClientMock);
+        Mockito.when(schedulerRestClientMock.getScheduler()).thenReturn(schedulerRestInterfaceMock);
+        Mockito.when(currentContextMock.resultStack()).thenReturn(stack);
+    }
 
-	@Test
-	public void testFilePathProvided() throws Exception {
+    @Test(expected = CLIException.class)
+    public void testFilePathProvided() throws Exception {
 
-		params = new String[2];
-		params[0] = new String();
-		params[0] = "a";
+        params = new String[1];
+        params[0] = new String();
+        params[0] = "";
 
-		String contentType = URLConnection.getFileNameMap().getContentTypeFor(params[0]);
+        String contentType = URLConnection.getFileNameMap().getContentTypeFor(params[0]);
 
-		Mockito.when(schedulerRestClientMock.submitJobArchive("sessionid", fileInputStreamMock,
-				jobKeyValueTransormerMock.transformVariablesToMap(""))).thenReturn(null);
+        Mockito.when(schedulerRestClientMock.submitJobArchive("sessionid",
+                                                              fileInputStreamMock,
+                                                              jobKeyValueTransormerMock.transformVariablesToMap("")))
+               .thenReturn(null);
 
-		new SubmitJobCommand(params).execute(currentContextMock);
+        new SubmitJobCommand(params).execute(currentContextMock);
+        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
 
-		Mockito.verify(schedulerRestClientMock).submitJobArchive("sessionid", null, null);
-	}
+        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null);
 
-	@Test(expected = CLIException.class)
-	public void testInvalidFilePathProvided() throws Exception {
+        throw stack.get(0);
+    }
 
-		params = new String[1];
-		params[0] = "/test/a.xm";
+    @Test(expected = CLIException.class)
+    public void testInvalidFilePathProvided() throws Exception {
 
-		new SubmitJobCommand(params).execute(currentContextMock);
+        params = new String[1];
+        params[0] = "/file/path/non/valid/a.xm";
 
-		assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
+        new SubmitJobCommand(params).execute(currentContextMock);
 
-		Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
+        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
 
-		throw stack.get(0);
-	}
+        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
 
-	@Test(expected = CLIException.class)
-	public void testNonExistingFilePathProvided() throws Exception {
+        throw stack.get(0);
+    }
 
-		params = new String[1];
-		params[0] = "/Users/c.xml";
+    @Test(expected = CLIException.class)
+    public void testNonExistingFilePathProvided() throws Exception {
 
-		new SubmitJobCommand(params).execute(currentContextMock);
+        params = new String[1];
+        params[0] = "/file/not/existing/c.xml";
 
-		assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' does not exist."));
+        new SubmitJobCommand(params).execute(currentContextMock);
 
-		Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
+        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' does not exist."));
 
-		throw stack.get(0);
-	}
+        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
 
-	@Test(expected = CLIException.class)
-	public void testFileIsEmpty() throws Exception {
+        throw stack.get(0);
+    }
 
-		params = new String[1];
-		params[0] = "/Users/zeinebzhioua/Downloads/a.xml";
+    @Test(expected = CLIException.class)
+    public void testFileIsEmpty() throws Exception {
 
-		new SubmitJobCommand(params).execute(currentContextMock);
+        params = new String[1];
+        params[0] = "/Users/zeinebzhioua/Downloads/a.xml";
 
-		assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
+        new SubmitJobCommand(params).execute(currentContextMock);
 
-		Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
+        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
 
-		throw stack.get(0);
-	}
+        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
+
+        throw stack.get(0);
+    }
 }

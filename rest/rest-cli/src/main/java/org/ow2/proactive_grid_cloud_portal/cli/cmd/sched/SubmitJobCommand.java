@@ -67,6 +67,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+
         try {
             validateFilePath(currentContext);
             File jobFile = new File(pathname);
@@ -92,15 +93,15 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     private void validateFilePath(ApplicationContext currentContext) {
-        if (!checkFilePathValid(pathname)) {
+        if (!isFilePathValid(pathname)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
         }
 
-        if (!checkFileExists(pathname)) {
+        if (!isFileExisting(pathname)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
         }
 
-        if (!checkFileNotEmpty(pathname)) {
+        if (isFileEmpty(pathname)) {
             writeLine(currentContext, "File " + pathname + " is empty ");
             throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
         }
@@ -111,20 +112,23 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         return jobKeyValueTransformer.transformVariablesToMap(variables);
     }
 
-    private Boolean checkFileNotEmpty(String pathname) {
+    private Boolean isFileEmpty(String pathname) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(pathname));
-            if (checkFileExists(pathname) && reader.readLine() == null) {
+            if (isFileExisting(pathname)) {
+                if (reader.readLine() == null) {
+                    return true;
+                }
                 return false;
-            } else
-                return true;
+            }
+            return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            e.getMessage();
             return false;
         }
     }
 
-    private Boolean checkFileExists(String pathname) {
+    private Boolean isFileExisting(String pathname) {
         File file = new File(pathname);
         if (file.exists() && !file.isDirectory()) {
             return true;
@@ -132,7 +136,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             return false;
     }
 
-    private Boolean checkFilePathValid(String pathname) {
+    private Boolean isFilePathValid(String pathname) {
         String regex = "^(\\/)?([^\\/\\\u0000]+(\\/)?)+\\.xml";
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(pathname);
