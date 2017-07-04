@@ -123,17 +123,16 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             }
             return true;
         } catch (IOException e) {
-            e.getMessage();
+            e.printStackTrace();
             return false;
         }
     }
 
     private Boolean isFileExisting(String pathname) {
         File file = new File(pathname);
-        if (file.exists() && !file.isDirectory()) {
+        if (file.exists() && !file.isDirectory())
             return true;
-        } else
-            return false;
+        return false;
     }
 
     private Boolean isFilePathValid(String pathname) {
