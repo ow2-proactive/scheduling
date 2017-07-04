@@ -146,7 +146,9 @@ public class SubmitJobCommandTest {
     public void testFileIsEmpty() throws Exception {
 
         params = new String[1];
-        params[0] = "/Users/zeinebzhioua/Downloads/a.xml";
+        params[0] = System.getProperty("user.dir") +
+                    "/src/test/java/org/ow2/proactive_grid_cloud_portal/cli/cmd/sched/empty.xml";
+        System.out.println(params[0]);
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
