@@ -36,6 +36,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -123,7 +125,8 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             }
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger logger = null;
+            logger.log(Level.INFO, "Error reading file", e);
             return false;
         }
     }
