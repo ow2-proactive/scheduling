@@ -254,7 +254,11 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
      * @throws InterruptedException
      */
     public static void unlockCacheSpaceCleaning() {
-        cacheCleaningRWLock.readLock().unlock();
+        try {
+            cacheCleaningRWLock.readLock().unlock();
+        } catch (IllegalMonitorStateException e) {
+            logger.warn("Cache space unlock failed: " + e.getMessage());
+        }
     }
 
     private void startCacheCleaningDaemon() {
