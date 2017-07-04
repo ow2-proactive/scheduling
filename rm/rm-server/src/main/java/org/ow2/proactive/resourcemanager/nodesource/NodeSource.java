@@ -152,6 +152,9 @@ public class NodeSource implements InitActive, RunActive {
     // level is configured by ns admin at the moment of ns creation
     private AccessType nodeUserAccessType;
 
+    // when recovering a node source, this variable tracks the recovered nodes
+    private int nbNodesToRecover;
+
     static {
         try {
             int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
@@ -492,6 +495,18 @@ public class NodeSource implements InitActive, RunActive {
         return rmcore.setDeploying(deployingNode);
     }
 
+    public int getNbNodesToRecover() {
+        return nbNodesToRecover;
+    }
+
+    public void resetNbNodesToRecover() {
+        this.nbNodesToRecover = 0;
+    }
+
+    public void setNbNodesToRecover(int nbNodesToRecover) {
+        this.nbNodesToRecover = nbNodesToRecover;
+    }
+
     /**
      * Looks up the node
      */
@@ -779,13 +794,8 @@ public class NodeSource implements InitActive, RunActive {
         // just in case the data structure is in a bad shape too, we remove
         // the node from the sane nodes.
         nodes.remove(nodeUrl);
-
-        // the node is down and apart from its URL we have no information
-        // about it: create an empty node.
-        Node downNode = new NodeImpl();
-        downNodes.put(nodeUrl, downNode);
+        // trigger infrastructure hook
         infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl);
-        rmcore.setDownNode(nodeUrl);
     }
 
     /**

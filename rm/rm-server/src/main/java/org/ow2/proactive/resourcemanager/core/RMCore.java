@@ -60,7 +60,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -107,7 +106,6 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
@@ -468,6 +466,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
         Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSource.getName());
         logger.info("There are " + nodesData.size() + " nodes to recover for the node source " + nodeSource.getName());
+        nodeSource.setNbNodesToRecover(nodesData.size());
 
         // for each node found in database, try to lookup node or recreate is as down
         for (RMNodeData rmNodeData : nodesData) {
@@ -499,26 +498,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             } else {
                 logger.info("Recreating a node to recover at URL: " + nodeUrl);
 
-                // if the node to recover was in deploying state then we must
-                // recreate a deploying instance of this node
-                if (rmNodeData.getState().equals(NodeState.DEPLOYING)) {
-                    rmnode = new RMDeployingNode(rmNodeData.getName(), nodeSource, "", rmNodeData.getProvider());
-                    this.allNodes.put(rmnode.getNodeURL(), rmnode);
-                } else {
-                    // at this point, we can only recreate the node from
-                    // scratch, and set the information we know about it
-                    Node recreatedNode = new NodeImpl();
-                    rmnode = new RMNodeImpl(recreatedNode,
-                                            nodeSource,
-                                            rmNodeData.getName(),
-                                            rmNodeData.getNodeUrl(),
-                                            rmNodeData.getProvider(),
-                                            rmNodeData.getHostname(),
-                                            rmNodeData.getJmxUrls(),
-                                            rmNodeData.getJvmName(),
-                                            rmNodeData.getUserPermission(),
-                                            rmNodeData.getState());
-                    this.allNodes.put(rmnode.getNodeURL(), rmnode);
+                // if the node to recover was in deploying state then we have
+                // nothing to do as it is going to be redeployed
+                if (!rmNodeData.getState().equals(NodeState.DEPLOYING)) {
                     // inform the node source that this recreated node is down
                     nodeSource.detectedPingedDownNodeAfterRecovery(rmNodeData.getName(), nodeUrl);
                 }
@@ -529,6 +511,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 eligibleNodes.add(rmnode);
             }
         }
+        nodeSource.resetNbNodesToRecover();
     }
 
     /**
@@ -1318,7 +1301,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
-        if (nodeSources.size() == 0) {
+        if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean() || nodeSources.size() == 0) {
             finalizeShutdown();
         } else {
             for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {

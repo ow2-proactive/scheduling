@@ -280,7 +280,22 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     @Override
     public void onDownNode(String nodename, String nodeUrl) {
+        super.onDownNode(nodename, nodeUrl);
         atomicRemoveDownNode(nodename, nodeUrl);
+        logger.info("Node source " + nodeSource.getName() + " has " + getNbDownNodes() + " down nodes, and there are " +
+                    nodeSource.getNbNodesToRecover() + " nodes to recover");
+        // All the nodes are down, we are going to redeploy the node source
+        if (getNbDownNodes() == nodeSource.getNbNodesToRecover()) {
+            logger.info("All nodes of node source " + nodeSource.getName() +
+                        " are detected down, redeploy node source");
+            // in case the RM was shut down properly, the shutdown flag has
+            // been saved in database as true, we must reset it to redeploy
+            setInfraShutdownFlag(false);
+            // trigger deployment
+            nodeSource.activate();
+            // reset internal counters
+            resetNbDownNodes();
+        }
     }
 
     @Override
@@ -398,8 +413,6 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                         } catch (Exception e) {
                             logger.trace("An exception occurred during node removal", e);
                         }
-                        // set the free hosts again
-                        addFreeHosts(host);
                     }
                     logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() +
                                 " #registered nodes: " + getRegisteredNodesSize());
@@ -422,6 +435,15 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                     logger.debug("Removing node " + nodeUrl + " from " + this.getClass().getSimpleName());
                     // remember the node removed
                     addRemovedHost(host);
+                    // in case all nodes relative to this host were removed kill the JVM
+                    if (!getRegisteredNodes().containsValue(host)) {
+                        // we set the free hosts again in order to enable a
+                        // redeployment at the next policy activation, in case
+                        // all nodes of this node source are down
+                        addFreeHosts(host);
+                    }
+                    logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() +
+                                " #registered nodes: " + getRegisteredNodesSize());
                 } else {
                     logger.error("Node " + nodeName +
                                  " is not known as a node belonging to this infrastructure manager");

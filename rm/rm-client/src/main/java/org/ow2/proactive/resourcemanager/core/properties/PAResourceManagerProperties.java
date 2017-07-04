@@ -240,6 +240,13 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true"),
 
     /**
+     * Defines if the nodes should be kept when the resource manager exits.
+     * This property is defaulted to false as shutting down the RM should
+     * clean also its nodes.
+     */
+    RM_PRESERVE_NODES_ON_EXIT("pa.rm.preserve.nodes.on.exit", PropertyType.BOOLEAN, "false"),
+
+    /**
      * Defines whether the node recovery mechanism is enabled on RM startup.
      * If set to {@code true}, it indicates that the node states and the node
      * source infrastructure states should be reloaded from database.

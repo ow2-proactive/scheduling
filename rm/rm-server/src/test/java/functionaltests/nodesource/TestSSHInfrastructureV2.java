@@ -31,8 +31,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
@@ -50,41 +48,38 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.utils.OperatingSystem;
-import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
-import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.ow2.proactive.utils.Criteria;
-import org.ow2.proactive.utils.NodeSet;
 
-import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SSHInfrastructureHelper;
 
 
+/**
+ * For convenience, public static members of this class are also used in
+ * {@link functionaltests.nodesrecovery.RecoverSSHInfrastructureV2Test}.
+ */
 public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
-    private static int port;
+    public static int port;
 
-    private static SshServer sshd;
+    public static SshServer sshd;
 
-    private static String javaExePath;
+    public static String javaExePath;
 
-    private static Object[] infraParams;
+    public static Object[] infraParams;
 
-    private static Object[] policyParameters;
+    public static Object[] policyParameters;
 
-    private static String nsname = "testSSHInfra";
+    public static String nsname = "testSSHInfra";
 
-    private static int NB_NODES = 3;
+    public static int NB_NODES = 3;
 
     private ResourceManager resourceManager;
 
@@ -161,7 +156,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                             ProcessShellFactory.TtyOptions.ICrNl,
                                             ProcessShellFactory.TtyOptions.ONlCr);
                 }
-                return new ProcessShellFactory(splitCommand(command), ttyOptions).create();
+                return new ProcessShellFactory(SSHInfrastructureHelper.splitCommand(command), ttyOptions).create();
             }
         }));
 
@@ -197,12 +192,4 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         }
     }
 
-    private static String[] splitCommand(String command) {
-        List<String> list = new ArrayList<>();
-        Matcher m = Pattern.compile("([^\\\\\"]\\S*|\\\\\".+?\\\\\")\\s*").matcher(command);
-        while (m.find()) {
-            list.add(m.group(1).replaceAll("\\\\\"", ""));
-        }
-        return list.toArray(new String[list.size()]);
-    }
 }

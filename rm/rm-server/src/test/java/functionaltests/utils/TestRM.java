@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
@@ -130,8 +129,12 @@ public class TestRM {
 
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
-        processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller("TEST_RM",
-                                                                                     processBuilder.environment());
+
+        if (!PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()) {
+            processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller("TEST_RM",
+                                                                                         processBuilder.environment());
+        }
+
         rmProcess = processBuilder.start();
 
         InputStreamReaderThread outputReader = new InputStreamReaderThread(rmProcess.getInputStream(), "[RM output]: ");
@@ -146,7 +149,9 @@ public class TestRM {
             System.out.println("Destroying RM process.");
             rmProcess.destroy();
             rmProcess.waitFor();
-            processTreeKiller.kill();
+            if (!PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()) {
+                processTreeKiller.kill();
+            }
             rmProcess = null;
         }
     }

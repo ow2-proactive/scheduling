@@ -108,6 +108,8 @@ public abstract class InfrastructureManager implements Serializable {
 
     private static final String RM_URL_KEY = "infrastructureManagerRmUrl";
 
+    private static final String NB_DOWN_NODES_KEY = "infrastructureManagerNbDownNodes";
+
     /**
      * Store information about the running infrastructure. The map holds the name of monitored information and its
      * value. The variables stored in this map should allow the full recovery of an infrastructure state.
@@ -450,7 +452,7 @@ public abstract class InfrastructureManager implements Serializable {
      * implementation thanks to the method {@link #shutDown()}
      */
     public final void internalShutDown() {
-        setShutdownFlag(true);
+        setInfraShutdownFlag(true);
         // first removing deploying nodes
         for (String dnUrl : keySetDeployingNodes()) {
             this.internalRemoveDeployingNode(dnUrl);
@@ -661,7 +663,7 @@ public abstract class InfrastructureManager implements Serializable {
     protected final String addDeployingNode(String name, String command, String description, final long timeout) {
         checkName(name);
         checkTimeout(timeout);
-        if (getShutdownFlag()) {
+        if (getInfraShutdownFlag()) {
             throw new UnsupportedOperationException("The infrastructure manager is shuting down.");
         }
         // if the user calls this method, we use the require nodes/timeout
@@ -923,13 +925,14 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * Called by the system every time a node is DOWN.
+     * Called by the system every time a node is DOWN. The default is to
+     * increment the number of down nodes.
      *
      * @param nodeName the name of the node that is down.
      * @param nodeUrl the URL of the node that is down.
      */
     public void onDownNode(String nodeName, String nodeUrl) {
-        // to be overridden by children
+        incrementNbDownNodes();
     }
 
     /**
@@ -987,6 +990,7 @@ public abstract class InfrastructureManager implements Serializable {
         runtimeVariables.put(USING_DEPLOYING_NODES_KEY, false);
         runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
         runtimeVariables.put(RM_URL_KEY, "");
+        runtimeVariables.put(NB_DOWN_NODES_KEY, 0);
     }
 
     /**
@@ -1218,7 +1222,7 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private boolean getShutdownFlag() {
+    private boolean getInfraShutdownFlag() {
         return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
@@ -1227,7 +1231,7 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private void setShutdownFlag(final boolean isShutdown) {
+    protected void setInfraShutdownFlag(final boolean isShutdown) {
         setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
             @Override
             public Void handle() {
@@ -1261,6 +1265,36 @@ public abstract class InfrastructureManager implements Serializable {
             @Override
             public String handle() {
                 return (String) runtimeVariables.get(RM_URL_KEY);
+            }
+        });
+    }
+
+    protected int getNbDownNodes() {
+        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) runtimeVariables.get(NB_DOWN_NODES_KEY);
+            }
+        });
+    }
+
+    protected void resetNbDownNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(NB_DOWN_NODES_KEY, 0);
+                return null;
+            }
+        });
+    }
+
+    protected void incrementNbDownNodes() {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int nb = (int) runtimeVariables.get(NB_DOWN_NODES_KEY);
+                runtimeVariables.put(NB_DOWN_NODES_KEY, ++nb);
+                return null;
             }
         });
     }
