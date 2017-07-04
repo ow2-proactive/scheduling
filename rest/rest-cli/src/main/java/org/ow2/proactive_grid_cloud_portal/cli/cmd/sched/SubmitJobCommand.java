@@ -53,6 +53,8 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private String variables;
 
+    private static final Logger logger = null;
+
     private final JobKeyValueTransformer jobKeyValueTransformer;
 
     public SubmitJobCommand(String... params) throws CLIException {
@@ -125,7 +127,6 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             }
             return true;
         } catch (IOException e) {
-            Logger logger = null;
             logger.log(Level.INFO, "Error reading file", e);
             return false;
         }
