@@ -127,7 +127,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             }
             return true;
         } catch (IOException e) {
-            logger.log(Level.INFO, "Error reading file", e);
+            logger.log(Level.INFO, "Error reading file " + pathname, e);
             return false;
         }
     }
