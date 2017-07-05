@@ -83,8 +83,6 @@ public class SubmitJobCommandTest {
 
     private String[] params;
 
-    private InputStream inputStream = null;
-
     @Before
     public void init() {
         stack = new Stack<Exception>();
@@ -170,9 +168,6 @@ public class SubmitJobCommandTest {
     public InputStream convertObjectToInputStream(Object object) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(object);
-        oos.flush();
-        oos.close();
         return new ByteArrayInputStream(baos.toByteArray());
     }
 }
