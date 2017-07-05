@@ -27,6 +27,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
@@ -39,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.URLConnection;
+import java.util.Map;
 import java.util.Stack;
 
 import org.junit.Before;
@@ -80,6 +82,8 @@ public class SubmitJobCommandTest {
     private FileInputStream fileInputStreamMock;
 
     private Stack<Exception> stack;
+
+    private Map<String, String> map;
 
     private String[] params;
 
@@ -127,7 +131,8 @@ public class SubmitJobCommandTest {
 
         assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
 
-        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
+        Mockito.verify(schedulerRestClientMock, times(0))
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
 
         throw stack.get(0);
     }
@@ -143,7 +148,7 @@ public class SubmitJobCommandTest {
         assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' does not exist."));
 
         Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyObject());
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
 
         throw stack.get(0);
     }
@@ -160,14 +165,15 @@ public class SubmitJobCommandTest {
         assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
 
         Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyObject());
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
 
         throw stack.get(0);
     }
 
-    public InputStream convertObjectToInputStream(Object object) throws IOException {
+    private InputStream convertObjectToInputStream(Object object) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         return new ByteArrayInputStream(baos.toByteArray());
     }
+
 }
