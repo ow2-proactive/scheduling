@@ -33,6 +33,7 @@ import static org.mockito.Mockito.times;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.Stack;
 
@@ -77,6 +78,8 @@ public class SubmitJobCommandTest {
     private Stack<Exception> stack;
 
     private String[] params;
+
+    private InputStream inputStream = null;
 
     @Before
     public void init() {
@@ -148,13 +151,12 @@ public class SubmitJobCommandTest {
         params = new String[1];
         params[0] = System.getProperty("user.dir") +
                     "/src/test/java/org/ow2/proactive_grid_cloud_portal/cli/cmd/sched/empty.xml";
-        System.out.println(params[0]);
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
         assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
 
-        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
+        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), inputStream, anyObject());
 
         throw stack.get(0);
     }
