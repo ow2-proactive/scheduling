@@ -31,9 +31,13 @@ import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.net.URLConnection;
 import java.util.Stack;
 
@@ -140,7 +144,8 @@ public class SubmitJobCommandTest {
 
         assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' does not exist."));
 
-        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), anyObject(), anyObject());
+        Mockito.verify(schedulerRestClientMock, times(0))
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyObject());
 
         throw stack.get(0);
     }
@@ -156,8 +161,18 @@ public class SubmitJobCommandTest {
 
         assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
 
-        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(), inputStream, anyObject());
+        Mockito.verify(schedulerRestClientMock, times(0))
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyObject());
 
         throw stack.get(0);
+    }
+
+    public InputStream convertObjectToInputStream(Object object) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(object);
+        oos.flush();
+        oos.close();
+        return new ByteArrayInputStream(baos.toByteArray());
     }
 }
