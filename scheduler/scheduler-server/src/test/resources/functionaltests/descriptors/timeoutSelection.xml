@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.8"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.8 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.8/schedulerjob.xsd"
+    name="Untitled Workflow 1" 
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2"
+>
+  <taskFlow>
+    <task name="toBeCompletetd1">
+      <description>
+        <![CDATA[ The simplest task, ran by a bash engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
+ls -la
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="SelScript">
+      <description>
+        <![CDATA[ The simplest task, ran by a bash engine. ]]>
+      </description>
+      <selection>
+        <script
+         type="dynamic" >
+          <code language="python">
+            <![CDATA[
+import time
+
+time.sleep(2)
+
+selected = True
+]]>
+          </code>
+        </script>
+      </selection>
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
+ls -la
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="toBeCompletetd2">
+      <description>
+        <![CDATA[ The simplest task, ran by a bash engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
+ls -la
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="toBeCompletetd3">
+      <description>
+        <![CDATA[ The simplest task, ran by a bash engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
+ls -la
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="toBeCompletetd4">
+      <description>
+        <![CDATA[ The simplest task, ran by a bash engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
+ls -la
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="toBeCompletetd5">
+      <description>
+        <![CDATA[ The simplest task, ran by a bash engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="bash">
+            <![CDATA[
+ls -la
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>

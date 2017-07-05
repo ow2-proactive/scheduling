@@ -160,8 +160,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         Map<JobId, JobDescriptor> toUnlock = jobMap;
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("jobs selected to be scheduled : " + jobMap);
+        if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
+            logger.trace("No jobs selected to be scheduled");
+        }
+        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
+            logger.debug("jobs selected to be scheduled : " + jobMap);
         }
 
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
