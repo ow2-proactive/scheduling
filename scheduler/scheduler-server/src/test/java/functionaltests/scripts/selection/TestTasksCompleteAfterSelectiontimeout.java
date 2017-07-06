@@ -37,6 +37,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
 
+
 /**
  * This class tests the way a task can kill a node. It will start 3 dependent
  * tasks where one will kill the node. The task will be restarted as defined in
@@ -51,62 +52,60 @@ import functionaltests.utils.SchedulerTHelper;
  */
 public class TestTasksCompleteAfterSelectiontimeout extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-	private static URL jobDescriptor = TestTasksCompleteAfterSelectiontimeout.class
-			.getResource("/functionaltests/descriptors/timeoutSelection.xml");
+    private static URL jobDescriptor = TestTasksCompleteAfterSelectiontimeout.class.getResource("/functionaltests/descriptors/timeoutSelection.xml");
 
-	@BeforeClass
-	public static void startDedicatedScheduler() throws Exception {
-		schedulerHelper = new SchedulerTHelper(true,
-				new File(SchedulerTHelper.class
-						.getResource("/functionaltests/config/scheduler-selectionWithShortTimeout.ini").toURI())
-								.getAbsolutePath());
-	}
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper = new SchedulerTHelper(true,
+                                               new File(SchedulerTHelper.class.getResource("/functionaltests/config/scheduler-selectionWithShortTimeout.ini")
+                                                                              .toURI()).getAbsolutePath());
+    }
 
-	@Test(timeout = 30000)
-	public void testJobCompleteAfterTimeout() throws Throwable {
+    @Test(timeout = 30000)
+    public void testJobCompleteAfterTimeout() throws Throwable {
 
-		String task1Name = "toBeCompletetd1";
-		String task2Name = "toBeCompletetd2";
-		String task3Name = "toBeCompletetd3";
-		String task4Name = "toBeCompletetd4";
-		String task5Name = "toBeCompletetd5";
+        String task1Name = "toBeCompletetd1";
+        String task2Name = "toBeCompletetd2";
+        String task3Name = "toBeCompletetd3";
+        String task4Name = "toBeCompletetd4";
+        String task5Name = "toBeCompletetd5";
 
-		// cannot use SchedulerTHelper.testJobsubmission because
-		// task 3 is never executed so no event can be received
-		// regarding this task.
-		JobId id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-		// check events reception
-		log("Job submitted, id " + id.toString());
-		log("Waiting for jobSubmitted");
-		schedulerHelper.waitForEventJobSubmitted(id);
-		log("Waiting for job running");
-		schedulerHelper.waitForEventJobRunning(id);
+        // cannot use SchedulerTHelper.testJobsubmission because
+        // task 3 is never executed so no event can be received
+        // regarding this task.
+        JobId id = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        // check events reception
+        log("Job submitted, id " + id.toString());
+        log("Waiting for jobSubmitted");
+        schedulerHelper.waitForEventJobSubmitted(id);
+        log("Waiting for job running");
+        schedulerHelper.waitForEventJobRunning(id);
 
-		log("Waiting for task running : " + task1Name);
-		schedulerHelper.waitForEventTaskRunning(id, task1Name);
-		log("Waiting for task finished : " + task1Name);
-		schedulerHelper.waitForEventTaskFinished(id, task1Name);
+        log("Waiting for task running : " + task1Name);
+        schedulerHelper.waitForEventTaskRunning(id, task1Name);
+        log("Waiting for task finished : " + task1Name);
+        schedulerHelper.waitForEventTaskFinished(id, task1Name);
 
-		log("Waiting for task running : " + task2Name);
-		schedulerHelper.waitForEventTaskRunning(id, task2Name);
-		log("Waiting for task finished : " + task2Name);
-		schedulerHelper.waitForEventTaskFinished(id, task2Name);
+        log("Waiting for task running : " + task2Name);
+        schedulerHelper.waitForEventTaskRunning(id, task2Name);
+        log("Waiting for task finished : " + task2Name);
+        schedulerHelper.waitForEventTaskFinished(id, task2Name);
 
-		log("Waiting for task running : " + task3Name);
-		schedulerHelper.waitForEventTaskRunning(id, task3Name);
-		log("Waiting for task finished : " + task3Name);
-		schedulerHelper.waitForEventTaskFinished(id, task3Name);
+        log("Waiting for task running : " + task3Name);
+        schedulerHelper.waitForEventTaskRunning(id, task3Name);
+        log("Waiting for task finished : " + task3Name);
+        schedulerHelper.waitForEventTaskFinished(id, task3Name);
 
-		log("Waiting for task running : " + task4Name);
-		schedulerHelper.waitForEventTaskRunning(id, task4Name);
-		log("Waiting for task finished : " + task4Name);
-		schedulerHelper.waitForEventTaskFinished(id, task4Name);
+        log("Waiting for task running : " + task4Name);
+        schedulerHelper.waitForEventTaskRunning(id, task4Name);
+        log("Waiting for task finished : " + task4Name);
+        schedulerHelper.waitForEventTaskFinished(id, task4Name);
 
-		log("Waiting for task running : " + task5Name);
-		schedulerHelper.waitForEventTaskRunning(id, task5Name);
-		log("Waiting for task finished : " + task5Name);
-		schedulerHelper.waitForEventTaskFinished(id, task5Name);
+        log("Waiting for task running : " + task5Name);
+        schedulerHelper.waitForEventTaskRunning(id, task5Name);
+        log("Waiting for task finished : " + task5Name);
+        schedulerHelper.waitForEventTaskFinished(id, task5Name);
 
-	}
+    }
 
 }
