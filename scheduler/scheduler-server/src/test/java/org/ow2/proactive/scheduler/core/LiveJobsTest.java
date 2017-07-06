@@ -34,9 +34,7 @@ import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -46,7 +44,6 @@ import org.mockito.stubbing.Answer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.runtime.VMInformation;
-import org.ow2.proactive.junitUtils.TimedOutTestsRunner;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -199,26 +196,6 @@ public class LiveJobsTest {
         liveJobs.jobSubmitted(job);
         liveJobs.finishInErrorTask(job.getId(), "task-name");
         assertThat(internalTask.getStatus(), is(TaskStatus.FINISHED));
-    }
-
-    @Ignore
-    @Test(timeout = 60000)
-    public void testFinishInErrorTaskDoesNotFinishPausedTask() throws UnknownTaskException, UnknownJobException {
-        InternalJob job = new InternalTaskFlowJob("test-name",
-                                                  JobPriority.NORMAL,
-                                                  OnTaskError.CONTINUE_JOB_EXECUTION,
-                                                  "description");
-        JobId id = new JobIdImpl(666L, "test-name");
-        job.setId(id);
-        List<InternalTask> tasksList = new ArrayList<>();
-        InternalTask internalTask = new InternalScriptTask(job);
-        internalTask.setName("task-name");
-        internalTask.setStatus(TaskStatus.PAUSED);
-        tasksList.add(internalTask);
-        job.setTasks(tasksList);
-        liveJobs.jobSubmitted(job);
-        liveJobs.finishInErrorTask(job.getId(), "task-name");
-        assertThat(internalTask.getStatus(), is(TaskStatus.PAUSED));
     }
 
     @Test(timeout = 60000)

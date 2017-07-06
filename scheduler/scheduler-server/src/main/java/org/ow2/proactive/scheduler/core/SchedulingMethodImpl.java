@@ -160,7 +160,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         Map<JobId, JobDescriptor> toUnlock = jobMap;
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
+            logger.trace("No jobs selected to be scheduled");
+        }
+        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
             logger.debug("jobs selected to be scheduled : " + jobMap);
         }
 
