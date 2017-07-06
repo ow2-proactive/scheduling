@@ -39,6 +39,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
+import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
 import java.util.Stack;
@@ -55,125 +56,125 @@ import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 
+import functionaltests.AbstractRestFuncTestCase;
 
 public class SubmitJobCommandTest {
-    @Mock
-    private ApplicationContext currentContextMock;
+	@Mock
+	private ApplicationContext currentContextMock;
 
-    @Mock
-    private SchedulerRestClient schedulerRestClientMock;
+	@Mock
+	private SchedulerRestClient schedulerRestClientMock;
 
-    @Mock
-    private SchedulerRestInterface schedulerRestInterfaceMock;
+	@Mock
+	private SchedulerRestInterface schedulerRestInterfaceMock;
 
-    @Mock
-    private AbstractDevice deviceMock;
+	@Mock
+	private AbstractDevice deviceMock;
 
-    @Mock
-    private File jobFileMock;
+	@Mock
+	private File jobFileMock;
 
-    @Mock
-    private JobKeyValueTransformer jobKeyValueTransormerMock;
+	@Mock
+	private JobKeyValueTransformer jobKeyValueTransormerMock;
 
-    @Mock
-    private JobIdData jobIdDataMock;
+	@Mock
+	private JobIdData jobIdDataMock;
 
-    @Mock
-    private FileInputStream fileInputStreamMock;
+	@Mock
+	private FileInputStream fileInputStreamMock;
 
-    private Stack<Exception> stack;
+	private Stack<Exception> stack;
 
-    private Map<String, String> map;
+	private Map<String, String> map;
 
-    private String[] params;
+	private String[] params;
 
-    @Before
-    public void init() {
-        stack = new Stack<Exception>();
-        MockitoAnnotations.initMocks(this);
+	final static URL defaultJobXml = AbstractRestFuncTestCase.class.getResource("config/test-job.xml");
 
-        Mockito.when(currentContextMock.getSessionId()).thenReturn("sessionid");
-        Mockito.when(currentContextMock.getDevice()).thenReturn(deviceMock);
-        Mockito.when(currentContextMock.getRestClient()).thenReturn(schedulerRestClientMock);
-        Mockito.when(schedulerRestClientMock.getScheduler()).thenReturn(schedulerRestInterfaceMock);
-        Mockito.when(currentContextMock.resultStack()).thenReturn(stack);
-    }
+	@Before
+	public void init() {
+		stack = new Stack<Exception>();
+		MockitoAnnotations.initMocks(this);
 
-    @Test(expected = CLIException.class)
-    public void testFilePathProvided() throws Exception {
+		Mockito.when(currentContextMock.getSessionId()).thenReturn("sessionid");
+		Mockito.when(currentContextMock.getDevice()).thenReturn(deviceMock);
+		Mockito.when(currentContextMock.getRestClient()).thenReturn(schedulerRestClientMock);
+		Mockito.when(schedulerRestClientMock.getScheduler()).thenReturn(schedulerRestInterfaceMock);
+		Mockito.when(currentContextMock.resultStack()).thenReturn(stack);
+	}
 
-        params = new String[1];
-        params[0] = new String();
-        params[0] = "";
+	@Test(expected = CLIException.class)
+	public void testFilePathProvided() throws Exception {
 
-        String contentType = URLConnection.getFileNameMap().getContentTypeFor(params[0]);
+		params = new String[1];
+		params[0] = new String();
+		params[0] = "";
 
-        Mockito.when(schedulerRestClientMock.submitJobArchive("sessionid",
-                                                              fileInputStreamMock,
-                                                              jobKeyValueTransormerMock.transformVariablesToMap("")))
-               .thenReturn(null);
+		String contentType = URLConnection.getFileNameMap().getContentTypeFor(params[0]);
 
-        new SubmitJobCommand(params).execute(currentContextMock);
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
+		Mockito.when(schedulerRestClientMock.submitJobArchive("sessionid", fileInputStreamMock,
+				jobKeyValueTransormerMock.transformVariablesToMap(""))).thenReturn(null);
 
-        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null);
+		new SubmitJobCommand(params).execute(currentContextMock);
+		assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
 
-        throw stack.get(0);
-    }
+		Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null);
 
-    @Test(expected = CLIException.class)
-    public void testInvalidFilePathProvided() throws Exception {
+		throw stack.get(0);
+	}
 
-        params = new String[1];
-        params[0] = "/file/path/non/valid/a.xm";
+	@Test(expected = CLIException.class)
+	public void testInvalidFilePathProvided() throws Exception {
 
-        new SubmitJobCommand(params).execute(currentContextMock);
+		params = new String[1];
+		params[0] = "/file/path/non/valid/a.xm";
 
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
+		new SubmitJobCommand(params).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+		assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
 
-        throw stack.get(0);
-    }
+		Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(),
+				convertObjectToInputStream(anyObject()), anyMap());
 
-    @Test(expected = CLIException.class)
-    public void testNonExistingFilePathProvided() throws Exception {
+		throw stack.get(0);
+	}
 
-        params = new String[1];
-        params[0] = "/file/not/existing/c.xml";
+	@Test(expected = CLIException.class)
+	public void testNonExistingFilePathProvided() throws Exception {
 
-        new SubmitJobCommand(params).execute(currentContextMock);
+		params = new String[1];
+		params[0] = "/file/not/existing/c.xml";
 
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' does not exist."));
+		new SubmitJobCommand(params).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+		assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' does not exist."));
 
-        throw stack.get(0);
-    }
+		Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(),
+				convertObjectToInputStream(anyObject()), anyMap());
 
-    @Test(expected = CLIException.class)
-    public void testFileIsEmpty() throws Exception {
+		throw stack.get(0);
+	}
 
-        params = new String[1];
-        params[0] = System.getProperty("user.dir") +
-                    "/src/test/java/org/ow2/proactive_grid_cloud_portal/cli/cmd/sched/empty.xml";
+	@Test(expected = CLIException.class)
+	public void testFileIsEmpty() throws Exception {
 
-        new SubmitJobCommand(params).execute(currentContextMock);
+		params = new String[1];
+		params[0] = System.getProperty("user.dir") + "/src/test/java/config/empty.xml";
 
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
+		new SubmitJobCommand(params).execute(currentContextMock);
 
-        Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+		assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
 
-        throw stack.get(0);
-    }
+		Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive(anyString(),
+				convertObjectToInputStream(anyObject()), anyMap());
 
-    private InputStream convertObjectToInputStream(Object object) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        return new ByteArrayInputStream(baos.toByteArray());
-    }
+		throw stack.get(0);
+	}
+
+	private InputStream convertObjectToInputStream(Object object) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		return new ByteArrayInputStream(baos.toByteArray());
+	}
 
 }
