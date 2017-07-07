@@ -156,7 +156,7 @@ public class RMProxyActiveObject {
             Map<String, String> genericInformation, TaskId taskId) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
-                releaseNodes(nodes);
+                releaseNodes(nodes).booleanValue();
             } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript)) {
                 handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId);
 
@@ -164,7 +164,7 @@ public class RMProxyActiveObject {
                 TaskLogger.getInstance().error(taskId,
                                                "Unauthorized clean script: " + System.getProperty("line.separator") +
                                                        cleaningScript.getScript());
-                releaseNodes(nodes);
+                releaseNodes(nodes).booleanValue();
             }
         }
     }
@@ -202,7 +202,7 @@ public class RMProxyActiveObject {
             instance.error(taskId,
                            "Error while starting cleaning script for task " + taskId + " on " + nodes.get(0),
                            e);
-            releaseNodes(nodes);
+            releaseNodes(nodes).booleanValue();
         }
     }
 
