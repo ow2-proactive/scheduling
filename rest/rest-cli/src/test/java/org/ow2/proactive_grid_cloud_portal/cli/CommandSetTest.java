@@ -79,7 +79,11 @@ public class CommandSetTest {
 
             if (!argNames.trim().isEmpty()) {
                 nbArgsBasedOnName = argNames.split(" ").length;
-                nbArgsBasedOnName = nbArgsBasedOnName - optionals;
+                if (entry.hasArgs()) {
+                    nbArgsBasedOnName = nbArgsBasedOnName - optionals;
+                } else if (entry.hasOptionalArg()) {
+                    nbArgsBasedOnName = optionals;
+                }
             }
 
             if (argNames.contains("...") && !optionalArgNames.contains("|") && !optionalArgNames.contains("...")) {

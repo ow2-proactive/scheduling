@@ -71,8 +71,8 @@ import org.ow2.proactive.utils.appenders.MultipleFileAppender;
 
 
 /**
- * An interface of selection manager which is responsible for
- * nodes selection from a pool of free nodes for further scripts execution. 
+ * An interface of selection manager which is responsible for nodes selection
+ * from a pool of free nodes for further scripts execution.
  *
  */
 public abstract class SelectionManager {
@@ -168,33 +168,40 @@ public abstract class SelectionManager {
     }
 
     /**
-     * Arranges nodes for script execution based on some criteria
-     * for example previous execution statistics.
+     * Arranges nodes for script execution based on some criteria for example
+     * previous execution statistics.
      * 
-     * @param nodes - nodes list for script execution
-     * @param scripts - set of selection scripts
+     * @param nodes
+     *            - nodes list for script execution
+     * @param scripts
+     *            - set of selection scripts
      * @return collection of arranged nodes
      */
     public abstract List<RMNode> arrangeNodesForScriptExecution(final List<RMNode> nodes, List<SelectionScript> scripts,
             Map<String, Serializable> bindings);
 
     /**
-     * Predicts script execution result. Allows to avoid duplicate script execution 
-     * on the same node. 
+     * Predicts script execution result. Allows to avoid duplicate script
+     * execution on the same node.
      * 
-     * @param script - script to execute
-     * @param rmnode - target node
-     * @return true if script will pass on the node 
+     * @param script
+     *            - script to execute
+     * @param rmnode
+     *            - target node
+     * @return true if script will pass on the node
      */
     public abstract boolean isPassed(SelectionScript script, Map<String, Serializable> bindings, RMNode rmnode);
 
     /**
-     * Processes script result and updates knowledge base of 
-     * selection manager at the same time.
+     * Processes script result and updates knowledge base of selection manager
+     * at the same time.
      *
-     * @param script - executed script
-     * @param scriptResult - obtained script result
-     * @param rmnode - node on which script has been executed
+     * @param script
+     *            - executed script
+     * @param scriptResult
+     *            - obtained script result
+     * @param rmnode
+     *            - node on which script has been executed
      * @return whether node is selected
      */
     public abstract boolean processScriptResult(SelectionScript script, Map<String, Serializable> bindings,
@@ -282,16 +289,20 @@ public abstract class SelectionManager {
                 matchedNodes = runScripts(arrangedFilteredNodes, criteria);
             } else {
 
-                // run scripts not on all nodes, but always on missing number of nodes
+                // run scripts not on all nodes, but always on missing number of
+                // nodes
                 // until required node set is found
                 matchedNodes = new LinkedList<>();
                 while (matchedNodes.size() < criteria.getSize()) {
                     int numberOfNodesForScriptExecution = criteria.getSize() - matchedNodes.size();
 
                     if (numberOfNodesForScriptExecution < PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()) {
-                        // we can run "PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()" scripts in parallel
+                        // we can run
+                        // "PAResourceManagerProperties.RM_SELECTION_MAX_THREAD_NUMBER.getValueAsInt()"
+                        // scripts in parallel
                         // in case when we need less nodes it still useful to
-                        // the full capacity of the thread pool to find nodes quicker
+                        // the full capacity of the thread pool to find nodes
+                        // quicker
 
                         // it is not important if we find more nodes than needed
                         // subset will be selected later (topology handlers)
@@ -323,7 +334,8 @@ public abstract class SelectionManager {
 
         // now we have a list of nodes which match to selection scripts
         // selecting subset according to topology requirements
-        // TopologyHandler handler = RMCore.topologyManager.getHandler(topologyDescriptor);
+        // TopologyHandler handler =
+        // RMCore.topologyManager.getHandler(topologyDescriptor);
 
         if (criteria.getTopology().isTopologyBased() && loggerIsDebugEnabled) {
             logger.debug("Filtering nodes with topology " + criteria.getTopology());
@@ -410,11 +422,13 @@ public abstract class SelectionManager {
     }
 
     /**
-     * Runs scripts on given set of nodes and returns matched nodes.
-     * It blocks until all results are obtained.
+     * Runs scripts on given set of nodes and returns matched nodes. It blocks
+     * until all results are obtained.
      *
-     * @param candidates nodes to execute scripts on
-     * @param criteria contains a set of scripts to execute on each node
+     * @param candidates
+     *            nodes to execute scripts on
+     * @param criteria
+     *            contains a set of scripts to execute on each node
      * @return nodes matched to all scripts
      */
     private List<Node> runScripts(List<RMNode> candidates, Criteria criteria) {
@@ -445,33 +459,23 @@ public abstract class SelectionManager {
 
         try {
             // launching
-            Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors,
-                                                                                       PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsLong(),
-                                                                                       TimeUnit.MILLISECONDS);
-            int index = 0;
+            Collection<Future<Node>> matchedNodes = scriptExecutorThreadPool.invokeAll(scriptExecutors);
 
             // waiting for the results
             for (Future<Node> futureNode : matchedNodes) {
-                if (!futureNode.isCancelled()) {
-                    Node node;
-                    try {
-                        node = futureNode.get();
-                        if (node != null) {
-                            matched.add(node);
-                        }
-                    } catch (InterruptedException e) {
-                        logger.warn("Interrupting the selection manager");
-                        return matched;
-                    } catch (ExecutionException e) {
-                        logger.warn("Ignoring exception in selection script: " + e.getMessage());
+                Node node;
+                try {
+                    node = futureNode.get();
+                    if (node != null) {
+                        matched.add(node);
                     }
-                } else {
-                    // no script result was obtained
-                    logger.warn("Timeout on " + scriptExecutors.get(index));
-                    // in this case scriptExecutionFinished may not be called
-                    scriptExecutionFinished(((ScriptExecutor) scriptExecutors.get(index)).getRMNode().getNodeURL());
+                } catch (InterruptedException e) {
+                    logger.warn("Interrupting the selection manager");
+                    return matched;
+                } catch (ExecutionException e) {
+                    logger.warn("Ignoring exception in selection script: " + e.getMessage());
                 }
-                index++;
+
             }
         } catch (InterruptedException e1) {
             logger.warn("Interrupting the selection manager");
@@ -523,7 +527,8 @@ public abstract class SelectionManager {
                 continue;
             }
 
-            // if client has AllPermissions he still can get a node with any token
+            // if client has AllPermissions he still can get a node with any
+            // token
             // we will avoid it here
             if (nodeWithTokenRequested) {
                 PrincipalPermission perm = (PrincipalPermission) node.getUserPermission();
@@ -555,13 +560,14 @@ public abstract class SelectionManager {
             scriptExecutors.add(new Callable<ScriptResult<T>>() {
                 @Override
                 public ScriptResult<T> call() throws Exception {
-                    // Execute with a timeout the script by the remote handler 
-                    // and always async-unlock the node, exceptions will be treated as ExecutionException
+                    // Execute with a timeout the script by the remote handler
+                    // and always async-unlock the node, exceptions will be
+                    // treated as ExecutionException
                     try {
                         ScriptResult<T> res = node.executeScript(script, bindings);
                         PAFuture.waitFor(res, timeout);
                         return res;
-                        //return PAFuture.getFutureValue(res, timeout);
+                        // return PAFuture.getFutureValue(res, timeout);
                     } finally {
                         // cleaning the node
                         try {
@@ -605,7 +611,7 @@ public abstract class SelectionManager {
             } catch (InterruptedException e) {
                 result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " + description));
             } catch (ExecutionException e) {
-                // Unwrap the root exception 
+                // Unwrap the root exception
                 Throwable rex = e.getCause();
                 result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description,
                                                                 rex));
@@ -617,7 +623,8 @@ public abstract class SelectionManager {
     }
 
     /**
-     * Indicates that script execution is finished for the node with specified url.
+     * Indicates that script execution is finished for the node with specified
+     * url.
      */
     public void scriptExecutionFinished(String nodeUrl) {
         synchronized (inProgress) {
@@ -629,7 +636,8 @@ public abstract class SelectionManager {
      * Handles shut down of the selection manager
      */
     public void shutdown() {
-        // shutdown the thread pool without waiting for script execution completions
+        // shutdown the thread pool without waiting for script execution
+        // completions
         scriptExecutorThreadPool.shutdownNow();
         PAActiveObject.terminateActiveObject(false);
     }
@@ -637,8 +645,10 @@ public abstract class SelectionManager {
     /**
      * Return true if node contains the node set.
      *
-     * @param nodeset - a list of nodes to inspect
-     * @param node - a node to find
+     * @param nodeset
+     *            - a list of nodes to inspect
+     * @param node
+     *            - a node to find
      * @return true if node contains the node set.
      */
     private boolean contains(NodeSet nodeset, RMNode node) {
