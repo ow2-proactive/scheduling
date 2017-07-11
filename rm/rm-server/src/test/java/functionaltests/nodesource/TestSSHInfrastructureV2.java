@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
@@ -99,6 +100,8 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                          policyParameters);
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
 
+        Thread.sleep(10000);
+
         RMTHelper.log("Checking scheduler state after node source creation");
         RMState s = resourceManager.getState();
         assertEquals(NB_NODES, s.getTotalNodesNumber());
@@ -124,16 +127,6 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
-        if (OsUtils.isUNIX()) {
-            sshd.setShellFactory(new ProcessShellFactory(new String[] { "/bin/sh", "-i", "-l" },
-                                                         EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr)));
-        } else {
-            sshd.setShellFactory(new ProcessShellFactory(new String[] { "cmd.exe " },
-                                                         EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
-                                                                    ProcessShellFactory.TtyOptions.ICrNl,
-                                                                    ProcessShellFactory.TtyOptions.ONlCr)));
-        }
-
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
         userAuthFactories.add(new UserAuthPassword.Factory());
         sshd.setUserAuthFactories(userAuthFactories);
@@ -148,6 +141,13 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         sshd.setCommandFactory(new ScpCommandFactory(new CommandFactory() {
             @Override
             public Command createCommand(String command) {
+                String[] splitCommand = SSHInfrastructureHelper.splitCommand(command);
+                StringBuilder rebuiltCommand = new StringBuilder();
+                for (String commandPiece : splitCommand) {
+                    rebuiltCommand.append(commandPiece).append(" ");
+                }
+                rebuiltCommand.trimToSize();
+
                 EnumSet<ProcessShellFactory.TtyOptions> ttyOptions;
                 if (OsUtils.isUNIX()) {
                     ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr);
@@ -156,7 +156,15 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                             ProcessShellFactory.TtyOptions.ICrNl,
                                             ProcessShellFactory.TtyOptions.ONlCr);
                 }
-                return new ProcessShellFactory(SSHInfrastructureHelper.splitCommand(command), ttyOptions).create();
+
+                if (OsUtils.isUNIX()) {
+                    return new ProcessShellFactory(new String[] { "/bin/sh", "-c", rebuiltCommand.toString() },
+                                                   ttyOptions).create();
+                } else {
+                    return new ProcessShellFactory(new String[] { rebuiltCommand.toString() }, ttyOptions).create();
+                }
+
+                //return new ProcessShellFactory(SSHInfrastructureHelper.splitCommand(command), ttyOptions).create();
             }
         }));
 

@@ -267,8 +267,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                         // we check the exit status of the session only in the
                         // case where we link the current process to the one
                         // that spawns the nodes. Otherwise, we let the two
-                        // processes live completely independently and do not
-                        // check the exit status
+                        // processes live completely independently
                         if (!deployNodesInDetachedMode) {
                             if (chan.getExitStatus() != -1) { // -1 means process is
                                 // still running

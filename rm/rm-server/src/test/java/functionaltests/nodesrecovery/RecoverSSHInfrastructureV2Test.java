@@ -29,36 +29,19 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.sshd.SshServer;
-import org.apache.sshd.common.NamedFactory;
-import org.apache.sshd.common.util.OsUtils;
-import org.apache.sshd.server.Command;
-import org.apache.sshd.server.CommandFactory;
-import org.apache.sshd.server.PasswordAuthenticator;
-import org.apache.sshd.server.UserAuth;
-import org.apache.sshd.server.auth.UserAuthPassword;
-import org.apache.sshd.server.command.ScpCommandFactory;
-import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.session.ServerSession;
-import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
-import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
@@ -66,7 +49,6 @@ import functionaltests.nodesource.TestSSHInfrastructureV2;
 import functionaltests.utils.NodesRecoveryProcessHelper;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
-import functionaltests.utils.SSHInfrastructureHelper;
 
 
 /**
@@ -90,19 +72,15 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     }
 
     @After
-    public void killNodes() throws Exception {
-        // kill the remaining nodes that were preserved for the test
-        try {
-            NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMNodeStarter");
-        } catch (Exception e) {
-            // we know that doing this will cause exceptions, keep silent after the test
-        }
+    public void tearDown() throws Exception {
+        killNodes();
         TestSSHInfrastructureV2.stopSSHServer();
     }
 
-    //@Test ATDD:  needs to find a way to live the node process alive
+    @Test
     public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
-        // kill the RM only by sending a SIGKILL and leave node processes alive
+        // kill only the RM by sending a SIGKILL and leave node processes alive
+        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
         NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMStarterForFunctionalTest");
         // nodes should be re-taken into account by the restarted RM
         restartRmAndCheckFinalState(false);
@@ -110,8 +88,10 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
     @Test
     public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
-        // kill the RM and also kill all node processes
-        rmHelper.killRM();
+        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
+        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMStarterForFunctionalTest");
+        RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test)");
+        killNodes();
         // nodes should be re-deployed by the restarted RM
         restartRmAndCheckFinalState(true);
     }
@@ -182,6 +162,15 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         assertThat(lockSucceeded).isEqualTo(new BooleanWrapper(true));
         BooleanWrapper unlockSucceeded = resourceManager.unlockNodes(allNodes);
         assertThat(unlockSucceeded).isEqualTo(new BooleanWrapper(true));
+    }
+
+    private void killNodes() throws Exception {
+        // kill the remaining nodes that were preserved for the test
+        try {
+            NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMNodeStarter");
+        } catch (Exception e) {
+            // we know that doing this will cause exceptions, keep silent after the test
+        }
     }
 
 }
