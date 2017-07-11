@@ -27,10 +27,8 @@ package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
-import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
 import javax.management.MBeanAttributeInfo;
@@ -41,6 +39,7 @@ import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeDataSupport;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.jmx.RRDDataStore;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.Sample;
@@ -58,6 +57,12 @@ public class RRDSigarDataStore extends RRDDataStore {
                                                    "sigar:Type=NetInterface,Name=*", "sigar:Type=Swap" };
 
     private HashMap<String, String> compositeTypes = new HashMap<>();
+
+    private static Set<String> exceptionsThrown = Collections.synchronizedSet(new HashSet<String>());
+
+    private static boolean AllThreadIdsThreadi_thrown = false;
+
+    private static boolean NonHeapMemoryUsageM_thrown = false;
 
     private MBeanServer mbs;
 
@@ -182,23 +187,23 @@ public class RRDSigarDataStore extends RRDDataStore {
                 }
             } catch (NumberFormatException ex) {
                 // do not save non-numeric values
-                if (logger.isTraceEnabled()) {
+                String exceptionAsString = StackTraceUtil.getStackTrace(ex).replaceAll("For input string: \".*\"", "");
+                exceptionAsString = dataSource + " / " + fullName + exceptionAsString;
+
+                if (!exceptionsThrown.contains(exceptionAsString)) {
+                    exceptionsThrown.add(exceptionAsString);
+                    logger.warn("Non numeric value for " + dataSource + " / " + fullName + ": " + ex.getMessage());
+                } else {
                     logger.trace("Non numeric value for " + dataSource + " / " + fullName + ": " + ex.getMessage());
                 }
-            } catch (InstanceNotFoundException | AttributeNotFoundException e) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Cannot read attribute " + attrName + " for object " + objectName + ": " +
-                                 e.getMessage());
-                }
-            } catch (UnsupportedOperationException e) {
-                if (logger.isTraceEnabled()) {
-                    logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
-                } else if (logger.isDebugEnabled()) {
-                    logger.warn("Cannot read attribute " + attrName + " for object " + objectName);
-                }
             } catch (Exception e) {
-                logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
-
+                String exceptionAsString = StackTraceUtil.getStackTrace(e);
+                if (!exceptionsThrown.contains(exceptionAsString)) {
+                    exceptionsThrown.add(exceptionAsString);
+                    logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
+                } else {
+                    logger.trace("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
+                }
             }
         }
         try {
