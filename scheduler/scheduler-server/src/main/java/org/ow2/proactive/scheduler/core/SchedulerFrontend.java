@@ -370,27 +370,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public JobId submit(Job userJob)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("New job submission requested : " + userJob.getName());
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("New job submission requested : " + userJob.getName());
+            }
+
+            // check if the scheduler is stopped
+            if (!schedulingService.isSubmitPossible()) {
+                String msg = "Scheduler is stopped, cannot submit job";
+                logger.info(msg);
+                throw new SubmissionClosedException(msg);
+            }
+
+            UserIdentificationImpl ident = frontendState.checkPermission("submit",
+                                                                         YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
+
+            InternalJob job = frontendState.createJob(userJob, ident);
+
+            schedulingService.submitJob(job);
+
+            frontendState.jobSubmitted(job, ident);
+            return job.getId();
+        } catch (Exception e) {
+            logger.warn("Error when submitting job.", e);
+            throw e;
         }
-
-        // check if the scheduler is stopped
-        if (!schedulingService.isSubmitPossible()) {
-            String msg = "Scheduler is stopped, cannot submit job";
-            logger.info(msg);
-            throw new SubmissionClosedException(msg);
-        }
-
-        UserIdentificationImpl ident = frontendState.checkPermission("submit",
-                                                                     YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
-
-        InternalJob job = frontendState.createJob(userJob, ident);
-
-        schedulingService.submitJob(job);
-
-        frontendState.jobSubmitted(job, ident);
-
-        return job.getId();
     }
 
     /**
