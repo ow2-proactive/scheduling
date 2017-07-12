@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -43,7 +42,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.utils.NodesRecoveryProcessHelper;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
@@ -66,32 +64,28 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     private ResourceManager resourceManager = null;
 
     @Before
-    public void prepareRM() throws Exception {
+    public void setup() throws Exception {
         startRmAndCheckInitialState();
     }
 
     @After
-    public void killNodes() throws Exception {
+    public void tearDown() throws Exception {
         // kill the remaining nodes that were preserved for the test
-        try {
-            NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMNodeStarter");
-        } catch (Exception e) {
-            // we know that doing this will cause exceptions, keep silent after the test
-        }
+        RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
-        // kill the RM only by sending a SIGKILL and leave node processes alive
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMStarterForFunctionalTest");
+        // kill only the RM by sending a SIGKILL and leave node processes alive
+        RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
         // nodes should be re-taken into account by the restarted RM
         restartRmAndCheckFinalState(false);
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
-        // kill the RM and also kill all node processes
-        rmHelper.killRM();
+        // kill RM and nodes with SIGKILL
+        RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
         // nodes should be re-deployed by the restarted RM
         restartRmAndCheckFinalState(true);
     }
@@ -105,8 +99,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     private void startRmAndCheckInitialState() throws Exception {
         // start RM
         startRmWithConfig(START_CONFIG);
-        Assert.assertTrue("Nodes preservation should be activated on RM start for the test",
-                          PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean());
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isTrue();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // check the initial state of the RM
@@ -124,8 +117,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         // restart RM
         rmHelper = new RMTHelper();
         startRmWithConfig(RESTART_CONFIG);
-        Assert.assertFalse("Nodes preservation should not be activated on RM restart for the test",
-                           PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean());
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isFalse();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // re-snapshot the RM state

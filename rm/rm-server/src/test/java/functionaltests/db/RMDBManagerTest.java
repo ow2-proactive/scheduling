@@ -34,22 +34,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.JMX;
 import javax.security.auth.AuthPermission;
 
-import org.jruby.ir.targets.JVM;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.core.history.LockHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
+import org.ow2.proactive.resourcemanager.db.RMNodeData;
 
 import com.google.common.collect.Sets;
 

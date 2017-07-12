@@ -369,12 +369,19 @@ public final class CommandLineBuilder implements Cloneable {
 
     private void makeDetachedCommand(ArrayList<String> command, OperatingSystem os) {
         if (os.equals(OperatingSystem.UNIX)) {
+            // if the system is unix-based, we need to start the process with
+            // the nohup indicator it normally goes with the end of the
+            // command finished with the background indicator '&' (see the end
+            // of command building)
             command.add("nohup");
         } else if (os.equals(OperatingSystem.WINDOWS)) {
-            command.add("cmd.exe");
-            command.add("/C");
+            // Windows equivalent is to use the start command with /b option
             command.add("start");
             command.add("/b");
+            // we must set the title of the new command prompt, otherwise it
+            // takes the java command as the title of the new prompt, and the
+            // second parameter as the command to execute
+            command.add("\"\"");
         }
     }
 }

@@ -141,7 +141,14 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         sshd.setCommandFactory(new ScpCommandFactory(new CommandFactory() {
             @Override
             public Command createCommand(String command) {
-                String[] splitCommand = SSHInfrastructureHelper.splitCommand(command);
+                String[] splitCommand;
+                if (OsUtils.isUNIX()) {
+                    splitCommand = SSHInfrastructureHelper.splitCommand(command);
+                } else if (OsUtils.isWin32()) {
+                    splitCommand = SSHInfrastructureHelper.splitCommandWithoutRemovingQuotes(command);
+                } else {
+                    throw new IllegalStateException("Operating system is not recognized");
+                }
                 StringBuilder rebuiltCommand = new StringBuilder();
                 for (String commandPiece : splitCommand) {
                     rebuiltCommand.append(commandPiece).append(" ");
@@ -161,10 +168,9 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                     return new ProcessShellFactory(new String[] { "/bin/sh", "-c", rebuiltCommand.toString() },
                                                    ttyOptions).create();
                 } else {
-                    return new ProcessShellFactory(new String[] { rebuiltCommand.toString() }, ttyOptions).create();
+                    return new ProcessShellFactory(new String[] { "cmd.exe", "/C", rebuiltCommand.toString() },
+                                                   ttyOptions).create();
                 }
-
-                //return new ProcessShellFactory(SSHInfrastructureHelper.splitCommand(command), ttyOptions).create();
             }
         }));
 
