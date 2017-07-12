@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.apache.sshd.common.util.OsUtils;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.tests.ProcessKiller;
@@ -40,7 +41,8 @@ import org.ow2.tests.ProcessKiller;
  */
 public class NodesRecoveryProcessHelper {
 
-    public static void findRmPidAndSendSigKill(String javaProcessName) throws Exception {
+    public static void findRmPidAndSendSigKill(String javaProcessName)
+            throws IOException, InterruptedException, ProcessNotFoundException {
         int pidToKill;
         OperatingSystem os = OperatingSystem.UNIX;
         if (System.getProperty("os.name").contains("Windows")) {
@@ -63,47 +65,65 @@ public class NodesRecoveryProcessHelper {
     }
 
     private static String buildJpsCommand() {
-        OperatingSystem os = OperatingSystem.UNIX;
-        // assuming no cygwin, windows or the "others"...
-        if (System.getProperty("os.name").contains("Windows")) {
+        OperatingSystem os;
+        String jpsCommandPath;
+        if (OsUtils.isWin32()) {
             os = OperatingSystem.WINDOWS;
+            jpsCommandPath = "\"" + System.getProperty("java.home") + os.fs + ".." + os.fs + "bin" + os.fs +
+                             "jps.exe\"";
+        } else if (OsUtils.isUNIX()) {
+            os = OperatingSystem.UNIX;
+            jpsCommandPath = System.getProperty("java.home") + os.fs + ".." + os.fs + "bin" + os.fs + "jps";
+        } else {
+            throw new IllegalStateException("Operating system is not recognized");
         }
-        String rmHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        if (!rmHome.endsWith(os.fs)) {
-            rmHome += os.fs;
-        }
-        return System.getProperty("java.home") + os.fs + ".." + os.fs + "bin" + os.fs + "jps";
+        return jpsCommandPath;
     }
 
-    private static int getUnixFirstJavaProcessPidWithName(String processName) throws IOException {
+    private static int getUnixFirstJavaProcessPidWithName(String processName)
+            throws IOException, ProcessNotFoundException {
         String line;
         ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", buildJpsCommand());
-        processBuilder.redirectErrorStream();
         Process p = processBuilder.start();
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        StringBuilder stringBuilder = new StringBuilder();
         while ((line = input.readLine()) != null) {
+            stringBuilder.append(line).append(",");
             if (line.contains(processName)) {
                 String pidString = line.split(" ")[0];
-                System.out.println("pid for process name: " + processName + " is: " + pidString);
                 input.close();
                 return Integer.parseInt(pidString);
             }
         }
-        return -1;
+        throw new ProcessNotFoundException(processName, stringBuilder);
     }
 
-    private static int getWindowsFirstJavaProcessPidWithName(String processName) throws IOException {
+    private static int getWindowsFirstJavaProcessPidWithName(String processName)
+            throws IOException, ProcessNotFoundException {
         String line;
         Process p = Runtime.getRuntime().exec(buildJpsCommand());
         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        StringBuilder stringBuilder = new StringBuilder();
         while ((line = input.readLine()) != null) {
+            stringBuilder.append(line).append(",");
             if (line.toLowerCase().contains(processName.toLowerCase())) {
                 String pidString = line.split(" ")[0];
-                System.out.println("pid for process name: " + processName + " is: " + pidString);
                 return Integer.parseInt(pidString);
             }
         }
-        return -1;
+        throw new ProcessNotFoundException(processName, stringBuilder);
+    }
+
+    static private class ProcessNotFoundException extends Exception {
+
+        ProcessNotFoundException(String processName, StringBuilder stringBuilder) {
+            // build sentence in reverse manner
+            super(stringBuilder.insert(0, " could not be found to be killed. Java processes found are: ")
+                               .insert(0, processName)
+                               .insert(0, "Java process with name: ")
+                               .toString());
+        }
+
     }
 
 }

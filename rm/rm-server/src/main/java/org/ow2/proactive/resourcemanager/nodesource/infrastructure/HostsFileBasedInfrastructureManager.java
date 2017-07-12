@@ -275,27 +275,17 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     @Override
     public void removeNode(Node node) {
-        atomicRemoveNode(node);
+        removeNodeAndReturnHost(node.getNodeInformation().getName(), node.getNodeInformation().getURL(), node);
     }
 
     @Override
-    public void onDownNode(String nodename, String nodeUrl) {
-        super.onDownNode(nodename, nodeUrl);
-        atomicRemoveDownNode(nodename, nodeUrl);
-        logger.info("Node source " + nodeSource.getName() + " has " + getNbDownNodes() + " down nodes, and there are " +
-                    nodeSource.getNbNodesToRecover() + " nodes to recover");
-        // All the nodes are down, we are going to redeploy the node source
-        if (getNbDownNodes() == nodeSource.getNbNodesToRecover()) {
-            logger.info("All nodes of node source " + nodeSource.getName() +
-                        " are detected down, redeploy node source");
-            // in case the RM was shut down properly, the shutdown flag has
-            // been saved in database as true, we must reset it to redeploy
-            setInfraShutdownFlag(false);
-            // trigger deployment
-            nodeSource.activate();
-            // reset internal counters
-            resetNbDownNodes();
+    public void notifyDownNode(final String nodeName, final String nodeUrl, final Node node) {
+        InetAddress host = removeNodeAndReturnHost(nodeName, nodeUrl, node);
+        if (host != null && !getRegisteredNodes().containsValue(host)) {
+            removeRemovedHostAndPutIfAbsentFreeHosts(host);
         }
+        logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() + " #registered nodes: " +
+                    getRegisteredNodesSize());
     }
 
     @Override
@@ -394,81 +384,6 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         runtimeVariables.put(PN_TIMEOUT_KEY, new HashMap<String, Boolean>());
     }
 
-    private void atomicRemoveNode(final Node node) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                String nodeName = node.getNodeInformation().getName();
-                InetAddress host = getRegisteredNodes().remove(nodeName);
-                if (host != null) {
-                    logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " +
-                                 this.getClass().getSimpleName());
-                    // remember the node removed
-                    addRemovedHost(host);
-
-                    // in case all nodes relative to this host were removed kill the JVM
-                    if (!getRegisteredNodes().containsValue(host)) {
-                        try {
-                            killNodeImpl(node, host);
-                        } catch (Exception e) {
-                            logger.trace("An exception occurred during node removal", e);
-                        }
-                    }
-                    logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() +
-                                " #registered nodes: " + getRegisteredNodesSize());
-
-                } else {
-                    logger.error("Node " + nodeName +
-                                 " is not known as a node belonging to this infrastructure manager");
-                }
-                return null;
-            }
-        });
-    }
-
-    private void atomicRemoveDownNode(final String nodeName, final String nodeUrl) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                InetAddress host = getRegisteredNodes().remove(nodeName);
-                if (host != null) {
-                    logger.debug("Removing node " + nodeUrl + " from " + this.getClass().getSimpleName());
-                    // remember the node removed
-                    addRemovedHost(host);
-                    // in case all nodes relative to this host were removed kill the JVM
-                    if (!getRegisteredNodes().containsValue(host)) {
-                        // we set the free hosts again in order to enable a
-                        // redeployment at the next policy activation, in case
-                        // all nodes of this node source are down
-                        addFreeHosts(host);
-                    }
-                    logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() +
-                                " #registered nodes: " + getRegisteredNodesSize());
-                } else {
-                    logger.error("Node " + nodeName +
-                                 " is not known as a node belonging to this infrastructure manager");
-                }
-                return null;
-            }
-        });
-    }
-
-    private void addFreeHosts(InetAddress host) {
-        int value = getRemovedHosts().remove(host);
-        Integer retrievedNbFreeHosts = getFreeHosts().get(host);
-        if (retrievedNbFreeHosts == null) {
-            getFreeHosts().put(host, value);
-        }
-    }
-
-    private void addRemovedHost(InetAddress host) {
-        Integer retrieved = getRemovedHosts().get(host);
-        if (retrieved == null) {
-            retrieved = 0;
-        }
-        getRemovedHosts().put(host, ++retrieved);
-    }
-
     /**
      * Launch the node on the host passed as parameter
      * @param host The host on which one the node will be started
@@ -487,10 +402,67 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     protected abstract void killNodeImpl(Node node, InetAddress host) throws RMException;
 
+    /**
+     * Removes a node from the registered nodes and adds one node removed to the removed host map.
+     *
+     * @param node the node to remove
+     *
+     * @return the {@see InetAddress} of the host of the removed node
+     */
+    private InetAddress removeNodeAndReturnHost(final String nodeName, final String nodeUrl, final Node node) {
+        return setRuntimeVariable(new RuntimeVariablesHandler<InetAddress>() {
+            @Override
+            public InetAddress handle() {
+                InetAddress host = getRegisteredNodes().remove(nodeName);
+                if (host != null) {
+                    logger.debug("Removing node " + nodeUrl + " from " + this.getClass().getSimpleName());
+                    // remember the node removed
+                    addRemovedHost(host);
+                    // In case all nodes relative to this host were removed, kill the JVM.
+                    // We need to check whether the node to kill is present because in case
+                    // of a recovery of the RM, the node object might not be retrievable.
+                    if (!getRegisteredNodes().containsValue(host) && node != null) {
+                        try {
+                            killNodeImpl(node, host);
+                        } catch (Exception e) {
+                            logger.trace("An exception occurred during node kill", e);
+                        }
+                    }
+                } else {
+                    logger.error("Node " + nodeName +
+                                 " is not known as a node belonging to this infrastructure manager");
+                }
+                return host;
+            }
+        });
+    }
+
+    private void addRemovedHost(InetAddress host) {
+        Integer retrieved = getRemovedHosts().get(host);
+        if (retrieved == null) {
+            retrieved = 0;
+        }
+        getRemovedHosts().put(host, ++retrieved);
+    }
+
     // Below are wrapper methods around the runtime variables map
 
     private Map<InetAddress, Integer> getFreeHosts() {
         return (Map<InetAddress, Integer>) runtimeVariables.get(FREE_HOSTS_KEY);
+    }
+
+    private void removeRemovedHostAndPutIfAbsentFreeHosts(final InetAddress host) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int value = getRemovedHosts().remove(host);
+                Integer retrievedNbFreeHosts = getFreeHosts().get(host);
+                if (retrievedNbFreeHosts == null) {
+                    getFreeHosts().put(host, value);
+                }
+                return null;
+            }
+        });
     }
 
     private int getFreeHostsSize() {
@@ -498,19 +470,6 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             @Override
             public Integer handle() {
                 return getFreeHosts().size();
-            }
-        });
-    }
-
-    private void putIfAbsentFreeHosts(final InetAddress inetAddress, final Integer value) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                Integer retrieved = getFreeHosts().get(inetAddress);
-                if (retrieved == null) {
-                    getFreeHosts().put(inetAddress, value);
-                }
-                return null;
             }
         });
     }

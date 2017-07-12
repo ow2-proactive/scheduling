@@ -43,20 +43,16 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
-import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -495,18 +491,6 @@ public class NodeSource implements InitActive, RunActive {
         return rmcore.setDeploying(deployingNode);
     }
 
-    public int getNbNodesToRecover() {
-        return nbNodesToRecover;
-    }
-
-    public void resetNbNodesToRecover() {
-        this.nbNodesToRecover = 0;
-    }
-
-    public void setNbNodesToRecover(int nbNodesToRecover) {
-        this.nbNodesToRecover = nbNodesToRecover;
-    }
-
     /**
      * Looks up the node
      */
@@ -760,9 +744,9 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Marks node as down. Remove it from node source node set. It remains in rmcore nodes list until
      * user decides to remove them or node source is shutdown.
-     * @see NodeSource#detectedPingedDownNode(String)
+     * @see NodeSource#detectedPingedDownNode(String, String)
      */
-    public void detectedPingedDownNode(String nodeUrl) {
+    public void detectedPingedDownNode(String nodeName, String nodeUrl) {
 
         if (toShutdown) {
             logger.warn("[" + name + "] detectedPingedDownNode request discarded because node source is shutting down");
@@ -775,27 +759,22 @@ public class NodeSource implements InitActive, RunActive {
             downNodes.put(nodeUrl, downNode);
             try {
                 RMCore.topologyManager.removeNode(downNode);
-                infrastructureManager.notifyDownNode(downNode);
+                infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl, downNode);
             } catch (RMException e) {
                 logger.error("Error while removing down node: " + nodeUrl, e);
+            }
+        } else {
+            // the node could not be found in the nodes map so we are trying
+            // here to restore the nodes after a recovery of the RM: we have
+            // almost no information about the node apart from its name and url
+            try {
+                infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl, null);
+            } catch (RMException e) {
+                logger.error("New empty Node " + nodeUrl + " could not be created to handle down node");
             }
         }
 
         rmcore.setDownNode(nodeUrl);
-    }
-
-    /**
-     * Marks node as down after a recovery, so that no finding the node in the
-     * usual data structure of the node source is not an exceptional behavior
-     */
-    public void detectedPingedDownNodeAfterRecovery(String nodeName, String nodeUrl) {
-        // the node source should not have the node in its node list, because
-        // after a recovery, it should have nothing in its data structures but
-        // just in case the data structure is in a bad shape too, we remove
-        // the node from the sane nodes.
-        nodes.remove(nodeUrl);
-        // trigger infrastructure hook
-        infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl);
     }
 
     /**
@@ -823,6 +802,7 @@ public class NodeSource implements InitActive, RunActive {
     public void pingNode(final Node node) {
         executeInParallel(new Runnable() {
             public void run() {
+                String nodeName = node.getNodeInformation().getName();
                 String nodeUrl = node.getNodeInformation().getURL();
 
                 try {
@@ -832,7 +812,7 @@ public class NodeSource implements InitActive, RunActive {
                     }
                 } catch (Throwable t) {
                     logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
-                    stub.detectedPingedDownNode(nodeUrl);
+                    stub.detectedPingedDownNode(nodeName, nodeUrl);
                 }
             }
         });

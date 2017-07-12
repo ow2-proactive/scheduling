@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -61,37 +60,36 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
     private static final String RESTART_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db.ini";
 
-    private static final String NODE_SOURCE_NAME = "testSSHInfra";
+    private static final String NODE_SOURCE_NAME = "testRecoverSSHInfra";
 
     private ResourceManager resourceManager = null;
 
     @Before
-    public void prepareRM() throws Exception {
+    public void setup() throws Exception {
         TestSSHInfrastructureV2.startSSHServer();
+        RMTHelper.log("SSH server started");
         startRmAndCheckInitialState();
     }
 
     @After
     public void tearDown() throws Exception {
-        killNodes();
+        // kill the remaining nodes that were preserved for the test
+        RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
         TestSSHInfrastructureV2.stopSSHServer();
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
         // kill only the RM by sending a SIGKILL and leave node processes alive
-        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMStarterForFunctionalTest");
+        RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
         // nodes should be re-taken into account by the restarted RM
         restartRmAndCheckFinalState(false);
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
-        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMStarterForFunctionalTest");
-        RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test)");
-        killNodes();
+        // kill RM and nodes with SIGKILL
+        RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
         // nodes should be re-deployed by the restarted RM
         restartRmAndCheckFinalState(true);
     }
@@ -105,8 +103,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     private void startRmAndCheckInitialState() throws Exception {
         // start RM
         startRmWithConfig(START_CONFIG);
-        Assert.assertTrue("Nodes preservation should be activated on RM start for the test",
-                          PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean());
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isTrue();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // check the initial state of the RM
@@ -132,8 +129,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         // restart RM
         rmHelper = new RMTHelper();
         startRmWithConfig(RESTART_CONFIG);
-        Assert.assertFalse("Nodes preservation should not be activated on RM restart for the test",
-                           PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean());
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isFalse();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // re-snapshot the RM state
@@ -162,15 +158,6 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         assertThat(lockSucceeded).isEqualTo(new BooleanWrapper(true));
         BooleanWrapper unlockSucceeded = resourceManager.unlockNodes(allNodes);
         assertThat(unlockSucceeded).isEqualTo(new BooleanWrapper(true));
-    }
-
-    private void killNodes() throws Exception {
-        // kill the remaining nodes that were preserved for the test
-        try {
-            NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMNodeStarter");
-        } catch (Exception e) {
-            // we know that doing this will cause exceptions, keep silent after the test
-        }
     }
 
 }

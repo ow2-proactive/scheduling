@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -100,15 +101,17 @@ public abstract class InfrastructureManager implements Serializable {
 
     private static final String USING_DEPLOYING_NODES_KEY = "usingDeployingNodes";
 
-    // key to retrieve the shutdown marker
-    private static final String SHUTDOWN_FLAG_KEY = "infrastructureManagerShutdown";
-
-    // used to timeout the nodes
-    private transient Timer timeouter = null;
-
     private static final String RM_URL_KEY = "infrastructureManagerRmUrl";
 
     private static final String NB_DOWN_NODES_KEY = "infrastructureManagerNbDownNodes";
+
+    /**
+     * Indicates whether the infrastructure is shutting down.
+     */
+    private AtomicBoolean shutDown = new AtomicBoolean(false);
+
+    // used to timeout the nodes
+    private transient Timer timeouter = null;
 
     /**
      * Store information about the running infrastructure. The map holds the name of monitored information and its
@@ -302,30 +305,35 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * The default behavior is to remove the node from the infrastructure manager.
-     * Then this method calls the {@link InfrastructureManager#onDownNode(String, String)} hook.
+     * This method is called by the system when a Node is detected as DOWN.
      *
-     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
+     * @param node the ProActive Programming Node that is down. This parameter
+     *             can be null if no information about the node can be
+     *             retrieved apart from its url.
+     * @param nodeUrl the URL of the node that is down.
+     *
+     * @throws RMException if any problems occurred.
      */
-    public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
-        String nodeName = proactiveProgrammingNode.getNodeInformation().getName();
-        String nodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
-        internalNotifyDownNode(nodeName, nodeUrl);
-    }
-
-    public void internalNotifyDownNode(String nodeName, String nodeUrl) {
+    public void internalNotifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
         writeLock.lock();
         try {
-            // if the node was previously sane, we need to remove it
             getAcquiredNodesMap().remove(nodeName);
-            // trigger the onDownNode hook
-            this.onDownNode(nodeName, nodeUrl);
+            this.notifyDownNode(nodeName, nodeUrl, node);
         } catch (Exception e) {
-            logger.warn("Exception occurred while removing node " + nodeName);
+            logger.warn("Exception occurred while removing node " + node);
         } finally {
             writeLock.unlock();
         }
     }
+
+    /**
+     * Define what needs to be done in an infrastructure implementation when a node is detected as down.
+     *
+     * @param node the ProActive Programming Node that is down.
+     *
+     * @throws RMException if any problems occurred.
+     */
+    public abstract void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException;
 
     /**
      * This method is called by the RMCore to notify the InfrastructureManager
@@ -452,7 +460,7 @@ public abstract class InfrastructureManager implements Serializable {
      * implementation thanks to the method {@link #shutDown()}
      */
     public final void internalShutDown() {
-        setInfraShutdownFlag(true);
+        shutDown.set(true);
         // first removing deploying nodes
         for (String dnUrl : keySetDeployingNodes()) {
             this.internalRemoveDeployingNode(dnUrl);
@@ -663,7 +671,7 @@ public abstract class InfrastructureManager implements Serializable {
     protected final String addDeployingNode(String name, String command, String description, final long timeout) {
         checkName(name);
         checkTimeout(timeout);
-        if (getInfraShutdownFlag()) {
+        if (shutDown.get()) {
             throw new UnsupportedOperationException("The infrastructure manager is shuting down.");
         }
         // if the user calls this method, we use the require nodes/timeout
@@ -925,17 +933,6 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * Called by the system every time a node is DOWN. The default is to
-     * increment the number of down nodes.
-     *
-     * @param nodeName the name of the node that is down.
-     * @param nodeUrl the URL of the node that is down.
-     */
-    public void onDownNode(String nodeName, String nodeUrl) {
-        incrementNbDownNodes();
-    }
-
-    /**
      * Called by the system every time a node that is DOWN reconnects
      * and changes its status to FREE or BUSY.
      *
@@ -988,7 +985,6 @@ public abstract class InfrastructureManager implements Serializable {
         runtimeVariables.put(LOST_NODES_KEY, new HashMap<String, RMDeployingNode>());
         runtimeVariables.put(ACQUIRED_NODES_KEY, new HashMap<String, Node>());
         runtimeVariables.put(USING_DEPLOYING_NODES_KEY, false);
-        runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
         runtimeVariables.put(RM_URL_KEY, "");
         runtimeVariables.put(NB_DOWN_NODES_KEY, 0);
     }
@@ -1222,25 +1218,6 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private boolean getInfraShutdownFlag() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return (Boolean) runtimeVariables.get(SHUTDOWN_FLAG_KEY);
-            }
-        });
-    }
-
-    protected void setInfraShutdownFlag(final boolean isShutdown) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                runtimeVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
-                return null;
-            }
-        });
-    }
-
     public boolean isUsingDeployingNode() {
         return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
             @Override
@@ -1255,6 +1232,16 @@ public abstract class InfrastructureManager implements Serializable {
             @Override
             public Void handle() {
                 runtimeVariables.put(USING_DEPLOYING_NODES_KEY, isUsingDeployingNodes);
+                return null;
+            }
+        });
+    }
+
+    protected void setRmUrl(final String rmUrl) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(RM_URL_KEY, rmUrl);
                 return null;
             }
         });

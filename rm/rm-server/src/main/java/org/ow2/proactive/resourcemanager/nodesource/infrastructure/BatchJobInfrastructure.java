@@ -562,6 +562,11 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
         putPnTimeout(pnURL, true);
     }
 
+    @Override
+    public void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
+        removeNode(node);
+    }
+
     /**
      * {@inheritDoc}
      */
