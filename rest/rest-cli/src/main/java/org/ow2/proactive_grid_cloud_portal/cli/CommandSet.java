@@ -256,7 +256,7 @@ public class CommandSet {
                                                                         .longOpt("submit")
                                                                         .description("Submit the specified job-description (XML) file")
                                                                         .hasArgs(true)
-                                                                        .numOfArgs(1)
+                                                                        .numOfArgs(2)
                                                                         .hasOptionalArg(true)
                                                                         .argNames("job-descriptor '[{\"var1\":\"value1\",\"var2\":\"value2\"}]'")
                                                                         .jsCommand("submit(job-descriptor,'{\"var1\":\"value1\",\"var2\":\"value2\"}'")
@@ -335,10 +335,10 @@ public class CommandSet {
                                                                           .longOpt("listjobs")
                                                                           .description("Retrieve a list of jobs managed by the Scheduler." +
                                                                                        "Use 'latest=x' to filter the latest x jobs, or 'from=y limit=z' to retrieve the z latest jobs from the yth job.")
-                                                                          .numOfArgs(3)
+                                                                          .numOfArgs(1)
                                                                           .hasOptionalArg(true)
-                                                                          .hasArgs(false)
-                                                                          .argNames("[latest=x |(from=y limit=z)]")
+                                                                          .hasArgs(true)
+                                                                          .argNames("jobs [latest=x |(from=y limit=z)]")
                                                                           .jsCommand("listjobs(x)")
                                                                           .commandClass(ListJobCommand.class)
                                                                           .entry();

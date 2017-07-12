@@ -63,33 +63,22 @@ public class CommandSetTest {
     @Test
     public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
         int nbArgsBasedOnName = Option.UNINITIALIZED;
-        String regex = "\\[.*\\]";
-        Pattern pattern = Pattern.compile(regex);
-        String optionalArgNames = "";
-        int optionals = 0;
 
         if (entry.argNames() != null) {
             String argNames = entry.argNames();
-            Matcher matcher = pattern.matcher(argNames);
 
-            while (matcher.find()) {
-                optionals = matcher.group().split(" ").length;
-                optionalArgNames = matcher.group();
+            if (entry.hasOptionalArg()) {
+                // argNames description of optional arguments is assumed to start with '['
+                argNames = argNames.substring(0, argNames.indexOf("["));
             }
 
             if (!argNames.trim().isEmpty()) {
                 nbArgsBasedOnName = argNames.split(" ").length;
-                if (entry.hasArgs()) {
-                    nbArgsBasedOnName = nbArgsBasedOnName - optionals;
-                } else if (entry.hasOptionalArg()) {
-                    nbArgsBasedOnName = optionals;
-                }
             }
 
-            if (argNames.contains("...") && !optionalArgNames.contains("|") && !optionalArgNames.contains("...")) {
+            if (argNames.contains("...")) {
                 nbArgsBasedOnName = Option.UNLIMITED_VALUES;
             }
-
         }
 
         Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
