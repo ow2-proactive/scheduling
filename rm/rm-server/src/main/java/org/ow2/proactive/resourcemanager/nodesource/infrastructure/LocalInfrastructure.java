@@ -349,9 +349,6 @@ public class LocalInfrastructure extends InfrastructureManager {
             // we are going to redeploy the nodes, so we need to indicate
             // that the command line needs to be started again
             setCommandLineStarted(false);
-            // in case the RM was shut down properly, the shutdown flag has
-            // been saved in database as true, we must reset it to redeploy
-            setInfraShutdownFlag(false);
             // trigger deployment
             nodeSource.activate();
             // reset internal counters

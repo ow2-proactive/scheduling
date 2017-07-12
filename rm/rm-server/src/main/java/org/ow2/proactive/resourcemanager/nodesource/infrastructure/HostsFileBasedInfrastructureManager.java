@@ -288,9 +288,6 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         if (getNbDownNodes() == nodeSource.getNbNodesToRecover()) {
             logger.info("All nodes of node source " + nodeSource.getName() +
                         " are detected down, redeploy node source");
-            // in case the RM was shut down properly, the shutdown flag has
-            // been saved in database as true, we must reset it to redeploy
-            setInfraShutdownFlag(false);
             // trigger deployment
             nodeSource.activate();
             // reset internal counters

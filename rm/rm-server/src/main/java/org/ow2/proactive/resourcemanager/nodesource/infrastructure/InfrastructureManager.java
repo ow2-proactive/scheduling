@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -100,15 +101,17 @@ public abstract class InfrastructureManager implements Serializable {
 
     private static final String USING_DEPLOYING_NODES_KEY = "usingDeployingNodes";
 
-    // key to retrieve the shutdown marker
-    private static final String SHUTDOWN_FLAG_KEY = "infrastructureManagerShutdown";
-
-    // used to timeout the nodes
-    private transient Timer timeouter = null;
-
     private static final String RM_URL_KEY = "infrastructureManagerRmUrl";
 
     private static final String NB_DOWN_NODES_KEY = "infrastructureManagerNbDownNodes";
+
+    /**
+     * Indicates whether the infrastructure is shutting down.
+     */
+    private AtomicBoolean shutDown = new AtomicBoolean(false);
+
+    // used to timeout the nodes
+    private transient Timer timeouter = null;
 
     /**
      * Store information about the running infrastructure. The map holds the name of monitored information and its
@@ -452,7 +455,7 @@ public abstract class InfrastructureManager implements Serializable {
      * implementation thanks to the method {@link #shutDown()}
      */
     public final void internalShutDown() {
-        setInfraShutdownFlag(true);
+        shutDown.set(true);
         // first removing deploying nodes
         for (String dnUrl : keySetDeployingNodes()) {
             this.internalRemoveDeployingNode(dnUrl);
@@ -663,7 +666,7 @@ public abstract class InfrastructureManager implements Serializable {
     protected final String addDeployingNode(String name, String command, String description, final long timeout) {
         checkName(name);
         checkTimeout(timeout);
-        if (getInfraShutdownFlag()) {
+        if (shutDown.get()) {
             throw new UnsupportedOperationException("The infrastructure manager is shuting down.");
         }
         // if the user calls this method, we use the require nodes/timeout
@@ -988,7 +991,6 @@ public abstract class InfrastructureManager implements Serializable {
         runtimeVariables.put(LOST_NODES_KEY, new HashMap<String, RMDeployingNode>());
         runtimeVariables.put(ACQUIRED_NODES_KEY, new HashMap<String, Node>());
         runtimeVariables.put(USING_DEPLOYING_NODES_KEY, false);
-        runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
         runtimeVariables.put(RM_URL_KEY, "");
         runtimeVariables.put(NB_DOWN_NODES_KEY, 0);
     }
@@ -1218,25 +1220,6 @@ public abstract class InfrastructureManager implements Serializable {
             @Override
             public Boolean handle() {
                 return getAcquiredNodesMap().containsKey(nodeUrl);
-            }
-        });
-    }
-
-    private boolean getInfraShutdownFlag() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return (Boolean) runtimeVariables.get(SHUTDOWN_FLAG_KEY);
-            }
-        });
-    }
-
-    protected void setInfraShutdownFlag(final boolean isShutdown) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                runtimeVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
-                return null;
             }
         });
     }

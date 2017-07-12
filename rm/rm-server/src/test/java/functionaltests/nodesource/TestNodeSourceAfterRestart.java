@@ -52,7 +52,7 @@ public class TestNodeSourceAfterRestart extends RMFunctionalTest {
                                                        //first parameter is empty rmHelper url
                                                        StaticPolicy.class.getName(),
                                                        new Object[] { "ME", "ALL" });
-        rmHelper.waitForNodeSourceCreation(sourceName, 1);
+        rmHelper.waitForNodeSourceCreation(sourceName);
     }
 
     private void startRMPreservingDB() throws Exception {

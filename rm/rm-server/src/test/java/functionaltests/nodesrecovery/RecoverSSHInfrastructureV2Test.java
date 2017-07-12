@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -105,8 +104,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     private void startRmAndCheckInitialState() throws Exception {
         // start RM
         startRmWithConfig(START_CONFIG);
-        Assert.assertTrue("Nodes preservation should be activated on RM start for the test",
-                          PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean());
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isTrue();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // check the initial state of the RM
@@ -132,8 +130,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         // restart RM
         rmHelper = new RMTHelper();
         startRmWithConfig(RESTART_CONFIG);
-        Assert.assertFalse("Nodes preservation should not be activated on RM restart for the test",
-                           PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean());
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isFalse();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // re-snapshot the RM state
