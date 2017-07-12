@@ -247,7 +247,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
                             // load and Initialize the executable container
                             loadAndInit(internalTask);
-
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
 
@@ -327,7 +326,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             EligibleTaskDescriptor etd;
             while (it.hasNext()) {
                 etd = it.next();
-                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd)) {
+                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd) ||
+                    etd.getInternal().getExecutableContainer() == null) {
                     //skip task here
                     it.remove();
                 }
