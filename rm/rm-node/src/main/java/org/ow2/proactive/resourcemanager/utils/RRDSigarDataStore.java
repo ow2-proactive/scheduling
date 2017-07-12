@@ -187,12 +187,12 @@ public class RRDSigarDataStore extends RRDDataStore {
             } catch (NumberFormatException ex) {
                 // do not save non-numeric values
                 String exceptionAsString = StackTraceUtil.getStackTrace(ex).replaceAll("For input string: \".*\"", "");
-                exceptionAsString = dataSource + " / " + fullName + exceptionAsString;
+                exceptionAsString = fullName + " / " + exceptionAsString;
 
                 if (!exceptionsThrown.contains(exceptionAsString)) {
                     exceptionsThrown.add(exceptionAsString);
                     logger.warn("Non numeric value for " + dataSource + " / " + fullName + ": " + ex.getMessage());
-                } else {
+                } else if (logger.isTraceEnabled()) {
                     logger.trace("Non numeric value for " + dataSource + " / " + fullName + ": " + ex.getMessage());
                 }
             } catch (Exception e) {
@@ -200,7 +200,7 @@ public class RRDSigarDataStore extends RRDDataStore {
                 if (!exceptionsThrown.contains(exceptionAsString)) {
                     exceptionsThrown.add(exceptionAsString);
                     logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
-                } else {
+                } else if (logger.isTraceEnabled()) {
                     logger.trace("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
                 }
             }
