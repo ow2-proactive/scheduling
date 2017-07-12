@@ -60,10 +60,6 @@ public class RRDSigarDataStore extends RRDDataStore {
 
     private static Set<String> exceptionsThrown = Collections.synchronizedSet(new HashSet<String>());
 
-    private static boolean AllThreadIdsThreadi_thrown = false;
-
-    private static boolean NonHeapMemoryUsageM_thrown = false;
-
     private MBeanServer mbs;
 
     /**
