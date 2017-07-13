@@ -2247,9 +2247,28 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private void persistNewRMNode(RMNode rmNode) {
         RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-        NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
-        rmNodeData.setNodeSource(nodeSourceData);
-        dbManager.addNode(rmNodeData);
+        // first check if the node exist already in database. This might
+        // happen in case the node exited abruptly and the node source was
+        // recovered afterwards: the node has not been removed from the
+        // database because it died improperly, but as it is not recoverable,
+        // it is recreated
+        RMNodeData retrievedNode = dbManager.getNodeByNameAndUrl(rmNodeData.getName(), rmNodeData.getNodeUrl());
+        if (retrievedNode != null) {
+            // the node exists already in database, update it but log this
+            // irregular behavior
+            if (retrievedNode.getState().equals(NodeState.DOWN)) {
+                logger.warn("A down node " + rmNodeData.getNodeUrl() + " is replaced in database");
+                dbManager.updateNode(rmNodeData);
+            } else {
+                logger.error("The node " + rmNodeData.getNodeUrl() +
+                            " has already been added to the database previously.");
+            }
+        } else {
+            // the node is not present in database
+            NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
+            rmNodeData.setNodeSource(nodeSourceData);
+            dbManager.addNode(rmNodeData);
+        }
     }
 
     /**

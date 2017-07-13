@@ -396,6 +396,24 @@ public class RMDBManager {
         }
     }
 
+    public RMNodeData getNodeByNameAndUrl(final String nodeName, final String nodeUrl) {
+        try {
+            return executeReadTransaction(new SessionWork<RMNodeData>() {
+                @Override
+                public RMNodeData doInTransaction(Session session) {
+                    logger.info("Retrieving the node " + nodeName + " from the database");
+                    Query query = session.getNamedQuery("getRMNodeDataByName")
+                                         .setParameter("name", nodeName)
+                                         .setParameter("url", nodeUrl);
+                    return (RMNodeData) query.uniqueResult();
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occured while retrieving node '" + nodeName + "' in the database: " +
+                                       e.getMessage());
+        }
+    }
+
     public void removeNode(final String nodeName) {
         try {
             executeReadWriteTransaction(new SessionWork<Void>() {
@@ -453,7 +471,7 @@ public class RMDBManager {
                 @Override
                 @SuppressWarnings("unchecked")
                 public Collection<RMNodeData> doInTransaction(Session session) {
-                    Query query = session.getNamedQuery("getRMNodeData");
+                    Query query = session.getNamedQuery("getAllRMNodeData");
                     return (Collection<RMNodeData>) query.list();
                 }
             });
