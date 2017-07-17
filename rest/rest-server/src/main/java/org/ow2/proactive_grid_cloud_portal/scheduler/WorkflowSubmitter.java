@@ -80,6 +80,9 @@ public class WorkflowSubmitter {
             throw new SubmissionClosedRestException(e);
         } catch (JobCreationException e) {
             throw new JobCreationRestException(e);
+        } catch (Exception e) {
+            logger.warn("Unexpected error when submitting job", e);
+            throw new JobCreationRestException(e);
         }
     }
 
