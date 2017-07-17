@@ -213,6 +213,15 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //get the next compatible tasks from the whole returned policy tasks
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
+                for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
+                    InternalJob currentJob = jobMap.get(etd.getJobId()).getInternal();
+                    InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
+                    if (internalTask.getExecutableContainer() == null) {
+                        // load and Initialize the executable container
+                        loadAndInit(internalTask);
+                    }
+                }
+
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
                     neededResourcesNumber = getNextcompatibleTasks(jobMap,
@@ -246,7 +255,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                         if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
                             // load and Initialize the executable container
-                            loadAndInit(internalTask);
+                            // loadAndInit(internalTask);
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
 
@@ -326,8 +335,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             EligibleTaskDescriptor etd;
             while (it.hasNext()) {
                 etd = it.next();
-                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd) ||
-                    etd.getInternal().getExecutableContainer() == null) {
+                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd)) {
                     //skip task here
                     it.remove();
                 }
