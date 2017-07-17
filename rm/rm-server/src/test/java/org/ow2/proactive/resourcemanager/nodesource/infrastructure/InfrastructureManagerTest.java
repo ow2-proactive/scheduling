@@ -266,6 +266,11 @@ public class InfrastructureManagerTest {
 
         }
 
+        @Override
+        public void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
+
+        }
+
     }
 
 }

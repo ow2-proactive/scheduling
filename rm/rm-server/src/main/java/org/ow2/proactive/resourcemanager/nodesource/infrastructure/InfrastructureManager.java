@@ -305,30 +305,35 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * The default behavior is to remove the node from the infrastructure manager.
-     * Then this method calls the {@link InfrastructureManager#onDownNode(String, String)} hook.
+     * This method is called by the system when a Node is detected as DOWN.
      *
-     * @param proactiveProgrammingNode the ProActive Programming Node that is down.
+     * @param node the ProActive Programming Node that is down. This parameter
+     *             can be null if no information about the node can be
+     *             retrieved apart from its url.
+     * @param nodeUrl the URL of the node that is down.
+     *
+     * @throws RMException if any problems occurred.
      */
-    public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
-        String nodeName = proactiveProgrammingNode.getNodeInformation().getName();
-        String nodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
-        internalNotifyDownNode(nodeName, nodeUrl);
-    }
-
-    public void internalNotifyDownNode(String nodeName, String nodeUrl) {
+    public void internalNotifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
         writeLock.lock();
         try {
-            // if the node was previously sane, we need to remove it
             getAcquiredNodesMap().remove(nodeName);
-            // trigger the onDownNode hook
-            this.onDownNode(nodeName, nodeUrl);
+            this.notifyDownNode(nodeName, nodeUrl, node);
         } catch (Exception e) {
-            logger.warn("Exception occurred while removing node " + nodeName);
+            logger.warn("Exception occurred while removing node " + node);
         } finally {
             writeLock.unlock();
         }
     }
+
+    /**
+     * Define what needs to be done in an infrastructure implementation when a node is detected as down.
+     *
+     * @param node the ProActive Programming Node that is down.
+     *
+     * @throws RMException if any problems occurred.
+     */
+    public abstract void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException;
 
     /**
      * This method is called by the RMCore to notify the InfrastructureManager
@@ -925,17 +930,6 @@ public abstract class InfrastructureManager implements Serializable {
             return getDeployingNodeFromRuntimeVariables(nodeUrl);
         }
         return null;
-    }
-
-    /**
-     * Called by the system every time a node is DOWN. The default is to
-     * increment the number of down nodes.
-     *
-     * @param nodeName the name of the node that is down.
-     * @param nodeUrl the URL of the node that is down.
-     */
-    public void onDownNode(String nodeName, String nodeUrl) {
-        incrementNbDownNodes();
     }
 
     /**

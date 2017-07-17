@@ -60,7 +60,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
     private static final String RESTART_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db.ini";
 
-    private static final String NODE_SOURCE_NAME = "testSSHInfra";
+    private static final String NODE_SOURCE_NAME = "testRecoverSSHInfra";
 
     private ResourceManager resourceManager = null;
 

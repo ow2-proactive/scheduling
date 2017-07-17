@@ -84,7 +84,6 @@ public class NodesRecoveryProcessHelper {
         while ((line = input.readLine()) != null) {
             if (line.contains(processName)) {
                 String pidString = line.split(" ")[0];
-                System.out.println("pid for process name: " + processName + " is: " + pidString);
                 input.close();
                 return Integer.parseInt(pidString);
             }
@@ -99,7 +98,6 @@ public class NodesRecoveryProcessHelper {
         while ((line = input.readLine()) != null) {
             if (line.toLowerCase().contains(processName.toLowerCase())) {
                 String pidString = line.split(" ")[0];
-                System.out.println("pid for process name: " + processName + " is: " + pidString);
                 return Integer.parseInt(pidString);
             }
         }

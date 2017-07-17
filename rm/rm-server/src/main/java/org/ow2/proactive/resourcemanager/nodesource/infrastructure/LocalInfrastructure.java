@@ -321,39 +321,18 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void removeNode(Node node) throws RMException {
-        logger.debug("Removing node " + node.getNodeInformation().getURL() + " from " +
+        logger.debug("A node is removed " + node.getNodeInformation().getURL() + " from " +
                      this.getClass().getSimpleName());
-
-        if (!this.nodeSource.getDownNodes().contains(node)) {
-            // the node was manually removed
-            decrementHandledNodes();
-        }
-
-        int remainingNodesCount = decrementAndGetAcquiredNodes();
-        // If there is no remaining node, kill the JVM process
-        if (remainingNodesCount == 0 && getCommandLineStarted()) {
-            shutDown();
-        }
+        // the node was removed intentionally, so we decrement the number of handled nodes
+        decrementHandledNodes();
+        // and the number of acquired nodes is decremented too
+        removeAcquiredNodesAndShutDownIfNeeded();
     }
 
     @Override
-    public void onDownNode(String nodeName, String nodeUrl) {
-        super.onDownNode(nodeName, nodeUrl);
-        decrementAndGetAcquiredNodes();
-        logger.info("Node source " + nodeSource.getName() + " has " + getNbDownNodes() + " down nodes, and there are " +
-                    nodeSource.getNbNodesToRecover() + " nodes to recover");
-        // All the nodes are down, we are going to redeploy the node source
-        if (getNbDownNodes() == nodeSource.getNbNodesToRecover()) {
-            logger.info("All nodes of node source " + nodeSource.getName() +
-                        " are detected down, redeploy node source");
-            // we are going to redeploy the nodes, so we need to indicate
-            // that the command line needs to be started again
-            setCommandLineStarted(false);
-            // trigger deployment
-            nodeSource.activate();
-            // reset internal counters
-            resetNbDownNodes();
-        }
+    public void notifyDownNode(String nodeName, String nodeUrl, Node node) {
+        logger.debug("A down node is removed: " + nodeUrl + " from " + this.getClass().getSimpleName());
+        removeAcquiredNodesAndShutDownIfNeeded();
     }
 
     @Override
@@ -382,6 +361,14 @@ public class LocalInfrastructure extends InfrastructureManager {
         runtimeVariables.put(NB_LOST_NODES_KEY, 0);
         runtimeVariables.put(COMMAND_LINE_STARTED_KEY, false);
         runtimeVariables.put(NB_HANDLED_NODES_KEY, maxNodes);
+    }
+
+    private void removeAcquiredNodesAndShutDownIfNeeded() {
+        int remainingNodesCount = decrementAndGetAcquiredNodes();
+        // if there is no remaining node, kill the JVM process
+        if (remainingNodesCount == 0 && getCommandLineStarted()) {
+            shutDown();
+        }
     }
 
     // Below are wrapper methods around the runtime variables map
