@@ -43,13 +43,14 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
  * @author ActiveEon Team
  * @since 23/06/2017
  */
-public class CheckEligibleTaskDescriptorScriptTest {
+public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
 
     private EligibleTaskDescriptor etd;
 

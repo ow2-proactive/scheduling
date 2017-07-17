@@ -39,6 +39,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 import org.junit.Test;
+import org.ow2.tests.ProActiveTestClean;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -51,7 +52,7 @@ import com.google.common.jimfs.Jimfs;
  *
  * @author ActiveEon Team
  */
-public class HsqldbServerTest {
+public class HsqldbServerTest extends ProActiveTestClean {
 
     @Test
     public void testAddCatalog() {

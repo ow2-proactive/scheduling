@@ -45,10 +45,11 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.utils.appenders.FileAppender;
+import org.ow2.tests.ProActiveTestClean;
 import org.python.icu.impl.Assert;
 
 
-public class TaskLoggerTest {
+public class TaskLoggerTest extends ProActiveTestClean {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();

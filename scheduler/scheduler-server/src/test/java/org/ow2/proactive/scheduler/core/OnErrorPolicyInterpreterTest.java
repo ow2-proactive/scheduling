@@ -40,9 +40,10 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class OnErrorPolicyInterpreterTest {
+public class OnErrorPolicyInterpreterTest extends ProActiveTestClean {
 
     @Test
     public void testRequiresPauseTaskOnError() {

@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.tests.ProActiveTestClean;
 import org.python.google.common.collect.Lists;
 
 import com.google.common.collect.Maps;
@@ -62,7 +63,7 @@ import com.google.common.collect.Maps;
  * @author ActiveEon Team
  * @since 2 Jan 2017
  */
-public class TerminateReplicateTaskHandlerTest {
+public class TerminateReplicateTaskHandlerTest extends ProActiveTestClean {
 
     /**
      * 

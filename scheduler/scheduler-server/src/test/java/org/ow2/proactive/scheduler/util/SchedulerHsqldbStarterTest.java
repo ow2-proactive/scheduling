@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
@@ -43,7 +44,7 @@ import org.mockito.Mockito;
  * 
  * @see SchedulerHsqldbStarter
  */
-public class SchedulerHsqldbStarterTest {
+public class SchedulerHsqldbStarterTest extends ProActiveTestClean {
 
     private HsqldbServer hsqldbServerMock;
 
