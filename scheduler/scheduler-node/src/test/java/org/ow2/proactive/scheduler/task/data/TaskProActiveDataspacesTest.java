@@ -176,14 +176,14 @@ public class TaskProActiveDataspacesTest {
     public void testGetFileTransferThreadPoolSizeDefaultValue() {
         int fileTransferThreadPoolSize = testGetFileTransferThreadPoolSize(Optional.<String> absent());
 
-        assertThat(fileTransferThreadPoolSize).isEqualTo(Runtime.getRuntime().availableProcessors() * 2);
+        assertThat(fileTransferThreadPoolSize).isEqualTo(Runtime.getRuntime().availableProcessors() * 5);
     }
 
     @Test
     public void testGetFileTransferThreadPoolSizeInvalidPropertyValue() {
         int fileTransferThreadPoolSize = testGetFileTransferThreadPoolSize(Optional.of("oops"));
 
-        assertThat(fileTransferThreadPoolSize).isEqualTo(Runtime.getRuntime().availableProcessors() * 2);
+        assertThat(fileTransferThreadPoolSize).isEqualTo(Runtime.getRuntime().availableProcessors() * 5);
     }
 
     @Test
@@ -215,7 +215,7 @@ public class TaskProActiveDataspacesTest {
         }
 
         TaskProActiveDataspaces taskProActiveDataspaces = new TaskProActiveDataspaces();
-        taskProActiveDataspaces.handleResultsWhileTransferringFile(builder.build());
+        taskProActiveDataspaces.handleResultsWhileTransferringFile(builder.build(), "SPACE", 0);
 
         verify(mock, times(nbFutures)).get();
     }
