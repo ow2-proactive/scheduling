@@ -254,8 +254,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
 
                         if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
-                            // load and Initialize the executable container
-                            // loadAndInit(internalTask);
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
 
