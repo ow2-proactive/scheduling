@@ -59,7 +59,7 @@ import functionaltests.utils.SchedulerTHelper;
 public class JobRecoverTest extends SchedulerFunctionalTestWithRestart {
 
     @Test
-    public void run() throws Throwable {
+    public void testJobRecover() throws Throwable {
         JobId firstJobId = schedulerHelper.submitJob(getWorkflowFile());
         JobId secondJobId = schedulerHelper.submitJob(getWorkflowFile());
         JobId thirdJobId = schedulerHelper.submitJob(getWorkflowFile());

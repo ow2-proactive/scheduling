@@ -95,12 +95,16 @@ public class TaskResultImpl implements TaskResult {
      * A map which contains the propagated variables of the previous (dependent)
      * tasks.
      */
-    private Map<String, byte[]> propagatedVariables;
+    private Map<String, byte[]> propagatedVariables = new HashMap();
 
     public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
             Map<String, String> metadata, Map<String, byte[]> propagatedVariables, boolean isRaw) {
         this(id, serializedValue, serializedException, output, isRaw);
-        this.propagatedVariables = propagatedVariables;
+        if (propagatedVariables == null) {
+            this.propagatedVariables = new HashMap();
+        } else {
+            this.propagatedVariables = propagatedVariables;
+        }
         this.metadata = metadata;
     }
 
@@ -454,7 +458,11 @@ public class TaskResultImpl implements TaskResult {
      * @param propagatedVariables a map of propagated variables
      */
     public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {
-        this.propagatedVariables = propagatedVariables;
+        if (propagatedVariables == null) {
+            this.propagatedVariables = new HashMap();
+        } else {
+            this.propagatedVariables = propagatedVariables;
+        }
     }
 
     /**
