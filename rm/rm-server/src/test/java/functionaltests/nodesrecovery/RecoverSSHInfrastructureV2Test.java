@@ -163,11 +163,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
     private void killNodes() throws Exception {
         // kill the remaining nodes that were preserved for the test
-        try {
-            NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMNodeStarter");
-        } catch (Exception e) {
-            // we know that doing this will cause exceptions, keep silent after the test
-        }
+        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMNodeStarter");
     }
 
 }
