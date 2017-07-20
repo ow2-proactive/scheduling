@@ -213,15 +213,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //get the next compatible tasks from the whole returned policy tasks
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
-                for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
-                    InternalJob currentJob = jobMap.get(etd.getJobId()).getInternal();
-                    InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
-                    if (internalTask.getExecutableContainer() == null) {
-                        // load and Initialize the executable container
-                        loadAndInit(internalTask);
-                    }
-                }
-
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
                     neededResourcesNumber = getNextcompatibleTasks(jobMap,
@@ -254,9 +245,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
 
                         if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
+                            // load and Initialize the executable container
+                            loadAndInit(internalTask);
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
-
                             numberOfTaskStarted++;
                             createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
 
@@ -333,7 +325,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             EligibleTaskDescriptor etd;
             while (it.hasNext()) {
                 etd = it.next();
-                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd)) {
+                InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
+                InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
+                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd) ||
+                    internalTask.getExecutableContainer() == null) {
                     //skip task here
                     it.remove();
                 }
