@@ -67,13 +67,14 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     @Before
     public void setup() throws Exception {
         TestSSHInfrastructureV2.startSSHServer();
+        RMTHelper.log("SSH server started");
         startRmAndCheckInitialState();
     }
 
     @After
     public void tearDown() throws Exception {
         // kill the remaining nodes that were preserved for the test
-        killNodes();
+        RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
         TestSSHInfrastructureV2.stopSSHServer();
     }
 
@@ -157,11 +158,6 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         assertThat(lockSucceeded).isEqualTo(new BooleanWrapper(true));
         BooleanWrapper unlockSucceeded = resourceManager.unlockNodes(allNodes);
         assertThat(unlockSucceeded).isEqualTo(new BooleanWrapper(true));
-    }
-
-    private void killNodes() throws Exception {
-        // kill the remaining nodes that were preserved for the test
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMNodeStarter");
     }
 
 }

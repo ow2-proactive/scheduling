@@ -1237,6 +1237,16 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
+    protected void setRmUrl(final String rmUrl) {
+        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                runtimeVariables.put(RM_URL_KEY, rmUrl);
+                return null;
+            }
+        });
+    }
+
     protected String getRmUrl() {
         return getRuntimeVariable(new RuntimeVariablesHandler<String>() {
             @Override
