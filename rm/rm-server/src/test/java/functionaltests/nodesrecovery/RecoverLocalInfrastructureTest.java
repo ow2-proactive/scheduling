@@ -42,7 +42,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.utils.NodesRecoveryProcessHelper;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
@@ -65,28 +64,28 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     private ResourceManager resourceManager = null;
 
     @Before
-    public void prepareRM() throws Exception {
+    public void setup() throws Exception {
         startRmAndCheckInitialState();
     }
 
     @After
-    public void killNodes() throws Exception {
+    public void tearDown() throws Exception {
         // kill the remaining nodes that were preserved for the test
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMNodeStarter");
+        RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
-        // kill the RM only by sending a SIGKILL and leave node processes alive
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMStarterForFunctionalTest");
+        // kill only the RM by sending a SIGKILL and leave node processes alive
+        RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
         // nodes should be re-taken into account by the restarted RM
         restartRmAndCheckFinalState(false);
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
-        // kill the RM and also kill all node processes
-        rmHelper.killRM();
+        // kill RM and nodes with SIGKILL
+        RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
         // nodes should be re-deployed by the restarted RM
         restartRmAndCheckFinalState(true);
     }

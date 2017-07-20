@@ -23,36 +23,33 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.utils;
+package functionaltests.nodesrecovery;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+
+import functionaltests.utils.NodesRecoveryProcessHelper;
+import functionaltests.utils.RMStarterForFunctionalTest;
+import functionaltests.utils.RMTHelper;
 
 
 /**
  * @author ActiveEon Team
- * @since 07/07/17
+ * @since 20/07/17
  */
-public class SSHInfrastructureHelper {
+class RecoverInfrastructureTestHelper {
 
-    public static String[] splitCommand(String command) {
-        List<String> list = new ArrayList<>();
-        Matcher m = Pattern.compile("([^\\\\\"]\\S*|\\\\\".+?\\\\\")\\s*").matcher(command);
-        while (m.find()) {
-            list.add(m.group(1).replaceAll("\\\\\"", ""));
-        }
-        return list.toArray(new String[list.size()]);
+    static void killNodesWithStrongSigKill() throws Exception {
+        RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test -- expect exceptions)");
+        NodesRecoveryProcessHelper.findRmPidAndSendSigKill(RMNodeStarter.class.getSimpleName());
     }
 
-    public static String[] splitCommandWithoutRemovingQuotes(String command) {
-        List<String> list = new ArrayList<>();
-        Matcher m = Pattern.compile("(\\\\\"\\\\\"|[^\\\\\"]\\S*|\\\\\".+?\\\\\")\\s*").matcher(command);
-        while (m.find()) {
-            list.add(m.group(1).replaceAll("\\\\\"", "\""));
-        }
-        return list.toArray(new String[list.size()]);
+    static void killRmWithStrongSigKill() throws Exception {
+        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
+        NodesRecoveryProcessHelper.findRmPidAndSendSigKill(RMStarterForFunctionalTest.class.getSimpleName());
     }
 
+    static void killRmAndNodesWithStrongSigKill() throws Exception {
+        killRmWithStrongSigKill();
+        killNodesWithStrongSigKill();
+    }
 }

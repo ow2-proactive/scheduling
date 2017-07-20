@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.apache.sshd.common.util.OsUtils;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.tests.ProcessKiller;
@@ -64,16 +65,19 @@ public class NodesRecoveryProcessHelper {
     }
 
     private static String buildJpsCommand() {
-        OperatingSystem os = OperatingSystem.UNIX;
-        // assuming no cygwin, windows or the "others"...
-        if (System.getProperty("os.name").contains("Windows")) {
+        OperatingSystem os;
+        String jpsCommandPath;
+        if (OsUtils.isWin32()) {
             os = OperatingSystem.WINDOWS;
+            jpsCommandPath = "\"" + System.getProperty("java.home") + os.fs + ".." + os.fs + "bin" + os.fs +
+                             "jps.exe\"";
+        } else if (OsUtils.isUNIX()) {
+            os = OperatingSystem.UNIX;
+            jpsCommandPath = System.getProperty("java.home") + os.fs + ".." + os.fs + "bin" + os.fs + "jps";
+        } else {
+            throw new IllegalStateException("Operating system is not recognized");
         }
-        String rmHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
-        if (!rmHome.endsWith(os.fs)) {
-            rmHome += os.fs;
-        }
-        return System.getProperty("java.home") + os.fs + ".." + os.fs + "bin" + os.fs + "jps";
+        return jpsCommandPath;
     }
 
     private static int getUnixFirstJavaProcessPidWithName(String processName)

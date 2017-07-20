@@ -65,13 +65,14 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     private ResourceManager resourceManager = null;
 
     @Before
-    public void prepareRM() throws Exception {
+    public void setup() throws Exception {
         TestSSHInfrastructureV2.startSSHServer();
         startRmAndCheckInitialState();
     }
 
     @After
     public void tearDown() throws Exception {
+        // kill the remaining nodes that were preserved for the test
         killNodes();
         TestSSHInfrastructureV2.stopSSHServer();
     }
@@ -79,18 +80,15 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     @Test
     public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
         // kill only the RM by sending a SIGKILL and leave node processes alive
-        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMStarterForFunctionalTest");
+        RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
         // nodes should be re-taken into account by the restarted RM
         restartRmAndCheckFinalState(false);
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
-        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill("RMStarterForFunctionalTest");
-        RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test)");
-        killNodes();
+        // kill RM and nodes with SIGKILL
+        RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
         // nodes should be re-deployed by the restarted RM
         restartRmAndCheckFinalState(true);
     }
