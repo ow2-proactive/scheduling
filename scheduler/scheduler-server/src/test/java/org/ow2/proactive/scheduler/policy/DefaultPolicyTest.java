@@ -43,9 +43,10 @@ import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class DefaultPolicyTest {
+public class DefaultPolicyTest extends ProActiveTestClean {
 
     private int jobId;
 

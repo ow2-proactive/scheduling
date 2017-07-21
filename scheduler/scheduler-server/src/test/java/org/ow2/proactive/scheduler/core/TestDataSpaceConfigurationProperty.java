@@ -28,7 +28,7 @@ package org.ow2.proactive.scheduler.core;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.ow2.tests.ProActiveTest;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
@@ -36,7 +36,7 @@ import org.ow2.tests.ProActiveTest;
  *
  * @author The ProActive Team
  **/
-public class TestDataSpaceConfigurationProperty extends ProActiveTest {
+public class TestDataSpaceConfigurationProperty extends ProActiveTestClean {
 
     @Test
     public void testPropertyParsing() throws Throwable {

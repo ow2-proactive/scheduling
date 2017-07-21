@@ -47,12 +47,13 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
  * Unit tests for ExtendedSchedulerPolicy class.
  */
-public class ExtendedSchedulerPolicyTest {
+public class ExtendedSchedulerPolicyTest extends ProActiveTestClean {
 
     private ExtendedSchedulerPolicy policy;
 

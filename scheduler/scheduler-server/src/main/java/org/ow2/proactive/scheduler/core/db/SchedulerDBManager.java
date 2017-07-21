@@ -108,43 +108,43 @@ import it.sauronsoftware.cron4j.Scheduler;
 @SuppressWarnings("JpaQueryApiInspection")
 public class SchedulerDBManager {
 
-    private static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
+    public static final String JAVA_PROPERTYNAME_NODB = "scheduler.database.nodb";
 
     private static final int RECOVERY_LOAD_JOBS_BATCH_SIZE = PASchedulerProperties.SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE.getValueAsInt();
 
     private static final Logger logger = Logger.getLogger(SchedulerDBManager.class);
 
-    protected static final Set<JobStatus> FINISHED_JOB_STATUSES = ImmutableSet.of(JobStatus.CANCELED,
-                                                                                  JobStatus.FAILED,
-                                                                                  JobStatus.KILLED,
-                                                                                  JobStatus.FINISHED);
+    public static final Set<JobStatus> FINISHED_JOB_STATUSES = ImmutableSet.of(JobStatus.CANCELED,
+                                                                               JobStatus.FAILED,
+                                                                               JobStatus.KILLED,
+                                                                               JobStatus.FINISHED);
 
-    protected static final Set<JobStatus> PENDING_JOB_STATUSES = ImmutableSet.of(JobStatus.PENDING);
+    public static final Set<JobStatus> PENDING_JOB_STATUSES = ImmutableSet.of(JobStatus.PENDING);
 
-    protected static final Set<JobStatus> RUNNING_JOB_STATUSES = ImmutableSet.of(JobStatus.PAUSED,
-                                                                                 JobStatus.IN_ERROR,
-                                                                                 JobStatus.STALLED,
-                                                                                 JobStatus.RUNNING);
+    public static final Set<JobStatus> RUNNING_JOB_STATUSES = ImmutableSet.of(JobStatus.PAUSED,
+                                                                              JobStatus.IN_ERROR,
+                                                                              JobStatus.STALLED,
+                                                                              JobStatus.RUNNING);
 
-    protected static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES = ImmutableSet.copyOf(Iterables.concat(RUNNING_JOB_STATUSES,
-                                                                                                           PENDING_JOB_STATUSES));
+    public static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES = ImmutableSet.copyOf(Iterables.concat(RUNNING_JOB_STATUSES,
+                                                                                                        PENDING_JOB_STATUSES));
 
-    protected static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(TaskStatus.SUBMITTED,
-                                                                           TaskStatus.PENDING,
-                                                                           TaskStatus.NOT_STARTED);
+    public static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(TaskStatus.SUBMITTED,
+                                                                        TaskStatus.PENDING,
+                                                                        TaskStatus.NOT_STARTED);
 
-    protected static final Set<TaskStatus> RUNNING_TASKS = ImmutableSet.of(TaskStatus.PAUSED,
-                                                                           TaskStatus.IN_ERROR,
-                                                                           TaskStatus.RUNNING,
-                                                                           TaskStatus.WAITING_ON_ERROR,
-                                                                           TaskStatus.WAITING_ON_FAILURE);
+    public static final Set<TaskStatus> RUNNING_TASKS = ImmutableSet.of(TaskStatus.PAUSED,
+                                                                        TaskStatus.IN_ERROR,
+                                                                        TaskStatus.RUNNING,
+                                                                        TaskStatus.WAITING_ON_ERROR,
+                                                                        TaskStatus.WAITING_ON_FAILURE);
 
-    protected static final Set<TaskStatus> FINISHED_TASKS = ImmutableSet.of(TaskStatus.FAILED,
-                                                                            TaskStatus.NOT_RESTARTED,
-                                                                            TaskStatus.ABORTED,
-                                                                            TaskStatus.FAULTY,
-                                                                            TaskStatus.FINISHED,
-                                                                            TaskStatus.SKIPPED);
+    public static final Set<TaskStatus> FINISHED_TASKS = ImmutableSet.of(TaskStatus.FAILED,
+                                                                         TaskStatus.NOT_RESTARTED,
+                                                                         TaskStatus.ABORTED,
+                                                                         TaskStatus.FAULTY,
+                                                                         TaskStatus.FINISHED,
+                                                                         TaskStatus.SKIPPED);
 
     private final SessionFactory sessionFactory;
 
