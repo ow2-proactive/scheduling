@@ -30,6 +30,7 @@ import java.security.KeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -53,7 +54,9 @@ public class HybridEncryptionUtil {
     // funny transformations require initial vector parameters, try to avoid them
     private static final String AES_CIPHER = "AES";
 
-    private static final String STRING_ENCRYPTION_CIPHER = "RSA/ECB/PKCS1Padding";
+    private static final String STRING_ENCRYPTION_CIPHER = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+
+    private static final String PREVIOUS_STRING_ENCRYPTION_CIPHER = "RSA/ECB/PKCS1Padding";
 
     public static byte[] decrypt(PrivateKey privateKey, String cipher, HybridEncryptedData encryptedData)
             throws KeyException {
@@ -103,7 +106,28 @@ public class HybridEncryptionUtil {
 
     public static String decryptString(HybridEncryptedData encryptedData, PrivateKey privateKey) throws KeyException {
         try {
-            return new String(decrypt(privateKey, STRING_ENCRYPTION_CIPHER, encryptedData), ENCRYPTED_STRING_CHARSET);
+            return decryptString(encryptedData, privateKey, STRING_ENCRYPTION_CIPHER);
+        } catch (KeyException e) {
+            // this workaround is to allow decrypting strings which used the previous cipher algorithm
+            if (isAPaddingException(e)) {
+                return decryptString(encryptedData, privateKey, PREVIOUS_STRING_ENCRYPTION_CIPHER);
+            }
+            throw e;
+        }
+    }
+
+    private static boolean isAPaddingException(KeyException keyException) {
+        Throwable currentException = keyException;
+        do {
+            currentException = currentException.getCause();
+        } while (currentException != null && !(currentException instanceof BadPaddingException));
+        return currentException != null;
+    }
+
+    private static String decryptString(HybridEncryptedData encryptedData, PrivateKey privateKey, String cipher)
+            throws KeyException {
+        try {
+            return new String(decrypt(privateKey, cipher, encryptedData), ENCRYPTED_STRING_CHARSET);
         } catch (UnsupportedEncodingException ignored) {
             return null; // never happens, we control charset value
         }

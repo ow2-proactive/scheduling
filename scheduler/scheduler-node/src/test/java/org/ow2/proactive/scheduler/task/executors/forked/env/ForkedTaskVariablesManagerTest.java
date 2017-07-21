@@ -590,7 +590,7 @@ public class ForkedTaskVariablesManagerTest {
         CredData credData = new CredData(username, password, thirdPartyCreds);
         KeyPairGenerator keyGen;
         keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(512, new SecureRandom());
+        keyGen.initialize(1024, new SecureRandom());
         KeyPair keyPair = keyGen.generateKeyPair();
         Decrypter decrypter = new Decrypter(keyPair.getPrivate());
         Credentials credentials = Credentials.createCredentials(credData, keyPair.getPublic());

@@ -80,6 +80,8 @@ public class Credentials implements Serializable {
     /** Java property describing the path to the public key on the local drive */
     public static final String pubkeyPathProperty = "pa.common.auth.pubkey";
 
+    public static final String DEFAULT_CYPHER = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+
     static {
         File home = new File(DEFAULT_CREDS).getParentFile();
         if (!home.isDirectory()) {
@@ -501,7 +503,7 @@ public class Credentials implements Serializable {
      * @throws KeyException key generation or encryption failed
      */
     public static Credentials createCredentials(final CredData cc, final PublicKey pubKey) throws KeyException {
-        return createCredentials(cc, pubKey, "RSA/ECB/PKCS1Padding");
+        return createCredentials(cc, pubKey, DEFAULT_CYPHER);
     }
 
     /**
@@ -594,7 +596,7 @@ public class Credentials implements Serializable {
      */
     @Deprecated
     public static Credentials createCredentials(String login, String password, String pubPath) throws KeyException {
-        return createCredentials(login, password, pubPath, "RSA/ECB/PKCS1Padding");
+        return createCredentials(login, password, pubPath, DEFAULT_CYPHER);
     }
 
     /**
@@ -610,7 +612,7 @@ public class Credentials implements Serializable {
      */
     @Deprecated
     public static Credentials createCredentials(String login, String password, PublicKey pubKey) throws KeyException {
-        return createCredentials(login, password, null, pubKey, "RSA/ECB/PKCS1Padding");
+        return createCredentials(login, password, null, pubKey, DEFAULT_CYPHER);
     }
 
     /**

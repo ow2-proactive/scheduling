@@ -614,7 +614,7 @@ public class InProcessTaskExecutorTest {
         credData.addThirdPartyCredential("PASSWORD", "p4ssw0rd");
         KeyPairGenerator keyGen;
         keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(512, new SecureRandom());
+        keyGen.initialize(1024, new SecureRandom());
         KeyPair keyPair = keyGen.generateKeyPair();
         Decrypter decrypter = new Decrypter(keyPair.getPrivate());
         Credentials credentials = Credentials.createCredentials(credData, keyPair.getPublic());

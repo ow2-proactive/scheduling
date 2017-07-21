@@ -85,7 +85,7 @@ public class CreateCredentials {
         String login = null;
         String pass = null;
         String keyfile = null;
-        String cipher = "RSA/ECB/PKCS1Padding";
+        String cipher = Credentials.DEFAULT_CYPHER;
         String path = Credentials.getCredentialsPath();
         String rm = null;
         String scheduler = null;
