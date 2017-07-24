@@ -35,12 +35,16 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.ow2.proactive.utils.ObjectByteConverter;
 
 
 /**
  * Encrypt data with a symmetric key that is asymmetrically encrypted.
  */
 public class HybridEncryptionUtil {
+
+    private static final Logger logger = Logger.getLogger(HybridEncryptionUtil.class);
 
     private static final String ENCRYPTED_STRING_CHARSET = "UTF-8";
 
@@ -62,6 +66,11 @@ public class HybridEncryptionUtil {
             throws KeyException {
         byte[] decryptedData;
         byte[] decryptedSymmetricKey;
+
+        logger.info("Private  key : " + ObjectByteConverter.byteArrayToBase64String(privateKey.getEncoded()));
+
+        logger.info("Encrypted symetric key (" + cipher + "):" +
+                    ObjectByteConverter.byteArrayToBase64String(encryptedData.getEncryptedSymmetricKey()));
 
         // recover clear AES key using the private key
         try {
@@ -94,6 +103,11 @@ public class HybridEncryptionUtil {
         } catch (KeyException e) {
             throw new KeyException("Symmetric key encryption failed", e);
         }
+
+        logger.info("Public  key : " + ObjectByteConverter.byteArrayToBase64String(publicKey.getEncoded()));
+        logger.info("Decrypted symetric key (" + cipher + "):" +
+                    ObjectByteConverter.byteArrayToBase64String(aesKey.getEncoded()));
+        logger.info("Encrypted symetric key (" + cipher + "):" + ObjectByteConverter.byteArrayToBase64String(encAes));
 
         // encrypt clear credentials with AES key
         try {
