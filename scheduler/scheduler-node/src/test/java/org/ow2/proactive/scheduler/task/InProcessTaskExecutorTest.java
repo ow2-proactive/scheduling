@@ -291,7 +291,8 @@ public class InProcessTaskExecutorTest {
                                                                  null,
                                                                  null,
                                                                  null,
-                                                                 SerializationUtil.serializeVariableMap(variablesFromParent)) };
+                                                                 SerializationUtil.serializeVariableMap(variablesFromParent),
+                                                                 false) };
 
         new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("print(variables.get('var'));print(variables.get('PA_TASK_ID'))",
                                                                                                                           "groovy"))),

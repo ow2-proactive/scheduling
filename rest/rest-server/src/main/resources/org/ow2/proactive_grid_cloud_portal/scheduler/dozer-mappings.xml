@@ -73,11 +73,18 @@
 			<a>id</a>
 			<b>taskId</b>
 		</field>
-		<field>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.ByteArrayToBase64StringCustomConverter">
 			<a>serializedValue</a>
 			<b>serializedValue</b>
 		</field>
-		<field>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.SerializableToStringCustomConverter">
+			<a>value</a>
+			<b get-method="getValue">value</b>
+		</field>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.ByteArrayToBase64StringCustomConverter">
 			<a>serializedException</a>
 			<b>serializedException</b>
 		</field>
@@ -89,7 +96,13 @@
 			<a>metadata</a>
 			<b>metadata</b>
 		</field>
-		<field>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.PropagatedVariablesCustomConverter">
+			<a>serializedPropagatedVariables</a>
+			<b>propagatedVariables</b>
+		</field>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.StringPropagatedVariablesCustomConverter">
 			<a>propagatedVariables</a>
 			<b>propagatedVariables</b>
 		</field>
@@ -97,6 +110,10 @@
 			<a>output</a>
 			<b>output</b>
 			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskLogsData</a-hint>
+		</field>
+		<field>
+			<a>raw</a>
+			<b>raw</b>
 		</field>
 	</mapping>
 

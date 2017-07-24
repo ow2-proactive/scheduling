@@ -34,6 +34,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
@@ -42,7 +43,7 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
  * @author ProActive team
  *
  */
-public class TimeoutThreadPoolExecutorTest {
+public class TimeoutThreadPoolExecutorTest extends ProActiveTestClean {
 
     private TimeoutThreadPoolExecutor executor;
 

@@ -40,6 +40,7 @@ import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -314,6 +315,29 @@ public class RMNodeImpl extends AbstractRMNode {
             node.killAllActiveObjects();
         } catch (IOException e) {
             throw new NodeException("Node is down");
+        }
+
+        // Wait until all active objects are terminated
+        waitUntilNodeIsCleaned();
+    }
+
+    private void waitUntilNodeIsCleaned() throws NodeException {
+        long timeout = PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsLong();
+        int sleepTime = 100;
+        int maximumNumberOfWait = Math.round(((float) timeout) / sleepTime);
+        try {
+            int numberOfActiveObjects = node.getNumberOfActiveObjects();
+            int numberOfWait = 0;
+            while (numberOfActiveObjects > 0 && numberOfWait < maximumNumberOfWait) {
+                Thread.sleep(sleepTime);
+                numberOfWait++;
+                numberOfActiveObjects = node.getNumberOfActiveObjects();
+            }
+            if (numberOfWait >= maximumNumberOfWait) {
+                logger.error("Node " + nodeName + "could not be cleaned after " + timeout + " ms.");
+            }
+        } catch (InterruptedException e) {
+            logger.warn("Interrupted while cleaning node " + nodeName, e);
         }
     }
 

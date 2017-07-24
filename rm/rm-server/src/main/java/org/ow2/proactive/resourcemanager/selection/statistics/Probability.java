@@ -97,16 +97,18 @@ public class Probability {
      * It's done to pause the permanent execution of dynamic selection scripts
      */
     public synchronized void decrease() {
-
-        if (probability > 0 && probability < 1) {
+        if (probability > 0) {
+            probability = calcProbability(--step);
             // setting the probability to 0 to timeout the script execution on this node
             // and scheduling the timer
-            probability = calcProbability(--step);
-            timer.schedule(new RestoreProbabilityTask(probability),
-                           PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.getValueAsLong());
-        }
+            long dynamicity = PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.getValueAsLong();
 
-        probability = 0;
+            if (dynamicity > 0) {
+                timer.schedule(new RestoreProbabilityTask(probability),
+                               PAResourceManagerProperties.RM_SELECT_SCRIPT_NODE_DYNAMICITY.getValueAsLong());
+                probability = 0;
+            }
+        }
     }
 
     /**

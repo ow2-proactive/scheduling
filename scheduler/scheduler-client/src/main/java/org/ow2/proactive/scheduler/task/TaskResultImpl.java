@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
+import org.ow2.proactive.utils.ObjectByteConverter;
 
 
 /**
@@ -63,6 +64,9 @@ public class TaskResultImpl implements TaskResult {
 
     /** The value of the result if no exception occurred as a byte array */
     private byte[] serializedValue = null;
+
+    /** true if this result contains raw data **/
+    private boolean isRaw = false;
 
     /** The value of the result if no exception occurred */
     private transient Serializable value = null;
@@ -91,20 +95,26 @@ public class TaskResultImpl implements TaskResult {
      * A map which contains the propagated variables of the previous (dependent)
      * tasks.
      */
-    private Map<String, byte[]> propagatedVariables;
+    private Map<String, byte[]> propagatedVariables = new HashMap();
 
     public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
-            Map<String, String> metadata, Map<String, byte[]> propagatedVariables) {
-        this(id, serializedValue, serializedException, output);
-        this.propagatedVariables = propagatedVariables;
+            Map<String, String> metadata, Map<String, byte[]> propagatedVariables, boolean isRaw) {
+        this(id, serializedValue, serializedException, output, isRaw);
+        if (propagatedVariables == null) {
+            this.propagatedVariables = new HashMap();
+        } else {
+            this.propagatedVariables = propagatedVariables;
+        }
         this.metadata = metadata;
     }
 
-    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output) {
+    public TaskResultImpl(TaskId id, byte[] serializedValue, byte[] serializedException, TaskLogs output,
+            boolean isRaw) {
         this(id, output);
         this.serializedValue = serializedValue;
         this.serializedException = serializedException;
         this.output = output;
+        this.isRaw = isRaw;
     }
 
     private TaskResultImpl(TaskId id, TaskLogs output) {
@@ -132,6 +142,7 @@ public class TaskResultImpl implements TaskResult {
             if (value instanceof byte[]) {
                 // object is already a byte array
                 this.serializedValue = (byte[]) value;
+                this.isRaw = true;
             } else {
                 //try to serialize user result
                 this.serializedValue = ObjectToByteConverter.ObjectStream.convert(value);
@@ -271,6 +282,11 @@ public class TaskResultImpl implements TaskResult {
         }
     }
 
+    @Override
+    public Serializable getValue() throws Throwable {
+        return value;
+    }
+
     /**
      * @see org.ow2.proactive.scheduler.common.task.TaskResult#getException()
      */
@@ -345,7 +361,11 @@ public class TaskResultImpl implements TaskResult {
      */
     private Serializable instanciateValue(ClassLoader cl) throws IOException, ClassNotFoundException {
         if (this.serializedValue != null && this.value == null) {
-            this.value = (Serializable) ByteToObjectConverter.ObjectStream.convert(this.serializedValue, cl);
+            if (this.isRaw) {
+                return this.serializedValue;
+            } else {
+                this.value = (Serializable) ByteToObjectConverter.ObjectStream.convert(this.serializedValue, cl);
+            }
         }
         return this.value;
     }
@@ -438,7 +458,11 @@ public class TaskResultImpl implements TaskResult {
      * @param propagatedVariables a map of propagated variables
      */
     public void setPropagatedVariables(Map<String, byte[]> propagatedVariables) {
-        this.propagatedVariables = propagatedVariables;
+        if (propagatedVariables == null) {
+            this.propagatedVariables = new HashMap();
+        } else {
+            this.propagatedVariables = propagatedVariables;
+        }
     }
 
     /**
@@ -447,5 +471,15 @@ public class TaskResultImpl implements TaskResult {
     @Override
     public Map<String, byte[]> getPropagatedVariables() {
         return propagatedVariables;
+    }
+
+    @Override
+    public Map<String, Serializable> getVariables() throws IOException, ClassNotFoundException {
+        return ObjectByteConverter.mapOfByteArrayToSerializable(propagatedVariables);
+    }
+
+    @Override
+    public boolean isRaw() {
+        return isRaw;
     }
 }

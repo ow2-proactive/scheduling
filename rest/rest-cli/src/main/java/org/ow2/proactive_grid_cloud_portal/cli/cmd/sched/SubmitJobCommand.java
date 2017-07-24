@@ -26,12 +26,20 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_FILE_EMPTY;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URLConnection;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
@@ -39,32 +47,34 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 
-import com.google.common.collect.Maps;
-
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
     private final String pathname;
 
     private String variables;
 
+    private static final Logger logger = null;
+
     private final JobKeyValueTransformer jobKeyValueTransformer;
 
-    public SubmitJobCommand(String... params) {
-
+    public SubmitJobCommand(String... params) throws CLIException {
+        if (params == null || params.length == 0) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
+        }
         this.pathname = params[0];
         if (params.length > 1) {
             this.variables = params[1];
         }
         this.jobKeyValueTransformer = new JobKeyValueTransformer();
+
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        File jobFile = new File(pathname);
-        if (!jobFile.exists()) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
-        }
+
         try {
+            validateFilePath(currentContext);
+            File jobFile = new File(pathname);
             String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
             JobIdData jobId;
             if (APPLICATION_XML.getMimeType().equals(contentType)) {
@@ -83,9 +93,62 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
                         e,
                         currentContext);
         }
+
+    }
+
+    private void validateFilePath(ApplicationContext currentContext) {
+        if (!isFilePathValid(pathname)) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
+        }
+
+        if (!isFileExisting(pathname)) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
+        }
+
+        if (isFileEmpty(pathname)) {
+            writeLine(currentContext, "File " + pathname + " is empty ");
+            throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
+        }
+
     }
 
     private Map<String, String> map(String variables) {
         return jobKeyValueTransformer.transformVariablesToMap(variables);
     }
+
+    private Boolean isFileEmpty(String pathname) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(pathname));
+            if (isFileExisting(pathname)) {
+                if (reader.readLine() == null) {
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        } catch (IOException e) {
+            logger.log(Level.INFO, "Error reading file " + pathname, e);
+            return false;
+        }
+    }
+
+    private Boolean isFileExisting(String pathname) {
+        File file = new File(pathname);
+        if (file.exists() && !file.isDirectory())
+            return true;
+        return false;
+    }
+
+    private Boolean isFilePathValid(String pathname) {
+        String regex = "^(\\/)?([^\\/\\\u0000]+(\\/)?)+\\.xml";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(pathname);
+
+        if (matcher.find()) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

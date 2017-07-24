@@ -56,10 +56,10 @@ import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.util.SendMail;
-import org.ow2.tests.ProActiveTest;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class JobEmailNotificationTest extends ProActiveTest {
+public class JobEmailNotificationTest extends ProActiveTestClean {
 
     public static class TestJavaTask extends JavaExecutable {
         @Override

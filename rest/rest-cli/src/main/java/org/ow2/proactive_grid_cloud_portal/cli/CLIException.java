@@ -35,6 +35,8 @@ public class CLIException extends RuntimeException {
 
     public static final int REASON_OTHER = 4;
 
+    public static final int REASON_FILE_EMPTY = 5;
+
     private static final long serialVersionUID = 1L;
 
     private final int reason;

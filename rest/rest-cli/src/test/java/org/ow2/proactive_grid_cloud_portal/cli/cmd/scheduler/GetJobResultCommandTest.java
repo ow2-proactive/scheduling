@@ -39,11 +39,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.ow2.proactive.utils.ObjectByteConverter;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
 import objectFaker.DataFaker;
+import objectFaker.propertyGenerator.FixedPropertyGenerator;
 import objectFaker.propertyGenerator.PrefixPropertyGenerator;
 
 
@@ -61,11 +63,15 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
         jobResultFaker.setGenerator("id.readableName", new PrefixPropertyGenerator("job", 1));
         jobResultFaker.setGenerator("allResults.key", new PrefixPropertyGenerator("task", 1));
         jobResultFaker.setGenerator("allResults.value.id.readableName", new PrefixPropertyGenerator("task", 1));
+        jobResultFaker.setGenerator("allResults.value.serializedValue",
+                                    new FixedPropertyGenerator(ObjectByteConverter.serializableToBase64String("Hello")));
 
         jobResult = jobResultFaker.fake();
 
         DataFaker<TaskResultData> taskResultsDataFaker = new DataFaker<TaskResultData>(TaskResultData.class);
         taskResultsDataFaker.setGenerator("id.readableName", new PrefixPropertyGenerator("task", 4));
+        taskResultsDataFaker.setGenerator("serializedValue",
+                                          new FixedPropertyGenerator(ObjectByteConverter.serializableToBase64String("Hello")));
 
         taskResults = taskResultsDataFaker.fakeList(3);
     }
@@ -78,9 +84,9 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
         System.out.println(out);
 
         assertThat(out, containsString("job('1') result:"));
-        assertThat(out, containsString("task1 : serializedValue1"));
-        assertThat(out, containsString("task2 : serializedValue2"));
-        assertThat(out, containsString("task3 : serializedValue3"));
+        assertThat(out, containsString("task1 : Hello"));
+        assertThat(out, containsString("task2 : Hello"));
+        assertThat(out, containsString("task3 : Hello"));
     }
 
     @Test
@@ -91,9 +97,9 @@ public class GetJobResultCommandTest extends AbstractJobTagCommandTest {
         String out = capturedOutput.toString();
         System.out.println(out);
 
-        assertThat(out, containsString("task4 result: serializedValue1"));
-        assertThat(out, containsString("task5 result: serializedValue2"));
-        assertThat(out, containsString("task6 result: serializedValue3"));
+        assertThat(out, containsString("task4 result: Hello"));
+        assertThat(out, containsString("task5 result: Hello"));
+        assertThat(out, containsString("task6 result: Hello"));
     }
 
     @Test
