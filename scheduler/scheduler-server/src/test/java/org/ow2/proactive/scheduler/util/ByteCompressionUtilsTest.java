@@ -37,9 +37,10 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class ByteCompressionUtilsTest {
+public class ByteCompressionUtilsTest extends ProActiveTestClean {
 
     private TaskFlowJob job;
 

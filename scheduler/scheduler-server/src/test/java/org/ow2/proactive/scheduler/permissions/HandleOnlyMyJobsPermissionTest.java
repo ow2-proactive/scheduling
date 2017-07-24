@@ -28,9 +28,10 @@ package org.ow2.proactive.scheduler.permissions;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class HandleOnlyMyJobsPermissionTest {
+public class HandleOnlyMyJobsPermissionTest extends ProActiveTestClean {
 
     @Test
     public void testHandleOnlyMyJobsPermissionFalse() {

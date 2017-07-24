@@ -36,9 +36,10 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class TerminateNotificationTest {
+public class TerminateNotificationTest extends ProActiveTestClean {
 
     private TerminateNotification terminateNotification;
 

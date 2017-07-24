@@ -53,11 +53,11 @@ import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
-import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class TerminationDataTest {
+public class TerminationDataTest extends ProActiveTestClean {
 
     private TerminationData terminationData;
 

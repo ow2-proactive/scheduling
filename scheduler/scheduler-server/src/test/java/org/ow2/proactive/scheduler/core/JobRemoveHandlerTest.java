@@ -44,9 +44,10 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class JobRemoveHandlerTest {
+public class JobRemoveHandlerTest extends ProActiveTestClean {
 
     private JobRemoveHandler jobRemoveHandler;
 

@@ -62,9 +62,10 @@ import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class SchedulerFrontendTest {
+public class SchedulerFrontendTest extends ProActiveTestClean {
 
     private SchedulerFrontend schedulerFrontend;
 

@@ -45,9 +45,10 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class ServerJobAndTaskLogsTest {
+public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
 
     @Rule
     public TemporaryFolder fakeSchedulerHome = new TemporaryFolder();

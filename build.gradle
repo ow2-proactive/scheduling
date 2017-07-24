@@ -130,7 +130,9 @@ configure(javaSubprojects) {
         if(Boolean.valueOf(System.getProperty("java.awt.headless"))){
             exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
         }
-        systemProperty 'file.encoding', 'UTF-8'
+        systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+        systemProperties << ['file.encoding': 'UTF-8']
+        systemProperties << ['pa.rm.home': rootDir.absolutePath]
     }
 
     task serialver(type: serialver.InsertSerialVersionUIDTask) {

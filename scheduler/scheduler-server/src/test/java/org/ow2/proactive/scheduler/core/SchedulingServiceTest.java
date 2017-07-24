@@ -58,9 +58,10 @@ import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class SchedulingServiceTest {
+public class SchedulingServiceTest extends ProActiveTestClean {
 
     private SchedulingService schedulingService;
 

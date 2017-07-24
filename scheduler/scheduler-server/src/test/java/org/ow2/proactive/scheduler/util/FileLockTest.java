@@ -35,6 +35,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
@@ -42,7 +43,7 @@ import org.junit.Test;
  * can be used from several threads at the same time to perform a
  * kind of synchronization barrier.
  */
-public class FileLockTest {
+public class FileLockTest extends ProActiveTestClean {
 
     @Test(timeout = 5000)
     public void testWaitUntilUnlocked() throws Exception {

@@ -439,11 +439,11 @@ public class RMDBManager {
         return entityToMap(lockHistoryResult);
     }
 
-    List<LockHistory> getLockHistories() {
+    public List<LockHistory> getLockHistories() {
         return (List<LockHistory>) executeSqlQuery("from LockHistory");
     }
 
-    Map<String, MutableInteger> entityToMap(List<LockHistory> lockHistoryResult) {
+    public Map<String, MutableInteger> entityToMap(List<LockHistory> lockHistoryResult) {
         if (lockHistoryResult == null || lockHistoryResult.isEmpty()) {
             return Maps.newHashMap();
         }
