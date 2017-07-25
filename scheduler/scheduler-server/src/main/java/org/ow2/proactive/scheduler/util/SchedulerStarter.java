@@ -27,27 +27,18 @@ package org.ow2.proactive.scheduler.util;
 
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
+import java.io.PrintStream;
+import java.net.*;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
@@ -73,10 +64,12 @@ import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scripting.*;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.PAMRRouterStarter;
 import org.ow2.proactive.utils.Tools;
+import org.ow2.proactive.web.WebProperties;
 
 
 /**
@@ -179,6 +172,8 @@ public class SchedulerStarter {
         }
 
         addShutdownMessageHook();
+
+        executeStartScripts();
     }
 
     private static void startRouter() throws Exception {
@@ -518,5 +513,45 @@ public class SchedulerStarter {
         if (notSet)
             System.setProperty(name, value.toString());
         return notSet;
+    }
+
+    private static void executeStartScripts() throws InvalidScriptException, IOException {
+
+        // Nothing to do if no script path is specified
+        if (!PASchedulerProperties.SCHEDULER_STARTSCRIPTS_PATHS.isSet())
+            return;
+
+        // Retrieve the start scripts paths
+        List<String> scriptsPaths = PASchedulerProperties.SCHEDULER_STARTSCRIPTS_PATHS.getValueAsList(";");
+
+        // Scripts binding
+        ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
+        scriptHandler.addBindings(PASchedulerProperties.getPropertiesAsHashMap());
+        scriptHandler.addBindings(PAResourceManagerProperties.getPropertiesAsHashMap());
+        scriptHandler.addBindings(WebProperties.getPropertiesAsHashMap());
+
+        // Execute all the listed scripts
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(os, true);
+        ScriptResult scriptResult;
+        for (String scriptPath : scriptsPaths) {
+
+            logger.info("Executing " + scriptPath);
+            scriptResult = scriptHandler.handle(new SimpleScript(new File(scriptPath), new String[0]), ps, ps);
+            if (scriptResult.errorOccured()) {
+
+                // Close streams before throwing
+                os.close();
+                ps.close();
+                throw new InvalidScriptException("Failed to execute script: " +
+                                                 scriptResult.getException().getMessage(), scriptResult.getException());
+            }
+            logger.info(os.toString());
+
+            os.reset();
+        }
+        // Close streams
+        os.close();
+        ps.close();
     }
 }
