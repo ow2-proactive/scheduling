@@ -149,6 +149,57 @@ public class LiveJobsTest {
         assertThat(liveJobs.getRunningTasks().isEmpty(), is(true));
     }
 
+    @Test(timeout = 600000)
+    public void testGetRunningTaskByTaskId() throws UnknownTaskException {
+        PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.updateProperty("5");
+
+        JobId id = new JobIdImpl(666L, "test-name");
+        TaskId tid = TaskIdImpl.createTaskId(id, "task-name", 0L);
+        submitJobAndStartTask(id, tid);
+
+        JobId id2 = new JobIdImpl(667L, "test-name");
+        TaskId tid2 = TaskIdImpl.createTaskId(id2, "task-name2", 0L);
+        submitJobAndStartTask(id2, tid2);
+
+        JobId id3 = new JobIdImpl(668L, "test-name");
+        TaskId tid3 = TaskIdImpl.createTaskId(id3, "task-name3", 0L);
+        submitJobAndStartTask(id3, tid3);
+
+        JobId id4 = new JobIdImpl(669L, "test-name");
+        TaskId tid4 = TaskIdImpl.createTaskId(id4, "task-name4", 0L);
+        submitJobAndStartTask(id4, tid4);
+
+        JobId id5 = new JobIdImpl(670L, "test-name");
+        TaskId tid5 = TaskIdImpl.createTaskId(id5, "task-name5", 0L);
+        submitJobAndStartTask(id5, tid5);
+
+        assertThat(liveJobs.getRunningTasks().size(), is(5));
+
+        assertThat(liveJobs.getRunningTask(tid).getTask().getName(), is("task-name"));
+        assertThat(liveJobs.getRunningTask(tid).getTask().getJobId(), is(id));
+
+    }
+
+    private void submitJobAndStartTask(JobId id, TaskId tid) throws UnknownTaskException {
+        InternalJob job = new InternalTaskFlowJob("test-name",
+                                                  JobPriority.NORMAL,
+                                                  OnTaskError.CANCEL_JOB,
+                                                  "description");
+
+        job.setId(id);
+        List<InternalTask> tasksList = new ArrayList<>();
+        InternalScriptTask internalTask = new InternalScriptTask(job);
+        internalTask.setName(tid.getReadableName());
+        internalTask.setStatus(TaskStatus.RUNNING);
+        internalTask.setMaxNumberOfExecution(5);
+        internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
+        tasksList.add(internalTask);
+        job.setTasks(tasksList);
+        liveJobs.jobSubmitted(job);
+        liveJobs.lockJobsToSchedule();
+        liveJobs.taskStarted(job, job.getTask(tid.getReadableName()), null);
+    }
+
     @Test(timeout = 60000)
     public void testJobSubmitted() {
         InternalJob job = new InternalTaskFlowJob("test-name",
@@ -192,7 +243,6 @@ public class LiveJobsTest {
 
         TaskLauncher taskLauncher = Mockito.mock(TaskLauncher.class);
         internalTask.setExecuterInformation(new ExecuterInformation(taskLauncher, node));
-        ExecuterInformation ex;
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
