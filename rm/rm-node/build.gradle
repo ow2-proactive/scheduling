@@ -27,4 +27,5 @@ dependencies {
     runtime 'jsr223:jsr223-nativeshell:0.4.3'
     runtime 'jsr223:jsr223-docker-compose:0.2.1'
     runtime 'jsr223:jsr223-perl:0.1.0'
+    runtime 'jsr223:jsr223-powershell:0.2.1'
 }

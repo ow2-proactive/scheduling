@@ -30,7 +30,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -102,6 +104,13 @@ public class PACommonPropertiesHelper {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Return all properties as a HashMap.
+     */
+    public Map<String, Object> getPropertiesAsHashMap() {
+        return new HashMap(propertiesLoader.getProperties());
     }
 
     /**
