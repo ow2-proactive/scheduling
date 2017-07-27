@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -485,15 +486,21 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public String getCurrentPolicy()throws NotConnectedException, PermissionException {
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException {
         renewSession();
         return client.getCurrentPolicy();
     }
 
     @Override
-    public Map getJobsToSchedule()throws NotConnectedException, PermissionException {
+    public Map getJobsToSchedule() throws NotConnectedException, PermissionException {
         renewSession();
         return client.getJobsToSchedule();
+    }
+
+    @Override
+    public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.getTasksToSchedule();
     }
 
     @Override

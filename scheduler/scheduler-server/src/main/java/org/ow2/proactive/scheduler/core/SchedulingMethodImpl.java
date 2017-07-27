@@ -46,7 +46,9 @@ import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyDisabledException;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
@@ -57,8 +59,7 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
-import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -235,7 +236,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 try {
                     while (nodeSet != null && !nodeSet.isEmpty()) {
                         EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                        currentJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
+                        currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
                         InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
 
                         if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
@@ -319,7 +320,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
             ((EligibleTaskDescriptorImpl) etd).addAttempt();
-            InternalJob currentJob = jobsMap.get(etd.getJobId()).getInternal();
+            InternalJob currentJob = ((JobDescriptorImpl) jobsMap.get(etd.getJobId())).getInternal();
             InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
             int neededNodes = internalTask.getNumberOfNodesNeeded();
             SchedulingTaskComparator referent = new SchedulingTaskComparator(internalTask, currentJob);
@@ -330,7 +331,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     if (!bagOfTasks.isEmpty()) {
                         etd = bagOfTasks.removeFirst();
                         ((EligibleTaskDescriptorImpl) etd).addAttempt();
-                        currentJob = jobsMap.get(etd.getJobId()).getInternal();
+                        currentJob = ((JobDescriptorImpl) jobsMap.get(etd.getJobId())).getInternal();
                         internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
                         neededNodes = internalTask.getNumberOfNodesNeeded();
                     }
@@ -382,7 +383,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
-        InternalJob currentJob = jobMap.get(etd.getJobId()).getInternal();
+        InternalJob currentJob = ((JobDescriptorImpl) jobMap.get(etd.getJobId())).getInternal();
         InternalTask internalTask0 = currentJob.getIHMTasks().get(etd.getTaskId());
 
         try {
@@ -464,7 +465,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     private void updateVariablesForTasksToSchedule(Map<JobId, JobDescriptor> jobMap,
             LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
         for (EligibleTaskDescriptor taskDescriptor : tasksToSchedule) {
-            InternalJob associatedJob = jobMap.get(taskDescriptor.getJobId()).getInternal();
+            InternalJob associatedJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
             InternalTask internalTask = associatedJob.getIHMTasks().get(taskDescriptor.getTaskId());
             internalTask.updateVariables(schedulingService);
         }

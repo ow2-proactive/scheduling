@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -39,15 +40,21 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
  * It is a sort of tag class that will avoid user from giving non-eligible task to the scheduler.
  * In fact policy will handle TaskDescriptor and EligibleTaskDescriptor but
  * will only be allowed to send EligibleTaskDescriptor to the scheduler
- * @see org.ow2.proactive.scheduler.descriptor.TaskDescriptor
+ * @see TaskDescriptor
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9.1
  */
 public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
 
+    /** Task Id */
+    private TaskId taskId;
+
+    /** Number of nodes needed of the task */
+    private int numberOfNodesNeeded;
+
     /** Internal representation of the task */
-    private InternalTask internalTask;
+    private transient InternalTask internalTask;
 
     /** Number of parents remaining (initial value must be 0) */
     private int parentsCount = 0;
@@ -74,6 +81,8 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      */
     public EligibleTaskDescriptorImpl(InternalTask td) {
         this.internalTask = td;
+        this.taskId = getInternal().getId();
+        this.numberOfNodesNeeded = getInternal().getNumberOfNodesNeeded();
     }
 
     /**
@@ -94,7 +103,7 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      * {@inheritDoc}
      */
     public TaskId getTaskId() {
-        return getInternal().getId();
+        return taskId;
     }
 
     /**
@@ -124,7 +133,16 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
      * @return the jobId
      */
     public JobId getJobId() {
-        return getInternal().getId().getJobId();
+        return getTaskId().getJobId();
+    }
+
+    /**
+     * Get the number of nodes needed for this task (by default: 1).
+     *
+     * @return the number of Nodes Needed
+     */
+    public int getNumberOfNodesNeeded() {
+        return numberOfNodesNeeded;
     }
 
     /**

@@ -37,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.TaskAbortedException;
@@ -58,7 +59,7 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.helpers.StartAtUpdater;
 import org.ow2.proactive.scheduler.core.helpers.TaskResultCreator;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -457,7 +458,12 @@ class LiveJobs {
                             updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
                             jlogger.info(jobId, "started");
                         }
-                        endJob(jobData, terminationData, eltd.getInternal(), null, errorMsg, JobStatus.CANCELED);
+                        endJob(jobData,
+                               terminationData,
+                               ((EligibleTaskDescriptorImpl) eltd).getInternal(),
+                               null,
+                               errorMsg,
+                               JobStatus.CANCELED);
                     } finally {
                         jobData.unlock();
                     }

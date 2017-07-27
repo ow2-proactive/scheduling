@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -142,13 +143,18 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public String getCurrentPolicy() throws NotConnectedException, PermissionException{
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException {
         return _getScheduler().getCurrentPolicy();
     }
 
     @Override
-    public Map getJobsToSchedule() throws NotConnectedException, PermissionException{
+    public Map getJobsToSchedule() throws NotConnectedException, PermissionException {
         return _getScheduler().getJobsToSchedule();
+    }
+
+    @Override
+    public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
+        return _getScheduler().getTasksToSchedule();
     }
 
     @Override

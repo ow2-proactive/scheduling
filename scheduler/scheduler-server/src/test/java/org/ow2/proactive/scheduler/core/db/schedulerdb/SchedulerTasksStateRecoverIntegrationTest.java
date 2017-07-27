@@ -27,13 +27,13 @@ package org.ow2.proactive.scheduler.core.db.schedulerdb;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
-import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -112,7 +112,7 @@ public class SchedulerTasksStateRecoverIntegrationTest extends BaseSchedulerDBTe
         state = checkRecoveredState(recoverHelper.recover(-1), state().withPending(expectedJob));
 
         job = state.getPendingJobs().get(0);
-        EligibleTaskDescriptor task = job.getJobDescriptor().getEligibleTasks().iterator().next();
+        TaskDescriptor task = job.getJobDescriptor().getEligibleTasks().iterator().next();
         Assert.assertEquals(2, task.getChildren().size());
         Assert.assertEquals(0, task.getParents().size());
 

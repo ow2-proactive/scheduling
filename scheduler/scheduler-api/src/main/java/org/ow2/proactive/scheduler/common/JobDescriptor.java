@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.descriptor;
+package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -31,8 +31,8 @@ import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.job.InternalJob;
 
 
 /**
@@ -57,7 +57,7 @@ public interface JobDescriptor extends Serializable, Comparable<JobDescriptor> {
      *
      * @return the tasks.
      */
-    Collection<EligibleTaskDescriptor> getEligibleTasks();
+    Collection<TaskDescriptor> getEligibleTasks();
 
     /**
      * Get the job id
@@ -67,12 +67,11 @@ public interface JobDescriptor extends Serializable, Comparable<JobDescriptor> {
     JobId getJobId();
 
     /**
-     * Return the internal representation of the job.
-     * To be used carefully.
+     * Get the job priority
      *
-     * @return the internal representation of the job.
+     * @return the job priority
      */
-    InternalJob getInternal();
+    JobPriority getJobPriority();
 
     /**
      * Return the list of running tasks
@@ -87,7 +86,5 @@ public interface JobDescriptor extends Serializable, Comparable<JobDescriptor> {
      * @return the list of paused tasks
      */
     Map<TaskId, ? extends TaskDescriptor> getPausedTasks();
-
-    void restoreInErrorTasks();
 
 }

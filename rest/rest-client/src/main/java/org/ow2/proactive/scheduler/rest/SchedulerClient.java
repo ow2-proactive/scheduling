@@ -76,6 +76,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -436,8 +437,13 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Map getJobsToSchedule()throws NotConnectedException, PermissionException {
+    public Map getJobsToSchedule() throws NotConnectedException, PermissionException {
         return getJobsToSchedule();
+    }
+
+    @Override
+    public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
+        return getTasksToSchedule();
     }
 
     @Override

@@ -41,7 +41,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.Task;
@@ -65,6 +68,12 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 public class JobDescriptorImpl implements JobDescriptor {
 
     public static final Logger logger = Logger.getLogger(JobDescriptorImpl.class);
+
+    /** Job Id  */
+    private JobId jobId;
+
+    /** Job Priority */
+    private JobPriority jobPriority;
 
     private transient InternalJob internalJob;
 
@@ -97,8 +106,9 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @param job the internal job to be lighted.
      */
     public JobDescriptorImpl(InternalJob job) {
-        internalJob = job;
-
+        this.internalJob = job;
+        this.jobPriority = getInternal().getPriority();
+        this.jobId = getInternal().getId();
         if (job.getType() == JobType.TASKSFLOW) {
             //build dependence tree
             makeTree(job);
@@ -312,7 +322,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     }
 
     private void putNewLoopTaskIntoPausedOrEligableList(TaskId taskid, EligibleTaskDescriptor newLoopTask) {
-        if (newLoopTask.getInternal().getStatus().equals(TaskStatus.PAUSED)) {
+        if (((JobDescriptorImpl) newLoopTask).getInternal().getStatus().equals(TaskStatus.PAUSED)) {
             pausedTasks.put(taskid, newLoopTask);
         } else {
             eligibleTasks.put(taskid, newLoopTask);
@@ -321,7 +331,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     private void setNewLoopTaskToPausedIfJobIsPaused(TaskDescriptor newLoopTask) {
         if (internalJob.getStatus() == JobStatus.PAUSED) {
-            newLoopTask.getInternal().setStatus(TaskStatus.PAUSED);
+            ((EligibleTaskDescriptorImpl) newLoopTask).getInternal().setStatus(TaskStatus.PAUSED);
         }
     }
 
@@ -556,9 +566,11 @@ public class JobDescriptorImpl implements JobDescriptor {
                         if (internalJob.getStatus() == JobStatus.PAUSED) {
                             pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
                         } else if (internalJob.getStatus() == JobStatus.IN_ERROR &&
-                                   childTask.getInternal().getStatus() == TaskStatus.PAUSED) {
+                                   ((EligibleTaskDescriptorImpl) childTask).getInternal()
+                                                                           .getStatus() == TaskStatus.PAUSED) {
                             pausedTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
-                        } else if (childTask.getInternal().getStatus() == TaskStatus.SKIPPED) {
+                        } else if (((EligibleTaskDescriptorImpl) childTask).getInternal()
+                                                                           .getStatus() == TaskStatus.SKIPPED) {
                             runningTasks.put(childTask.getTaskId(), (EligibleTaskDescriptor) childTask);
                             taskIdsToSkip.add(childTask.getTaskId());
                         } else {
@@ -652,12 +664,11 @@ public class JobDescriptorImpl implements JobDescriptor {
             EligibleTaskDescriptor eligibleTaskDescriptor = eligibleTasks.get(taskId);
 
             if (eligibleTaskDescriptor != null) {
-                eligibleTaskDescriptor.getInternal().setScheduledTime(scheduledTime);
+                ((EligibleTaskDescriptorImpl) eligibleTaskDescriptor).getInternal().setScheduledTime(scheduledTime);
             }
         }
     }
 
-    @Override
     public void restoreInErrorTasks() {
         final Iterator<Entry<TaskId, EligibleTaskDescriptor>> iterator = eligibleTasks.entrySet().iterator();
 
@@ -666,7 +677,7 @@ public class JobDescriptorImpl implements JobDescriptor {
             TaskId taskId = entry.getKey();
             EligibleTaskDescriptor task = entry.getValue();
 
-            if (task.getInternal().getStatus() == TaskStatus.IN_ERROR) {
+            if (((EligibleTaskDescriptorImpl) task).getInternal().getStatus() == TaskStatus.IN_ERROR) {
                 pausedTasks.put(taskId, task);
                 iterator.remove();
             }
@@ -689,15 +700,22 @@ public class JobDescriptorImpl implements JobDescriptor {
      * @return the tasks.
      */
     @XmlTransient
-    public Collection<EligibleTaskDescriptor> getEligibleTasks() {
-        return new Vector<>(eligibleTasks.values());
+    public Collection<TaskDescriptor> getEligibleTasks() {
+        return new Vector<TaskDescriptor>(eligibleTasks.values());
     }
 
     /**
      * {@inheritDoc}
      */
     public JobId getJobId() {
-        return getInternal().getId();
+        return jobId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JobPriority getJobPriority() {
+        return jobPriority;
     }
 
     /**
@@ -725,7 +743,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         List<InternalTask> children = new ArrayList<>();
         if (allTasksWithTheirChildren.containsKey(internalTask)) {
             for (TaskDescriptor taskDescriptor : allTasksWithTheirChildren.get(internalTask).getChildren()) {
-                children.add(taskDescriptor.getInternal());
+                children.add(((EligibleTaskDescriptorImpl) taskDescriptor).getInternal());
             }
         }
         return children;
@@ -737,7 +755,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * Compare jobs on Priority
      */
     public int compareTo(JobDescriptor job) {
-        return job.getInternal().getPriority().compareTo(getInternal().getPriority());
+        return job.getJobPriority().compareTo(getJobPriority());
     }
 
     /**

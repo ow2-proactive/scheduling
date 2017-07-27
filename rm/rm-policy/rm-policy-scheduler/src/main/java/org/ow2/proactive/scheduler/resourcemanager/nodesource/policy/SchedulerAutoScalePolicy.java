@@ -62,7 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 
 @ActiveObject
-public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
+public class SchedulerAutoScalePolicy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
 
     public class NodeAcquisition {
         private int number_of_nodes;
@@ -96,7 +96,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         }
     }
 
-    protected static Logger logger = Logger.getLogger(SchedulerLoadingPolicy.class);
+    protected static Logger logger = Logger.getLogger(SchedulerAutoScalePolicy.class);
 
     private Map<JobId, Integer> activeTasks;
 
@@ -122,7 +122,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     // policy state
     private boolean active = false;
 
-    private SchedulerLoadingPolicy thisStub;
+    private SchedulerAutoScalePolicy thisStub;
 
     protected int nodesNumberInNodeSource = 0;
 
@@ -133,7 +133,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     // positive when deploying, negative when removing, zero when idle
     protected long timeStamp = 0;
 
-    public SchedulerLoadingPolicy() {
+    public SchedulerAutoScalePolicy() {
     }
 
     /**
@@ -160,7 +160,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     public void initActivity(Body body) {
-        thisStub = (SchedulerLoadingPolicy) PAActiveObject.getStubOnThis();
+        thisStub = (SchedulerAutoScalePolicy) PAActiveObject.getStubOnThis();
     }
 
     public void runActivity(Body body) {
@@ -171,10 +171,12 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
+
             try {
                 service.blockingServeOldest(refreshTime);
                 delta += System.currentTimeMillis() - timeStamp;
                 timeStamp = System.currentTimeMillis();
+
                 if (delta > refreshTime) {
                     if (active && nodeSource != null) {
                         try {
@@ -219,6 +221,14 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     protected void updateNumberOfNodes() {
         logger.debug("Refreshing policy state: " + nodesNumberInNodeSource + " nodes in node source, " +
                      nodesNumberInRM + " nodes in RM");
+
+        try {
+            updateNumberOfNodesForEligibleTasks();
+        } catch (Exception e) {
+            logger.error("Error in computing required Nodes for Eligible tasks:", e);
+        }
+        // System.out.println("required Nodes= " + requiredNodes + " tasksState size= " + tasksState.size());
+        activeTask = handleNodeAcquisition();
         if (timeStamp > 0) {
             logger.debug("Pending node deployment request");
             // pending node deployment
@@ -248,17 +258,11 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             removeNode();
             return;
         }
-        try {
-            updateNumberOfNodesForEligibleTasks();
-        } catch (Exception e) {
-            logger.error("Error in updating number of Nodes for Eligible tasks:", e);
-        }
-        activeTask = handleNodeAcquisition();
+
         int requiredNodesNumber = activeTask / loadFactor + (activeTask % loadFactor == 0 ? 0 : 1);
-        logger.debug("Required node number according to scheduler auto scale policy " + requiredNodesNumber);
-        //System.out.println("Current task number= " + tasksState.size() + " Required Nodes Number= " +
-          //                 requiredNodesNumber + " nodes Number In RM= " + nodesNumberInRM +
-            //               " nodesNumberInNodeSource " + nodesNumberInNodeSource);
+        logger.debug("Required node number according to scheduler loading " + requiredNodesNumber);
+        // System.out.println("Required Nodes Number= " + requiredNodesNumber + " nodes Number In RM= " + nodesNumberInRM +
+        //                  " nodesNumberInNodeSource " + nodesNumberInNodeSource);
         if (requiredNodesNumber == nodesNumberInRM)
             return;
 
@@ -308,7 +312,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
                 nodesNumberInRM++;
             }
         }
-        logger.debug("RM listener successfully registered. RM node number is " + nodesNumberInRM);
+        logger.debug("RM listener successully registered. RM node number is " + nodesNumberInRM);
         active = true;
     }
 
@@ -333,7 +337,6 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         int nodesForThisJob = this.computeRequiredNodesForPendingJob(jobState);
         activeTasks.put(jobState.getId(), nodesForThisJob);
         //activeTask += nodesForThisJob;
-        //System.out.println("Job submitted. Current number of tasks " + nodesForThisJob);
         logger.debug("Job submitted. Current number of tasks " + activeTask);
     }
 
@@ -510,7 +513,6 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         if (taskRetrievedFromPolicy.isEmpty()) {
             return;
         }
-        //.println("Full List= " + taskRetrievedFromPolicy.size());
         for (TaskDescriptor etd : taskRetrievedFromPolicy) {
             TaskId taskId = etd.getTaskId();
             if (!tasksState.containsKey(taskId)) {
@@ -527,9 +529,9 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     private int handleNodeAcquisition() {
         int nodesForEligibleTasks = 0;
-        for (Map.Entry<TaskId, NodeAcquisition> task : tasksState.entrySet()) {
-            if (!tasksState.get(task.getKey()).isAcquisition_started()) {
-                nodesForEligibleTasks += task.getValue().getNumber_of_nodes();
+        for (Map.Entry<TaskId, NodeAcquisition> taskId : tasksState.entrySet()) {
+            if (!tasksState.get(taskId).isAcquisition_started()) {
+                nodesForEligibleTasks += taskId.getValue().getNumber_of_nodes();
             }
         }
         return nodesForEligibleTasks;

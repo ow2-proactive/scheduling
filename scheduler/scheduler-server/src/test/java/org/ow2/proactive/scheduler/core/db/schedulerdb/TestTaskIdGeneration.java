@@ -30,12 +30,12 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
-import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -60,7 +60,7 @@ public class TestTaskIdGeneration extends BaseSchedulerDBTest {
         for (InternalTask task : job.getITasks()) {
             Assert.assertSame(task, job.getIHMTasks().get(task.getId()));
         }
-        for (EligibleTaskDescriptor task : job.getJobDescriptor().getEligibleTasks()) {
+        for (TaskDescriptor task : job.getJobDescriptor().getEligibleTasks()) {
             Assert.assertNotNull(job.getIHMTasks().get(task.getTaskId()));
         }
 

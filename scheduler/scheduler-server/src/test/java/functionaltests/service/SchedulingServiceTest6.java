@@ -31,12 +31,13 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 
 
 public class SchedulingServiceTest6 extends BaseServiceTest {
@@ -65,8 +66,8 @@ public class SchedulingServiceTest6 extends BaseServiceTest {
         assertEquals(1, jobsMap.size());
         jobDesc = jobsMap.values().iterator().next();
         Assert.assertEquals(1, jobDesc.getEligibleTasks().size());
-        for (EligibleTaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
-            taskStarted(jobDesc, taskDesc);
+        for (TaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
+            taskStarted(jobDesc, (EligibleTaskDescriptor) taskDesc);
         }
         service.unlockJobsToSchedule(jobsMap.values());
 
