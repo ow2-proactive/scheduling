@@ -27,11 +27,15 @@ package org.ow2.proactive.scheduler.job;
 
 import java.security.Permission;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.TimerTask;
 
 import javax.security.auth.Subject;
 
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
@@ -111,6 +115,16 @@ public class UserIdentificationImpl extends UserIdentification {
     @Override
     public String getUsername() {
         return username;
+    }
+
+    @Override
+    public Set<String> getGroups() {
+        Set<String> answer = new HashSet<>();
+        Set<GroupNamePrincipal> groupPrincipals = subject.getPrincipals(GroupNamePrincipal.class);
+        for (GroupNamePrincipal principal : groupPrincipals) {
+            answer.add(principal.getName());
+        }
+        return answer;
     }
 
     /**

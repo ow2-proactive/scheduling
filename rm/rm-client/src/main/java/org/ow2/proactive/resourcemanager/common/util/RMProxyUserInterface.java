@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -324,6 +325,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public StringWrapper getCurrentUser() {
         return this.target.getCurrentUser();
+    }
+
+    @Override
+    public UserData getCurrentUserData() {
+        return this.target.getCurrentUserData();
     }
 
 }

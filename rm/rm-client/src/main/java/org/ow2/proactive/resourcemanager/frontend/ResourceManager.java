@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -433,4 +434,10 @@ public interface ResourceManager {
      * @return user name
      */
     StringWrapper getCurrentUser();
+
+    /**
+     * Returns the groups associated with the current connected user.
+     * @return a set of groups
+     */
+    UserData getCurrentUserData();
 }

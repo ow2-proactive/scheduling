@@ -101,6 +101,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.StackTraceUtil;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortOrder;
@@ -2972,6 +2973,27 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             return sessionStore.get(sessionId).getUserName();
         }
         return "";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @GET
+    @Path("logins/sessionid/{sessionId}/userdata")
+    @Produces("application/json")
+    public UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId) {
+        if (sessionId != null && sessionStore.exists(sessionId)) {
+            try {
+                Scheduler scheduler = sessionStore.get(sessionId).getScheduler();
+                UserData userData = scheduler.getCurrentUserData();
+                return userData;
+            } catch (NotConnectedException e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /**

@@ -54,6 +54,7 @@ import javax.ws.rs.core.PathSegment;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
@@ -1582,6 +1583,20 @@ public interface SchedulerRestInterface {
     @Path("logins/sessionid/{sessionId}")
     @Produces("application/json")
     String getLoginFromSessionId(@PathParam("sessionId") String sessionId);
+
+    /**
+     * Get a UserData object associated to the user connected with the {@code sessionId}
+     *
+     * In case that the given sessionId doesn't have an associated login (session id expired, or invalid),
+     * this endpoint will return null
+     *
+     * @param sessionId with which the endpoint is going to look for the login value
+     * @return a UserData object or null
+     */
+    @GET
+    @Path("logins/sessionid/{sessionId}/userdata")
+    @Produces("application/json")
+    UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId);
 
     /**
      * login to the scheduler using a multipart form can be used either by

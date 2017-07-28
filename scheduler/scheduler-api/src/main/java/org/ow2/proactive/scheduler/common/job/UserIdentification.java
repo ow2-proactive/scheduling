@@ -26,6 +26,8 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 import java.util.TimerTask;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -75,6 +77,13 @@ public abstract class UserIdentification implements Serializable, Comparable<Use
      * @return the user name
      */
     public abstract String getUsername();
+
+    /**
+     * To get the groups associated with this user name
+     *
+     * @return a set of groups
+     */
+    public abstract Set<String> getGroups();
 
     /**
      * Get the number of submit for this user.

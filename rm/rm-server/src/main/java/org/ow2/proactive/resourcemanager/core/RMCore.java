@@ -64,6 +64,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.MethodCallPermission;
@@ -2153,6 +2154,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public StringWrapper getCurrentUser() {
         return new StringWrapper(caller.getName());
+    }
+
+    @Override
+    public UserData getCurrentUserData() {
+        UserData userData = new UserData();
+        userData.setUserName(caller.getName());
+        userData.setGroups(caller.getGroups());
+        return userData;
     }
 
 }
