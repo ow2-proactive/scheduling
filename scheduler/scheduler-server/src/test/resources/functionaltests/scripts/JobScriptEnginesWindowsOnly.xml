@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:3.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:proactive:jobdescriptor:3.2 ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/3.2/schedulerjob.xsd"
+		name="JobScriptEngines" cancelJobOnError="true">
+	<description>Script engines on windows</description>
+	<taskFlow>
+		<task name="powershelltask">
+			<description>powershell task</description>
+			<scriptExecutable>
+				<script>
+					<code language="powershell">
+						Write-Output "Hello World"
+						$result = $True
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+		<task name="cmdtask">
+			<description>powershell task</description>
+			<scriptExecutable>
+				<script>
+					<code language="cmd">
+						echo "Hello World"
+					</code>
+				</script>
+			</scriptExecutable>
+		</task>
+	</taskFlow>
+</job>

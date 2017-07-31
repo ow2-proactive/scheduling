@@ -43,7 +43,6 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -55,6 +54,7 @@ import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -99,6 +99,20 @@ public interface RMRestInterface {
     @Path("logins/sessionid/{sessionId}")
     @Produces("application/json")
     String getLoginFromSessionId(@PathParam("sessionId") String sessionId);
+
+    /**
+     * Get a UserData object associated to the user connected with the {@code sessionId}
+     *
+     * In case that the given sessionId doesn't have an associated login (session id expired, or invalid),
+     * this endpoint will return null
+     *
+     * @param sessionId with which the endpoint is going to look for the login value
+     * @return a UserData object or null
+     */
+    @GET
+    @Path("logins/sessionid/{sessionId}/userdata")
+    @Produces("application/json")
+    UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId);
 
     @GET
     @Path("state")

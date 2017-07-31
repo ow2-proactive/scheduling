@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.core.properties;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.core.properties.PACommonProperties;
@@ -310,6 +311,13 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      */
     public static void updateProperties(String filename) {
         propertiesHelper.updateProperties(filename);
+    }
+
+    /**
+     * Return all properties as a HashMap.
+     */
+    public static Map<String, Object> getPropertiesAsHashMap() {
+        return propertiesHelper.getPropertiesAsHashMap();
     }
 
     /**

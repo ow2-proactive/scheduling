@@ -40,6 +40,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.db.SortParameter;
@@ -645,6 +646,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @Override
     public String getCurrentUser() throws NotConnectedException {
         return uischeduler.getCurrentUser();
+    }
+
+    @Override
+    public UserData getCurrentUserData() throws NotConnectedException {
+        return uischeduler.getCurrentUserData();
     }
 
 }
