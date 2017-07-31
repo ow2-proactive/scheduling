@@ -78,6 +78,7 @@ import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.permissions.ChangePolicyPermission;
 import org.ow2.proactive.scheduler.permissions.ChangePriorityPermission;
 import org.ow2.proactive.scheduler.permissions.ConnectToResourceManagerPermission;
+import org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission;
 import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -266,7 +267,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     private void prepare(Set<JobState> jobStates, JobState js, boolean finished) {
         jobStates.add(js);
         UserIdentificationImpl uIdent = new UserIdentificationImpl(js.getOwner());
-        IdentifiedJob ij = new IdentifiedJob(js.getId(), uIdent);
+        IdentifiedJob ij = new IdentifiedJob(js.getId(), uIdent, js.getGenericInformation());
         jobs.put(js.getId(), ij);
         jobsMap.put(js.getId(), js);
         ij.setFinished(finished);
@@ -370,6 +371,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                                                                    ")");
     }
 
+    synchronized void handleJobsWithGenericInformationPermission(Map<String, String> genericInformation,
+            UserIdentificationImpl ui, String errorMessage) throws PermissionException {
+        ui.checkPermission(new HandleJobsWithGenericInformationPermission(genericInformation),
+                           ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
+    }
+
     synchronized void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException {
         addEventListener(sel, myEventsOnly, false, events);
@@ -470,7 +477,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized void jobSubmitted(InternalJob job, UserIdentificationImpl ident)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         // put the job inside the frontend management list
-        jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident));
+        jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident, job.getGenericInformation()));
         // increase number of submit for this user
         ident.addSubmit();
         // send update user event
@@ -603,7 +610,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             checkJobOwner(methodName, identifiedJob, errorMessage);
         } catch (PermissionException pe) {
             UserIdentificationImpl ident = checkPermission(methodName, errorMessage);
-            handleOnlyMyJobsPermission(false, ident, errorMessage);
+            try {
+                handleOnlyMyJobsPermission(false, ident, errorMessage);
+            } catch (PermissionException pe2) {
+                handleJobsWithGenericInformationPermission(identifiedJob.getGenericInformation(), ident, errorMessage);
+            }
+
         }
     }
 
@@ -727,15 +739,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /*
-     * ###########################################################################################
+     * #########################################################################
+     * ##################
      */
     /*                                                                                             */
     /*
-     * ################################## LISTENER DISPATCHER ####################################
+     * ################################## LISTENER DISPATCHER
+     * ####################################
      */
     /*                                                                                             */
     /*
-     * ###########################################################################################
+     * #########################################################################
+     * ##################
      */
 
     /**
