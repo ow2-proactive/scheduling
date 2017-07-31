@@ -52,16 +52,6 @@ import javax.crypto.Cipher;
  */
 public class KeyPairUtil {
 
-    private static SecureRandom secureRandom;
-
-    private static synchronized void initSecureRandom() {
-        if (secureRandom == null) {
-            secureRandom = new SecureRandom();
-            final byte[] dummy = new byte[512];
-            secureRandom.nextBytes(dummy);
-        }
-    }
-
     /**
      * Generates a pair of public and private keys
      * 
@@ -99,7 +89,7 @@ public class KeyPairUtil {
         }
     }
 
-    public static KeyPair generateKeyPair(String algorithm, int size) throws KeyException {
+    public static synchronized KeyPair generateKeyPair(String algorithm, int size) throws KeyException {
         KeyPairGenerator keyGen = null;
         try {
             keyGen = KeyPairGenerator.getInstance(algorithm);
@@ -107,7 +97,7 @@ public class KeyPairUtil {
             throw new KeyException("Cannot initialize keypair generator", e);
         }
 
-        SecureRandom random = new SecureRandom();
+        SecureRandom random = KeyUtil.getSecureRandom();
         keyGen.initialize(size, random);
 
         return keyGen.generateKeyPair();
@@ -122,13 +112,13 @@ public class KeyPairUtil {
      * @return the encrypted message
      * @throws KeyException encryption failed, public key recovery failed
      */
-    public static byte[] encrypt(PublicKey pubKey, String cipherParams, byte[] message) throws KeyException {
+    public static synchronized byte[] encrypt(PublicKey pubKey, String cipherParams, byte[] message)
+            throws KeyException {
 
         Cipher ciph = null;
         try {
             ciph = Cipher.getInstance(cipherParams);
-            initSecureRandom();
-            ciph.init(Cipher.ENCRYPT_MODE, pubKey, secureRandom);
+            ciph.init(Cipher.ENCRYPT_MODE, pubKey, KeyUtil.getSecureRandom());
         } catch (Exception e) {
             throw new KeyException("Could not initialize cipher", e);
         }
@@ -152,13 +142,13 @@ public class KeyPairUtil {
      * @return the decrypted message
      * @throws KeyException private key recovery failed, decryption failed
      */
-    public static byte[] decrypt(PrivateKey privKey, String cipherParams, byte[] message) throws KeyException {
+    public static synchronized byte[] decrypt(PrivateKey privKey, String cipherParams, byte[] message)
+            throws KeyException {
 
         Cipher ciph = null;
         try {
             ciph = Cipher.getInstance(cipherParams);
-            initSecureRandom();
-            ciph.init(Cipher.DECRYPT_MODE, privKey, secureRandom);
+            ciph.init(Cipher.DECRYPT_MODE, privKey, KeyUtil.getSecureRandom());
         } catch (Exception e) {
             throw new KeyException("Could not initialize cipher", e);
         }

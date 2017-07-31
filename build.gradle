@@ -273,7 +273,7 @@ dependencies {
     nativeBundle 'net.sf.jpam:libjpam:1.1-proactive:native'
     nativeBundle 'jsr223:jsr223-powershell:0.2.1:native'
 
-    compile 'org.codehaus.groovy:groovy-all:2.4.6'
+    compile 'org.codehaus.groovy:groovy-all:2.4.12'
     compile 'commons-io:commons-io:2.5'
 }
 
