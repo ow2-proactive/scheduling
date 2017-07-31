@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.ConnectionInfo;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Page;
@@ -821,6 +822,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     @Override
     public String getCurrentUser() throws NotConnectedException {
         return schedulerProxy.getCurrentUser();
+    }
+
+    @Override
+    public UserData getCurrentUserData() throws NotConnectedException {
+        return schedulerProxy.getCurrentUserData();
     }
 
 }

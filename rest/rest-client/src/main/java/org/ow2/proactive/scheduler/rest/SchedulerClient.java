@@ -67,6 +67,7 @@ import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -1169,6 +1170,16 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throw new NotConnectedException("Session " + sid + " is not connected");
         }
         return connectedUser;
+    }
+
+    @Override
+    public UserData getCurrentUserData() throws NotConnectedException {
+
+        UserData connectedUserData = restApi().getUserDataFromSessionId(sid);
+        if (connectedUserData == null) {
+            throw new NotConnectedException("Session " + sid + " is not connected");
+        }
+        return connectedUserData;
     }
 
 }

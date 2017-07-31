@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -1135,6 +1136,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         // renew session for this user
         renewUserSession(id, ident);
         return ident.getUsername();
+    }
+
+    public UserData getCurrentUserData() throws NotConnectedException {
+        UniqueID id = checkAccess();
+
+        UserIdentificationImpl ident = identifications.get(id).getUser();
+        // renew session for this user
+        renewUserSession(id, ident);
+        UserData userData = new UserData();
+        userData.setUserName(ident.getUsername());
+        userData.setGroups(ident.getGroups());
+        return userData;
     }
 
     synchronized List<SchedulerUserInfo> getUsers() {

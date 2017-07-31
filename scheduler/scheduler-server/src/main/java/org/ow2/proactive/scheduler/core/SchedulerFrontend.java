@@ -78,6 +78,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -1328,6 +1329,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public String getCurrentUser() throws NotConnectedException {
         return frontendState.getCurrentUser();
+    }
+
+    @Override
+    public UserData getCurrentUserData() throws NotConnectedException {
+        return frontendState.getCurrentUserData();
     }
 
 }
