@@ -29,7 +29,6 @@ import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PrivateKey;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 
@@ -41,8 +40,6 @@ import org.ow2.proactive.authentication.crypto.Credentials;
  * @since ProActive Scheduling 2.2
  */
 public final class Decrypter implements Serializable {
-
-    Logger logger = Logger.getLogger(Decrypter.class);
 
     private PrivateKey key;
 
