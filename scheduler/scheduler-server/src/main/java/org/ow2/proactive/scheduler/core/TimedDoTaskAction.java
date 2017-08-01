@@ -153,6 +153,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
     }
 
     private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException {
+        logger.info("Generating credentials for task " + task.getId());
         CredData decryptedUserCredentials = job.getCredentials().decrypt(corePrivateKey);
 
         enrichWithThirdPartyCredentials(decryptedUserCredentials);

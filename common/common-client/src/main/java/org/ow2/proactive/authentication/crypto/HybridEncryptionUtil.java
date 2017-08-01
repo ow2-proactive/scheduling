@@ -69,7 +69,7 @@ public class HybridEncryptionUtil {
 
         logger.info("Private  key : " + ObjectByteConverter.byteArrayToBase64String(privateKey.getEncoded()));
 
-        logger.info("Encrypted symetric key (" + cipher + "):" +
+        logger.info("RSA Encrypted symetric key (" + cipher + "):" +
                     ObjectByteConverter.byteArrayToBase64String(encryptedData.getEncryptedSymmetricKey()));
 
         // recover clear AES key using the private key
@@ -97,6 +97,11 @@ public class HybridEncryptionUtil {
         byte[] encData;
         byte[] encAes;
 
+        logger.info("Public  key : " + ObjectByteConverter.byteArrayToBase64String(publicKey.getEncoded()));
+
+        logger.info("Generated symetric key (" + cipher + "):" +
+                    ObjectByteConverter.byteArrayToBase64String(aesKey.getEncoded()));
+
         // encrypt AES key with public RSA key
         try {
             encAes = KeyPairUtil.encrypt(publicKey, cipher, aesKey.getEncoded());
@@ -104,10 +109,8 @@ public class HybridEncryptionUtil {
             throw new KeyException("Symmetric key encryption failed", e);
         }
 
-        logger.info("Public  key : " + ObjectByteConverter.byteArrayToBase64String(publicKey.getEncoded()));
-        logger.info("Decrypted symetric key (" + cipher + "):" +
-                    ObjectByteConverter.byteArrayToBase64String(aesKey.getEncoded()));
-        logger.info("Encrypted symetric key (" + cipher + "):" + ObjectByteConverter.byteArrayToBase64String(encAes));
+        logger.info("RSA Encrypted symetric key (" + cipher + "):" +
+                    ObjectByteConverter.byteArrayToBase64String(encAes));
 
         // encrypt clear credentials with AES key
         try {
