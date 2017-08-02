@@ -57,7 +57,7 @@ public class HandleJobsWithGenericInformationPermission extends ClientPermission
         super(DESCRIPTION);
         if (keysValuesCommaSeparated != null) {
             String[] keysValues = keysValuesCommaSeparated.split("[\\s,]+");
-            populateGenericInformation(keysValues);
+            populateGenericInformation(keysValues);
         }
 
     }
@@ -91,7 +91,7 @@ public class HandleJobsWithGenericInformationPermission extends ClientPermission
 
     }
 
-    private void populateGenericInformation(String[] keysValues) {
+    private void populateGenericInformation(String[] keysValues) {
         for (int i = 0; i < keysValues.length; i++) {
             if (keysValues[i] != null && keysValues[i].contains("=")) {
                 StringTokenizer st = new StringTokenizer(keysValues[i], "=");
