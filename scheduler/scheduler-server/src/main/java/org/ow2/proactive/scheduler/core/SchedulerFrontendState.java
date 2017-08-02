@@ -371,6 +371,20 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                                                                    ")");
     }
 
+    /**
+     * Check if the given user can get the state as it is demanded (based on the
+     * generic information content)
+     *
+     * @param genericInformation
+     *            generic information of the job. In order to have the
+     *            authorisation, this generic information need to contains the
+     *            keys-values specified in the security file.
+     * 
+     * @param ui
+     *            the user identification
+     * @throws PermissionException
+     *             if permission is denied
+     */
     synchronized void handleJobsWithGenericInformationPermission(Map<String, String> genericInformation,
             UserIdentificationImpl ui, String errorMessage) throws PermissionException {
         ui.checkPermission(new HandleJobsWithGenericInformationPermission(genericInformation),
@@ -608,11 +622,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throws NotConnectedException, UnknownJobException, PermissionException {
         try {
             checkJobOwner(methodName, identifiedJob, errorMessage);
-        } catch (PermissionException pe) {
+        } catch (PermissionException jobOwnerException) {
             UserIdentificationImpl ident = checkPermission(methodName, errorMessage);
             try {
-                handleOnlyMyJobsPermission(false, ident, errorMessage);
-            } catch (PermissionException pe2) {
+                boolean iAmTheJobOwner = false;
+                handleOnlyMyJobsPermission(iAmTheJobOwner, ident, errorMessage);
+            } catch (PermissionException onlyMyJobException) {
                 handleJobsWithGenericInformationPermission(identifiedJob.getGenericInformation(), ident, errorMessage);
             }
 

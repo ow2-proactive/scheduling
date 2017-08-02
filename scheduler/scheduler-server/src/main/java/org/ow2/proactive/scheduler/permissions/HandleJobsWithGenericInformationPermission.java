@@ -35,40 +35,45 @@ import org.ow2.proactive.permissions.ClientPermission;
 
 /**
  *
- * This permission allows to handle other users jobs or not
+ * This permission allows to handle other users jobs that contains the generic
+ * information specified in the security.java.policy-server
  *
  *
  */
 public class HandleJobsWithGenericInformationPermission extends ClientPermission {
 
-    private final static String DESCRIPTION = "Handle Jobs that contains this specific Generic Information ";
+    private final static String DESCRIPTION = "Handle Jobs that contains this specific Generic Information";
 
-    private Map<String, String> genericInformations = new HashMap<String, String>();
+    private Map<String, String> genericInformation = new HashMap<String, String>();
 
     /**
      * Construct the permission with specified authorization string.
      *
-     * @param handleOnlyMyJobsPermissionAllowed
-     *            string that represents a boolean
+     * @param keyValue
+     *            string that represents a key value comma separated String. Ex
+     *            : "KEY1=VALUE1,KEY2=VALUE2"
      */
-    public HandleJobsWithGenericInformationPermission(String keyValue) {
+    public HandleJobsWithGenericInformationPermission(String keysValuesCommaSeparated) {
         super(DESCRIPTION);
-        if (keyValue != null && keyValue.contains("=")) {
-            StringTokenizer st = new StringTokenizer(keyValue, "=");
-            this.genericInformations.put(st.nextToken(), st.nextToken());
+        if (keysValuesCommaSeparated != null) {
+            String[] keysValues = keysValuesCommaSeparated.split("[\\s,]+");
+            populateGenericInformation(keysValues);
         }
 
     }
 
     /**
-     * Construct the permission with specified authorization boolean.
+     * Construct the permission with specified authorization genericInformations
+     * Map.
      *
-     * @param handleOnlyMyJobsPermissionAllowed
-     *            specified authorization boolean
+     * @param genericInformations
+     *            map that contains all the generic information of a job that it
+     *            needs to be authorised
+     * 
      */
     public HandleJobsWithGenericInformationPermission(Map<String, String> genericInformations) {
         super(DESCRIPTION);
-        this.genericInformations = genericInformations;
+        this.genericInformation = genericInformations;
     }
 
     /**
@@ -81,16 +86,25 @@ public class HandleJobsWithGenericInformationPermission extends ClientPermission
         }
         HandleJobsWithGenericInformationPermission fsp = (HandleJobsWithGenericInformationPermission) p;
         // check incoming permission and permission given by the security file
-        return !genericInformations.isEmpty() &&
-               externalGenericInformationContainsMyGenericInformation(fsp.genericInformations);
+        return !genericInformation.isEmpty() &&
+               externalGenericInformationContainsMyGenericInformation(fsp.genericInformation);
 
     }
 
-    private boolean
-            externalGenericInformationContainsMyGenericInformation(Map<String, String> externalGenericInformations) {
+    private void populateGenericInformation(String[] keysValues) {
+        for (int i = 0; i < keysValues.length; i++) {
+            if (keysValues[i] != null && keysValues[i].contains("=")) {
+                StringTokenizer st = new StringTokenizer(keysValues[i], "=");
+                this.genericInformation.put(st.nextToken(), st.nextToken());
+            }
+        }
+    }
 
-        for (Map.Entry<String, String> entry : genericInformations.entrySet()) {
-            String value = externalGenericInformations.get(entry.getKey());
+    private boolean
+            externalGenericInformationContainsMyGenericInformation(Map<String, String> externalGenericInformation) {
+
+        for (Map.Entry<String, String> entry : genericInformation.entrySet()) {
+            String value = externalGenericInformation.get(entry.getKey());
             if (value == null || !value.equals(entry.getValue())) {
                 return false;
             }

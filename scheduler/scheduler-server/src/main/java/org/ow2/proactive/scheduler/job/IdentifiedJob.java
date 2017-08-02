@@ -53,6 +53,7 @@ public class IdentifiedJob implements Serializable {
     /** is this job finished */
     private boolean finished = false;
 
+    /** genericInformation of this job */
     private final Map<String, String> genericInformation;
 
     /**
@@ -63,6 +64,8 @@ public class IdentifiedJob implements Serializable {
      * @param userIdentification
      *            a user identification that should be able to identify the job
      *            user.
+     * @param genericInformation
+     *            map containing the generic information of the job
      */
     public IdentifiedJob(JobId jobId, UserIdentificationImpl userIdentification,
             Map<String, String> genericInformation) {
@@ -90,6 +93,11 @@ public class IdentifiedJob implements Serializable {
         return userIdentification;
     }
 
+    /**
+     * To get the genericInformation
+     *
+     * @return the genericInformation
+     */
     public Map<String, String> getGenericInformation() {
         return genericInformation;
     }
