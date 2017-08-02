@@ -628,6 +628,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 boolean iAmTheJobOwner = false;
                 handleOnlyMyJobsPermission(iAmTheJobOwner, ident, errorMessage);
             } catch (PermissionException onlyMyJobException) {
+                logger.debug("No permission to handle other user job(" + onlyMyJobException.getMessage() +
+                             ") checking generic information permission");
                 handleJobsWithGenericInformationPermission(identifiedJob.getGenericInformation(), ident, errorMessage);
             }
 
