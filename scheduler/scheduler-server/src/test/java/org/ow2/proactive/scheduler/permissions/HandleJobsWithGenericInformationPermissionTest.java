@@ -32,112 +32,118 @@ import java.util.Map;
 
 import org.junit.Test;
 
-
 public class HandleJobsWithGenericInformationPermissionTest {
 
-    @Test
-    public void testHandleOnlyMyJobsPermissionFalseEmptyGenericInformationEmptyRule() {
-        // on security.java.policy-server file > permission
-        // org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
-        // "GROUP=guests";
-        HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission("");
+	@Test
+	public void testHandleOnlyMyJobsPermissionFalseEmptyGenericInformationEmptyRule() {
+		// on security.java.policy-server file > permission
+		// org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
+		// "";
+		HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission(
+				"");
 
-        Map<String, String> genericInformation = new HashMap<String, String>();
+		Map<String, String> genericInformation = new HashMap<String, String>();
 
-        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleJobsWithGenericInformationPermission(genericInformation)),
-                     (false));
+		assertEquals(permissionDefinedAtJaasConfigurationLevel
+				.implies(new HandleJobsWithGenericInformationPermission(genericInformation)), (false));
 
-    }
+	}
 
-    @Test
-    public void testHandleOnlyMyJobsPermissionFalseGenericInformationEmptyRule() {
-        // on security.java.policy-server file > permission
-        // org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
-        // "GROUP=guests";
-        HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission("");
+	@Test
+	public void testHandleOnlyMyJobsPermissionFalseGenericInformationEmptyRule() {
+		// on security.java.policy-server file > permission
+		// org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
+		// "";
+		HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission(
+				"");
 
-        Map<String, String> genericInformation = new HashMap<String, String>();
-        genericInformation.put("GROUP", "admin");
+		Map<String, String> genericInformation = new HashMap<String, String>();
+		genericInformation.put("GROUP", "admin");
 
-        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleJobsWithGenericInformationPermission(genericInformation)),
-                     (false));
+		assertEquals(permissionDefinedAtJaasConfigurationLevel
+				.implies(new HandleJobsWithGenericInformationPermission(genericInformation)), (false));
 
-    }
+	}
 
-    @Test
-    public void testHandleOnlyMyJobsPermissionFalseEmptyGenericInformation() {
-        // on security.java.policy-server file > permission
-        // org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
-        // "GROUP=guests";
-        HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission("GROUP=guests");
+	@Test
+	public void testHandleOnlyMyJobsPermissionFalseEmptyGenericInformation() {
+		// on security.java.policy-server file > permission
+		// org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
+		// "GROUP=guests";
+		HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission(
+				"GROUP=guests");
 
-        Map<String, String> genericInformation = new HashMap<String, String>();
+		Map<String, String> genericInformation = new HashMap<String, String>();
 
-        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleJobsWithGenericInformationPermission(genericInformation)),
-                     (false));
+		assertEquals(permissionDefinedAtJaasConfigurationLevel
+				.implies(new HandleJobsWithGenericInformationPermission(genericInformation)), (false));
 
-    }
+	}
 
-    @Test
-    public void testHandleOnlyMyJobsPermissionFalseWrongGenericInformation() {
-        // on security.java.policy-server file > permission
-        // org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
-        // "GROUP=guests";
-        HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission("GROUP=guests");
+	@Test
+	public void testHandleOnlyMyJobsPermissionFalseWrongGenericInformation() {
+		// on security.java.policy-server file > permission
+		// org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
+		// "GROUP=guests";
+		HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission(
+				"GROUP=guests");
 
-        Map<String, String> genericInformation = new HashMap<String, String>();
-        genericInformation.put("GROUP", "admin");
+		Map<String, String> genericInformation = new HashMap<String, String>();
+		genericInformation.put("GROUP", "admin");
 
-        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleJobsWithGenericInformationPermission(genericInformation)),
-                     (false));
+		assertEquals(permissionDefinedAtJaasConfigurationLevel
+				.implies(new HandleJobsWithGenericInformationPermission(genericInformation)), (false));
 
-    }
+	}
 
-    @Test
-    public void testHandleOnlyMyJobsPermissionTrueCorrectGenericInformation() {
-        // on security.java.policy-server file > permission
-        // org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
-        // "GROUP=guests";
-        HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission("GROUP=guests");
+	@Test
+	public void testHandleOnlyMyJobsPermissionTrueCorrectGenericInformation() {
+		// on security.java.policy-server file > permission
+		// org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
+		// "GROUP=guests";
+		HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission(
+				"GROUP=guests");
 
-        Map<String, String> genericInformation = new HashMap<String, String>();
-        genericInformation.put("GROUP", "guests");
+		Map<String, String> genericInformation = new HashMap<String, String>();
+		genericInformation.put("GROUP", "guests");
 
-        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleJobsWithGenericInformationPermission(genericInformation)),
-                     (true));
+		assertEquals(permissionDefinedAtJaasConfigurationLevel
+				.implies(new HandleJobsWithGenericInformationPermission(genericInformation)), (true));
 
-    }
+	}
 
-    @Test
-    public void testHandleOnlyMyJobsPermissionFalseMultipleGenericInformation() {
-        // on security.java.policy-server file > permission
-        // org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
-        // "GROUP=guests";
-        HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission("GROUP=guests,TYPE=entry");
+	@Test
+	public void testHandleOnlyMyJobsPermissionFalseMultipleGenericInformation() {
+		// on security.java.policy-server file > permission
+		// org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
+		// "GROUP=guests,TYPE=entry";
+		HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission(
+				"GROUP=guests,TYPE=entry");
 
-        Map<String, String> genericInformation = new HashMap<String, String>();
-        genericInformation.put("GROUP", "guests");
+		Map<String, String> genericInformation = new HashMap<String, String>();
+		genericInformation.put("GROUP", "guests");
 
-        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleJobsWithGenericInformationPermission(genericInformation)),
-                     (false));
+		assertEquals(permissionDefinedAtJaasConfigurationLevel
+				.implies(new HandleJobsWithGenericInformationPermission(genericInformation)), (false));
 
-    }
+	}
 
-    @Test
-    public void testHandleOnlyMyJobsPermissionTrueMultipleGenericInformation() {
-        // on security.java.policy-server file > permission
-        // org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
-        // "GROUP=guests";
-        HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission("GROUP=guests,TYPE=entry");
+	@Test
+	public void testHandleOnlyMyJobsPermissionTrueMultipleGenericInformation() {
+		// on security.java.policy-server file > permission
+		// org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationPermission
+		// "GROUP=guests,TYPE=entry";
+		HandleJobsWithGenericInformationPermission permissionDefinedAtJaasConfigurationLevel = new HandleJobsWithGenericInformationPermission(
+				"GROUP=guests,TYPE=entry");
 
-        Map<String, String> genericInformation = new HashMap<String, String>();
-        genericInformation.put("GROUP", "guests");
-        genericInformation.put("TYPE", "entry");
-        genericInformation.put("SOME_OTHER", "random");
+		Map<String, String> genericInformation = new HashMap<String, String>();
+		genericInformation.put("GROUP", "guests");
+		genericInformation.put("TYPE", "entry");
+		genericInformation.put("SOME_OTHER", "random");
 
-        assertEquals(permissionDefinedAtJaasConfigurationLevel.implies(new HandleJobsWithGenericInformationPermission(genericInformation)),
-                     (true));
+		assertEquals(permissionDefinedAtJaasConfigurationLevel
+				.implies(new HandleJobsWithGenericInformationPermission(genericInformation)), (true));
 
-    }
+	}
 
 }
