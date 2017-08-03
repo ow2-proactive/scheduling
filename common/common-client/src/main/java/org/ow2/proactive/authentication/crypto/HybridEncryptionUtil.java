@@ -30,16 +30,21 @@ import java.security.KeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.ow2.proactive.utils.ObjectByteConverter;
 
 
 /**
  * Encrypt data with a symmetric key that is asymmetrically encrypted.
  */
 public class HybridEncryptionUtil {
+
+    private static final Logger logger = Logger.getLogger(HybridEncryptionUtil.class);
 
     private static final String ENCRYPTED_STRING_CHARSET = "UTF-8";
 
@@ -53,12 +58,19 @@ public class HybridEncryptionUtil {
     // funny transformations require initial vector parameters, try to avoid them
     private static final String AES_CIPHER = "AES";
 
-    private static final String STRING_ENCRYPTION_CIPHER = "RSA/ECB/PKCS1Padding";
+    private static final String STRING_ENCRYPTION_CIPHER = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+
+    private static final String PREVIOUS_STRING_ENCRYPTION_CIPHER = "RSA/ECB/PKCS1Padding";
 
     public static byte[] decrypt(PrivateKey privateKey, String cipher, HybridEncryptedData encryptedData)
             throws KeyException {
         byte[] decryptedData;
         byte[] decryptedSymmetricKey;
+
+        logger.info("Private  key : " + ObjectByteConverter.byteArrayToBase64String(privateKey.getEncoded()));
+
+        logger.info("RSA Encrypted symetric key (" + cipher + "):" +
+                    ObjectByteConverter.byteArrayToBase64String(encryptedData.getEncryptedSymmetricKey()));
 
         // recover clear AES key using the private key
         try {
@@ -85,12 +97,20 @@ public class HybridEncryptionUtil {
         byte[] encData;
         byte[] encAes;
 
+        logger.info("Public  key : " + ObjectByteConverter.byteArrayToBase64String(publicKey.getEncoded()));
+
+        logger.info("Generated symetric key (" + cipher + "):" +
+                    ObjectByteConverter.byteArrayToBase64String(aesKey.getEncoded()));
+
         // encrypt AES key with public RSA key
         try {
             encAes = KeyPairUtil.encrypt(publicKey, cipher, aesKey.getEncoded());
         } catch (KeyException e) {
             throw new KeyException("Symmetric key encryption failed", e);
         }
+
+        logger.info("RSA Encrypted symetric key (" + cipher + "):" +
+                    ObjectByteConverter.byteArrayToBase64String(encAes));
 
         // encrypt clear credentials with AES key
         try {
@@ -103,7 +123,28 @@ public class HybridEncryptionUtil {
 
     public static String decryptString(HybridEncryptedData encryptedData, PrivateKey privateKey) throws KeyException {
         try {
-            return new String(decrypt(privateKey, STRING_ENCRYPTION_CIPHER, encryptedData), ENCRYPTED_STRING_CHARSET);
+            return decryptString(encryptedData, privateKey, STRING_ENCRYPTION_CIPHER);
+        } catch (KeyException e) {
+            // this workaround is to allow decrypting strings which used the previous cipher algorithm
+            if (isAPaddingException(e)) {
+                return decryptString(encryptedData, privateKey, PREVIOUS_STRING_ENCRYPTION_CIPHER);
+            }
+            throw e;
+        }
+    }
+
+    private static boolean isAPaddingException(KeyException keyException) {
+        Throwable currentException = keyException;
+        do {
+            currentException = currentException.getCause();
+        } while (currentException != null && !(currentException instanceof BadPaddingException));
+        return currentException != null;
+    }
+
+    private static String decryptString(HybridEncryptedData encryptedData, PrivateKey privateKey, String cipher)
+            throws KeyException {
+        try {
+            return new String(decrypt(privateKey, cipher, encryptedData), ENCRYPTED_STRING_CHARSET);
         } catch (UnsupportedEncodingException ignored) {
             return null; // never happens, we control charset value
         }

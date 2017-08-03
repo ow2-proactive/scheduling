@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
@@ -47,6 +48,8 @@ import com.google.common.base.Strings;
 
 
 public class ForkedTaskVariablesManager implements Serializable {
+
+    private static final Logger logger = Logger.getLogger(ForkedTaskVariablesManager.class);
 
     /**
      * Will be replaced by the matching third-party credential
@@ -106,6 +109,7 @@ public class ForkedTaskVariablesManager implements Serializable {
     public Map<String, String> extractThirdPartyCredentials(TaskContext container) throws Exception {
         try {
             Map<String, String> thirdPartyCredentials = new HashMap<>();
+            logger.info("Decrypting credentials for task " + container.getTaskId());
             if (container.getDecrypter() != null) {
                 thirdPartyCredentials.putAll(container.getDecrypter().decrypt().getThirdPartyCredentials());
             }

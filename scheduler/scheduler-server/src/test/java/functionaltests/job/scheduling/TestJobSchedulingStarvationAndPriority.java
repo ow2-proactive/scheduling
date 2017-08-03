@@ -180,8 +180,13 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
             throws Exception {
         long min = Long.MAX_VALUE;
         long max = -1;
+        schedulerHelper.log("Total number of tasks: " + scheduler.getJobState(jobId).getTasks().size());
         for (TaskState state : scheduler.getJobState(jobId).getTasks()) {
             if (state.getName().matches(taskNameFilter)) {
+                if (state.getStartTime() <= -1) {
+                    schedulerHelper.log("Wrong start time value " + state.getStartTime() + " for task " +
+                                        state.getName() + " status of the task is " + state.getStatus());
+                }
                 long startTime = state.getStartTime() > -1 ? state.getStartTime() : Long.MAX_VALUE;
                 min = Math.min(min, startTime);
                 max = Math.max(max, startTime);
