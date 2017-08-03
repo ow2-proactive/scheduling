@@ -214,12 +214,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
                 for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
-                    InternalJob currentJob = jobMap.get(etd.getJobId()).getInternal();
-                    InternalTask internalTask = currentJob.getIHMTasks().get(etd.getTaskId());
-                    if (internalTask.getExecutableContainer() == null) {
-                        // load and Initialize the executable container
-                        loadAndInit(internalTask);
-                    }
+                    // load and Initialize the executable container
+                    loadAndInit(etd.getInternal());
                 }
 
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {

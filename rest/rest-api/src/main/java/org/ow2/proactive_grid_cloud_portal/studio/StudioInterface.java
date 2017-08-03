@@ -50,6 +50,7 @@ import javax.ws.rs.core.PathSegment;
 
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
@@ -86,6 +87,10 @@ public interface StudioInterface {
     @GET
     @Path("currentuser")
     String currentUser(@HeaderParam("sessionid") String sessionId);
+
+    @GET
+    @Path("currentuserdata")
+    UserData currentUserData(@HeaderParam("sessionid") String sessionId);
 
     @GET
     @Path("workflows")

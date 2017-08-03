@@ -36,6 +36,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -699,5 +700,11 @@ public class SchedulerNodeClient implements ISchedulerClient {
     public String getCurrentUser() throws NotConnectedException {
         renewSession();
         return client.getCurrentUser();
+    }
+
+    @Override
+    public UserData getCurrentUserData() throws NotConnectedException {
+        renewSession();
+        return client.getCurrentUserData();
     }
 }
