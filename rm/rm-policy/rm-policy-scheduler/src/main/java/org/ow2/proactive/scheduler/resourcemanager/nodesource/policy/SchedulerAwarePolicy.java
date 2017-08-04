@@ -52,38 +52,42 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     protected static Logger logger = Logger.getLogger(SchedulerAwarePolicy.class);
 
-    @Configurable
+    @Configurable(description = "url used to contact the scheduler, e.g. pnp://, pamr://")
     protected String schedulerUrl = "";
 
-    @Configurable(credential = true)
+    @Configurable(credential = true, description = "credentials used when contacting the scheduler")
     protected File schedulerCredentialsPath;
 
     protected SchedulerState state;
+
+    private byte[] credentials;
 
     protected Scheduler scheduler;
 
     @Override
     public BooleanWrapper configure(Object... params) {
         super.configure(params);
-        SchedulerAuthenticationInterface authentication;
+
+        if (params[2] == null) {
+            throw new IllegalArgumentException("Scheduler url must be specified");
+        }
+
+        schedulerUrl = params[2].toString();
 
         if (params[3] == null) {
             throw new IllegalArgumentException("Credentials must be specified");
         }
 
-        try {
-            authentication = SchedulerConnection.join(params[2].toString());
-            Credentials creds = Credentials.getCredentialsBase64((byte[]) params[3]);
-            scheduler = authentication.login(creds);
-        } catch (Throwable t) {
-            throw new IllegalArgumentException(t);
-        }
+        credentials = (byte[]) params[3];
 
         return new BooleanWrapper(true);
     }
 
     @Override
     public BooleanWrapper activate() {
+
+        connectToScheduler();
+
         try {
             state = scheduler.addEventListener(getSchedulerListener(), false, true, getEventsList());
         } catch (Exception e) {
@@ -91,6 +95,27 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
             throw new RuntimeException(e.getMessage(), e);
         }
         return new BooleanWrapper(true);
+    }
+
+    private void connectToScheduler() {
+        SchedulerAuthenticationInterface authentication;
+        boolean firstException = true;
+        while (scheduler == null) {
+            try {
+                authentication = SchedulerConnection.join(schedulerUrl);
+                Credentials creds = Credentials.getCredentialsBase64(credentials);
+                scheduler = authentication.login(creds);
+                Thread.sleep(1000);
+            } catch (Throwable t) {
+                if (firstException) {
+                    logger.warn("Could not contact scheduler at url " + schedulerUrl +
+                                " this is normal if the scheduler has just been restarted", t);
+                    firstException = false;
+                } else {
+                    logger.debug("Could not contact scheduler", t);
+                }
+            }
+        }
     }
 
     @Override

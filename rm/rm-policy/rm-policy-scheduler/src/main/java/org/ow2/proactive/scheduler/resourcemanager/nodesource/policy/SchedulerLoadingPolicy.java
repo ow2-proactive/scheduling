@@ -25,10 +25,15 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -41,97 +46,70 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.scheduler.common.NotificationData;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+
+import com.google.common.math.DoubleMath;
 
 
 @ActiveObject
 public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements InitActive, RunActive, RMEventListener {
 
-    public class NodeAcquisition {
-        private int number_of_nodes;
-
-        private boolean acquisition_started;
-
-        public NodeAcquisition() {
-            this.number_of_nodes = 0;
-            this.acquisition_started = false;
-        }
-
-        public NodeAcquisition(int number_of_nodes, boolean acquisition_started) {
-            this.number_of_nodes = number_of_nodes;
-            this.acquisition_started = acquisition_started;
-        }
-
-        public int getNumber_of_nodes() {
-            return number_of_nodes;
-        }
-
-        public void setNumber_of_nodes(int number_of_nodes) {
-            this.number_of_nodes = number_of_nodes;
-        }
-
-        public boolean isAcquisition_started() {
-            return acquisition_started;
-        }
-
-        public void setAcquisition_started(boolean acquisition_started) {
-            this.acquisition_started = acquisition_started;
-        }
-    }
-
     protected static Logger logger = Logger.getLogger(SchedulerLoadingPolicy.class);
 
-    private Map<JobId, Integer> activeTasks;
-
-    private Map<TaskId, NodeAcquisition> tasksState;
-
-    private int activeTask = 0;
-
     @Configurable(description = "refresh frequency (ms)")
-    private int refreshTime = 1000;
+    protected long refreshTime = 10000;
 
-    @Configurable
-    private int minNodes = 0;
+    @Configurable(description = "minimum number of nodes deployed")
+    protected int minNodes = 0;
 
-    @Configurable
-    private int maxNodes = 10;
+    @Configurable(description = "maximum number of nodes deployed")
+    protected int maxNodes = 10;
 
     @Configurable(description = "number of tasks per node")
-    private int loadFactor = 10;
+    protected int loadFactor = 10;
 
-    @Configurable()
-    protected int nodeDeploymentTimeout = 10000;
+    @Configurable(description = "Number of refresh cycles used to memorize scheduler load. Actual load will be computed as an average")
+    protected int refreshCycleWindow = 5;
+
+    @Configurable(description = "paid instance duration in Milliseconds: time after which the instance has to be paid again. Default is 0 (not a paid instance, no delay). This parameter can be used for paid cloud instances such as Amazon, Azure, etc. Example for Amazon : 3600000 ms (1 hour)")
+    protected long releaseDelay = 0;
+
+    @Configurable(description = "nodes can be released if current time is in interval [releaseDelay - threshold, releaseDelay]. Default is 0 (not a paid instance, no delay). Related to releaseDelay. Example for amazon : 600000 ms (10 minutes)")
+    protected long threshold = 0;
+
+    /**
+     * associates a Node URL with a acquisition time the time (as return by
+     * System.currentTimeMillis()) is actually when it was registered in the RM,
+     * not the VM startup in AWS accounting, which probably occurred ~2mn sooner
+     */
+    protected Map<String, Long> nodes = new LinkedHashMap<>();
 
     // policy state
     private boolean active = false;
 
-    private SchedulerLoadingPolicy thisStub;
+    protected SchedulerLoadingPolicy thisStub;
 
-    protected int nodesNumberInNodeSource = 0;
+    protected AtomicInteger nodesNumberInNodeSource = new AtomicInteger(0);
 
-    private int nodesNumberInRM = 0;
+    protected AtomicInteger pendingAddedNodesNumberInNodeSource = new AtomicInteger(0);
 
-    private String nodeSourceName = null;
+    protected AtomicInteger pendingRemovedNodesNumberInNodeSource = new AtomicInteger(0);
 
-    // positive when deploying, negative when removing, zero when idle
-    protected long timeStamp = 0;
+    protected CircularFifoQueue<Integer> refreshCycleWindowQueue;
+
+    protected String nodeSourceName = null;
 
     public SchedulerLoadingPolicy() {
     }
@@ -145,14 +123,17 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
         super.configure(policyParameters);
 
         try {
-            activeTasks = new HashMap<>();
-            tasksState = new HashMap<>();
             int index = 4;
-            refreshTime = Integer.parseInt(policyParameters[index++].toString());
+            refreshTime = Long.parseLong(policyParameters[index++].toString());
             minNodes = Integer.parseInt(policyParameters[index++].toString());
             maxNodes = Integer.parseInt(policyParameters[index++].toString());
             loadFactor = Integer.parseInt(policyParameters[index++].toString());
-            nodeDeploymentTimeout = Integer.parseInt(policyParameters[index++].toString());
+            refreshCycleWindow = Integer.parseInt(policyParameters[index++].toString());
+
+            refreshCycleWindowQueue = new CircularFifoQueue(refreshCycleWindow);
+
+            releaseDelay = Long.parseLong(policyParameters[index++].toString());
+            threshold = Long.parseLong(policyParameters[index++].toString());
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e);
         }
@@ -171,10 +152,12 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
         // recalculating nodes number only once per policy period
         while (body.isActive()) {
+
             try {
                 service.blockingServeOldest(refreshTime);
                 delta += System.currentTimeMillis() - timeStamp;
                 timeStamp = System.currentTimeMillis();
+
                 if (delta > refreshTime) {
                     if (active && nodeSource != null) {
                         try {
@@ -197,92 +180,200 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             return activationStatus;
         }
 
-        for (JobState js : state.getPendingJobs()) {
-            int nodesForThisJob = this.computeRequiredNodesForPendingJob(js);
-            activeTask += nodesForThisJob;
-            activeTasks.put(js.getId(), nodesForThisJob);
-        }
-
-        for (JobState js : state.getRunningJobs()) {
-            int nodesForThisJob = this.computeRequiredNodesForRunningJob(js);
-            activeTask += nodesForThisJob;
-            activeTasks.put(js.getId(), nodesForThisJob);
-        }
-
         nodeSourceName = nodeSource.getName();
 
         thisStub.registerRMListener();
-        logger.debug("Policy activated. Current number of tasks " + activeTask);
+        logger.info("Policy activated.");
         return new BooleanWrapper(true);
     }
 
+    /**
+     * Compare the scheduler state which the current number of available nodes. Initiate requests to add new nodes or to remove existing nodes.
+     */
     protected void updateNumberOfNodes() {
-        logger.debug("Refreshing policy state: " + nodesNumberInNodeSource + " nodes in node source, " +
-                     nodesNumberInRM + " nodes in RM");
-        if (timeStamp > 0) {
-            logger.debug("Pending node deployment request");
-            // pending node deployment
-            if (System.currentTimeMillis() - timeStamp > nodeDeploymentTimeout) {
-                logger.debug("Node deployment timeout.");
-                timeStamp = 0;
+        logger.debug("Refreshing policy state: " + nodesNumberInNodeSource + " nodes in node source.");
+
+        int consideredNumberOfAliveTasks = getConsideredNumberOfAliveTasks();
+
+        int requiredNodesNumber = (int) Math.ceil((double) consideredNumberOfAliveTasks / loadFactor);
+
+        logger.debug("Number of nodes required by computation: " + requiredNodesNumber);
+
+        int estimateNodeSourceNodesNumber = nodesNumberInNodeSource.get() + pendingAddedNodesNumberInNodeSource.get() -
+                                            pendingRemovedNodesNumberInNodeSource.get();
+
+        logger.debug("Number of nodes currently in the node source: " + estimateNodeSourceNodesNumber);
+
+        int estimateRMNodesNumber = getNumberOfAliveNodes() + pendingAddedNodesNumberInNodeSource.get() -
+                                    pendingRemovedNodesNumberInNodeSource.get();
+
+        logger.debug("Number of nodes currently in the rm: " + estimateRMNodesNumber);
+
+        if (estimateNodeSourceNodesNumber < minNodes) {
+            logger.info("Number of nodes in node source less than minimum");
+            addNewNodes(minNodes - estimateNodeSourceNodesNumber);
+            return;
+        }
+
+        if (estimateNodeSourceNodesNumber > maxNodes) {
+            logger.info("Number of nodes in node source greater than maximum");
+            removeSomeNodes(estimateNodeSourceNodesNumber - maxNodes);
+            return;
+        }
+
+        int numberOfNodesToAdd = Math.min(maxNodes - estimateNodeSourceNodesNumber,
+                                          requiredNodesNumber - estimateRMNodesNumber);
+
+        if (numberOfNodesToAdd > 0) {
+            logger.info("Number of nodes in RM less than required by computation");
+
+            if (numberOfNodesToAdd > 0) {
+                addNewNodes(Math.min(requiredNodesNumber, maxNodes) - estimateNodeSourceNodesNumber);
+                return;
             }
         }
 
-        if (timeStamp != 0) {
-            if (timeStamp < 0) {
-                logger.debug("Pending node removal request");
-            }
-            return;
-        }
+        int numberOfNodesToRemove = Math.min(estimateNodeSourceNodesNumber - minNodes,
+                                             estimateRMNodesNumber - requiredNodesNumber);
 
-        if (nodesNumberInNodeSource < minNodes) {
-            logger.debug("Node deployment request");
-            timeStamp = System.currentTimeMillis();
-            acquireNodes(minNodes - nodesNumberInNodeSource, new HashMap<String, Object>());
-            return;
-        }
+        if (numberOfNodesToRemove > 0) {
+            logger.info("Number of nodes in RM greater than required by computation");
 
-        if (nodesNumberInNodeSource > maxNodes) {
-            logger.debug("Node removal request");
-            timeStamp = -System.currentTimeMillis();
-            removeNode();
-            return;
-        }
-        try {
-            updateNumberOfNodesForEligibleTasks();
-        } catch (Exception e) {
-            logger.error("Error in updating number of Nodes for Eligible tasks:", e);
-        }
-        activeTask = handleNodeAcquisition();
-        int requiredNodesNumber = activeTask / loadFactor + (activeTask % loadFactor == 0 ? 0 : 1);
-        logger.debug("Required node number according to scheduler auto scale policy " + requiredNodesNumber);
-        //System.out.println("Current task number= " + tasksState.size() + " Required Nodes Number= " +
-          //                 requiredNodesNumber + " nodes Number In RM= " + nodesNumberInRM +
-            //               " nodesNumberInNodeSource " + nodesNumberInNodeSource);
-        if (requiredNodesNumber == nodesNumberInRM)
-            return;
-
-        if (requiredNodesNumber > nodesNumberInRM && nodesNumberInNodeSource < maxNodes) {
-            logger.debug("Node deployment request");
-            timeStamp = System.currentTimeMillis();
-            acquireNodes(requiredNodesNumber, new HashMap<String, Object>());
-            return;
-        }
-
-        if (requiredNodesNumber < nodesNumberInRM && nodesNumberInNodeSource > minNodes) {
-            logger.debug("Node removal request");
-            timeStamp = -System.currentTimeMillis();
-            removeNode();
+            removeSomeNodes(numberOfNodesToRemove);
             return;
         }
     }
 
     /**
-     * Too many nodes are held by the NodeSource,
-     * remove one node
+     * Returns the average number of alive tasks based on the window size to avoid creating and removing nodes too quickly
      */
-    protected void removeNode() {
-        removeNodes(1, false);
+    private int getConsideredNumberOfAliveTasks() {
+        int totalNumberOfAliveTasks = 0;
+        try {
+            totalNumberOfAliveTasks = getTotalNumberOfAliveTasks();
+        } catch (Exception e) {
+            logger.error("Error in computing required Nodes for Eligible tasks:", e);
+        }
+
+        refreshCycleWindowQueue.add(totalNumberOfAliveTasks);
+
+        return computeMean(refreshCycleWindowQueue);
+    }
+
+    private int computeMean(Collection<Integer> values) {
+        return (int) Math.ceil(DoubleMath.mean(values));
+    }
+
+    private void removeSomeNodes(int numberToRemove) {
+        logger.info("Nodes removal request: " + numberToRemove);
+        pendingRemovedNodesNumberInNodeSource.addAndGet(numberToRemove);
+        for (int i = 0; i < numberToRemove; i++) {
+            boolean nodeRemoved = removeNode();
+            if (!nodeRemoved) {
+                numberToRemove--;
+                pendingRemovedNodesNumberInNodeSource.decrementAndGet();
+            }
+        }
+        logger.info("Nodes actually removed: " + numberToRemove);
+    }
+
+    private void addNewNodes(int numberOfNodesToAdd) {
+        logger.info("Nodes deployment request: " + numberOfNodesToAdd);
+        pendingAddedNodesNumberInNodeSource.addAndGet(numberOfNodesToAdd);
+        acquireNodes(numberOfNodesToAdd, new HashMap<String, Object>());
+    }
+
+    /**
+     * Remove a node present in the node source
+     * @return
+     */
+    protected boolean removeNode() {
+        String bestFree = null;
+        String bestBusy = null;
+        String bestDown = null;
+        synchronized (nodes) {
+
+            long t = System.currentTimeMillis();
+
+            if (releaseDelay <= 0) {
+                Iterator<Map.Entry<String, Long>> iterator = nodes.entrySet().iterator();
+                if (!iterator.hasNext()) {
+                    return false;
+                }
+                Map.Entry<String, Long> entry = iterator.next();
+                iterator.remove();
+                NodeState nodeState = nodeSource.getRMCore().getNodeState(entry.getKey());
+                switch (nodeState) {
+                    case FREE:
+                    case BUSY:
+                        removeNode(entry.getKey(), false);
+                        return true;
+                    case DOWN:
+                    case LOST:
+                        removeNode(entry.getKey(), false);
+                        return false;
+                    default:
+                        return false;
+                }
+            }
+
+            /*
+             * A Node can be removed only if (minutes_since_acquisisiont % 60 < 10),
+             * ie. we are in the last 10 minutes of the last paid hour Down nodes
+             * are removed in priority, then free nodes, then busy nodes
+             */
+
+            for (Map.Entry<String, Long> node : nodes.entrySet()) {
+                long rt = releaseDelay - ((t - node.getValue()) % releaseDelay);
+                NodeState nodeState = null;
+                try {
+                    nodeState = nodeSource.getRMCore().getNodeState(node.getKey());
+                } catch (Throwable exc) {
+                    // pending / configuring
+                    continue;
+                }
+
+                switch (nodeState) {
+                    case BUSY:
+                    case CONFIGURING:
+                    case DEPLOYING:
+                        if (rt <= threshold) {
+                            bestBusy = node.getKey();
+                        }
+                        break;
+                    case LOST:
+                    case DOWN:
+                        if (rt <= threshold) {
+                            bestDown = node.getKey();
+                        }
+                        break;
+                    case FREE:
+                        if (rt <= threshold) {
+                            bestFree = node.getKey();
+                        }
+                        break;
+                }
+            }
+
+            if (bestDown != null) {
+                removeNode(bestDown, false);
+                this.nodes.remove(bestDown);
+                // removing a down or lost node does not count, but we do this in priority
+                return false;
+            } else if (bestFree != null) {
+                removeNode(bestFree, false);
+                this.nodes.remove(bestFree);
+                return true;
+            } else if (bestBusy != null) {
+                removeNode(bestBusy, false);
+                this.nodes.remove(bestBusy);
+                return true;
+            } else {
+                // no node can be removed, cancel request
+                return false;
+            }
+        }
+
     }
 
     @Override
@@ -299,16 +390,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     protected void registerRMListener() {
-        RMInitialState state = nodeSource.getRMCore()
-                                         .getMonitoring()
-                                         .addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
-        for (RMNodeEvent event : state.getNodesEvents()) {
-            //we only count "useable" nodes
-            if (checkNodeStates(event)) {
-                nodesNumberInRM++;
-            }
-        }
-        logger.debug("RM listener successfully registered. RM node number is " + nodesNumberInRM);
+        nodeSource.getRMCore().getMonitoring().addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis());
+        logger.debug("RM listener successfully registered.");
         active = true;
     }
 
@@ -320,54 +403,8 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     @Override
     public String toString() {
         return super.toString() + " [Max Nodes: " + maxNodes + " Min Nodes: " + minNodes + " Job Per Node: " +
-               loadFactor + " Refresh period " + refreshTime + "]";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-
-    @Override
-    public void jobSubmittedEvent(JobState jobState) {
-        //computing the required number of nodes regarding tasks' parallel environment
-        int nodesForThisJob = this.computeRequiredNodesForPendingJob(jobState);
-        activeTasks.put(jobState.getId(), nodesForThisJob);
-        //activeTask += nodesForThisJob;
-        //System.out.println("Job submitted. Current number of tasks " + nodesForThisJob);
-        logger.debug("Job submitted. Current number of tasks " + activeTask);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
-        switch (notification.getEventType()) {
-            case JOB_RUNNING_TO_FINISHED:
-            case JOB_PENDING_TO_FINISHED:
-                int tasksLeft = activeTasks.remove(notification.getData().getJobId());
-                activeTask -= tasksLeft;
-                break;
-            case TASK_REPLICATED:
-            case TASK_SKIPPED:
-                JobId jid = notification.getData().getJobId();
-                //need to get an up to date job view from the scheduler
-                //computing the required number of nodes from 0...
-                JobState jobState = null;
-                try {
-                    jobState = this.scheduler.getJobState(jid);
-                } catch (Exception e) {
-                    logger.error("Cannot update the " + this.getClass().getSimpleName() +
-                                 " state as an exception occured", e);
-                    break;
-                }
-                int nodesForThisTask = this.computeRequiredNodesForRunningJob(jobState);
-                int oldActiveTask = activeTasks.get(jid);
-                activeTasks.put(jid, nodesForThisTask);
-                activeTask += (nodesForThisTask - oldActiveTask);
-                logger.debug("Tasks replicated. Current number of tasks " + activeTask);
-                break;
-        }
+               loadFactor + " Refresh period: " + refreshTime + " Refresh cycle window: " + refreshCycleWindow +
+               " Release delay: " + releaseDelay + " Threshold: " + threshold + "]";
     }
 
     public void rmEvent(RMEvent event) {
@@ -377,46 +414,78 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
     }
 
     public void nodeEvent(RMNodeEvent event) {
-        switch (event.getEventType()) {
-            case NODE_ADDED:
-                //if node addition is related to pending nodes/down nodes
-                //we discard the computation
-                if (!checkNodeStates(event)) {
-                    break;
-                }
-                nodesNumberInRM++;
-                if (event.getNodeSource().equals(nodeSourceName)) {
-                    nodesNumberInNodeSource++;
-
-                    if (timeStamp > 0) {
+        synchronized (nodes) {
+            switch (event.getEventType()) {
+                case NODE_ADDED:
+                    //if node addition is related to pending nodes/down nodes
+                    //we discard the computation
+                    if (!checkNodeStates(event)) {
+                        break;
+                    }
+                    if (event.getNodeSource().equals(nodeSourceName)) {
+                        nodesNumberInNodeSource.incrementAndGet();
+                        pendingAddedNodesNumberInNodeSource.decrementAndGet();
+                        nodes.put(event.getNodeUrl(), System.currentTimeMillis());
                         logger.debug("Requested node arrived " + event.getNodeUrl());
-                        timeStamp = 0;
                     }
-                    if (timeStamp < 0) {
-                        logger.debug("Waiting for node to be removed but new node arrived " + event.getNodeUrl());
-                    }
-                }
-                break;
-            case NODE_REMOVED:
-                //we only care about non pending nodes
-                if (event.getNodeState() == NodeState.LOST || event.getNodeState() == NodeState.DEPLOYING) {
                     break;
-                }
-                nodesNumberInRM--;
-                if (event.getNodeSource().equals(nodeSourceName)) {
-                    nodesNumberInNodeSource--;
-
-                    if (timeStamp > 0) {
-                        logger.debug("Waiting for node to be acquired but the node " + event.getNodeUrl() + " removed");
+                case NODE_REMOVED:
+                    //we only care about non pending nodes
+                    if (event.getNodeState() == NodeState.LOST || event.getNodeState() == NodeState.DEPLOYING) {
+                        break;
                     }
-                    if (timeStamp < 0) {
+                    if (event.getNodeSource().equals(nodeSourceName)) {
+                        nodesNumberInNodeSource.decrementAndGet();
+                        pendingRemovedNodesNumberInNodeSource.decrementAndGet();
+                        nodes.remove(event.getNodeUrl());
                         logger.debug("Requested node removed " + event.getNodeUrl());
-                        timeStamp = 0;
-                    }
-                }
 
-                break;
+                    }
+
+                    break;
+                case NODE_STATE_CHANGED:
+                    //we only care about down nodes
+                    if (event.getNodeSource().equals(nodeSourceName)) {
+                        if (event.getNodeState() == NodeState.DOWN) {
+                            nodesNumberInNodeSource.decrementAndGet();
+                        } else if (event.getPreviousNodeState() == NodeState.DOWN &&
+                                   (event.getNodeState() == NodeState.BUSY || event.getNodeState() == NodeState.FREE)) {
+                            nodesNumberInNodeSource.incrementAndGet();
+                        } else if (event.getNodeState() == NodeState.LOST) {
+                            pendingAddedNodesNumberInNodeSource.decrementAndGet();
+                        }
+                    }
+
+            }
         }
+    }
+
+    /**
+     * Returns the total number of nodes alive in the resource manager (i.e. not lost, down, to_be_removed, etc)
+     */
+    private int getNumberOfAliveNodes() {
+        return nodeSource.getRMCore().listAliveNodeUrls().size();
+    }
+
+    /**
+     * Returns the total number of tasks ready to be scheduled
+     */
+    private int getTotalNumberOfAliveTasks() throws NotConnectedException, PermissionException, UnknownJobException {
+        Map<JobId, JobDescriptor> jobsRetrievedFromPolicy = scheduler.getJobsToSchedule();
+
+        int totalNumberOfRunningTasks = 0;
+        for (JobId jobId : jobsRetrievedFromPolicy.keySet()) {
+            JobState jobState = scheduler.getJobState(jobId);
+            totalNumberOfRunningTasks += jobState.getNumberOfRunningTasks();
+        }
+
+        int totalNumberOfEligibleTasks = 0;
+        List<TaskDescriptor> taskRetrievedFromPolicy = scheduler.getTasksToSchedule();
+        //if there is no task to be scheduled
+        for (TaskDescriptor etd : taskRetrievedFromPolicy) {
+            totalNumberOfEligibleTasks += etd.getNumberOfNodesNeeded();
+        }
+        return totalNumberOfRunningTasks + totalNumberOfEligibleTasks;
     }
 
     private boolean checkNodeStates(RMNodeEvent event) {
@@ -425,114 +494,6 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             return false;
         }
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
-        TaskId taskId = notification.getData().getTaskId();
-        switch (notification.getEventType()) {
-            case TASK_RUNNING_TO_FINISHED:
-            case TASK_IN_ERROR_TO_FINISHED:
-            case TASK_WAITING_FOR_RESTART:
-                tasksState.remove(taskId);
-                break;
-
-            case TASK_PENDING_TO_RUNNING:
-                if (tasksState.containsKey(taskId)) {
-                    tasksState.get(taskId).setAcquisition_started(true);
-                } else {
-                    JobId id = notification.getData().getJobId();
-                    JobState jobState = null;
-                    int nodesForThisTask = 0;
-                    try {
-                        jobState = this.scheduler.getJobState(id);
-                        TaskState taskState = jobState.getHMTasks().get(notification.getData().getTaskId());
-                        if (taskState.isParallel()) {
-                            nodesForThisTask = taskState.getParallelEnvironment().getNodesNumber();
-                        } else {
-                            nodesForThisTask = 1;
-                        }
-                    } catch (Exception e) {
-                        logger.error("Cannot update " + this.getClass().getSimpleName() +
-                                     "'s state because of an exception.", e);
-                    }
-                    tasksState.put(taskId, new NodeAcquisition(nodesForThisTask, true));
-                }
-                break;
-        }
-    }
-
-    /**
-     * Returns the required number of nodes for a pending job
-     * @param jobState
-     * @return Returns the required number of nodes for a pending job
-     */
-    private int computeRequiredNodesForPendingJob(JobState jobState) {
-        int nodesForThisJob = 0;
-        for (TaskState taskState : jobState.getTasks()) {
-            if (TaskStatus.PENDING.equals(taskState.getStatus())) {
-                if (taskState.isParallel()) {
-                    nodesForThisJob += taskState.getParallelEnvironment().getNodesNumber();
-                } else {
-                    nodesForThisJob++;
-                }
-            }
-        }
-        return nodesForThisJob;
-    }
-
-    /**
-     * Returns the required number of nodes for a running job
-     * @param jobState
-     * @return the required number of nodes for a running job
-     */
-    private int computeRequiredNodesForRunningJob(JobState jobState) {
-        int nodesForThisJob = 0;
-        for (TaskState taskState : jobState.getTasks()) {
-            if (TaskStatus.PENDING.equals(taskState.getStatus()) || TaskStatus.RUNNING.equals(taskState.getStatus())) {
-                if (taskState.isParallel()) {
-                    nodesForThisJob += taskState.getParallelEnvironment().getNodesNumber();
-                } else {
-                    nodesForThisJob++;
-                }
-            }
-        }
-        return nodesForThisJob;
-    }
-
-    private void updateNumberOfNodesForEligibleTasks() throws NotConnectedException, PermissionException {
-
-        List<TaskDescriptor> taskRetrievedFromPolicy = scheduler.getTasksToSchedule();
-        //if there is no task to be scheduled
-        if (taskRetrievedFromPolicy.isEmpty()) {
-            return;
-        }
-        //.println("Full List= " + taskRetrievedFromPolicy.size());
-        for (TaskDescriptor etd : taskRetrievedFromPolicy) {
-            TaskId taskId = etd.getTaskId();
-            if (!tasksState.containsKey(taskId)) {
-                tasksState.put(taskId, new NodeAcquisition(etd.getNumberOfNodesNeeded(), false));
-
-            }
-        }
-    }
-
-    /**
-     * Returns the required number of nodes for eligible tasks
-     * @return the required number of nodes for eligible tasks
-     */
-
-    private int handleNodeAcquisition() {
-        int nodesForEligibleTasks = 0;
-        for (Map.Entry<TaskId, NodeAcquisition> task : tasksState.entrySet()) {
-            if (!tasksState.get(task.getKey()).isAcquisition_started()) {
-                nodesForEligibleTasks += task.getValue().getNumber_of_nodes();
-            }
-        }
-        return nodesForEligibleTasks;
     }
 
     /**

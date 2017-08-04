@@ -13,9 +13,6 @@ org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWh
 # Acquire nodes according to the scheduler loading
 org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.SchedulerLoadingPolicy
 
-# Acquire nodes on Amazon EC2 according to the scheduler loading
-org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.EC2Policy
-
 # Allocated nodes for given time slot in cron syntax
 org.ow2.proactive.resourcemanager.nodesource.policy.CronPolicy
 

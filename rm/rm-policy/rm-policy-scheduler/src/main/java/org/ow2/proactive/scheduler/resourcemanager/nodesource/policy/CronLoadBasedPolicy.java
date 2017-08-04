@@ -110,15 +110,15 @@ public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
     }
 
     protected void updateNumberOfNodes() {
-        if (nodesNumberInNodeSource > 0 && !isAcquisitionAllowed.get()) {
+        if (nodesNumberInNodeSource.get() > 0 && !isAcquisitionAllowed.get()) {
             logger.debug("Policy triggers all nodes removal");
             removeAllNodes(preemptive);
         }
         if (isAcquisitionAllowed.get()) {
-            logger.debug("Node acquision allowed");
+            logger.debug("Node acquisition allowed");
             super.updateNumberOfNodes();
         } else {
-            logger.debug("Node acquision forbidden");
+            logger.debug("Node acquisition forbidden");
         }
     }
 
@@ -130,9 +130,9 @@ public class CronLoadBasedPolicy extends SchedulerLoadingPolicy {
 
     @Override
     public String toString() {
-        return super.toString() + ", acquisiotion allowed at [" + acquisionAllowed + "]" +
-               ", acquisiotion forbidden at [" + acquisionForbidden + "], preemptive: " + preemptive +
-               ", allowed initialy: " + allowed;
+        return super.toString() + ", acquisition allowed at [" + acquisionAllowed + "]" +
+               ", acquisition forbidden at [" + acquisionForbidden + "], preemptive: " + preemptive +
+               ", allowed initially: " + allowed;
     }
 
     @Override

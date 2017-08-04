@@ -906,14 +906,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
             // we wait for next scheduling loop
             if (jobMap.isEmpty()) {
-                //System.out.println("Here1");
                 return eligibleTasks;
             }
             List<JobDescriptor> descriptors = new ArrayList<>(jobMap.values());
             LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = policy.getOrderedTasks(descriptors);
             //if there is no task to scheduled, return
             if (taskRetrievedFromPolicy.isEmpty()) {
-               // System.out.println("Here2");
                 return eligibleTasks;
             }
             eligibleTasks = (List) taskRetrievedFromPolicy;
@@ -924,7 +922,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         finally {
             schedulingService.unlockJobsToSchedule(jobMap.values());
         }
-        //System.out.println("Here3");
         return eligibleTasks;
     }
 
