@@ -27,13 +27,17 @@ package functionaltests.scripts;
 
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -52,18 +56,44 @@ public class TestScriptEngines extends SchedulerFunctionalTestNoRestart {
 
     private static String jobDescriptorsLoc = "JobScriptEngines.xml";
 
+    private static String jobDescriptorsLocWindows = "JobScriptEnginesWindowsOnly.xml";
+
+    private static String jobDescriptorsLocLinux = "JobScriptEnginesLinuxOnly.xml";
+
     private URL jobDescriptor = TestScriptEngines.class.getResource("/functionaltests/scripts/" + jobDescriptorsLoc);
+
+    private URL jobDescriptorWindows = TestScriptEngines.class.getResource("/functionaltests/scripts/" +
+                                                                           jobDescriptorsLocWindows);
+
+    private URL jobDescriptorLinux = TestScriptEngines.class.getResource("/functionaltests/scripts/" +
+                                                                         jobDescriptorsLocLinux);
 
     @Test
     public void testScriptEngines() throws Throwable {
-        log("Testing submission of job descriptor : " + jobDescriptor);
-        JobId id = schedulerHelper.testJobSubmission(new File(jobDescriptor.toURI()).getAbsolutePath());
+        testScriptEnginesWithGivenWorkflow(jobDescriptor, 4);
+    }
+
+    @Test
+    public void testScriptEnginesLinuxOnly() throws Throwable {
+        assumeFalse(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
+        testScriptEnginesWithGivenWorkflow(jobDescriptorLinux, 1);
+    }
+
+    @Test
+    public void testScriptEnginesWindowsOnly() throws Throwable {
+        assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.windows);
+        testScriptEnginesWithGivenWorkflow(jobDescriptorWindows, 2);
+    }
+
+    private void testScriptEnginesWithGivenWorkflow(URL workflow, int numberOfTasks) throws Throwable {
+        log("Testing submission of job descriptor : " + workflow);
+        JobId id = schedulerHelper.testJobSubmission(new File(workflow.toURI()).getAbsolutePath());
 
         // check result are not null
         JobResult res = schedulerHelper.getJobResult(id);
-        assertFalse("Had Exception : " + jobDescriptor.toString(), schedulerHelper.getJobResult(id).hadException());
+        assertFalse("Had Exception : " + workflow.toString(), schedulerHelper.getJobResult(id).hadException());
 
-        Assert.assertEquals(4, res.getAllResults().size());
+        Assert.assertEquals(numberOfTasks, res.getAllResults().size());
         for (Map.Entry<String, TaskResult> entry : res.getAllResults().entrySet()) {
 
             assertFalse("Had Exception : " + entry.getKey(), entry.getValue().hadException());

@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.job;
 
 import java.io.Serializable;
 import java.security.Permission;
+import java.util.Map;
 
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
@@ -35,8 +36,8 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 /**
- * This class represented an authenticate job.
- * It is what the scheduler should be able to managed.
+ * This class represented an authenticate job. It is what the scheduler should
+ * be able to managed.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -52,15 +53,26 @@ public class IdentifiedJob implements Serializable {
     /** is this job finished */
     private boolean finished = false;
 
+    /** genericInformation of this job */
+    private final Map<String, String> genericInformation;
+
     /**
      * Identify job constructor with a given job and Identification.
      *
-     * @param jobId a job identification.
-     * @param userIdentification a user identification that should be able to identify the job user.
+     * @param jobId
+     *            a job identification.
+     * @param userIdentification
+     *            a user identification that should be able to identify the job
+     *            user.
+     * @param genericInformation
+     *            map containing the generic information of the job
      */
-    public IdentifiedJob(JobId jobId, UserIdentificationImpl userIdentification) {
+    public IdentifiedJob(JobId jobId, UserIdentificationImpl userIdentification,
+            Map<String, String> genericInformation) {
         this.jobId = jobId;
         this.userIdentification = userIdentification;
+        this.genericInformation = genericInformation;
+
     }
 
     /**
@@ -82,9 +94,19 @@ public class IdentifiedJob implements Serializable {
     }
 
     /**
+     * To get the genericInformation
+     *
+     * @return the genericInformation
+     */
+    public Map<String, String> getGenericInformation() {
+        return genericInformation;
+    }
+
+    /**
      * Check if the given user identification can managed this job.
      *
-     * @param userId the user identification to check.
+     * @param userId
+     *            the user identification to check.
      * @return true if userId has permission to managed this job.
      */
     public boolean hasRight(UserIdentificationImpl userId) {
@@ -96,7 +118,7 @@ public class IdentifiedJob implements Serializable {
                                                            userIdentification.getSubject()
                                                                              .getPrincipals(UserNamePrincipal.class));
         try {
-            //check method call
+            // check method call
             userId.checkPermission(jobPermission, "");
         } catch (PermissionException ex) {
             return false;
@@ -117,7 +139,8 @@ public class IdentifiedJob implements Serializable {
     /**
      * Set the finish status of the job.
      *
-     * @param finished the finish status to set.
+     * @param finished
+     *            the finish status to set.
      */
     public void setFinished(boolean finished) {
         this.finished = finished;

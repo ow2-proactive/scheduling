@@ -49,6 +49,7 @@ import org.apache.log4j.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
@@ -130,6 +131,11 @@ public class StudioRest implements StudioInterface {
         } catch (NotConnectedRestException e) {
             return null;
         }
+    }
+
+    @Override
+    public UserData currentUserData(@HeaderParam("sessionid") String sessionId) {
+        return scheduler().getUserDataFromSessionId(sessionId);
     }
 
     @Override

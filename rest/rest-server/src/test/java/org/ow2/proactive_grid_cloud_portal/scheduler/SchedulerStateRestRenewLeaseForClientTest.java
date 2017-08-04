@@ -82,6 +82,7 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
     public static Iterable<Object[]> data() throws NoSuchMethodException, IllegalAccessException {
         Set<String> methodsToIgnore = ImmutableSet.of("getCreateCredential",
                                                       "getLoginFromSessionId",
+                                                      "getUserDataFromSessionId",
                                                       "login",
                                                       "loginOrRenewSession",
                                                       "loginWithCredential",

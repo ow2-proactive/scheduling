@@ -28,6 +28,8 @@ package org.ow2.proactive.resourcemanager.authentication;
 import java.io.Serializable;
 import java.security.Permission;
 import java.security.PrivilegedAction;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 
@@ -39,6 +41,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 
@@ -119,6 +122,15 @@ public class Client implements Serializable {
      */
     public String getName() {
         return name;
+    }
+
+    public Set<String> getGroups() {
+        Set<String> answer = new HashSet<>();
+        Set<GroupNamePrincipal> groupPrincipals = subject.getPrincipals(GroupNamePrincipal.class);
+        for (GroupNamePrincipal principal : groupPrincipals) {
+            answer.add(principal.getName());
+        }
+        return answer;
     }
 
     /**

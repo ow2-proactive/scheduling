@@ -37,6 +37,7 @@ import java.util.concurrent.TimeoutException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.authentication.ConnectionInfo;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.common.Page;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -601,6 +602,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     @Override
     public String getCurrentUser() throws NotConnectedException {
         return ((ISchedulerClient) _getScheduler()).getCurrentUser();
+    }
+
+    @Override
+    public UserData getCurrentUserData() throws NotConnectedException {
+        return ((ISchedulerClient) _getScheduler()).getCurrentUserData();
     }
 
 }

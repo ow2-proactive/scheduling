@@ -48,6 +48,18 @@ import javax.crypto.SecretKey;
  */
 public class KeyUtil {
 
+    private static SecureRandom secureRandom;
+
+    public static synchronized SecureRandom getSecureRandom() {
+        if (secureRandom == null) {
+            secureRandom = new SecureRandom();
+            final byte[] dummy = new byte[512];
+            secureRandom.nextBytes(dummy);
+        }
+
+        return secureRandom;
+    }
+
     /**
      * Generates a secret symmetric key
      * 
@@ -57,7 +69,7 @@ public class KeyUtil {
      * @return the generated key
      * @throws KeyException key generation or saving failed
      */
-    public static SecretKey generateKey(String algorithm, int size) throws KeyException {
+    public static synchronized SecretKey generateKey(String algorithm, int size) throws KeyException {
         KeyGenerator keyGen = null;
         try {
             keyGen = KeyGenerator.getInstance(algorithm);
@@ -65,8 +77,7 @@ public class KeyUtil {
             throw new KeyException("Cannot initialize key generator", e);
         }
 
-        SecureRandom random = new SecureRandom();
-        keyGen.init(size, random);
+        keyGen.init(size, getSecureRandom());
 
         return keyGen.generateKey();
     }
@@ -80,11 +91,11 @@ public class KeyUtil {
      * @return the encrypted message
      * @throws KeyException encryption failed, public key recovery failed
      */
-    public static byte[] encrypt(SecretKey key, String cipherParams, byte[] message) throws KeyException {
+    public static synchronized byte[] encrypt(SecretKey key, String cipherParams, byte[] message) throws KeyException {
         Cipher ciph = null;
         try {
             ciph = Cipher.getInstance(cipherParams);
-            ciph.init(Cipher.ENCRYPT_MODE, key);
+            ciph.init(Cipher.ENCRYPT_MODE, key, getSecureRandom());
         } catch (Exception e) {
             throw new KeyException("Coult not initialize cipher", e);
         }
@@ -107,7 +118,7 @@ public class KeyUtil {
      * @return the decrypted message
      * @throws KeyException private key recovery failed, decryption failed
      */
-    public static byte[] decrypt(SecretKey key, String cipherParams, byte[] message) throws KeyException {
+    public static synchronized byte[] decrypt(SecretKey key, String cipherParams, byte[] message) throws KeyException {
         Cipher ciph = null;
         try {
             ciph = Cipher.getInstance(cipherParams);

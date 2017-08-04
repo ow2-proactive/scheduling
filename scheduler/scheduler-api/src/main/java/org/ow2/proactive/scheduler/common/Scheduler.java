@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -1401,5 +1402,11 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return user name
      */
     String getCurrentUser() throws NotConnectedException;
+
+    /**
+     * Returns the user data object associated with the user currently connected
+     * @return a user data object
+     */
+    UserData getCurrentUserData() throws NotConnectedException;
 
 }

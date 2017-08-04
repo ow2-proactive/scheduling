@@ -96,4 +96,15 @@ public class ScriptHandler implements Serializable {
         }
         additionalBindings.put(name, value);
     }
+
+    /**
+     * Add multiple bindings to the script that will be handle by this handler.
+     * @param bindings as a map
+     */
+    public void addBindings(Map<String, Object> bindings) {
+        if (additionalBindings == null) {
+            additionalBindings = new HashMap<>();
+        }
+        additionalBindings.putAll(bindings);
+    }
 }
