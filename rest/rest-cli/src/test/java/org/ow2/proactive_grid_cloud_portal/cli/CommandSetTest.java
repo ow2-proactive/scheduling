@@ -63,7 +63,7 @@ public class CommandSetTest {
     @Test
     public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
         int nbArgsBasedOnName = Option.UNINITIALIZED;
-        String regex = "\\[.*\\]";
+        String regex = "\\[(.*?)\\]";
         Pattern pattern = Pattern.compile(regex);
         String optionalArgNames = "";
         int optionals = 0;
@@ -79,7 +79,11 @@ public class CommandSetTest {
 
             if (!argNames.trim().isEmpty()) {
                 nbArgsBasedOnName = argNames.split(" ").length;
-                nbArgsBasedOnName = nbArgsBasedOnName - optionals;
+                if (entry.hasArgs()) {
+                    nbArgsBasedOnName = nbArgsBasedOnName - optionals;
+                } else if (entry.hasOptionalArg()) {
+                    nbArgsBasedOnName = optionals;
+                }
             }
 
             if (argNames.contains("...") && !optionalArgNames.contains("|") && !optionalArgNames.contains("...")) {
@@ -88,9 +92,27 @@ public class CommandSetTest {
 
         }
 
+        if (entry.numOfArgs() != nbArgsBasedOnName) {
+            nbArgsBasedOnName = numberComplexOptionalArgs(entry);
+        }
+
         Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
                             entry.numOfArgs(),
                             nbArgsBasedOnName);
+    }
+
+    public int numberComplexOptionalArgs(CommandSet.Entry entry) {
+        int numberArgs = 0;
+        final String regex = "(\\\\w+)=\\\"([^\\\"]+)\\\"|([^\\\\s]+)";
+
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(entry.argNames());
+
+        while (matcher.find()) {
+            numberArgs = matcher.group().split(" ").length;
+        }
+        return numberArgs;
+
     }
 
     @Parameterized.Parameters(name = "{1}")

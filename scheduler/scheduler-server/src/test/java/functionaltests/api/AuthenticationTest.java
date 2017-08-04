@@ -30,10 +30,13 @@ import static org.junit.Assert.fail;
 
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -83,6 +86,13 @@ public class AuthenticationTest extends SchedulerFunctionalTestNoRestart {
         Credentials cred = Credentials.createCredentials(new CredData(TestUsers.DEMO.username, TestUsers.DEMO.password),
                                                          pubKey);
         Scheduler admin = auth.login(cred);
+        String userName = admin.getCurrentUser();
+        Assert.assertEquals(TestUsers.DEMO.username, userName);
+        UserData userData = admin.getCurrentUserData();
+        Assert.assertNotNull(userData);
+        Assert.assertNotNull(userData.getUserName());
+        Assert.assertNotNull(userData.getGroups());
+        Assert.assertTrue(userData.getGroups().contains("admin"));
         admin.disconnect();
         log("Passed: successful authentication");
     }
@@ -95,6 +105,13 @@ public class AuthenticationTest extends SchedulerFunctionalTestNoRestart {
         Credentials cred = Credentials.createCredentials(new CredData(TestUsers.USER.username, TestUsers.USER.password),
                                                          pubKey);
         Scheduler user = auth.login(cred);
+        String userName = user.getCurrentUser();
+        Assert.assertEquals(TestUsers.USER.username, userName);
+        UserData userData = user.getCurrentUserData();
+        Assert.assertNotNull(userData);
+        Assert.assertNotNull(userData.getUserName());
+        Assert.assertNotNull(userData.getGroups());
+        Assert.assertTrue(userData.getGroups().contains("user"));
         user.disconnect();
         log("Passed: successful authentication");
     }

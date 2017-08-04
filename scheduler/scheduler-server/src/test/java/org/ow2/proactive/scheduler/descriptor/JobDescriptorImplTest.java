@@ -43,9 +43,10 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class JobDescriptorImplTest {
+public class JobDescriptorImplTest extends ProActiveTestClean {
 
     @Test
     public void testThatDoLoopPausesNewlyCreatedTasksIfJobIsPaused() {

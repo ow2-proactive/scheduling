@@ -33,6 +33,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -45,6 +46,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.ConnectionInfo;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -375,6 +377,24 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         String destDirPath = URI.create(client.getUserSpaceURIs().get(0)).getPath();
         File destFile = new File(destDirPath, "test_non_admin_user_push_file/tmpfile.tmp");
         assertTrue(Files.equal(tmpFile, destFile));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testGetGroups() throws Exception {
+        ISchedulerClient client = SchedulerClient.createInstance();
+        client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
+        UserData userData = client.getCurrentUserData();
+        Assert.assertNotNull(userData);
+        Assert.assertNotNull(userData.getGroups());
+        Assert.assertTrue(userData.getGroups().contains("admin"));
+        client.disconnect();
+
+        client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(), null, true));
+        userData = client.getCurrentUserData();
+        Assert.assertNotNull(userData);
+        Assert.assertNotNull(userData.getGroups());
+        Assert.assertTrue(userData.getGroups().contains("user"));
+        client.disconnect();
     }
 
     private ISchedulerClient clientInstance() throws Exception {

@@ -81,7 +81,7 @@ public class ScriptExecutor implements Callable<Node> {
         if (selectionScriptSpecified) {
             // initializing parallel script execution
             for (SelectionScript script : selectionScriptList) {
-                if (manager.isPassed(script, rmnode)) {
+                if (manager.isPassed(script, criteria.getBindings(), rmnode)) {
                     // already executed static script
                     logger.debug(rmnode.getNodeURL() + " : " + script.hashCode() + " skipping script execution");
                     continue;
@@ -108,6 +108,7 @@ public class ScriptExecutor implements Callable<Node> {
                             PAFuture.waitFor(scriptResult,
                                              PAResourceManagerProperties.RM_SELECT_SCRIPT_TIMEOUT.getValueAsLong());
                         } catch (ProActiveTimeoutException e) {
+                            logger.warn("Timeout on " + rmnode.getNodeURL());
                             // do not produce an exception here
                             nodeMatch = false;
                             break;
@@ -134,7 +135,7 @@ public class ScriptExecutor implements Callable<Node> {
 
                         // processing script result and updating knowledge base of
                         // selection manager at the same time. Returns whether node is selected.
-                        if (!manager.processScriptResult(script, scriptResult, rmnode)) {
+                        if (!manager.processScriptResult(script, criteria.getBindings(), scriptResult, rmnode)) {
                             nodeMatch = false;
                             break;
                         }

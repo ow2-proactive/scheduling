@@ -34,9 +34,10 @@ import java.net.SocketTimeoutException;
 
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.utils.BroadcastDiscoveryClient;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class BroadcastDiscoveryTest {
+public class BroadcastDiscoveryTest extends ProActiveTestClean {
 
     @Test
     public void base_case() throws Exception {

@@ -69,6 +69,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -203,6 +204,26 @@ public class RMRest implements RMRestInterface {
             return sessionStore.get(sessionId).getUserName();
         }
         return "";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @GET
+    @Path("logins/sessionid/{sessionId}/userdata")
+    @Produces("application/json")
+    public UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId) {
+        if (sessionId != null && sessionStore.exists(sessionId)) {
+            try {
+                ResourceManager rm = sessionStore.get(sessionId).getRM();
+                return PAFuture.getFutureValue(rm.getCurrentUserData());
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     /**

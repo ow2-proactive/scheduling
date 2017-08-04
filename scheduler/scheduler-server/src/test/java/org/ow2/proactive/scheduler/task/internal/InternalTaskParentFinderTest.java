@@ -40,13 +40,14 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
  * @author ActiveEon Team
  * @since 2 Jan 2017
  */
-public class InternalTaskParentFinderTest {
+public class InternalTaskParentFinderTest extends ProActiveTestClean {
 
     private InternalTaskParentFinder internalTaskParentFinder;
 

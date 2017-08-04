@@ -59,9 +59,9 @@ public class JettyStarter {
 
     protected static final String FOLDER_TO_DEPLOY = "/dist/war/";
 
-    protected static final String HTTP_CONNECTOR_NAME = "http";
+    public static final String HTTP_CONNECTOR_NAME = "http";
 
-    protected static final String HTTPS_CONNECTOR_NAME = "https";
+    public static final String HTTPS_CONNECTOR_NAME = "https";
 
     private static final Logger logger = Logger.getLogger(JettyStarter.class);
 
@@ -132,7 +132,7 @@ public class JettyStarter {
         return new ArrayList<>();
     }
 
-    protected int getJettyHttpPort() {
+    public int getJettyHttpPort() {
 
         if (WebProperties.WEB_HTTP_PORT.isSet()) {
             return WebProperties.WEB_HTTP_PORT.getValueAsInt();
@@ -141,7 +141,7 @@ public class JettyStarter {
         return 8080;
     }
 
-    protected Server createHttpServer(int httpPort, int httpsPort, boolean httpsEnabled, boolean redirectHttpToHttps) {
+    public Server createHttpServer(int httpPort, int httpsPort, boolean httpsEnabled, boolean redirectHttpToHttps) {
 
         int maxThreads = 100;
         if (WebProperties.WEB_MAX_THREADS.isSet()) {

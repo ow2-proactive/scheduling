@@ -51,11 +51,12 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
+import org.ow2.tests.ProActiveTestClean;
 
 import com.google.common.collect.Maps;
 
 
-public class TerminateLoopHandlerTest {
+public class TerminateLoopHandlerTest extends ProActiveTestClean {
 
     private TerminateLoopHandler terminateLoopHandler;
 

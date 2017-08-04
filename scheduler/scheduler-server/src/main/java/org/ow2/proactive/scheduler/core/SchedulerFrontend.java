@@ -79,6 +79,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.utils.NamedThreadFactory;
+import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -201,15 +202,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
 
     /*
-     * ######################################################################### ##################
+     * #########################################################################
+     * ##################
      */
     /*                                                                                             */
     /*
-     * ################################## SCHEDULER CONSTRUCTION #################################
+     * ################################## SCHEDULER CONSTRUCTION
+     * #################################
      */
     /*                                                                                             */
     /*
-     * ######################################################################### ##################
+     * #########################################################################
+     * ##################
      */
 
     /**
@@ -339,15 +343,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     /*
-     * ######################################################################### ##################
+     * #########################################################################
+     * ##################
      */
     /*                                                                                             */
     /*
-     * ################################### SCHEDULING MANAGEMENT #################################
+     * ################################### SCHEDULING MANAGEMENT
+     * #################################
      */
     /*                                                                                             */
     /*
-     * ######################################################################### ##################
+     * #########################################################################
+     * ##################
      */
 
     /**
@@ -375,27 +382,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public JobId submit(Job userJob)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("New job submission requested : " + userJob.getName());
+        try {
+            if (logger.isDebugEnabled()) {
+                logger.debug("New job submission requested : " + userJob.getName());
+            }
+
+            // check if the scheduler is stopped
+            if (!schedulingService.isSubmitPossible()) {
+                String msg = "Scheduler is stopped, cannot submit job";
+                logger.info(msg);
+                throw new SubmissionClosedException(msg);
+            }
+
+            UserIdentificationImpl ident = frontendState.checkPermission("submit",
+                                                                         YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
+
+            InternalJob job = frontendState.createJob(userJob, ident);
+
+            schedulingService.submitJob(job);
+
+            frontendState.jobSubmitted(job, ident);
+            return job.getId();
+        } catch (Exception e) {
+            logger.warn("Error when submitting job.", e);
+            throw e;
         }
-
-        // check if the scheduler is stopped
-        if (!schedulingService.isSubmitPossible()) {
-            String msg = "Scheduler is stopped, cannot submit job";
-            logger.info(msg);
-            throw new SubmissionClosedException(msg);
-        }
-
-        UserIdentificationImpl ident = frontendState.checkPermission("submit",
-                                                                     YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
-
-        InternalJob job = frontendState.createJob(userJob, ident);
-
-        schedulingService.submitJob(job);
-
-        frontendState.jobSubmitted(job, ident);
-
-        return job.getId();
     }
 
     /**
@@ -529,7 +540,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
 
-        // checking permissions      
+        // checking permissions
         frontendState.checkPermissions("getTaskResultFromIncarnation",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
@@ -651,9 +662,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkJobOwner("finishTaskInError",
-                                    frontendState.getIdentifiedJob(jobIdObject),
-                                    "You do not have permission to finish this task!");
         frontendState.checkPermissions("finishTaskInError",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
@@ -682,7 +690,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public boolean preemptTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
-        // checking permissions       
+        // checking permissions
         frontendState.checkPermissions("preemptTask",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_PREEMPT_THIS_TASK);
@@ -705,7 +713,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
 
-        // checking permissions       
+        // checking permissions
         frontendState.checkPermissions("removeJob",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
@@ -720,7 +728,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        // checking permissions        
+        // checking permissions
         frontendState.checkPermissions("listenJobLogs",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_LISTEN_THE_LOG_OF_THIS_JOB);
@@ -792,15 +800,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     /*
-     * ######################################################################### ##################
+     * #########################################################################
+     * ##################
      */
     /*                                                                                             */
     /*
-     * ##################################### SCHEDULER ORDERS ####################################
+     * ##################################### SCHEDULER ORDERS
+     * ####################################
      */
     /*                                                                                             */
     /*
-     * ######################################################################### ##################
+     * #########################################################################
+     * ##################
      */
 
     /**
@@ -1371,6 +1382,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public String getCurrentUser() throws NotConnectedException {
         return frontendState.getCurrentUser();
+    }
+
+    @Override
+    public UserData getCurrentUserData() throws NotConnectedException {
+        return frontendState.getCurrentUserData();
     }
 
 }

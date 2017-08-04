@@ -39,7 +39,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.tests.ProActiveTest;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
@@ -51,7 +51,7 @@ import org.ow2.tests.ProActiveTest;
  *
  * @author ActiveEon Team
  */
-public class JobStateTest extends ProActiveTest {
+public class JobStateTest extends ProActiveTestClean {
 
     private JobState jobState;
 

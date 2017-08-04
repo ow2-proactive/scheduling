@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core.properties;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.core.properties.PACommonProperties;
@@ -123,6 +124,9 @@ public enum PASchedulerProperties implements PACommonProperties {
      * than can block at the same time. If this number is reached, every clients won't receive events until
      * a thread unlock. */
     SCHEDULER_LISTENERS_THREADNUMBER("pa.scheduler.core.listener.threadnumber", PropertyType.INTEGER, "5"),
+
+    /** List of the scripts paths to execute at scheduler start. Paths are separated by a ';'. */
+    SCHEDULER_STARTSCRIPTS_PATHS("pa.scheduler.startscripts.paths", PropertyType.LIST),
 
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
@@ -419,6 +423,13 @@ public enum PASchedulerProperties implements PACommonProperties {
      */
     public void updateProperty(String value) {
         propertiesHelper.updateProperty(key, value);
+    }
+
+    /**
+     * Return all properties as a HashMap.
+     */
+    public static Map<String, Object> getPropertiesAsHashMap() {
+        return propertiesHelper.getPropertiesAsHashMap();
     }
 
     /**

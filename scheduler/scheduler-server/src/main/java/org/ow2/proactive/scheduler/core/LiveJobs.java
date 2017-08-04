@@ -156,12 +156,7 @@ class LiveJobs {
     }
 
     RunningTaskData getRunningTask(TaskId taskId) {
-        for (RunningTaskData taskData : runningTasksData.values()) {
-            if (taskData.getTask().getId().equals(taskId)) {
-                return taskData;
-            }
-        }
-        return null;
+        return runningTasksData.get(TaskIdWrapper.wrap(taskId));
     }
 
     boolean hasJobOwnedByUser(String user) {
@@ -236,7 +231,7 @@ class LiveJobs {
                 updateTasksInSchedulerState(job, updatedTasks);
             }
 
-            //update tasks events list and send it to front-end
+            // update tasks events list and send it to front-end
             updateJobInSchedulerState(job, SchedulerEvent.JOB_RESUMED);
 
             return updatedTasks.size() > 0;
@@ -261,7 +256,7 @@ class LiveJobs {
                 updateTasksInSchedulerState(job, updatedTasks);
             }
 
-            //update tasks events list and send it to front-end
+            // update tasks events list and send it to front-end
             updateJobInSchedulerState(job, SchedulerEvent.JOB_PAUSED);
 
             return updatedTasks.size() > 0;
@@ -326,8 +321,9 @@ class LiveJobs {
     }
 
     /**
-     * This method checks if there is a conflict priority between the jobs selected to be scheduled and those not selected.
-     * There is a conflict if any job scheduled has a strictly lower priority than any unscheduled job
+     * This method checks if there is a conflict priority between the jobs
+     * selected to be scheduled and those not selected. There is a conflict if
+     * any job scheduled has a strictly lower priority than any unscheduled job
      *
      * @param prioritiesScheduled
      * @param prioritiesNotScheduled
@@ -507,7 +503,7 @@ class LiveJobs {
                                   new NotificationData<TaskInfo>(SchedulerEvent.TASK_PENDING_TO_RUNNING,
                                                                  new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
 
-        //fill previous task progress with 0, means task has started
+        // fill previous task progress with 0, means task has started
         task.setProgress(0);
     }
 
@@ -708,37 +704,38 @@ class LiveJobs {
             terminationData.addTaskData(job, data, TerminationData.TerminationStatus.ABORTED, taskResult);
 
             tlogger.debug(taskId, "result added to job " + job.getId());
-            //to be done before terminating the task, once terminated it is not running anymore..
+            // to be done before terminating the task, once terminated it is not
+            // running anymore..
             ChangedTasksInfo changesInfo = job.finishInErrorTask(taskId, taskResult, listener);
 
             boolean jobFinished = job.isFinished();
 
-            //update job info if it is terminated
+            // update job info if it is terminated
             if (jobFinished) {
-                //terminating job
+                // terminating job
                 job.terminate();
                 jlogger.debug(job.getId(), "terminated");
                 jobs.remove(job.getId());
                 terminationData.addJobToTerminate(job.getId());
             }
 
-            //Update database
+            // Update database
             if (taskResult.getAction() != null) {
                 dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, taskResult);
             } else {
                 dbManager.updateAfterTaskFinished(job, task, taskResult);
             }
 
-            //send event
+            // send event
             listener.taskStateUpdated(job.getOwner(),
                                       new NotificationData<TaskInfo>(SchedulerEvent.TASK_IN_ERROR_TO_FINISHED,
                                                                      new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
-            //if this job is finished (every task have finished)
+            // if this job is finished (every task have finished)
             jlogger.info(job.getId(),
                          "finished tasks " + job.getNumberOfFinishedTasks() + ", total tasks " +
                                       job.getTotalNumberOfTasks() + ", finished " + jobFinished);
             if (jobFinished) {
-                //send event to client
+                // send event to client
                 listener.jobStateUpdated(job.getOwner(),
                                          new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                                                                        new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
@@ -910,37 +907,38 @@ class LiveJobs {
         TaskId taskId = task.getId();
 
         tlogger.debug(taskId, "result added to job " + job.getId());
-        //to be done before terminating the task, once terminated it is not running anymore..
+        // to be done before terminating the task, once terminated it is not
+        // running anymore..
         job.getRunningTaskDescriptor(taskId);
         ChangedTasksInfo changesInfo = job.terminateTask(errorOccurred, taskId, listener, result.getAction(), result);
 
         boolean jobFinished = job.isFinished();
 
-        //update job info if it is terminated
+        // update job info if it is terminated
         if (jobFinished) {
-            //terminating job
+            // terminating job
             job.terminate();
             jlogger.debug(job.getId(), "terminated");
             terminationData.addJobToTerminate(job.getId());
         }
 
-        //Update database
+        // Update database
         if (result.getAction() != null) {
             dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, result);
         } else {
             dbManager.updateAfterTaskFinished(job, task, result);
         }
 
-        //send event
+        // send event
         listener.taskStateUpdated(job.getOwner(),
                                   new NotificationData<TaskInfo>(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
                                                                  new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
-        //if this job is finished (every task have finished)
+        // if this job is finished (every task have finished)
         jlogger.info(job.getId(),
                      "finished tasks " + job.getNumberOfFinishedTasks() + ", total tasks " +
                                   job.getTotalNumberOfTasks() + ", finished " + jobFinished);
         if (jobFinished) {
-            //send event to client
+            // send event to client
             listener.jobStateUpdated(job.getOwner(),
                                      new NotificationData<JobInfo>(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
                                                                    new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
@@ -998,24 +996,26 @@ class LiveJobs {
             RunningTaskData taskData = i.next();
             if (taskData.getTask().getJobId().equals(jobId)) {
                 i.remove();
-                //remove previous read progress
+                // remove previous read progress
                 taskData.getTask().setProgress(0);
                 terminationData.addTaskData(job, taskData, TerminationData.TerminationStatus.ABORTED, taskResult);
             }
         }
 
-        //if job has been killed
+        // if job has been killed
         if (jobStatus == JobStatus.KILLED) {
             Set<TaskId> tasksToUpdate = job.failed(null, jobStatus);
             dbManager.updateAfterJobKilled(job, tasksToUpdate);
             updateTasksInSchedulerState(job, tasksToUpdate);
 
         } else {
-            // don't tamper the original job status if it's already in a finished state (failed/canceled)
+            // don't tamper the original job status if it's already in a
+            // finished state (failed/canceled)
             if (jobStatus != JobStatus.FINISHED) {
                 Set<TaskId> tasksToUpdate = job.failed(task.getId(), jobStatus);
 
-                //store the exception into jobResult / To prevent from empty task result (when job canceled), create one
+                // store the exception into jobResult / To prevent from empty
+                // task result (when job canceled), create one
                 boolean noResult = (jobStatus == JobStatus.CANCELED && taskResult == null);
                 if (jobStatus == JobStatus.FAILED || noResult) {
                     taskResult = new TaskResultImpl(task.getId(),
@@ -1028,7 +1028,7 @@ class LiveJobs {
             }
         }
 
-        //update job and tasks events list and send it to front-end
+        // update job and tasks events list and send it to front-end
         updateJobInSchedulerState(job, event);
 
         jlogger.info(job.getId(), "finished (" + jobStatus + ")");
@@ -1082,7 +1082,7 @@ class LiveJobs {
                                                                    new JobInfoImpl((JobInfoImpl) currentJob.getJobInfo())));
             listener.jobUpdatedFullData(currentJob);
         } catch (Throwable t) {
-            //Just to prevent update method error
+            // Just to prevent update method error
         }
     }
 

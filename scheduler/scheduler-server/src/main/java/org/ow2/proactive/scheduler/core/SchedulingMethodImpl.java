@@ -31,6 +31,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -107,9 +108,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private TaskTerminateNotification terminateNotification;
 
+    private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
+
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
-
+        this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
         terminateNotification = new TerminateNotification(schedulingService);
         terminateNotification = PAActiveObject.turnActive(terminateNotification,
                                                           TaskTerminateNotification.class.getName(),
@@ -158,7 +161,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         Map<JobId, JobDescriptor> toUnlock = jobMap;
 
-        if (logger.isDebugEnabled()) {
+        if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
+            logger.trace("No jobs selected to be scheduled");
+        }
+        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
             logger.debug("jobs selected to be scheduled : " + jobMap);
         }
 
@@ -208,6 +214,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //get the next compatible tasks from the whole returned policy tasks
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
+                for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
+                    // load and Initialize the executable container
+                    loadAndInit(etd.getInternal());
+                }
+
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
                     neededResourcesNumber = getNextcompatibleTasks(jobMap,
@@ -240,9 +251,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
 
                         if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
-                            // load and Initialize the executable container
-                            loadAndInit(internalTask);
-
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
 
@@ -317,6 +325,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             throw new IllegalArgumentException("The two given lists must not be null !");
         }
         int neededResource = 0;
+        if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+            Iterator<EligibleTaskDescriptor> it = bagOfTasks.iterator();
+            EligibleTaskDescriptor etd;
+            while (it.hasNext()) {
+                etd = it.next();
+                if (checkEligibleTaskDescriptorScript.isTaskContainsAPIBinding(etd)) {
+                    //skip task here
+                    it.remove();
+                }
+            }
+        }
         if (maxResource > 0 && !bagOfTasks.isEmpty()) {
             EligibleTaskDescriptor etd = bagOfTasks.removeFirst();
             ((EligibleTaskDescriptorImpl) etd).addAttempt();

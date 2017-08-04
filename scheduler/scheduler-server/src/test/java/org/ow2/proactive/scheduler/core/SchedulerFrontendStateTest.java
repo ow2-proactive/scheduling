@@ -47,11 +47,11 @@ import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
-import org.ow2.tests.ProActiveTest;
+import org.ow2.tests.ProActiveTestClean;
 import org.python.google.common.collect.Lists;
 
 
-public class SchedulerFrontendStateTest extends ProActiveTest {
+public class SchedulerFrontendStateTest extends ProActiveTestClean {
 
     @Test // SCHEDULING-2242
     public void session_removal_should_not_throw_concurrent_modification_exception() throws Exception {
@@ -87,6 +87,8 @@ public class SchedulerFrontendStateTest extends ProActiveTest {
             fail("Should exit with timeout exception " + e.getMessage());
         } catch (TimeoutException e) {
             // expected timeout exception after two seconds
+        } finally {
+            executor.shutdownNow();
         }
     }
 

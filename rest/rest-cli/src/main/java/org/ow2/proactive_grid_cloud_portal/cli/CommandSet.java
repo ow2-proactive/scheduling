@@ -32,9 +32,81 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.cli.Option;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.*;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.*;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.*;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.EvalScriptCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.ExitCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.HelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.JsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.LoginWithCredentialsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.OutputCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.PrintSessionCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetCaCertsPassCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetDebugModeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetInsecureAccessCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetPasswordCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.VersionCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListInfrastructureCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.LockNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobTasksCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListTaskStatesCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PutThirdPartyCredentialCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveThirdPartyCredentialCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartAllInErrorTasksCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartInErrorTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartRunningTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartTaskCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeAllPausedTasksAndRestartAllInErrorTasksCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeAllPausedTasksCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ThirdPartyCredentialKeySetCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand;
 
 import com.google.common.collect.Ordering;
 
@@ -184,7 +256,7 @@ public class CommandSet {
                                                                         .longOpt("submit")
                                                                         .description("Submit the specified job-description (XML) file")
                                                                         .hasArgs(true)
-                                                                        .numOfArgs(1)
+                                                                        .numOfArgs(2)
                                                                         .hasOptionalArg(true)
                                                                         .argNames("job-descriptor '[{\"var1\":\"value1\",\"var2\":\"value2\"}]'")
                                                                         .jsCommand("submit(job-descriptor,'{\"var1\":\"value1\",\"var2\":\"value2\"}'")
@@ -261,11 +333,12 @@ public class CommandSet {
     public static final CommandSet.Entry JOB_LIST = CommandSetEntryBuilder.newInstance()
                                                                           .opt("lj")
                                                                           .longOpt("listjobs")
-                                                                          .description("Retrieve a list of jobs managed by the Scheduler.If specified the latest 'x' number of jobs or 'z' maximum number of jobs starting from 'y'th job.") //Example: to return the five last jobs, >./proactive-client -lj limit=5. To return the list of z jobs from index y, >./proactive-client -lj from=y limit=z ")
-                                                                          .numOfArgs(1)
+                                                                          .description("Retrieve a list of jobs managed by the Scheduler." +
+                                                                                       "Use 'latest=x' to filter the latest x jobs, or 'from=y limit=z' to retrieve the z latest jobs from the yth job.")
+                                                                          .numOfArgs(3)
                                                                           .hasOptionalArg(true)
-                                                                          .hasArgs(true)
-                                                                          .argNames("jobs [latest=x |(from=y limit=z)]")
+                                                                          .hasArgs(false)
+                                                                          .argNames("[latest=x |(from=y limit=z)]")
                                                                           .jsCommand("listjobs(x)")
                                                                           .commandClass(ListJobCommand.class)
                                                                           .entry();
@@ -292,7 +365,8 @@ public class CommandSet {
 
     public static final CommandSet.Entry JS_LIST_LATEST = CommandSetEntryBuilder.newInstance()
                                                                                 .opt("lj")
-                                                                                .description("Retrieves a list of the latest 'x' number of jobs. Example: to return the five last jobs, >listjobs(5)")
+                                                                                .description("Retrieves a list of the latest 'x' number of jobs." +
+                                                                                             "Example: to return the five last jobs, >listjobs(5)")
                                                                                 .jsCommand("listjobs(x)")
                                                                                 .commandClass(ListJobCommand.class)
                                                                                 .entry();
@@ -928,7 +1002,8 @@ public class CommandSet {
         /**
          * Sets the long name of this option.
          *
-         * @param longOpt the long name of this option.
+         * @param longOpt
+         *            the long name of this option.
          */
         private void setLongOpt(String longOpt) {
             this.longOpt = longOpt;
@@ -946,7 +1021,8 @@ public class CommandSet {
         /**
          * Sets the description of this option.
          *
-         * @param description the description of this option.
+         * @param description
+         *            the description of this option.
          */
         private void setDescription(String description) {
             this.description = description;
@@ -964,7 +1040,8 @@ public class CommandSet {
         /**
          * Sets the description of interactive shell command of this option.
          *
-         * @param jsCommand the interactive shell command description.
+         * @param jsCommand
+         *            the interactive shell command description.
          */
         private void setJsCommand(String jsCommand) {
             this.jsCommand = jsCommand;
@@ -982,7 +1059,8 @@ public class CommandSet {
         /**
          * Sets whether this option has one or more arguments.
          *
-         * @param hasArgs whether this option has one or more arguments.
+         * @param hasArgs
+         *            whether this option has one or more arguments.
          */
         private void setHasArgs(boolean hasArgs) {
             this.hasArgs = hasArgs;
@@ -1000,7 +1078,8 @@ public class CommandSet {
         /**
          * Sets whether this option has optional argument.
          *
-         * @param hasOptionalArg whether this option has optional argument
+         * @param hasOptionalArg
+         *            whether this option has optional argument
          */
         public void setHasOptionalArg(boolean hasOptionalArg) {
             this.hasOptionalArg = hasOptionalArg;
@@ -1018,7 +1097,8 @@ public class CommandSet {
         /**
          * Sets the argument names of this option.
          *
-         * @param argNames the argument names.
+         * @param argNames
+         *            the argument names.
          */
         public void setArgNames(String argNames) {
             this.argNames = argNames;
@@ -1037,7 +1117,8 @@ public class CommandSet {
         /**
          * Sets the number of arguments of this option.
          *
-         * @param numOfArgs the number of arguments of this option.
+         * @param numOfArgs
+         *            the number of arguments of this option.
          */
         private void setNumOfArgs(int numOfArgs) {
             this.numOfArgs = numOfArgs;
@@ -1047,8 +1128,9 @@ public class CommandSet {
          * Returns an instance of Command class which is responsible for
          * processing this option along with any arguments specified.
          *
-         * @param option a wrapper instance which contains arguments of this
-         *               option.
+         * @param option
+         *            a wrapper instance which contains arguments of this
+         *            option.
          */
         public Command commandObject(Option option) {
             return CommandSetEntryHelper.newCommandObject(option, commandClass);
@@ -1058,7 +1140,8 @@ public class CommandSet {
          * Sets the name of the Command type responsible for processing this
          * option.
          *
-         * @param commandClass the class name of the Command type.
+         * @param commandClass
+         *            the class name of the Command type.
          */
         public void setCommandClass(Class<?> commandClass) {
             this.commandClass = commandClass;
