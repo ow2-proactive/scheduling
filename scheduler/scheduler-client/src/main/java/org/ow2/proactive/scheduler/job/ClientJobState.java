@@ -56,7 +56,7 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
  * 
  * @author esalagea
  */
-public final class ClientJobState extends JobState {
+public class ClientJobState extends JobState {
 
     private final ClientJobSerializationHelper clientJobSerializationHelper;
 
