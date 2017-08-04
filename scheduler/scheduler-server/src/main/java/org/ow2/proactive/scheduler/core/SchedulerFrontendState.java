@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.util.converter.ProActiveMakeDeepCopy;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.permissions.MethodCallPermission;
@@ -210,9 +212,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * Scheduler state maintains by this class : avoid charging the core from
      * some request
      */
-    private final SchedulerStateImpl sState;
+    private final SchedulerStateImpl<ClientJobState> sState;
 
-    private final Map<JobId, JobState> jobsMap;
+    private final Map<JobId, ClientJobState> jobsMap;
 
     SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper) {
         this.identifications = new HashMap<>();
@@ -231,9 +233,9 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * the different list of userIdentification and job/user association.
      */
     private void recover(SchedulerStateImpl sState) {
-        Vector<JobState> pendingJobs = sState.getPendingJobs();
-        Vector<JobState> runningJobs = sState.getRunningJobs();
-        Vector<JobState> finishedJobs = sState.getFinishedJobs();
+        Vector<ClientJobState> pendingJobs = sState.getPendingJobs();
+        Vector<ClientJobState> runningJobs = sState.getRunningJobs();
+        Vector<ClientJobState> finishedJobs = sState.getFinishedJobs();
 
         // default state = started
         Set<JobState> jobStates = new HashSet<>(pendingJobs.size() + runningJobs.size() + finishedJobs.size());
@@ -243,13 +245,13 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         " #Finished jobs: " + finishedJobs.size());
         }
 
-        for (JobState js : pendingJobs) {
+        for (ClientJobState js : pendingJobs) {
             prepare(jobStates, js, false);
         }
-        for (JobState js : runningJobs) {
+        for (ClientJobState js : runningJobs) {
             prepare(jobStates, js, false);
         }
-        for (JobState js : finishedJobs) {
+        for (ClientJobState js : finishedJobs) {
             prepare(jobStates, js, true);
         }
     }
@@ -264,7 +266,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @param finished
      *            if the job is finished or not
      */
-    private void prepare(Set<JobState> jobStates, JobState js, boolean finished) {
+    private void prepare(Set<JobState> jobStates, ClientJobState js, boolean finished) {
         jobStates.add(js);
         UserIdentificationImpl uIdent = new UserIdentificationImpl(js.getOwner());
         IdentifiedJob ij = new IdentifiedJob(js.getId(), uIdent, js.getGenericInformation());
@@ -647,14 +649,16 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     synchronized Set<TaskId> getJobTasks(JobId jobId) {
         JobState jobState = jobsMap.get(jobId);
-        if (jobState == null) {
-            return Collections.emptySet();
-        } else {
-            Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
-            for (TaskState task : jobState.getTasks()) {
-                tasks.add(task.getId());
+        synchronized (jobState) {
+            if (jobState == null) {
+                return Collections.emptySet();
+            } else {
+                Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
+                for (TaskState task : jobState.getTasks()) {
+                    tasks.add(task.getId());
+                }
+                return tasks;
             }
-            return tasks;
         }
     }
 
@@ -663,7 +667,17 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
-        return jobsMap.get(jobId);
+        ClientJobState jobState = jobsMap.get(jobId);
+        ClientJobState jobStateCopy;
+        synchronized (jobState) {
+            try {
+                jobStateCopy = (ClientJobState) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(jobState);
+            } catch (Exception e) {
+                logger.error("Error when copying job state", e);
+                throw new IllegalStateException(e);
+            }
+        }
+        return jobStateCopy;
     }
 
     synchronized TaskState getTaskState(JobId jobId, TaskId taskId)
@@ -674,11 +688,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         if (jobsMap.get(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
-        TaskState ts = jobsMap.get(jobId).getHMTasks().get(taskId);
-        if (ts == null) {
-            throw new UnknownTaskException(taskId, jobId);
+        JobState jobState = jobsMap.get(jobId);
+        synchronized (jobState) {
+            TaskState ts = jobState.getHMTasks().get(taskId);
+            if (ts == null) {
+                throw new UnknownTaskException(taskId, jobId);
+            }
+            return ts;
         }
-        return ts;
     }
 
     synchronized TaskState getTaskState(JobId jobId, String taskName)
@@ -700,11 +717,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         if (taskId == null) {
             throw new UnknownTaskException(taskName, jobId);
         }
-        TaskState ts = jobsMap.get(jobId).getHMTasks().get(taskId);
-        if (ts == null) {
-            throw new UnknownTaskException(taskId, jobId);
+        JobState jobState = jobsMap.get(jobId);
+        synchronized (jobState) {
+            TaskState ts = jobState.getHMTasks().get(taskId);
+            if (ts == null) {
+                throw new UnknownTaskException(taskId, jobId);
+            }
+            return ts;
         }
-        return ts;
     }
 
     synchronized TaskId getTaskId(JobId jobId, String taskName) throws UnknownTaskException, UnknownJobException {
@@ -1076,43 +1096,45 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     @Override
     public synchronized void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
-        JobState js = jobsMap.get(notification.getData().getJobId());
-        js.update(notification.getData());
-        switch (notification.getEventType()) {
-            case JOB_PENDING_TO_RUNNING:
-                sState.pendingToRunning(js);
-                break;
-            case JOB_PAUSED:
-            case JOB_IN_ERROR:
-            case JOB_RESUMED:
-            case JOB_RESTARTED_FROM_ERROR:
-            case JOB_CHANGE_PRIORITY:
-            case TASK_REPLICATED:
-            case TASK_SKIPPED:
-                break;
-            case JOB_PENDING_TO_FINISHED:
-                sState.pendingToFinished(js);
-                // set this job finished, user can get its result
-                jobs.get(notification.getData().getJobId()).setFinished(true);
-                break;
-            case JOB_RUNNING_TO_FINISHED:
-                sState.runningToFinished(js);
-                // set this job finished, user can get its result
-                jobs.get(notification.getData().getJobId()).setFinished(true);
-                break;
-            case JOB_REMOVE_FINISHED:
-                // removing jobs from the global list : this job is no more managed
-                sState.removeFinished(js);
-                jobsMap.remove(js.getId());
-                jobs.remove(notification.getData().getJobId());
-                break;
-            default:
-                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                            notification.getEventType());
-                return;
+        ClientJobState js = jobsMap.get(notification.getData().getJobId());
+        synchronized (js) {
+            js.update(notification.getData());
+            switch (notification.getEventType()) {
+                case JOB_PENDING_TO_RUNNING:
+                    sState.pendingToRunning(js);
+                    break;
+                case JOB_PAUSED:
+                case JOB_IN_ERROR:
+                case JOB_RESUMED:
+                case JOB_RESTARTED_FROM_ERROR:
+                case JOB_CHANGE_PRIORITY:
+                case TASK_REPLICATED:
+                case TASK_SKIPPED:
+                    break;
+                case JOB_PENDING_TO_FINISHED:
+                    sState.pendingToFinished(js);
+                    // set this job finished, user can get its result
+                    jobs.get(notification.getData().getJobId()).setFinished(true);
+                    break;
+                case JOB_RUNNING_TO_FINISHED:
+                    sState.runningToFinished(js);
+                    // set this job finished, user can get its result
+                    jobs.get(notification.getData().getJobId()).setFinished(true);
+                    break;
+                case JOB_REMOVE_FINISHED:
+                    // removing jobs from the global list : this job is no more managed
+                    sState.removeFinished(js);
+                    jobsMap.remove(js.getId());
+                    jobs.remove(notification.getData().getJobId());
+                    break;
+                default:
+                    logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                                notification.getEventType());
+                    return;
+            }
+            dispatchJobStateUpdated(owner, notification);
+            new JobEmailNotification(js, notification).checkAndSend();
         }
-        dispatchJobStateUpdated(owner, notification);
-        new JobEmailNotification(js, notification).checkAndSend();
     }
 
     @Override
@@ -1123,29 +1145,32 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     @Override
     public synchronized void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
-        jobsMap.get(notification.getData().getJobId()).update(notification.getData());
-        switch (notification.getEventType()) {
-            case TASK_PENDING_TO_RUNNING:
-            case TASK_RUNNING_TO_FINISHED:
-            case TASK_WAITING_FOR_RESTART:
-            case TASK_IN_ERROR:
-            case TASK_SKIPPED:
-            case TASK_REPLICATED:
-            case TASK_IN_ERROR_TO_FINISHED:
-                dispatchTaskStateUpdated(owner, notification);
-                break;
-            case TASK_PROGRESS:
-                // this event can be sent while task is already finished,
-                // as it is not a correct behavior, event is dropped if task is
-                // already finished.
-                // so if task is not finished, send event
-                if (notification.getData().getFinishedTime() <= 0) {
+        JobState jobState = jobsMap.get(notification.getData().getJobId());
+        synchronized (jobState) {
+            jobState.update(notification.getData());
+            switch (notification.getEventType()) {
+                case TASK_PENDING_TO_RUNNING:
+                case TASK_RUNNING_TO_FINISHED:
+                case TASK_WAITING_FOR_RESTART:
+                case TASK_IN_ERROR:
+                case TASK_SKIPPED:
+                case TASK_REPLICATED:
+                case TASK_IN_ERROR_TO_FINISHED:
                     dispatchTaskStateUpdated(owner, notification);
-                }
-                break;
-            default:
-                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                            notification.getEventType());
+                    break;
+                case TASK_PROGRESS:
+                    // this event can be sent while task is already finished,
+                    // as it is not a correct behavior, event is dropped if task is
+                    // already finished.
+                    // so if task is not finished, send event
+                    if (notification.getData().getFinishedTime() <= 0) {
+                        dispatchTaskStateUpdated(owner, notification);
+                    }
+                    break;
+                default:
+                    logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                                notification.getEventType());
+            }
         }
     }
 

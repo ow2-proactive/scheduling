@@ -45,14 +45,14 @@ public class RecoveredSchedulerState {
 
     private final Vector<InternalJob> finishedJobs;
 
-    private final SchedulerStateImpl schedulerState;
+    private final SchedulerStateImpl<ClientJobState> schedulerState;
 
     public RecoveredSchedulerState(Vector<InternalJob> pendingJobs, Vector<InternalJob> runningJobs,
             Vector<InternalJob> finishedJobs) {
         this.pendingJobs = pendingJobs;
         this.runningJobs = runningJobs;
         this.finishedJobs = finishedJobs;
-        schedulerState = new SchedulerStateImpl();
+        schedulerState = new SchedulerStateImpl<>();
         schedulerState.setPendingJobs(convertToClientJobState(pendingJobs));
         schedulerState.setRunningJobs(convertToClientJobState(runningJobs));
         schedulerState.setFinishedJobs(convertToClientJobState(finishedJobs));
@@ -70,12 +70,12 @@ public class RecoveredSchedulerState {
         return finishedJobs;
     }
 
-    public SchedulerStateImpl getSchedulerState() {
+    public SchedulerStateImpl<ClientJobState> getSchedulerState() {
         return schedulerState;
     }
 
-    private Vector<JobState> convertToClientJobState(List<InternalJob> jobs) {
-        Vector<JobState> result = new Vector<>(jobs.size());
+    private Vector<ClientJobState> convertToClientJobState(List<InternalJob> jobs) {
+        Vector<ClientJobState> result = new Vector<>(jobs.size());
         for (InternalJob internalJob : jobs) {
             result.add(new ClientJobState(internalJob));
         }

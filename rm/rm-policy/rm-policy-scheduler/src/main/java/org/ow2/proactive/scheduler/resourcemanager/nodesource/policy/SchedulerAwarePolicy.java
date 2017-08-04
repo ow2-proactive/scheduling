@@ -58,7 +58,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     @Configurable(credential = true)
     protected File schedulerCredentialsPath;
 
-    protected SchedulerState state;
+    protected SchedulerState<JobState> state;
 
     protected Scheduler scheduler;
 
