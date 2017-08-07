@@ -216,7 +216,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 int neededResourcesNumber = 0;
                 for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
                     // load and Initialize the executable container
-                    loadAndInit(etd.getInternal());
+                    loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
                 }
 
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {

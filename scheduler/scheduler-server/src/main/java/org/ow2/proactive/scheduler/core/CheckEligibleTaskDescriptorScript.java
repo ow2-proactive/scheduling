@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core;
 
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scripting.Script;
@@ -46,39 +47,44 @@ public class CheckEligibleTaskDescriptorScript {
 
     public boolean isTaskContainsAPIBinding(EligibleTaskDescriptor etd) {
         return isPrePostFlowEnvironmentScriptContainsApiBinding(etd) ||
-               ((etd.getInternal() instanceof InternalScriptTask) && (isInternalScriptContainsApiBinding(etd)));
+               ((((EligibleTaskDescriptorImpl) etd).getInternal() instanceof InternalScriptTask) &&
+                (isInternalScriptContainsApiBinding(etd)));
 
     }
 
     private boolean isInternalScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return (etd.getInternal().getExecutableContainer() != null) &&
-               (etd.getInternal().getExecutableContainer() instanceof ScriptExecutableContainer) &&
-               (((ScriptExecutableContainer) etd.getInternal().getExecutableContainer()).getScript() != null) &&
-               isScriptContainsApiBinding(((ScriptExecutableContainer) etd.getInternal()
-                                                                          .getExecutableContainer()).getScript());
+        return (((EligibleTaskDescriptorImpl) etd).getInternal().getExecutableContainer() != null) &&
+               (((EligibleTaskDescriptorImpl) etd).getInternal()
+                                                  .getExecutableContainer() instanceof ScriptExecutableContainer) &&
+               (((ScriptExecutableContainer) ((EligibleTaskDescriptorImpl) etd).getInternal().getExecutableContainer())
+                                                                                                                       .getScript() != null) &&
+               isScriptContainsApiBinding(((ScriptExecutableContainer) ((EligibleTaskDescriptorImpl) etd).getInternal()
+                                                                                                         .getExecutableContainer()).getScript());
 
     }
 
     private boolean isPresScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return (etd.getInternal().getPreScript() != null) &&
-               isScriptContainsApiBinding(etd.getInternal().getPreScript());
+        return (((EligibleTaskDescriptorImpl) etd).getInternal().getPreScript() != null) &&
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getPreScript());
     }
 
     private boolean isPostScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return (etd.getInternal().getPostScript() != null) &&
-               isScriptContainsApiBinding(etd.getInternal().getPostScript());
+        return (((EligibleTaskDescriptorImpl) etd).getInternal().getPostScript() != null) &&
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getPostScript());
     }
 
     private boolean isFlowScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return (etd.getInternal().getFlowScript() != null) &&
-               isScriptContainsApiBinding(etd.getInternal().getFlowScript());
+        return (((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript() != null) &&
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript());
 
     }
 
     private boolean isEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
-        return (etd.getInternal().getForkEnvironment() != null) &&
-               (etd.getInternal().getForkEnvironment().getEnvScript() != null) &&
-               isScriptContainsApiBinding(etd.getInternal().getForkEnvironment().getEnvScript());
+        return (((EligibleTaskDescriptorImpl) etd).getInternal().getForkEnvironment() != null) &&
+               (((EligibleTaskDescriptorImpl) etd).getInternal().getForkEnvironment().getEnvScript() != null) &&
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal()
+                                                                            .getForkEnvironment()
+                                                                            .getEnvScript());
     }
 
     private boolean isScriptContainsApiBinding(Script script) {

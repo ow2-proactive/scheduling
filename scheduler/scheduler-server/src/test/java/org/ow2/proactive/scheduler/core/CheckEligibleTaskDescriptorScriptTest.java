@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -36,7 +35,7 @@ import org.mockito.Mockito;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -52,7 +51,7 @@ import org.ow2.tests.ProActiveTestClean;
  */
 public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
 
-    private EligibleTaskDescriptor etd;
+    private EligibleTaskDescriptorImpl etd;
 
     private InternalTask it;
 
@@ -64,13 +63,13 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
 
     @Before
     public void init() {
-        etd = mock(EligibleTaskDescriptor.class);
+        etd = mock(EligibleTaskDescriptorImpl.class);
         it = mock(InternalTask.class);
         ist = mock(InternalScriptTask.class);
         sec = mock(ScriptExecutableContainer.class);
         fe = mock(ForkEnvironment.class);
 
-        Mockito.when(etd.getInternal()).thenReturn(it);
+        Mockito.when(((EligibleTaskDescriptorImpl) etd).getInternal()).thenReturn(it);
         Mockito.when(ist.getExecutableContainer()).thenReturn(sec);
         Mockito.when(it.getForkEnvironment()).thenReturn(fe);
         Mockito.when(ist.getForkEnvironment()).thenReturn(fe);
@@ -133,7 +132,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Script s = scriptWithApiBindingGlobal();
         Script s2 = scriptWithoutApiBinding();
         FlowScript fs = flowScriptWithoutApiBinding();
-        Mockito.when(etd.getInternal()).thenReturn(ist);
+        Mockito.when(((EligibleTaskDescriptorImpl) etd).getInternal()).thenReturn(ist);
         Mockito.when(ist.getPreScript()).thenReturn(s2);
         Mockito.when(ist.getPostScript()).thenReturn(s2);
         Mockito.when(sec.getScript()).thenReturn(s);
@@ -182,7 +181,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
     @Test
     public void testForkEnvironmentNull() throws InvalidScriptException {
         fe = null;
-        Mockito.when(etd.getInternal()).thenReturn(it);
+        Mockito.when(((EligibleTaskDescriptorImpl) etd).getInternal()).thenReturn(it);
         Mockito.when(it.getForkEnvironment()).thenReturn(fe);
         assertFalse(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
     }
@@ -190,7 +189,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
     @Test
     public void testScriptExecutableContainerNull() throws InvalidScriptException {
         sec = null;
-        Mockito.when(etd.getInternal()).thenReturn(ist);
+        Mockito.when(((EligibleTaskDescriptorImpl) etd).getInternal()).thenReturn(ist);
         Mockito.when(ist.getExecutableContainer()).thenReturn(sec);
         Boolean result = new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd);
         assertFalse(result);

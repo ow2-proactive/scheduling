@@ -266,15 +266,16 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
 
     private void removeSomeNodes(int numberToRemove) {
         logger.info("Nodes removal request: " + numberToRemove);
+        int effectiveNumberToRemove = numberToRemove;
         pendingRemovedNodesNumberInNodeSource.addAndGet(numberToRemove);
         for (int i = 0; i < numberToRemove; i++) {
             boolean nodeRemoved = removeNode();
             if (!nodeRemoved) {
-                numberToRemove--;
+                effectiveNumberToRemove--;
                 pendingRemovedNodesNumberInNodeSource.decrementAndGet();
             }
         }
-        logger.info("Nodes actually removed: " + numberToRemove);
+        logger.info("Nodes actually removed: " + effectiveNumberToRemove);
     }
 
     private void addNewNodes(int numberOfNodesToAdd) {
@@ -318,7 +319,7 @@ public class SchedulerLoadingPolicy extends SchedulerAwarePolicy implements Init
             }
 
             /*
-             * A Node can be removed only if (minutes_since_acquisisiont % 60 < 10),
+             * A Node can be removed only if (minutes_since_acquisition % 60 < 10),
              * ie. we are in the last 10 minutes of the last paid hour Down nodes
              * are removed in priority, then free nodes, then busy nodes
              */
