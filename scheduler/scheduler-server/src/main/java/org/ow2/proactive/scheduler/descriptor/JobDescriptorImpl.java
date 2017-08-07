@@ -322,7 +322,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     }
 
     private void putNewLoopTaskIntoPausedOrEligableList(TaskId taskid, EligibleTaskDescriptor newLoopTask) {
-        if (((JobDescriptorImpl) newLoopTask).getInternal().getStatus().equals(TaskStatus.PAUSED)) {
+        if (((EligibleTaskDescriptorImpl) newLoopTask).getInternal().getStatus().equals(TaskStatus.PAUSED)) {
             pausedTasks.put(taskid, newLoopTask);
         } else {
             eligibleTasks.put(taskid, newLoopTask);
