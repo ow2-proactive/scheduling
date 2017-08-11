@@ -31,14 +31,25 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
@@ -51,7 +62,6 @@ import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
-import org.objectweb.proactive.utils.SecurityManagerConfigurator;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -64,10 +74,15 @@ import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scripting.*;
+import org.ow2.proactive.scripting.InvalidScriptException;
+import org.ow2.proactive.scripting.ScriptHandler;
+import org.ow2.proactive.scripting.ScriptLoader;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.PAMRRouterStarter;
+import org.ow2.proactive.utils.SecurityPolicyLoader;
 import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive.web.WebProperties;
 
@@ -491,8 +506,10 @@ public class SchedulerStarter {
     }
 
     protected static void configureSecurityManager() {
-        SecurityManagerConfigurator.configureSecurityManager(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                                                             "/config/security.java.policy-server");
+        SecurityPolicyLoader.configureSecurityManager(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
+                                                      "/config/security.java.policy-server",
+                                                      PASchedulerProperties.POLICY_RELOAD_FREQUENCY_IN_SECONDS.getValueAsLong());
+
     }
 
     protected static void configureLogging() {

@@ -183,6 +183,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Resource Manager hibernate configuration file*/
     RM_DB_HIBERNATE_CONFIG("pa.rm.db.hibernate.configuration", PropertyType.STRING, "config/rm/database.properties"),
 
+    /** Refresh time to reload the security policy file (security.java.policy-server) */
+    POLICY_RELOAD_FREQUENCY_IN_SECONDS("pa.rm.auth.policy.refreshperiod.seconds", PropertyType.INTEGER, "30"),
+
     /**
      * Drop database before creating a new one
      * If this value is true, the database will be dropped and then re-created
