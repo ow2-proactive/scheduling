@@ -551,21 +551,28 @@ public class SchedulerStarter {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         PrintStream ps = new PrintStream(os, true);
         ScriptResult scriptResult;
+        File scriptFile;
+
         for (String scriptPath : scriptsPaths) {
 
-            logger.info("Executing " + scriptPath);
-            scriptResult = scriptHandler.handle(new SimpleScript(new File(scriptPath), new String[0]), ps, ps);
-            if (scriptResult.errorOccured()) {
+            scriptFile = new File(PASchedulerProperties.getAbsolutePath(scriptPath));
+            if (scriptFile.exists()) {
+                logger.info("Executing " + scriptPath);
+                scriptResult = scriptHandler.handle(new SimpleScript(scriptFile, new String[0]), ps, ps);
+                if (scriptResult.errorOccured()) {
 
-                // Close streams before throwing
-                os.close();
-                ps.close();
-                throw new InvalidScriptException("Failed to execute script: " +
-                                                 scriptResult.getException().getMessage(), scriptResult.getException());
-            }
-            logger.info(os.toString());
+                    // Close streams before throwing
+                    os.close();
+                    ps.close();
+                    throw new InvalidScriptException("Failed to execute script: " +
+                            scriptResult.getException().getMessage(),
+                            scriptResult.getException());
+                }
+                logger.info(os.toString());
 
-            os.reset();
+                os.reset();
+            } else
+                logger.warn("Start script " + scriptPath + " not found");
         }
         // Close streams
         os.close();
