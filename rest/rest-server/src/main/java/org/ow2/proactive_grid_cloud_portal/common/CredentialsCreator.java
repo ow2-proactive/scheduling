@@ -71,7 +71,7 @@ public class CredentialsCreator {
             return;
         }
         File credentialsfile = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-            "/config/authentication/" + username + ".cred");
+                                        "/config/authentication/" + username + ".cred");
 
         if (credentialsfile.exists() && sameCredentialsBytes(credentialBytes, credentialsfile)) {
             return;
@@ -112,7 +112,10 @@ public class CredentialsCreator {
         byte[] privateKey = auth.getPrivateKey();
 
         Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(username),
-            CredData.parseDomain(username), password, privateKey), pubKey);
+                                                                      CredData.parseDomain(username),
+                                                                      password,
+                                                                      privateKey),
+                                                         pubKey);
 
         byte[] credentialBytes = cred.getBase64();
         return credentialBytes;
