@@ -26,13 +26,16 @@
 package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.KeyException;
 import java.security.PublicKey;
+import java.util.Arrays;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.io.IOUtils;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
@@ -63,7 +66,12 @@ public class CredentialsCreator {
             return;
         }
         File credentialsfile = new File(PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-                                        "/config/authentication/" + username + ".cred");
+            "/config/authentication/" + username + ".cred");
+
+        if (credentialsfile.exists() && sameCredentialsBytes(credentialBytes, credentialsfile)) {
+            return;
+        }
+
         FileOutputStream fos = null;
         try {
             credentialsfile.delete();
@@ -81,6 +89,14 @@ public class CredentialsCreator {
         }
     }
 
+    private boolean sameCredentialsBytes(byte[] credentialBytes, File credentialsfile) {
+        try {
+            return Arrays.equals(credentialBytes, IOUtils.toByteArray(new FileInputStream(credentialsfile)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private byte[] createCredentials(String username, String password)
             throws ConnectionException, LoginException, KeyException {
         String url = PortalConfiguration.SCHEDULER_URL.getValueAsString();
@@ -89,10 +105,7 @@ public class CredentialsCreator {
         byte[] privateKey = auth.getPrivateKey();
 
         Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(username),
-                                                                      CredData.parseDomain(username),
-                                                                      password,
-                                                                      privateKey),
-                                                         pubKey);
+            CredData.parseDomain(username), password, privateKey), pubKey);
 
         byte[] credentialBytes = cred.getBase64();
         return credentialBytes;
