@@ -101,8 +101,8 @@ public class Session {
         return scheduler;
     }
 
-    public void connectToScheduler(Credentials credentials) throws LoginException,
-            ActiveObjectCreationException, SchedulerException, NodeException, KeyException {
+    public void connectToScheduler(Credentials credentials)
+            throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException, KeyException {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
         this.credentials = credentials;
         setUserName(scheduler.getCurrentUser());
@@ -124,8 +124,7 @@ public class Session {
         rm = schedulerRMProxyFactory.connectToRM(credentials);
         this.credentials = credentials;
         setUserName(rm.getCurrentUser().getStringValue());
-        this.credentialsCreator.saveCredentialsFile(rm.getCurrentUser().getStringValue(),
-                credentials.getBase64());
+        this.credentialsCreator.saveCredentialsFile(rm.getCurrentUser().getStringValue(), credentials.getBase64());
 
     }
 
