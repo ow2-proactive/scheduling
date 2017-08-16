@@ -2906,6 +2906,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Session session = sessionStore.create(username);
             session.connectToScheduler(new CredData(username, password));
             logger.info("Binding user " + username + " to session " + session.getSessionId());
+
             return session.getSessionId();
         } catch (ActiveObjectCreationException e) {
             throw new SchedulerRestException(e);
@@ -3174,24 +3175,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("*/*")
     public byte[] getCreateCredential(@MultipartForm LoginForm multipart)
             throws LoginException, SchedulerRestException {
+
+        String username = multipart.getUsername();
+        String password = multipart.getPassword();
+        byte[] privKey = multipart.getSshKey();
+
         try {
             String url = PortalConfiguration.SCHEDULER_URL.getValueAsString();
-
             SchedulerAuthenticationInterface auth = SchedulerConnection.join(url);
             PublicKey pubKey = auth.getPublicKey();
-
-            try {
-                Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(multipart.getUsername()),
-                                                                              CredData.parseDomain(multipart.getUsername()),
-                                                                              multipart.getPassword(),
-                                                                              multipart.getSshKey()),
-                                                                 pubKey);
-
-                return cred.getBase64();
-            } catch (KeyException e) {
-                throw new SchedulerRestException(e);
-            }
-        } catch (ConnectionException e) {
+            sessionStore.create(username);
+            Credentials cred = Credentials.createCredentials(new CredData(CredData.parseLogin(username),
+                                                                          CredData.parseDomain(username),
+                                                                          password,
+                                                                          privKey),
+                                                             pubKey);
+            return cred.getBase64();
+        } catch (ConnectionException | KeyException e) {
             throw new SchedulerRestException(e);
         }
     }

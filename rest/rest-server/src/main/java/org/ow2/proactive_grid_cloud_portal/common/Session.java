@@ -69,29 +69,19 @@ public class Session {
 
     private FileSystem fs;
 
+    private final CredentialsCreator credentialsCreator;
+
     public Session(String sessionId, SchedulerRMProxyFactory schedulerRMProxyFactory, Clock clock) {
         this.sessionId = sessionId;
         this.schedulerRMProxyFactory = schedulerRMProxyFactory;
         this.clock = clock;
+        this.credentialsCreator = new CredentialsCreator();
         updateLastAccessedTime();
+
     }
 
     private void updateLastAccessedTime() {
         this.lastAccessTimestamp = clock.now();
-    }
-
-    public void connectToScheduler(Credentials credentials)
-            throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
-        scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
-        this.credentials = credentials;
-        setUserName(scheduler.getCurrentUser());
-    }
-
-    public void connectToScheduler(CredData credData)
-            throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
-        scheduler = schedulerRMProxyFactory.connectToScheduler(credData);
-        this.credData = credData;
-        setUserName(credData.getLogin());
     }
 
     public SchedulerProxyUserInterface getScheduler() {
@@ -111,11 +101,32 @@ public class Session {
         return scheduler;
     }
 
+    public void connectToScheduler(Credentials credentials) throws LoginException,
+            ActiveObjectCreationException, SchedulerException, NodeException, KeyException {
+        scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
+        this.credentials = credentials;
+        setUserName(scheduler.getCurrentUser());
+        this.credentialsCreator.saveCredentialsFile(scheduler.getCurrentUser(), credentials.getBase64());
+
+    }
+
+    public void connectToScheduler(CredData credData)
+            throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
+        scheduler = schedulerRMProxyFactory.connectToScheduler(credData);
+        this.credData = credData;
+        setUserName(credData.getLogin());
+        this.credentialsCreator.createAndStoreCredentialFile(credData.getLogin(), credData.getPassword());
+
+    }
+
     public void connectToRM(Credentials credentials)
             throws LoginException, ActiveObjectCreationException, KeyException, NodeException, RMException {
         rm = schedulerRMProxyFactory.connectToRM(credentials);
         this.credentials = credentials;
         setUserName(rm.getCurrentUser().getStringValue());
+        this.credentialsCreator.saveCredentialsFile(rm.getCurrentUser().getStringValue(),
+                credentials.getBase64());
+
     }
 
     public void connectToRM(CredData credData)
@@ -123,6 +134,8 @@ public class Session {
         rm = schedulerRMProxyFactory.connectToRM(credData);
         this.credData = credData;
         setUserName(credData.getLogin());
+        this.credentialsCreator.createAndStoreCredentialFile(credData.getLogin(), credData.getPassword());
+
     }
 
     public RMProxyUserInterface getRM() {

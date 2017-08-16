@@ -25,8 +25,20 @@
  */
 package org.ow2.proactive.authentication.crypto;
 
-import java.io.*;
-import java.security.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.security.KeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -160,11 +172,12 @@ public class Credentials implements Serializable {
      * @throws KeyException the key could not be retrieved or is malformed
      */
     public static PublicKey getPublicKey(String pubPath) throws KeyException {
+
+        String algo = "", tmp = "";
+
         byte[] bytes;
         File f = new File(pubPath);
         FileInputStream fin;
-
-        String algo = "", tmp = "";
 
         // recover public key bytes
         try {

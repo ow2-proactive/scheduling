@@ -193,6 +193,7 @@ public class RMRest implements RMRestInterface {
                                              multipart.getPassword(),
                                              multipart.getSshKey());
             session.connectToRM(credData);
+
         }
 
         return session.getSessionId();
