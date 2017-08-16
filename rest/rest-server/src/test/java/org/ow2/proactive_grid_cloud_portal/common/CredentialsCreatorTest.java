@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
+import static org.junit.Assume.assumeTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,6 +38,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
@@ -47,11 +50,13 @@ public class CredentialsCreatorTest {
 
     @Before
     public void init() throws IOException {
+        assumeTrue(OperatingSystem.getOperatingSystem() != OperatingSystem.windows);
+
         PASchedulerProperties.SCHEDULER_HOME.updateProperty(".");
-        authenticationPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/config/authentication/";
+        authenticationPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/" + "config" + "/" +
+                             "authentication" + "/";
         setupFolder();
         credentialsCreator = new CredentialsCreator();
-
     }
 
     @Test
