@@ -48,8 +48,7 @@ public class CredentialsCreatorTest {
     @Before
     public void init() throws IOException {
         PASchedulerProperties.SCHEDULER_HOME.updateProperty(".");
-        authenticationPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() +
-            "/config/authentication/";
+        authenticationPath = PASchedulerProperties.SCHEDULER_HOME.getValueAsString() + "/config/authentication/";
         setupFolder();
         credentialsCreator = new CredentialsCreator();
 
@@ -64,8 +63,7 @@ public class CredentialsCreatorTest {
         credentialsCreator.saveCredentialsFile(username, credentialBytes);
         File credentialsFile = new File(authenticationPath + username + ".cred");
         Assert.assertTrue(credentialsFile.exists());
-        Assert.assertTrue(
-                Arrays.equals(credentialBytes, IOUtils.toByteArray(new FileInputStream(credentialsFile))));
+        Assert.assertTrue(Arrays.equals(credentialBytes, IOUtils.toByteArray(new FileInputStream(credentialsFile))));
 
     }
 
@@ -90,8 +88,7 @@ public class CredentialsCreatorTest {
     }
 
     @Test
-    public void testSaveCredentialsFileNoDifference()
-            throws FileNotFoundException, IOException, InterruptedException {
+    public void testSaveCredentialsFileNoDifference() throws FileNotFoundException, IOException, InterruptedException {
         PASchedulerProperties.SCHEDULER_CREATE_CREDENTIALS_WHEN_LOGIN.updateProperty("true");
         String username = "user1";
         byte[] credentialBytes = new byte[1];
@@ -100,8 +97,7 @@ public class CredentialsCreatorTest {
 
         File credentialsFile = new File(authenticationPath + username + ".cred");
         Assert.assertTrue(credentialsFile.exists());
-        Assert.assertTrue(
-                Arrays.equals(credentialBytes, IOUtils.toByteArray(new FileInputStream(credentialsFile))));
+        Assert.assertTrue(Arrays.equals(credentialBytes, IOUtils.toByteArray(new FileInputStream(credentialsFile))));
         long lastModified = credentialsFile.lastModified();
 
         credentialsCreator.saveCredentialsFile(username, credentialBytes);
@@ -120,8 +116,7 @@ public class CredentialsCreatorTest {
 
         File credentialsFile = new File(authenticationPath + username + ".cred");
         Assert.assertTrue(credentialsFile.exists());
-        Assert.assertTrue(
-                Arrays.equals(credentialBytes, IOUtils.toByteArray(new FileInputStream(credentialsFile))));
+        Assert.assertTrue(Arrays.equals(credentialBytes, IOUtils.toByteArray(new FileInputStream(credentialsFile))));
         long lastModified = credentialsFile.lastModified();
 
         credentialsCreator.saveCredentialsFile(username, credentialBytes);
@@ -133,8 +128,7 @@ public class CredentialsCreatorTest {
         Thread.sleep(300);
 
         credentialsCreator.saveCredentialsFile(username, credentialBytes2);
-        Assert.assertNotEquals(lastModified,
-                new File(authenticationPath + username + ".cred").lastModified());
+        Assert.assertNotEquals(lastModified, new File(authenticationPath + username + ".cred").lastModified());
     }
 
     private void setupFolder() throws IOException {
