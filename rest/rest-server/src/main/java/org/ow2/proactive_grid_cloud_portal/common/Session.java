@@ -69,13 +69,10 @@ public class Session {
 
     private FileSystem fs;
 
-    private final CredentialsCreator credentialsCreator;
-
     public Session(String sessionId, SchedulerRMProxyFactory schedulerRMProxyFactory, Clock clock) {
         this.sessionId = sessionId;
         this.schedulerRMProxyFactory = schedulerRMProxyFactory;
         this.clock = clock;
-        this.credentialsCreator = new CredentialsCreator();
         updateLastAccessedTime();
 
     }
@@ -101,12 +98,12 @@ public class Session {
         return scheduler;
     }
 
-    public void connectToScheduler(Credentials credentials)
-            throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException, KeyException {
+    public void connectToScheduler(Credentials credentials) throws LoginException,
+            ActiveObjectCreationException, SchedulerException, NodeException, KeyException {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credentials);
         this.credentials = credentials;
         setUserName(scheduler.getCurrentUser());
-        this.credentialsCreator.saveCredentialsFile(scheduler.getCurrentUser(), credentials.getBase64());
+        CredentialsCreator.INSTANCE.saveCredentialsFile(scheduler.getCurrentUser(), credentials.getBase64());
 
     }
 
@@ -115,7 +112,7 @@ public class Session {
         scheduler = schedulerRMProxyFactory.connectToScheduler(credData);
         this.credData = credData;
         setUserName(credData.getLogin());
-        this.credentialsCreator.createAndStoreCredentialFile(credData.getLogin(), credData.getPassword());
+        CredentialsCreator.INSTANCE.createAndStoreCredentialFile(credData.getLogin(), credData.getPassword());
 
     }
 
@@ -124,7 +121,8 @@ public class Session {
         rm = schedulerRMProxyFactory.connectToRM(credentials);
         this.credentials = credentials;
         setUserName(rm.getCurrentUser().getStringValue());
-        this.credentialsCreator.saveCredentialsFile(rm.getCurrentUser().getStringValue(), credentials.getBase64());
+        CredentialsCreator.INSTANCE.saveCredentialsFile(rm.getCurrentUser().getStringValue(),
+                credentials.getBase64());
 
     }
 
@@ -133,7 +131,7 @@ public class Session {
         rm = schedulerRMProxyFactory.connectToRM(credData);
         this.credData = credData;
         setUserName(credData.getLogin());
-        this.credentialsCreator.createAndStoreCredentialFile(credData.getLogin(), credData.getPassword());
+        CredentialsCreator.INSTANCE.createAndStoreCredentialFile(credData.getLogin(), credData.getPassword());
 
     }
 
