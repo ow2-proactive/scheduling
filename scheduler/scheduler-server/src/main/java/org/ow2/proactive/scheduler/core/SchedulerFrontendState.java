@@ -483,7 +483,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throw ex;
         }
         // setting the job properties
-        job.setOwner("guests1");
+        job.setOwner(ident.getUsername());
 
         return job;
     }
