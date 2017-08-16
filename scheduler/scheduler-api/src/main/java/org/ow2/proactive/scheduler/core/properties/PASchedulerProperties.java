@@ -163,7 +163,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     POLICY_RELOAD_FREQUENCY_IN_SECONDS("pa.scheduler.auth.policy.refreshperiod.seconds", PropertyType.INTEGER, "30"),
 
     /** Creates a credential file (username.cred) for each successful login in the authentication folder*/
-    SCHEDULER_CREATE_CREDENTIALS_WHEN_LOGIN("pa.scheduler.create.credentials.when.login", PropertyType.BOOLEAN, "true"),
+    SCHEDULER_CREATE_CREDENTIALS_WHEN_LOGIN("pa.scheduler.create.credentials.when.login", PropertyType.BOOLEAN, "false"),
 
     /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */
