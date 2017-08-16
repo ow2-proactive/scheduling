@@ -125,7 +125,7 @@ public class CredentialsCreatorTest {
         byte[] credentialBytes2 = new byte[1];
         credentialBytes2[0] = 'b';
 
-        Thread.sleep(300);
+        Thread.sleep(1000);
 
         credentialsCreator.saveCredentialsFile(username, credentialBytes2);
         Assert.assertNotEquals(lastModified, new File(authenticationPath + username + ".cred").lastModified());
