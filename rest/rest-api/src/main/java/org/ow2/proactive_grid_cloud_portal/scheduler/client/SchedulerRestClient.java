@@ -48,7 +48,13 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.Variant;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
@@ -96,6 +102,10 @@ public class SchedulerRestClient {
         }
 
         scheduler = createRestProxy(providerFactory, restEndpointURL, httpEngine);
+    }
+
+    public JobIdData submitXmlAs(String sessionId, InputStream jobXml, String user) throws Exception {
+        return submitXml(sessionId, jobXml, null);
     }
 
     public JobIdData submitXml(String sessionId, InputStream jobXml) throws Exception {

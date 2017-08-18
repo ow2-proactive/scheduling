@@ -61,6 +61,14 @@ public interface Authentication extends Loggable, Serializable {
     PublicKey getPublicKey() throws LoginException;
 
     /**
+     * Request this Authentication's private key for credentials encryption
+     *
+     * @return this Authentication's private key
+     * @throws LoginException the key could not be retrieved
+     */
+    byte[] getPrivateKey() throws LoginException;
+
+    /**
      * Return the JMX connector server URL used to contact this instance.
      *
      * @return the string representation of the JMX connector server URL
