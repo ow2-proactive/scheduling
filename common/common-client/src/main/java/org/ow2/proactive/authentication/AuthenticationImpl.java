@@ -26,6 +26,9 @@
 package org.ow2.proactive.authentication;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -184,6 +187,18 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
         } catch (KeyException e) {
             getLogger().error("", e);
             throw new LoginException("Could not retrieve public key");
+        }
+    }
+
+    public byte[] getPrivateKey() throws LoginException {
+        if (activated == false) {
+            throw new LoginException("Authentication active object is not activated.");
+        }
+        try {
+            return Files.readAllBytes(Paths.get(this.privateKeyPath));
+        } catch (IOException e) {
+            getLogger().error("", e);
+            throw new LoginException("Could not retrieve private key");
         }
     }
 
