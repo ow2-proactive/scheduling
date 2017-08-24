@@ -61,7 +61,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     protected File schedulerCredentialsPath;
 
     @Configurable(description = "timeout in ms for the resource manger to recover broken node source")
-    protected int nodeSourceRecoveryTimeout = 10000;
+    protected long nodeSourceRecoveryTimeout = 10000;
 
     @Configurable(description = "number of trials for the resource manager to recover a broken node source")
     protected int nodeSourceRecoveryTrialsNumber = 10;
@@ -93,11 +93,11 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         credentials = (byte[]) policyParameters[3];
 
         if (policyParameters[4] == null) {
-            nodeSourceRecoveryTimeout = PAResourceManagerProperties.RM_NODESOURCE_RECOVERY_TIMEOUT.getValueAsInt();
+            nodeSourceRecoveryTimeout = PAResourceManagerProperties.RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TIMEOUT.getValueAsLong();
         }
 
         if (policyParameters[5] == null) {
-            nodeSourceRecoveryTrialsNumber = PAResourceManagerProperties.RM_NODESOURCE_RECOVERY_TRIAL_NUMBER.getValueAsInt();
+            nodeSourceRecoveryTrialsNumber = PAResourceManagerProperties.RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TRIAL_NUMBER.getValueAsInt();
         }
         return new BooleanWrapper(true);
     }
