@@ -1256,34 +1256,4 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    protected int getNbDownNodes() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
-            @Override
-            public Integer handle() {
-                return (int) runtimeVariables.get(NB_DOWN_NODES_KEY);
-            }
-        });
-    }
-
-    protected void resetNbDownNodes() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                runtimeVariables.put(NB_DOWN_NODES_KEY, 0);
-                return null;
-            }
-        });
-    }
-
-    protected void incrementNbDownNodes() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                int nb = (int) runtimeVariables.get(NB_DOWN_NODES_KEY);
-                runtimeVariables.put(NB_DOWN_NODES_KEY, ++nb);
-                return null;
-            }
-        });
-    }
-
 }

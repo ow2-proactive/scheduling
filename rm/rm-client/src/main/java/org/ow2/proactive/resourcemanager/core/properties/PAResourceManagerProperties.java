@@ -265,7 +265,14 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * {@link PAResourceManagerProperties#RM_DB_HIBERNATE_DROPDB_NODESOURCES})
      * are not set to {@code true}.
      */
-    RM_NODES_RECOVERY("pa.rm.nodes.recovery", PropertyType.BOOLEAN, "true");
+    RM_NODES_RECOVERY("pa.rm.nodes.recovery", PropertyType.BOOLEAN, "true"),
+
+    /**
+     * Defines whether all the resources of the deployed Azure instances 
+     * should be destroyed along with the nodes termination when the scheduler 
+     * is shut down.
+     */
+    RM_AZURE_DESTROY_INSTANCES_ON_SHUTDOWN("pa.rm.azureinstances.destroyonshutdown", PropertyType.BOOLEAN, "false");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
