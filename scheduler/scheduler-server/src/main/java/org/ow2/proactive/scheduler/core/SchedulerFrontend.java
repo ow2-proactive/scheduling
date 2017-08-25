@@ -910,8 +910,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
         Policy policy = null;
         List<TaskDescriptor> eligibleTasks = new ArrayList<>();
-        Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
+        Map<JobId, JobDescriptor> jobMap = null;
         try {
+            jobMap = schedulingService.lockJobsToSchedule();
             policy = (Policy) Class.forName(getCurrentPolicy()).newInstance();
 
             // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,

@@ -60,11 +60,11 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     @Configurable(credential = true, description = "credentials used when contacting the scheduler")
     protected File schedulerCredentialsPath;
 
-    @Configurable(description = "timeout in ms for the resource manger to recover broken node source")
-    protected long nodeSourceRecoveryTimeout = 10000;
+    @Configurable(description = "Delay in ms for the resource manger to recover broken node source in scheduler aware policy")
+    protected long schedulerAwarePolicyNodeSourceRecoveryDelay = 10000;
 
-    @Configurable(description = "number of trials for the resource manager to recover a broken node source")
-    protected int nodeSourceRecoveryTrialsNumber = 10;
+    @Configurable(description = "number of trials for the resource manager to recover a broken node source in scheduler aware policy")
+    protected int schedulerAwarePolicyNodeSourceRecoveryTrialsNumber = 10;
 
     protected SchedulerState state;
 
@@ -93,11 +93,11 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         credentials = (byte[]) policyParameters[3];
 
         if (policyParameters[4] == null) {
-            nodeSourceRecoveryTimeout = PAResourceManagerProperties.RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TIMEOUT.getValueAsLong();
+            schedulerAwarePolicyNodeSourceRecoveryDelay = PAResourceManagerProperties.RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TIMEOUT.getValueAsLong();
         }
 
         if (policyParameters[5] == null) {
-            nodeSourceRecoveryTrialsNumber = PAResourceManagerProperties.RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TRIAL_NUMBER.getValueAsInt();
+            schedulerAwarePolicyNodeSourceRecoveryTrialsNumber = PAResourceManagerProperties.RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TRIAL_NUMBER.getValueAsInt();
         }
         return new BooleanWrapper(true);
     }
@@ -124,13 +124,13 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         SchedulerAuthenticationInterface authentication;
         boolean firstException = true;
         int trialsNumber = 0;
-        while (scheduler == null && trialsNumber <= nodeSourceRecoveryTrialsNumber) {
+        while (scheduler == null && trialsNumber <= schedulerAwarePolicyNodeSourceRecoveryTrialsNumber) {
             trialsNumber++;
             try {
                 authentication = SchedulerConnection.join(schedulerUrl);
                 Credentials creds = Credentials.getCredentialsBase64(credentials);
                 scheduler = authentication.login(creds);
-                Thread.sleep(nodeSourceRecoveryTimeout);
+                Thread.sleep(schedulerAwarePolicyNodeSourceRecoveryDelay);
 
             } catch (Throwable t) {
                 if (firstException) {
@@ -141,7 +141,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
                     logger.debug("Could not contact scheduler", t);
                 }
             }
-            if (trialsNumber > nodeSourceRecoveryTrialsNumber)
+            if (trialsNumber > schedulerAwarePolicyNodeSourceRecoveryTrialsNumber)
                 throw new ConnectionException("Number of trials exceeded and could not contact scheduler");
         }
     }
