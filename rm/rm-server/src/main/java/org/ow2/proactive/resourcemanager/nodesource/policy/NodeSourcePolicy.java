@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -58,6 +59,8 @@ public abstract class NodeSourcePolicy implements Serializable {
 
     /** logger */
     private static Logger logger = Logger.getLogger(NodeSourcePolicy.class);
+
+    private AtomicInteger handledNodes;
 
     /** Node source of the policy */
     protected NodeSource nodeSource;
@@ -170,6 +173,7 @@ public abstract class NodeSourcePolicy implements Serializable {
      */
     protected void removeNodes(int n, boolean preemptive) {
         info("Removing " + n + " nodes");
+        this.handledNodes = new AtomicInteger(n);
         nodeSource.getRMCore().removeNodes(n, this.nodeSource.getName(), preemptive);
     }
 

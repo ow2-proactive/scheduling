@@ -31,14 +31,16 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -101,19 +103,19 @@ public class SchedulingServiceTest2 extends BaseServiceTest {
         jobDesc = jobsMap.values().iterator().next();
         Assert.assertEquals(2, jobDesc.getEligibleTasks().size());
 
-        for (EligibleTaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
-            taskStarted(jobDesc, taskDesc);
+        for (TaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
+            taskStarted(jobDesc, (EligibleTaskDescriptor) taskDesc);
         }
         service.unlockJobsToSchedule(jobsMap.values());
 
         if (failNativeTask) {
-            InternalTask nativeTask = jobDesc.getInternal().getTask("nativeTask");
+            InternalTask nativeTask = ((JobDescriptorImpl) jobDesc).getInternal().getTask("nativeTask");
             // native task terminates with code 1, flag 'cancelJobOnError' was
             // set so job should be cancelled
             service.taskTerminatedWithResult(nativeTask.getId(),
                                              new TaskResultImpl(nativeTask.getId(), new RuntimeException(), null, 0));
         } else {
-            InternalTask javaTask = jobDesc.getInternal().getTask("javaTask");
+            InternalTask javaTask = ((JobDescriptorImpl) jobDesc).getInternal().getTask("javaTask");
             // java task terminates with exception, flag 'cancelJobOnError' was
             // set so job should be cancelled
             service.taskTerminatedWithResult(javaTask.getId(),

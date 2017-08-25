@@ -1,4 +1,5 @@
 dependencies {
     compile project(':scheduler:scheduler-client')
+    compile project(':scheduler:scheduler-server')
     compile project(':rm:rm-server')
 }

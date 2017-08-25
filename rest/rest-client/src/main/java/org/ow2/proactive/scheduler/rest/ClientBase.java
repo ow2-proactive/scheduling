@@ -25,9 +25,12 @@
  */
 package org.ow2.proactive.scheduler.rest;
 
+import java.util.List;
+
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -45,6 +48,11 @@ public abstract class ClientBase implements ISchedulerClient {
             SchedulerEvent... arg3) throws NotConnectedException, PermissionException {
         throw newUnsupportedOperationException();
 
+    }
+
+    @Override
+    public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
+        throw newUnsupportedOperationException();
     }
 
     @Override

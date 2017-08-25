@@ -32,6 +32,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.scheduler.common.NotificationData;
@@ -41,6 +42,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConnection;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.exception.ConnectionException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
@@ -52,38 +54,63 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     protected static Logger logger = Logger.getLogger(SchedulerAwarePolicy.class);
 
-    @Configurable
+    @Configurable(description = "url used to contact the scheduler, e.g. pnp://, pamr://")
     protected String schedulerUrl = "";
 
-    @Configurable(credential = true)
+    @Configurable(credential = true, description = "credentials used when contacting the scheduler")
     protected File schedulerCredentialsPath;
+
+    @Configurable(description = "Delay in ms for the resource manger to recover broken node source in scheduler aware policy")
+    protected long schedulerAwarePolicyNodeSourceRecoveryDelay = 10000;
+
+    @Configurable(description = "number of trials for the resource manager to recover a broken node source in scheduler aware policy")
+    protected int schedulerAwarePolicyNodeSourceRecoveryTrialsNumber = 10;
 
     protected SchedulerState state;
 
+    private byte[] credentials;
+
     protected Scheduler scheduler;
 
+    /**
+     * Configure a policy with given parameters.
+     * @param policyParameters parameters defined by user
+     */
     @Override
-    public BooleanWrapper configure(Object... params) {
-        super.configure(params);
-        SchedulerAuthenticationInterface authentication;
+    public BooleanWrapper configure(Object... policyParameters) {
+        super.configure(policyParameters);
 
-        if (params[3] == null) {
+        if (policyParameters[2] == null) {
+            throw new IllegalArgumentException("Scheduler url must be specified");
+        }
+
+        schedulerUrl = policyParameters[2].toString();
+
+        if (policyParameters[3] == null) {
             throw new IllegalArgumentException("Credentials must be specified");
         }
 
-        try {
-            authentication = SchedulerConnection.join(params[2].toString());
-            Credentials creds = Credentials.getCredentialsBase64((byte[]) params[3]);
-            scheduler = authentication.login(creds);
-        } catch (Throwable t) {
-            throw new IllegalArgumentException(t);
+        credentials = (byte[]) policyParameters[3];
+
+        if (policyParameters[4] == null) {
+            schedulerAwarePolicyNodeSourceRecoveryDelay = PAResourceManagerProperties.RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TIMEOUT.getValueAsLong();
         }
 
+        if (policyParameters[5] == null) {
+            schedulerAwarePolicyNodeSourceRecoveryTrialsNumber = PAResourceManagerProperties.RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TRIAL_NUMBER.getValueAsInt();
+        }
         return new BooleanWrapper(true);
     }
 
     @Override
     public BooleanWrapper activate() {
+
+        try {
+            waitAndConnectToScheduler();
+        } catch (Exception e) {
+            logger.debug("Number of trials exceeded and could not contact scheduler", e);
+        }
+
         try {
             state = scheduler.addEventListener(getSchedulerListener(), false, true, getEventsList());
         } catch (Exception e) {
@@ -91,6 +118,32 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
             throw new RuntimeException(e.getMessage(), e);
         }
         return new BooleanWrapper(true);
+    }
+
+    private void waitAndConnectToScheduler() throws Exception {
+        SchedulerAuthenticationInterface authentication;
+        boolean firstException = true;
+        int trialsNumber = 0;
+        while (scheduler == null && trialsNumber <= schedulerAwarePolicyNodeSourceRecoveryTrialsNumber) {
+            trialsNumber++;
+            try {
+                authentication = SchedulerConnection.join(schedulerUrl);
+                Credentials creds = Credentials.getCredentialsBase64(credentials);
+                scheduler = authentication.login(creds);
+                Thread.sleep(schedulerAwarePolicyNodeSourceRecoveryDelay);
+
+            } catch (Throwable t) {
+                if (firstException) {
+                    logger.warn("Could not contact scheduler at url " + schedulerUrl +
+                                " this is normal if the scheduler has just been restarted", t);
+                    firstException = false;
+                } else {
+                    logger.debug("Could not contact scheduler", t);
+                }
+            }
+            if (trialsNumber > schedulerAwarePolicyNodeSourceRecoveryTrialsNumber)
+                throw new ConnectionException("Number of trials exceeded and could not contact scheduler");
+        }
     }
 
     @Override

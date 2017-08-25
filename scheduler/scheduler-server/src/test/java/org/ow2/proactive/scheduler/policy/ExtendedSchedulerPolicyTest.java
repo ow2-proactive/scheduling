@@ -36,10 +36,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
@@ -180,7 +181,9 @@ public class ExtendedSchedulerPolicyTest extends ProActiveTestClean {
     }
 
     private String startAtValue(EligibleTaskDescriptor taskDesc) {
-        return taskDesc.getInternal().getRuntimeGenericInformation().get(GENERIC_INFO_START_AT_KEY);
+        return ((EligibleTaskDescriptorImpl) taskDesc).getInternal()
+                                                      .getRuntimeGenericInformation()
+                                                      .get(GENERIC_INFO_START_AT_KEY);
     }
 
     private EligibleTaskDescriptor first(List<EligibleTaskDescriptor> taskDescList) {
