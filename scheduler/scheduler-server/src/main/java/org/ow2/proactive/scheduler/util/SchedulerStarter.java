@@ -565,8 +565,8 @@ public class SchedulerStarter {
                     os.close();
                     ps.close();
                     throw new InvalidScriptException("Failed to execute script: " +
-                            scriptResult.getException().getMessage(),
-                            scriptResult.getException());
+                                                     scriptResult.getException().getMessage(),
+                                                     scriptResult.getException());
                 }
                 logger.info(os.toString());
 
