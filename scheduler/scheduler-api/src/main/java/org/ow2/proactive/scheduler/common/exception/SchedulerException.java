@@ -69,7 +69,7 @@ public class SchedulerException extends Exception {
      *
      * @param cause the cause of the exception.
      */
-    protected SchedulerException(Throwable cause) {
+    public SchedulerException(Throwable cause) {
         super(cause);
     }
 }

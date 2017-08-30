@@ -32,8 +32,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 
 
@@ -64,11 +67,11 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
         Date now = new Date();
         LinkedList<EligibleTaskDescriptor> executionCycleTasks = new LinkedList<>();
-
         Collections.sort(jobDescList, FIFO_BY_PRIORITY_COMPARATOR);
 
         for (JobDescriptor jobDesc : jobDescList) {
-            Collection<EligibleTaskDescriptor> eligibleTasks = jobDesc.getEligibleTasks();
+            Collection<TaskDescriptor> tasks = jobDesc.getEligibleTasks();
+            Collection<EligibleTaskDescriptor> eligibleTasks = (Collection) tasks;
             for (EligibleTaskDescriptor candidate : eligibleTasks) {
                 String startAt = getStartAtValue(jobDesc, candidate);
                 if (startAt == null) {
@@ -108,9 +111,13 @@ public class ExtendedSchedulerPolicy extends DefaultPolicy {
      * defined job level.
      */
     private String getStartAtValue(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) {
-        String startAt = taskDesc.getInternal().getRuntimeGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
+        String startAt = ((EligibleTaskDescriptorImpl) taskDesc).getInternal()
+                                                                .getRuntimeGenericInformation()
+                                                                .get(GENERIC_INFORMATION_KEY_START_AT);
         if (startAt == null) {
-            startAt = jobDesc.getInternal().getRuntimeGenericInformation().get(GENERIC_INFORMATION_KEY_START_AT);
+            startAt = ((JobDescriptorImpl) jobDesc).getInternal()
+                                                   .getRuntimeGenericInformation()
+                                                   .get(GENERIC_INFORMATION_KEY_START_AT);
         }
         return startAt;
     }

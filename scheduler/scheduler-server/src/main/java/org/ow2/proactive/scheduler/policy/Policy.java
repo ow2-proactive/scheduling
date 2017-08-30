@@ -36,10 +36,10 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.utils.NodeSet;
 
 

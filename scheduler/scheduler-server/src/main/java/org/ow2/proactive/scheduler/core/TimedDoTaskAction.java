@@ -39,11 +39,12 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.descriptor.TaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -89,7 +90,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             PrivateKey corePrivateKey) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
-        this.task = taskDescriptor.getInternal();
+        this.task = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
         this.launcher = launcher;
         this.schedulingService = schedulingService;
         this.terminateNotification = terminateNotification;
@@ -111,9 +112,8 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
                 Set<TaskId> parentIds = new HashSet<>(resultSize);
                 for (int i = 0; i < resultSize; i++) {
-                    parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(taskDescriptor.getParents()
-                                                                                                            .get(i)
-                                                                                                            .getInternal()));
+                    parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(((EligibleTaskDescriptorImpl) taskDescriptor.getParents()
+                                                                                                                                          .get(i)).getInternal()));
                 }
 
                 params = new TaskResult[parentIds.size()];

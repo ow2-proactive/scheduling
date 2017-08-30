@@ -84,7 +84,7 @@ public class NodeSourceData implements Serializable {
         this.name = name;
     }
 
-    @Column(length = 65535)
+    @Column(length = 64984)
     public String getInfrastructureType() {
         return infrastructureType;
     }
