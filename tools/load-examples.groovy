@@ -57,12 +57,13 @@ class Main {
 		println "[" + scriptFileName + "] bucket_owner " + bucket_owner
 
 
-		// If the unzipped dir already exists, lets remove it
+		// If the unzipped dir already exists, stop the script execution
 		def example_dir = new File(example_dir_path)
 		if (example_dir.exists())
 		{
-			example_dir.deleteDir()
-			println "[" + scriptFileName + "] Existing " + example_dir_path + " deleted!"
+			println "[" + scriptFileName + "] Existing " + example_dir_path + ", delete it to redeploy examples."
+			println "[" + scriptFileName + "] Terminated."
+			return
 		}
 
 		// Unzip the examples
@@ -246,6 +247,7 @@ class Main {
 		}
 
 		println "[" + scriptFileName + "] ... proactive examples deployed!"
+		println "[" + scriptFileName + "] Terminated."
 	}
 }
 
