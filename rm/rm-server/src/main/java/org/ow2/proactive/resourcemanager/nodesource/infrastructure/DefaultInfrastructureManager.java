@@ -169,29 +169,29 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        runtimeVariables.put(NODES_COUNT_KEY, 0);
+    protected void initializePersistedInfraVariables() {
+        persistedInfraVariables.put(NODES_COUNT_KEY, 0);
     }
 
     // Below are wrapper methods around the runtime variables map
 
     private void incrementNodesCount() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(NODES_COUNT_KEY) + 1;
-                runtimeVariables.put(NODES_COUNT_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NODES_COUNT_KEY) + 1;
+                persistedInfraVariables.put(NODES_COUNT_KEY, updated);
                 return null;
             }
         });
     }
 
     private void decrementNodesCount() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(NODES_COUNT_KEY) - 1;
-                runtimeVariables.put(NODES_COUNT_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NODES_COUNT_KEY) - 1;
+                persistedInfraVariables.put(NODES_COUNT_KEY, updated);
                 return null;
             }
         });

@@ -247,7 +247,7 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * The approach is best effort and Node hostname is not considered.
      * As a result, Nodes are not necessarily locked on the same host.
      */
-    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true"),
+    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "false"),
 
     /**
      * Defines if the nodes should be kept when the resource manager exits.

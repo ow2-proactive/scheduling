@@ -92,7 +92,7 @@ public class InfrastructureManagerFactory {
     public static InfrastructureManager recreate(String infrastructureType, Object[] infrastructureParameters,
             Map<String, Object> infrastructureVariables) {
         InfrastructureManager infrastructure = create(infrastructureType, infrastructureParameters);
-        infrastructure.recoverRuntimeVariables(infrastructureVariables);
+        infrastructure.recoverPersistedInfraVariables(infrastructureVariables);
         return infrastructure;
     }
 

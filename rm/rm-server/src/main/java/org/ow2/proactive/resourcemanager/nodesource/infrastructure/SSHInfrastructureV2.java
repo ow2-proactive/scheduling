@@ -174,7 +174,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean();
         if (deployNodesInDetachedMode) {
             // if we do not want to kill the nodes when the RM exits or
-            // restarts, then we should launch
+            // restarts, then we should launch the nodes in background and
+            // ignore the RM termination signal
             clb.setDetached();
         }
 
@@ -385,7 +386,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         if (targetOs == null) {
             throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
         }
-        runtimeVariables.put(TARGET_OS_OBJ_KEY, targetOs);
+        persistedInfraVariables.put(TARGET_OS_OBJ_KEY, targetOs);
 
         this.javaOptions = parameters[index++].toString();
     }
@@ -425,37 +426,37 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        super.initializeRuntimeVariables();
-        runtimeVariables.put(TARGET_OS_OBJ_KEY, null);
-        runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
+    protected void initializePersistedInfraVariables() {
+        super.initializePersistedInfraVariables();
+        persistedInfraVariables.put(TARGET_OS_OBJ_KEY, null);
+        persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, false);
     }
 
     // Below are wrapper methods around the runtime variables map
 
     private OperatingSystem getTargetOSObj() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<OperatingSystem>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<OperatingSystem>() {
             @Override
             public OperatingSystem handle() {
-                return (OperatingSystem) runtimeVariables.get(TARGET_OS_OBJ_KEY);
+                return (OperatingSystem) persistedInfraVariables.get(TARGET_OS_OBJ_KEY);
             }
         });
     }
 
     private boolean getShutdownFlag() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
-                return (boolean) runtimeVariables.get(SHUTDOWN_FLAG_KEY);
+                return (boolean) persistedInfraVariables.get(SHUTDOWN_FLAG_KEY);
             }
         });
     }
 
     private void setShutdownFlag(final boolean isShutdown) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                runtimeVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
+                persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
                 return null;
             }
         });

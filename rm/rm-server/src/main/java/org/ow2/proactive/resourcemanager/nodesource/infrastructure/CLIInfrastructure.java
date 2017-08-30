@@ -283,39 +283,39 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        super.initializeRuntimeVariables();
-        runtimeVariables.put(NB_REMOVAL_THREAD_KEY, 0);
+    protected void initializePersistedInfraVariables() {
+        super.initializePersistedInfraVariables();
+        persistedInfraVariables.put(NB_REMOVAL_THREAD_KEY, 0);
     }
 
     // Below are wrapper methods around the runtime variables map
 
     private int getNbRemovalThread() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return (int) runtimeVariables.get(NB_REMOVAL_THREAD_KEY);
+                return (int) persistedInfraVariables.get(NB_REMOVAL_THREAD_KEY);
             }
         });
     }
 
     private void incrementNbRemovalThread() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(NB_REMOVAL_THREAD_KEY) + 1;
-                runtimeVariables.put(NB_REMOVAL_THREAD_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NB_REMOVAL_THREAD_KEY) + 1;
+                persistedInfraVariables.put(NB_REMOVAL_THREAD_KEY, updated);
                 return null;
             }
         });
     }
 
     private void decrementNbRemovalThread() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(NB_REMOVAL_THREAD_KEY) - 1;
-                runtimeVariables.put(NB_REMOVAL_THREAD_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NB_REMOVAL_THREAD_KEY) - 1;
+                persistedInfraVariables.put(NB_REMOVAL_THREAD_KEY, updated);
                 return null;
             }
         });

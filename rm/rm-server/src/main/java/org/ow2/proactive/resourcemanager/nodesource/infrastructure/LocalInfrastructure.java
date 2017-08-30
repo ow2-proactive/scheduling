@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -315,7 +314,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         try {
             this.maxNodes = Integer.parseInt(args[index++].toString());
-            runtimeVariables.put(NB_HANDLED_NODES_KEY, maxNodes);
+            persistedInfraVariables.put(NB_HANDLED_NODES_KEY, maxNodes);
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot determine max node");
         }
@@ -380,12 +379,12 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        runtimeVariables.put(NB_ACQUIRED_NODES_KEY, 0);
-        runtimeVariables.put(NB_LOST_NODES_KEY, 0);
-        runtimeVariables.put(COMMAND_LINE_STARTED_KEY, false);
-        runtimeVariables.put(NB_HANDLED_NODES_KEY, 0);
-        runtimeVariables.put(INDEX_KEY, 0);
+    protected void initializePersistedInfraVariables() {
+        persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, 0);
+        persistedInfraVariables.put(NB_LOST_NODES_KEY, 0);
+        persistedInfraVariables.put(COMMAND_LINE_STARTED_KEY, false);
+        persistedInfraVariables.put(NB_HANDLED_NODES_KEY, 0);
+        persistedInfraVariables.put(INDEX_KEY, 0);
     }
 
     private void removeAcquiredNodesAndShutDownIfNeeded() {
@@ -399,92 +398,92 @@ public class LocalInfrastructure extends InfrastructureManager {
     // Below are wrapper methods around the runtime variables map
 
     private int getAcquiredNodes() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY);
+                return (int) persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY);
             }
         });
     }
 
     private int getLostNodes() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return (int) runtimeVariables.get(NB_LOST_NODES_KEY);
+                return (int) persistedInfraVariables.get(NB_LOST_NODES_KEY);
             }
         });
     }
 
     private void incrementAcquiredNodes() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY) + 1;
-                runtimeVariables.put(NB_ACQUIRED_NODES_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY) + 1;
+                persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, updated);
                 return null;
             }
         });
     }
 
     private void incrementLostNodes() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(NB_LOST_NODES_KEY) + 1;
-                runtimeVariables.put(NB_LOST_NODES_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NB_LOST_NODES_KEY) + 1;
+                persistedInfraVariables.put(NB_LOST_NODES_KEY, updated);
                 return null;
             }
         });
     }
 
     private int decrementAndGetAcquiredNodes() {
-        return setRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                int updated = (int) runtimeVariables.get(NB_ACQUIRED_NODES_KEY) - 1;
-                runtimeVariables.put(NB_ACQUIRED_NODES_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY) - 1;
+                persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, updated);
                 return updated;
             }
         });
     }
 
     private int getHandledNodes() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return (int) runtimeVariables.get(NB_HANDLED_NODES_KEY);
+                return (int) persistedInfraVariables.get(NB_HANDLED_NODES_KEY);
             }
         });
     }
 
     private void decrementHandledNodes() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(NB_HANDLED_NODES_KEY) - 1;
-                runtimeVariables.put(NB_HANDLED_NODES_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NB_HANDLED_NODES_KEY) - 1;
+                persistedInfraVariables.put(NB_HANDLED_NODES_KEY, updated);
                 return null;
             }
         });
     }
 
     private void addHandledNodes(final int numberOfNodes) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(NB_HANDLED_NODES_KEY) + numberOfNodes;
-                runtimeVariables.put(NB_HANDLED_NODES_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(NB_HANDLED_NODES_KEY) + numberOfNodes;
+                persistedInfraVariables.put(NB_HANDLED_NODES_KEY, updated);
                 return null;
             }
         });
     }
 
     private int getIndex() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return (int) runtimeVariables.get(INDEX_KEY);
+                return (int) persistedInfraVariables.get(INDEX_KEY);
             }
         });
     }
