@@ -69,8 +69,8 @@ public class LSFInfrastructure extends BatchJobInfrastructure {
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        super.initializeRuntimeVariables();
+    protected void initializePersistedInfraVariables() {
+        super.initializePersistedInfraVariables();
     }
 
 }

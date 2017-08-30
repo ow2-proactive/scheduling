@@ -226,7 +226,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             try {
                 InetAddress addr = InetAddress.getByName(host);
 
-                // do not use the setRuntimeVariable method here because we cannot persist the variable yet: we need
+                // do not use the setPersistedInfraVariable method here because we cannot persist the variable yet: we need
                 // the configuration to be over for that
                 writeLock.lock();
                 try {
@@ -377,11 +377,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        runtimeVariables.put(FREE_HOSTS_KEY, new HashMap<InetAddress, Integer>());
-        runtimeVariables.put(REGISTERED_NODES_KEY, new HashMap<String, InetAddress>());
-        runtimeVariables.put(REMOVED_HOSTS_KEY, new HashMap<InetAddress, Integer>());
-        runtimeVariables.put(PN_TIMEOUT_KEY, new HashMap<String, Boolean>());
+    protected void initializePersistedInfraVariables() {
+        persistedInfraVariables.put(FREE_HOSTS_KEY, new HashMap<InetAddress, Integer>());
+        persistedInfraVariables.put(REGISTERED_NODES_KEY, new HashMap<String, InetAddress>());
+        persistedInfraVariables.put(REMOVED_HOSTS_KEY, new HashMap<InetAddress, Integer>());
+        persistedInfraVariables.put(PN_TIMEOUT_KEY, new HashMap<String, Boolean>());
     }
 
     /**
@@ -410,7 +410,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * @return the {@see InetAddress} of the host of the removed node
      */
     private InetAddress removeNodeAndReturnHost(final String nodeName, final String nodeUrl, final Node node) {
-        return setRuntimeVariable(new RuntimeVariablesHandler<InetAddress>() {
+        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<InetAddress>() {
             @Override
             public InetAddress handle() {
                 InetAddress host = getRegisteredNodes().remove(nodeName);
@@ -448,11 +448,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     // Below are wrapper methods around the runtime variables map
 
     private Map<InetAddress, Integer> getFreeHosts() {
-        return (Map<InetAddress, Integer>) runtimeVariables.get(FREE_HOSTS_KEY);
+        return (Map<InetAddress, Integer>) persistedInfraVariables.get(FREE_HOSTS_KEY);
     }
 
     private void removeRemovedHostAndPutIfAbsentFreeHosts(final InetAddress host) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 int value = getRemovedHosts().remove(host);
@@ -466,7 +466,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private int getFreeHostsSize() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
                 return getFreeHosts().size();
@@ -475,7 +475,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private Iterator<Map.Entry<InetAddress, Integer>> getFreeHostsEntrySetIterator() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Iterator<Map.Entry<InetAddress, Integer>>>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Iterator<Map.Entry<InetAddress, Integer>>>() {
             @Override
             public Iterator<Map.Entry<InetAddress, Integer>> handle() {
                 return getFreeHosts().entrySet().iterator();
@@ -484,11 +484,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private Map<String, InetAddress> getRegisteredNodes() {
-        return (Map<String, InetAddress>) runtimeVariables.get(REGISTERED_NODES_KEY);
+        return (Map<String, InetAddress>) persistedInfraVariables.get(REGISTERED_NODES_KEY);
     }
 
     private int getRegisteredNodesSize() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
                 return getRegisteredNodes().size();
@@ -497,7 +497,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private void putRegisteredNodes(final String nodeName, final InetAddress inetAddress) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 getRegisteredNodes().put(nodeName, inetAddress);
@@ -507,11 +507,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private Map<InetAddress, Integer> getRemovedHosts() {
-        return (Map<InetAddress, Integer>) runtimeVariables.get(REMOVED_HOSTS_KEY);
+        return (Map<InetAddress, Integer>) persistedInfraVariables.get(REMOVED_HOSTS_KEY);
     }
 
     private int getRemovedNodesNumberPerHost(final InetAddress inetAddress) {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
                 return getRemovedHosts().get(inetAddress);
@@ -520,7 +520,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private void decrementRemovedNodes(final InetAddress inetAddress) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 int updated = getRemovedHosts().get(inetAddress) - 1;
@@ -531,11 +531,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private Map<String, Boolean> getPnTimeoutMap() {
-        return (Map<String, Boolean>) runtimeVariables.get(PN_TIMEOUT_KEY);
+        return (Map<String, Boolean>) persistedInfraVariables.get(PN_TIMEOUT_KEY);
     }
 
     private Boolean getPnTimeout(final String key) {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
                 return getPnTimeoutMap().get(key);
@@ -544,7 +544,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private void putPnTimeout(final String key, final Boolean value) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 getPnTimeoutMap().put(key, value);
@@ -554,7 +554,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private void removePnTimeout(final String key) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 getPnTimeoutMap().remove(key);

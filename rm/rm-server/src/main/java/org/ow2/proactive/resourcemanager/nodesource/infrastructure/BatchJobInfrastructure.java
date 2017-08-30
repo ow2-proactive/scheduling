@@ -794,82 +794,82 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     protected abstract String extractSubmitOutput(String output);
 
     @Override
-    protected void initializeRuntimeVariables() {
-        runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
-        runtimeVariables.put(CREDENTIALS_KEY, null);
-        runtimeVariables.put(CURRENT_NODES_KEY, new HashMap<String, String>());
-        runtimeVariables.put(DEPLOYING_NODES_KEY, 0);
-        runtimeVariables.put(PN_TIMEOUT_KEY, new HashMap<String, Boolean>());
+    protected void initializePersistedInfraVariables() {
+        persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, false);
+        persistedInfraVariables.put(CREDENTIALS_KEY, null);
+        persistedInfraVariables.put(CURRENT_NODES_KEY, new HashMap<String, String>());
+        persistedInfraVariables.put(DEPLOYING_NODES_KEY, 0);
+        persistedInfraVariables.put(PN_TIMEOUT_KEY, new HashMap<String, Boolean>());
     }
 
     // Below are wrapper methods around the runtime variables map
 
     private void setShutdown(final boolean isShutdown) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                runtimeVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
+                persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
                 return null;
             }
         });
     }
 
     private Credentials getCredentials() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Credentials>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Credentials>() {
             @Override
             public Credentials handle() {
-                return (Credentials) runtimeVariables.get(CREDENTIALS_KEY);
+                return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
             }
         });
     }
 
     private void setCredentials(final Credentials credentials) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                runtimeVariables.put(CREDENTIALS_KEY, credentials);
+                persistedInfraVariables.put(CREDENTIALS_KEY, credentials);
                 return null;
             }
         });
     }
 
     private void incrementDeployingNodes() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(DEPLOYING_NODES_KEY) + 1;
-                runtimeVariables.put(DEPLOYING_NODES_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(DEPLOYING_NODES_KEY) + 1;
+                persistedInfraVariables.put(DEPLOYING_NODES_KEY, updated);
                 return null;
             }
         });
     }
 
     private void decrementDeployingNodes() {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                int updated = (int) runtimeVariables.get(DEPLOYING_NODES_KEY) - 1;
-                runtimeVariables.put(DEPLOYING_NODES_KEY, updated);
+                int updated = (int) persistedInfraVariables.get(DEPLOYING_NODES_KEY) - 1;
+                persistedInfraVariables.put(DEPLOYING_NODES_KEY, updated);
                 return null;
             }
         });
     }
 
     private int getNbDeployingNodes() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return (int) runtimeVariables.get(DEPLOYING_NODES_KEY);
+                return (int) persistedInfraVariables.get(DEPLOYING_NODES_KEY);
             }
         });
     }
 
     private Map<String, String> getCurrentNodes() {
-        return (Map<String, String>) runtimeVariables.get(CURRENT_NODES_KEY);
+        return (Map<String, String>) persistedInfraVariables.get(CURRENT_NODES_KEY);
     }
 
     private String getCurrentNode(final String key) {
-        return getRuntimeVariable(new RuntimeVariablesHandler<String>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<String>() {
             @Override
             public String handle() {
                 return getCurrentNodes().get(key);
@@ -878,7 +878,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     private int getCurrentNodesSize() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Integer>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
                 return getCurrentNodes().size();
@@ -887,7 +887,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     private void putCurrentNode(final String key, final String value) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 getCurrentNodes().put(key, value);
@@ -897,7 +897,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     private void removeCurrentNode(final String key) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 getCurrentNodes().remove(key);
@@ -907,11 +907,11 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     private Map<String, Boolean> getPnTimeoutMap() {
-        return (Map<String, Boolean>) runtimeVariables.get(PN_TIMEOUT_KEY);
+        return (Map<String, Boolean>) persistedInfraVariables.get(PN_TIMEOUT_KEY);
     }
 
     private Boolean getPnTimeout(final String key) {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Boolean>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
                 return getPnTimeoutMap().get(key);
@@ -920,7 +920,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     private void putPnTimeout(final String key, final Boolean value) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 getPnTimeoutMap().put(key, value);
@@ -931,7 +931,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
 
     private void atomicRemovePnTimeoutAndJob(final String nodeName, final String dnURL, final Process p,
             final String id) throws RMException {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
                 if (getPnTimeout(dnURL)) {

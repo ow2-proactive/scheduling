@@ -327,7 +327,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                 if (targetOs == null) {
                     throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
                 }
-                runtimeVariables.put(TARGET_OS_OBJ_KEY, targetOs);
+                persistedInfraVariables.put(TARGET_OS_OBJ_KEY, targetOs);
             } else {
                 throw new IllegalArgumentException("Target OS parameter cannot be null");
             }
@@ -339,7 +339,8 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
-                runtimeVariables.put(CREDENTIALS_KEY, Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                persistedInfraVariables.put(CREDENTIALS_KEY,
+                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
@@ -384,38 +385,38 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        super.initializeRuntimeVariables();
-        runtimeVariables.put(CREDENTIALS_KEY, null);
-        runtimeVariables.put(TARGET_OS_OBJ_KEY, null);
-        runtimeVariables.put(SHUTDOWN_FLAG_KEY, false);
+    protected void initializePersistedInfraVariables() {
+        super.initializePersistedInfraVariables();
+        persistedInfraVariables.put(CREDENTIALS_KEY, null);
+        persistedInfraVariables.put(TARGET_OS_OBJ_KEY, null);
+        persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, false);
     }
 
     // Below are wrapper methods around the runtime variables map
 
     private Credentials getCredentials() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<Credentials>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Credentials>() {
             @Override
             public Credentials handle() {
-                return (Credentials) runtimeVariables.get(CREDENTIALS_KEY);
+                return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
             }
         });
     }
 
     private OperatingSystem getTargetOSObj() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<OperatingSystem>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<OperatingSystem>() {
             @Override
             public OperatingSystem handle() {
-                return (OperatingSystem) runtimeVariables.get(TARGET_OS_OBJ_KEY);
+                return (OperatingSystem) persistedInfraVariables.get(TARGET_OS_OBJ_KEY);
             }
         });
     }
 
     private void setShutdownFlag(final boolean isShutdown) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                runtimeVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
+                persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
                 return null;
             }
         });
