@@ -88,7 +88,7 @@ public class PBSInfrastructure extends BatchJobInfrastructure {
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        super.initializeRuntimeVariables();
+    protected void initializePersistedInfraVariables() {
+        super.initializePersistedInfraVariables();
     }
 }

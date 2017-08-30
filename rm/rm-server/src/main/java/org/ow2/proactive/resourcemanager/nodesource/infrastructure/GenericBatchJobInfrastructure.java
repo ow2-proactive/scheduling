@@ -139,27 +139,27 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
     }
 
     @Override
-    protected void initializeRuntimeVariables() {
-        super.initializeRuntimeVariables();
-        runtimeVariables.put(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY, null);
+    protected void initializePersistedInfraVariables() {
+        super.initializePersistedInfraVariables();
+        persistedInfraVariables.put(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY, null);
     }
 
     // Below are wrapper methods around the runtime variables map
 
     private BatchJobInfrastructure getBatchJobInfrastructure() {
-        return getRuntimeVariable(new RuntimeVariablesHandler<BatchJobInfrastructure>() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<BatchJobInfrastructure>() {
             @Override
             public BatchJobInfrastructure handle() {
-                return (BatchJobInfrastructure) runtimeVariables.get(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY);
+                return (BatchJobInfrastructure) persistedInfraVariables.get(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY);
             }
         });
     }
 
     private void setBatchJobInfrastructure(final BatchJobInfrastructure batchJobInfrastructure) {
-        setRuntimeVariable(new RuntimeVariablesHandler<Void>() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                runtimeVariables.put(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY, batchJobInfrastructure);
+                persistedInfraVariables.put(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY, batchJobInfrastructure);
                 return null;
             }
         });
