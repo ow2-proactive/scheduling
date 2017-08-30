@@ -215,6 +215,8 @@ class Main {
 						def studio_template = object.get("studio_template")
 						if (studio_template != null)
 						{
+							println "[" + scriptFileName + "] " + workflow_file.getName() + " will be exposed as a template"
+
 							// Create a new template dir in the targeted directory and copy the wkw into it
 							def template_dir = new File(workflow_templates_dir_path, template_dir_name)
 							template_dir.mkdir()
