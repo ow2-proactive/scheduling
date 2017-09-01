@@ -25,13 +25,20 @@ class Main {
 		}
 	}
 
-
+	def isAStudioTemplate (workflow_name, templates_dir_path) {
+		try {
+			new File(templates_dir_path).eachDir() { dir ->
+				if (new File(dir, "name").text == workflow_name)
+					throw new Exception()
+			}
+			return false
+		} catch (Exception e) {
+			return true
+		}
+	}
 
 
 	def run( binding ) {
-
-
-
 
 		def scriptFileName = "load-examples.groovy"
 		println "[" + scriptFileName + "] Automatic deployment of proactive examples ..."
@@ -46,22 +53,24 @@ class Main {
 		def scheduler_rest_url = binding.variables.get("pa.scheduler.rest.url")
 
 		// Deduced variables
-		def workflow_catalog_url = scheduler_rest_url.substring(0,scheduler_rest_url.length()-4) + "catalog"
+		def catalog_url = scheduler_rest_url.substring(0,scheduler_rest_url.length()-4) + "catalog"
 		def example_dir_path = examples_zip_path.substring(0,examples_zip_path.lastIndexOf("."))
 
+		println "[" + scriptFileName + "] Variables : "
 		println "[" + scriptFileName + "] examples_zip_path " + examples_zip_path
 		println "[" + scriptFileName + "] example_dir_path " + example_dir_path
 		println "[" + scriptFileName + "] global_space_path " + global_space_path
-		println "[" + scriptFileName + "] workflow_catalog_url " + workflow_catalog_url
+		println "[" + scriptFileName + "] catalog_url " + catalog_url
 		println "[" + scriptFileName + "] workflow_templates_dir_path " + workflow_templates_dir_path
 		println "[" + scriptFileName + "] bucket_owner " + bucket_owner
 
+		println "[" + scriptFileName + "] Actions : "
 
 		// If the unzipped dir already exists, stop the script execution
 		def example_dir = new File(example_dir_path)
 		if (example_dir.exists())
 		{
-			println "[" + scriptFileName + "] Existing " + example_dir_path + ", delete it to redeploy examples."
+			println "[" + scriptFileName + "] " + example_dir_path + " already exists, delete it to redeploy examples."
 			println "[" + scriptFileName + "] Terminated."
 			return
 		}
@@ -139,20 +148,20 @@ class Main {
 
 				// Does the bucket already exist? -------------
 				// GET QUERY
-				def list_buckets_rest_query = workflow_catalog_url + "/buckets?owner=" + bucket_owner
+				def list_buckets_rest_query = catalog_url + "/buckets?owner=" + bucket_owner
 				def response =  new URL(list_buckets_rest_query).text
-				def object_list = slurper.parseText(response.toString())
-				def object_found = object_list.find {object -> object.name == bucket}
+				def buckets_list = slurper.parseText(response.toString())
+				def bucket_found = buckets_list.find {object -> object.name == bucket}
 
-				println "[" + scriptFileName + "] bucket " + bucket + " found? " + (object_found != null)
+				println "[" + scriptFileName + "] bucket " + bucket + " found? " + (bucket_found != null)
 
 				// Create a bucket if needed -------------
 				def bucket_id = null
-				if (object_found)
-					bucket_id = object_found.id
+				if (bucket_found)
+					bucket_id = bucket_found.id
 				else {
 					// POST QUERY
-					def create_bucket_query = workflow_catalog_url + "/buckets?name=" + bucket + "&owner=" + bucket_owner
+					def create_bucket_query = catalog_url + "/buckets?name=" + bucket + "&owner=" + bucket_owner
 					def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
 					post.addHeader("Accept", "application/json");
 					post.addHeader("Content-Type", "application/json");
@@ -169,7 +178,8 @@ class Main {
 				// OBJECTS SECTION /////////////////////////////
 
 
-				def list_bucket_resources_rest_query = workflow_catalog_url + "/buckets/" + bucket_id + "/resources"
+				// GET QUERY
+				def list_bucket_resources_rest_query = catalog_url + "/buckets/" + bucket_id + "/resources"
 				response =  new URL(list_bucket_resources_rest_query).text
 				def bucket_resources_list = slurper.parseText(response.toString())
 
@@ -178,46 +188,55 @@ class Main {
 					def metadata_map = object.get("metadata")
 
 
-					// WORKFLOWS SECTION /////////////////////////////
+					// OBJECT SECTION /////////////////////////////
 
 
-					if (metadata_map.get("kind") == "workflow")
+					// Does the object already exist in the catalog ? -------------
+					def object_name = object.get("name")
+					def object_found = bucket_resources_list.find {resource -> resource.name == object_name}
+					println "[" + scriptFileName + "] " + object_name + " found? " + (object_found != null)
+
+					// Push the object to the bucket if it not exists
+					def object_relative_path = object.get("file")
+					def object_file = new File(dir.absolutePath, object_relative_path)
+					def object_absolute_path = object_file.absolutePath
+					if (!object_found)
 					{
-						// Does the workflow already exists? -------------
-						def object_name = object.get("name")
-						def workflow_found = bucket_resources_list.find {resource -> resource.name == object_name && resource.kind == "workflow"}
+						// Retrieve object metadata
+						def kind = metadata_map.get("kind")
+						def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage"), "UTF-8")
+						def contentType = metadata_map.get("contentType")
 
-						println "[" + scriptFileName + "] workflow " + object_name + " found? " + (workflow_found != null)
+						// POST QUERY
+						def query_push_obj_query = catalog_url + "/buckets/" + bucket_id + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&contentType=" + contentType
+						def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
+						post.addHeader("Accept", "application/json");
+						post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType()+";boundary="+boundary);
 
-						// Push the workflow to the bucket if it not exists
-						def workflow_relative_path = object.get("file")
-						def workflow_file = new File(dir.absolutePath, workflow_relative_path)
-						def workflow_absolute_path = workflow_file.absolutePath
-						if (!workflow_found)
+						def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
+						builder.setBoundary(boundary);
+						builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
+						builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file ))
+						post.setEntity(builder.build())
+
+						def result = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
+						println "[" + scriptFileName + "] " + object_file.getName() + " pushed!"
+					}
+
+					// Expose the workflow/object as a studio template
+					def studio_template = object.get("studio_template")
+					if (studio_template != null)
+					{
+						// Retrieve the studio template name
+						def studio_template_name = studio_template.get("name")
+
+						// Is the workflow already exposed as a studio template ? -------------
+						def studio_template_found = isAStudioTemplate(studio_template_name, workflow_templates_dir_path)
+						println "[" + scriptFileName + "] " + studio_template_name + " found in studio templates ? " + studio_template_found
+
+						if (! studio_template_found)
 						{
-							// POST QUERY
-							def query_push_wkw = workflow_catalog_url + "/buckets/" + bucket_id + "/resources?name=" + object_name + "&kind=workflow&commitMessage=FirstCommit&contentType=application%2Fxml"
-							def post = new org.apache.http.client.methods.HttpPost(query_push_wkw)
-							post.addHeader("Accept", "application/json");
-							post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType()+";boundary="+boundary);
-
-							def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
-							builder.setBoundary(boundary);
-							builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
-							builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(workflow_file /*, org.apache.http.entity.ContentType.APPLICATION_XML*/ ))
-							post.setEntity(builder.build())
-
-							def result = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
-							println "[" + scriptFileName + "] " + workflow_file.getName() + " pushed!"
-						}
-
-						// Expose the workflow as a studio template
-						def studio_template = object.get("studio_template")
-						if (studio_template != null)
-						{
-							println "[" + scriptFileName + "] " + workflow_file.getName() + " will be exposed as a template"
-
-							// Create a new template dir in the targeted directory and copy the wkw into it
+							// Create a new template dir in the targeted directory and copy the workflow into it
 							def template_dir = new File(workflow_templates_dir_path, template_dir_name)
 							template_dir.mkdir()
 							println "[" + scriptFileName + "] " + template_dir.absolutePath + " created!"
@@ -225,12 +244,12 @@ class Main {
 							// Copy the workflow into it
 							def file_dest = new File(template_dir, "job.xml")
 							def file_dest_path = file_dest.absolutePath
-							Files.copy(Paths.get(workflow_absolute_path), Paths.get(file_dest_path))
+							Files.copy(Paths.get(object_absolute_path), Paths.get(file_dest_path))
 							println "[" + scriptFileName + "] " + file_dest_path + " created!"
 
 							// Create a name file into it
 							def name_file = new File(template_dir,"name")
-							name_file.text = studio_template.get("name")
+							name_file.text = studio_template_name
 							println "[" + scriptFileName + "] " + name_file.absolutePath + " created!"
 
 							// Create the metadata file into it
@@ -240,10 +259,10 @@ class Main {
 
 							template_dir_name = (template_dir_name.toInteger() + 1) + ""
 						}
+
 					}
 
 				}
-
 
 			}
 		}
