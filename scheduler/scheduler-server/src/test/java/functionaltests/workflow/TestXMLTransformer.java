@@ -50,8 +50,7 @@ import functionaltests.job.multinodes.TestMultipleHostsRequest;
 /**
  * This class tests the coherence between the {@link Job2XMLTransformer} and the
  * {@link StaxJobFactory}. For each job descriptor in the
- * "/functionaltests/descriptors/" and
- * "$pa.scheduler.home/samples/workflows/" folders (except if the file descriptor
+ * "/functionaltests/descriptors/" folder (except if the file descriptor
  * contains the keyword 'invalid') it creates a {@link TaskFlowJob} object using
  * the {@link StaxJobFactory}. The java job is then serialized to xml using the
  * {@link Job2XMLTransformer} and then a new {@link TaskFlowJob} is created.
