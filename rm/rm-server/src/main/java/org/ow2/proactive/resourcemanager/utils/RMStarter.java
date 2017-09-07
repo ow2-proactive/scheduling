@@ -26,7 +26,6 @@
 package org.ow2.proactive.resourcemanager.utils;
 
 import java.io.File;
-import java.security.Policy;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -48,6 +47,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.SecurityPolicyLoader;
 
 
 /**
@@ -188,12 +188,9 @@ public class RMStarter {
     }
 
     private static void configureSecurityManager() {
-        if (System.getProperty("java.security.policy") == null) {
-            System.setProperty("java.security.policy",
-                               System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
-                                                       "/config/security.java.policy-server");
-            Policy.getPolicy().refresh();
-        }
+        SecurityPolicyLoader.configureSecurityManager(System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()) +
+                                                      "/config/security.java.policy-server",
+                                                      PAResourceManagerProperties.POLICY_RELOAD_FREQUENCY_IN_SECONDS.getValueAsLong());
     }
 
     private static void configureLogging() {

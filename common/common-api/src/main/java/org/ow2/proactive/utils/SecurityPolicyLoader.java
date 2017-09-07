@@ -23,19 +23,29 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.descriptor;
+package org.ow2.proactive.utils;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.scheduler.common.TaskDescriptor;
+import java.security.Policy;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import org.objectweb.proactive.utils.SecurityManagerConfigurator;
 
 
-/**
- * This class represents an eligible task for the policy.
- *
- * @author The ProActive Team
- * @since ProActive Scheduling 0.9
- */
-@PublicAPI
-public interface EligibleTaskDescriptor extends TaskDescriptor {
+public class SecurityPolicyLoader {
+
+    public static void configureSecurityManager(String securityFilePath, long refreshPeriod) {
+        SecurityManagerConfigurator.configureSecurityManager(securityFilePath);
+        ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
+        scheduledThreadPool.scheduleWithFixedDelay(new Runnable() {
+
+            @Override
+            public void run() {
+                Policy.getPolicy().refresh();
+            }
+        }, 0, refreshPeriod, TimeUnit.SECONDS);
+
+    }
 
 }

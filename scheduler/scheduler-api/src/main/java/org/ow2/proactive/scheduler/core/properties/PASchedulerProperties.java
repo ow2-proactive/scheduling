@@ -159,6 +159,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Property that define the method that have to be used for logging users to the Scheduler */
     SCHEDULER_LOGIN_METHOD("pa.scheduler.core.authentication.loginMethod", PropertyType.STRING, "SchedulerFileLoginMethod"),
 
+    /** Refresh time to reload the security policy file (security.java.policy-server) */
+    POLICY_RELOAD_FREQUENCY_IN_SECONDS("pa.scheduler.auth.policy.refreshperiod.seconds", PropertyType.INTEGER, "30"),
+
+    /** Creates a credential file (username.cred) for each successful login in the authentication folder*/
+    SCHEDULER_CREATE_CREDENTIALS_WHEN_LOGIN("pa.scheduler.create.credentials.when.login", PropertyType.BOOLEAN, "false"),
+
     /* ***************************************************************** */
     /* ************************* JOBS PROPERTIES *********************** */
     /* ***************************************************************** */
