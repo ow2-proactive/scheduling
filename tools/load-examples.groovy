@@ -43,14 +43,15 @@ class Main {
 		def scriptFileName = "load-examples.groovy"
 		println "[" + scriptFileName + "] Automatic deployment of proactive examples ..."
 
-		// User variables
-		def examples_zip_path = "../samples/proactive-examples.zip"
-		def workflow_templates_dir_path = "../config/workflows/templates"
-		def bucket_owner = "GROUP:public-objects"
-
 		// Bindings
 		def global_space_path = binding.variables.get("pa.scheduler.dataspace.defaultglobal.localpath")
 		def scheduler_rest_url = binding.variables.get("pa.scheduler.rest.url")
+		def scheduler_home = binding.variables.get("pa.scheduler.home")
+
+		// User variables
+		def examples_zip_path = new File(scheduler_home, "samples/proactive-examples.zip").absolutePath
+		def workflow_templates_dir_path = new File(scheduler_home, "config/workflows/templates").absolutePath
+		def bucket_owner = "GROUP:public-objects"
 
 		// Deduced variables
 		def catalog_url = scheduler_rest_url.substring(0,scheduler_rest_url.length()-4) + "catalog"
@@ -100,7 +101,7 @@ class Main {
 		println "[" + scriptFileName + "] Next template dir name " + template_dir_name
 
 		// For POST queries
-		Main.class.getClass().getResource(new File("../dist/lib/httpclient-4.5.2.jar").absolutePath);
+		Main.class.getClass().getResource(new File(scheduler_home, "dist/lib/httpclient-4.5.2.jar").absolutePath);
 		def boundary = "---------------" + UUID.randomUUID().toString();
 
 		// For each example directory
