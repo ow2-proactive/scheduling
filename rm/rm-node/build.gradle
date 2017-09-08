@@ -21,7 +21,7 @@ dependencies {
 
     // script engines
     runtime 'org.jruby:jruby-complete:9.1.12.0'
-    runtime 'org.python:jython-standalone:2.7.1'
+    runtime 'org.python:jython-standalone:2.7.0'
 
     runtime 'org.codehaus.groovy:groovy-all:2.4.12'
     runtime 'jsr223:jsr223-nativeshell:0.4.3'

@@ -4,7 +4,7 @@ dependencies {
     compile "org.objectweb.proactive:programming-util:${programmingVersion}"
 
     testRuntime 'org.jruby:jruby-complete:9.1.12.0'
-    testRuntime 'org.python:jython-standalone:2.7.1'
+    testRuntime 'org.python:jython-standalone:2.7.0'
     testRuntime 'org.codehaus.groovy:groovy-all:2.4.12'
     testRuntime 'jsr223:jsr223-nativeshell:0.4.3'
     testCompile 'junit:junit:4.12'
