@@ -66,7 +66,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     @Configurable(description = "number of trials for the resource manager to recover a broken node source in scheduler aware policy")
     protected int schedulerAwarePolicyNodeSourceRecoveryTrialsNumber = 10;
 
-    protected SchedulerState state;
+    protected SchedulerState<JobState> state;
 
     private byte[] credentials;
 
