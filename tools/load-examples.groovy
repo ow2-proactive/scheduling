@@ -50,7 +50,8 @@ class Main {
 
 		// User variables
 		def examples_zip_path = new File(scheduler_home, "samples/proactive-examples.zip").absolutePath
-		def workflow_templates_dir_path = new File(scheduler_home, "config/workflows/templates").absolutePath
+		def workflow_templates_dir = new File(scheduler_home, "config/workflows/templates")
+		def workflow_templates_dir_path = workflow_templates_dir.absolutePath
 		def bucket_owner = "GROUP:public-objects"
 
 		// Deduced variables
@@ -91,13 +92,20 @@ class Main {
 		def bucket = ""
 
 		// Start by finding the next template dir index
-		def templates_dirs_list = []
-		new File(workflow_templates_dir_path).eachDir { dir ->
-			templates_dirs_list << dir.getName().toInteger()
-		}
 		def template_dir_name = "1"
-		if (!templates_dirs_list.isEmpty())
-			template_dir_name = (templates_dirs_list.sort().last() + 1) + ""
+		// If the wkw template dir does not exist, let's create it
+		if (!workflow_templates_dir.exists())
+			workflow_templates_dir.mkdirs()
+		// If it exists, let's iterate over existing templates
+		else
+		{
+			def templates_dirs_list = []
+			new File(workflow_templates_dir_path).eachDir { dir ->
+				templates_dirs_list << dir.getName().toInteger()
+			}
+			if (!templates_dirs_list.isEmpty())
+				template_dir_name = (templates_dirs_list.sort().last() + 1) + ""
+		}
 		println "[" + scriptFileName + "] Next template dir name " + template_dir_name
 
 		// For POST queries
