@@ -626,7 +626,13 @@
       <xs:documentation>Definition of a script by writing directly the code inside the descriptor </xs:documentation>
     </xs:annotation>
     <xs:complexType mixed="true">
-      <xs:attribute name="language" use="required" type="xs:string"/>
+      <xs:attribute name="language" use="required">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
   <xs:element name="file">
