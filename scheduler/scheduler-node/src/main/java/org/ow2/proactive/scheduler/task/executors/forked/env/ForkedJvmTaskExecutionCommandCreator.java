@@ -116,6 +116,10 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         List<String> javaCommand = new ArrayList<>(prefixes.size() + 3 + jvmArguments.size() + 2);
         javaCommand.addAll(prefixes);
         javaCommand.add(javaHome + javaHomePostfixJavaExecutable);
+
+        // uncomment to enable debugging
+        // javaCommand.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005");
+
         javaCommand.add("-cp");
         javaCommand.add(classpath.toString());
         javaCommand.addAll(jvmArguments);

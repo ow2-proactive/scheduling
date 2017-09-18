@@ -113,10 +113,10 @@ public class SchedulingService {
         this.infrastructure = infrastructure;
         this.listener = listener;
         this.jobs = new LiveJobs(infrastructure.getDBManager(), listener);
-        this.listenJobLogsSupport = ListenJobLogsSupport.newInstance(infrastructure.getDBManager(), jobs);
         if (recoveredState != null) {
             recover(recoveredState);
         }
+        this.listenJobLogsSupport = ListenJobLogsSupport.newInstance(infrastructure.getDBManager(), jobs);
 
         this.policy = (Policy) Class.forName(policyClassName).newInstance();
         if (!this.policy.reloadConfig()) {
@@ -958,6 +958,7 @@ public class SchedulingService {
             if (restoreInErrorTasks) {
                 job.getJobDescriptor().restoreInErrorTasks();
             }
+            job.getJobDescriptor().restoreRunningTasks();
         }
     }
 

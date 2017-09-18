@@ -179,13 +179,11 @@ public class RMTHelper {
             ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
 
         Map<String, String> map = new HashMap<>();
-        List<TestNode> nodes = new ArrayList<>();
         map.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
+
+        List<TestNode> nodes = createNodes("node", nodesNumber);
         for (int i = 0; i < nodesNumber; i++) {
-            String nodeName = "node-" + i;
-            TestNode node = createNode(nodeName, map, vmOptions != null ? vmOptions : setup.getJvmParametersAsList());
-            nodes.add(node);
-            resourceManager.addNode(node.getNode().getNodeInformation().getURL());
+            resourceManager.addNode(nodes.get(i).getNode().getNodeInformation().getURL());
         }
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT, monitor);
         for (int i = 0; i < nodesNumber; i++) {
@@ -249,7 +247,7 @@ public class RMTHelper {
     /**
      * Create several nodes on the same JVMProcess
      */
-    public List<TestNode> createNodes(final String nodeName, int number)
+    public static List<TestNode> createNodes(final String nodeName, int number)
             throws IOException, NodeException, ExecutionException, InterruptedException, AlreadyBoundException {
         if (number == 0) {
             throw new IllegalArgumentException("" + number);
@@ -310,7 +308,7 @@ public class RMTHelper {
                                                               Collections.singletonList(nodeName),
                                                               vmParameters,
                                                               vmOptions);
-                return createNode(nodeName, nodeUrl, nodeProcess);
+                return lookupNode(nodeName, nodeUrl, nodeProcess);
             } catch (NodeException e) {
                 exceptionOccurredWhileCreatingNode = true;
                 lastException = e;
@@ -320,7 +318,7 @@ public class RMTHelper {
         throw lastException;
     }
 
-    public static TestNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
+    public static TestNode lookupNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
             throws IOException, NodeException, InterruptedException {
         Node newNode = null;
 

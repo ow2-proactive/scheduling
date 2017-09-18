@@ -53,6 +53,7 @@ import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -454,16 +455,22 @@ public class NodeSource implements InitActive, RunActive {
      * @return the expected RMNode
      */
     private RMNode buildRMNodeAfterRecovery(Node node, RMNodeData rmNodeData) {
-        return new RMNodeImpl(node,
-                              stub,
-                              node.getNodeInformation().getName(),
-                              node.getNodeInformation().getURL(),
-                              rmNodeData.getProvider(),
-                              rmNodeData.getHostname(),
-                              rmNodeData.getJmxUrls(),
-                              rmNodeData.getJvmName(),
-                              rmNodeData.getUserPermission(),
-                              rmNodeData.getState());
+        RMNodeImpl rmNode = new RMNodeImpl(node,
+                                           stub,
+                                           rmNodeData.getName(),
+                                           rmNodeData.getNodeUrl(),
+                                           rmNodeData.getProvider(),
+                                           rmNodeData.getHostname(),
+                                           rmNodeData.getJmxUrls(),
+                                           rmNodeData.getJvmName(),
+                                           rmNodeData.getUserPermission(),
+                                           rmNodeData.getState());
+        if (rmNodeData.getState().equals(NodeState.BUSY)) {
+            logger.info("Node " + rmNodeData.getName() + " was found busy after scheduler recovery with owner " +
+                        rmNodeData.getOwner());
+            rmNode.setBusy(rmNodeData.getOwner());
+        }
+        return rmNode;
     }
 
     public boolean setNodeAvailable(RMNode node) {

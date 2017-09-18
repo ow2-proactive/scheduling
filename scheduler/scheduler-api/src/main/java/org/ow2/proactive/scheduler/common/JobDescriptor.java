@@ -87,4 +87,6 @@ public interface JobDescriptor extends Serializable, Comparable<JobDescriptor> {
      */
     Map<TaskId, ? extends TaskDescriptor> getPausedTasks();
 
+    void restoreRunningTasks();
+
 }

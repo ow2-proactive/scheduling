@@ -958,7 +958,7 @@ public class SchedulerDBManager {
 
         try {
             for (TaskData taskData : taskRuntimeDataList) {
-                InternalTask internalTask = taskData.toInternalTask(internalJob);
+                InternalTask internalTask = taskData.toInternalTask(internalJob, loadFullState);
                 if (loadFullState) {
                     internalTask.setParallelEnvironment(taskData.getParallelEnvironment());
                     internalTask.setGenericInformation(taskData.getGenericInformation());
@@ -1067,9 +1067,10 @@ public class SchedulerDBManager {
                        .setParameter("startTime", taskInfo.getStartTime())
                        .setParameter("finishedTime", taskInfo.getFinishedTime())
                        .setParameter("executionHostName", taskInfo.getExecutionHostName())
+                       .setParameter("executerInformationData",
+                                     new ExecuterInformationData(task.getExecuterInformation()))
                        .setParameter("taskId", taskId)
                        .executeUpdate();
-
                 return null;
             }
 
@@ -1682,7 +1683,7 @@ public class SchedulerDBManager {
 
             return container;
         } catch (Exception e) {
-            throw new DatabaseManagerException(e);
+            throw new DatabaseManagerException("Failed to query script data for task " + task.getId(), e);
         }
     }
 

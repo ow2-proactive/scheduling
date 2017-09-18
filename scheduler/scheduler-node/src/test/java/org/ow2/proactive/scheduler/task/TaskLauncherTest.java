@@ -49,7 +49,6 @@ import org.mockito.Matchers;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -67,7 +66,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 
 
-public class TaskLauncherTest {
+public class TaskLauncherTest extends TaskLauncherTestAbstract {
 
     private final static String HEADLESS_JAVA_LOG = "Picked up _JAVA_OPTIONS: -Djava.awt.headless=true";
 
@@ -90,8 +89,9 @@ public class TaskLauncherTest {
         initializer.setPostScript(new SimpleScript("print('post')", "groovy"));
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new TestTaskLauncherFactory()),
+                                                executableContainer);
 
         assertThat((String) taskResult.value(), is("hello"));
         assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("prehellopost%n")), is(true));
@@ -109,8 +109,9 @@ public class TaskLauncherTest {
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job*1", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new TestTaskLauncherFactory()),
+                                                executableContainer);
 
         assertThat((String) taskResult.value(), is(not("")));
         assertThat(taskResult.getOutput().getAllLogs(false).contains("123"), is(true));
@@ -125,8 +126,9 @@ public class TaskLauncherTest {
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new TestTaskLauncherFactory()),
+                                                executableContainer);
 
         assertNotNull(taskResult.getException());
         assertNotEquals("", taskResult.getOutput().getStderrLogs(false).replace(HEADLESS_JAVA_LOG, ""));
@@ -140,7 +142,7 @@ public class TaskLauncherTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
+        createLauncherWithInjectedMocks(initializer, new TestTaskLauncherFactory());
 
         CredData credData = new CredData("john", "pwd");
         credData.addThirdPartyCredential("password", "r00t");
@@ -163,8 +165,9 @@ public class TaskLauncherTest {
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new TestTaskLauncherFactory()),
+                                                executableContainer);
 
         assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)), is(true));
     }
@@ -181,8 +184,9 @@ public class TaskLauncherTest {
 
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new TestTaskLauncherFactory()),
+                                                executableContainer);
 
         assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("%s%n", tempFolder)), is(true));
     }
@@ -208,15 +212,14 @@ public class TaskLauncherTest {
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
         when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
+        runTaskLauncher(createLauncherWithInjectedMocks(initializer, new TestTaskLauncherFactory() {
 
             @Override
             public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
                     boolean isRunAsUser) {
                 return dataspacesMock;
             }
-        });
-        runTaskLauncher(taskLauncher, executableContainer);
+        }), executableContainer);
 
         verify(dataspacesMock, times(2)).copyScratchDataToOutput(Matchers.<List<OutputSelector>> any());
     }
@@ -234,15 +237,14 @@ public class TaskLauncherTest {
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
         when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
+        runTaskLauncher(createLauncherWithInjectedMocks(initializer, new TestTaskLauncherFactory() {
 
             @Override
             public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
                     boolean isRunAsUser) {
                 return dataspacesMock;
             }
-        });
-        runTaskLauncher(taskLauncher, executableContainer);
+        }), executableContainer);
 
         verify(dataspacesMock, times(1)).copyScratchDataToOutput(Matchers.<List<OutputSelector>> any());
     }
@@ -258,15 +260,14 @@ public class TaskLauncherTest {
         final TaskDataspaces dataspacesMock = mock(TaskDataspaces.class);
         when(dataspacesMock.getScratchFolder()).thenReturn(tmpFolder.newFolder());
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory() {
+        runTaskLauncher(createLauncherWithInjectedMocks(initializer, new TestTaskLauncherFactory() {
 
             @Override
             public TaskDataspaces createTaskDataspaces(TaskId taskId, NamingService namingService,
                     boolean isRunAsUser) {
                 return dataspacesMock;
             }
-        });
-        runTaskLauncher(taskLauncher, executableContainer);
+        }), executableContainer);
 
         verify(dataspacesMock).close();
     }
@@ -285,8 +286,9 @@ public class TaskLauncherTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new TestTaskLauncherFactory()),
+                                                executableContainer);
 
         List result = (List) taskResult.value();
 
@@ -296,20 +298,9 @@ public class TaskLauncherTest {
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer) {
-        TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
-
         taskLauncher.doTask(executableContainer, null, taskResult);
 
         return taskResult.result;
-    }
-
-    private static class TaskTerminateNotificationVerifier implements TaskTerminateNotification {
-        TaskResult result;
-
-        @Override
-        public void terminate(TaskId taskId, TaskResult taskResult) {
-            this.result = taskResult;
-        }
     }
 
 }

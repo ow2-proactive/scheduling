@@ -23,25 +23,31 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.task;
+package functionaltests.restart;
 
-public class TaskLauncherUtils {
+import java.net.URL;
 
-    /**
-     * Creates a task launcher for testing purposes.
-     * <p>
-     * The task launcher that is created is not an active object
-     * but it is initialized by using the defined initActive method.
-     *
-     * @param initializer the task initializer to use.
-     * @param factory the task launcher factory to use.
-     *
-     * @return a non-active task launcher instance ready to be used with tests.
-     */
-    public static TaskLauncher create(TaskLauncherInitializer initializer, TaskLauncherFactory factory) {
-        TaskLauncher taskLauncher = new TaskLauncher(initializer, factory);
-        taskLauncher.initActivity(null);
-        return taskLauncher;
+
+/**
+ * Tests that a task that is run in a forked JVM is able to reconnect to the scheduler after restart.
+ *
+ * @author ActiveEon Team
+ * @since 20/09/17
+ */
+public class TaskReconnectionWithForkedTaskExecutorTest extends TaskReconnectionToRecoveredNodeTest {
+
+    private static final URL SCHEDULER_CONFIGURATION_START = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
+
+    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
+
+    @Override
+    protected URL getSchedulerStartConfigurationURL() {
+        return SCHEDULER_CONFIGURATION_START;
+    }
+
+    @Override
+    protected URL getSchedulerReStartConfigurationURL() {
+        return SCHEDULER_CONFIGURATION_RESTART;
     }
 
 }

@@ -25,15 +25,13 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 
@@ -57,7 +55,6 @@ public class SchedulerStateRecoverHelper {
         Vector<InternalJob> runningJobs = new Vector<>();
 
         for (InternalJob job : notFinishedJobs) {
-            job.getJobDescriptor();
             switch (job.getStatus()) {
                 case PENDING:
                     pendingJobs.add(job);
@@ -66,7 +63,7 @@ public class SchedulerStateRecoverHelper {
                 case RUNNING:
                 case IN_ERROR:
                     runningJobs.add(job);
-                    runningTasksToPending(job.getITasks());
+                    recoverRunningTasksOrResetToPending(job, job.getITasks());
                     break;
                 case PAUSED:
                     if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() +
@@ -74,7 +71,7 @@ public class SchedulerStateRecoverHelper {
                         pendingJobs.add(job);
                     } else {
                         runningJobs.add(job);
-                        runningTasksToPending(job.getITasks());
+                        recoverRunningTasksOrResetToPending(job, job.getITasks());
                     }
                     break;
                 default:
@@ -94,17 +91,9 @@ public class SchedulerStateRecoverHelper {
                     job.recoverTask(task.getId());
                 }
 
-                if ((job.getStatus() == JobStatus.RUNNING) || (job.getStatus() == JobStatus.PAUSED)) {
-                    //set the status to stalled because the scheduler start in stopped mode.
-                    if (job.getStatus() == JobStatus.RUNNING) {
-                        job.setStatus(JobStatus.STALLED);
-                    }
-
-                    //set the task to pause inside the job if it is paused.
-                    if (job.getStatus() == JobStatus.PAUSED) {
-                        job.setStatus(JobStatus.STALLED);
-                        job.setPaused();
-                    }
+                if (job.getStatus() == JobStatus.PAUSED) {
+                    job.setStatus(JobStatus.STALLED);
+                    job.setPaused();
 
                     //update the count of pending and running task.
                     job.setNumberOfPendingTasks(job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks());
@@ -122,25 +111,48 @@ public class SchedulerStateRecoverHelper {
             }
         }
 
-        for (InternalJob job : pendingJobs) {
-            //set the task to pause inside the job if it is paused.
-            if (job.getStatus() == JobStatus.PAUSED) {
-                job.setStatus(JobStatus.STALLED);
-                job.setPaused();
-            }
-        }
-
         finishedJobs.addAll(dbManager.loadFinishedJobs(false, loadJobPeriod));
+        logger.info("[Recovering counters] " + " Pending: " + pendingJobs.size() + " Running: " + runningJobs.size() +
+                    " Finished: " + finishedJobs.size());
 
         return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
     }
 
-    private void runningTasksToPending(List<InternalTask> tasks) {
+    private void recoverRunningTasksOrResetToPending(InternalJob job, List<InternalTask> tasks) {
+        int pendingTasksCount = 0;
+        int runningTasksCount = 0;
         for (InternalTask task : tasks) {
-            if (task.getStatus() == TaskStatus.RUNNING) {
-                task.setStatus(TaskStatus.PENDING);
+            // we only need to take into account the tasks that were running 
+            // and recount the number of pending tasks, because if we do not 
+            // manage to recover a running task, it will be recovered as a 
+            // pending task
+            if (task.getStatus() == TaskStatus.RUNNING && task.getExecuterInformation() != null) {
+                try {
+                    TaskLauncher launcher = task.getExecuterInformation().getLauncher();
+                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
+                                ") successfully. Launcher: " + launcher);
+                    runningTasksCount++;
+                } catch (Throwable e) {
+                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
+                                ") failed. Moving back task from status RUNNING TO PENDING.", e);
+                    task.setStatus(TaskStatus.PENDING);
+                    pendingTasksCount++;
+                }
+            } else {
+                // recount existing pending tasks
+                if (task.getStatus().equals(TaskStatus.PENDING)) {
+                    task.setStatus(TaskStatus.PENDING);
+                    pendingTasksCount++;
+                }
             }
+            logger.debug("Task " + task.getId() + " status is " + task.getStatus().name());
         }
+        // reapply definition of stalled job
+        if (runningTasksCount == 0 && job.getStatus() == JobStatus.RUNNING) {
+            job.setStatus(JobStatus.STALLED);
+        }
+        job.setNumberOfPendingTasks(pendingTasksCount);
+        job.setNumberOfRunningTasks(runningTasksCount);
     }
 
     /**
@@ -163,10 +175,6 @@ public class SchedulerStateRecoverHelper {
                 case FAULTY:
                 case SKIPPED:
                     tasksList.add(task);
-            }
-            //if task was running, put it in pending status
-            if (task.getStatus() == TaskStatus.RUNNING) {
-                task.setStatus(TaskStatus.PENDING);
             }
         }
 
