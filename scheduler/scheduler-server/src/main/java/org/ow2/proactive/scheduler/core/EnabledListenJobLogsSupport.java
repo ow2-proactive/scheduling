@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
-class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
+public class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
 
     private static final JobLogger jlogger = JobLogger.getInstance();
 
@@ -74,7 +74,7 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     }
 
     @Override
-    void shutdown() {
+    public void shutdown() {
         try {
             lfs.terminate();
         } catch (LogForwardingException e) {
@@ -84,7 +84,7 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     }
 
     @Override
-    synchronized void cleanLoggers(JobId jobId) {
+    public synchronized void cleanLoggers(JobId jobId) {
         jobsToBeLogged.remove(jobId);
         jlogger.debug(jobId, "cleaning loggers");
         String loggerName = Log4JTaskLogs.getLoggerName(jobId);
@@ -93,14 +93,14 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
     }
 
     @Override
-    synchronized void activeLogsIfNeeded(JobId jobId, TaskLauncher launcher) throws LogForwardingException {
+    public synchronized void activeLogsIfNeeded(JobId jobId, TaskLauncher launcher) throws LogForwardingException {
         if (jobsToBeLogged.contains(jobId)) {
             launcher.activateLogs(lfs.getAppenderProvider());
         }
     }
 
     @Override
-    synchronized void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
+    public synchronized void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
         jlogger.info(jobId, "listening logs");
 
         // create the appender to the remote listener
@@ -127,11 +127,14 @@ class EnabledListenJobLogsSupport extends ListenJobLogsSupport {
         }
 
         for (RunningTaskData taskData : liveJobs.getRunningTasks(jobId)) {
+            jlogger.debug(jobId, "Handling log initialization for task " + taskData.getTask().getName());
             try {
                 TaskLauncher taskLauncher = taskData.getLauncher();
                 if (logIsAlreadyInitialized) {
+                    jlogger.debug(jobId, "Call getStoredLogs");
                     taskLauncher.getStoredLogs(appenderProvider);
                 } else {
+                    jlogger.debug(jobId, "Call activateLogs");
                     taskLauncher.activateLogs(lfs.getAppenderProvider());
                 }
             } catch (Exception e) {

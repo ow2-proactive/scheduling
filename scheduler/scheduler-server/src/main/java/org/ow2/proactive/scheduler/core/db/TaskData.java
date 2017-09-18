@@ -26,10 +26,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -44,7 +41,6 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKey;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -140,7 +136,9 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                                           " where id = :taskId"),
                 @NamedQuery(name = "updateTaskDataTaskStarted", query = "update TaskData task set task.taskStatus = :taskStatus, " +
                                                                         "task.startTime = :startTime, task.finishedTime = :finishedTime, " +
-                                                                        "task.executionHostName = :executionHostName where task.id = :taskId"), })
+                                                                        "task.executionHostName = :executionHostName, " +
+                                                                        "task.executerInformationData = :executerInformationData " +
+                                                                        " where task.id = :taskId"), })
 @Table(name = "TASK_DATA", indexes = { @Index(name = "TASK_DATA_CLEAN_SCRIPT_ID", columnList = "CLEAN_SCRIPT_ID"),
                                        @Index(name = "TASK_DATA_ENV_SCRIPT_ID", columnList = "ENV_SCRIPT_ID"),
                                        @Index(name = "TASK_DATA_FINISH_TIME", columnList = "FINISH_TIME"),
@@ -261,6 +259,8 @@ public class TaskData {
     private List<EnvironmentModifierData> envModifiers;
 
     private String workingDir;
+
+    private ExecuterInformationData executerInformationData;
 
     @Column(name = "JAVA_HOME", length = Integer.MAX_VALUE)
     @Lob
@@ -618,7 +618,7 @@ public class TaskData {
         return TaskIdImpl.createTaskId(internalJob.getId(), getTaskName(), getId().getTaskId());
     }
 
-    InternalTask toInternalTask(InternalJob internalJob) throws InvalidScriptException {
+    InternalTask toInternalTask(InternalJob internalJob, boolean loadFullState) throws InvalidScriptException {
         TaskId taskId = createTaskId(internalJob);
 
         InternalTask internalTask;
@@ -658,6 +658,10 @@ public class TaskData {
         internalTask.setMatchingBlock(getMatchingBlock());
         internalTask.setVariables(variablesToTaskVariables());
 
+        if (getExecuterInformationData() != null) {
+            internalTask.setExecuterInformation(getExecuterInformationData().toExecuterInformation(loadFullState));
+        }
+
         ForkEnvironment forkEnv = createForkEnvironment();
 
         internalTask.setForkEnvironment(forkEnv);
@@ -693,6 +697,18 @@ public class TaskData {
 
     public void setVariables(Map<String, TaskDataVariable> variables) {
         this.variables = variables;
+    }
+
+    @Column(name = "EXECUTER_INFORMATION_DATA", length = Integer.MAX_VALUE)
+    @Cascade(CascadeType.ALL)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    public ExecuterInformationData getExecuterInformationData() {
+        return executerInformationData;
+    }
+
+    public void setExecuterInformationData(ExecuterInformationData executerInformationData) {
+        this.executerInformationData = executerInformationData;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

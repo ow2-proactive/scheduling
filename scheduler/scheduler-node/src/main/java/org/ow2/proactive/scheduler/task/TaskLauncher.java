@@ -27,11 +27,13 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URL;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -41,11 +43,14 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -102,6 +107,8 @@ public class TaskLauncher implements InitActive {
 
     private Thread nodeShutdownHook;
 
+    private TaskLauncherRebinder taskLauncherRebinder = new TaskLauncherRebinder();
+
     /**
      * Needed for ProActive but should never be used manually to create an instance of the object.
      */
@@ -157,6 +164,8 @@ public class TaskLauncher implements InitActive {
 
         TaskContext context = null;
 
+        taskLauncherRebinder.saveTaskTerminateNotificationURL(taskId, terminateNotification);
+
         try {
             addShutdownHook();
             // lock the cache space cleaning mechanism
@@ -205,6 +214,12 @@ public class TaskLauncher implements InitActive {
             taskStopwatchForFailures.start();
             taskResult = taskExecutor.execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink());
             taskStopwatchForFailures.stop();
+
+            // by the time the task finishes, the scheduler might have had a
+            // transient failure, so we need to make sure that the placeholder
+            // for the task's result still exists, or get the new place for
+            // the result if it does not exist anymore.
+            terminateNotification = taskLauncherRebinder.makeSureSchedulerIsConnected(terminateNotification);
 
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
@@ -371,6 +386,11 @@ public class TaskLauncher implements InitActive {
                 logger.debug("Successfully notified task termination " + taskId);
                 return;
             } catch (Throwable t) {
+                logger.warn("Cannot notify task termination, trying to rebind to to the task termination handler", t);
+                terminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
+                if (terminateNotification != null) {
+                    continue;
+                }
                 logger.warn("Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms",
                             t);
 

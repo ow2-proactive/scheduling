@@ -23,31 +23,31 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.core;
+package functionaltests.restart;
 
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
-import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
+import java.net.URL;
 
 
-public class DisabledListenJobLogsSupport extends ListenJobLogsSupport {
+/**
+ * Tests that a task that is run in-process is able to reconnect to the scheduler after restart.
+ *
+ * @author ActiveEon Team
+ * @since 20/09/17
+ */
+public class TaskReconnectionWithInProcessTaskExecutorTest extends TaskReconnectionToRecoveredNodeTest {
+
+    private static final URL SCHEDULER_CONFIGURATION_START = TaskReconnectionWithInProcessTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-nonforkedtasks.ini");
+
+    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithInProcessTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB-nonforkedtasks.ini");
 
     @Override
-    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
+    protected URL getSchedulerStartConfigurationURL() {
+        return SCHEDULER_CONFIGURATION_START;
     }
 
     @Override
-    public void activeLogsIfNeeded(JobId jobId, TaskLauncher launcher) throws LogForwardingException {
-    }
-
-    @Override
-    public void cleanLoggers(JobId jobId) {
-    }
-
-    @Override
-    public void shutdown() {
+    protected URL getSchedulerReStartConfigurationURL() {
+        return SCHEDULER_CONFIGURATION_RESTART;
     }
 
 }
