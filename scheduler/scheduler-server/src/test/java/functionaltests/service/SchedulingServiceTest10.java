@@ -36,6 +36,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
@@ -43,7 +45,6 @@ import org.ow2.proactive.scheduler.core.SchedulingMethod;
 import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 import org.ow2.tests.ProActiveTest;
 
@@ -93,12 +94,13 @@ public class SchedulingServiceTest10 extends ProActiveTest {
         service.submitJob(BaseServiceTest.createJob(createTestJob()));
         jobsMap = service.lockJobsToSchedule();
         Assert.assertEquals(2, jobsMap.size());
-        List<EligibleTaskDescriptor> tasks = new ArrayList<>(jobsMap.entrySet()
-                                                                    .iterator()
-                                                                    .next()
-                                                                    .getValue()
-                                                                    .getEligibleTasks());
-        service.simulateJobStartAndCancelIt(tasks, "");
+        List<TaskDescriptor> tasks = new ArrayList<>(jobsMap.entrySet()
+                                                            .iterator()
+                                                            .next()
+                                                            .getValue()
+                                                            .getEligibleTasks());
+        List<EligibleTaskDescriptor> eligibleTasks = (List) tasks;
+        service.simulateJobStartAndCancelIt(eligibleTasks, "");
         service.unlockJobsToSchedule(jobsMap.values());
 
         // wait when request started by the 'simulateJobStartAndCancelIt' finishes

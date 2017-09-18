@@ -31,12 +31,14 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
@@ -101,7 +103,7 @@ public class SchedulingServiceTest1 extends BaseServiceTest {
         jobDesc = jobsMap.values().iterator().next();
         Assert.assertEquals(1, jobDesc.getEligibleTasks().size());
 
-        taskStarted(jobDesc, jobDesc.getEligibleTasks().iterator().next());
+        taskStarted(jobDesc, (EligibleTaskDescriptor) jobDesc.getEligibleTasks().iterator().next());
 
         service.unlockJobsToSchedule(jobsMap.values());
 
@@ -111,7 +113,7 @@ public class SchedulingServiceTest1 extends BaseServiceTest {
         Assert.assertEquals(0, jobDesc.getEligibleTasks().size());
         service.unlockJobsToSchedule(jobsMap.values());
 
-        TaskId taskId = jobDesc.getInternal().getTask("task1").getId();
+        TaskId taskId = ((JobDescriptorImpl) jobDesc).getInternal().getTask("task1").getId();
         service.taskTerminatedWithResult(taskId, new TaskResultImpl(taskId, "Result", null, 0));
 
         jobsMap = service.lockJobsToSchedule();

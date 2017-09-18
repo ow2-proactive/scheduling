@@ -44,28 +44,28 @@ import org.ow2.proactive.scheduler.common.job.JobState;
  */
 @PublicAPI
 @XmlRootElement(name = "schedulerstate")
-public interface SchedulerState extends Serializable {
+public interface SchedulerState<T extends JobState> extends Serializable {
 
     /**
      * Get the finished Jobs list
      *
      * @return the finished Jobs list
      */
-    Vector<JobState> getFinishedJobs();
+    Vector<T> getFinishedJobs();
 
     /**
      * Get the pending Jobs list
      *
      * @return the pending Jobs list
      */
-    Vector<JobState> getPendingJobs();
+    Vector<T> getPendingJobs();
 
     /**
      * Get the running Jobs list
      *
      * @return the running Jobs list
      */
-    Vector<JobState> getRunningJobs();
+    Vector<T> getRunningJobs();
 
     /**
      * Get the status of the scheduler
@@ -95,5 +95,5 @@ public interface SchedulerState extends Serializable {
     /**
      * Updates the scheduler state given the event passed as a parameter
      */
-    void update(JobState jobState);
+    void update(T jobState);
 }

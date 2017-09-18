@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;

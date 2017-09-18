@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.descriptor;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 
 
 /**

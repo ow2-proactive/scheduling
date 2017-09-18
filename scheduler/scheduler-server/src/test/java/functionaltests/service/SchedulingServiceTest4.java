@@ -31,7 +31,9 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -39,7 +41,7 @@ import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
@@ -87,7 +89,7 @@ public class SchedulingServiceTest4 extends BaseServiceTest {
 
         startTask();
 
-        TaskId taskId = jobDesc.getInternal().getTask("javaTask").getId();
+        TaskId taskId = ((JobDescriptorImpl) jobDesc).getInternal().getTask("javaTask").getId();
         service.taskTerminatedWithResult(taskId, new TaskResultImpl(taskId, "OK", null, 0));
 
         listener.assertEvents(SchedulerEvent.TASK_PENDING_TO_RUNNING,
@@ -135,8 +137,8 @@ public class SchedulingServiceTest4 extends BaseServiceTest {
         assertEquals(1, jobsMap.size());
         jobDesc = jobsMap.values().iterator().next();
         Assert.assertEquals(1, jobDesc.getEligibleTasks().size());
-        for (EligibleTaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
-            taskStarted(jobDesc, taskDesc);
+        for (TaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
+            taskStarted(jobDesc, (EligibleTaskDescriptor) taskDesc);
         }
         service.unlockJobsToSchedule(jobsMap.values());
 

@@ -153,6 +153,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Resource Manager node source policies file*/
     RM_NODESOURCE_POLICY_FILE("pa.rm.nodesource.policies", PropertyType.STRING, "config/rm/nodesource/policies"),
 
+    /** Timeout (ms) for the resource manager to recover a broken node source in scheduler aware policy*/
+    RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TIMEOUT("pa.rm.scheduler.aware.policy.nodesource.recovery.timeout", PropertyType.INTEGER, "10000"),
+
+    /** Number of trials for the resource manager to recover a broken node source in scheduler aware policy*/
+    RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TRIAL_NUMBER("pa.rm.scheduler.aware.policy.nodesource.recovery.trial.number", PropertyType.INTEGER, "10"),
+
     /** Max number of threads in node source for parallel task execution */
     RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PropertyType.INTEGER, "50"),
 
