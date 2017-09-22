@@ -153,7 +153,7 @@ selectionScript = ## Definition of a specific script which is used for resource 
 scriptType = ## Type of script for the infrastructure manager (default to dynamic)  
     attribute type { scriptTypeT}
 codeScript = ## Definition of a script by writing directly the code inside the descriptor 
-    element code { attribute language { xsd:string }, text }
+    element code { attribute language { xsd:string { minLength = "1" } }, text }
 fileScript = ## Definition of a script by loading a file 
     element file { ( path | url), fileScriptArguments? }
 path = ## File path to script definition  

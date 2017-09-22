@@ -511,7 +511,9 @@
     <element name="code">
       <doc:documentation>Definition of a script by writing directly the code inside the descriptor </doc:documentation>
       <attribute name="language">
-        <data type="string"/>
+        <data type="string">
+          <param name = "minLength">1</param>
+        </data>
       </attribute>
       <text/>
     </element>
