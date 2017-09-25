@@ -29,9 +29,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
+import org.ow2.proactive.scheduler.common.util.AllObjects2BytesConverterHandler;
 
 
 /**
@@ -55,51 +54,15 @@ public class SerializationUtil {
             return new HashMap<>();
         }
 
-        final Map<String, Serializable> deserialized = new HashMap<String, Serializable>(target.size());
-        for (Entry<String, byte[]> e : target.entrySet()) {
-            deserialized.put(e.getKey(), (Serializable) Object2ByteConverter.convertByte2Object(e.getValue(), cl));
-        }
+        final Map<String, Serializable> deserialized = AllObjects2BytesConverterHandler.convertAllBytes2Objects(target,
+                                                                                                                cl);
+
         return deserialized;
     }
 
     public static Map<String, byte[]> serializeVariableMap(Map<String, Serializable> variableMap) {
-        Map<String, byte[]> serializedMap = new HashMap<String, byte[]>();
-        for (String key : variableMap.keySet()) {
-            // TODO: should do the check at the time of setting the variable
-            if (key != null && key.length() > 255) {
-                throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + key);
-            } else {
-                try {
-                    Serializable value = variableMap.get(key);
-                    byte[] serialized = Object2ByteConverter.convertObject2Byte(value);
-                    serializedMap.put(key, serialized);
-                } catch (IOException e) {
-                    throw new IllegalArgumentException("Cannot add argument " + key, e);
-                }
-            }
-        }
+        Map<String, byte[]> serializedMap = AllObjects2BytesConverterHandler.convertAllObjects2Bytes(variableMap);
         return serializedMap;
     }
 
-    public static Serializable deserializeAndGetVariable(String key, Map<String, byte[]> variables, ClassLoader cl)
-            throws IOException, ClassNotFoundException {
-        Serializable serialized = null;
-        if (variables.containsKey(key)) {
-            serialized = (Serializable) Object2ByteConverter.convertByte2Object(variables.get(key), cl);
-        }
-        return serialized;
-    }
-
-    public static void serializeAndSetVariable(String key, Serializable value, Map<String, byte[]> map) {
-        if (key != null && key.length() > 255) {
-            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + key);
-        } else {
-            try {
-                byte[] serialized = Object2ByteConverter.convertObject2Byte(value);
-                map.put(key, serialized);
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Cannot add argument " + key, e);
-            }
-        }
-    }
 }

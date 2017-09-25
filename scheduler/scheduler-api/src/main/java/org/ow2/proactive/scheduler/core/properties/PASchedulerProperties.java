@@ -216,6 +216,11 @@ public enum PASchedulerProperties implements PACommonProperties {
      */
     EXECUTE_SCRIPT_AUTHORIZED_DIR_REFRESHPERIOD("pa.scheduler.script.authorized.dir.refreshperiod", PropertyType.INTEGER, "60000"),
 
+    /**
+     * The maximum amount of seconds to wait for serialization or deserialization of task and job variables.
+     */
+    MAX_SECONDS_TO_WAIT_FOR_SERIALIZATION_DESERIALIZATION("pa.scheduler.task.max.seconds.for.serialization.deserialization", PropertyType.INTEGER, "30"),
+
     /* ***************************************************************** */
     /* ********************** DATASPACES PROPERTIES ******************** */
     /* ***************************************************************** */

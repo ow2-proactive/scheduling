@@ -33,7 +33,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 
-public class Object2ByteConverter {
+class Object2ByteConverter {
 
     public static byte[] convertObject2Byte(Object o) throws IOException {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -51,12 +51,11 @@ public class Object2ByteConverter {
         }
     }
 
-    public static Object convertByte2Object(byte[] byteArray) throws IOException, ClassNotFoundException {
+    static Object convertByte2Object(byte[] byteArray) throws IOException, ClassNotFoundException {
         return convertByte2Object(byteArray, null);
     }
 
-    public static Object convertByte2Object(byte[] byteArray, ClassLoader cl)
-            throws IOException, ClassNotFoundException {
+    static Object convertByte2Object(byte[] byteArray, ClassLoader cl) throws IOException, ClassNotFoundException {
         InputStream is = new ByteArrayInputStream(byteArray);
         ObjectInputStream objectInputStream = null;
 
