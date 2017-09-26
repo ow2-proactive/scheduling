@@ -940,6 +940,7 @@ public class JavaForkerExecutable extends JavaExecutable implements ForkerStarte
 
                 if (process != null) {
                     process.destroy();
+                    process.waitFor();
                 }
                 taskProcessTreeKiller.kill();
                 terminateStreamReaders();
