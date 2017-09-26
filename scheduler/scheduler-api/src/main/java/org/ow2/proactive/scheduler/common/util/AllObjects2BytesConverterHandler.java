@@ -39,12 +39,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class AllObjects2BytesConverterHandler {
 
     private static final Logger logger = Logger.getLogger(AllObjects2BytesConverterHandler.class);
+
+    private static Long secondsToWait = Long.getLong("pa.max.deserialization.seconds", 30L);
 
     public static Map<String, Serializable> convertAllBytes2Objects(final Map<String, byte[]> target,
             final ClassLoader cl) {
@@ -70,7 +71,6 @@ public class AllObjects2BytesConverterHandler {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<Map<K, V>> future = executor.submit(callable);
 
-        long secondsToWait = PASchedulerProperties.MAX_SECONDS_TO_WAIT_FOR_SERIALIZATION_DESERIALIZATION.getValueAsLong();
         try {
             resultMap = future.get(secondsToWait, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
@@ -96,7 +96,6 @@ public class AllObjects2BytesConverterHandler {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<V> future = executor.submit(callable);
 
-        long secondsToWait = PASchedulerProperties.MAX_SECONDS_TO_WAIT_FOR_SERIALIZATION_DESERIALIZATION.getValueAsLong();
         try {
             result = future.get(secondsToWait, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
