@@ -284,7 +284,11 @@ public class TaskResultImpl implements TaskResult {
 
     @Override
     public Serializable getValue() throws Throwable {
-        return value;
+        if (hadException()) {
+            return value;
+        } else {
+            return value();
+        }
     }
 
     /**
