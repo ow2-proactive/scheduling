@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<webappbnd:WebAppBinding xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:webappbnd="webappbnd.xmi" xmlns:webapplication="webapplication.xmi" xmlns:commonbnd="commonbnd.xmi" xmlns:common="common.xmi" xmi:id="WebApp_ID_Bnd" virtualHostName="default_host">
-
-  <webapp href="WEB-INF/web.xml#Proactive_Rest"/>
-
-</webappbnd:WebAppBinding>
