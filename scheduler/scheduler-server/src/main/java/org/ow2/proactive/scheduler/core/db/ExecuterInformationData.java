@@ -26,9 +26,11 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.utils.NodeSet;
@@ -42,6 +44,8 @@ public class ExecuterInformationData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ExecuterInformationData.class);
 
+    private long taskIds;
+
     private String taskLauncherNodeUrl;
 
     private NodeSet nodes;
@@ -50,24 +54,50 @@ public class ExecuterInformationData implements Serializable {
 
     private String hostName;
 
-    public ExecuterInformationData(ExecuterInformation executerInformation) {
-        taskLauncherNodeUrl = PAActiveObject.getUrl(executerInformation.getLauncher());
+    public ExecuterInformationData(long taskIds, ExecuterInformation executerInformation) {
+        this.taskIds = taskIds;
+        if (executerInformation.getLauncher() != null) {
+            taskLauncherNodeUrl = PAActiveObject.getUrl(executerInformation.getLauncher());
+        }
         nodes = executerInformation.getNodes();
         nodeName = executerInformation.getNodeName();
         hostName = executerInformation.getHostName();
     }
 
+    /**
+     * Rebuild an executer information from the data. A stub to the task
+     * launcher is attempted to be retrieved.
+     * @param loadFullState whether it is important to have a task launcher
+     *                      stub in the end (it is important if the task is
+     *                      running)
+     */
     public ExecuterInformation toExecuterInformation(boolean loadFullState) {
         TaskLauncher taskLauncher = new TaskLauncher();
-        if (loadFullState) {
+        if (taskLauncherNodeUrl != null) {
             try {
                 taskLauncher = PAActiveObject.lookupActive(TaskLauncher.class, taskLauncherNodeUrl);
-                logger.info("Retrieve task launcher " + taskLauncherNodeUrl + " successfully");
+                logger.info("Retrieve task launcher " + taskLauncherNodeUrl + " successfully for task " + taskIds);
             } catch (Exception e) {
-                logger.warn("Task launcher " + taskLauncherNodeUrl + " cannot be looked up", e);
+                if (loadFullState) {
+                    logger.warn("Task launcher " + taskLauncherNodeUrl + " of task " + taskIds +
+                                " cannot be looked up. Trying to rebind it", e);
+                    taskLauncher = getRebindedTaskLauncher();
+                }
             }
         }
         return new ExecuterInformation(taskLauncher, nodes, nodeName, hostName);
+    }
+
+    private TaskLauncher getRebindedTaskLauncher() {
+        try {
+            logger.debug("List AOs on " + taskLauncherNodeUrl + " (expect only one): " +
+                         Arrays.toString(NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects()));
+            Object[] aos = NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects();
+            return (TaskLauncher) aos[0];
+        } catch (Throwable e) {
+            logger.error("Failed to rebind TaskLauncher " + taskLauncherNodeUrl + " of task " + taskIds, e);
+            return new TaskLauncher();
+        }
     }
 
 }

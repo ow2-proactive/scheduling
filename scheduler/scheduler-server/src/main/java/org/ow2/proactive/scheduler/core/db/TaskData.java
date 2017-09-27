@@ -658,7 +658,7 @@ public class TaskData {
         internalTask.setMatchingBlock(getMatchingBlock());
         internalTask.setVariables(variablesToTaskVariables());
 
-        if (getExecuterInformationData() != null) {
+        if (hasAliveTaskLauncher() && getExecuterInformationData() != null) {
             internalTask.setExecuterInformation(getExecuterInformationData().toExecuterInformation(loadFullState));
         }
 
@@ -667,6 +667,12 @@ public class TaskData {
         internalTask.setForkEnvironment(forkEnv);
 
         return internalTask;
+    }
+
+    private boolean hasAliveTaskLauncher() {
+        return getTaskStatus().equals(TaskStatus.RUNNING) || getTaskStatus().equals(TaskStatus.PAUSED) ||
+               getTaskStatus().equals(TaskStatus.WAITING_ON_ERROR) ||
+               getTaskStatus().equals(TaskStatus.WAITING_ON_FAILURE);
     }
 
     @EmbeddedId

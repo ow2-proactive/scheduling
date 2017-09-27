@@ -106,9 +106,9 @@ public abstract class InfrastructureManager implements Serializable {
 
     private static final String USING_DEPLOYING_NODES_KEY = "usingDeployingNodes";
 
-    private static final String RM_URL_KEY = "infrastructureManagerRmUrl";
-
     private static final String NB_DOWN_NODES_KEY = "infrastructureManagerNbDownNodes";
+
+    protected static final String RM_URL_KEY = "infrastructureManagerRmUrl";
 
     /**
      * Indicates whether the infrastructure is shutting down.
@@ -123,15 +123,15 @@ public abstract class InfrastructureManager implements Serializable {
      * value. The variables stored in this map should allow the full recovery of an infrastructure state.
      * All accesses to this map must be synchronized.
      */
-    protected Map<String, Object> persistedInfraVariables = new HashMap<>();
+    protected Map<String, Serializable> persistedInfraVariables = new HashMap<>();
 
-    private ReadWriteLock reentrantLock = new ReentrantReadWriteLock();
+    private transient ReadWriteLock reentrantLock = new ReentrantReadWriteLock();
 
     /** Use this lock to wrap a read access to runtime variables */
-    protected Lock readLock = reentrantLock.readLock();
+    protected transient Lock readLock = reentrantLock.readLock();
 
     /** Use this lock to wrap a write access to runtime variables */
-    protected Lock writeLock = reentrantLock.writeLock();
+    protected transient Lock writeLock = reentrantLock.writeLock();
 
     /**
      * Database manager, used to persist the runtime variables.
@@ -208,7 +208,7 @@ public abstract class InfrastructureManager implements Serializable {
      * variables map of this infrastructure.
      * @param infraVariablesToUpdate the runtime variables to recover.
      */
-    public void recoverPersistedInfraVariables(Map<String, Object> infraVariablesToUpdate) {
+    public void recoverPersistedInfraVariables(Map<String, Serializable> infraVariablesToUpdate) {
         persistedInfraVariables.putAll(infraVariablesToUpdate);
     }
 
@@ -325,7 +325,7 @@ public abstract class InfrastructureManager implements Serializable {
             getAcquiredNodesMap().remove(nodeName);
             this.notifyDownNode(nodeName, nodeUrl, node);
         } catch (Exception e) {
-            logger.warn("Exception occurred while removing node " + node);
+            logger.warn("Exception occurred while removing node " + node, e);
         } finally {
             writeLock.unlock();
         }
@@ -381,20 +381,14 @@ public abstract class InfrastructureManager implements Serializable {
                 emitEvent(event);
                 this.notifyAcquiredNode(node);
                 // if everything went well with the new node, caching it
-                try {
-                    putAcquiredNode(node.getNodeInformation().getName(), node);
-                } catch (Exception e) {
-                    // if an exception occurred, we don't want to discard the
-                    // node registration
-                    logger.warn("Cannot cache the node in the InfrastructureManager after registration: " + node, e);
-                }
+                putAcquiredNode(node.getNodeInformation().getName(), node);
             } else {
                 String url = node.getNodeInformation().getURL();
                 logger.warn("Not expected node registered, discarding it: " + url);
                 throw new RMException("Not expected node registered, discarding it: " + url);
             }
         } catch (RuntimeException e) {
-            logger.error("Exception while changing deploying node to acquired node: " + e.getMessage());
+            logger.error("Exception while moving deploying node to acquired node", e);
             throw e;
         } finally {
             writeLock.unlock();
@@ -416,7 +410,7 @@ public abstract class InfrastructureManager implements Serializable {
         try {
             Thread.sleep(PERSISTED_INFRA_VARIABLES_INIT_DELAY);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("Could not wait for persisted infrastructure variables init delay to end", e);
         }
         List<String> answer = new ArrayList<>(nodeNames.size());
         for (String nodeName : nodeNames) {
@@ -584,21 +578,23 @@ public abstract class InfrastructureManager implements Serializable {
      * the infrastructure, and then update in database the {@link NodeSourceData}.
      */
     public void persistInfraVariables() {
-        readLock.lock();
-        try {
-            if (dbManager == null) {
-                setRmDbManager(RMDBManager.getInstance());
+        if (!nodeSource.getName().equals(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
+            readLock.lock();
+            try {
+                if (dbManager == null) {
+                    setRmDbManager(RMDBManager.getInstance());
+                }
+                NodeSourceData nodeSourceData = dbManager.getNodeSource(this.nodeSource.getName());
+                if (nodeSourceData != null) {
+                    nodeSourceData.setInfrastructureVariables(persistedInfraVariables);
+                    dbManager.updateNodeSource(nodeSourceData);
+                }
+            } catch (RuntimeException e) {
+                logger.error("Exception while persisting runtime variables: " + e.getMessage());
+                throw e;
+            } finally {
+                readLock.unlock();
             }
-            NodeSourceData nodeSource = dbManager.getNodeSource(this.nodeSource.getName());
-            if (nodeSource != null) {
-                nodeSource.setInfrastructureVariables(persistedInfraVariables);
-                dbManager.updateNodeSource(nodeSource);
-            }
-        } catch (RuntimeException e) {
-            logger.error("Exception while persisting runtime variables: " + e.getMessage());
-            throw e;
-        } finally {
-            readLock.unlock();
         }
     }
 

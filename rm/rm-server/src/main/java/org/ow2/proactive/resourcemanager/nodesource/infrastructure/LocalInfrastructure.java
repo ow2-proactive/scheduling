@@ -76,10 +76,8 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     private static final String NB_HANDLED_NODES_KEY = "nbHandledNodes";
 
-    private static final String COMMAND_LINE_STARTED_KEY = "commandLineStarted";
-
     /**
-     * Index of deployment, if startNode is called multiple times, each time a new process will be created.
+     * Index of deployment, if startNodesOnTheFly is called multiple times, each time a new process will be created.
      * The index is used to prevent conflicts in nodes urls
      */
     private static final String INDEX_KEY = "index";
@@ -99,20 +97,33 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireAllNodes() {
-        startNode(maxNodes);
+        readLock.lock();
+        try {
+            logger.info("Starting node acquisition. Acquired nodes=" + getAcquiredNodes() + ", Handled nodes=" +
+                        getHandledNodes());
+            if (getAcquiredNodes() < getHandledNodes()) {
+                int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenHandledAndAcquiredNodes();
+                logger.info("Starting " + differenceBetweenHandledAndAcquiredNodes + " nodes");
+                startNodes(differenceBetweenHandledAndAcquiredNodes);
+            }
+        } catch (RuntimeException e) {
+            logger.error("Could not start nodes of local infrastructure " + nodeSource.getName(), e);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @Override
     public void acquireNode() {
-        startNode(1);
+        startNodesOnTheFly(1);
     }
 
     @Override
     public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
-        startNode(n);
+        startNodesOnTheFly(n);
     }
 
-    private void startNode(final int n) {
+    private void startNodes(final int n) {
         this.nodeSource.executeInParallel(new Runnable() {
             public void run() {
                 LocalInfrastructure.this.startNodeProcess(n);
@@ -120,10 +131,17 @@ public class LocalInfrastructure extends InfrastructureManager {
         });
     }
 
-    private void startNodeProcess(int numberOfNodes) {
+    private void startNodesOnTheFly(final int n) {
+        this.nodeSource.executeInParallel(new Runnable() {
+            @Override
+            public void run() {
+                LocalInfrastructure.this.startNodeProcessOnTheFly(n);
+            }
+        });
+    }
 
-        addHandledNodes(numberOfNodes);
-        int currentIndex = getIndex();
+    private void startNodeProcess(int numberOfNodes) {
+        int currentIndex = getIndexAndIncrement();
         String baseNodeName = "local-" + this.nodeSource.getName() + "-" + currentIndex;
         OperatingSystem os = OperatingSystem.UNIX;
         // assuming no cygwin, windows or the "others"...
@@ -251,6 +269,11 @@ public class LocalInfrastructure extends InfrastructureManager {
             // clean up the process
             cleanProcess(processExecutor);
         }
+    }
+
+    private void startNodeProcessOnTheFly(int numberOfNodes) {
+        addHandledNodes(numberOfNodes);
+        startNodeProcess(numberOfNodes);
     }
 
     private void logNodeOutput(final String prefix, List<String> nodeOutputLines) {
@@ -382,7 +405,6 @@ public class LocalInfrastructure extends InfrastructureManager {
     protected void initializePersistedInfraVariables() {
         persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, 0);
         persistedInfraVariables.put(NB_LOST_NODES_KEY, 0);
-        persistedInfraVariables.put(COMMAND_LINE_STARTED_KEY, false);
         persistedInfraVariables.put(NB_HANDLED_NODES_KEY, 0);
         persistedInfraVariables.put(INDEX_KEY, 0);
     }
@@ -479,13 +501,24 @@ public class LocalInfrastructure extends InfrastructureManager {
         });
     }
 
-    private int getIndex() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
+    private int getIndexAndIncrement() {
+        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return (int) persistedInfraVariables.get(INDEX_KEY);
+                int deployedNodeIndex = (int) persistedInfraVariables.get(INDEX_KEY);
+                persistedInfraVariables.put(INDEX_KEY, deployedNodeIndex + 1);
+                return deployedNodeIndex;
             }
         });
     }
 
+    public int getDifferenceBetweenHandledAndAcquiredNodes() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) persistedInfraVariables.get(NB_HANDLED_NODES_KEY) -
+                       (int) persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY);
+            }
+        });
+    }
 }

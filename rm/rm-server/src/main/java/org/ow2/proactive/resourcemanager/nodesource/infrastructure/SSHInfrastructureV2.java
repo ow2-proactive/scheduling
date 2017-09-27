@@ -76,6 +76,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     private static final Logger logger = Logger.getLogger(SSHInfrastructureV2.class);
 
+    private static final int PROCESS_STILL_RUNNING_VALUE = -1;
+
     public static final int DEFAULT_OUTPUT_BUFFER_LENGTH = 1000;
 
     public static final int DEFAULT_SSH_PORT = 22;
@@ -269,11 +271,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
                         // case where we link the current process to the one
                         // that spawns the nodes. Otherwise, we let the two
                         // processes live completely independently
-                        if (!deployNodesInDetachedMode) {
-                            if (chan.getExitStatus() != -1) { // -1 means process is
-                                // still running
-                                throw new IllegalStateException("The jvm process of the node has exited prematurely");
-                            }
+                        if (!deployNodesInDetachedMode && chan.getExitStatus() != PROCESS_STILL_RUNNING_VALUE) {
+                            throw new IllegalStateException("The jvm process of the node has exited prematurely");
                         }
                         try {
                             Thread.sleep(1000);
@@ -382,11 +381,11 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         if (parameters[index] == null) {
             throw new IllegalArgumentException("Target OS parameter cannot be null");
         }
-        OperatingSystem targetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
-        if (targetOs == null) {
+        OperatingSystem configuredTargetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
+        if (configuredTargetOs == null) {
             throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
         }
-        persistedInfraVariables.put(TARGET_OS_OBJ_KEY, targetOs);
+        persistedInfraVariables.put(TARGET_OS_OBJ_KEY, configuredTargetOs);
 
         this.javaOptions = parameters[index++].toString();
     }

@@ -323,11 +323,11 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             this.schedulingPath = parameters[index++].toString();
             // target OS
             if (parameters[index] != null) {
-                OperatingSystem targetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
-                if (targetOs == null) {
+                OperatingSystem configuredTargetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
+                if (configuredTargetOs == null) {
                     throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
                 }
-                persistedInfraVariables.put(TARGET_OS_OBJ_KEY, targetOs);
+                persistedInfraVariables.put(TARGET_OS_OBJ_KEY, configuredTargetOs);
             } else {
                 throw new IllegalArgumentException("Target OS parameter cannot be null");
             }

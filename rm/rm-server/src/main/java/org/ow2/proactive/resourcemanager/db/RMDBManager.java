@@ -292,8 +292,8 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while adding new node source '" + nodeSourceData.getName() +
-                                       "'");
+            throw new RuntimeException("Exception occurred while adding new node source " + nodeSourceData.getName(),
+                                       e);
         }
     }
 
@@ -308,7 +308,7 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while getting a node source from name '" + sourceName + "'");
+            throw new RuntimeException("Exception occurred while getting a node source from name " + sourceName, e);
         }
     }
 
@@ -323,8 +323,8 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while updating a node source '" + nodeSourceData.getName() +
-                                       "'");
+            throw new RuntimeException("Exception occurred while updating a node source " + nodeSourceData.getName(),
+                                       e);
         }
     }
 
@@ -375,8 +375,7 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while adding new node '" + nodeData.getName() + "': " +
-                                       e.getMessage());
+            throw new RuntimeException("Exception occurred while adding new node " + nodeData.getName(), e);
         }
     }
 
@@ -391,8 +390,7 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while updating node '" + nodeData.getName() +
-                                       "' in the database: " + e.getMessage());
+            throw new RuntimeException("Exception occurred while updating node " + nodeData.getName(), e);
         }
     }
 
@@ -402,31 +400,32 @@ public class RMDBManager {
                 @Override
                 public RMNodeData doInTransaction(Session session) {
                     logger.info("Retrieving the node " + nodeName + " from the database");
-                    Query query = session.getNamedQuery("getRMNodeDataByName")
+                    Query query = session.getNamedQuery("getRMNodeDataByNameAndUrl")
                                          .setParameter("name", nodeName)
                                          .setParameter("url", nodeUrl);
                     return (RMNodeData) query.uniqueResult();
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while retrieving node '" + nodeName + "' in the database: " +
-                                       e.getMessage());
+            throw new RuntimeException("Exception occurred while retrieving node " + nodeName, e);
         }
     }
 
-    public void removeNode(final String nodeName) {
+    public void removeNode(final String nodeName, final String nodeUrl) {
         try {
             executeReadWriteTransaction(new SessionWork<Void>() {
                 @Override
                 public Void doInTransaction(Session session) {
                     logger.info("Removing the node " + nodeName + " from the database");
-                    session.getNamedQuery("deleteRMNodeDataByName").setParameter("name", nodeName).executeUpdate();
+                    session.getNamedQuery("deleteRMNodeDataByNameAndUrl")
+                           .setParameter("name", nodeName)
+                           .setParameter("url", nodeUrl)
+                           .executeUpdate();
                     return null;
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while removing node '" + nodeName + "' in the database: " +
-                                       e.getMessage());
+            throw new RuntimeException("Exception occurred while removing node " + nodeName, e);
         }
     }
 
@@ -437,16 +436,17 @@ public class RMDBManager {
                 public Void doInTransaction(Session session) {
                     for (RMNodeData nodeData : nodes) {
                         logger.info("Removing the node " + nodeData.getName() + " from the database");
-                        session.getNamedQuery("deleteRMNodeDataByName")
+                        session.getNamedQuery("deleteRMNodeDataByNameAndUrl")
                                .setParameter("name", nodeData.getName())
+                               .setParameter("url", nodeData.getNodeUrl())
                                .executeUpdate();
                     }
                     return null;
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while removing " + nodes.size() +
-                                       " nodes from the database: " + e.getMessage());
+            throw new RuntimeException("Exception occurred while removing " + nodes.size() + " nodes from the database",
+                                       e);
         }
     }
 
@@ -461,7 +461,7 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while removing all nodes in the database: " + e.getMessage());
+            throw new RuntimeException("Exception occurred while removing all nodes in the database", e);
         }
     }
 
@@ -476,7 +476,7 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while getting all nodes from database: " + e.getMessage());
+            throw new RuntimeException("Exception occurred while getting all nodes from database", e);
         }
     }
 
@@ -492,8 +492,8 @@ public class RMDBManager {
                 }
             });
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while getting node by node source name '" + nodeSourceName +
-                                       "': " + e.getMessage());
+            throw new RuntimeException("Exception occurred while getting node by node source name " + nodeSourceName,
+                                       e);
         }
     }
 

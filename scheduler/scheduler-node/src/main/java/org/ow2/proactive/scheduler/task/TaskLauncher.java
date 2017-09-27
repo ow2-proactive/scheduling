@@ -219,12 +219,12 @@ public class TaskLauncher implements InitActive {
             // transient failure, so we need to make sure that the placeholder
             // for the task's result still exists, or get the new place for
             // the result if it does not exist anymore.
-            terminateNotification = taskLauncherRebinder.makeSureSchedulerIsConnected(terminateNotification);
+            TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.makeSureSchedulerIsConnected(terminateNotification);
 
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
                     taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
-                    sendResultToScheduler(terminateNotification, taskResult);
+                    sendResultToScheduler(rebindedTerminateNotification, taskResult);
                     return;
                 case KILLED_MANUALLY:
                     // killed by Scheduler, no need to send results back
@@ -239,7 +239,7 @@ public class TaskLauncher implements InitActive {
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
             taskResult.setLogs(taskLogger.getLogs());
 
-            sendResultToScheduler(terminateNotification, taskResult);
+            sendResultToScheduler(rebindedTerminateNotification, taskResult);
         } catch (Throwable taskFailure) {
             wallTimer.stop();
 
@@ -380,15 +380,17 @@ public class TaskLauncher implements InitActive {
         int pingAttempts = initializer.getPingAttempts();
         int pingPeriodMs = initializer.getPingPeriod() * 1000;
 
+        TaskTerminateNotification currentTerminateNotification = terminateNotification;
         for (int i = 0; i < pingAttempts; i++) {
             try {
-                terminateNotification.terminate(taskId, taskResult);
+                currentTerminateNotification.terminate(taskId, taskResult);
                 logger.debug("Successfully notified task termination " + taskId);
                 return;
             } catch (Throwable t) {
                 logger.warn("Cannot notify task termination, trying to rebind to to the task termination handler", t);
-                terminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
-                if (terminateNotification != null) {
+                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
+                if (rebindedTerminateNotification != null) {
+                    currentTerminateNotification = rebindedTerminateNotification;
                     continue;
                 }
                 logger.warn("Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms",

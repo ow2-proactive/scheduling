@@ -357,7 +357,7 @@ public final class RMDeployingNode extends AbstractRMNode {
 
     @Override
     public String[] getJmxUrls() {
-        return null;
+        return new String[] {};
     }
 
     @Override

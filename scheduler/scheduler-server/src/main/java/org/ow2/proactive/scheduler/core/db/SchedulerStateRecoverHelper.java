@@ -126,7 +126,8 @@ public class SchedulerStateRecoverHelper {
             // and recount the number of pending tasks, because if we do not 
             // manage to recover a running task, it will be recovered as a 
             // pending task
-            if (task.getStatus() == TaskStatus.RUNNING && task.getExecuterInformation() != null) {
+            if ((task.getStatus() == TaskStatus.RUNNING || task.getStatus() == TaskStatus.PAUSED) &&
+                task.getExecuterInformation() != null) {
                 try {
                     TaskLauncher launcher = task.getExecuterInformation().getLauncher();
                     logger.info("Recover running task " + task.getId() + " (" + task.getName() +
@@ -139,16 +140,25 @@ public class SchedulerStateRecoverHelper {
                     pendingTasksCount++;
                 }
             } else {
-                // recount existing pending tasks
-                if (task.getStatus().equals(TaskStatus.PENDING)) {
-                    task.setStatus(TaskStatus.PENDING);
+                // recount existing pending tasks. We base this number on the 
+                // definition provided in SchedulerDBManager#PENDING_TASKS
+                if (task.getStatus().equals(TaskStatus.PENDING) || task.getStatus().equals(TaskStatus.SUBMITTED) ||
+                    task.getStatus().equals(TaskStatus.NOT_STARTED)) {
                     pendingTasksCount++;
+                } else {
+                    // recount existing running tasks that are not recoverable
+                    // These tasks are "running" by the definition provided in
+                    // SchedulerDBManager#RUNNING_TASKS
+                    if (task.getStatus() == TaskStatus.IN_ERROR || task.getStatus() == TaskStatus.WAITING_ON_ERROR ||
+                        task.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
+                        runningTasksCount++;
+                    }
                 }
             }
             logger.debug("Task " + task.getId() + " status is " + task.getStatus().name());
         }
         // reapply definition of stalled job
-        if (runningTasksCount == 0 && job.getStatus() == JobStatus.RUNNING) {
+        if (runningTasksCount == 0 && job.getStatus().equals(JobStatus.RUNNING)) {
             job.setStatus(JobStatus.STALLED);
         }
         job.setNumberOfPendingTasks(pendingTasksCount);
