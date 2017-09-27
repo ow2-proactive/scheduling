@@ -54,15 +54,11 @@ public class SerializationUtil {
             return new HashMap<>();
         }
 
-        final Map<String, Serializable> deserialized = AllObjects2BytesConverterHandler.convertAllBytes2Objects(target,
-                                                                                                                cl);
-
-        return deserialized;
+        return AllObjects2BytesConverterHandler.convertAllBytes2Objects(target, cl);
     }
 
     public static Map<String, byte[]> serializeVariableMap(Map<String, Serializable> variableMap) {
-        Map<String, byte[]> serializedMap = AllObjects2BytesConverterHandler.convertAllObjects2Bytes(variableMap);
-        return serializedMap;
+        return AllObjects2BytesConverterHandler.convertAllObjects2Bytes(variableMap);
     }
 
 }

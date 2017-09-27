@@ -47,6 +47,9 @@ public class AllObjects2BytesConverterHandler {
 
     private static Long secondsToWait = Long.getLong("pa.max.deserialization.seconds", 30L);
 
+    private AllObjects2BytesConverterHandler() {
+    }
+
     public static Map<String, Serializable> convertAllBytes2Objects(final Map<String, byte[]> target,
             final ClassLoader cl) {
         return convert("Deserialization of variables", createDeserializeCollable(target, cl));
