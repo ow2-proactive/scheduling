@@ -93,14 +93,18 @@ public class RecoveredSchedulerState {
         logger.info("Enable live logs for running tasks if needed");
         for (InternalJob job : runningJobs) {
             for (InternalTask task : job.getITasks()) {
-                if (task.getStatus() == TaskStatus.RUNNING && task.getExecuterInformation() != null) {
-                    try {
-                        schedulingService.getListenJobLogsSupport()
-                                         .activeLogsIfNeeded(job.getId(), task.getExecuterInformation().getLauncher());
-                    } catch (LogForwardingException e) {
-                        logger.warn("Failed to activate logs for task " + task.getId(), e);
-                    }
-                }
+                enableLiveLogsForRunningTask(schedulingService, job, task);
+            }
+        }
+    }
+
+    private void enableLiveLogsForRunningTask(SchedulingService schedulingService, InternalJob job, InternalTask task) {
+        if (task.getStatus() == TaskStatus.RUNNING && task.getExecuterInformation() != null) {
+            try {
+                schedulingService.getListenJobLogsSupport()
+                                 .activeLogsIfNeeded(job.getId(), task.getExecuterInformation().getLauncher());
+            } catch (LogForwardingException e) {
+                logger.warn("Failed to activate logs for task " + task.getId(), e);
             }
         }
     }

@@ -51,15 +51,21 @@ public class ExecuterInformationData implements Serializable {
     private String hostName;
 
     public ExecuterInformationData(ExecuterInformation executerInformation) {
-        taskLauncherNodeUrl = PAActiveObject.getUrl(executerInformation.getLauncher());
+        if (executerInformation.getLauncher() != null) {
+            taskLauncherNodeUrl = PAActiveObject.getUrl(executerInformation.getLauncher());
+        }
         nodes = executerInformation.getNodes();
         nodeName = executerInformation.getNodeName();
         hostName = executerInformation.getHostName();
     }
 
+    public void setTaskLauncherNodeUrl(String taskLauncherNodeUrl) {
+        this.taskLauncherNodeUrl = taskLauncherNodeUrl;
+    }
+
     public ExecuterInformation toExecuterInformation(boolean loadFullState) {
         TaskLauncher taskLauncher = new TaskLauncher();
-        if (loadFullState) {
+        if (loadFullState && taskLauncherNodeUrl != null) {
             try {
                 taskLauncher = PAActiveObject.lookupActive(TaskLauncher.class, taskLauncherNodeUrl);
                 logger.info("Retrieve task launcher " + taskLauncherNodeUrl + " successfully");

@@ -55,7 +55,7 @@ public class TaskLauncherRebinder {
                                                                          .getURL();
         } catch (NodeException e) {
             logger.warn("The URL of TaskTerminatedNotification handler of task " + taskId.getReadableName() +
-                        " cannot be retrieved");
+                        " cannot be retrieved", e);
         }
     }
 

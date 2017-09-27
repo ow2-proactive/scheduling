@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class InfrastructureManagerFactory {
      * @return recovered infrastructure manager
      */
     public static InfrastructureManager recreate(String infrastructureType, Object[] infrastructureParameters,
-            Map<String, Object> infrastructureVariables) {
+            Map<String, Serializable> infrastructureVariables) {
         InfrastructureManager infrastructure = create(infrastructureType, infrastructureParameters);
         infrastructure.recoverPersistedInfraVariables(infrastructureVariables);
         return infrastructure;

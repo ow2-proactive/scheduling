@@ -149,9 +149,6 @@ public class NodeSource implements InitActive, RunActive {
     // level is configured by ns admin at the moment of ns creation
     private AccessType nodeUserAccessType;
 
-    // when recovering a node source, this variable tracks the recovered nodes
-    private int nbNodesToRecover;
-
     static {
         try {
             int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
@@ -777,7 +774,7 @@ public class NodeSource implements InitActive, RunActive {
             try {
                 infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl, null);
             } catch (RMException e) {
-                logger.error("New empty Node " + nodeUrl + " could not be created to handle down node");
+                logger.error("New empty node " + nodeUrl + " could not be created to handle down node", e);
             }
         }
 

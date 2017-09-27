@@ -484,7 +484,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 logger.info("Trying to lookup a node to recover: " + nodeUrl);
                 node = nodeSource.lookupNode(nodeUrl, lookUpTimeout);
             } catch (Exception e) {
-                logger.warn("Node to recover could not be looked up at URL: " + nodeUrl);
+                logger.warn("Node to recover could not be looked up at URL: " + nodeUrl, e);
                 node = null;
             }
 
@@ -703,7 +703,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                              rmnode.getState(),
                                                              initiator.getName()));
         // persist node removal
-        dbManager.removeNode(rmnode.getNodeName());
+        dbManager.removeNode(rmnode.getNodeName(), rmnode.getNodeURL());
     }
 
     /**

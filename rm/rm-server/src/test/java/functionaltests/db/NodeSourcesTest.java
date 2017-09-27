@@ -27,6 +27,7 @@ package functionaltests.db;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.tests.ProActiveTest;
 
 
@@ -55,7 +57,7 @@ public class NodeSourcesTest extends ProActiveTest {
 
     protected static RMDBManager dbManager;
 
-    private Map<String, Object> infrastructureVariables;
+    private Map<String, Serializable> infrastructureVariables;
 
     @Before
     public void setUp() throws Exception {
@@ -120,7 +122,7 @@ public class NodeSourcesTest extends ProActiveTest {
     @Test
     public void testAddNodeSourceWithEmptyInfrastructureVariables() {
         NodeSourceData nodeSourceData = createNodeSource();
-        nodeSourceData.setInfrastructureVariables(new HashMap<String, Object>());
+        nodeSourceData.setInfrastructureVariables(new HashMap<String, Serializable>());
         dbManager.addNodeSource(nodeSourceData);
 
         Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
@@ -133,7 +135,7 @@ public class NodeSourcesTest extends ProActiveTest {
     @Test
     public void testAddNodeSourceWithVariousObjectsInInfrastructureVariables() {
         NodeSourceData nodeSourceData = createNodeSource();
-        Map<String, Object> infrastructureVariables = new HashMap<>();
+        Map<String, Serializable> infrastructureVariables = new HashMap<>();
 
         Integer integer = new Integer(42);
         AtomicBoolean atomicBoolean = new AtomicBoolean(true);
@@ -149,7 +151,7 @@ public class NodeSourcesTest extends ProActiveTest {
         assertThat(nodeSources).hasSize(1);
 
         NodeSourceData nodeSource = nodeSources.iterator().next();
-        Map<String, Object> retrievedInfravariables = nodeSource.getInfrastructureVariables();
+        Map<String, Serializable> retrievedInfravariables = nodeSource.getInfrastructureVariables();
         assertThat(retrievedInfravariables).hasSize(3);
         assertThat(retrievedInfravariables.get("anInteger")).isEqualTo(integer);
         // works with autoboxing

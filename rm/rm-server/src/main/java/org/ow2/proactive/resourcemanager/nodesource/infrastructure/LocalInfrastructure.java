@@ -99,7 +99,9 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireAllNodes() {
-        startNode(maxNodes);
+        if (getAcquiredNodes() < maxNodes) {
+            startNode(getDifferenceBetweenHandledAndAcquiredNodes());
+        }
     }
 
     @Override
@@ -123,7 +125,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private void startNodeProcess(int numberOfNodes) {
 
         addHandledNodes(numberOfNodes);
-        int currentIndex = getIndex();
+        int currentIndex = getIndexAndIncrement();
         String baseNodeName = "local-" + this.nodeSource.getName() + "-" + currentIndex;
         OperatingSystem os = OperatingSystem.UNIX;
         // assuming no cygwin, windows or the "others"...
@@ -479,13 +481,24 @@ public class LocalInfrastructure extends InfrastructureManager {
         });
     }
 
-    private int getIndex() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
+    private int getIndexAndIncrement() {
+        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return (int) persistedInfraVariables.get(INDEX_KEY);
+                int deployedNodeIndex = (int) persistedInfraVariables.get(INDEX_KEY);
+                persistedInfraVariables.put(INDEX_KEY, deployedNodeIndex + 1);
+                return deployedNodeIndex;
             }
         });
     }
 
+    public int getDifferenceBetweenHandledAndAcquiredNodes() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
+            @Override
+            public Integer handle() {
+                return (int) persistedInfraVariables.get(NB_HANDLED_NODES_KEY) -
+                       (int) persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY);
+            }
+        });
+    }
 }

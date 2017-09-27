@@ -52,10 +52,10 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  * @since 05/06/2017
  */
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteRMNodeDataByName", query = "delete from RMNodeData where name=:name"),
+@NamedQueries({ @NamedQuery(name = "deleteRMNodeDataByNameAndUrl", query = "delete from RMNodeData where name=:name and nodeUrl=:url"),
                 @NamedQuery(name = "deleteAllRMNodeData", query = "delete from RMNodeData"),
                 @NamedQuery(name = "getAllRMNodeData", query = "from RMNodeData"),
-                @NamedQuery(name = "getRMNodeDataByName", query = "from RMNodeData where name=:name and nodeUrl=:url"),
+                @NamedQuery(name = "getRMNodeDataByNameAndUrl", query = "from RMNodeData where name=:name and nodeUrl=:url"),
                 @NamedQuery(name = "getRMNodeDataByNodeSource", query = "from RMNodeData where nodeSource.name=:name") })
 @Table(name = "RMNodeData")
 public class RMNodeData implements Serializable {

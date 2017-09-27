@@ -225,25 +225,27 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             String host = elts[0];
             try {
                 InetAddress addr = InetAddress.getByName(host);
-
-                // do not use the setPersistedInfraVariable method here because we cannot persist the variable yet: we need
-                // the configuration to be over for that
-                writeLock.lock();
-                try {
-                    Integer retrieved = getFreeHosts().get(addr);
-                    if (retrieved == null) {
-                        getFreeHosts().put(addr, num);
-                    }
-                } catch (RuntimeException e) {
-                    logger.error("Exception while manipulating free nodes data structure: " + e.getMessage());
-                    throw e;
-                } finally {
-                    writeLock.unlock();
-                }
-
+                putFreeHostIfNotExist(num, addr);
             } catch (UnknownHostException ex) {
                 throw new RuntimeException("Unknown host: " + host, ex);
             }
+        }
+    }
+
+    private void putFreeHostIfNotExist(int num, InetAddress addr) {
+        // do not use the setPersistedInfraVariable method here because we cannot persist the variable yet: we need
+        // the configuration to be over for that
+        writeLock.lock();
+        try {
+            Integer retrieved = getFreeHosts().get(addr);
+            if (retrieved == null) {
+                getFreeHosts().put(addr, num);
+            }
+        } catch (RuntimeException e) {
+            logger.error("Exception while manipulating free nodes data structure: " + e.getMessage());
+            throw e;
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -404,6 +406,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     /**
      * Removes a node from the registered nodes and adds one node removed to the removed host map.
+     * In case all nodes relative to this host were removed, the JVM is killed.
      *
      * @param node the node to remove
      *
@@ -416,11 +419,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                 InetAddress host = getRegisteredNodes().remove(nodeName);
                 if (host != null) {
                     logger.debug("Removing node " + nodeUrl + " from " + this.getClass().getSimpleName());
-                    // remember the node removed
                     addRemovedHost(host);
-                    // In case all nodes relative to this host were removed, kill the JVM.
-                    // We need to check whether the node to kill is present because in case
-                    // of a recovery of the RM, the node object might not be retrievable.
                     if (!getRegisteredNodes().containsValue(host) && node != null) {
                         try {
                             killNodeImpl(node, host);
@@ -429,8 +428,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                         }
                     }
                 } else {
-                    logger.error("Node " + nodeName +
-                                 " is not known as a node belonging to this infrastructure manager");
+                    logger.error("Node " + nodeName + " is not known by this infrastructure manager");
                 }
                 return host;
             }

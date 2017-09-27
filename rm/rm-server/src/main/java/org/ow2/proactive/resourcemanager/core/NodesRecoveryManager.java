@@ -41,7 +41,7 @@ import com.google.common.base.Function;
  */
 public class NodesRecoveryManager {
 
-    private final static Logger logger = Logger.getLogger(NodesRecoveryManager.class);
+    private static final Logger logger = Logger.getLogger(NodesRecoveryManager.class);
 
     private RMCore resourceManager;
 

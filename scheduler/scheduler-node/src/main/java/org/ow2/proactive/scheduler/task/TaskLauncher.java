@@ -219,12 +219,12 @@ public class TaskLauncher implements InitActive {
             // transient failure, so we need to make sure that the placeholder
             // for the task's result still exists, or get the new place for
             // the result if it does not exist anymore.
-            terminateNotification = taskLauncherRebinder.makeSureSchedulerIsConnected(terminateNotification);
+            TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.makeSureSchedulerIsConnected(terminateNotification);
 
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
                     taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
-                    sendResultToScheduler(terminateNotification, taskResult);
+                    sendResultToScheduler(rebindedTerminateNotification, taskResult);
                     return;
                 case KILLED_MANUALLY:
                     // killed by Scheduler, no need to send results back
@@ -239,7 +239,7 @@ public class TaskLauncher implements InitActive {
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
             taskResult.setLogs(taskLogger.getLogs());
 
-            sendResultToScheduler(terminateNotification, taskResult);
+            sendResultToScheduler(rebindedTerminateNotification, taskResult);
         } catch (Throwable taskFailure) {
             wallTimer.stop();
 

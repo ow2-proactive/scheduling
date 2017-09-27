@@ -66,7 +66,7 @@ public class NodeSourceData implements Serializable {
     /**
      * name of the variable --> value of the variable
      */
-    private Map<String, Object> infrastructureVariables;
+    private Map<String, Serializable> infrastructureVariables;
 
     public NodeSourceData() {
     }
@@ -143,11 +143,11 @@ public class NodeSourceData implements Serializable {
 
     @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Map<String, Object> getInfrastructureVariables() {
+    public Map<String, Serializable> getInfrastructureVariables() {
         return infrastructureVariables;
     }
 
-    public void setInfrastructureVariables(Map<String, Object> infrastructureVariables) {
+    public void setInfrastructureVariables(Map<String, Serializable> infrastructureVariables) {
         this.infrastructureVariables = infrastructureVariables;
     }
 
