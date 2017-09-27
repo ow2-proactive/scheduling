@@ -55,7 +55,7 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
-import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
+import org.ow2.proactive.scheduler.common.util.AllObjects2BytesConverterHandler;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
@@ -100,7 +100,7 @@ public class TaskLauncherTest {
     @Test
     public void javaTask() throws Throwable {
         HashMap<String, byte[]> args = new HashMap<>();
-        args.put("number", Object2ByteConverter.convertObject2Byte(123));
+        args.put("number", AllObjects2BytesConverterHandler.convertObject2Byte("number", 123));
         ScriptExecutableContainer executableContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript(WaitAndPrint.class.getName(),
                                                                                                                       "java",
                                                                                                                       new Serializable[] { args })));
