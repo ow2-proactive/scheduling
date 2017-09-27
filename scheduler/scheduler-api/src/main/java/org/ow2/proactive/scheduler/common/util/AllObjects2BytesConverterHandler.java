@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -45,7 +44,14 @@ public class AllObjects2BytesConverterHandler {
 
     private static final Logger logger = Logger.getLogger(AllObjects2BytesConverterHandler.class);
 
-    private static Long secondsToWait = Long.getLong("pa.max.deserialization.seconds", 30L);
+    private final static String TIMEOUT_JAVA_PROPERTY = "pa.max.deserialization.seconds";
+
+    private final static Long secondsToWait = Long.getLong(TIMEOUT_JAVA_PROPERTY, 30L);
+
+    private final static String ERROR_MESSAGE = " was stuck for more than " + secondsToWait +
+                                                " seconds. Killing the Java process.(You can control this timeout  with the java property -D" +
+                                                TIMEOUT_JAVA_PROPERTY +
+                                                "= when starting nodes and/or when starting the scheduler )";
 
     private AllObjects2BytesConverterHandler() {
     }
@@ -77,12 +83,12 @@ public class AllObjects2BytesConverterHandler {
         try {
             resultMap = future.get(secondsToWait, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
-            logger.fatal(action + " was stuck for more than " + secondsToWait + " seconds. Killing the Java process.");
+            logger.fatal(action + ERROR_MESSAGE);
             System.exit(1);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             executor.shutdownNow();
@@ -102,13 +108,12 @@ public class AllObjects2BytesConverterHandler {
         try {
             result = future.get(secondsToWait, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
-            logger.fatal(action + " of variable was stuck for more than " + secondsToWait +
-                         " seconds. Killing the Java process.");
+            logger.fatal(action + ERROR_MESSAGE);
             System.exit(1);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             executor.shutdownNow();
