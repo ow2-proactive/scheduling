@@ -86,7 +86,7 @@ public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTestWithCust
         Credentials creds = Credentials.createCredentials(new CredData(TestUsers.DEMO.username,
                                                                        TestUsers.DEMO.password),
                                                           auth.getPublicKey());
-        return new Object[] { "ALL", "ME", SchedulerTHelper.getLocalUrl(), creds.getBase64(), "30000" };
+        return new Object[] { "ALL", "ME", SchedulerTHelper.getLocalUrl(), creds.getBase64(), "1000", "2" };
     }
 
     private ResourceManager startRMPreservingDB() throws Exception {

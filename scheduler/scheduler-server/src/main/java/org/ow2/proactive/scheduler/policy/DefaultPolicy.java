@@ -25,14 +25,17 @@
  */
 package org.ow2.proactive.scheduler.policy;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.ow2.proactive.scheduler.common.JobDescriptor;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 
 
 /**
@@ -70,7 +73,9 @@ public class DefaultPolicy extends Policy {
 
         //add all sorted tasks to list of tasks
         for (JobDescriptor jd : jobs) {
-            toReturn.addAll(jd.getEligibleTasks());
+            Collection<TaskDescriptor> tasks = jd.getEligibleTasks();
+            Collection<EligibleTaskDescriptor> eligibleTasks = (Collection) tasks;
+            toReturn.addAll(eligibleTasks);
         }
 
         //return sorted list of tasks
@@ -80,8 +85,8 @@ public class DefaultPolicy extends Policy {
     public static final Comparator<JobDescriptor> FIFO_BY_PRIORITY_COMPARATOR = new Comparator<JobDescriptor>() {
         @Override
         public int compare(JobDescriptor job1, JobDescriptor job2) {
-            JobPriority job1Priority = job1.getInternal().getPriority();
-            JobPriority job2Priority = job2.getInternal().getPriority();
+            JobPriority job1Priority = ((JobDescriptorImpl) job1).getInternal().getPriority();
+            JobPriority job2Priority = ((JobDescriptorImpl) job2).getInternal().getPriority();
             if (job1Priority.equals(job2Priority)) {
                 return job1.getJobId().compareTo(job2.getJobId());
             } else {

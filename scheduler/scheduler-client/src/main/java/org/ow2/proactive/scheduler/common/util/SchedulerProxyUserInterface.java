@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -214,6 +215,24 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
                              e);
                 return false;
             }
+    }
+
+    @Override
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.getCurrentPolicy();
+    }
+
+    @Override
+    public Map getJobsToSchedule() throws NotConnectedException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.getJobsToSchedule();
+    }
+
+    @Override
+    public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.getTasksToSchedule();
     }
 
     @Override

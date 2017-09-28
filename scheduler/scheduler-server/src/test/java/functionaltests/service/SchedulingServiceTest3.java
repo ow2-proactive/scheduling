@@ -31,7 +31,9 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -41,7 +43,7 @@ import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
@@ -80,8 +82,8 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
         jobDesc = jobsMap.values().iterator().next();
         Assert.assertEquals(2, jobDesc.getEligibleTasks().size());
 
-        for (EligibleTaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
-            taskStarted(jobDesc, taskDesc);
+        for (TaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
+            taskStarted(jobDesc, (EligibleTaskDescriptor) taskDesc);
         }
         service.unlockJobsToSchedule(jobsMap.values());
 
@@ -113,8 +115,8 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
         jobDesc = jobsMap.values().iterator().next();
         Assert.assertEquals(2, jobDesc.getEligibleTasks().size());
 
-        for (EligibleTaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
-            taskStarted(jobDesc, taskDesc);
+        for (TaskDescriptor taskDesc : jobDesc.getEligibleTasks()) {
+            taskStarted(jobDesc, (EligibleTaskDescriptor) taskDesc);
         }
         service.unlockJobsToSchedule(jobsMap.values());
 
@@ -140,7 +142,7 @@ public class SchedulingServiceTest3 extends BaseServiceTest {
 
         Assert.assertFalse(service.killTask(jobDesc.getJobId(), "javaTask"));
 
-        TaskId nativeTaskId = jobDesc.getInternal().getTask("nativeTask").getId();
+        TaskId nativeTaskId = ((JobDescriptorImpl) jobDesc).getInternal().getTask("nativeTask").getId();
         service.taskTerminatedWithResult(nativeTaskId, new TaskResultImpl(nativeTaskId, new Integer(0), null, 0));
 
         listener.assertEvents(SchedulerEvent.TASK_RUNNING_TO_FINISHED,

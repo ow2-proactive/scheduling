@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -63,7 +64,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
@@ -125,7 +126,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
         }
     }
 
-    static class StateMatcher extends TypeSafeMatcher<SchedulerState> {
+    static class StateMatcher extends TypeSafeMatcher<SchedulerState<ClientJobState>> {
 
         private final List<JobStateMatcher> pending = new ArrayList<>();
 
@@ -163,7 +164,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
         }
 
         @Override
-        protected boolean matchesSafely(SchedulerState item) {
+        protected boolean matchesSafely(SchedulerState<ClientJobState> item) {
             assertThat(item.getPendingJobs(), containsInAnyOrder(pending.toArray(new JobStateMatcher[] {})));
             assertThat(item.getRunningJobs(), containsInAnyOrder(running.toArray(new JobStateMatcher[] {})));
             assertThat(item.getFinishedJobs(), containsInAnyOrder(finished.toArray(new JobStateMatcher[] {})));
@@ -306,7 +307,7 @@ public class BaseSchedulerDBTest extends ProActiveTest {
 
                 if (!finishedJobStatus.contains(status)) {
                     Set<String> actualEligible = new HashSet<>();
-                    for (EligibleTaskDescriptor desc : internalJob.getJobDescriptor().getEligibleTasks()) {
+                    for (TaskDescriptor desc : internalJob.getJobDescriptor().getEligibleTasks()) {
                         actualEligible.add(desc.getTaskId().getReadableName());
                     }
                     Assert.assertEquals("Eligible tasks for " + id, eligibleTasks, actualEligible);

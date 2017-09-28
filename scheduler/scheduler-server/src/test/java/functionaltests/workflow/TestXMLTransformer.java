@@ -50,8 +50,7 @@ import functionaltests.job.multinodes.TestMultipleHostsRequest;
 /**
  * This class tests the coherence between the {@link Job2XMLTransformer} and the
  * {@link StaxJobFactory}. For each job descriptor in the
- * "/functionaltests/descriptors/" and
- * "$pa.scheduler.home/samples/workflows/" folders (except if the file descriptor
+ * "/functionaltests/descriptors/" folder (except if the file descriptor
  * contains the keyword 'invalid') it creates a {@link TaskFlowJob} object using
  * the {@link StaxJobFactory}. The java job is then serialized to xml using the
  * {@link Job2XMLTransformer} and then a new {@link TaskFlowJob} is created.
@@ -95,17 +94,9 @@ public class TestXMLTransformer {
         File folder = new File(jobDescriptorsFolder.toURI());
         Collection<File> testJobDescrFiles = FileUtils.listFiles(folder, new String[] { "xml" }, true);
 
-        File samplesJobDescrFiles = new File(System.getProperty("pa.scheduler.home") + File.separator + "samples" +
-                                             File.separator + "workflows");
+        log("Treating " + testJobDescrFiles.size() + " job descriptors.");
 
-        log(samplesJobDescrFiles.getAbsolutePath());
-
-        Collection<File> samples = FileUtils.listFiles(samplesJobDescrFiles, new String[] { "xml" }, true);
-        samples.addAll(testJobDescrFiles);
-
-        log("Treating " + samples.size() + " job descriptors.");
-
-        for (File file : samples) {
+        for (File file : testJobDescrFiles) {
             // skip descriptor files which are there to test invalid job description
             if (file.getName().contains("invalid")) {
                 continue;

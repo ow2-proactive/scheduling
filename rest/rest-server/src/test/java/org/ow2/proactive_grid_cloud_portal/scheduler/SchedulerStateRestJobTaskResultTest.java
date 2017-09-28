@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,14 +34,18 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.JobResultImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
 
 public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
@@ -91,6 +96,34 @@ public class SchedulerStateRestJobTaskResultTest extends RestTestServer {
         String exceptionStackTrace = jobResult.get("mytask");
 
         assertNotNull(exceptionStackTrace);
+    }
+
+    @Test
+    public void testValueOfJobResult() throws Throwable {
+        TaskResultImpl taskResult = new TaskResultImpl(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("42"), "mytask", 1),
+                                                       ObjectToByteConverter.ObjectStream.convert("hello"),
+                                                       null,
+                                                       null,
+                                                       false);
+        JobResultImpl jobResultWithValue = new JobResultImpl();
+        JobInfoImpl jobInfo = new JobInfoImpl();
+        jobInfo.setJobId(new JobIdImpl(12, "myjob"));
+        jobResultWithValue.setJobInfo(jobInfo);
+        jobResultWithValue.addTaskResult("mytask", taskResult, false);
+        when(mockOfScheduler.getJobResult("42")).thenReturn(jobResultWithValue);
+
+        JobResultData jobResultData = restInterface.jobResult(sessionId, "42");
+        TaskResultData taskResultData = jobResultData.getAllResults().get("mytask");
+
+        assertNotNull(taskResultData);
+        assertNotNull(taskResultData.getValue());
+        assertEquals("hello", taskResultData.getValue());
+
+        Map<String, String> jobResult = restInterface.jobResultValue(sessionId, "42");
+        String result = jobResult.get("mytask");
+
+        assertNotNull(result);
+        assertEquals("hello", result);
     }
 
 }

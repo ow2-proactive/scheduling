@@ -33,16 +33,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.Mockito;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.core.SchedulingMethod;
 import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
-import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
@@ -82,10 +81,10 @@ public class BaseServiceTest extends ProActiveTest {
     }
 
     void taskStarted(JobDescriptor jobDesc, EligibleTaskDescriptor taskDesc) throws Exception {
-        InternalTask task = taskDesc.getInternal();
+        InternalTask task = ((EligibleTaskDescriptorImpl) taskDesc).getInternal();
         TaskLauncher launcher = Mockito.mock(TaskLauncher.class);
         task.setExecuterInformation(new ExecuterInformation(launcher, NodeFactory.getDefaultNode()));
-        service.taskStarted(jobDesc.getInternal(), task, launcher);
+        service.taskStarted(((JobDescriptorImpl) jobDesc).getInternal(), task, launcher);
     }
 
     public static InternalJob createJob(TaskFlowJob job) throws Exception {

@@ -16,7 +16,7 @@ This will start all components, including 4 local nodes and Web portals.
 URLs to access them will be displayed in the server's output.
 
 From here you can submit a job to the Scheduler, using for instance the
-XML files in `samples/workflows/`.
+XML files in `samples/proactive-examples`.
 
 To run the command line client:
 

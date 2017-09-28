@@ -31,6 +31,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
@@ -57,9 +58,10 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
 
         logger.debug("Selected Nodes: " + selectedNodes);
 
-        logger.debug("Analysing task: " + task.getInternal().getName());
-
-        String allocRam = task.getInternal().getRuntimeGenericInformation().get(RAM_VARIABLE_NAME);
+        logger.debug("Analysing task: " + ((EligibleTaskDescriptorImpl) task).getInternal().getName());
+        String allocRam = ((EligibleTaskDescriptorImpl) task).getInternal()
+                                                             .getRuntimeGenericInformation()
+                                                             .get(RAM_VARIABLE_NAME);
 
         if (allocRam != null) {
             try {
@@ -81,7 +83,8 @@ public class RamSchedulingPolicy extends ExtendedSchedulerPolicy {
             logger.debug("Free Ram for node (" + n.getNodeInformation().getName() + ") : " + freeRam +
                          " , neededRam : " + neededRam);
             if (freeRam >= neededRam) {
-                logger.debug("Task " + task.getInternal().getName() + " can execute on " + n);
+                logger.debug("Task " + ((EligibleTaskDescriptorImpl) task).getInternal().getName() +
+                             " can execute on " + n);
                 n.setProperty(RAM_VARIABLE_NAME, "" + neededRam);
                 return true;
             }

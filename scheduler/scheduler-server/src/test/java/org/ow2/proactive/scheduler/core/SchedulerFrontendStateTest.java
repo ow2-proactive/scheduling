@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.tests.ProActiveTestClean;
@@ -60,7 +61,7 @@ public class SchedulerFrontendStateTest extends ProActiveTestClean {
         SchedulerJMXHelper mockJMX = mock(SchedulerJMXHelper.class);
         when(mockJMX.getSchedulerRuntimeMBean()).thenReturn(new RuntimeDataMBeanImpl(null));
 
-        final SchedulerFrontendState schedulerFrontendState = new SchedulerFrontendState(new SchedulerStateImpl(),
+        final SchedulerFrontendState schedulerFrontendState = new SchedulerFrontendState(new SchedulerStateImpl<ClientJobState>(),
                                                                                          mockJMX);
 
         // create a bunch of active sessions, they will be removed in 1s
@@ -98,11 +99,11 @@ public class SchedulerFrontendStateTest extends ProActiveTestClean {
         SchedulerJMXHelper mockJMX = mock(SchedulerJMXHelper.class);
         when(mockJMX.getSchedulerRuntimeMBean()).thenReturn(new RuntimeDataMBeanImpl(null));
 
-        SchedulerStateImpl schedulerStateImpl = new SchedulerStateImpl();
+        SchedulerStateImpl<ClientJobState> schedulerStateImpl = new SchedulerStateImpl<>();
 
         JobIdImpl jobId = new JobIdImpl(1234L, "job name");
 
-        JobState jobState = mock(JobState.class);
+        ClientJobState jobState = mock(ClientJobState.class);
 
         when(jobState.getId()).thenReturn(jobId);
 

@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
+import org.ow2.proactive.scheduler.job.ClientJobState;
 
 
 /**
@@ -55,16 +56,16 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
  * @since ProActive Scheduling 0.9
  */
 @XmlRootElement(name = "schedulerstate")
-public final class SchedulerStateImpl implements SchedulerState {
+public final class SchedulerStateImpl<T extends JobState> implements SchedulerState<T> {
 
     /** Pending jobs */
-    private Set<JobState> pendingJobs = Collections.synchronizedSet(new LinkedHashSet<JobState>());
+    private Set<T> pendingJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
 
     /** Running jobs */
-    private Set<JobState> runningJobs = Collections.synchronizedSet(new LinkedHashSet<JobState>());
+    private Set<T> runningJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
 
     /** Finished jobs */
-    private Set<JobState> finishedJobs = Collections.synchronizedSet(new LinkedHashSet<JobState>());
+    private Set<T> finishedJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
 
     /** Scheduler status */
     private SchedulerStatus status = SchedulerStatus.STARTED;
@@ -76,7 +77,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      * keep a map of all jobs (pending, running finished) to facilitate
      * their updates
      */
-    Map<JobId, JobState> jobs = new HashMap<>();
+    Map<JobId, T> jobs = new HashMap<>();
 
     /**
      * indicates if the <code>jobs</code> field has already been
@@ -96,7 +97,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      *
      * @return the finishedJobs
      */
-    public Vector<JobState> getFinishedJobs() {
+    public Vector<T> getFinishedJobs() {
         return new Vector(finishedJobs);
     }
 
@@ -105,7 +106,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      *
      * @param finishedJobs the finishedJobs to set
      */
-    public void setFinishedJobs(Vector<JobState> finishedJobs) {
+    public void setFinishedJobs(Vector<T> finishedJobs) {
         this.finishedJobs = Collections.synchronizedSet(new LinkedHashSet<>(finishedJobs));
     }
 
@@ -114,7 +115,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      *
      * @return the pendingJobs
      */
-    public Vector<JobState> getPendingJobs() {
+    public Vector<T> getPendingJobs() {
         return new Vector(pendingJobs);
     }
 
@@ -123,7 +124,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      *
      * @param pendingJobs the pendingJobs to set
      */
-    public void setPendingJobs(Vector<JobState> pendingJobs) {
+    public void setPendingJobs(Vector<T> pendingJobs) {
         this.pendingJobs = Collections.synchronizedSet(new LinkedHashSet<>(pendingJobs));
     }
 
@@ -132,7 +133,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      *
      * @return the runningJobs
      */
-    public Vector<JobState> getRunningJobs() {
+    public Vector<T> getRunningJobs() {
         return new Vector(runningJobs);
     }
 
@@ -141,7 +142,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      *
      * @param runningJobs the runningJobs to set
      */
-    public void setRunningJobs(Vector<JobState> runningJobs) {
+    public void setRunningJobs(Vector<T> runningJobs) {
         this.runningJobs = Collections.synchronizedSet(new LinkedHashSet<>(runningJobs));
     }
 
@@ -190,8 +191,8 @@ public final class SchedulerStateImpl implements SchedulerState {
         ssi.setState(getStatus());
         ssi.setUsers(getUsers());
         //pending
-        Vector<JobState> tmp = new Vector<>();
-        for (JobState js : getPendingJobs()) {
+        Vector<T> tmp = new Vector<>();
+        for (T js : getPendingJobs()) {
             if (js.getOwner().equals(name)) {
                 tmp.add(js);
             }
@@ -199,7 +200,7 @@ public final class SchedulerStateImpl implements SchedulerState {
         ssi.setPendingJobs(tmp);
         //running
         tmp = new Vector<>();
-        for (JobState js : getRunningJobs()) {
+        for (T js : getRunningJobs()) {
             if (js.getOwner().equals(name)) {
                 tmp.add(js);
             }
@@ -207,7 +208,7 @@ public final class SchedulerStateImpl implements SchedulerState {
         ssi.setRunningJobs(tmp);
         //finished
         tmp = new Vector<>();
-        for (JobState js : getFinishedJobs()) {
+        for (T js : getFinishedJobs()) {
             if (js.getOwner().equals(name)) {
                 tmp.add(js);
             }
@@ -256,7 +257,7 @@ public final class SchedulerStateImpl implements SchedulerState {
     /**
      * Updates the scheduler state given the event passed as a parameter
      */
-    private void updateJobState(NotificationData<JobState> notification) {
+    private void updateJobState(NotificationData<T> notification) {
         this.pendingJobs.add(notification.getData());
         this.jobs.put(notification.getData().getId(), notification.getData());
     }
@@ -266,7 +267,7 @@ public final class SchedulerStateImpl implements SchedulerState {
      */
     private void updateJobInfo(NotificationData<JobInfo> notification) {
 
-        JobState js = jobs.get(notification.getData().getJobId());
+        T js = jobs.get(notification.getData().getJobId());
         js.update(notification.getData());
         switch (notification.getEventType()) {
             case JOB_PENDING_TO_FINISHED:
@@ -296,13 +297,13 @@ public final class SchedulerStateImpl implements SchedulerState {
     public synchronized void update(NotificationData<?> notification) {
 
         if (!initialized) {
-            for (JobState j : pendingJobs) {
+            for (T j : pendingJobs) {
                 jobs.put(j.getId(), j);
             }
-            for (JobState j : runningJobs) {
+            for (T j : runningJobs) {
                 jobs.put(j.getId(), j);
             }
-            for (JobState j : finishedJobs) {
+            for (T j : finishedJobs) {
                 jobs.put(j.getId(), j);
             }
             initialized = true;
@@ -332,32 +333,32 @@ public final class SchedulerStateImpl implements SchedulerState {
                 updateUserIdentification((NotificationData<UserIdentification>) notification);
                 break;
             case JOB_SUBMITTED:
-                updateJobState((NotificationData<JobState>) notification);
+                updateJobState((NotificationData<T>) notification);
                 break;
         }
     }
 
-    public synchronized void update(JobState js) {
+    public synchronized void update(T js) {
         pendingJobs.add(js);
         this.jobs.put(js.getId(), js);
     }
 
-    public synchronized void pendingToRunning(JobState js) {
+    public synchronized void pendingToRunning(T js) {
         pendingJobs.remove(js);
         runningJobs.add(js);
     }
 
-    public synchronized void pendingToFinished(JobState js) {
+    public synchronized void pendingToFinished(T js) {
         pendingJobs.remove(js);
         finishedJobs.add(js);
     }
 
-    public synchronized void runningToFinished(JobState js) {
+    public synchronized void runningToFinished(T js) {
         runningJobs.remove(js);
         finishedJobs.add(js);
     }
 
-    public synchronized void removeFinished(JobState js) {
+    public synchronized void removeFinished(T js) {
         finishedJobs.remove(js);
         jobs.remove(js.getId());
     }

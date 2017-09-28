@@ -292,7 +292,7 @@ public abstract class InfrastructureManager implements Serializable {
      * @return a list of deploying nodes urls
      */
     protected List<String> addMultipleDeployingNodes(List<String> nodeNames, String obfuscatedCmd, String message,
-            int nodeTimeout) {
+            long nodeTimeout) {
         List<String> answer = new ArrayList<>(nodeNames.size());
         for (String nodeName : nodeNames) {
             String depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, message, nodeTimeout);

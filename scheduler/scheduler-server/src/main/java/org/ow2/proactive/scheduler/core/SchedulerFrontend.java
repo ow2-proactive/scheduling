@@ -58,6 +58,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -86,6 +87,7 @@ import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.authentication.SchedulerAuthentication;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
 import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Page;
@@ -97,6 +99,7 @@ import org.ow2.proactive.scheduler.common.SchedulerEventListener;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.exception.AlreadyConnectedException;
 import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
@@ -129,11 +132,13 @@ import org.ow2.proactive.scheduler.core.db.SchedulerStateRecoverHelper;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
+import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
@@ -887,6 +892,49 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public boolean isConnected() {
         return frontendState.isConnected();
+    }
+
+    @Override
+    public String getCurrentPolicy() throws NotConnectedException, PermissionException {
+        return policyFullName;
+    }
+
+    @Override
+    public Map<JobId, JobDescriptor> getJobsToSchedule() throws NotConnectedException, PermissionException {
+        Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
+        schedulingService.unlockJobsToSchedule(jobMap.values());
+        return jobMap;
+    }
+
+    @Override
+    public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
+        Policy policy = null;
+        List<TaskDescriptor> eligibleTasks = new ArrayList<>();
+        Map<JobId, JobDescriptor> jobMap = null;
+        try {
+            jobMap = schedulingService.lockJobsToSchedule();
+            policy = (Policy) Class.forName(getCurrentPolicy()).newInstance();
+
+            // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
+            // we wait for next scheduling loop
+            if (jobMap.isEmpty()) {
+                return eligibleTasks;
+            }
+            List<JobDescriptor> descriptors = new ArrayList<>(jobMap.values());
+            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = policy.getOrderedTasks(descriptors);
+            //if there is no task to scheduled, return
+            if (taskRetrievedFromPolicy.isEmpty()) {
+                return eligibleTasks;
+            }
+            eligibleTasks = (List) taskRetrievedFromPolicy;
+        } catch (Exception e) {
+            logger.error("Error Loading Current Policy:", e);
+        }
+
+        finally {
+            schedulingService.unlockJobsToSchedule(jobMap.values());
+        }
+        return eligibleTasks;
     }
 
     /**

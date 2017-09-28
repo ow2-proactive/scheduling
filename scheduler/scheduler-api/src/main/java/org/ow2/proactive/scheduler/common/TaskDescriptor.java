@@ -23,14 +23,13 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.descriptor;
+package org.ow2.proactive.scheduler.common;
 
 import java.io.Serializable;
 import java.util.Vector;
 
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -47,14 +46,6 @@ public interface TaskDescriptor extends Serializable {
      * @return the children
      */
     Vector<TaskDescriptor> getChildren();
-
-    /**
-     * Return the internal representation of the task.
-     * To be used carefully.
-     *
-     * @return the internal representation of the task.
-     */
-    InternalTask getInternal();
 
     /**
      * To get the id of the corresponding task
@@ -76,6 +67,13 @@ public interface TaskDescriptor extends Serializable {
      * @return the jobId
      */
     JobId getJobId();
+
+    /**
+     * Get the number of nodes needed for this task (by default: 1).
+     *
+     * @return the number of Nodes Needed
+     */
+    int getNumberOfNodesNeeded();
 
     /**
      * Return the number of children remaining.
