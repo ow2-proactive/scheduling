@@ -1068,7 +1068,7 @@ public class SchedulerDBManager {
                        .setParameter("finishedTime", taskInfo.getFinishedTime())
                        .setParameter("executionHostName", taskInfo.getExecutionHostName())
                        .setParameter("executerInformationData",
-                                     new ExecuterInformationData(task.getExecuterInformation()))
+                                     new ExecuterInformationData(taskId.getTaskId(), task.getExecuterInformation()))
                        .setParameter("taskId", taskId)
                        .executeUpdate();
                 return null;

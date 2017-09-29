@@ -578,21 +578,23 @@ public abstract class InfrastructureManager implements Serializable {
      * the infrastructure, and then update in database the {@link NodeSourceData}.
      */
     public void persistInfraVariables() {
-        readLock.lock();
-        try {
-            if (dbManager == null) {
-                setRmDbManager(RMDBManager.getInstance());
+        if (!nodeSource.getName().equals(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
+            readLock.lock();
+            try {
+                if (dbManager == null) {
+                    setRmDbManager(RMDBManager.getInstance());
+                }
+                NodeSourceData nodeSourceData = dbManager.getNodeSource(this.nodeSource.getName());
+                if (nodeSourceData != null) {
+                    nodeSourceData.setInfrastructureVariables(persistedInfraVariables);
+                    dbManager.updateNodeSource(nodeSourceData);
+                }
+            } catch (RuntimeException e) {
+                logger.error("Exception while persisting runtime variables: " + e.getMessage());
+                throw e;
+            } finally {
+                readLock.unlock();
             }
-            NodeSourceData nodeSourceData = dbManager.getNodeSource(this.nodeSource.getName());
-            if (nodeSourceData != null) {
-                nodeSourceData.setInfrastructureVariables(persistedInfraVariables);
-                dbManager.updateNodeSource(nodeSourceData);
-            }
-        } catch (RuntimeException e) {
-            logger.error("Exception while persisting runtime variables: " + e.getMessage());
-            throw e;
-        } finally {
-            readLock.unlock();
         }
     }
 

@@ -2297,8 +2297,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // the node exists already in database, update it but log this
             // irregular behavior
             if (retrievedNode.getState().equals(NodeState.DOWN)) {
-                logger.warn("A down node " + rmNodeData.getNodeUrl() + " is replaced in database");
-                dbManager.updateNode(rmNodeData);
+                if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(rmNode.getNodeSourceName())) {
+                    logger.warn("A down node " + rmNodeData.getNodeUrl() + " is replaced in database");
+                    dbManager.updateNode(rmNodeData);
+                }
             } else {
                 logger.error("The node " + rmNodeData.getNodeUrl() +
                              " has already been added to the database previously.");
@@ -2307,7 +2309,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // the node is not present in database
             NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
             rmNodeData.setNodeSource(nodeSourceData);
-            dbManager.addNode(rmNodeData);
+            if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceData.getName())) {
+                dbManager.addNode(rmNodeData);
+            }
         }
     }
 
@@ -2317,7 +2321,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private void persistUpdatedRMNode(RMNode rmNode) {
         RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-        dbManager.updateNode(rmNodeData);
+        if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(rmNode.getNodeSourceName())) {
+            dbManager.updateNode(rmNodeData);
+        }
     }
 
     private boolean isEligible(RMNode node) {

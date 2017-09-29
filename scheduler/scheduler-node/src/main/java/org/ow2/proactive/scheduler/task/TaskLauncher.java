@@ -387,8 +387,8 @@ public class TaskLauncher implements InitActive {
                 return;
             } catch (Throwable t) {
                 logger.warn("Cannot notify task termination, trying to rebind to to the task termination handler", t);
-                terminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
-                if (terminateNotification != null) {
+                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
+                if (rebindedTerminateNotification != null) {
                     continue;
                 }
                 logger.warn("Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms",
