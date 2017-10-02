@@ -43,6 +43,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -294,8 +295,12 @@ final class TerminationData {
                                                                                new ArrayList(parentIds));
                 getResultsFromListOfTaskResults(variablesMap.getInheritedMap(), taskResults);
             } else {
-                if (internalJob != null)
-                    variablesMap.getInheritedMap().putAll(internalJob.getVariables());
+                if (internalJob != null) {
+                    for (Map.Entry<String, JobVariable> jobVariableEntry : internalJob.getVariables().entrySet()) {
+                        variablesMap.getInheritedMap().put(jobVariableEntry.getKey(),
+                                                           jobVariableEntry.getValue().getValue());
+                    }
+                }
             }
             variablesMap.getInheritedMap().put(SchedulerVars.PA_TASK_SUCCESS.toString(), Boolean.toString(false));
         } else if (taskResult.hadException()) {

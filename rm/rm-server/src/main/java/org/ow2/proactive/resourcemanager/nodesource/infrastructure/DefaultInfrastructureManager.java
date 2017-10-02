@@ -46,7 +46,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     protected static Logger logger = Logger.getLogger(DefaultInfrastructureManager.class);
 
     /** registered nodes number */
-    protected int nodesCount = 0;
+    private static final String NODES_COUNT_KEY = "nodesCount";
 
     /**
      * Proactive default constructor.
@@ -99,7 +99,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
                     }
                 });
             }
-            nodesCount--;
+            decrementNodesCount();
         } catch (Exception e) {
             throw new RMException(e);
         }
@@ -149,14 +149,14 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void notifyAcquiredNode(Node node) throws RMException {
-        nodesCount++;
+        incrementNodesCount();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void notifyDownNode(Node proactiveProgrammingNode) throws RMException {
+    public void notifyDownNode(String nodeName, String nodeUrl, Node proactiveProgrammingNode) throws RMException {
         logger.info("[" + getClass().getSimpleName() + "] Node removal skipped because the node is down: " +
                     proactiveProgrammingNode.getNodeInformation().getURL());
     }
@@ -166,6 +166,35 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void shutDown() {
+    }
+
+    @Override
+    protected void initializePersistedInfraVariables() {
+        persistedInfraVariables.put(NODES_COUNT_KEY, 0);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private void incrementNodesCount() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) persistedInfraVariables.get(NODES_COUNT_KEY) + 1;
+                persistedInfraVariables.put(NODES_COUNT_KEY, updated);
+                return null;
+            }
+        });
+    }
+
+    private void decrementNodesCount() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                int updated = (int) persistedInfraVariables.get(NODES_COUNT_KEY) - 1;
+                persistedInfraVariables.put(NODES_COUNT_KEY, updated);
+                return null;
+            }
+        });
     }
 
 }

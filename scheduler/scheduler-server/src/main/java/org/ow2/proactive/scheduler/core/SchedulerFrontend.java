@@ -328,6 +328,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                                            policyFullName,
                                                            null);
 
+            recoveredState.enableLiveLogsForRunningTasks(schedulingService);
+
             logger.debug("Registering scheduler...");
             PAActiveObject.registerByName(authentication, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
             authentication.setActivated(true);

@@ -29,6 +29,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -183,6 +184,15 @@ public class SchedulerTHelper {
         startScheduler(localnodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
     }
 
+    public SchedulerTHelper(boolean deployLocalNodes, String schedPropertiesFilePath, String rmPropertiesFilePath,
+            String rmUrl, boolean cleanTMP) throws Exception {
+        if (cleanTMP) {
+            startScheduler(deployLocalNodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
+        } else {
+            startSchedulerWithoutCleaningTMP(deployLocalNodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
+        }
+    }
+
     private void startScheduler(String configuration) throws Exception {
         startScheduler(true, SchedulerTestConfiguration.customSchedulerConfig(configuration));
     }
@@ -197,12 +207,34 @@ public class SchedulerTHelper {
         startScheduler(true, configuration);
     }
 
+    private void startSchedulerWithoutCleaningTMP(boolean localnodes, String schedPropertiesFilePath,
+            String rmPropertiesFilePath, String rmUrl) throws Exception {
+        SchedulerTestConfiguration configuration = new SchedulerTestConfiguration(schedPropertiesFilePath,
+                                                                                  rmPropertiesFilePath,
+                                                                                  localnodes,
+                                                                                  TestScheduler.PNP_PORT,
+                                                                                  rmUrl);
+        startSchedulerWithoutCleaningTMP(true, configuration);
+    }
+
     private void startScheduler(boolean restart, SchedulerTestConfiguration configuration) throws Exception {
         if (restart || !scheduler.isStartedWithSameConfiguration(configuration)) {
             log("Kill previous Scheduler and alive connexions");
             killScheduler();
             log("Starting Scheduler");
-            scheduler.start(configuration);
+            scheduler.start(configuration, true);
+            RMTestUser.getInstance().connect(TestUsers.DEMO, scheduler.getRMUrl());
+        }
+        currentTestConfiguration = configuration;
+    }
+
+    private void startSchedulerWithoutCleaningTMP(boolean restart, SchedulerTestConfiguration configuration)
+            throws Exception {
+        if (restart || !scheduler.isStartedWithSameConfiguration(configuration)) {
+            log("Kill previous Scheduler and alive connexions");
+            killScheduler();
+            log("Starting Scheduler");
+            scheduler.start(configuration, false);
             RMTestUser.getInstance().connect(TestUsers.DEMO, scheduler.getRMUrl());
         }
         currentTestConfiguration = configuration;
@@ -1053,8 +1085,13 @@ public class SchedulerTHelper {
         RMTHelper.killNode(url);
     }
 
-    public TestNode createRMNodeStarterNode(String nodeName) throws Exception {
+    public List<TestNode> createRMNodeStarterNodes(String nodeName, int number) throws Exception {
         int pnpPort = RMTHelper.findFreePort();
+        List<String> nodeUrls = new ArrayList<>(number);
+        List<String> nodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, number);
+        for (int i = 0; i < number; i++) {
+            nodeUrls.add("pnp://localhost:" + pnpPort + "/" + nodeNames.get(i));
+        }
         String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
         Map<String, String> vmParameters = new HashMap<>();
         vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
@@ -1063,14 +1100,33 @@ public class SchedulerTHelper {
                                                                               nodeName,
                                                                               "-r",
                                                                               getLocalUrl(),
+                                                                              "-w",
+                                                                              "" + number,
                                                                               "-Dproactive.net.nolocal=false"),
                                                                 vmParameters,
                                                                 null);
-        return RMTHelper.createNode(nodeName, nodeUrl, nodeProcess);
+        ArrayList<TestNode> nodes = new ArrayList<>(number);
+
+        // lookup all subsequent nodes remotely
+        for (int i = 0; i < number; i++) {
+            TestNode node0 = RMTHelper.lookupNode(nodeNames.get(i), nodeUrls.get(i), nodeProcess);
+            nodes.add(node0);
+        }
+        return nodes;
+
     }
 
     public RMNodeEvent waitForAnyNodeEvent(RMEventType nodeStateChanged) throws Exception {
         return RMTHelper.waitForAnyNodeEvent(nodeStateChanged, getRMMonitorsHandler());
+    }
+
+    public List<RMNodeEvent> waitForAnyMultipleNodeEvent(RMEventType nodeStateChanged, int n) throws Exception {
+        List<RMNodeEvent> answer = new ArrayList<>(n);
+
+        for (int i = 0; i < n; i++) {
+            answer.add(RMTHelper.waitForAnyNodeEvent(nodeStateChanged, getRMMonitorsHandler()));
+        }
+        return answer;
     }
 
     public void waitForNodeSourceEvent(RMEventType nodesourceCreated, String nsName) throws Exception {

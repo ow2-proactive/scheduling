@@ -26,7 +26,7 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import static org.ow2.proactive.resourcemanager.common.event.RMEventType.NODE_STATE_CHANGED;
-import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION;
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_RECOVERY;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -88,6 +88,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
+import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -248,7 +249,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private RMDBManager dbManager;
 
-    private NodesLockRestorationManager nodesLockRestorationManager;
+    private NodesRecoveryManager nodesRecoveryManager;
 
     /**
      * ProActive Empty constructor
@@ -395,9 +396,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             clientPinger.ping();
 
-            initNodesRestorationManager();
+            initiateRecoveryIfRequired();
 
-            restoreNodeSources();
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
         } catch (NodeException e) {
@@ -413,27 +413,30 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    void initNodesRestorationManager() {
-        nodesLockRestorationManager = getNodesLockRestorationManagerBuilder().apply(this);
+    void initiateRecoveryIfRequired() {
+        nodesRecoveryManager = getNodesRecoveryManagerBuilder().apply(this);
 
-        if (RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
-            nodesLockRestorationManager.initialize();
+        // the recovery property is enabled by default
+        if (RM_NODES_RECOVERY.getValueAsBoolean()) {
+            logger.info("Starting RM nodes recovery");
+            nodesRecoveryManager.initialize();
+            restoreNodesAndNodeSources();
         } else {
-            logger.info("Nodes lock restoration is disabled");
+            logger.info("RM nodes recovery is disabled");
         }
     }
 
-    Function<RMCore, NodesLockRestorationManager> getNodesLockRestorationManagerBuilder() {
-        return new Function<RMCore, NodesLockRestorationManager>() {
+    Function<RMCore, NodesRecoveryManager> getNodesRecoveryManagerBuilder() {
+        return new Function<RMCore, NodesRecoveryManager>() {
             @Override
-            public NodesLockRestorationManager apply(RMCore rmCore) {
-                return new NodesLockRestorationManager(rmCore);
+            public NodesRecoveryManager apply(RMCore rmCore) {
+                return new NodesRecoveryManager(rmCore);
             }
         };
     }
 
     @VisibleForTesting
-    boolean restoreNodeSources() {
+    boolean restoreNodesAndNodeSources() {
         Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
 
         for (NodeSourceData nodeSourceData : nodeSources) {
@@ -445,7 +448,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             } else {
                 try {
                     logger.info("Restoring node source " + nodeSourceDataName);
-                    createNodeSource(nodeSourceData);
+                    createNodeSource(nodeSourceData, true);
                 } catch (Throwable t) {
                     logger.error(t.getMessage(), t);
                     brokenNodeSources.add(nodeSourceDataName);
@@ -454,6 +457,64 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         return true;
+    }
+
+    private void restoreNodes(NodeSource nodeSource) {
+        int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
+        String nodeSourceName = nodeSource.getName();
+
+        // the getNodesCount call to the node source is blocking here
+        // after this call, we are sure that the node source is initialized
+        // and saved in database
+        int nodesCount = nodeSource.getNodesCount();
+        if (nodesCount != 0) {
+            logger.warn("Recovered node source " + nodeSourceName + " unexpectedly already has nodes registered.");
+        }
+
+        Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSourceName);
+        logger.info("Number of nodes to recover for the node source " + nodeSourceName + ": " + nodesData.size());
+
+        // for each node found in database, try to lookup node or recreate is as down
+        for (RMNodeData rmNodeData : nodesData) {
+            String nodeUrl = rmNodeData.getNodeUrl();
+            RMNode rmnode = null;
+            Node node = null;
+
+            try {
+                logger.info("Trying to lookup a node to recover: " + nodeUrl);
+                node = nodeSource.lookupNode(nodeUrl, lookUpTimeout);
+            } catch (Exception e) {
+                logger.warn("Node to recover could not be looked up at URL: " + nodeUrl, e);
+                node = null;
+            }
+
+            if (node != null) {
+                // the node has been successfully looked up, we compare its
+                // information to the node data retrieved in database.
+                if (rmNodeData.equalsToNode(node)) {
+                    logger.info("Node to recover could successfully be looked up at URL: " + nodeUrl);
+                    rmnode = nodeSource.internalAddNodeAfterRecovery(node, rmNodeData);
+                    this.allNodes.put(rmnode.getNodeURL(), rmnode);
+                } else {
+                    logger.warn("The node that has been looked up does not have the same information as the node to recover: " +
+                                node.getNodeInformation().getName() + " is not equal to " + rmNodeData.getName() +
+                                " or " + node.getNodeInformation().getURL() + " is not equal to " +
+                                rmNodeData.getNodeUrl());
+                }
+            } else {
+                // if the node to recover was in deploying state then we have
+                // nothing to do as it is going to be redeployed
+                if (!rmNodeData.getState().equals(NodeState.DEPLOYING)) {
+                    // inform the node source that this recreated node is down
+                    nodeSource.detectedPingedDownNode(rmNodeData.getName(), nodeUrl);
+                }
+            }
+            // we must add the recreated node to the eligible data
+            // structure if we want it to be usable by a task
+            if (isEligible(rmnode)) {
+                eligibleNodes.add(rmnode);
+            }
+        }
     }
 
     /**
@@ -551,13 +612,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         // resetting owner here
         rmNode.setFree();
-
         // an eligible node is a node that is free and not locked
         if (!rmNode.isLocked()) {
             this.eligibleNodes.add(rmNode);
         }
 
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, client.getName()));
+        // persist the state change to the database
+        persistUpdatedRMNode(rmNode);
 
         return new BooleanWrapper(true);
     }
@@ -601,6 +663,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                                                              previousNodeState,
                                                              initiator.getName()));
+        // persist the state change to the database
+        persistUpdatedRMNode(rmNode);
     }
 
     /**
@@ -638,6 +702,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_REMOVED,
                                                              rmnode.getState(),
                                                              initiator.getName()));
+        // persist node removal
+        dbManager.removeNode(rmnode.getNodeName(), rmnode.getNodeURL());
     }
 
     /**
@@ -734,6 +800,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         rmnode.setConfiguring(rmnode.getProvider());
+
         //we add the configuring node to the collection to be able to ping it
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
 
@@ -741,6 +808,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_ADDED,
                                                              null,
                                                              rmnode.getProvider().getName()));
+        // save the information of this new node in DB, in particular its state
+        persistNewRMNode(rmnode);
+
         if (logger.isDebugEnabled()) {
             logger.debug("Configuring node " + rmnode.getNodeURL());
         }
@@ -1136,7 +1206,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         boolean added = dbManager.addNodeSource(nodeSourceData);
 
         try {
-            return createNodeSource(nodeSourceData);
+            return createNodeSource(nodeSourceData, false);
         } catch (RuntimeException ex) {
             logger.error(ex.getMessage(), ex);
             if (added) {
@@ -1146,15 +1216,33 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    protected BooleanWrapper createNodeSource(NodeSourceData data) {
+    protected BooleanWrapper createNodeSource(NodeSourceData data, boolean isRecovery) {
+        String nodeSourceName = data.getName();
 
         //checking that nsname doesn't contain invalid characters and doesn't exist yet
-        checkNodeSourceName(data.getName());
+        checkNodeSourceName(nodeSourceName);
 
-        logger.info("Creating a node source : " + data.getName());
+        logger.info("Creating a node source : " + nodeSourceName);
 
-        InfrastructureManager im = InfrastructureManagerFactory.create(data.getInfrastructureType(),
-                                                                       data.getInfrastructureParameters());
+        // if this is a recovery, we also need to check whether there are
+        // nodes in database for this node source, otherwise, we will do a
+        // redeployment from scratch. The reason is that when the RM shuts
+        // down correctly, it removes all its nodes. Thus if we restart and
+        // recover the RM afterwards there will be no nodes in the database,
+        // but there will be no redeployment neither, hence the special case here.
+        boolean recoverNodes = existNodesToRecover(isRecovery, nodeSourceName);
+
+        InfrastructureManager im;
+
+        // we need to reload the infrastructure variables saved in database if
+        // we recover the nodes
+        if (recoverNodes) {
+            im = InfrastructureManagerFactory.recreate(data.getInfrastructureType(),
+                                                       data.getInfrastructureParameters(),
+                                                       data.getInfrastructureVariables());
+        } else {
+            im = InfrastructureManagerFactory.create(data.getInfrastructureType(), data.getInfrastructureParameters());
+        }
 
         NodeSourcePolicy policy = NodeSourcePolicyFactory.create(data.getPolicyType(),
                                                                  data.getInfrastructureType(),
@@ -1165,7 +1253,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         try {
             nodeSource = new NodeSource(this.getUrl(),
-                                        data.getName(),
+                                        nodeSourceName,
                                         provider,
                                         im,
                                         policy,
@@ -1174,7 +1262,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             nodeSource = PAActiveObject.turnActive(nodeSource, nodeRM);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw new RuntimeException("Cannot create node source " + data.getName(), e);
+            throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
+        }
+
+        // finally recreate the nodes from a saved state if needed
+        if (recoverNodes) {
+            restoreNodes(nodeSource);
         }
 
         // Adding access to the core for node source and policy.
@@ -1188,7 +1281,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         BooleanWrapper result = nodeSource.activate();
         if (!result.getBooleanValue()) {
-            logger.error("Node source " + data.getName() + " cannot be activated");
+            logger.error("Node source " + nodeSourceName + " cannot be activated");
         }
 
         Client nsService = new Client(provider.getSubject(), false);
@@ -1200,7 +1293,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         RMCore.clients.put(nsId, nsService);
         RMCore.clients.put(policyId, policyService);
 
-        this.nodeSources.put(data.getName(), nodeSource);
+        this.nodeSources.put(nodeSourceName, nodeSource);
 
         // generate the event of node source creation
         this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_CREATED,
@@ -1209,9 +1302,26 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               nodeSource.getDescription(),
                                                               nodeSource.getAdministrator().getName()));
 
-        logger.info("Node source " + data.getName() + " has been successfully created by " + provider);
+        logger.info("Node source " + nodeSourceName + " has been successfully created by " + provider);
 
         return new BooleanWrapper(true);
+    }
+
+    private boolean existNodesToRecover(boolean isRecovery, String nodeSourceName) {
+        boolean recoverNodes = false;
+        if (isRecovery) {
+            // check what is in database for this node source
+            Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSourceName);
+            // if there is no node in database for this node source, then
+            // abort nodes recovery for this node source false
+            if (nodesData.isEmpty()) {
+                logger.info("There is no node in database for node source: " + nodeSourceName +
+                            ". The node source is going to be redeployed from scratch");
+            } else {
+                recoverNodes = true;
+            }
+        }
+        return recoverNodes;
     }
 
     /**
@@ -1226,7 +1336,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
-        if (nodeSources.size() == 0) {
+        if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean() || nodeSources.size() == 0) {
             finalizeShutdown();
         } else {
             for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
@@ -1563,6 +1673,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.eligibleNodes.remove(rmNode);
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, owner.getName()));
+        // persist the state change to the database
+        persistUpdatedRMNode(rmNode);
+
     }
 
     /**
@@ -1588,6 +1701,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                                                                  previousNodeState,
                                                                  rmNode.getProvider().getName()));
+            // persist the state change to the database
+            persistUpdatedRMNode(rmNode);
         } else {
             // the nodes has been removed from core asynchronously
             // when pinger of selection manager tried to access it
@@ -1674,7 +1789,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             //remove down nodes handled by the source
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
-            nodeSource.shutdown(caller);
+            // here we need the shutdown to be completed before the node source is removed from the database
+            // so we must ensure that the next call is blocking
+            PAFuture.waitFor(nodeSource.shutdown(caller));
             dbManager.removeNodeSource(sourceName);
 
             return new BooleanWrapper(true);
@@ -2147,7 +2264,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     public boolean setDeploying(RMNode rmNode) {
-        nodesLockRestorationManager.handle(rmNode);
+        nodesRecoveryManager.restoreLocks(rmNode);
         return true;
     }
 
@@ -2162,6 +2279,58 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         userData.setUserName(caller.getName());
         userData.setGroups(caller.getGroups());
         return userData;
+    }
+
+    /**
+     * Add the information of the given node to the database.
+     * @param rmNode the node to add to the database
+     */
+    private void persistNewRMNode(RMNode rmNode) {
+        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+        // first check if the node exist already in database. This might
+        // happen in case the node exited abruptly and the node source was
+        // recovered afterwards: the node has not been removed from the
+        // database because it died improperly, but as it is not recoverable,
+        // it is recreated
+        RMNodeData retrievedNode = dbManager.getNodeByNameAndUrl(rmNodeData.getName(), rmNodeData.getNodeUrl());
+        if (retrievedNode != null) {
+            // the node exists already in database, update it but log this
+            // irregular behavior
+            if (retrievedNode.getState().equals(NodeState.DOWN)) {
+                if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(rmNode.getNodeSourceName())) {
+                    logger.warn("A down node " + rmNodeData.getNodeUrl() + " is replaced in database");
+                    dbManager.updateNode(rmNodeData);
+                }
+            } else {
+                logger.error("The node " + rmNodeData.getNodeUrl() +
+                             " has already been added to the database previously.");
+            }
+        } else {
+            // the node is not present in database
+            NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
+            rmNodeData.setNodeSource(nodeSourceData);
+            if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceData.getName())) {
+                dbManager.addNode(rmNodeData);
+            }
+        }
+    }
+
+    /**
+     * Update the information of the given node in database.
+     * @param rmNode the node to update in database
+     */
+    private void persistUpdatedRMNode(RMNode rmNode) {
+        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+        if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(rmNode.getNodeSourceName())) {
+            dbManager.updateNode(rmNodeData);
+        }
+    }
+
+    private boolean isEligible(RMNode node) {
+        if (node != null && node.isFree() && !node.isLocked()) {
+            return true;
+        }
+        return false;
     }
 
 }

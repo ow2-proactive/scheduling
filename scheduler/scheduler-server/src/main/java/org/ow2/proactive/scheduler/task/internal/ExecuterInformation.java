@@ -70,6 +70,16 @@ public class ExecuterInformation implements Serializable {
     }
 
     /**
+     * Create a full state executer informations with the given info.
+     */
+    public ExecuterInformation(TaskLauncher launcher, NodeSet nodes, String nodeName, String hostName) {
+        this.launcher = launcher;
+        this.nodes = nodes;
+        this.nodeName = nodeName;
+        this.hostName = hostName;
+    }
+
+    /**
      * Returns the launcher.
      *
      * @return the launcher.s
