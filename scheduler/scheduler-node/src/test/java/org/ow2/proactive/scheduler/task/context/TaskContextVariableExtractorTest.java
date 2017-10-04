@@ -37,7 +37,7 @@ import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
-import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
+import org.ow2.proactive.scheduler.common.util.AllObjects2BytesConverterHandler;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
@@ -104,10 +104,7 @@ public class TaskContextVariableExtractorTest {
 
     @Test(expected = NullPointerException.class)
     public void testExtractThrowsNullPointerExceptionIfTaskContextIsNull() throws Exception {
-
-        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().extractVariables(null,
-                                                                                                         (TaskResult) null,
-                                                                                                         true);
+        new TaskContextVariableExtractor().extractVariables(null, (TaskResult) null, true);
     }
 
     @Test
@@ -119,7 +116,8 @@ public class TaskContextVariableExtractorTest {
         Map<String, byte[]> taskResultVariables = new HashMap<>();
         // The task result variables are expected to be converted to byte streams.
         taskResultVariables.put(taskResultPropagatedVariables1Key,
-                                Object2ByteConverter.convertObject2Byte(taskResultPropagatedVariables1Value));
+                                AllObjects2BytesConverterHandler.convertObject2Byte(taskResultPropagatedVariables1Key,
+                                                                                    taskResultPropagatedVariables1Value));
 
         TaskResultImpl taskResult = new TaskResultImpl(taskLauncherInitializer.getTaskId(), new Exception("Exception"));
         taskResult.setPropagatedVariables(taskResultVariables);
@@ -157,7 +155,8 @@ public class TaskContextVariableExtractorTest {
 
         // The task result variables are expected to be converted to byte streams.
         taskResultVariables.put(taskResultPropagatedVariables1Key,
-                                Object2ByteConverter.convertObject2Byte(taskResultPropagatedVariables1Value));
+                                AllObjects2BytesConverterHandler.convertObject2Byte(taskResultPropagatedVariables1Key,
+                                                                                    taskResultPropagatedVariables1Value));
 
         TaskResultImpl taskResult = new TaskResultImpl(taskContext.getTaskId(), new Exception("Exception"));
         taskResult.setPropagatedVariables(taskResultVariables);
