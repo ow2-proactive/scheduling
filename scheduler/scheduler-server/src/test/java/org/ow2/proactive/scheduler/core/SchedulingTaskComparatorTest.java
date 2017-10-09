@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.Serializable;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,30 +102,24 @@ public class SchedulingTaskComparatorTest extends ProActiveTestClean {
         Mockito.when(task1.getSelectionScripts())
                .thenReturn(ImmutableList.of(new SelectionScript("variables.get(\"PA_JOB\");selected = true",
                                                                 "javascript")));
+        Mockito.when(task1.getRuntimeVariables()).thenReturn(ImmutableMap.of("PA_JOB", (Serializable) "job1"));
         Mockito.when(task2.getSelectionScripts())
-               .thenReturn(ImmutableList.of(new SelectionScript("selected = true", "javascript")));
+               .thenReturn(ImmutableList.of(new SelectionScript("variables.get(\"PA_JOB\");selected = true",
+                                                                "javascript")));
+        Mockito.when(task2.getRuntimeVariables()).thenReturn(ImmutableMap.of("PA_JOB", (Serializable) "job2"));
+
         Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
                                                                                                            job2)));
 
-        Mockito.when(task1.getSelectionScripts())
-               .thenReturn(ImmutableList.of(new SelectionScript("selected = true", "javascript")));
-        Mockito.when(task2.getSelectionScripts())
-               .thenReturn(ImmutableList.of(new SelectionScript("variables.get(\"PA_JOB\");selected = false",
-                                                                "javascript")));
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
+        Mockito.when(task2.getRuntimeVariables()).thenReturn(ImmutableMap.of("PA_JOB", (Serializable) "job1"));
+
+        Assert.assertTrue((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
+                                                                                                          job2)));
     }
 
     @Test
     public void testJobOwnerDiffers() throws Exception {
         Mockito.when(job2.getOwner()).thenReturn("notadmin");
-        Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
-                                                                                                           job2)));
-    }
-
-    @Test
-    public void testPriorityDiffers() throws Exception {
-        Mockito.when(job2.getPriority()).thenReturn(JobPriority.HIGH);
         Assert.assertFalse((new SchedulingTaskComparator(task1, job1)).equals(new SchedulingTaskComparator(task2,
                                                                                                            job2)));
     }

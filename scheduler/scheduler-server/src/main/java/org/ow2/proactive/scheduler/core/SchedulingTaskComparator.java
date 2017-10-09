@@ -25,6 +25,13 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -42,7 +49,9 @@ public class SchedulingTaskComparator {
 
     private InternalTask task;
 
-    private int ssHashCode;
+    private Set<String> digests = new HashSet<>();
+
+    private static final Logger logger = Logger.getLogger(SchedulingTaskComparator.class);
 
     private InternalJob job;
 
@@ -53,8 +62,32 @@ public class SchedulingTaskComparator {
      */
     public SchedulingTaskComparator(InternalTask task, InternalJob job) {
         this.task = task;
-        this.ssHashCode = SelectionScript.hashCodeFromList(task.getSelectionScripts());
+
+        if (task.getSelectionScripts() != null) {
+            computeHashForSelectionScripts(task, job);
+        }
         this.job = job;
+    }
+
+    private void computeHashForSelectionScripts(InternalTask task, InternalJob job) {
+        List<SelectionScript> scriptList = SchedulingMethodImpl.resolveScriptVariables(task.getSelectionScripts(),
+                                                                                       task.getRuntimeVariables());
+
+        for (SelectionScript script : scriptList) {
+            SelectionScript modifiedScript = script;
+            try {
+                Map<String, Serializable> bindings = SchedulingMethodImpl.createBindingsForSelectionScripts(job, task);
+                modifiedScript = SchedulingMethodImpl.replaceBindingsInsideScript(script, bindings);
+
+            } catch (Exception e) {
+                logger.error("Error while replacing selection script bindings for task " + task.getId(), e);
+            }
+            try {
+                digests.add(new String(modifiedScript.digest()));
+            } catch (Exception e) {
+                logger.error("Error while replacing selection script bindings for task " + task.getId(), e);
+            }
+        }
     }
 
     /**
@@ -77,7 +110,7 @@ public class SchedulingTaskComparator {
             return true;
         }
         //test whether the selections script are the same
-        boolean sameSsHash = (ssHashCode == tcomp.ssHashCode);
+        boolean sameSsHash = digests.equals(tcomp.digests);
         //test whether nodes exclusion are the same (both is null...
         boolean sameNodeEx = (task.getNodeExclusion() == null) && (tcomp.task.getNodeExclusion() == null);
         //...or they are equals
@@ -85,14 +118,8 @@ public class SchedulingTaskComparator {
                      (task.getNodeExclusion() != null && task.getNodeExclusion().equals(tcomp.task.getNodeExclusion()));
         //test whether owner is the same
         boolean sameOwner = this.job.getOwner().equals(tcomp.job.getOwner());
-        //test that both tasks have the same priority (to ensure that higher priority tasks are not executed concurrently
-        // with lower priority ones)
-        boolean samePriority = this.job.getPriority().equals(tcomp.job.getPriority());
         //if the parallel environment is specified for any of tasks => not equal
         boolean isParallel = task.isParallel() || tcomp.task.isParallel();
-
-        boolean selectionScriptUseVariables = (doesSelectionScriptsUseVariables(task) ||
-                                               doesSelectionScriptsUseVariables(tcomp.task));
 
         boolean requireNodeWithTokern = task.getRuntimeGenericInformation()
                                             .containsKey(SchedulerConstants.NODE_ACCESS_TOKEN) ||
@@ -104,28 +131,7 @@ public class SchedulingTaskComparator {
         // checked before
 
         //add the 6 tests to the returned value
-        return sameSsHash && sameNodeEx && sameOwner && samePriority && !isParallel && !selectionScriptUseVariables &&
-               !requireNodeWithTokern;
-    }
-
-    private boolean doesSelectionScriptsUseVariables(InternalTask task) {
-        if (task.getSelectionScripts() != null) {
-            for (SelectionScript script : task.getSelectionScripts()) {
-                if (script.getScript().contains(SchedulerConstants.VARIABLES_BINDING_NAME.toString())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Get the ssHashCode
-     *
-     * @return the ssHashCode
-     */
-    public int getSsHashCode() {
-        return ssHashCode;
+        return sameSsHash && sameNodeEx && sameOwner && !isParallel && !requireNodeWithTokern;
     }
 
 }

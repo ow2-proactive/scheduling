@@ -118,4 +118,26 @@ public class ParallelEnvironment implements Serializable {
         return "ParallelEnvironment { " + " nodesNumber = " + nodesNumber + ", topologyDescriptor = " +
                topologyDescriptor + '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ParallelEnvironment that = (ParallelEnvironment) o;
+
+        if (nodesNumber != that.nodesNumber)
+            return false;
+        return topologyDescriptor != null ? topologyDescriptor.equals(that.topologyDescriptor)
+                                          : that.topologyDescriptor == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nodesNumber;
+        result = 31 * result + (topologyDescriptor != null ? topologyDescriptor.hashCode() : 0);
+        return result;
+    }
 }
