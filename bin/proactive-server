@@ -14,10 +14,6 @@ DEFAULT_JVM_OPTS='"-server" "-Dfile.encoding=UTF-8"'
 
 JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+AggressiveOpts -XX:+ExitOnOutOfMemoryError -XX:-UseGCOverheadLimit"
 
-# AWS_SECRET_KEY & AWS_ACCESS_KEY
-export AWS_ACCESS_KEY=AKIAIFT4QRZ7AK3UMQJQ
-export AWS_SECRET_KEY=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
-
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD="maximum"
 
