@@ -122,11 +122,17 @@ public class TaskContextVariableExtractor implements Serializable {
 
     public Map<String, Serializable> extractScopeVariables(TaskContext taskContext) {
         Map<String, Serializable> variables = new HashMap<>();
-
+        Map<String, Serializable> previousVariables = null;
+        try {
+            previousVariables = extractVariables(taskContext, false);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         // variables from task definition
         if (taskContext.getInitializer().getTaskVariables() != null) {
             for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
-                if (!taskVariable.isJobInherited()) {
+                if (!taskVariable.isJobInherited() ||
+                    (taskVariable.isJobInherited() && !previousVariables.containsKey(taskVariable.getName()))) {
                     variables.put(taskVariable.getName(), taskVariable.getValue());
                 }
             }
