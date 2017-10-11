@@ -68,6 +68,7 @@ import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -205,6 +206,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             schedulingService.unlockJobsToSchedule(toUnlock.values());
             toUnlock = null;
 
+            updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
+
+            for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
+                // load and Initialize the executable container
+                loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
+            }
+
             while (!taskRetrievedFromPolicy.isEmpty()) {
 
                 if (freeResources.isEmpty()) {
@@ -214,10 +222,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //get the next compatible tasks from the whole returned policy tasks
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
-                for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
-                    // load and Initialize the executable container
-                    loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
-                }
 
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
@@ -406,7 +410,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         InternalTask internalTask0 = currentJob.getIHMTasks().get(etd.getTaskId());
 
         try {
-            updateVariablesForTasksToSchedule(jobMap, tasksToSchedule);
 
             TopologyDescriptor descriptor = null;
             boolean bestEffort = true;
@@ -493,7 +496,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /**
      * Create bindings which will be used by selection scripts for the given tasks
      */
-    private Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task)
+    public static Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task)
             throws IOException, ClassNotFoundException {
         Map<String, Serializable> bindings = new HashMap<>();
         Map<String, Serializable> variables = new HashMap<>();
@@ -510,6 +513,26 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         bindings.put(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
         bindings.put(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInfo);
         return bindings;
+    }
+
+    public static SelectionScript replaceBindingsInsideScript(SelectionScript script,
+            Map<String, Serializable> bindings) {
+        String scriptContent = script.getScript();
+        if (bindings != null) {
+            for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
+                scriptContent = scriptContent.replace(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        try {
+            return new SelectionScript(scriptContent,
+                                       script.getEngineName(),
+                                       script.getParameters(),
+                                       script.isDynamic());
+        } catch (InvalidScriptException e) {
+            logger.warn("Error when replacing bindings of script (revert to use original script):" +
+                        System.lineSeparator() + script.toString(), e);
+            return script;
+        }
     }
 
     /**
@@ -618,7 +641,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /*
      * Replace selection script variables with values specified in the map.
      */
-    private List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
+    public static List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
             Map<String, Serializable> variables) {
         if (selectionScripts == null) {
             return null;
