@@ -66,7 +66,7 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     private Map<String, Serializable> extractVariables(TaskContext container, TaskResult taskResult, String nodesFile,
-            boolean useTaskVariables) throws Exception {
+            boolean useTaskVariables) throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables = extractVariables(container, taskResult, useTaskVariables);
 
         variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getOtherNodesURLs().size() + 1);
@@ -125,8 +125,8 @@ public class TaskContextVariableExtractor implements Serializable {
         Map<String, Serializable> previousVariables = null;
         try {
             previousVariables = extractVariables(taskContext, false);
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Unable to extract variables", e);
         }
         // variables from task definition
         if (taskContext.getInitializer().getTaskVariables() != null) {
