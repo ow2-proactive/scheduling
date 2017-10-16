@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -258,8 +259,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
 
-                            numberOfTaskStarted++;
-                            createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                            if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
+                                numberOfTaskStarted++;
+                            }
 
                         }
 
@@ -556,12 +558,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @param taskDescriptor the descriptor of the task to be started
      *
      */
-    protected void createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
+    protected boolean createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
             TaskDescriptor taskDescriptor) throws Exception {
         TaskLauncher launcher = null;
 
         //enough nodes to be launched at same time for a communicating task
-        if (nodeSet.size() >= task.getNumberOfNodesNeeded()) {
+        // task is not paused
+        if (nodeSet.size() >= task.getNumberOfNodesNeeded() && (task.getStatus() != TaskStatus.PAUSED)) {
             //start dataspace app for this job
             DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure().getDataSpaceServiceStarter();
             job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
@@ -601,6 +604,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                    corePrivateKey),
                                              DOTASK_ACTION_TIMEOUT,
                                              TimeUnit.MILLISECONDS);
+                return true;
             } catch (Exception t) {
                 try {
                     //if there was a problem, free nodeSet for multi-nodes task
@@ -614,6 +618,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 jobData.unlock();
             }
 
+        } else {
+            return false;
         }
 
     }
