@@ -120,13 +120,14 @@ public class TaskContextVariableExtractor implements Serializable {
         return variables;
     }
 
-    public Map<String, Serializable> extractScopeVariables(TaskContext taskContext) {
+    public Map<String, Serializable> extractScopeVariables(TaskContext taskContext) throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables = new HashMap<>();
-        Map<String, Serializable> previousVariables = null;
+        Map<String, Serializable> previousVariables = new HashMap<>();
         try {
             previousVariables = extractVariables(taskContext, false);
         } catch (IOException | ClassNotFoundException e) {
             logger.error("Unable to extract variables", e);
+            throw e;
         }
         // variables from task definition
         if (taskContext.getInitializer().getTaskVariables() != null) {
