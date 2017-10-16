@@ -50,9 +50,11 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -705,16 +707,27 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submit(URL job)
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> requestHeaderParams)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
         try {
-            InputStream is = job.openStream();
-            jobIdData = restApiClient().submitXml(sid, is);
+            URLConnection urlConnection = job.openConnection();
+
+            for (Map.Entry<String, String> requestHeaderEntry : requestHeaderParams.entrySet()) {
+                urlConnection.addRequestProperty(requestHeaderEntry.getKey(), requestHeaderEntry.getValue());
+            }
+            InputStream is = urlConnection.getInputStream();
+            jobIdData = restApiClient().submitXml(sid, is, variables);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
         return jobId(jobIdData);
+    }
+
+    @Override
+    public JobId submit(URL job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return this.submit(job, Collections.<String, String> emptyMap(), Collections.<String, String> emptyMap());
     }
 
     @Override
@@ -733,14 +746,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public JobId submit(URL job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        JobIdData jobIdData = null;
-        try {
-            InputStream is = job.openStream();
-            jobIdData = restApiClient().submitXml(sid, is, variables);
-        } catch (Exception e) {
-            throwNCEOrPEOrSCEOrJCE(e);
-        }
-        return jobId(jobIdData);
+        return this.submit(job, variables, Collections.<String, String> emptyMap());
     }
 
     @Override

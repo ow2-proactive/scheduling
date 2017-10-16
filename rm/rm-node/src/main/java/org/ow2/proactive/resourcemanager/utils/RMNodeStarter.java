@@ -532,18 +532,24 @@ public class RMNodeStarter {
                     } catch (Throwable e) {
                         logger.error(ExitStatus.RM_NO_PING.description, e);
                     } finally {
-                        try {
-                            logger.warn("Disconnected from the resource manager");
-                            logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
-                            logger.warn("Number of attempts left is " + numberOfReconnectionAttemptsLeft);
+                        if (nodes.size() > 0) {
+                            try {
+                                logger.warn("Disconnected from the resource manager");
+                                logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
+                                logger.warn("Number of attempts left is " + numberOfReconnectionAttemptsLeft);
 
-                            numberOfReconnectionAttemptsLeft--;
+                                numberOfReconnectionAttemptsLeft--;
 
-                            if (numberOfReconnectionAttemptsLeft != 0) {
-                                Thread.sleep(PING_DELAY_IN_MS);
+                                if (numberOfReconnectionAttemptsLeft != 0) {
+                                    Thread.sleep(PING_DELAY_IN_MS);
+                                }
+                            } catch (InterruptedException ignored) {
+                                logger.debug("Ignored interrupted exception", ignored);
                             }
-                        } catch (InterruptedException ignored) {
-                            logger.debug("Ignored interrupted exception", ignored);
+                        } else {
+                            // if we are here it means all nodes have been removed by the resource manager
+                            logger.error(ExitStatus.ALL_NODES_REMOVED.description);
+                            System.exit(ExitStatus.ALL_NODES_REMOVED.exitCode);
                         }
                     }
                 }
@@ -621,7 +627,7 @@ public class RMNodeStarter {
             logger.debug("Node count is equal to " + nodeCount);
         }
 
-        return true;
+        return nodeCount > 0;
     }
 
     private void killWorkerNodeIfRemovedByUser(Map<String, Node> nodes, String unknownNodeUrl) {
@@ -1405,6 +1411,7 @@ public class RMNodeStarter {
         RMNODE_EXIT_FORCED(
                 305,
                 "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."),
+        ALL_NODES_REMOVED(306, "All nodes have been removed from the Resource Manager."),
         FAILED_TO_LAUNCH(-1, RMNodeStarter.class.getSimpleName() + " process hasn't been started at all."),
         UNKNOWN(-2, "Cannot determine exit status.");
         public final int exitCode;
