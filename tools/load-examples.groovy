@@ -5,9 +5,9 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipFile
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger
 
-class LoadExamplesIntoCatalog {
+class LoadExamples {
 
 	private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/scheduler.cred"
 
@@ -27,7 +27,7 @@ class LoadExamplesIntoCatalog {
 	private logger = Logger.getLogger("org.ow2.proactive.scheduler")
 
 
-	LoadExamplesIntoCatalog(binding) {
+	LoadExamples(binding) {
 
 		// Bindings
 		this.GLOBAL_SPACE_PATH = binding.variables.get("pa.scheduler.dataspace.defaultglobal.localpath")
@@ -63,7 +63,7 @@ class LoadExamplesIntoCatalog {
 	}
 
 	def writeToOutput(String output) {
-		logger.info("[" + this.SCRIPT_NAME + "] "+output)
+		logger.info("[" + this.SCRIPT_NAME + "] " + output)
 	}
 
 	def loginAdminUserCredToSchedulerAndGetSessionId() {
@@ -94,25 +94,13 @@ class LoadExamplesIntoCatalog {
 
 	def run() {
 
-		writeToOutput(" Automatic deployment of proactive examples ...")
-
-		writeToOutput(" Variables : ")
-		writeToOutput(" EXAMPLES_ZIP_PATH " + this.EXAMPLES_ZIP_PATH)
-		writeToOutput(" EXAMPLES_DIR_PATH " + this.EXAMPLES_DIR_PATH)
-		writeToOutput(" GLOBAL_SPACE_PATH " + this.GLOBAL_SPACE_PATH)
-		writeToOutput(" CATALOG_URL " + this.CATALOG_URL)
-		writeToOutput(" WORKFLOW_TEMPLATES_DIR_PATH " + this.WORKFLOW_TEMPLATES_DIR_PATH)
-		writeToOutput(" BUCKET_OWNER " + this.BUCKET_OWNER)
-
 		String sessionId = loginAdminUserCredToSchedulerAndGetSessionId()
-
-		writeToOutput(" Actions : ")
 
 		// If the unzipped dir already exists, stop the script execution
 		def examples_dir = new File(this.EXAMPLES_DIR_PATH)
 		if (examples_dir.exists())
 		{
-			writeToOutput(" " + this.EXAMPLES_DIR_PATH + " already exists, delete it to redeploy examples.")
+			writeToOutput(this.EXAMPLES_DIR_PATH + " already exists, delete it to redeploy examples.")
 			writeToOutput("Terminated.")
 			return
 		}
@@ -121,15 +109,13 @@ class LoadExamplesIntoCatalog {
 		def examples_zip = new File(this.EXAMPLES_ZIP_PATH)
 		if (!examples_zip.exists())
 		{
-			writeToOutput("] " + this.EXAMPLES_ZIP_PATH + " not found!")
+			writeToOutput(this.EXAMPLES_ZIP_PATH + " not found!")
 			return
 
 		}
 		unzipFile(examples_zip, this.EXAMPLES_DIR_PATH)
-		writeToOutput(" " + this.EXAMPLES_ZIP_PATH + " extracted!")
+		writeToOutput(this.EXAMPLES_ZIP_PATH + " extracted!")
 
-		def target_dir_path = ""
-		def bucket = ""
 
 		// Start by finding the next template dir index
 		def template_dir_name = "1"
@@ -146,177 +132,193 @@ class LoadExamplesIntoCatalog {
 			if (!templates_dirs_list.isEmpty())
 				template_dir_name = (templates_dirs_list.sort().last() + 1) + ""
 		}
-		writeToOutput(" Next template dir name " + template_dir_name)
+		writeToOutput("Next template dir name " + template_dir_name)
 
 		// For POST queries
 		this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.2.jar").absolutePath);
 		def boundary = "---------------" + UUID.randomUUID().toString();
 
-		// Retrieve the ordered busket list
+		// To parse json files
+		def slurper = new groovy.json.JsonSlurper()
+
+		// Retrieve the ordered bucket list
 		def ordered_bucket_list_file = new File(examples_dir, "ordered_bucket_list")
 		ordered_bucket_list_file.text.split(",").each { bucket_name ->
 
-			// If the bucket directory exists
-			def bucket_dir = new File(examples_dir, bucket_name)
-			if (bucket_dir.exists())
-			{
-
-				def metadata_file = new File(bucket_dir.absolutePath, "METADATA.json")
-				if (metadata_file.exists())
-				{
-					writeToOutput(" Parsing " + metadata_file.absolutePath)
-
-					// From json to map
-					def slurper = new groovy.json.JsonSlurper()
-					def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
-
-					def catalog_map = metadata_file_map.get("catalog")
-
-
-					// DATASPACE SECTION /////////////////////////////
-
-
-					def dataspace_map = null
-					if ((dataspace_map = catalog_map.get("dataspace")) != null)
-					{
-						// Retrieve the targeted directory path
-						def target = dataspace_map.get("target")
-						if(target == "global")
-							target_dir_path = this.GLOBAL_SPACE_PATH
-
-						// Copy all files into the targeted directory
-						dataspace_map.get("files").each { file_relative_path ->
-							def file_src = new File(bucket_dir.absolutePath, file_relative_path)
-							def file_src_path = file_src.absolutePath
-							def file_name = file_src.getName()
-							def file_dest = new File(target_dir_path, file_name)
-							def file_dest_path = file_dest.absolutePath
-							Files.copy(Paths.get(file_src_path), Paths.get(file_dest_path), StandardCopyOption.REPLACE_EXISTING)
-						}
+			// Define a specific filter on package directories to only consider those targeting the current bucket
+			def package_related_to_bucket_filter = new FileFilter() {
+				boolean accept(File package_dir) {
+					def metadata_file = new File(package_dir, "METADATA.json")
+					if (metadata_file.exists()) {
+						// From json to map
+						def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
+						return bucket_name == metadata_file_map.get("catalog").get("bucket")
 					}
+					return false
+				}
+			}
 
 
-					// BUCKET SECTION /////////////////////////////
+			// CREATE OR NOT CREATE THE BUCKET ? /////////////////////////////
 
 
-					bucket = catalog_map.get("bucket")
+			// Does the bucket already exist? -------------
+			// GET QUERY
+			def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
+			def response =  new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: sessionId])
+			def buckets_list = slurper.parseText(response.toString())
+			def bucket_found = buckets_list.find {object -> object.name == bucket_name}
 
-					// Does the bucket already exist? -------------
-					// GET QUERY
-					def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
-					def response =  new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: sessionId])
-					def buckets_list = slurper.parseText(response.toString())
-					def bucket_found = buckets_list.find {object -> object.name == bucket}
+			writeToOutput("bucket " + bucket_name + " found? " + (bucket_found != null))
 
-					writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
+			// Create a bucket if needed -------------
+			def bucket_id = null
+			if (bucket_found)
+				bucket_id = bucket_found.id
+			else {
+				// POST QUERY
+				def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket_name + "&owner=" + this.BUCKET_OWNER
+				def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
+				post.addHeader("Accept", "application/json")
+				post.addHeader("Content-Type", "application/json")
+				post.addHeader("sessionId", sessionId)
 
-					// Create a bucket if needed -------------
-					def bucket_id = null
-					if (bucket_found)
-						bucket_id = bucket_found.id
-					else {
+				response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
+				def bis = new BufferedInputStream(response.getEntity().getContent())
+				def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+				bucket_id = slurper.parseText(result.toString()).get("id")
+				bis.close();
+				writeToOutput(bucket_name + " created!")
+			}
+
+
+			// FOR EACH PACKAGE ... /////////////////////////////
+
+
+			// For each package targeting the current bucket
+			examples_dir.listFiles(package_related_to_bucket_filter).each { package_dir ->
+
+				writeToOutput("Loading package " + package_dir.absolutePath)
+
+				// Parse the metadata json file
+				def metadata_file = new File(package_dir, "METADATA.json")
+
+				// From json to map
+				def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
+
+
+
+				// DATASPACE SECTION /////////////////////////////
+
+
+				def target_dir_path = ""
+				def dataspace_map = null
+				if ((dataspace_map = metadata_file_map.get("dataspace")) != null)
+				{
+					// Retrieve the targeted directory path
+					def target = dataspace_map.get("target")
+					if(target == "global")
+						target_dir_path = this.GLOBAL_SPACE_PATH
+
+					// Copy all files into the targeted directory
+					dataspace_map.get("files").each { file_relative_path ->
+						def file_src = new File(package_dir, file_relative_path)
+						def file_src_path = file_src.absolutePath
+						def file_name = file_src.getName()
+						def file_dest = new File(target_dir_path, file_name)
+						def file_dest_path = file_dest.absolutePath
+						Files.copy(Paths.get(file_src_path), Paths.get(file_dest_path), StandardCopyOption.REPLACE_EXISTING)
+						writeToOutput(file_src_path + " copied to " + file_dest_path)
+					}
+				}
+
+
+				// FOR EACH OBJECT OF THE CATALOG ... /////////////////////////////
+
+
+				def catalog_map = metadata_file_map.get("catalog")
+
+				// GET QUERY
+				def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources"
+				response =  new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: sessionId])
+				def bucket_resources_list = slurper.parseText(response.toString())
+
+				catalog_map.get("objects").each { object ->
+
+					def metadata_map = object.get("metadata")
+
+
+					// OBJECT SECTION /////////////////////////////
+
+
+					// Does the object already exist in the catalog ? -------------
+					def object_name = object.get("name")
+					def object_found = bucket_resources_list.find {resource -> resource.name == object_name}
+					writeToOutput(object_name + " found? " + (object_found != null))
+
+					// Push the object to the bucket if it not exists
+					def object_relative_path = object.get("file")
+					def object_file = new File(package_dir, object_relative_path)
+					def object_absolute_path = object_file.absolutePath
+					if (!object_found)
+					{
+						// Retrieve object metadata
+						def kind = metadata_map.get("kind")
+						def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage"), "UTF-8")
+						def contentType = metadata_map.get("contentType")
+
 						// POST QUERY
-						def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
-						def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
+						def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&contentType=" + contentType
+						def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
 						post.addHeader("Accept", "application/json")
-						post.addHeader("Content-Type", "application/json")
+						post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType()+";boundary="+boundary)
 						post.addHeader("sessionId", sessionId)
 
-						response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
-						def bis = new BufferedInputStream(response.getEntity().getContent())
-						def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
-						bucket_id = slurper.parseText(result.toString()).get("id")
-						bis.close();
-						writeToOutput(" " + bucket + " created!")
+						def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
+						builder.setBoundary(boundary);
+						builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
+						builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file ))
+						post.setEntity(builder.build())
+
+						def result = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
+						writeToOutput(object_file.getName() + " pushed!")
 					}
 
+					// Expose the workflow/object as a studio template
+					def studio_template = object.get("studio_template")
+					if (studio_template != null)
+					{
+						// Retrieve the studio template name
+						def studio_template_name = studio_template.get("name")
 
-					// OBJECTS SECTION /////////////////////////////
+						// Is the workflow already exposed as a studio template ? -------------
+						def studio_template_found = isAStudioTemplate(studio_template_name, this.WORKFLOW_TEMPLATES_DIR_PATH)
+						writeToOutput(studio_template_name + " found in studio templates ? " + studio_template_found)
 
-
-					// GET QUERY
-					def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources"
-					response =  new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: sessionId])
-					def bucket_resources_list = slurper.parseText(response.toString())
-
-					catalog_map.get("objects").each { object ->
-
-						def metadata_map = object.get("metadata")
-
-
-						// OBJECT SECTION /////////////////////////////
-
-
-						// Does the object already exist in the catalog ? -------------
-						def object_name = object.get("name")
-						def object_found = bucket_resources_list.find {resource -> resource.name == object_name}
-						writeToOutput(" " + object_name + " found? " + (object_found != null))
-
-						// Push the object to the bucket if it not exists
-						def object_relative_path = object.get("file")
-						def object_file = new File(bucket_dir.absolutePath, object_relative_path)
-						def object_absolute_path = object_file.absolutePath
-						if (!object_found)
+						if (! studio_template_found)
 						{
-							// Retrieve object metadata
-							def kind = metadata_map.get("kind")
-							def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage"), "UTF-8")
-							def contentType = metadata_map.get("contentType")
+							// Create a new template dir in the targeted directory and copy the workflow into it
+							def template_dir = new File(this.WORKFLOW_TEMPLATES_DIR_PATH, template_dir_name)
+							template_dir.mkdir()
+							writeToOutput(template_dir.absolutePath + " created!")
 
-							// POST QUERY
-							def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&contentType=" + contentType
-							def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
-							post.addHeader("Accept", "application/json")
-							post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType()+";boundary="+boundary)
-							post.addHeader("sessionId", sessionId)
+							// Copy the workflow into it
+							def file_dest = new File(template_dir, "job.xml")
+							def file_dest_path = file_dest.absolutePath
+							Files.copy(Paths.get(object_absolute_path), Paths.get(file_dest_path))
+							writeToOutput(file_dest_path + " created!")
 
-							def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
-							builder.setBoundary(boundary);
-							builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
-							builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file ))
-							post.setEntity(builder.build())
+							// Create a name file into it
+							def name_file = new File(template_dir,"name")
+							name_file.text = studio_template_name
+							writeToOutput(name_file.absolutePath + " created!")
 
-							def result = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
-							writeToOutput(" " + object_file.getName() + " pushed!")
-						}
+							// Create the metadata file into it
+							def studio_metadata_file = new File(template_dir,"metadata")
+							studio_metadata_file.text = studio_template.get("offsets_json_string")
+							writeToOutput(studio_metadata_file.absolutePath + " created!")
 
-						// Expose the workflow/object as a studio template
-						def studio_template = object.get("studio_template")
-						if (studio_template != null)
-						{
-							// Retrieve the studio template name
-							def studio_template_name = studio_template.get("name")
-
-							// Is the workflow already exposed as a studio template ? -------------
-							def studio_template_found = isAStudioTemplate(studio_template_name, this.WORKFLOW_TEMPLATES_DIR_PATH)
-							writeToOutput(" " + studio_template_name + " found in studio templates ? " + studio_template_found)
-
-							if (! studio_template_found)
-							{
-								// Create a new template dir in the targeted directory and copy the workflow into it
-								def template_dir = new File(this.WORKFLOW_TEMPLATES_DIR_PATH, template_dir_name)
-								template_dir.mkdir()
-								writeToOutput("] " + template_dir.absolutePath + " created!")
-
-								// Copy the workflow into it
-								def file_dest = new File(template_dir, "job.xml")
-								def file_dest_path = file_dest.absolutePath
-								Files.copy(Paths.get(object_absolute_path), Paths.get(file_dest_path))
-								writeToOutput(" " + file_dest_path + " created!")
-
-								// Create a name file into it
-								def name_file = new File(template_dir,"name")
-								name_file.text = studio_template_name
-								writeToOutput(" " + name_file.absolutePath + " created!")
-
-								// Create the metadata file into it
-								def studio_metadata_file = new File(template_dir,"metadata")
-								studio_metadata_file.text = studio_template.get("offsets_json_string")
-								writeToOutput(" " + studio_metadata_file.absolutePath + " created!")
-
-								template_dir_name = (template_dir_name.toInteger() + 1) + ""
-							}
-
+							template_dir_name = (template_dir_name.toInteger() + 1) + ""
 						}
 
 					}
@@ -327,14 +329,13 @@ class LoadExamplesIntoCatalog {
 
 		}
 
-		writeToOutput(" ... proactive examples deployed!")
-		writeToOutput(" Terminated.")
+		writeToOutput("Terminated.")
 	}
 }
 
 try {
-	new LoadExamplesIntoCatalog(this.binding).run()
+	new LoadExamples(this.binding).run()
 } catch (Exception e) {
-	println "Failed to load examples into catalog."+ e.getMessage()
+	println "Failed to load examples into the catalog."+ e.getMessage()
 }
 
