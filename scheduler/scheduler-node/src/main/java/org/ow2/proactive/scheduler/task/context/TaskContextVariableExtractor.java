@@ -120,7 +120,19 @@ public class TaskContextVariableExtractor implements Serializable {
         return variables;
     }
 
-    public Map<String, Serializable> extractScopeVariables(TaskContext taskContext) throws IOException, ClassNotFoundException {
+    public Map<String, Serializable> extractScopeVariables(TaskContext taskContext)
+            throws IOException, ClassNotFoundException {
+        Map<String, Serializable> variables = new HashMap<>();
+
+        // variables from task definition
+        if (taskContext.getInitializer() != null && taskContext.getInitializer().getTaskVariables() != null) {
+            variables = appendNonInheritedTaskVariables(taskContext);
+        }
+        return variables;
+    }
+
+    public Map<String, Serializable> appendNonInheritedTaskVariables(TaskContext taskContext)
+            throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables = new HashMap<>();
         Map<String, Serializable> previousVariables = new HashMap<>();
         try {
@@ -129,13 +141,10 @@ public class TaskContextVariableExtractor implements Serializable {
             logger.error("Unable to extract variables", e);
             throw e;
         }
-        // variables from task definition
-        if (taskContext.getInitializer().getTaskVariables() != null) {
-            for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
-                if (!taskVariable.isJobInherited() ||
-                    (taskVariable.isJobInherited() && !previousVariables.containsKey(taskVariable.getName()))) {
-                    variables.put(taskVariable.getName(), taskVariable.getValue());
-                }
+        for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
+            if (!taskVariable.isJobInherited() ||
+                (taskVariable.isJobInherited() && !previousVariables.containsKey(taskVariable.getName()))) {
+                variables.put(taskVariable.getName(), taskVariable.getValue());
             }
         }
         return variables;
