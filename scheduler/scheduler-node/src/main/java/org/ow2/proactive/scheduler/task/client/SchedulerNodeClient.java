@@ -732,4 +732,10 @@ public class SchedulerNodeClient implements ISchedulerClient {
         renewSession();
         return client.getCurrentUserData();
     }
+
+    @Override
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
+        renewSession();
+        return client.getSchedulerProperties();
+    }
 }

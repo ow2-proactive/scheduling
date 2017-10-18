@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -1215,6 +1214,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                                             user.getSubmitNumber()));
         }
         return users;
+    }
+
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
+        UniqueID id = checkAccess();
+
+        UserIdentificationImpl ident = identifications.get(id).getUser();
+        // renew session for this user
+        renewUserSession(id, ident);
+        return PASchedulerProperties.getPropertiesAsHashMap();
     }
 
 }

@@ -1204,4 +1204,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return connectedUserData;
     }
 
+    @Override
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
+
+        Map<String, Object> schedulerProperties = restApi().getSchedulerPropertiesFromSessionId(sid);
+        if (schedulerProperties == null) {
+            throw new NotConnectedException("Session " + sid + " is not connected");
+        }
+        return schedulerProperties;
+    }
+
 }

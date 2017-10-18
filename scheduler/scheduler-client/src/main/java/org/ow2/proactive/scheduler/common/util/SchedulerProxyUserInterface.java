@@ -672,4 +672,9 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getCurrentUserData();
     }
 
+    @Override
+    public Map getSchedulerProperties() throws NotConnectedException {
+        return uischeduler.getSchedulerProperties();
+    }
+
 }

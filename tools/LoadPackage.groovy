@@ -17,11 +17,9 @@ class LoadPackage {
     private final String GLOBAL_SPACE_PATH
     private final String SCHEDULER_REST_URL
     private final String SCHEDULER_HOME
-    private final String EXAMPLES_ZIP_PATH
     private final File WORKFLOW_TEMPLATES_DIR
     private final String WORKFLOW_TEMPLATES_DIR_PATH
     private final String CATALOG_URL
-    private final String EXAMPLES_DIR_PATH
 
 
     private logger = Logger.getLogger("org.ow2.proactive.scheduler")
@@ -30,19 +28,23 @@ class LoadPackage {
     LoadPackage(binding) {
 
         // Bindings
+        println("GROOVY SCRIPT********************************************")
         this.GLOBAL_SPACE_PATH = binding.variables.get("pa.scheduler.dataspace.defaultglobal.localpath")
+        println("GLOBAL_SPACE_PATH " +this.GLOBAL_SPACE_PATH)
         this.SCHEDULER_REST_URL = binding.variables.get("pa.scheduler.rest.url")
+        println("SCHEDULER_REST_URL " +this.SCHEDULER_REST_URL)
         this.SCHEDULER_HOME = binding.variables.get("pa.scheduler.home")
-
+        println("SCHEDULER_HOME " +this.SCHEDULER_HOME)
+        //println(binding.variables.toString())
         // User variables
-        this.EXAMPLES_ZIP_PATH = new File(this.SCHEDULER_HOME, "samples/proactive-examples.zip").absolutePath
         this.WORKFLOW_TEMPLATES_DIR = new File(this.SCHEDULER_HOME, "config/workflows/templates")
+
         this.WORKFLOW_TEMPLATES_DIR_PATH = this.WORKFLOW_TEMPLATES_DIR.absolutePath
+
 
         // Deduced variables
         this.CATALOG_URL = this.SCHEDULER_REST_URL.substring(0, this.SCHEDULER_REST_URL.length() - 4) + "catalog"
-        this.EXAMPLES_DIR_PATH = this.EXAMPLES_ZIP_PATH.substring(0, this.EXAMPLES_ZIP_PATH.lastIndexOf("."))
-
+        println("CATALOG_URL " +this.CATALOG_URL)
     }
 
 
@@ -67,7 +69,7 @@ class LoadPackage {
     def loginAdminUserCredToSchedulerAndGetSessionId() {
         writeToOutput("Scheduler home: " + this.SCHEDULER_HOME)
         writeToOutput("Scheduler rest: " + this.SCHEDULER_REST_URL)
-
+        writeToOutput("CATALOG_URL " +this.CATALOG_URL)
         def schedulerClient = SchedulerClient.createInstance()
         def schedulerConnectionSettings = new ConnectionInfo(this.SCHEDULER_REST_URL, null, null, new File(this.SCHEDULER_HOME, this.PATH_TO_SCHEDULER_CREDENTIALS_FILE), false)
         schedulerClient.init(schedulerConnectionSettings)
@@ -79,6 +81,7 @@ class LoadPackage {
 
 
     def run(File package_dir) {
+        println "hello"
         def target_dir_path = ""
         def bucket = ""
         String sessionId = loginAdminUserCredToSchedulerAndGetSessionId()
@@ -249,4 +252,23 @@ class LoadPackage {
 
         }
     }
+    static void main(String[] args) {
+        println "hello"
+        try {
+            new LoadPackage(this.binding).run()
+        } catch (Exception e) {
+            println "Failed to load packages into catalog." + e.getMessage()
+            e.printStackTrace()
+        }
+    }
+
 }
+
+/*try {
+    new LoadPackage(this.binding).run()
+} catch (Exception e) {
+    println "Failed to load packages into catalog." + e.getMessage()
+    e.printStackTrace()
+}
+*/
+//println "hello"

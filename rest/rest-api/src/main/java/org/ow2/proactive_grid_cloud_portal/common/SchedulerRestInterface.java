@@ -1927,4 +1927,17 @@ public interface SchedulerRestInterface {
     public Map<Object, Object> getPortalConfiguration(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedRestException, PermissionRestException;
 
+    /**
+     * returns properties of the scheduler
+     *
+     * In case that the given sessionId doesn't have an associated login (session id expired, or invalid),
+     * this endpoint will return null
+     *
+     * @param sessionId with which the endpoint is going to look for the login value
+     * @return a map containing scheduler properties or null
+     */
+    @GET
+    @Path("properties")
+    @Produces("application/json")
+    Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid") String sessionId);
 }

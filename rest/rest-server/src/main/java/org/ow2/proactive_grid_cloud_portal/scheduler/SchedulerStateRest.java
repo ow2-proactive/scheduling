@@ -3667,4 +3667,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    @GET
+    @Path("properties")
+    @Produces("application/json")
+    public Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid") String sessionId) {
+
+        if (sessionId != null && sessionStore.exists(sessionId)) {
+            try {
+                Scheduler scheduler = sessionStore.get(sessionId).getScheduler();
+                Map<String, Object> schedulerProperties = scheduler.getSchedulerProperties();
+                return schedulerProperties;
+            } catch (NotConnectedException e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+
+    }
+
 }

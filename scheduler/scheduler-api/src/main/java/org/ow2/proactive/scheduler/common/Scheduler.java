@@ -1430,4 +1430,10 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      */
     UserData getCurrentUserData() throws NotConnectedException;
 
+    /**
+     * Returns the scheduler properties associated with the user currently connected
+     * @return a scheduler properties
+     */
+    Map<String, Object> getSchedulerProperties() throws NotConnectedException;
+
 }
