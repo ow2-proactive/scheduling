@@ -68,6 +68,7 @@
                         <![CDATA[
                         	println variables["TESTVAR3"]
                         	variables["TESTVAR7"]="testvar7modified"
+                        	variables["TESTVAR8"]="testvar8propagated"
                         ]]>
                     </code>
                 </script>
@@ -91,10 +92,10 @@
             <genericInformation>
                 <info name="childTaskGI" value="${TESTVAR4}" />
             </genericInformation>
-			<depends>
-			  <task ref="taskVariables"/>
-			</depends>
-      		<parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
+            <depends>
+                <task ref="taskVariables"/>
+            </depends>
+            <parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
             <scriptExecutable>
                 <script>
                     <code language="groovy">
@@ -107,6 +108,38 @@
                         	println variables["TESTVAR5"]
                         	println variables["TESTVAR6"]
                         	println variables["TESTVAR7"]
+                       	]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="inheritedVariablesTask">
+            <variables>
+                <variable name="TESTVAR0" value="testvartask0" inherited="false" model=""/>
+                <variable name="TESTVAR1" value="testvartask1" inherited="true" model=""/>
+                <variable name="TESTVAR7" value="testvartask7" inherited="false" model=""/>
+                <variable name="TESTVAR8" value="testvartask8" inherited="true" model=""/>
+                <variable name="TESTVAR9" value="testvartask9" inherited="false" model=""/>
+                <variable name="TESTVAR10" value="testvartask10" inherited="true" model=""/>
+                <variable name="NUMBER_OF_NODES" value="2" inherited="false" model=""/>
+            </variables>
+            <genericInformation>
+                <info name="inheritedVariablesTaskGI" value="${TESTVAR3}" />
+            </genericInformation>
+            <depends>
+                <task ref="taskVariables"/>
+            </depends>
+            <parallel numberOfNodes="${NUMBER_OF_NODES}"></parallel>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+                        	println variables["TESTVAR0"]
+                        	println variables["TESTVAR1"]
+                        	println variables["TESTVAR7"]
+                        	println variables["TESTVAR8"]
+                        	println variables["TESTVAR9"]
+                        	println variables["TESTVAR10"]
                        	]]>
                     </code>
                 </script>
