@@ -846,7 +846,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
         return schedulerProxy.getSchedulerProperties();
     }
 

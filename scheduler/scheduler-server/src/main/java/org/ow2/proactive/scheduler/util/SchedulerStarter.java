@@ -541,7 +541,6 @@ public class SchedulerStarter {
         // Retrieve the start scripts paths
         List<String> scriptsPaths = PASchedulerProperties.SCHEDULER_STARTSCRIPTS_PATHS.getValueAsList(";");
 
-        // Scripts binding
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         scriptHandler.addBindings(PASchedulerProperties.getPropertiesAsHashMap());
         scriptHandler.addBindings(PAResourceManagerProperties.getPropertiesAsHashMap());

@@ -3668,21 +3668,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @GET
+    @Override
     @Path("properties")
     @Produces("application/json")
-    public Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid") String sessionId) {
-
-        if (sessionId != null && sessionStore.exists(sessionId)) {
-            try {
-                Scheduler scheduler = sessionStore.get(sessionId).getScheduler();
-                Map<String, Object> schedulerProperties = scheduler.getSchedulerProperties();
-                return schedulerProperties;
-            } catch (NotConnectedException e) {
-                return null;
-            }
-        } else {
+    public Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+        SchedulerProxyUserInterface scheduler = checkAccess(sessionId, "properties");
+        Map<String, Object> schedulerProperties = null;
+        try {
+            schedulerProperties = scheduler.getSchedulerProperties();
+        } catch (NotConnectedException e) {
+            logger.warn("Attempt to retrieve scheduler properties but failed because connection exception", e);
+            return null;
+        } catch (PermissionException e) {
+            logger.warn("Attempt to retrieve scheduler properties but failed because permission exception", e);
             return null;
         }
+        return schedulerProperties;
 
     }
 

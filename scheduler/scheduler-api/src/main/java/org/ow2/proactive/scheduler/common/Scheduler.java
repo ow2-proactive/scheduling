@@ -1432,8 +1432,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * Returns the scheduler properties associated with the user currently connected
-     * @return a scheduler properties
+     * @return scheduler properties
      */
-    Map<String, Object> getSchedulerProperties() throws NotConnectedException;
+    Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException;
 
 }

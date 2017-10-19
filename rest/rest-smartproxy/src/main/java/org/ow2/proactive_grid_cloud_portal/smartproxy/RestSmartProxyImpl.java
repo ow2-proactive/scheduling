@@ -632,7 +632,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
         return ((ISchedulerClient) _getScheduler()).getSchedulerProperties();
     }
 

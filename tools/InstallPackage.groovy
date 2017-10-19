@@ -1,16 +1,17 @@
-import org.ow2.proactive.authentication.ConnectionInfo
-import org.ow2.proactive.scheduler.rest.SchedulerClient
+
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import org.apache.log4j.Logger;
+import org.apache.log4j.Logger
+
+import java.util.zip.ZipFile;
 
 
-class LoadPackage {
+class InstallPackage {
 
     private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/scheduler.cred"
 
-    private final String LOAD_PACKAGE_SCRIPT_NAME = "LoadPackage.groovy"
+    private final String INSTALL_PACKAGE_SCRIPT_NAME = "InstallPackage.groovy"
 
     private final String BUCKET_OWNER = "GROUP:public-objects"
 
@@ -20,17 +21,21 @@ class LoadPackage {
     private final File WORKFLOW_TEMPLATES_DIR
     private final String WORKFLOW_TEMPLATES_DIR_PATH
     private final String CATALOG_URL
+    private final String PACKAGE_PATH_NAME
+    private final String SESSION_ID
 
 
     private logger = Logger.getLogger("org.ow2.proactive.scheduler")
 
 
-    LoadPackage(binding) {
+    InstallPackage(binding) {
 
         // Bindings
         this.GLOBAL_SPACE_PATH = binding.variables.get("pa.scheduler.dataspace.defaultglobal.localpath")
         this.SCHEDULER_REST_URL = binding.variables.get("pa.scheduler.rest.url")
         this.SCHEDULER_HOME = binding.variables.get("pa.scheduler.home")
+        this.PACKAGE_PATH_NAME=binding.variables.get("package.path.name")
+        this.SESSION_ID=binding.variables.get("session.id")
 
         // User variables
         this.WORKFLOW_TEMPLATES_DIR = new File(this.SCHEDULER_HOME, "config/workflows/templates")
@@ -44,7 +49,7 @@ class LoadPackage {
 
 
     def writeToOutput(String output) {
-        logger.info("[" + this.LOAD_PACKAGE_SCRIPT_NAME + "] " + output)
+        logger.info("[" + this.INSTALL_PACKAGE_SCRIPT_NAME + "] " + output)
     }
 
 
@@ -61,30 +66,50 @@ class LoadPackage {
     }
 
 
-    def loginAdminUserCredToSchedulerAndGetSessionId() {
-        writeToOutput("Scheduler home: " + this.SCHEDULER_HOME)
-        writeToOutput("Scheduler rest: " + this.SCHEDULER_REST_URL)
-        writeToOutput("CATALOG_URL " +this.CATALOG_URL)
-        def schedulerClient = SchedulerClient.createInstance()
-        def schedulerConnectionSettings = new ConnectionInfo(this.SCHEDULER_REST_URL, null, null, new File(this.SCHEDULER_HOME, this.PATH_TO_SCHEDULER_CREDENTIALS_FILE), false)
-        schedulerClient.init(schedulerConnectionSettings)
-
-        String sessionID = schedulerClient.getSession()
-        writeToOutput("SessionId: " + sessionID)
-        return sessionID
+    def unzipFile(src, dest) {
+        def zipFile = new ZipFile(src)
+        zipFile.entries().each { it ->
+            def path = Paths.get(dest + "/" + it.name)
+            if (it.directory) {
+                Files.createDirectories(path)
+            } else {
+                def parentDir = path.getParent()
+                if (!Files.exists(parentDir)) {
+                    Files.createDirectories(parentDir)
+                }
+                Files.copy(zipFile.getInputStream(it), path)
+            }
+        }
     }
-
 
     def run(File package_dir) {
         def target_dir_path = ""
         def bucket = ""
-        String sessionId = loginAdminUserCredToSchedulerAndGetSessionId()
+
+        if (package_dir.getPath().endsWith(".zip")) {
+            def package_zip = package_dir
+            if (!package_zip.exists()) {
+                writeToOutput("] " + packager_dir + " not found!")
+                return
+            } else {
+                def package_dest_dir = package_dir.getParent()
+                unzipFile(package_zip, package_dest_dir)
+                writeToOutput(" " + package_zip + " extracted!")
+                package_dir = new File(package_dir.getPath().substring(0, package_dir.getPath().length() - 4))
+            }
+        }
+
+
+
         def metadata_file = new File(package_dir.absolutePath, "METADATA.json")
         writeToOutput(" Parsing " + metadata_file.absolutePath)
+
         // From json to map
         def slurper = new groovy.json.JsonSlurper()
         def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
         def catalog_map = metadata_file_map.get("catalog")
+
+
 
         // DATASPACE SECTION /////////////////////////////
 
@@ -114,7 +139,7 @@ class LoadPackage {
         // Does the bucket already exist? -------------
         // GET QUERY
         def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
-        def response = new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: sessionId])
+        def response = new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: SESSION_ID])
         def buckets_list = slurper.parseText(response.toString())
         def bucket_found = buckets_list.find { object -> object.name == bucket }
 
@@ -130,7 +155,7 @@ class LoadPackage {
             def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
             post.addHeader("Accept", "application/json")
             post.addHeader("Content-Type", "application/json")
-            post.addHeader("sessionId", sessionId)
+            post.addHeader("sessionId", SESSION_ID)
 
             response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
             def bis = new BufferedInputStream(response.getEntity().getContent())
@@ -144,7 +169,7 @@ class LoadPackage {
 
         // GET QUERY
         def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources"
-        response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: sessionId])
+        response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: SESSION_ID])
         def bucket_resources_list = slurper.parseText(response.toString())
 
         catalog_map.get("objects").each { object ->
@@ -177,7 +202,7 @@ class LoadPackage {
                 def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
                 post.addHeader("Accept", "application/json")
                 post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)
-                post.addHeader("sessionId", sessionId)
+                post.addHeader("sessionId", SESSION_ID)
 
                 def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
                 builder.setBoundary(boundary);
@@ -249,3 +274,10 @@ class LoadPackage {
 
 }
 
+
+try {
+    new InstallPackage(this.binding).run(new File(args[0]))
+} catch (Exception e) {
+    println "Failed to install package into catalog." + e.getMessage()
+    e.printStackTrace()
+}

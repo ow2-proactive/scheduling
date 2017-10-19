@@ -25,12 +25,6 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli;
 
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-
-
 class RmCommandFactory extends CommandFactory {
 
     {

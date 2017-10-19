@@ -734,7 +734,7 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
-    public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
         renewSession();
         return client.getSchedulerProperties();
     }

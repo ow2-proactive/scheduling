@@ -32,7 +32,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.script.ScriptContext;
@@ -40,20 +39,17 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import org.apache.log4j.Logger;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptHandler;
-import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.proactive.web.WebProperties;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 
 /**
@@ -62,87 +58,49 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
  */
 public class InstallPackageCommand extends AbstractCommand implements Command {
 
-    private final String packagePathName;
+    private final String PACKAGE_PATH_NAME;
 
-    private static final String scriptPath = "tools/LoadPackage.groovy";
+    private static final String SCRIPT_PATH = "tools/InstallPackage.groovy";
 
     private static Logger logger = Logger.getLogger(InstallPackageCommand.class);
 
     public InstallPackageCommand(String packagePathName) {
 
-        this.packagePathName = packagePathName;
+        this.PACKAGE_PATH_NAME = packagePathName;
 
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        /*
-         * if (!validatePackagePath()) {
-         * throw new CLIException(REASON_INVALID_ARGUMENTS,
-         * String.format("'%s' is not a valid Package.", packagePathName));
-         * } else {
-         * System.out.println("Path of the package" + packagePathName + " is OK");
-         * }
-         * System.out.println("1");
-         * ScriptEngine engine = currentContext.getEngine();
-         * System.out.println("2");
-         * Writer writer = currentContext.getDevice().getWriter();
-         * System.out.println("3");
-         * engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE).put("packagePathName",
-         * packagePathName);
-         * System.out.println("binding " +
-         * engine.getContext().getBindings(ScriptContext.ENGINE_SCOPE).toString());
-         * String script = FileUtility.readFileToString(new
-         * File(PASchedulerProperties.getAbsolutePath(scriptPath)));
-         * System.out.println("4");
-         * if (script != null) {
-         * System.out.println("script " + scriptPath);
-         * }
-         * try {
-         * logger.info("Executing " + scriptPath);
-         * System.out.println("Executing " + scriptPath);
-         * engine.eval(script);
-         * System.out.println("5");
-         * } catch (ScriptException e) {
-         * e.printStackTrace(new PrintWriter(writer, true));
-         * }
-         */
-
-        ScriptEngine engine = currentContext.getEngine();
-
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
+            //retrieve the scheduler properties
+            Map<String, Object> schedulerProperties = scheduler.getSchedulerPropertiesFromSessionId(currentContext.getSessionId());
+            resultStack(currentContext).push(schedulerProperties);
+            logger.info("The scheduler properties are retrieved");
+
+            // Retrieve the script path
+            if (!validatePackagePath()) {
+                throw new CLIException(REASON_INVALID_ARGUMENTS,
+                                       String.format("'%s'does not exist or is not a valid Package path.",
+                                                     PACKAGE_PATH_NAME));
+            }
+            // Scripts binding
+            schedulerProperties.put("package.path.name", PACKAGE_PATH_NAME);
+            schedulerProperties.put("session.id", currentContext.getSessionId());
+            ScriptHandler scriptHandler = new ScriptHandler();
+            scriptHandler.addBindings(schedulerProperties);
+
+            // Execute the script
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(os, true);
             ScriptResult scriptResult;
             File scriptFile;
-            // Retrieve the script path
-            if (!validatePackagePath()) {
-                throw new CLIException(REASON_INVALID_ARGUMENTS,
-                                       String.format("'%s' is not a valid Package.", packagePathName));
-            }
-            // Scripts binding
-            //ScriptEngine engine = currentContext.getEngine();
-            // String x = (String) engine.getContext()
-            //                          .getBindings(ScriptContext.ENGINE_SCOPE)
-            //                          .get("pa.scheduler.dataspace.defaultglobal.localpath");
-            // String y = (String) engine.getContext()
-            //        .getBindings(ScriptContext.ENGINE_SCOPE)
-            //        .get("pa.scheduler.home");
-            //System.out.println("pa.scheduler.dataspace.defaultglobal.localpath= " + x);
-            //System.out.println("pa.scheduler.home= " + y);
-
-            ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
-            scriptHandler.addBindings(PASchedulerProperties.getPropertiesAsHashMap());
-            scriptHandler.addBindings(PAResourceManagerProperties.getPropertiesAsHashMap());
-            scriptHandler.addBindings(WebProperties.getPropertiesAsHashMap());
-
-            // Execute the script
-
-            scriptFile = new File(PASchedulerProperties.getAbsolutePath(scriptPath));
+            scriptFile = new File(PASchedulerProperties.getAbsolutePath(SCRIPT_PATH));
             if (scriptFile.exists()) {
-                logger.info("Executing " + scriptPath);
-                String[] param = { packagePathName };
+                logger.info("Executing " + SCRIPT_PATH);
+                String[] param = { PACKAGE_PATH_NAME };
                 scriptResult = scriptHandler.handle(new SimpleScript(scriptFile, param), ps, ps);
                 if (scriptResult.errorOccured()) {
 
@@ -153,24 +111,21 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
                                                      scriptResult.getException().getMessage(),
                                                      scriptResult.getException());
                 }
-                //logger.info(os.toString());
-                System.out.println(os.toString());
-                System.out.println("cool1");
-                logger.fatal("cool3");
-
+                logger.info(os.toString());
                 os.reset();
             } else {
-                logger.warn("Start script " + scriptPath + " not found");
+                logger.warn("Start script " + SCRIPT_PATH + " not found");
             }
 
             // Close streams
             os.close();
             ps.close();
-            writeLine(currentContext, "Package('%s') successfully installed in the catalog", packagePathName);
-            resultStack(currentContext).push(packagePathName);
+            writeLine(currentContext, "Package('%s') successfully installed in the catalog", PACKAGE_PATH_NAME);
+            resultStack(currentContext).push(PACKAGE_PATH_NAME);
+
         } catch (Exception e) {
             handleError(String.format("An error occurred while attempting to install package('%s') in the catalog",
-                                      packagePathName),
+                                      PACKAGE_PATH_NAME),
                         e,
                         currentContext);
             e.printStackTrace();
@@ -179,45 +134,13 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
     }
 
     private boolean validatePackagePath() {
-        /*
-         * if (!isPackagePathValid(packagePathName)) {
-         * throw new CLIException(REASON_INVALID_ARGUMENTS,
-         * String.format("'%s' is not a valid Package.", packagePathName));
-         * }
-         * 
-         * if (!isPackageExisting(packagePathName)) {
-         * throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.",
-         * packagePathName));
-         * }
-         */
+        File file = new File(PACKAGE_PATH_NAME);
         try {
-            File file = new File(packagePathName);
-            return (file.exists() && file.isDirectory());
+            return ((file.exists() && file.isDirectory()) || (file.exists() && file.getPath().endsWith(".zip")));
         } catch (Exception e) {
             return false;
         }
 
     }
-
-    /*
-     * private Boolean isPackageExisting(String packagePathName) {
-     * File file = new File(packagePathName);
-     * if (file.exists() && file.isDirectory())
-     * return true;
-     * return false;
-     * }
-     * 
-     * private Boolean isPackagePathValid(String packagePathName) {
-     * String regex = "^(\\/[\\w^ ]+)+\\/?$";
-     * final Pattern pattern = Pattern.compile(regex);
-     * final Matcher matcher = pattern.matcher(packagePathName);
-     * 
-     * if (matcher.find()) {
-     * return true;
-     * }
-     * 
-     * return false;
-     * }
-     */
 
 }
