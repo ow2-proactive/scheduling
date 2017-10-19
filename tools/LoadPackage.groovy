@@ -22,6 +22,7 @@ class LoadPackage {
     private final String CATALOG_URL
 
 
+
     private logger = Logger.getLogger("org.ow2.proactive.scheduler")
 
 
@@ -40,6 +41,7 @@ class LoadPackage {
 
         // Deduced variables
         this.CATALOG_URL = this.SCHEDULER_REST_URL.substring(0, this.SCHEDULER_REST_URL.length() - 4) + "catalog"
+
     }
 
 
@@ -246,6 +248,5 @@ class LoadPackage {
 
         }
     }
-
 }
 
