@@ -30,13 +30,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALI
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.Map;
-
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -48,7 +42,6 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.FileUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
 

@@ -8,8 +8,6 @@ dependencies {
 
     compile project(":common:common-api")
     compile project(":common:common-client")
-    compile project(":rm:rm-client")
-    compile project(":scheduler:scheduler-server")
     compile project(":common:common-http")
     compile project(':rest:rest-api')
 
