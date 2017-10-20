@@ -223,6 +223,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job, variables, headerParams);
+    }
+
+    @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return _getScheduler().submit(job, variables);

@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -68,6 +69,7 @@ import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.threading.TimeoutThreadPoolExecutor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
@@ -205,6 +207,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             schedulingService.unlockJobsToSchedule(toUnlock.values());
             toUnlock = null;
 
+            updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
+
+            for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
+                // load and Initialize the executable container
+                loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
+            }
+
             while (!taskRetrievedFromPolicy.isEmpty()) {
 
                 if (freeResources.isEmpty()) {
@@ -214,10 +223,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //get the next compatible tasks from the whole returned policy tasks
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
-                for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
-                    // load and Initialize the executable container
-                    loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
-                }
 
                 while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
@@ -254,8 +259,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
 
-                            numberOfTaskStarted++;
-                            createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                            if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
+                                numberOfTaskStarted++;
+                            }
 
                         }
 
@@ -406,7 +412,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         InternalTask internalTask0 = currentJob.getIHMTasks().get(etd.getTaskId());
 
         try {
-            updateVariablesForTasksToSchedule(jobMap, tasksToSchedule);
 
             TopologyDescriptor descriptor = null;
             boolean bestEffort = true;
@@ -493,7 +498,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /**
      * Create bindings which will be used by selection scripts for the given tasks
      */
-    private Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task)
+    public static Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task)
             throws IOException, ClassNotFoundException {
         Map<String, Serializable> bindings = new HashMap<>();
         Map<String, Serializable> variables = new HashMap<>();
@@ -510,6 +515,26 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         bindings.put(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
         bindings.put(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInfo);
         return bindings;
+    }
+
+    public static SelectionScript replaceBindingsInsideScript(SelectionScript script,
+            Map<String, Serializable> bindings) {
+        String scriptContent = script.getScript();
+        if (bindings != null) {
+            for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
+                scriptContent = scriptContent.replace(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        try {
+            return new SelectionScript(scriptContent,
+                                       script.getEngineName(),
+                                       script.getParameters(),
+                                       script.isDynamic());
+        } catch (InvalidScriptException e) {
+            logger.warn("Error when replacing bindings of script (revert to use original script):" +
+                        System.lineSeparator() + script.toString(), e);
+            return script;
+        }
     }
 
     /**
@@ -533,64 +558,72 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @param taskDescriptor the descriptor of the task to be started
      *
      */
-    protected void createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
+    protected boolean createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
             TaskDescriptor taskDescriptor) throws Exception {
         TaskLauncher launcher = null;
+        LiveJobs.JobData jobData = null;
+        try {
+            jobData = schedulingService.lockJob(job.getId());
+            //enough nodes to be launched at same time for a communicating task
+            // task is not paused
+            if (nodeSet.size() >= task.getNumberOfNodesNeeded() && (task.getStatus() != TaskStatus.PAUSED) &&
+                (jobData != null)) {
+                //start dataspace app for this job
+                DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure().getDataSpaceServiceStarter();
+                job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
 
-        //enough nodes to be launched at same time for a communicating task
-        if (nodeSet.size() >= task.getNumberOfNodesNeeded()) {
-            //start dataspace app for this job
-            DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure().getDataSpaceServiceStarter();
-            job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
-
-            NodeSet nodes = new NodeSet();
-            LiveJobs.JobData jobData = null;
-            try {
-                jobData = schedulingService.lockJob(job.getId());
-
-                // create launcher
-                launcher = task.createLauncher(node);
-
-                activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-
-                nodeSet.remove(0);
-
-                //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
-                // we will need to update this code once topology will be allowed for single-node task
-                if (task.isParallel()) {
-                    nodes = new NodeSet(nodeSet);
-                    task.getExecuterInformation().addNodes(nodes);
-                    nodeSet.clear();
-                }
-
-                //set nodes in the executable container
-                task.getExecutableContainer().setNodes(nodes);
-
-                tlogger.debug(task.getId(), "deploying");
-
-                finalizeStarting(job, task, node, launcher);
-
-                threadPool.submitWithTimeout(new TimedDoTaskAction(job,
-                                                                   taskDescriptor,
-                                                                   launcher,
-                                                                   schedulingService,
-                                                                   terminateNotification,
-                                                                   corePrivateKey),
-                                             DOTASK_ACTION_TIMEOUT,
-                                             TimeUnit.MILLISECONDS);
-            } catch (Exception t) {
+                NodeSet nodes = new NodeSet();
                 try {
-                    //if there was a problem, free nodeSet for multi-nodes task
-                    nodes.add(node);
-                    releaseNodes(job, nodes);
-                } catch (Throwable ni) {
-                    //miam miam
+
+                    // create launcher
+                    launcher = task.createLauncher(node);
+
+                    activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
+
+                    nodeSet.remove(0);
+
+                    //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
+                    // we will need to update this code once topology will be allowed for single-node task
+                    if (task.isParallel()) {
+                        nodes = new NodeSet(nodeSet);
+                        task.getExecuterInformation().addNodes(nodes);
+                        nodeSet.clear();
+                    }
+
+                    //set nodes in the executable container
+                    task.getExecutableContainer().setNodes(nodes);
+
+                    tlogger.debug(task.getId(), "deploying");
+
+                    finalizeStarting(job, task, node, launcher);
+
+                    threadPool.submitWithTimeout(new TimedDoTaskAction(job,
+                                                                       taskDescriptor,
+                                                                       launcher,
+                                                                       schedulingService,
+                                                                       terminateNotification,
+                                                                       corePrivateKey),
+                                                 DOTASK_ACTION_TIMEOUT,
+                                                 TimeUnit.MILLISECONDS);
+                    return true;
+                } catch (Exception t) {
+                    try {
+                        //if there was a problem, free nodeSet for multi-nodes task
+                        nodes.add(node);
+                        releaseNodes(job, nodes);
+                    } catch (Throwable ni) {
+                        //miam miam
+                    }
+                    throw t;
                 }
-                throw t;
-            } finally {
+
+            } else {
+                return false;
+            }
+        } finally {
+            if (jobData != null) {
                 jobData.unlock();
             }
-
         }
 
     }
@@ -618,7 +651,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /*
      * Replace selection script variables with values specified in the map.
      */
-    private List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
+    public static List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
             Map<String, Serializable> variables) {
         if (selectionScripts == null) {
             return null;

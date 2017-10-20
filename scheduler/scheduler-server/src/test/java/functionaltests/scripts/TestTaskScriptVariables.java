@@ -65,6 +65,8 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         String[] outputVariablesLines = outputVariables.getStdoutLogs(false).split(System.lineSeparator());
         TaskLogs outputChild = schedulerHelper.getTaskResult(id, "childTask").getOutput();
         String[] outputChildLines = outputChild.getStdoutLogs(false).split(System.lineSeparator());
+        TaskLogs outputInherited = schedulerHelper.getTaskResult(id, "inheritedVariablesTask").getOutput();
+        String[] outputInheritedlines = outputInherited.getStdoutLogs(false).split(System.lineSeparator());
         TaskLogs outputNoVariables = schedulerHelper.getTaskResult(id, "taskNoVariables").getOutput();
         String[] outputNoVariablesLines = outputNoVariables.getStdoutLogs(false).split(System.lineSeparator());
 
@@ -92,6 +94,15 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         assertEquals("testvarjob5", outputChildLines[5]);
         assertEquals("testvarjob6", outputChildLines[6]);
         assertEquals("testvar7modified", outputChildLines[7]);
+
+        //Test that inherited variables are propagated correctly
+        assertEquals(6, outputInheritedlines.length);
+        assertEquals("testvartask0", outputInheritedlines[0]);
+        assertEquals("testvarjob1", outputInheritedlines[1]);
+        assertEquals("testvartask7", outputInheritedlines[2]);
+        assertEquals("testvar8propagated", outputInheritedlines[3]);
+        assertEquals("testvartask9", outputInheritedlines[4]);
+        assertEquals("testvartask10", outputInheritedlines[5]);
 
         //Test that other tasks don't have access to task variables
         assertEquals(8, outputNoVariablesLines.length);
