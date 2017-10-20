@@ -173,7 +173,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         }
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
 
-        final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean();
+        final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean();
         if (deployNodesInDetachedMode) {
             // if we do not want to kill the nodes when the RM exits or
             // restarts, then we should launch the nodes in background and

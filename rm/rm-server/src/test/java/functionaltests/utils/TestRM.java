@@ -130,7 +130,7 @@ public class TestRM {
         ProcessBuilder processBuilder = new ProcessBuilder(commandLine);
         processBuilder.redirectErrorStream(true);
 
-        if (!PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()) {
+        if (!PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()) {
             processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller("TEST_RM",
                                                                                          processBuilder.environment());
         }
@@ -149,7 +149,7 @@ public class TestRM {
             System.out.println("Destroying RM process.");
             rmProcess.destroy();
             rmProcess.waitFor();
-            if (!PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()) {
+            if (!PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()) {
                 processTreeKiller.kill();
             }
             rmProcess = null;

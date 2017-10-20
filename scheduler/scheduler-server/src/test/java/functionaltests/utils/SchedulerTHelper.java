@@ -1085,6 +1085,22 @@ public class SchedulerTHelper {
         RMTHelper.killNode(url);
     }
 
+    public TestNode createRMNodeStarterNode(String nodeName) throws Exception {
+        int pnpPort = RMTHelper.findFreePort();
+        String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
+        Map<String, String> vmParameters = new HashMap<>();
+        vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
+        JVMProcessImpl nodeProcess = RMTHelper.createJvmProcess(RMNodeStarter.class.getName(),
+                                                                Arrays.asList("-n",
+                                                                              nodeName,
+                                                                              "-r",
+                                                                              getLocalUrl(),
+                                                                              "-Dproactive.net.nolocal=false"),
+                                                                vmParameters,
+                                                                null);
+        return RMTHelper.createNode(nodeName, nodeUrl, nodeProcess);
+    }
+
     public List<TestNode> createRMNodeStarterNodes(String nodeName, int number) throws Exception {
         int pnpPort = RMTHelper.findFreePort();
         List<String> nodeUrls = new ArrayList<>(number);
@@ -1109,7 +1125,7 @@ public class SchedulerTHelper {
 
         // lookup all subsequent nodes remotely
         for (int i = 0; i < number; i++) {
-            TestNode node0 = RMTHelper.lookupNode(nodeNames.get(i), nodeUrls.get(i), nodeProcess);
+            TestNode node0 = RMTHelper.createNode(nodeNames.get(i), nodeUrls.get(i), nodeProcess);
             nodes.add(node0);
         }
         return nodes;

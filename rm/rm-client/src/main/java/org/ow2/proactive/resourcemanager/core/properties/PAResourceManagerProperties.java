@@ -247,14 +247,14 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * The approach is best effort and Node hostname is not considered.
      * As a result, Nodes are not necessarily locked on the same host.
      */
-    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "false"),
+    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true"),
 
     /**
      * Defines if the nodes should be kept when the resource manager exits.
      * This property is defaulted to false as shutting down the RM should
      * clean also its nodes.
      */
-    RM_PRESERVE_NODES_ON_EXIT("pa.rm.preserve.nodes.on.exit", PropertyType.BOOLEAN, "false"),
+    RM_PRESERVE_NODES_ON_SHUTDOWN("pa.rm.preserve.nodes.on.shutdown", PropertyType.BOOLEAN, "false"),
 
     /**
      * Defines whether the node recovery mechanism is enabled on RM startup.
@@ -268,11 +268,11 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     RM_NODES_RECOVERY("pa.rm.nodes.recovery", PropertyType.BOOLEAN, "true"),
 
     /**
-     * Defines whether all the resources of the deployed Azure instances 
+     * Defines whether all the resources of the deployed cloud instances
      * should be destroyed along with the nodes termination when the scheduler 
      * is shut down.
      */
-    RM_AZURE_DESTROY_INSTANCES_ON_SHUTDOWN("pa.rm.azureinstances.destroyonshutdown", PropertyType.BOOLEAN, "false");
+    RM_CLOUD_INFRASTRUCTURES_DESTROY_INSTANCES_ON_SHUTDOWN("pa.rm.cloud.infrastructures.destroy.instances.on.shutdown", PropertyType.BOOLEAN, "false");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

@@ -80,7 +80,7 @@ public class LocalInfrastructure extends InfrastructureManager {
      * Index of deployment, if startNodesOnTheFly is called multiple times, each time a new process will be created.
      * The index is used to prevent conflicts in nodes urls
      */
-    private static final String INDEX_KEY = "index";
+    private static final String LAST_NODE_STARTED_INDEX_KEY = "lastNodeStartedIndex";
 
     /**
      * A map containing process executors, associated with their corresponding deployment node urls.
@@ -406,7 +406,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, 0);
         persistedInfraVariables.put(NB_LOST_NODES_KEY, 0);
         persistedInfraVariables.put(NB_HANDLED_NODES_KEY, 0);
-        persistedInfraVariables.put(INDEX_KEY, 0);
+        persistedInfraVariables.put(LAST_NODE_STARTED_INDEX_KEY, 0);
     }
 
     private void removeAcquiredNodesAndShutDownIfNeeded() {
@@ -505,8 +505,8 @@ public class LocalInfrastructure extends InfrastructureManager {
         return setPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                int deployedNodeIndex = (int) persistedInfraVariables.get(INDEX_KEY);
-                persistedInfraVariables.put(INDEX_KEY, deployedNodeIndex + 1);
+                int deployedNodeIndex = (int) persistedInfraVariables.get(LAST_NODE_STARTED_INDEX_KEY);
+                persistedInfraVariables.put(LAST_NODE_STARTED_INDEX_KEY, deployedNodeIndex + 1);
                 return deployedNodeIndex;
             }
         });

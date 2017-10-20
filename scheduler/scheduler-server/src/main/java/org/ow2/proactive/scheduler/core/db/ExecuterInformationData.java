@@ -30,6 +30,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
@@ -44,7 +45,7 @@ public class ExecuterInformationData implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ExecuterInformationData.class);
 
-    private long taskIds;
+    private long taskId;
 
     private String taskLauncherNodeUrl;
 
@@ -54,14 +55,20 @@ public class ExecuterInformationData implements Serializable {
 
     private String hostName;
 
-    public ExecuterInformationData(long taskIds, ExecuterInformation executerInformation) {
-        this.taskIds = taskIds;
-        if (executerInformation.getLauncher() != null) {
-            taskLauncherNodeUrl = PAActiveObject.getUrl(executerInformation.getLauncher());
+    public ExecuterInformationData(long taskId, ExecuterInformation executerInformation) {
+        this.taskId = taskId;
+        if (executerInformation != null) {
+            if (executerInformation.getLauncher() != null) {
+                try {
+                    taskLauncherNodeUrl = PAActiveObject.getUrl(executerInformation.getLauncher());
+                } catch (ProActiveRuntimeException e) {
+                    logger.warn("TaskLauncher node URL could not be retrieved for task " + taskId);
+                }
+            }
+            nodes = executerInformation.getNodes();
+            nodeName = executerInformation.getNodeName();
+            hostName = executerInformation.getHostName();
         }
-        nodes = executerInformation.getNodes();
-        nodeName = executerInformation.getNodeName();
-        hostName = executerInformation.getHostName();
     }
 
     /**
@@ -76,10 +83,10 @@ public class ExecuterInformationData implements Serializable {
         if (taskLauncherNodeUrl != null) {
             try {
                 taskLauncher = PAActiveObject.lookupActive(TaskLauncher.class, taskLauncherNodeUrl);
-                logger.info("Retrieve task launcher " + taskLauncherNodeUrl + " successfully for task " + taskIds);
+                logger.info("Retrieve task launcher " + taskLauncherNodeUrl + " successfully for task " + taskId);
             } catch (Exception e) {
                 if (loadFullState) {
-                    logger.warn("Task launcher " + taskLauncherNodeUrl + " of task " + taskIds +
+                    logger.warn("Task launcher " + taskLauncherNodeUrl + " of task " + taskId +
                                 " cannot be looked up. Trying to rebind it", e);
                     taskLauncher = getRebindedTaskLauncher();
                 }
@@ -95,7 +102,7 @@ public class ExecuterInformationData implements Serializable {
             Object[] aos = NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects();
             return (TaskLauncher) aos[0];
         } catch (Throwable e) {
-            logger.error("Failed to rebind TaskLauncher " + taskLauncherNodeUrl + " of task " + taskIds, e);
+            logger.error("Failed to rebind TaskLauncher " + taskLauncherNodeUrl + " of task " + taskId, e);
             return new TaskLauncher();
         }
     }

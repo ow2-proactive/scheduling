@@ -99,7 +99,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     private void startRmAndCheckInitialState() throws Exception {
         // start RM
         startRmWithConfig(START_CONFIG);
-        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isTrue();
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isTrue();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // check the initial state of the RM
@@ -117,7 +117,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         // restart RM
         rmHelper = new RMTHelper();
         startRmWithConfig(RESTART_CONFIG);
-        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isFalse();
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isFalse();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // re-snapshot the RM state

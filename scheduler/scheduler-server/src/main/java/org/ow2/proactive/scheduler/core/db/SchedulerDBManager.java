@@ -1062,13 +1062,15 @@ public class SchedulerDBManager {
 
                 TaskInfo taskInfo = task.getTaskInfo();
 
+                ExecuterInformationData executerInfo = new ExecuterInformationData(taskId.getTaskId(),
+                                                                                   task.getExecuterInformation());
+
                 session.getNamedQuery("updateTaskDataTaskStarted")
                        .setParameter("taskStatus", taskInfo.getStatus())
                        .setParameter("startTime", taskInfo.getStartTime())
                        .setParameter("finishedTime", taskInfo.getFinishedTime())
                        .setParameter("executionHostName", taskInfo.getExecutionHostName())
-                       .setParameter("executerInformationData",
-                                     new ExecuterInformationData(taskId.getTaskId(), task.getExecuterInformation()))
+                       .setParameter("executerInformationData", executerInfo)
                        .setParameter("taskId", taskId)
                        .executeUpdate();
                 return null;

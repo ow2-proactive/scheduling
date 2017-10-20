@@ -29,6 +29,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
@@ -36,6 +37,12 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 
 
 /**
+ * This class is used in the task recovery mechanism. If, when a task finishes,
+ * the TaskTermination active object cannot be contacted anymore (maybe due to
+ * a transient failure of the scheduler), then it will use the
+ * TaskLauncherRebinder to reacquire a reference to the
+ * TaskTerminateNotification active object.
+ *
  * @author ActiveEon Team
  * @since 25/09/17
  */
@@ -59,6 +66,13 @@ public class TaskLauncherRebinder {
         }
     }
 
+    /**
+     * Perform a lookup of the TaskTerminateNotification active object of the
+     * scheduler, e.g. to check that it is still alive when a task finishes.
+     *
+     * @param terminateNotification The TaskTerminateNotification that was used at the time the task was launched
+     * @return a correct reference to a TaskTerminateNotification, or null if none can be retrieved
+     */
     public TaskTerminateNotification makeSureSchedulerIsConnected(TaskTerminateNotification terminateNotification) {
         try {
             PAActiveObject.lookupActive(TaskTerminateNotification.class, PAActiveObject.getUrl(terminateNotification));
@@ -70,12 +84,21 @@ public class TaskLauncherRebinder {
         }
     }
 
+    /**
+     * Attempt to reaquire a correct reference to the TaskTerminateNotification
+     * active object from a previously saved URL for this object.
+     *
+     * @return a correct reference to a TaskTerminateNotification, or null if none can be retrieved
+     */
     public TaskTerminateNotification getRebindedTaskTerminateNotificationHandler() {
         try {
             logger.debug("List AOs on " + taskTerminateNotificationHandlerNodeURL + " (expect only one): " +
                          Arrays.toString(NodeFactory.getNode(taskTerminateNotificationHandlerNodeURL)
-                                                    .getActiveObjects()));
-            Object[] aos = NodeFactory.getNode(taskTerminateNotificationHandlerNodeURL).getActiveObjects();
+                                                    .getActiveObjects(TaskTerminateNotification.class.getName())));
+            Node node = NodeFactory.getNode(taskTerminateNotificationHandlerNodeURL);
+            Object[] aos = node.getActiveObjects(TaskTerminateNotification.class.getName());
+            logger.info("On node " + node.getNodeInformation().getName() + " number of active objects found is " +
+                        aos.length + " and the first one " + aos[0] + " will be used to send back the task result");
             return (TaskTerminateNotification) aos[0];
         } catch (Throwable e) {
             // error when retrieving the termination handler after reconnection

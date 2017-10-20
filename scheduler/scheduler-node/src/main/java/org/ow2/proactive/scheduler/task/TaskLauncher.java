@@ -380,34 +380,45 @@ public class TaskLauncher implements InitActive {
         int pingAttempts = initializer.getPingAttempts();
         int pingPeriodMs = initializer.getPingPeriod() * 1000;
 
+        // We are going to contact the recipient of the task result. This
+        // recipient is the TaskTerminateNotification, an active object on the
+        // scheduler side. If the scheduler experienced a transient failure
+        // while the task was computing, then the reference to this
+        // TaskTerminateNotification is obsolete and we need to update it. This
+        // is what the following code does.
         TaskTerminateNotification currentTerminateNotification = terminateNotification;
         for (int i = 0; i < pingAttempts; i++) {
             try {
                 currentTerminateNotification.terminate(taskId, taskResult);
                 logger.debug("Successfully notified task termination " + taskId);
+                // termination has succeeded, exit the method
                 return;
             } catch (Throwable t) {
                 logger.warn("Cannot notify task termination, trying to rebind to to the task termination handler", t);
                 TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
                 if (rebindedTerminateNotification != null) {
                     currentTerminateNotification = rebindedTerminateNotification;
+                    // we'll retry to call the terminate method
                     continue;
                 }
-                logger.warn("Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms",
-                            t);
-
-                if (i != pingAttempts - 1) {
-                    try {
-                        Thread.sleep(pingPeriodMs);
-                    } catch (InterruptedException e) {
-                        logger.error("Interrupted while waiting to notify task termination", e);
-                    }
-                }
+                decreasePingAttemptsAndWait(pingAttempts, pingPeriodMs, i, t);
             }
         }
 
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
                      " attempts, terminating task launcher now");
+    }
+
+    private void decreasePingAttemptsAndWait(int pingAttempts, int pingPeriodMs, int i, Throwable t) {
+        logger.warn("Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms", t);
+
+        if (i != pingAttempts - 1) {
+            try {
+                Thread.sleep(pingPeriodMs);
+            } catch (InterruptedException e) {
+                logger.error("Interrupted while waiting to notify task termination", e);
+            }
+        }
     }
 
     private boolean isNodeShuttingDown() {

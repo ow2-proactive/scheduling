@@ -308,7 +308,7 @@ public class RMTHelper {
                                                               Collections.singletonList(nodeName),
                                                               vmParameters,
                                                               vmOptions);
-                return lookupNode(nodeName, nodeUrl, nodeProcess);
+                return createNode(nodeName, nodeUrl, nodeProcess);
             } catch (NodeException e) {
                 exceptionOccurredWhileCreatingNode = true;
                 lastException = e;
@@ -318,7 +318,7 @@ public class RMTHelper {
         throw lastException;
     }
 
-    public static TestNode lookupNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
+    public static TestNode createNode(String nodeName, String expectedUrl, JVMProcess nodeProcess)
             throws IOException, NodeException, InterruptedException {
         Node newNode = null;
 

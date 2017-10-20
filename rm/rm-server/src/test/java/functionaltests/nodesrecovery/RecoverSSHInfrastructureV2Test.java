@@ -45,7 +45,6 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.nodesource.TestSSHInfrastructureV2;
-import functionaltests.utils.NodesRecoveryProcessHelper;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
@@ -103,7 +102,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     private void startRmAndCheckInitialState() throws Exception {
         // start RM
         startRmWithConfig(START_CONFIG);
-        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isTrue();
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isTrue();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // check the initial state of the RM
@@ -129,7 +128,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         // restart RM
         rmHelper = new RMTHelper();
         startRmWithConfig(RESTART_CONFIG);
-        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_EXIT.getValueAsBoolean()).isFalse();
+        assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isFalse();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // re-snapshot the RM state
