@@ -59,6 +59,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     public SubmitJobCommand(String... params) throws CLIException {
         if (params == null || params.length == 0) {
+            System.out.println("Error message: Workflow file path is required");
             throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
         }
         this.pathname = params[0];
@@ -106,7 +107,6 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         }
 
         if (isFileEmpty(pathname)) {
-            writeLine(currentContext, "File " + pathname + " is empty ");
             throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
         }
 
