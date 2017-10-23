@@ -105,7 +105,7 @@ public class SubmitJobCommandTest {
     }
 
     @Test(expected = CLIException.class)
-    public void testFilePathProvided() throws Exception {
+    public void testNoFilePathProvided() throws Exception {
 
         params = new String[1];
         params[0] = new String();
@@ -130,7 +130,7 @@ public class SubmitJobCommandTest {
     public void testInvalidFilePathProvided() throws Exception {
 
         params = new String[1];
-        params[0] = "/file/path/non/valid/a.xm";
+        params[0] = "/src/test/java/config/c.xm";
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
@@ -146,7 +146,7 @@ public class SubmitJobCommandTest {
     public void testNonExistingFilePathProvided() throws Exception {
 
         params = new String[1];
-        params[0] = "/file/not/existing/c.xml";
+        params[0] = System.getProperty("user.dir") + "/src/test/java/config/c.xml";
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
