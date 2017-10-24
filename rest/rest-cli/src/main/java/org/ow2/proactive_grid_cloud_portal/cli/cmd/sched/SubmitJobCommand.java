@@ -48,113 +48,117 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 
+
 public class SubmitJobCommand extends AbstractCommand implements Command {
-	private final String pathname;
+    private final String pathname;
 
-	private String variables;
+    private String variables;
 
-	private static final Logger logger = null;
+    private static final Logger logger = null;
 
-	private final JobKeyValueTransformer jobKeyValueTransformer;
+    private final JobKeyValueTransformer jobKeyValueTransformer;
 
-	public SubmitJobCommand(String... params) throws CLIException {
-		if (params == null || params.length == 0) {
-			System.err.println("Error message: Workflow file path is required");
-			throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
-		}
-		this.pathname = params[0];
-		if (params.length > 1) {
-			this.variables = params[1];
-		}
-		this.jobKeyValueTransformer = new JobKeyValueTransformer();
+    public SubmitJobCommand(String... params) throws CLIException {
+        if (params == null || params.length == 0) {
+            System.err.println("Error message: Workflow file path is required");
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
+        }
+        this.pathname = params[0];
+        if (params.length > 1) {
+            this.variables = params[1];
+        }
+        this.jobKeyValueTransformer = new JobKeyValueTransformer();
 
-	}
+    }
 
-	@Override
-	public void execute(ApplicationContext currentContext) throws CLIException {
+    @Override
+    public void execute(ApplicationContext currentContext) throws CLIException {
 
-		try {
-			validateFilePath(currentContext);
-			File jobFile = new File(pathname);
-			String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
-			JobIdData jobId;
-			if (APPLICATION_XML.getMimeType().equals(contentType)) {
-				jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
-						new FileInputStream(jobFile), map(this.variables));
-			} else {
-				jobId = currentContext.getRestClient().submitJobArchive(currentContext.getSessionId(),
-						new FileInputStream(jobFile), map(this.variables));
-			}
-			writeLine(currentContext, "Job('%s') successfully submitted: job('%d')", pathname, jobId.getId());
-			resultStack(currentContext).push(jobId);
-		} catch (Exception e) {
-			handleError(String.format("An error occurred while attempting to submit job('%s'):", pathname), e,
-					currentContext);
-		}
+        try {
+            validateFilePath(currentContext);
+            File jobFile = new File(pathname);
+            String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
+            JobIdData jobId;
+            if (APPLICATION_XML.getMimeType().equals(contentType)) {
+                jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
+                                                                 new FileInputStream(jobFile),
+                                                                 map(this.variables));
+            } else {
+                jobId = currentContext.getRestClient().submitJobArchive(currentContext.getSessionId(),
+                                                                        new FileInputStream(jobFile),
+                                                                        map(this.variables));
+            }
+            writeLine(currentContext, "Job('%s') successfully submitted: job('%d')", pathname, jobId.getId());
+            resultStack(currentContext).push(jobId);
+        } catch (Exception e) {
+            handleError(String.format("An error occurred while attempting to submit job('%s'):", pathname),
+                        e,
+                        currentContext);
+        }
 
-	}
+    }
 
-	private void validateFilePath(ApplicationContext currentContext) {
+    private void validateFilePath(ApplicationContext currentContext) {
 
-		if (!isFilePathValid(pathname) || !isXMLFile(pathname)) {
-			throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
-		}
+        if (!isFilePathValid(pathname) || !isXMLFile(pathname)) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
+        }
 
-		if (isFileExisting(pathname) && isFileEmpty(pathname)) {
-			throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
-		}
+        if (isFileExisting(pathname) && isFileEmpty(pathname)) {
+            throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
+        }
 
-		if (!isFileExisting(pathname)) {
-			throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
-		}
+        if (!isFileExisting(pathname)) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
+        }
 
-	}
+    }
 
-	private Map<String, String> map(String variables) {
-		return jobKeyValueTransformer.transformVariablesToMap(variables);
-	}
+    private Map<String, String> map(String variables) {
+        return jobKeyValueTransformer.transformVariablesToMap(variables);
+    }
 
-	private Boolean isFileEmpty(String pathname) {
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(pathname));
-			if (isFileExisting(pathname)) {
-				if (reader.readLine() == null) {
-					return true;
-				}
-				return false;
-			}
-			return true;
-		} catch (IOException e) {
-			logger.log(Level.INFO, "Error reading file " + pathname, e);
-			return false;
-		}
-	}
+    private Boolean isFileEmpty(String pathname) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(pathname));
+            if (isFileExisting(pathname)) {
+                if (reader.readLine() == null) {
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        } catch (IOException e) {
+            logger.log(Level.INFO, "Error reading file " + pathname, e);
+            return false;
+        }
+    }
 
-	private Boolean isFileExisting(String pathname) {
-		File file = new File(pathname);
-		if (file.exists() && !file.isDirectory())
-			return true;
-		return false;
-	}
+    private Boolean isFileExisting(String pathname) {
+        File file = new File(pathname);
+        if (file.exists() && !file.isDirectory())
+            return true;
+        return false;
+    }
 
-	private Boolean isFilePathValid(String pathname) {
-		String regex = "^(?>[a-z]:)?(?>\\\\|\\/)?([^\\\\\\/?%*:|\\\"<>\\r\\n]+(?>\\\\|\\/)?)+$";
-		final Pattern pattern = Pattern.compile(regex);
-		final Matcher matcher = pattern.matcher(pathname);
+    private Boolean isFilePathValid(String pathname) {
+        String regex = "^(?>[a-z]:)?(?>\\\\|\\/)?([^\\\\\\/?%*:|\\\"<>\\r\\n]+(?>\\\\|\\/)?)+$";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(pathname);
 
-		if (matcher.find()) {
-			return true;
-		}
+        if (matcher.find()) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	private Boolean isXMLFile(String pathname) {
-		String extension = FilenameUtils.getExtension(pathname);
-		if (extension.toLowerCase().toString().equals("xml")) {
-			return true;
-		}
-		return false;
-	}
+    private Boolean isXMLFile(String pathname) {
+        String extension = FilenameUtils.getExtension(pathname);
+        if (extension.toLowerCase().toString().equals("xml")) {
+            return true;
+        }
+        return false;
+    }
 
 }
