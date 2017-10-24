@@ -50,10 +50,10 @@ import org.ow2.proactive.utils.Tools;
 
 
 /**
- * This is the authentication class of the scheduler.
- * To get an instance of the scheduler you must ident yourself with this class.
- * Once authenticate, the <code>login</code> method returns a user/admin interface
- * in order to managed the scheduler.
+ * This is the authentication class of the scheduler. To get an instance of the
+ * scheduler you must ident yourself with this class. Once authenticate, the
+ * <code>login</code> method returns a user/admin interface in order to managed
+ * the scheduler.
  *
  * @author The ProActive Team
  * @since ProActive Scheduling 0.9
@@ -75,10 +75,12 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
     }
 
     /**
-     * Get a new instance of SchedulerAuthentication according to the given logins file.
-     * This will also set java.security.auth.login.config property.
+     * Get a new instance of SchedulerAuthentication according to the given
+     * logins file. This will also set java.security.auth.login.config property.
      *
-     * @param frontend the scheduler front-end on which to connect the user after authentication success.
+     * @param frontend
+     *            the scheduler front-end on which to connect the user after
+     *            authentication success.
      */
     public SchedulerAuthentication(SchedulerFrontend frontend) {
         super(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_JAAS_PATH.getValueAsString()),
@@ -97,6 +99,7 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         String user = unPrincipal.getName();
 
         logger.info("user : " + user);
+
         // add this user to the scheduler front-end
         UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
         ident.setHostName(getSenderHostName());
@@ -104,7 +107,8 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
         this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident, cred);
 
         try {
-            // return the stub on Scheduler interface to keep avoid using server class on client side
+            // return the stub on Scheduler interface to keep avoid using server
+            // class on client side
             return PAActiveObject.lookupActive(Scheduler.class, PAActiveObject.getUrl(frontend));
         } catch (ActiveObjectCreationException e) {
             rethrowSchedulerStubException(e);
@@ -157,23 +161,27 @@ public class SchedulerAuthentication extends AuthenticationImpl implements Sched
     }
 
     /**
-     * Returns the address of the JMX connector server depending on the specified protocol.
+     * Returns the address of the JMX connector server depending on the
+     * specified protocol.
      * 
-     * @param protocol the JMX transport protocol
+     * @param protocol
+     *            the JMX transport protocol
      * @return the address of the anonymous connector server
-     * @throws JMException in case of boot sequence failure
+     * @throws JMException
+     *             in case of boot sequence failure
      */
     public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException {
         return SchedulerJMXHelper.getInstance().getAddress(protocol).toString();
     }
 
     /**
-     * Return the URL of this Scheduler.
-     * This URL must be used to contact this Scheduler.
+     * Return the URL of this Scheduler. This URL must be used to contact this
+     * Scheduler.
      *
      * @return the URL of this Scheduler.
      */
     public String getHostURL() {
         return Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
     }
+
 }

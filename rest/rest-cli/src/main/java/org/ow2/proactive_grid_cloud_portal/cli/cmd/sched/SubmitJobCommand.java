@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
@@ -59,6 +60,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     public SubmitJobCommand(String... params) throws CLIException {
         if (params == null || params.length == 0) {
+            System.err.println("Error message: Workflow file path is required");
             throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
         }
         this.pathname = params[0];
@@ -97,17 +99,17 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     private void validateFilePath(ApplicationContext currentContext) {
-        if (!isFilePathValid(pathname)) {
+
+        if (!isFilePathValid(pathname) || !isXMLFile(pathname)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
+        }
+
+        if (isFileExisting(pathname) && isFileEmpty(pathname)) {
+            throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
         }
 
         if (!isFileExisting(pathname)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
-        }
-
-        if (isFileEmpty(pathname)) {
-            writeLine(currentContext, "File " + pathname + " is empty ");
-            throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
         }
 
     }
@@ -140,7 +142,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     private Boolean isFilePathValid(String pathname) {
-        String regex = "^(\\/)?([^\\/\\\u0000]+(\\/)?)+\\.xml";
+        String regex = "^(?>[a-z]:)?(?>\\\\|\\/)?([^\\\\\\/?%*:|\\\"<>\\r\\n]+(?>\\\\|\\/)?)+$";
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(pathname);
 
@@ -148,6 +150,14 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             return true;
         }
 
+        return false;
+    }
+
+    private Boolean isXMLFile(String pathname) {
+        String extension = FilenameUtils.getExtension(pathname);
+        if (extension.toLowerCase().toString().equals("xml")) {
+            return true;
+        }
         return false;
     }
 
