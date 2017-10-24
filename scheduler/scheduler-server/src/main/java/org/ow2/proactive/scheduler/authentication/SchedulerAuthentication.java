@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.utils.Tools;
 
+
 /**
  * This is the authentication class of the scheduler. To get an instance of the
  * scheduler you must ident yourself with this class. Once authenticate, the
@@ -61,128 +62,126 @@ import org.ow2.proactive.utils.Tools;
 @ActiveObject
 public class SchedulerAuthentication extends AuthenticationImpl implements SchedulerAuthenticationInterface {
 
-	/** Scheduler logger */
-	public static final Logger logger = Logger.getLogger(SchedulerAuthentication.class);
+    /** Scheduler logger */
+    public static final Logger logger = Logger.getLogger(SchedulerAuthentication.class);
 
-	/** The scheduler front-end connected to this authentication interface */
-	private SchedulerFrontend frontend;
+    /** The scheduler front-end connected to this authentication interface */
+    private SchedulerFrontend frontend;
 
-	/**
-	 * ProActive empty constructor.
-	 */
-	public SchedulerAuthentication() {
-	}
+    /**
+     * ProActive empty constructor.
+     */
+    public SchedulerAuthentication() {
+    }
 
-	/**
-	 * Get a new instance of SchedulerAuthentication according to the given
-	 * logins file. This will also set java.security.auth.login.config property.
-	 *
-	 * @param frontend
-	 *            the scheduler front-end on which to connect the user after
-	 *            authentication success.
-	 */
-	public SchedulerAuthentication(SchedulerFrontend frontend) {
-		super(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_JAAS_PATH.getValueAsString()),
-				PASchedulerProperties
-						.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()),
-				PASchedulerProperties
-						.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
-		this.frontend = frontend;
-	}
+    /**
+     * Get a new instance of SchedulerAuthentication according to the given
+     * logins file. This will also set java.security.auth.login.config property.
+     *
+     * @param frontend
+     *            the scheduler front-end on which to connect the user after
+     *            authentication success.
+     */
+    public SchedulerAuthentication(SchedulerFrontend frontend) {
+        super(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_JAAS_PATH.getValueAsString()),
+              PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString()),
+              PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
+        this.frontend = frontend;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public Scheduler login(Credentials cred) throws LoginException, AlreadyConnectedException {
-		Subject subject = authenticate(cred);
+    /**
+     * {@inheritDoc}
+     */
+    public Scheduler login(Credentials cred) throws LoginException, AlreadyConnectedException {
+        Subject subject = authenticate(cred);
 
-		UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
-		String user = unPrincipal.getName();
+        UserNamePrincipal unPrincipal = subject.getPrincipals(UserNamePrincipal.class).iterator().next();
+        String user = unPrincipal.getName();
 
-		logger.info("user : " + user);
+        logger.info("user : " + user);
 
-		// add this user to the scheduler front-end
-		UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
-		ident.setHostName(getSenderHostName());
+        // add this user to the scheduler front-end
+        UserIdentificationImpl ident = new UserIdentificationImpl(user, subject);
+        ident.setHostName(getSenderHostName());
 
-		this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident, cred);
+        this.frontend.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(), ident, cred);
 
-		try {
-			// return the stub on Scheduler interface to keep avoid using server
-			// class on client side
-			return PAActiveObject.lookupActive(Scheduler.class, PAActiveObject.getUrl(frontend));
-		} catch (ActiveObjectCreationException e) {
-			rethrowSchedulerStubException(e);
-		} catch (IOException e) {
-			rethrowSchedulerStubException(e);
-		}
-		return null;
-	}
+        try {
+            // return the stub on Scheduler interface to keep avoid using server
+            // class on client side
+            return PAActiveObject.lookupActive(Scheduler.class, PAActiveObject.getUrl(frontend));
+        } catch (ActiveObjectCreationException e) {
+            rethrowSchedulerStubException(e);
+        } catch (IOException e) {
+            rethrowSchedulerStubException(e);
+        }
+        return null;
+    }
 
-	private void rethrowSchedulerStubException(Exception e) throws LoginException {
-		logger.error("Could not lookup stub for Scheduler interface", e);
-		throw new LoginException("Could not lookup stub for Scheduler interface : " + e.getMessage());
-	}
+    private void rethrowSchedulerStubException(Exception e) throws LoginException {
+        logger.error("Could not lookup stub for Scheduler interface", e);
+        throw new LoginException("Could not lookup stub for Scheduler interface : " + e.getMessage());
+    }
 
-	/**
-	 * get the host name of the sender
-	 * 
-	 * @return the host name of the sender
-	 */
-	private String getSenderHostName() {
-		String senderURL = PAActiveObject.getContext().getCurrentRequest().getSender().getNodeURL();
-		senderURL = senderURL.replaceFirst(".*//", "").replaceFirst("/.*", "");
-		return senderURL;
-	}
+    /**
+     * get the host name of the sender
+     * 
+     * @return the host name of the sender
+     */
+    private String getSenderHostName() {
+        String senderURL = PAActiveObject.getContext().getCurrentRequest().getSender().getNodeURL();
+        senderURL = senderURL.replaceFirst(".*//", "").replaceFirst("/.*", "");
+        return senderURL;
+    }
 
-	/**
-	 * @see org.ow2.proactive.authentication.Loggable#getLogger()
-	 */
-	public Logger getLogger() {
-		return Logger.getLogger(SchedulerAuthentication.class);
-	}
+    /**
+     * @see org.ow2.proactive.authentication.Loggable#getLogger()
+     */
+    public Logger getLogger() {
+        return Logger.getLogger(SchedulerAuthentication.class);
+    }
 
-	/**
-	 * @see org.ow2.proactive.authentication.AuthenticationImpl#getLoginMethod()
-	 */
-	@Override
-	protected String getLoginMethod() {
-		return PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString();
-	}
+    /**
+     * @see org.ow2.proactive.authentication.AuthenticationImpl#getLoginMethod()
+     */
+    @Override
+    protected String getLoginMethod() {
+        return PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public String getJMXConnectorURL() {
-		try {
-			return SchedulerJMXHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
-		} catch (JMException e) {
-			throw new RuntimeException(e);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     */
+    public String getJMXConnectorURL() {
+        try {
+            return SchedulerJMXHelper.getInstance().getAddress(JMXTransportProtocol.RMI).toString();
+        } catch (JMException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	/**
-	 * Returns the address of the JMX connector server depending on the
-	 * specified protocol.
-	 * 
-	 * @param protocol
-	 *            the JMX transport protocol
-	 * @return the address of the anonymous connector server
-	 * @throws JMException
-	 *             in case of boot sequence failure
-	 */
-	public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException {
-		return SchedulerJMXHelper.getInstance().getAddress(protocol).toString();
-	}
+    /**
+     * Returns the address of the JMX connector server depending on the
+     * specified protocol.
+     * 
+     * @param protocol
+     *            the JMX transport protocol
+     * @return the address of the anonymous connector server
+     * @throws JMException
+     *             in case of boot sequence failure
+     */
+    public String getJMXConnectorURL(final JMXTransportProtocol protocol) throws JMException {
+        return SchedulerJMXHelper.getInstance().getAddress(protocol).toString();
+    }
 
-	/**
-	 * Return the URL of this Scheduler. This URL must be used to contact this
-	 * Scheduler.
-	 *
-	 * @return the URL of this Scheduler.
-	 */
-	public String getHostURL() {
-		return Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
-	}
+    /**
+     * Return the URL of this Scheduler. This URL must be used to contact this
+     * Scheduler.
+     *
+     * @return the URL of this Scheduler.
+     */
+    public String getHostURL() {
+        return Tools.getHostURL(PAActiveObject.getActiveObjectNodeUrl(PAActiveObject.getStubOnThis()));
+    }
 
 }

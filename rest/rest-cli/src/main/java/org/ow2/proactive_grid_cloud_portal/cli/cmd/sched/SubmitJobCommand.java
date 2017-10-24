@@ -60,7 +60,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     public SubmitJobCommand(String... params) throws CLIException {
         if (params == null || params.length == 0) {
-            System.out.println("Error message: Workflow file path is required");
+            System.err.println("Error message: Workflow file path is required");
             throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
         }
         this.pathname = params[0];
@@ -99,7 +99,8 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     private void validateFilePath(ApplicationContext currentContext) {
-        if (!isFilePathValid(pathname) && !isXMLFile(pathname)) {
+
+        if (!isFilePathValid(pathname) || !isXMLFile(pathname)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
         }
 
@@ -141,7 +142,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     private Boolean isFilePathValid(String pathname) {
-        String regex = "^(?>[a-z]:)?(?>\\\\|\\/)?([^\\\\\\/?%*:|\\\"<>\\r\\n]+(?>\\\\|\\/)?)+\\.xml$";
+        String regex = "^(?>[a-z]:)?(?>\\\\|\\/)?([^\\\\\\/?%*:|\\\"<>\\r\\n]+(?>\\\\|\\/)?)+$";
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(pathname);
 
@@ -154,7 +155,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private Boolean isXMLFile(String pathname) {
         String extension = FilenameUtils.getExtension(pathname);
-        if (extension.toLowerCase() == "xml") {
+        if (extension.toLowerCase().toString().equals("xml")) {
             return true;
         }
         return false;
