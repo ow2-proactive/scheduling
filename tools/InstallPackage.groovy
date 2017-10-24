@@ -9,8 +9,6 @@ import java.util.zip.ZipFile;
 
 class InstallPackage {
 
-    private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/scheduler.cred"
-
     private final String INSTALL_PACKAGE_SCRIPT_NAME = "InstallPackage.groovy"
 
     private final String BUCKET_OWNER = "GROUP:public-objects"
@@ -21,7 +19,7 @@ class InstallPackage {
     private final File WORKFLOW_TEMPLATES_DIR
     private final String WORKFLOW_TEMPLATES_DIR_PATH
     private final String CATALOG_URL
-    private final String PACKAGE_PATH_NAME
+    private final String PACKAGE_DIR_PATH
     private final String SESSION_ID
 
 
@@ -34,7 +32,7 @@ class InstallPackage {
         this.GLOBAL_SPACE_PATH = binding.variables.get("pa.scheduler.dataspace.defaultglobal.localpath")
         this.SCHEDULER_REST_URL = binding.variables.get("pa.scheduler.rest.url")
         this.SCHEDULER_HOME = binding.variables.get("pa.scheduler.home")
-        this.PACKAGE_PATH_NAME=binding.variables.get("package.path.name")
+        this.PACKAGE_DIR_PATH=binding.variables.get("package.path.name")
         this.SESSION_ID=binding.variables.get("session.id")
 
         // User variables
@@ -45,6 +43,7 @@ class InstallPackage {
 
         // Deduced variables
         this.CATALOG_URL = this.SCHEDULER_REST_URL.substring(0, this.SCHEDULER_REST_URL.length() - 4) + "catalog"
+
     }
 
 
@@ -86,16 +85,18 @@ class InstallPackage {
         def target_dir_path = ""
         def bucket = ""
 
+        //If the package dir is a zip file, create a temporary directory that contains the unzipped package dir
         if (package_dir.getPath().endsWith(".zip")) {
-            def package_zip = package_dir
-            if (!package_zip.exists()) {
+            if (!package_dir.exists()) {
                 writeToOutput("] " + packager_dir + " not found!")
                 return
             } else {
-                def package_dest_dir = package_dir.getParent()
-                unzipFile(package_zip, package_dest_dir)
-                writeToOutput(" " + package_zip + " extracted!")
-                package_dir = new File(package_dir.getPath().substring(0, package_dir.getPath().length() - 4))
+                 def package_temp_dir = Files.createTempDirectory("package_temp_dir").toFile()
+                 unzipFile(package_dir, package_temp_dir.getPath())
+                 writeToOutput(" " + package_dir + " extracted!")
+                 package_dir = new File(package_temp_dir.getPath()+"/"+package_dir.getName().substring(0, package_dir.getName().length() - 4))
+                 package_temp_dir.deleteOnExit()
+
             }
         }
 
@@ -278,6 +279,5 @@ class InstallPackage {
 try {
     new InstallPackage(this.binding).run(new File(args[0]))
 } catch (Exception e) {
-    println "Failed to install package into catalog." + e.getMessage()
-    e.printStackTrace()
+    throw new Exception ("Failed to install package into catalog." + e.getMessage())
 }

@@ -3674,15 +3674,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException {
         SchedulerProxyUserInterface scheduler = checkAccess(sessionId, "properties");
-        Map<String, Object> schedulerProperties = null;
+        Map<String, Object> schedulerProperties = new HashMap<String, Object>();
         try {
             schedulerProperties = scheduler.getSchedulerProperties();
         } catch (NotConnectedException e) {
             logger.warn("Attempt to retrieve scheduler properties but failed because connection exception", e);
-            return null;
+            throw new PermissionRestException(e);
         } catch (PermissionException e) {
             logger.warn("Attempt to retrieve scheduler properties but failed because permission exception", e);
-            return null;
+            throw new NotConnectedRestException(e);
         }
         return schedulerProperties;
 

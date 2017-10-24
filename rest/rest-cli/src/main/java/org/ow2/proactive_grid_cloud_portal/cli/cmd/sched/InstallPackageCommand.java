@@ -29,7 +29,9 @@ import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALI
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -37,12 +39,13 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 
 /**
@@ -57,9 +60,13 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
 
     private static Logger logger = Logger.getLogger(InstallPackageCommand.class);
 
-    public InstallPackageCommand(String packagePathName) {
+    // A script executor is an object able to perform execution of a script.
+    private ScriptExecutor scriptExecutor;
+
+    public InstallPackageCommand(String packagePathName) throws CLIException {
 
         this.PACKAGE_PATH_NAME = packagePathName;
+        this.scriptExecutor = new ScriptExecutor();
 
     }
 
@@ -67,73 +74,85 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
     public void execute(ApplicationContext currentContext) throws CLIException {
 
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        ByteArrayOutputStream outputStream = null;
+        PrintStream printStream = null;
+        ScriptResult scriptResult;
         try {
-            //retrieve the scheduler properties
-            Map<String, Object> schedulerProperties = scheduler.getSchedulerPropertiesFromSessionId(currentContext.getSessionId());
-            resultStack(currentContext).push(schedulerProperties);
-            logger.info("The scheduler properties are retrieved");
+            validatePackagePath();
 
-            // Retrieve the script path
-            if (!validatePackagePath()) {
-                throw new CLIException(REASON_INVALID_ARGUMENTS,
-                                       String.format("'%s'does not exist or is not a valid Package path.",
-                                                     PACKAGE_PATH_NAME));
-            }
-            // Scripts binding
-            schedulerProperties.put("package.path.name", PACKAGE_PATH_NAME);
-            schedulerProperties.put("session.id", currentContext.getSessionId());
-            ScriptHandler scriptHandler = new ScriptHandler();
-            scriptHandler.addBindings(schedulerProperties);
+            Map<String, Object> schedulerProperties = retrieveSchedulerProperties(currentContext, scheduler);
+
+            Map<String, Object> propertiesWithSessionIdAndPackage = addSessionIdAndPackageNameToProperties(currentContext,
+                                                                                                           schedulerProperties);
+            ScriptHandler scriptHandler = createScriptHandlerAndAddBindings(propertiesWithSessionIdAndPackage);
 
             // Execute the script
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(os, true);
-            ScriptResult scriptResult;
-            File scriptFile;
-            scriptFile = new File(PASchedulerProperties.getAbsolutePath(SCRIPT_PATH));
-            if (scriptFile.exists()) {
-                logger.info("Executing " + SCRIPT_PATH);
-                String[] param = { PACKAGE_PATH_NAME };
-                scriptResult = scriptHandler.handle(new SimpleScript(scriptFile, param), ps, ps);
-                if (scriptResult.errorOccured()) {
+            File scriptFile = new File(PASchedulerProperties.getAbsolutePath(SCRIPT_PATH));
+            String[] param = { PACKAGE_PATH_NAME };
+            scriptResult = scriptExecutor.execute(scriptHandler, scriptFile, param);
 
-                    // Close streams before throwing
-                    os.close();
-                    ps.close();
-                    throw new InvalidScriptException("Failed to execute script: " +
-                                                     scriptResult.getException().getMessage(),
-                                                     scriptResult.getException());
-                }
-                logger.info(os.toString());
-                os.reset();
+            if (scriptResult.errorOccured()) {
+                logger.warn("Failed to execute script: " + SCRIPT_PATH);
+                throw new InvalidScriptException("Failed to execute script: " +
+                                                 scriptResult.getException().getMessage(), scriptResult.getException());
             } else {
-                logger.warn("Start script " + SCRIPT_PATH + " not found");
+                writeLine(currentContext, "Package('%s') successfully installed in the catalog", PACKAGE_PATH_NAME);
             }
-
-            // Close streams
-            os.close();
-            ps.close();
-            writeLine(currentContext, "Package('%s') successfully installed in the catalog", PACKAGE_PATH_NAME);
-            resultStack(currentContext).push(PACKAGE_PATH_NAME);
-
         } catch (Exception e) {
             handleError(String.format("An error occurred while attempting to install package('%s') in the catalog",
                                       PACKAGE_PATH_NAME),
                         e,
                         currentContext);
-            e.printStackTrace();
+
+        } finally {
+            // Close streams
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
+            if (printStream != null) {
+                printStream.close();
+            }
         }
 
     }
 
-    private boolean validatePackagePath() {
+    private void validatePackagePath() {
         File file = new File(PACKAGE_PATH_NAME);
-        try {
-            return ((file.exists() && file.isDirectory()) || (file.exists() && file.getPath().endsWith(".zip")));
-        } catch (Exception e) {
-            return false;
+        if (file.exists()) {
+            if (!(file.isDirectory() || file.getPath().endsWith(".zip"))) {
+                logger.warn(PACKAGE_PATH_NAME + " must be a directory or a zip file.");
+                throw new CLIException(REASON_INVALID_ARGUMENTS,
+                                       String.format("'%s' must be a directory or a zip file.", PACKAGE_PATH_NAME));
+            }
+        } else {
+            logger.warn(PACKAGE_PATH_NAME + " is not a valid package.");
+            throw new CLIException(REASON_INVALID_ARGUMENTS,
+                                   String.format("'%s' is not a valid package.", PACKAGE_PATH_NAME));
+
         }
 
     }
 
+    private ScriptHandler createScriptHandlerAndAddBindings(Map<String, Object> schedulerProperties) {
+        ScriptHandler scriptHandler = new ScriptHandler();
+        scriptHandler.addBindings(schedulerProperties);
+        return scriptHandler;
+    }
+
+    private Map<String, Object> retrieveSchedulerProperties(ApplicationContext currentContext,
+            SchedulerRestInterface scheduler) throws PermissionRestException, NotConnectedRestException {
+        return scheduler.getSchedulerPropertiesFromSessionId(currentContext.getSessionId());
+    }
+
+    private Map<String, Object> addSessionIdAndPackageNameToProperties(ApplicationContext currentContext,
+            Map<String, Object> schedulerProperties) {
+        Map<String, Object> propertiesWithSessionIdAndPackage = new HashMap<>(schedulerProperties);
+        propertiesWithSessionIdAndPackage.put("package.path.name", PACKAGE_PATH_NAME);
+        propertiesWithSessionIdAndPackage.put("session.id", currentContext.getSessionId());
+        return propertiesWithSessionIdAndPackage;
+    }
 }

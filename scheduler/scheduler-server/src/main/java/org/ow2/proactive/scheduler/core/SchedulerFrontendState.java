@@ -1220,7 +1220,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UniqueID id = checkAccess();
 
         UserIdentificationImpl ident = identifications.get(id).getUser();
-        // renew session for this user
         renewUserSession(id, ident);
         return PASchedulerProperties.getPropertiesAsHashMap();
     }
