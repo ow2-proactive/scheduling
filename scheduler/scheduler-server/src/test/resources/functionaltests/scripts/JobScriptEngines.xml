@@ -33,8 +33,6 @@ result = True;
 				<script>
 					<!-- For python code it is mandatory to strictly control indentation as it has a meaning in the language -->
 					<code language="cpython"><![CDATA[
-import platform
-print("The current version of python you are using is: " + platform.python_version())
 print("Hello World");
 result = True;
                  ]]></code>
