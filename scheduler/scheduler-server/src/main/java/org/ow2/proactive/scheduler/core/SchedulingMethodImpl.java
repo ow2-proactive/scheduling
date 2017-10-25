@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -258,8 +259,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
 
-                            numberOfTaskStarted++;
-                            createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor);
+                            if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
+                                numberOfTaskStarted++;
+                            }
 
                         }
 
@@ -556,64 +558,72 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @param taskDescriptor the descriptor of the task to be started
      *
      */
-    protected void createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
+    protected boolean createExecution(NodeSet nodeSet, Node node, InternalJob job, InternalTask task,
             TaskDescriptor taskDescriptor) throws Exception {
         TaskLauncher launcher = null;
+        LiveJobs.JobData jobData = null;
+        try {
+            jobData = schedulingService.lockJob(job.getId());
+            //enough nodes to be launched at same time for a communicating task
+            // task is not paused
+            if (nodeSet.size() >= task.getNumberOfNodesNeeded() && (task.getStatus() != TaskStatus.PAUSED) &&
+                (jobData != null)) {
+                //start dataspace app for this job
+                DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure().getDataSpaceServiceStarter();
+                job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
 
-        //enough nodes to be launched at same time for a communicating task
-        if (nodeSet.size() >= task.getNumberOfNodesNeeded()) {
-            //start dataspace app for this job
-            DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure().getDataSpaceServiceStarter();
-            job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
-
-            NodeSet nodes = new NodeSet();
-            LiveJobs.JobData jobData = null;
-            try {
-                jobData = schedulingService.lockJob(job.getId());
-
-                // create launcher
-                launcher = task.createLauncher(node);
-
-                activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
-
-                nodeSet.remove(0);
-
-                //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
-                // we will need to update this code once topology will be allowed for single-node task
-                if (task.isParallel()) {
-                    nodes = new NodeSet(nodeSet);
-                    task.getExecuterInformation().addNodes(nodes);
-                    nodeSet.clear();
-                }
-
-                //set nodes in the executable container
-                task.getExecutableContainer().setNodes(nodes);
-
-                tlogger.debug(task.getId(), "deploying");
-
-                finalizeStarting(job, task, node, launcher);
-
-                threadPool.submitWithTimeout(new TimedDoTaskAction(job,
-                                                                   taskDescriptor,
-                                                                   launcher,
-                                                                   schedulingService,
-                                                                   terminateNotification,
-                                                                   corePrivateKey),
-                                             DOTASK_ACTION_TIMEOUT,
-                                             TimeUnit.MILLISECONDS);
-            } catch (Exception t) {
+                NodeSet nodes = new NodeSet();
                 try {
-                    //if there was a problem, free nodeSet for multi-nodes task
-                    nodes.add(node);
-                    releaseNodes(job, nodes);
-                } catch (Throwable ni) {
-                    //miam miam
+
+                    // create launcher
+                    launcher = task.createLauncher(node);
+
+                    activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
+
+                    nodeSet.remove(0);
+
+                    //if topology is enabled and it is a multi task, give every nodes to the multi-nodes task
+                    // we will need to update this code once topology will be allowed for single-node task
+                    if (task.isParallel()) {
+                        nodes = new NodeSet(nodeSet);
+                        task.getExecuterInformation().addNodes(nodes);
+                        nodeSet.clear();
+                    }
+
+                    //set nodes in the executable container
+                    task.getExecutableContainer().setNodes(nodes);
+
+                    tlogger.debug(task.getId(), "deploying");
+
+                    finalizeStarting(job, task, node, launcher);
+
+                    threadPool.submitWithTimeout(new TimedDoTaskAction(job,
+                                                                       taskDescriptor,
+                                                                       launcher,
+                                                                       schedulingService,
+                                                                       terminateNotification,
+                                                                       corePrivateKey),
+                                                 DOTASK_ACTION_TIMEOUT,
+                                                 TimeUnit.MILLISECONDS);
+                    return true;
+                } catch (Exception t) {
+                    try {
+                        //if there was a problem, free nodeSet for multi-nodes task
+                        nodes.add(node);
+                        releaseNodes(job, nodes);
+                    } catch (Throwable ni) {
+                        //miam miam
+                    }
+                    throw t;
                 }
-                throw t;
-            } finally {
+
+            } else {
+                return false;
+            }
+        } finally {
+            if (jobData != null) {
                 jobData.unlock();
             }
-
         }
 
     }
