@@ -66,7 +66,7 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     private Map<String, Serializable> extractVariables(TaskContext container, TaskResult taskResult, String nodesFile,
-            boolean useTaskVariables) throws Exception {
+            boolean useTaskVariables) throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables = extractVariables(container, taskResult, useTaskVariables);
 
         variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getOtherNodesURLs().size() + 1);
@@ -120,15 +120,31 @@ public class TaskContextVariableExtractor implements Serializable {
         return variables;
     }
 
-    public Map<String, Serializable> extractScopeVariables(TaskContext taskContext) {
+    public Map<String, Serializable> extractScopeVariables(TaskContext taskContext)
+            throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables = new HashMap<>();
 
         // variables from task definition
-        if (taskContext.getInitializer().getTaskVariables() != null) {
-            for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
-                if (!taskVariable.isJobInherited()) {
-                    variables.put(taskVariable.getName(), taskVariable.getValue());
-                }
+        if (taskContext.getInitializer() != null && taskContext.getInitializer().getTaskVariables() != null) {
+            variables = appendNonInheritedTaskVariables(taskContext);
+        }
+        return variables;
+    }
+
+    public Map<String, Serializable> appendNonInheritedTaskVariables(TaskContext taskContext)
+            throws IOException, ClassNotFoundException {
+        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Serializable> previousVariables = new HashMap<>();
+        try {
+            previousVariables = extractVariables(taskContext, false);
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Unable to extract variables", e);
+            throw e;
+        }
+        for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
+            if (!taskVariable.isJobInherited() ||
+                (taskVariable.isJobInherited() && !previousVariables.containsKey(taskVariable.getName()))) {
+                variables.put(taskVariable.getName(), taskVariable.getValue());
             }
         }
         return variables;
