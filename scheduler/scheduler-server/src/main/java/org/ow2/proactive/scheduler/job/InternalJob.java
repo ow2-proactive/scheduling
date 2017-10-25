@@ -745,6 +745,7 @@ public abstract class InternalJob extends JobState {
         tasks.clear();
         // re-init taskId
         int id = 0;
+        this.jobInfo.setVariables(this.getVariablesAsReplacementMap());
         for (InternalTask td : sorted) {
             TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++);
             td.setId(newId);

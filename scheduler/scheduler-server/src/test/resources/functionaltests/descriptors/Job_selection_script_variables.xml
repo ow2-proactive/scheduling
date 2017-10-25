@@ -4,6 +4,8 @@
 	name="Job_select_variables" priority="normal">
 	<variables>
 		<variable name="TESTVAR" value="testvar"/>
+		<variable name="TESTVAR1" value="jobVar1"/>
+		<variable name="TESTVAR2" value="jobVar2"/>
 	</variables>
 	<description>Job using variables in selection scripts, check the scheduler logs if the test fails to see the selection scripts output</description>
 	<genericInformation>
@@ -46,6 +48,8 @@
 				<script>
 					<code language="groovy">
 						variables.put("TESTVAR", "newValue")
+						variables.put("TESTVAR3", "propagatedVar3")
+						variables.put("TESTVAR4", "propagatedVar4")
 					</code>
 				</script>
 			</scriptExecutable>
@@ -75,6 +79,50 @@
 						ok = ok && (variables.get(SchedulerVars.PA_USER.toString()) != null)
 						ok = ok && ("newValue".equals(variables.get("TESTVAR")))
 						ok = ok && ("testgi".equals(genericInformation.get("TESTGI")))
+						selected = ok
+                     	]]>
+					</code>
+				</script>
+			</selection>
+			<javaExecutable class="org.ow2.proactive.scheduler.examples.EmptyTask"/>
+		</task>
+		<task name="taskInheritedVars">
+			<variables>
+				<variable name="TESTVAR1" value="taskVar1" inherited="false" model=""/>
+				<variable name="TESTVAR2" value="taskVar2" inherited="true" model=""/>
+				<variable name="TESTVAR3" value="taskVar3" inherited="false" model=""/>
+				<variable name="TESTVAR4" value="taskVar4" inherited="true" model=""/>
+				<variable name="TESTVAR5" value="taskVar5" inherited="false" model=""/>
+				<variable name="TESTVAR6" value="taskVar6" inherited="true" model=""/>
+			</variables>
+			<description>Task to validate inherited job and propagated variables</description>
+			<genericInformation>
+				<info name="TESTGI" value="testgi"/>
+			</genericInformation>
+			<depends>
+				<task ref="taskChangeVar"/>
+			</depends>
+			<selection>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+						import org.ow2.proactive.scheduler.task.SchedulerVars
+						println variables
+						println genericInformation
+
+						ok = (variables.get(SchedulerVars.PA_JOB_ID.toString()) != null)
+						ok = ok && ("Job_select_variables".equals(variables.get(SchedulerVars.PA_JOB_NAME.toString())))
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_ID.toString()) != null)
+						ok = ok && ("taskInheritedVars".equals(variables.get(SchedulerVars.PA_TASK_NAME.toString())))
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_ITERATION.toString()) != null)
+						ok = ok && (variables.get(SchedulerVars.PA_TASK_REPLICATION.toString()) != null)
+						ok = ok && (variables.get(SchedulerVars.PA_USER.toString()) != null)
+						ok = ok && ("taskVar1".equals(variables.get("TESTVAR1")))
+						ok = ok && ("jobVar2".equals(variables.get("TESTVAR2")))
+						ok = ok && ("taskVar3".equals(variables.get("TESTVAR3")))
+						ok = ok && ("propagatedVar4".equals(variables.get("TESTVAR4")))
+						ok = ok && ("taskVar5".equals(variables.get("TESTVAR5")))
+						ok = ok && ("taskVar6".equals(variables.get("TESTVAR6")))
 						selected = ok
                      	]]>
 					</code>
