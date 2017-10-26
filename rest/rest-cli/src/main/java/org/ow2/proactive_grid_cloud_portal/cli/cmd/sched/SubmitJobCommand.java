@@ -147,8 +147,8 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     private Boolean isFilePathValid(String pathname) {
-        String regex = "^(?>[a-z]:)?(?>\\\\|\\/)?([^\\\\\\/?%*:|\\\"<>\\r\\n]+(?>\\\\|\\/)?)+$";
-        final Pattern pattern = Pattern.compile(regex);
+        String correctPathnameRegex = "^(?>[a-z]:)?(?>\\\\|\\/)?([^\\\\\\/?%*:|\\\"<>\\r\\n]+(?>\\\\|\\/)?)+$";
+        final Pattern pattern = Pattern.compile(correctPathnameRegex);
         final Matcher matcher = pattern.matcher(pathname);
 
         if (matcher.find()) {
