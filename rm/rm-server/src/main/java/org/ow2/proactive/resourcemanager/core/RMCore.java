@@ -654,9 +654,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.eligibleNodes.add(rmNode);
         }
 
-        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, client.getName()));
         // persist the state change to the database
         persistUpdatedRMNode(rmNode);
+
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, client.getName()));
 
         return new BooleanWrapper(true);
     }
@@ -695,12 +696,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         final NodeState previousNodeState = rmNode.getState();
         rmNode.setToRemove();
 
+        // persist the state change to the database
+        persistUpdatedRMNode(rmNode);
+
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                                                              previousNodeState,
                                                              initiator.getName()));
-        // persist the state change to the database
-        persistUpdatedRMNode(rmNode);
     }
 
     /**
@@ -732,12 +734,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             eligibleNodes.remove(rmnode);
         }
         this.allNodes.remove(rmnode.getNodeURL());
+
+        // persist node removal
+        dbManager.removeNode(rmnode.getNodeName(), rmnode.getNodeURL());
+
         // create the event
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_REMOVED,
                                                              rmnode.getState(),
                                                              initiator.getName()));
-        // persist node removal
-        dbManager.removeNode(rmnode.getNodeName(), rmnode.getNodeURL());
     }
 
     /**
@@ -841,12 +845,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         //we add the configuring node to the collection to be able to ping it
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
 
+        // save the information of this new node in DB, in particular its state
+        persistNewRMNode(rmnode);
+
         // create the event
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_ADDED,
                                                              null,
                                                              rmnode.getProvider().getName()));
-        // save the information of this new node in DB, in particular its state
-        persistNewRMNode(rmnode);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Configuring node " + rmnode.getNodeURL());
@@ -1707,10 +1712,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         final NodeState previousNodeState = rmNode.getState();
         rmNode.setBusy(owner);
         this.eligibleNodes.remove(rmNode);
-        // create the event
-        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, owner.getName()));
+
         // persist the state change to the database
         persistUpdatedRMNode(rmNode);
+
+        // create the event
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, owner.getName()));
 
     }
 
@@ -1733,12 +1740,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
 
             rmNode.setDown();
+
+            // persist the state change to the database
+            persistUpdatedRMNode(rmNode);
+
             // create the event
             this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                                                                  previousNodeState,
                                                                  rmNode.getProvider().getName()));
-            // persist the state change to the database
-            persistUpdatedRMNode(rmNode);
         } else {
             // the nodes has been removed from core asynchronously
             // when pinger of selection manager tried to access it

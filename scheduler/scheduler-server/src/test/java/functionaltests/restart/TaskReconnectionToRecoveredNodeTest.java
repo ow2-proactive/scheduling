@@ -104,9 +104,6 @@ public abstract class TaskReconnectionToRecoveredNodeTest extends SchedulerFunct
 
         nodes = schedulerHelper.createRMNodeStarterNodes(TaskReconnectionWithForkedTaskExecutorTest.class.getSimpleName(),
                                                          NB_NODES);
-        for (TestNode node : nodes) {
-            rm.addNode(node.getNodeURL());
-        }
 
         JobId jobid = schedulerHelper.submitJob(new File(JOB_DESCRIPTOR.toURI()).getAbsolutePath());
         schedulerHelper.waitForEventJobRunning(jobid);

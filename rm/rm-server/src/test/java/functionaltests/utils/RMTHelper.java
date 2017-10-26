@@ -74,7 +74,7 @@ public class RMTHelper {
     /**
      * Timeout for local infrastructure
      */
-    public static final int DEFAULT_NODES_TIMEOUT = 60 * 1000; //60s
+    public static final int DEFAULT_NODES_TIMEOUT = 180 * 1000; //3minutes
 
     /**
      * Number of nodes deployed with default deployment descriptor

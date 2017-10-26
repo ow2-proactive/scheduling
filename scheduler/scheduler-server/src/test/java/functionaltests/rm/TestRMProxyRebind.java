@@ -113,6 +113,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
 
         helper1.start(config1.getAbsolutePath(),
                       pnpPort1,
+                      RMTHelper.testClasspath(),
                       PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort1);
 
         Credentials connectedUserCreds = Credentials.createCredentials(new CredData(CredData.parseLogin(TestUsers.DEMO.username),
@@ -132,6 +133,7 @@ public class TestRMProxyRebind extends MultipleRMTBase {
 
         helper2.start(config2.getAbsolutePath(),
                       pnpPort2,
+                      RMTHelper.testClasspath(),
                       PAResourceManagerProperties.RM_JMX_PORT.getCmdLine() + jmxPort2);
 
         Map.Entry<RMMonitorsHandler, RMMonitorEventReceiver> entry2 = connectToRM(helper2.getUrl(), connectedUserCreds);
