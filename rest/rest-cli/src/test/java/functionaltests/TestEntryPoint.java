@@ -27,7 +27,6 @@ package functionaltests;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.RestConstants.RM_RESOURCE_TYPE;
 
-import org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint;
 import org.ow2.proactive_grid_cloud_portal.cli.EntryPoint;
 
 

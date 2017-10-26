@@ -25,8 +25,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.console;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import jline.console.completer.Completer;
 

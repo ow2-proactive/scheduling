@@ -25,19 +25,14 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.print.attribute.standard.JobPriority;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -49,8 +44,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStatusData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 
 /**
