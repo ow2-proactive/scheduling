@@ -845,4 +845,9 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         return schedulerProxy.getCurrentUserData();
     }
 
+    @Override
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
+        return schedulerProxy.getSchedulerProperties();
+    }
+
 }
