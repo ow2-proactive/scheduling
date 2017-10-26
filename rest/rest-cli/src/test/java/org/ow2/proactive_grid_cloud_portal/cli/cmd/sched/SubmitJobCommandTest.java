@@ -55,6 +55,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 
 import functionaltests.AbstractRestFuncTestCase;
 
@@ -126,7 +127,7 @@ public class SubmitJobCommandTest {
         throw stack.get(0);
     }
 
-    @Test(expected = CLIException.class)
+    @Test(expected = JobCreationRestException.class)
     public void testInvalidFilePathProvided() throws Exception {
 
         params = new String[1];
@@ -134,7 +135,7 @@ public class SubmitJobCommandTest {
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
+        assertThat(stack.get(0).getMessage(), is("Unknown job descriptor type: " + params[0]));
 
         Mockito.verify(schedulerRestClientMock, times(0))
                .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
