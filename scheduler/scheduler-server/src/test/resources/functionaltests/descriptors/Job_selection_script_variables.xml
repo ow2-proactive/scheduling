@@ -95,7 +95,6 @@
 				<variable name="TESTVAR5" value="taskVar5" inherited="false" model=""/>
 				<variable name="TESTVAR6" value="taskVar6" inherited="true" model=""/>
 			</variables>
-			<description>Task to validate inherited job and propagated variables</description>
 			<genericInformation>
 				<info name="TESTGI" value="testgi"/>
 			</genericInformation>
