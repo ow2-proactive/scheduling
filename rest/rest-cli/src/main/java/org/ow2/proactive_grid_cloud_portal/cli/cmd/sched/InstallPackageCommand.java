@@ -55,7 +55,7 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
 
     private final String PACKAGE_PATH_NAME;
 
-    private static final String SCRIPT_PATH = "tools/LoadPackage.groovy";
+    private static final String SCRIPT_PATH = "tools/LoadPackageClient.groovy";
 
     private static Logger logger = Logger.getLogger(InstallPackageCommand.class);
 

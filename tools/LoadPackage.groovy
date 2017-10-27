@@ -155,8 +155,9 @@ class LoadPackage {
 
         // Create a bucket if needed -------------
         def bucket_id = null
-        if (bucket_found)
+        if (bucket_found) {
             bucket_id = bucket_found.id
+        }
         else {
             // POST QUERY
             def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
