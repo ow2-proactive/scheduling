@@ -1217,4 +1217,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return users;
     }
 
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
+        UniqueID id = checkAccess();
+
+        UserIdentificationImpl ident = identifications.get(id).getUser();
+        renewUserSession(id, ident);
+        return PASchedulerProperties.getPropertiesAsHashMap();
+    }
 }

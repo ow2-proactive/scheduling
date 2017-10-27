@@ -1927,4 +1927,18 @@ public interface SchedulerRestInterface {
     public Map<Object, Object> getPortalConfiguration(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedRestException, PermissionRestException;
 
+    /**
+     * returns scheduler properties
+     *
+     * @param sessionId
+     *            the session id associated to this new connection
+     * @return a map containing the properties
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     */
+    @GET
+    @Path("properties")
+    @Produces("application/json")
+    Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException, PermissionRestException;
 }
