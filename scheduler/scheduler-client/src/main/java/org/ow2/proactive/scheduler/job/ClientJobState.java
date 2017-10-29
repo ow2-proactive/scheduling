@@ -85,6 +85,7 @@ public class ClientJobState extends JobState {
         this.priority = jobState.getPriority();
         this.inputSpace = jobState.getInputSpace();
         this.outputSpace = jobState.getOutputSpace();
+        this.variables = jobState.getVariables();
 
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 

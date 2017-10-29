@@ -78,6 +78,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskOutputCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.InstallPackageCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LinkRmCommand;
@@ -870,6 +871,17 @@ public class CommandSet {
                                                                          .commandClass(VersionCommand.class)
                                                                          .entry();
 
+    public static final CommandSet.Entry INSTALL_PACKAGE = CommandSetEntryBuilder.newInstance()
+                                                                                 .opt("pkg")
+                                                                                 .longOpt("installpackage")
+                                                                                 .description("Install the specified package in the catalog")
+                                                                                 .hasArgs(true)
+                                                                                 .numOfArgs(1)
+                                                                                 .argNames("package-dir")
+                                                                                 .jsCommand("installpackage(package-dir)")
+                                                                                 .commandClass(InstallPackageCommand.class)
+                                                                                 .entry();
+
     /**
      * CommandSet.Entry objects which are common to both Scheduler and Resource
      * Manager CLIs
@@ -903,7 +915,8 @@ public class CommandSet {
                                                                                      PUT_THIRD_PARTY_CREDENTIAL,
                                                                                      REMOVE_THIRD_PARTY_CREDENTIAL,
                                                                                      THIRD_PARTY_CREDENTIAL_KEY_SET,
-                                                                                     SCHEDULER_HELP, LIVE_LOG };
+                                                                                     SCHEDULER_HELP, LIVE_LOG,
+                                                                                     INSTALL_PACKAGE };
 
     /**
      * CommandSet.Entry objects which are specific to Resource Manager CLI

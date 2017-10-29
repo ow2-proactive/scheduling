@@ -1204,4 +1204,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return connectedUserData;
     }
 
+    @Override
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
+
+        try {
+            return restApi().getSchedulerPropertiesFromSessionId(sid);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException("Session " + sid + " is not connected");
+        } catch (PermissionRestException e) {
+            throw new PermissionException("Session " + sid + " doesnt have permission");
+        }
+    }
 }

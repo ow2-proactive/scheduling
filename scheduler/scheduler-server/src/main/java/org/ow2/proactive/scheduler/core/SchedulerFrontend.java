@@ -1390,4 +1390,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return frontendState.getCurrentUserData();
     }
 
+    @Override
+    public Map getSchedulerProperties() throws NotConnectedException {
+        return frontendState.getSchedulerProperties();
+    }
+
 }
