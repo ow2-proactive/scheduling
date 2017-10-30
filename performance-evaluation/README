@@ -1,0 +1,29 @@
+Performance tests runs agains current repository.
+Before run performance evaluation you have to configure:
+	
+ - 'scheduling/performance-evaluation/config.ini'
+	- set USERNAME, and PASSWORD properties
+ - 'scheduling/config/scheduler/settings.ini'
+	- pa.scheduler.core.nodepingfrequency 1
+	- pa.scheduler.core.node.ping.attempts 600
+ - 'config/rm/settings.ini'
+	- pa.rm.nodes.recovery true
+	- pa.rm.preserve.nodes.on.shutdown false
+
+In order to run node (task) recovery test you have to start 
+./nodeRecovery.sh %MIN_WORKERS% %MAX_WORKERS% [ %STEP = 10 ]
+(./taskRecovery.sh %MIN_WORKERS% %MAX_WORKERS% [ %STEP = 10 ])
+
+It will execute series of experiments changing number of workers, e.g.
+./nodeRecovery 10 30 
+- will run 3 experiments with 10, 20, and 30 workers. 
+
+Results of this series is saved in /scheduling/performance-evaluation/storage/allruns
+
+
+Performance evaluation run on 'localInfrastructure' where we start as './proactive-server -ln 0' 
+and './proactive-node -w 50 -Dproactive.node.reconnection.attempts=100'. (50 is a number of wrokers we want to start on the node).
+
+
+
+
