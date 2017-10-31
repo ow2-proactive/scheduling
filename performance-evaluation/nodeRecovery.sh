@@ -16,7 +16,7 @@ fi
 
 N_WORKERS=$MIN_WORKERS
 
-echo "#New seriest of node recovery tests are started" >> $STORAGE_FILE
+echo "#New series of node recovery tests are started" >> $STORAGE_FILE
 
 while [ $N_WORKERS -le $MAX_WORKERS ]
 do

@@ -1,3 +1,4 @@
+#@IgnoreInspection BashAddShebang
 function cleanLogs {
     rm -f $SCHEDULER_HOME/logs/*.log
 }
@@ -8,8 +9,7 @@ function waitServer {
     while [ $lines -eq "0" ]
     do
         lines=$(grep "Get started" $SCHEDULER_LOG_FILE 2>/dev/null | wc -l )
-#		echo $lines
-            sleep 1
+        sleep 1
     done
 
 }
@@ -27,14 +27,13 @@ function waitNode {
     while [ $lns -eq "0" ]
     do
         lns=$(grep "Connected to the resource manager at " $NODE_LOG_FILE 2>/dev/null | wc -l )
-#		echo $lns
-            sleep 1
+        sleep 1
     done
 
 }
 
 function startNode {
-    echo Start node with N workers
+    echo "Start node with $N_WORKERS workers"
     $SCHEDULER_HOME/bin/proactive-node -w $N_WORKERS -Dproactive.node.reconnection.attempts=100 &
 }
 
@@ -48,18 +47,25 @@ function killNode {
     pkill -SIGKILL -f org.ow2.proactive.resourcemanager.utils.RMNodeStarter
 }
 
+function removeDb {
+    s="rm -f -r $SCHEDULER_HOME/data/db/rm"
+    eval $s
+    rm -f -r $SCHEDULER_HOME/data/db/scheduler
+}
 
 function shutdownEverything {
     killServer
     killNode
+    removeDb
 }
 
 function saveRecords {
+    echo "type-of-test; start-time; n-workers; startup-time; status; actually-recovered" >> $STORAGE_FILE
     recordLine="$1;$2;$3;$4;$5;$6"
     echo $recordLine
     echo $recordLine >> $STORAGE_FILE
     mkdir -p $STORAGE/$2
-    cp $SCHEDULER_HOME/logs/* $STORAGE/$1/
+    cp $SCHEDULER_HOME/logs/* $STORAGE/$2/
 }
 
 function getMilliseconds {
@@ -77,14 +83,108 @@ function countRecoveredNodes {
 }
 
 function loginAndReturnSessionId {
-    RET=$(curl --data "username=$USERNAME&password=$PASSWORD" $SERVER/rest/studio/login)
-    echo $RET
-    return $RET
+    SESSIONID="$(curl -s --data "username=$USERNAME&password=$PASSWORD" $SERVER/rest/studio/login)"
 }
 
 function submitJob {
-    curl -H "sessionid:$SESSIONID" -F "file=@$LONG_JOB_PATH;type=application/xml" "$SERVER/rest/scheduler/submit"
+    local JOBID=$(curl -s -H "sessionid:$SESSIONID" -F "file=@$LONG_JOB_PATH;type=application/xml" "$SERVER/rest/scheduler/submit" | jq -r '.id')
+    echo $JOBID
+    return $JOBID
 }
+
+function progressBar {
+    local TOTAL_LENGTH_OF_PROGRESS=50
+    local DONE_BLOCKS=$(echo "$1*$TOTAL_LENGTH_OF_PROGRESS/$2" | bc)
+    local DONE_PERCENTAGE=$(echo "scale=2; $1*100/$2" | bc -l)
+    local COUNT=0
+    s="["
+    while [ $COUNT -lt $DONE_BLOCKS ]
+    do
+        s="$s#"
+        let "COUNT=COUNT+1"
+    done
+    while [ $COUNT -lt $TOTAL_LENGTH_OF_PROGRESS ]
+    do
+        s="$s "
+        let "COUNT=COUNT+1"
+    done
+    s="$s] ($DONE_PERCENTAGE%)"
+    if [ $1 -ne $2 ]
+    then
+        s="$s\r"
+        echo -ne "$s"
+    else
+        echo "$s"
+    fi
+}
+
+
+function countRunningJob {
+    RUNNING_JOBS=0
+    echo "Counting running jobs..."
+    c=0
+    for jobid in "${jobids[@]}"
+    do
+        status=$(curl -s -H "sessionid:$SESSIONID"  "$SERVER/rest/scheduler/jobs/$jobid/" | jq -r '.jobInfo.status')
+#		echo "Status for job $jobid is $status"
+        if [ $status = "RUNNING" ]
+        then
+            let "RUNNING_JOBS=RUNNING_JOBS+1"
+        fi
+        progressBar $c ${#jobids[@]}
+        let "c=c+1"
+    done
+    progressBar $c ${#jobids[@]}
+}
+
+function waitRunningJob {
+    RUNNING_JOBS=0
+    for jobid in "${jobids[@]}"
+    do
+        local status="notrunning"
+        while [ $status != "RUNNING" ]
+        do
+            status=$(curl -s -H "sessionid:$SESSIONID"  "$SERVER/rest/scheduler/jobs/$jobid/" | jq -r '.jobInfo.status')
+            sleep 1
+        done
+        progressBar $RUNNING_JOBS ${#jobids[@]}
+        let "RUNNING_JOBS=RUNNING_JOBS+1"
+    done
+    progressBar $RUNNING_JOBS ${#jobids[@]}
+}
+
+function waitKilledJob {
+    local status="non-empty-srting"
+    while [ $status != "KILLED" ] && [ $status != "FINISHED" ] && [ $status != "STALLED" ] && [ $status != "CANCELED" ] ;
+    do
+        status=$(curl -s -H "sessionid:$SESSIONID"  "$SERVER/rest/scheduler/jobs/$jobid/" | jq -r '.jobInfo.status')
+        sleep 1
+    done
+}
+
+
+
+function killAndDeleteAllJobs {
+    local i=0
+    echo "Killing and deleting jobs..."
+    for jobid in "${jobids[@]}"
+    do
+        curl -X PUT -s -H "sessionid:$SESSIONID"  "$SERVER/rest/scheduler/jobs/$jobid/kill/" > /dev/null
+        waitKilledJob $jobid
+        curl -X DELETE -s -H "sessionid:$SESSIONID"  "$SERVER/rest/scheduler/jobs/$jobid/" > /dev/null
+        progressBar $i ${#jobids[@]}
+        let "i=i+1"
+    done
+    progressBar $i ${#jobids[@]}
+}
+
+
+function getStartupTime {
+    START_TIME=$(getMilliseconds "Starting the scheduler")
+    END_TIME=$(getMilliseconds "Get started")
+    STARTUP_TIME=`expr $END_TIME - $START_TIME`
+}
+
 
 function testNodeRecovery {
     cleanLogs
@@ -102,11 +202,8 @@ function testNodeRecovery {
     startServer
     waitServer
 
-    START_TIME=$(getMilliseconds "Starting the scheduler")
+    getStartupTime
 
-    END_TIME=$(getMilliseconds "Get started")
-
-    STARTUP_TIME=`expr $END_TIME - $START_TIME`
 
     RECOVERED_NODES=$(countRecoveredNodes)
     STATUS="FAILURE"
@@ -124,7 +221,12 @@ function testNodeRecovery {
 }
 
 
+
+
 function testTaskRecovery {
+    declare -a jobids
+
+    removeDb
     cleanLogs
 
     startServer
@@ -133,24 +235,58 @@ function testTaskRecovery {
     startNode
     waitNode
 
-    SESSIONID=$(loginAndReturnSessionId)
+    loginAndReturnSessionId
+
     COUNT=0
-    while [ $COUNT -lt $N_WORKERS]
+    echo "Submitting jobs..."
+    while [ $COUNT -lt $N_WORKERS ]
     do
-        submitJob
+        NEWJOBID=$(submitJob)
+        jobids+=($NEWJOBID)
+        progressBar $COUNT ${N_WORKERS}
         let "COUNT=COUNT+1"
     done
+    progressBar $COUNT ${N_WORKERS}
 
-    numberRunningJobs
+    echo "Counting running jobs..."
 
-    killServer
+    waitRunningJob
 
-    cleanLogs
+    echo "Running jobs $RUNNING_JOBS"
 
-    startServer
-    waitServer
+    if [ $RUNNING_JOBS -eq $N_WORKERS ]
+    then
+        killServer
 
-    numberRunningJobs
+        cleanLogs
+
+        startServer
+        waitServer
+        loginAndReturnSessionId
+
+        getStartupTime
+
+        countRunningJob
+
+#        printf '%s\n' "${jobids[@]}"
+
+        STATUS="FAILURE"
+        if [ $RUNNING_JOBS -eq $N_WORKERS ]
+        then
+            STATUS="SUCCESS"
+        fi
+
+        saveRecords "task-recovery" $START_TIME $N_WORKERS $STARTUP_TIME $STATUS $RUNNING_JOBS
+
+    else
+
+        echo "test failed, workers = " $N_WORKERS "but running jobs is " $RUNNING_JOBS
+
+    fi
+
+    echo "before killing and deleting jobs"
+    killAndDeleteAllJobs
 
     shutdownEverything
+
 }

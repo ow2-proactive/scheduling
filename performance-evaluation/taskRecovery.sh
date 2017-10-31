@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#SCHEDULER_HOME=$(cd ../ && pwd)
-SCHEDULER_HOME=/home/Gleb/git/fork/jrochas/scheduling
+SCHEDULER_HOME=$(cd ../ && pwd)
 
 . config.ini
 . util.sh
@@ -15,10 +14,12 @@ then
   STEP=$3
 fi
 
-N_WORKERS=$MIN_WORKERS
+declare N_WORKERS=$MIN_WORKERS
 
-while [ $N_WORKERS -le $MAX_WORKERS ]
+echo "#New series of task recovery tests are started" >> $STORAGE_FILE
+
+while [ ${N_WORKERS} -le $MAX_WORKERS ]
 do
-#	testTaskRecovery
+    testTaskRecovery
     let "N_WORKERS=N_WORKERS+$STEP"
 done
