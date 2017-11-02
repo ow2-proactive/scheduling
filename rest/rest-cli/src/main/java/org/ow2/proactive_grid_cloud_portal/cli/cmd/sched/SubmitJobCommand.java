@@ -35,18 +35,21 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
+import org.xml.sax.SAXException;
 
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
@@ -58,11 +61,9 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private final JobKeyValueTransformer jobKeyValueTransformer;
 
-    public SubmitJobCommand(String... params) throws CLIException {
-        if (params == null || params.length == 0) {
-            logger.log(Level.SEVERE, "Error message: Workflow file path is required");
-            throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
-        }
+    public SubmitJobCommand(String... params) throws NullPointerException {
+        Objects.requireNonNull(params);
+
         this.pathname = params[0];
         if (params.length > 1) {
             this.variables = params[1];
@@ -98,7 +99,8 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     }
 
-    private void validateFilePath(ApplicationContext currentContext) throws JobCreationRestException {
+    private void validateFilePath(ApplicationContext currentContext)
+            throws JobCreationRestException, JobCreationException, SAXException, IOException {
 
         if (!isFilePathValid(pathname)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
@@ -145,24 +147,25 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         return false;
     }
 
-    private Boolean isFilePathValid(String pathname) {
-        String correctPathnameRegex = "^(?>[a-z]:)?(?>\\\\|\\/)?([^\\\\\\/?%*:|\\\"<>\\r\\n]+(?>\\\\|\\/)?)+$";
-        final Pattern pattern = Pattern.compile(correctPathnameRegex);
-        final Matcher matcher = pattern.matcher(pathname);
-
-        if (matcher.find()) {
-            return true;
-        }
-
-        return false;
-    }
-
     private Boolean isValidFileMimeType(String pathname) {
         String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
         if (contentType != null)
             return (contentType.toLowerCase().equals("application/xml") ||
                     contentType.toLowerCase().equals("application/zip"));
         return false;
+    }
+
+    public static boolean isFilePathValid(String path) {
+
+        try {
+
+            Paths.get(path);
+
+        } catch (InvalidPathException | NullPointerException ex) {
+            return false;
+        }
+
+        return true;
     }
 
 }

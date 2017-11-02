@@ -105,12 +105,12 @@ public class SubmitJobCommandTest {
         Mockito.when(currentContextMock.resultStack()).thenReturn(stack);
     }
 
-    @Test(expected = CLIException.class)
-    public void testNoFilePathProvided() throws Exception {
+    @Test(expected = NullPointerException.class)
+    public void testNoFilePathProvided() throws Exception, NullPointerException {
 
         params = new String[1];
         params[0] = new String();
-        params[0] = "";
+        params[0] = null;
 
         String contentType = URLConnection.getFileNameMap().getContentTypeFor(params[0]);
 
@@ -119,8 +119,7 @@ public class SubmitJobCommandTest {
                                                               jobKeyValueTransormerMock.transformVariablesToMap("")))
                .thenReturn(null);
 
-        new SubmitJobCommand(params).execute(currentContextMock);
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
+        assertThat(stack.get(0).getMessage(), is("Workflow file path is required"));
 
         Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null);
 
