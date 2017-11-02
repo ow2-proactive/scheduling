@@ -55,6 +55,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -745,7 +746,6 @@ public abstract class InternalJob extends JobState {
         tasks.clear();
         // re-init taskId
         int id = 0;
-        this.jobInfo.setVariables(this.getVariablesAsReplacementMap());
         for (InternalTask td : sorted) {
             TaskId newId = TaskIdImpl.createTaskId(getId(), td.getName(), id++);
             td.setId(newId);
@@ -1280,6 +1280,18 @@ public abstract class InternalJob extends JobState {
 
     public void setScheduledTimeForRemoval(long scheduledTimeForRemoval) {
         this.jobInfo.setScheduledTimeForRemoval(scheduledTimeForRemoval);
+    }
+
+    @Override
+    public void setVariables(Map<String, JobVariable> variables) {
+        super.setVariables(variables);
+        this.jobInfo.setVariables(this.getVariablesAsReplacementMap());
+    }
+
+    @Override
+    public void setGenericInformation(Map<String, String> genericInformation) {
+        super.setGenericInformation(genericInformation);
+        this.jobInfo.setGenericInformation(genericInformation);
     }
 
 }
