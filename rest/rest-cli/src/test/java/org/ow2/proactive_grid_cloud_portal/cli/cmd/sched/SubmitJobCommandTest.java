@@ -108,11 +108,7 @@ public class SubmitJobCommandTest {
     @Test(expected = NullPointerException.class)
     public void testNoFilePathProvided() throws Exception, NullPointerException {
 
-        params = new String[1];
-        params[0] = new String();
-        params[0] = null;
-
-        String contentType = URLConnection.getFileNameMap().getContentTypeFor(params[0]);
+        String contentType = URLConnection.getFileNameMap().getContentTypeFor(null);
 
         Mockito.when(schedulerRestClientMock.submitJobArchive("sessionid",
                                                               fileInputStreamMock,

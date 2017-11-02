@@ -42,14 +42,12 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
-import org.xml.sax.SAXException;
 
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
@@ -99,8 +97,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     }
 
-    private void validateFilePath(ApplicationContext currentContext)
-            throws JobCreationRestException, JobCreationException, SAXException, IOException {
+    private void validateFilePath(ApplicationContext currentContext) throws JobCreationRestException {
 
         if (!isFilePathValid(pathname)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
