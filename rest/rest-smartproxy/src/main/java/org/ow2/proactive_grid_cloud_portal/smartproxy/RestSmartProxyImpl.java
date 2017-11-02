@@ -631,4 +631,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
         return ((ISchedulerClient) _getScheduler()).getCurrentUserData();
     }
 
+    @Override
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
+        return ((ISchedulerClient) _getScheduler()).getSchedulerProperties();
+    }
+
 }
