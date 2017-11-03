@@ -35,6 +35,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 
 
 /**
@@ -56,7 +57,8 @@ public class InfrastructureManagerFactory {
      * @param infrastructureParameters parameters for nodes acquisition
      * @return new infrastructure manager
      */
-    public static InfrastructureManager create(String infrastructureType, Object[] infrastructureParameters) {
+    public static InfrastructureManager create(String infrastructureType, Object[] infrastructureParameters,
+            NodeSourceData nodeSourceData) {
 
         InfrastructureManager im = null;
         try {
@@ -75,6 +77,7 @@ public class InfrastructureManagerFactory {
             Class<?> imClass = Class.forName(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
             im.internalConfigure(infrastructureParameters);
+            im.setNodeSourceData(nodeSourceData);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -88,11 +91,12 @@ public class InfrastructureManagerFactory {
      * @param infrastructureType a full class name of an infrastructure manager
      * @param infrastructureParameters parameters for nodes acquisition
      * @param infrastructureVariables runtime variable values of the infrastructure to recover
+     * @param nodeSourceData
      * @return recovered infrastructure manager
      */
     public static InfrastructureManager recreate(String infrastructureType, Object[] infrastructureParameters,
-            Map<String, Serializable> infrastructureVariables) {
-        InfrastructureManager infrastructure = create(infrastructureType, infrastructureParameters);
+            Map<String, Serializable> infrastructureVariables, NodeSourceData nodeSourceData) {
+        InfrastructureManager infrastructure = create(infrastructureType, infrastructureParameters, nodeSourceData);
         infrastructure.recoverPersistedInfraVariables(infrastructureVariables);
         return infrastructure;
     }

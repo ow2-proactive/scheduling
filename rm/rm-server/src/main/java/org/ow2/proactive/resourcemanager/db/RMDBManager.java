@@ -52,6 +52,7 @@ import org.ow2.proactive.resourcemanager.core.history.LockHistory;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 import com.google.common.collect.Maps;
 
@@ -67,6 +68,8 @@ public class RMDBManager {
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
+
+    private final RMDBManagerBuffer rmdbManagerBuffer;
 
     private Scheduler houseKeepingScheduler;
 
@@ -164,6 +167,7 @@ public class RMDBManager {
 
             sessionFactory = configuration.buildSessionFactory();
             transactionHelper = new TransactionHelper(sessionFactory);
+            rmdbManagerBuffer = new RMDBManagerBuffer(this);
 
             Alive lastAliveTimeResult = findRmLastAliveEntry();
 
@@ -249,7 +253,7 @@ public class RMDBManager {
     /**
      * Should be used for insert/update/delete queries
      */
-    private <T> T executeReadWriteTransaction(SessionWork<T> sessionWork) {
+    protected <T> T executeReadWriteTransaction(SessionWork<T> sessionWork) {
         return executeReadWriteTransaction(sessionWork, true);
     }
 
@@ -286,7 +290,7 @@ public class RMDBManager {
             return executeReadWriteTransaction(new SessionWork<Boolean>() {
                 @Override
                 public Boolean doInTransaction(Session session) {
-                    logger.info("Adding a new node source " + nodeSourceData.getName() + " to the database");
+                    logger.debug("Adding a new node source " + nodeSourceData.getName() + " to the database");
                     session.save(nodeSourceData);
                     return true;
                 }
@@ -312,25 +316,13 @@ public class RMDBManager {
         }
     }
 
-    public boolean updateNodeSource(final NodeSourceData nodeSourceData) {
-        try {
-            return executeReadWriteTransaction(new SessionWork<Boolean>() {
-                @Override
-                public Boolean doInTransaction(Session session) {
-                    logger.info("Updating a node source " + nodeSourceData.getName() + " in database");
-                    session.update(nodeSourceData);
-                    return true;
-                }
-            });
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while updating a node source " + nodeSourceData.getName(),
-                                       e);
-        }
+    public void updateNodeSource(final NodeSourceData nodeSourceData) {
+        rmdbManagerBuffer.addPendingUpdateOperationAndRescheduleTransaction(nodeSourceData);
     }
 
     public void removeNodeSource(final String sourceName) {
         final Collection<RMNodeData> relatedNodes = getNodesByNodeSource(sourceName);
-        logger.info("Removing nodes linked to the node source " + sourceName + " from the database");
+        logger.debug("Removing nodes linked to the node source " + sourceName + " from the database");
         removeNodes(relatedNodes);
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
@@ -364,42 +356,34 @@ public class RMDBManager {
         });
     }
 
-    public void addNode(final RMNodeData nodeData) {
-        try {
-            executeReadWriteTransaction(new SessionWork<Void>() {
-                @Override
-                public Void doInTransaction(Session session) {
-                    logger.info("Adding a new node " + nodeData.getName() + " to the database");
-                    session.save(nodeData);
-                    return null;
-                }
-            });
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while adding new node " + nodeData.getName(), e);
-        }
+    public void addNode(RMNodeData rmNodeData) {
+        rmdbManagerBuffer.executeOrAddPendingOperation(RMDBManagerBuffer.DatabaseOperationType.CREATE, rmNodeData);
     }
 
-    public void updateNode(final RMNodeData nodeData) {
-        try {
-            executeReadWriteTransaction(new SessionWork<Void>() {
-                @Override
-                public Void doInTransaction(Session session) {
-                    logger.info("Updating node " + nodeData.getName() + " in database");
-                    session.update(nodeData);
-                    return null;
-                }
-            });
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while updating node " + nodeData.getName(), e);
-        }
+    public void updateNode(RMNodeData rmNodeData) {
+        rmdbManagerBuffer.executeOrAddPendingOperation(RMDBManagerBuffer.DatabaseOperationType.UPDATE, rmNodeData);
+    }
+
+    public void removeNode(RMNode rmNode) {
+        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+        rmdbManagerBuffer.executeOrAddPendingOperation(RMDBManagerBuffer.DatabaseOperationType.DELETE, rmNodeData);
+    }
+
+    public void removeNode(RMNodeData rmNodeData) {
+        rmdbManagerBuffer.executeOrAddPendingOperation(RMDBManagerBuffer.DatabaseOperationType.DELETE, rmNodeData);
+    }
+
+    private void removeNodes(final Collection<RMNodeData> nodes) {
+        rmdbManagerBuffer.addPendingOperations(RMDBManagerBuffer.DatabaseOperationType.DELETE, nodes);
     }
 
     public RMNodeData getNodeByNameAndUrl(final String nodeName, final String nodeUrl) {
+        rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
             return executeReadTransaction(new SessionWork<RMNodeData>() {
                 @Override
                 public RMNodeData doInTransaction(Session session) {
-                    logger.info("Retrieving the node " + nodeName + " from the database");
+                    logger.debug("Retrieving the node " + nodeName + " from the database");
                     Query query = session.getNamedQuery("getRMNodeDataByNameAndUrl")
                                          .setParameter("name", nodeName)
                                          .setParameter("url", nodeUrl);
@@ -411,61 +395,8 @@ public class RMDBManager {
         }
     }
 
-    public void removeNode(final String nodeName, final String nodeUrl) {
-        try {
-            executeReadWriteTransaction(new SessionWork<Void>() {
-                @Override
-                public Void doInTransaction(Session session) {
-                    logger.info("Removing the node " + nodeName + " from the database");
-                    session.getNamedQuery("deleteRMNodeDataByNameAndUrl")
-                           .setParameter("name", nodeName)
-                           .setParameter("url", nodeUrl)
-                           .executeUpdate();
-                    return null;
-                }
-            });
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while removing node " + nodeName, e);
-        }
-    }
-
-    private void removeNodes(final Collection<RMNodeData> nodes) {
-        try {
-            executeReadWriteTransaction(new SessionWork<Void>() {
-                @Override
-                public Void doInTransaction(Session session) {
-                    for (RMNodeData nodeData : nodes) {
-                        logger.info("Removing the node " + nodeData.getName() + " from the database");
-                        session.getNamedQuery("deleteRMNodeDataByNameAndUrl")
-                               .setParameter("name", nodeData.getName())
-                               .setParameter("url", nodeData.getNodeUrl())
-                               .executeUpdate();
-                    }
-                    return null;
-                }
-            });
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while removing " + nodes.size() + " nodes from the database",
-                                       e);
-        }
-    }
-
-    private void removeAllNodes() {
-        try {
-            executeReadWriteTransaction(new SessionWork<Void>() {
-                @Override
-                public Void doInTransaction(Session session) {
-                    logger.info("Removing all nodes from the database");
-                    session.getNamedQuery("deleteAllRMNodeData").executeUpdate();
-                    return null;
-                }
-            });
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while removing all nodes in the database", e);
-        }
-    }
-
     public Collection<RMNodeData> getAllNodes() {
+        rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
             return executeReadTransaction(new SessionWork<Collection<RMNodeData>>() {
                 @Override
@@ -481,6 +412,7 @@ public class RMDBManager {
     }
 
     public Collection<RMNodeData> getNodesByNodeSource(final String nodeSourceName) {
+        rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
             return executeReadTransaction(new SessionWork<Collection<RMNodeData>>() {
                 @Override

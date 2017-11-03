@@ -214,6 +214,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private Map<String, NodeSource> nodeSources;
 
+    private Map<String, NodeSourceData> nodeSourcesData;
+
     private List<String> brokenNodeSources;
 
     /**
@@ -300,6 +302,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.nodeRM = nodeRM;
 
         nodeSources = new HashMap<>();
+        nodeSourcesData = new HashMap<>();
         brokenNodeSources = new ArrayList<>();
         allNodes = new HashMap<>();
         eligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
@@ -501,6 +504,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             if (node != null) {
                 rmnode = restoreInternalNode(nodeSource, rmNodeData, nodeUrl, node);
             } else {
+                // the node is not recoverable and does not appear in any data
+                // structures: we can remove it safely
+                dbManager.removeNode(rmNodeData);
                 triggerDownNodeHandling(nodeSource, rmNodeData, nodeUrl);
             }
             // we must add the recreated node to the eligible data
@@ -736,7 +742,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.allNodes.remove(rmnode.getNodeURL());
 
         // persist node removal
-        dbManager.removeNode(rmnode.getNodeName(), rmnode.getNodeURL());
+        dbManager.removeNode(rmnode);
 
         // create the event
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_REMOVED,
@@ -1246,6 +1252,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                            policyParameters,
                                                            caller);
         boolean added = dbManager.addNodeSource(nodeSourceData);
+        nodeSourcesData.put(nodeSourceName, nodeSourceData);
 
         try {
             return createNodeSource(nodeSourceData, false);
@@ -1281,9 +1288,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (recoverNodes) {
             im = InfrastructureManagerFactory.recreate(data.getInfrastructureType(),
                                                        data.getInfrastructureParameters(),
-                                                       data.getInfrastructureVariables());
+                                                       data.getInfrastructureVariables(),
+                                                       nodeSourcesData.get(nodeSourceName));
         } else {
-            im = InfrastructureManagerFactory.create(data.getInfrastructureType(), data.getInfrastructureParameters());
+            im = InfrastructureManagerFactory.create(data.getInfrastructureType(),
+                                                     data.getInfrastructureParameters(),
+                                                     nodeSourcesData.get(nodeSourceName));
         }
 
         NodeSourcePolicy policy = NodeSourcePolicyFactory.create(data.getPolicyType(),

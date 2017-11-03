@@ -18,7 +18,7 @@ declare N_WORKERS=$MIN_WORKERS
 
 echo "#New series of task recovery tests are started" >> $STORAGE_FILE
 
-while [ ${N_WORKERS} -le $MAX_WORKERS ]
+while [[ ${N_WORKERS} -le $MAX_WORKERS ]]
 do
     testTaskRecovery
     let "N_WORKERS=N_WORKERS+$STEP"

@@ -34,7 +34,7 @@ function waitNode {
 
 function startNode {
     echo "Start node with $N_WORKERS workers"
-    $SCHEDULER_HOME/bin/proactive-node -w $N_WORKERS -Dproactive.node.reconnection.attempts=100 &
+    $SCHEDULER_HOME/bin/proactive-node -Dproactive.communication.protocol=pnp -Dproactive.node.reconnection.attempts=100 -r pnp://${PNP_SERVER}:64738 -w $N_WORKERS &
 }
 
 function killServer {

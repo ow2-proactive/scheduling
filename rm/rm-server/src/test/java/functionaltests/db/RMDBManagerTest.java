@@ -264,8 +264,8 @@ public class RMDBManagerTest {
     @Test
     public void testRemoveRMNodeData() {
 
-        addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
-        dbManager.removeNode(NODE_NAME_BASE, NODE_URL);
+        RMNodeData rmNodeData = addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
+        dbManager.removeNode(rmNodeData);
 
         Collection<RMNodeData> allNodes = dbManager.getAllNodes();
         assertThat(allNodes).hasSize(0);
@@ -364,10 +364,10 @@ public class RMDBManagerTest {
     public void testRemoveDeployingNode() {
 
         addRMNodeData(NODE_NAME_BASE + "1", NODE_STATE_BASE);
-        addRMNodeData(NODE_NAME_BASE + "2", NodeState.DEPLOYING);
+        RMNodeData rmNodeData = addRMNodeData(NODE_NAME_BASE + "2", NodeState.DEPLOYING);
         addRMNodeData(NODE_NAME_BASE + "3", NODE_STATE_BASE);
 
-        dbManager.removeNode(NODE_NAME_BASE + "2", NODE_URL);
+        dbManager.removeNode(rmNodeData);
 
         Collection<RMNodeData> allNodes = dbManager.getAllNodes();
         assertThat(allNodes).hasSize(2);
