@@ -55,6 +55,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 
 import functionaltests.AbstractRestFuncTestCase;
 
@@ -104,37 +105,32 @@ public class SubmitJobCommandTest {
         Mockito.when(currentContextMock.resultStack()).thenReturn(stack);
     }
 
-    @Test(expected = CLIException.class)
-    public void testFilePathProvided() throws Exception {
+    @Test(expected = NullPointerException.class)
+    public void testNoFilePathProvided() throws Exception, NullPointerException {
 
-        params = new String[1];
-        params[0] = new String();
-        params[0] = "";
-
-        String contentType = URLConnection.getFileNameMap().getContentTypeFor(params[0]);
+        String contentType = URLConnection.getFileNameMap().getContentTypeFor(null);
 
         Mockito.when(schedulerRestClientMock.submitJobArchive("sessionid",
                                                               fileInputStreamMock,
                                                               jobKeyValueTransormerMock.transformVariablesToMap("")))
                .thenReturn(null);
 
-        new SubmitJobCommand(params).execute(currentContextMock);
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
+        assertThat(stack.get(0).getMessage(), is("Workflow file path is required"));
 
         Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null);
 
         throw stack.get(0);
     }
 
-    @Test(expected = CLIException.class)
+    @Test(expected = JobCreationRestException.class)
     public void testInvalidFilePathProvided() throws Exception {
 
         params = new String[1];
-        params[0] = "/file/path/non/valid/a.xm";
+        params[0] = "/src/test/java/config/c.xm";
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is not a valid file."));
+        assertThat(stack.get(0).getMessage(), is("Unknown job descriptor type: " + params[0]));
 
         Mockito.verify(schedulerRestClientMock, times(0))
                .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
@@ -146,7 +142,7 @@ public class SubmitJobCommandTest {
     public void testNonExistingFilePathProvided() throws Exception {
 
         params = new String[1];
-        params[0] = "/file/not/existing/c.xml";
+        params[0] = System.getProperty("user.dir") + "/src/test/java/config/c.xml";
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
