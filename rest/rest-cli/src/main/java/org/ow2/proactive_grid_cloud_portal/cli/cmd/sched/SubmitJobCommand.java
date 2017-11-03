@@ -35,17 +35,19 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 
 
 public class SubmitJobCommand extends AbstractCommand implements Command {
@@ -57,10 +59,9 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private final JobKeyValueTransformer jobKeyValueTransformer;
 
-    public SubmitJobCommand(String... params) throws CLIException {
-        if (params == null || params.length == 0) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, "Workflow file path is required");
-        }
+    public SubmitJobCommand(String... params) throws NullPointerException {
+        Objects.requireNonNull(params);
+
         this.pathname = params[0];
         if (params.length > 1) {
             this.variables = params[1];
@@ -96,18 +97,22 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     }
 
-    private void validateFilePath(ApplicationContext currentContext) {
+    private void validateFilePath(ApplicationContext currentContext) throws JobCreationRestException {
+
         if (!isFilePathValid(pathname)) {
             throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' is not a valid file.", pathname));
         }
 
-        if (!isFileExisting(pathname)) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
+        if (!isValidFileMimeType(pathname)) {
+            throw new JobCreationRestException("Unknown job descriptor type: " + pathname);
         }
 
-        if (isFileEmpty(pathname)) {
-            writeLine(currentContext, "File " + pathname + " is empty ");
+        if (isFileExisting(pathname) && isFileEmpty(pathname)) {
             throw new CLIException(REASON_FILE_EMPTY, String.format("'%s' is empty.", pathname));
+        }
+
+        if (!isFileExisting(pathname)) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", pathname));
         }
 
     }
@@ -139,16 +144,25 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         return false;
     }
 
-    private Boolean isFilePathValid(String pathname) {
-        String regex = "^(\\/)?([^\\/\\\u0000]+(\\/)?)+\\.xml";
-        final Pattern pattern = Pattern.compile(regex);
-        final Matcher matcher = pattern.matcher(pathname);
+    private Boolean isValidFileMimeType(String pathname) {
+        String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
+        if (contentType != null)
+            return (contentType.toLowerCase().equals("application/xml") ||
+                    contentType.toLowerCase().equals("application/zip"));
+        return false;
+    }
 
-        if (matcher.find()) {
-            return true;
+    public static boolean isFilePathValid(String path) {
+
+        try {
+
+            Paths.get(path);
+
+        } catch (InvalidPathException | NullPointerException ex) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 
 }
