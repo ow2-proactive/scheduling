@@ -385,6 +385,8 @@ public class InternalJobFactory {
             throws IllegalArgumentException, IllegalAccessException {
         autoCopyfields(CommonAttribute.class, job, jobToSet);
         autoCopyfields(Job.class, job, jobToSet);
+        jobToSet.setVariables(job.getVariables());
+        jobToSet.setGenericInformation(job.getGenericInformation());
         //special behavior
         jobToSet.setPriority(job.getPriority());
     }
