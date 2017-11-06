@@ -4,12 +4,11 @@ function cleanLogs {
 }
 
 function waitServer {
-    echo "Wait until server Scheduler has been started"
-    lines="0"
+    echo "Wait until server Scheduler has been started..."
+    local lines="0"
     while [ $lines -eq "0" ]
     do
         lines=$(grep "Get started" $SCHEDULER_LOG_FILE 2>/dev/null | wc -l )
-        sleep 1
     done
 
 }
@@ -27,7 +26,6 @@ function waitNode {
     while [ $lns -eq "0" ]
     do
         lns=$(grep "Connected to the resource manager at " $NODE_LOG_FILE 2>/dev/null | wc -l )
-        sleep 1
     done
 
 }
@@ -126,7 +124,6 @@ function countRunningJob {
     for jobid in "${jobids[@]}"
     do
         status=$(curl -s -H "sessionid:$SESSIONID"  "$SERVER/rest/scheduler/jobs/$jobid/" | jq -r '.jobInfo.status')
-#		echo "Status for job $jobid is $status"
         if [ $status = "RUNNING" ]
         then
             let "RUNNING_JOBS=RUNNING_JOBS+1"
@@ -145,7 +142,6 @@ function waitRunningJob {
         while [ $status != "RUNNING" ]
         do
             status=$(curl -s -H "sessionid:$SESSIONID"  "$SERVER/rest/scheduler/jobs/$jobid/" | jq -r '.jobInfo.status')
-            sleep 1
         done
         progressBar $RUNNING_JOBS ${#jobids[@]}
         let "RUNNING_JOBS=RUNNING_JOBS+1"
@@ -158,7 +154,6 @@ function waitKilledJob {
     while [ $status != "KILLED" ] && [ $status != "FINISHED" ] && [ $status != "STALLED" ] && [ $status != "CANCELED" ] ;
     do
         status=$(curl -s -H "sessionid:$SESSIONID"  "$SERVER/rest/scheduler/jobs/$jobid/" | jq -r '.jobInfo.status')
-        sleep 1
     done
 }
 
@@ -268,8 +263,6 @@ function testTaskRecovery {
 
         countRunningJob
 
-#        printf '%s\n' "${jobids[@]}"
-
         STATUS="FAILURE"
         if [ $RUNNING_JOBS -eq $N_WORKERS ]
         then
@@ -286,7 +279,6 @@ function testTaskRecovery {
 
     echo "before killing and deleting jobs"
     killAndDeleteAllJobs
-
     shutdownEverything
 
 }
