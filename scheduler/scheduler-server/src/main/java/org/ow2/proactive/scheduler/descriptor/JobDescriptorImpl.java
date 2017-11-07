@@ -684,7 +684,9 @@ public class JobDescriptorImpl implements JobDescriptor {
         }
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void restoreRunningTasks() {
         logger.info("Starting task recovery for job " + jobId);
         final Iterator<Entry<TaskId, EligibleTaskDescriptor>> iterator = eligibleTasks.entrySet().iterator();

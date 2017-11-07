@@ -100,8 +100,6 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                          policyParameters);
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
 
-        Thread.sleep(10000);
-
         RMTHelper.log("Checking scheduler state after node source creation");
         RMState s = resourceManager.getState();
         assertEquals(NB_NODES, s.getTotalNodesNumber());

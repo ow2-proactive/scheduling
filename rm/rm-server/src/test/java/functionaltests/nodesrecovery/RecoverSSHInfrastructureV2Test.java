@@ -78,7 +78,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     }
 
     @Test
-    public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
+    public void testRecoverSSHInfrastructureV2WithAliveNodes() throws Exception {
         // kill only the RM by sending a SIGKILL and leave node processes alive
         RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
         // nodes should be re-taken into account by the restarted RM
@@ -86,7 +86,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     }
 
     @Test
-    public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
+    public void testRecoverSSHInfrastructureV2WithDownNodes() throws Exception {
         // kill RM and nodes with SIGKILL
         RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
         // nodes should be re-deployed by the restarted RM

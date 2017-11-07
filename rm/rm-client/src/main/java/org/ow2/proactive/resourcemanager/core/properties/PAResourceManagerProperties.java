@@ -268,6 +268,32 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     RM_NODES_RECOVERY("pa.rm.nodes.recovery", PropertyType.BOOLEAN, "true"),
 
     /**
+     * Defines the minimum inter-time in MILLISECONDS between database
+     * operations before a database transaction is triggered. In between
+     * such a delay, several database operations will be batched together.
+     *
+     * This delayed is applied for two different batches of database
+     * operations. It applies separately for node source updates and for node
+     * adds. If node adds are pending while other node operations are
+     * required, then the other node operations are also delayed to preserve
+     * operation ordering. Then, if no node adds are pending, the subsequent
+     * node operations are either executed synchronously or asynchronously,
+     * depending on the {@link PAResourceManagerProperties#RM_NODES_DB_SYNCHRONOUS_UPDATES}
+     * property.
+     *
+     * updates will be batched together In milliseconds. If this property is
+     * set to 0, then database operations are not delayed and are synchronous.
+     */
+    RM_NODES_DB_OPERATIONS_DELAY("pa.rm.node.db.operations.delay", PropertyType.INTEGER, "500"),
+
+    /**
+     * Defines if, in the presence of a delay to execute node-related database
+     * operations, the node update database operations must still be run
+     * synchronously whenever possible.
+     */
+    RM_NODES_DB_SYNCHRONOUS_UPDATES("pa.rm.nodes.db.operations.update.synchronous", PropertyType.BOOLEAN, "true"),
+
+    /**
      * Defines whether all the resources of the deployed cloud instances
      * should be destroyed along with the nodes termination when the scheduler 
      * is shut down.

@@ -87,6 +87,10 @@ public interface JobDescriptor extends Serializable, Comparable<JobDescriptor> {
      */
     Map<TaskId, ? extends TaskDescriptor> getPausedTasks();
 
+    /**
+     * Retrieve the persisted state of tasks and restore the state of tasks
+     * that are found running.
+     */
     void restoreRunningTasks();
 
 }
