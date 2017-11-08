@@ -122,7 +122,7 @@ class LoadExamples {
 						// From json to map
 						def slurper = new groovy.json.JsonSlurper()
 						def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
-						return bucket_name = metadata_file_map.get("catalog").get("bucket")
+						return bucket_name == metadata_file_map.get("catalog").get("bucket")
 					}
 					return false
 				}
