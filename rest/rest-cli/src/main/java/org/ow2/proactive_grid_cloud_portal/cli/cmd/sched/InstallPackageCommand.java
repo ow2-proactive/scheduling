@@ -76,6 +76,8 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
 
             schedulerProperties = retrieveSchedulerProperties(currentContext, scheduler);
 
+            schedulerProperties = addSessionIdToSchedulerProperties(currentContext, schedulerProperties);
+
             scriptResult = executeScript(schedulerProperties);
 
             if (scriptResult.errorOccured()) {
@@ -148,5 +150,11 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
     private Map<String, Object> retrieveSchedulerProperties(ApplicationContext currentContext,
             SchedulerRestInterface scheduler) throws PermissionRestException, NotConnectedRestException {
         return scheduler.getSchedulerPropertiesFromSessionId(currentContext.getSessionId());
+    }
+
+    private Map<String, Object> addSessionIdToSchedulerProperties(ApplicationContext currentContext,
+            Map<String, Object> schedulerProperties) {
+        schedulerProperties.put("pa.scheduler.session.id", currentContext.getSessionId());
+        return schedulerProperties;
     }
 }

@@ -152,6 +152,6 @@ class LoadExamples {
 try {
 	new LoadExamples(this.binding).run()
 } catch (Exception e) {
-	println "Failed to load examples into the catalog."+ e.getMessage()
+	throw new Exception ( "Failed to load examples into the catalog."+ e.getMessage())
 }
 
