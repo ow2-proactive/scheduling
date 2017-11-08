@@ -7,6 +7,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
         maven { url "http://nexus.qmino.com/content/repositories/miredot" }
+        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     dependencies {
@@ -30,10 +31,28 @@ buildscript {
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:1.2"
         classpath "com.diffplug.gradle.spotless:spotless:2.4.0"
         classpath "org.ow2.proactive:coding-rules:1.0.0"
+        classpath "gradle.plugin.net.foragerr.jmeter:jmeter-gradle-plugin:1.0.7-2.13" // plugin which is used to run jmeter which launches our performance tests
+
         delete "gradle/ext"
         ant.unjar src: configurations.classpath.find { it.name.startsWith("coding-rules") }, dest: 'gradle/ext'
     }
 }
+
+logging.captureStandardOutput(LogLevel.DEBUG)
+
+//logging {
+//    file ('build.log', LogLevel.DEBUG)
+//    console (LogLevel.INFO)
+//}
+def fileLogger = [
+        onOutput : {
+            File logfile = new File( 'gradle.log' )
+            logfile << it
+        }
+] as org.gradle.api.logging.StandardOutputListener
+
+allprojects { logging.addStandardOutputListener( fileLogger ) }
+
 
 def isWindows = System.properties['os.name'].toLowerCase().contains('windows')
 
@@ -103,7 +122,6 @@ configure(javaSubprojects) {
 
     sourceCompatibility = JavaVersion.VERSION_1_7
     targetCompatibility = JavaVersion.VERSION_1_8
-
     compileJava.options.compilerArgs << '-Xlint:-options' // remove warning about bootstrap class path
 
     dependencies {
@@ -126,6 +144,7 @@ configure(javaSubprojects) {
         exclude 'functionaltests/**'
         exclude 'unittests/**'
         exclude 'unitTests/**'
+        exclude 'performancetests/**'
 
         if(Boolean.valueOf(System.getProperty("java.awt.headless"))){
             exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
@@ -358,6 +377,10 @@ createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-route
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn dist
+}
+
+subprojects {
+    task allDeps(type: DependencyReportTask) {}
 }
 
 apply plugin: 'distribution'

@@ -1,4 +1,6 @@
 repositories {
+    if (project.hasProperty('local')) mavenLocal()
+
     maven {
         url "http://repository.activeeon.com/content/groups/proactive/"
     }
@@ -28,11 +30,15 @@ dependencies {
     compile project(':rm:rm-server')
     compile project(':rm:rm-client')
 
+
+
+
     testCompile "com.google.jimfs:jimfs:1.1"
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     testCompile "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
+    testCompile 'org.apache.jmeter:ApacheJMeter_junit:3.3'
 
     testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
 
@@ -54,6 +60,47 @@ dependencies {
 }
 
 task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration
+
+/**
+ * The whole idea is to have peformancetests/* tests which are run by JMeter.
+ * Run performanceTest task:
+ * it creates junit-performance-tests.jar with performance tests and all our project,
+ * then it runs jmRun task of jmeter-gradle-plugin.
+ * Which takes our prepared plan myverytest.jmx (where is specified which tests to launch).
+ * So JMeter executes tests specified in myverytest.jmx and provided in junit-performance-tests.jar
+ * So final report stored … and goes to Jenkins
+ */
+apply plugin: "net.foragerr.jmeter"
+
+/**
+ * Prepares jar with tests to be run in JMeter.
+ */
+task performanceTestsJar (type: Jar) {
+    archiveName = 'junit-performance-tests.jar'
+
+    destinationDir = file("${buildDir}/resources/jars")
+    from sourceSets.main.output
+    from sourceSets.test.output
+    from configurations.runtime.allArtifacts.files
+    from configurations.runtime
+}
+
+/**
+ * Task which should be called to execute performance tests.
+ * It configures jmeter-gradle-plugin and it is followed by jmRun (plugin task to run all tests)
+ */
+task performanceTests {
+    dependsOn performanceTestsJar
+    jmeter {
+        jmUserProperties = ["user.classpath=${buildDir}/resources/jars/junit-performance-tests.jar"] // specifies where to search for jar
+        jmTestFiles = [file("src/test/resources/jmeter/myverytest.jmx")] // plan which should be executed by JMeter
+        jmLog = file("src/test/resources/jmeter/jmeter.log") // file path to log
+        enableReports = true
+        enableExtendedReports = true
+    }
+    finalizedBy jmRun
+}
+
 
 task testJar(type: Jar) {
     classifier = 'tests'
