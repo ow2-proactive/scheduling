@@ -26,8 +26,13 @@
 package performancetests.recovery;
 
 import org.apache.jmeter.protocol.java.sampler.JUnitSampler;
+import org.apache.jmeter.threads.JMeterVariables;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -41,7 +46,10 @@ public class NodeRecoveryTest {
 
     @Test
     public void testNodeRecovery() throws Exception {
-        int nodesNumber = Integer.valueOf(new JUnitSampler().getThreadContext().getVariables().get("nodesNumber"));
-        Assert.assertEquals(45, nodesNumber);
+        JUnitSampler sampler = new JUnitSampler();
+        final JMeterVariables variables = sampler.getThreadContext().getVariables();
+        JUnitSampler jUnitSampler = (JUnitSampler) sampler.getThreadContext().getCurrentSampler();
+        Integer nodesNumber  = Integer.valueOf(variables.get("nodesNumber"));
+
     }
 }

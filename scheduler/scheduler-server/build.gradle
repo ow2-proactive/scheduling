@@ -89,16 +89,27 @@ task performanceTestsJar (type: Jar) {
  * Task which should be called to execute performance tests.
  * It configures jmeter-gradle-plugin and it is followed by jmRun (plugin task to run all tests)
  */
-task performanceTests {
+task performanceTestsRun {
     dependsOn performanceTestsJar
+
+//    testResultsDir = file("${buildDir}/test-results")
     jmeter {
         jmUserProperties = ["user.classpath=${buildDir}/resources/jars/junit-performance-tests.jar"] // specifies where to search for jar
-        jmTestFiles = [file("src/test/resources/jmeter/myverytest.jmx")] // plan which should be executed by JMeter
+        jmTestFiles = [file("src/test/resources/jmeter/performance-test-plan.jmx")] // plan which should be executed by JMeter
         jmLog = file("src/test/resources/jmeter/jmeter.log") // file path to log
         enableReports = true
-        enableExtendedReports = true
+        enableExtendedReports = false
     }
+
+    /**
+     * in order to run tests it is necessary to run jmRun task of jmeter-gradle-plugin
+     */
     finalizedBy jmRun
+}
+
+task performanceTests {
+    dependsOn performanceTestsRun
+    finalizedBy jmReport
 }
 
 
@@ -106,6 +117,7 @@ task testJar(type: Jar) {
     classifier = 'tests'
     from sourceSets.test.output
 }
+
 
 task stub(type: StubTask) {
     classes = [
