@@ -113,6 +113,8 @@ public class SchedulerStarter {
 
     protected static String rmURL;
 
+    protected static String schedulerURL;
+
     protected static byte[] credentials;
 
     /**
@@ -132,6 +134,7 @@ public class SchedulerStarter {
             CommandLine commandLine = getCommandLine(args, options);
             if (commandLine.hasOption("h")) {
                 displayHelp(options);
+                System.exit(0);
             } else {
                 start(commandLine);
             }
@@ -162,33 +165,39 @@ public class SchedulerStarter {
         setCleanNodesourcesProperty(commandLine);
 
         rmUrl = connectToOrStartResourceManager(commandLine, rmUrl);
+        rmURL = rmUrl;
 
         if (commandLine.hasOption("rm-only")) {
             return;
         }
 
-        SchedulerAuthenticationInterface schedulerAuthenticationInterface = startScheduler(commandLine, rmUrl);
-
-        schedAuthInter = schedulerAuthenticationInterface;
-        rmURL = rmUrl;
+        schedulerURL = getSchedulerUrl(commandLine);
+        if (!commandLine.hasOption("scheduler-url")) {
+            SchedulerAuthenticationInterface schedulerAuthenticationInterface = startScheduler(commandLine, rmUrl);
+            schedulerURL = schedulerAuthenticationInterface.getHostURL();
+            schedAuthInter = schedulerAuthenticationInterface;
+        }
 
         if (!commandLine.hasOption("no-rest")) {
-            List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl,
-                                                                                     schedulerAuthenticationInterface.getHostURL()));
-            if (applicationUrls != null) {
-                for (String applicationUrl : applicationUrls) {
-                    if (applicationUrl.endsWith("/rest")) {
-                        if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-                            PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
-                        }
-                    }
-                }
-            }
+            startJetty(rmUrl, schedulerURL);
         }
 
         addShutdownMessageHook();
 
         executeStartScripts();
+    }
+
+    public static void startJetty(String rmUrl, String scheduleUrl) {
+        List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, scheduleUrl));
+        if (applicationUrls != null) {
+            for (String applicationUrl : applicationUrls) {
+                if (applicationUrl.endsWith("/rest")) {
+                    if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+                        PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
+                    }
+                }
+            }
+        }
     }
 
     private static void startRouter() throws Exception {
@@ -313,6 +322,16 @@ public class SchedulerStarter {
         return rmUrl;
     }
 
+    private static String getSchedulerUrl(CommandLine commandLine) {
+        String schedulerUrl = null;
+
+        if (commandLine.hasOption("scheduler-url")) {
+            schedulerUrl = commandLine.getOptionValue("scheduler-url");
+            logger.info("Scheduler URL : " + schedulerUrl);
+        }
+        return schedulerUrl;
+    }
+
     private static String getPolicyFullName(CommandLine commandLine) {
         String policyFullName = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString();
 
@@ -366,10 +385,18 @@ public class SchedulerStarter {
         help.setRequired(false);
         options.addOption(help);
 
-        Option rmURL = new Option("u", "rmURL", true, "the resource manager URL (default: localhost)");
+        Option rmURL = new Option("u", "rmURL", true, "bind to a given resource manager URL (default: localhost)");
         rmURL.setArgName("rmURL");
         rmURL.setRequired(false);
         options.addOption(rmURL);
+
+        Option schedulerUrl = new Option("s",
+                                         "scheduler-url",
+                                         true,
+                                         "bind to a given scheduler URL (default: localhost)");
+        schedulerUrl.setArgName("scheduler-url");
+        schedulerUrl.setRequired(false);
+        options.addOption(schedulerUrl);
 
         Option policy = new Option("p",
                                    "policy",
