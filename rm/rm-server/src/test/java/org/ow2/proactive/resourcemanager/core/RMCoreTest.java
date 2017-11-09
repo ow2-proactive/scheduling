@@ -348,9 +348,9 @@ public class RMCoreTest {
 
     @Test
     public void testNodesRestorationManagerHandleInSetDeploying() {
-        verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class));
+        verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class), Mockito.any(Client.class));
         rmCore.setDeploying(mockedBusyNode);
-        verify(nodesRecoveryManager).restoreLocks(Mockito.any(RMNode.class));
+        verify(nodesRecoveryManager).restoreLocks(Mockito.any(RMNode.class), Mockito.any(Client.class));
     }
 
     @Test
@@ -624,7 +624,7 @@ public class RMCoreTest {
     public void testInternalLockNodeWithNodeNotLocked() {
         verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
 
-        rmCore.internalLockNode(mockedRemovableNode);
+        rmCore.internalLockNode(mockedRemovableNode, mockedCaller);
 
         verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
     }
@@ -633,7 +633,7 @@ public class RMCoreTest {
     public void testInternalLockNodeWithNodeLocked() {
         verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
 
-        rmCore.internalLockNode(mockedBusyNode);
+        rmCore.internalLockNode(mockedBusyNode, mockedCaller);
 
         verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
     }

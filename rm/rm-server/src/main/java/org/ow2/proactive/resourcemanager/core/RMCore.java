@@ -442,10 +442,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     void initiateRecoveryIfRequired() {
         nodesRecoveryManager = getNodesRecoveryManagerBuilder().apply(this);
-
+        nodesRecoveryManager.initialize();
         if (RM_NODES_RECOVERY.getValueAsBoolean()) {
             logger.info("Starting RM nodes recovery");
-            nodesRecoveryManager.initialize();
             restoreNodesAndNodeSources();
         } else {
             logger.info("RM nodes recovery is disabled. Removing all nodes from database");
@@ -504,9 +503,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             if (node != null) {
                 rmnode = restoreInternalNode(nodeSource, rmNodeData, nodeUrl, node);
+                nodesRecoveryManager.restoreLocks(rmnode, rmNodeData.getProvider());
             } else {
                 // the node is not recoverable and does not appear in any data
-                // structures: we can remove it safely
+                // structures: we can remove it safely from database
                 dbManager.removeNode(rmNodeData);
                 triggerDownNodeHandling(nodeSource, rmNodeData, nodeUrl);
             }
@@ -2061,7 +2061,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private boolean checkNodeAdminPermission(RMNode rmnode, Client client) {
         NodeSource nodeSource = rmnode.getNodeSource();
 
-        String errorMessage = caller + " is not authorized to remove node " + rmnode.getNodeURL() + " from " +
+        String errorMessage = client.getName() + " is not authorized to manage node " + rmnode.getNodeURL() + " from " +
                               rmnode.getNodeSourceName();
 
         // in order to be the node administrator a client has to be either
@@ -2070,10 +2070,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // a node provider
         try {
             // checking if the caller is an administrator
-            caller.checkPermission(nodeSource.getAdminPermission(), errorMessage);
+            client.checkPermission(nodeSource.getAdminPermission(), errorMessage);
         } catch (SecurityException ex) {
             // the caller is not an administrator, so checking if it is a node provider
-            caller.checkPermission(rmnode.getAdminPermission(), errorMessage);
+            client.checkPermission(rmnode.getAdminPermission(), errorMessage);
         }
 
         return true;
@@ -2084,15 +2084,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Override
     public BooleanWrapper lockNodes(Set<String> urls) {
+        return lockNodes(urls, caller);
+    }
+
+    protected BooleanWrapper lockNodes(Set<String> urls, final Client caller) {
         return mapOnNodeUrlSet(urls, new Predicate<RMNode>() {
             @Override
             public boolean apply(RMNode node) {
-                return internalLockNode(node);
+                return internalLockNode(node, caller);
             }
         }, "lock");
     }
 
-    boolean internalLockNode(RMNode rmNode) {
+    boolean internalLockNode(RMNode rmNode, Client lockInitiator) {
         if (rmNode.isLocked()) {
             logger.warn("Cannot lock a node that is already locked: " + rmNode.getNodeURL());
             // locking a node that is already locked must not update
@@ -2101,12 +2105,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         try {
-            // can throw a security exception if the caller is not an admin
-            this.checkNodeAdminPermission(rmNode, this.caller);
-            rmNode.lock(this.caller);
+            // can throw a security exception if the lockInitiator is not an admin
+            this.checkNodeAdminPermission(rmNode, lockInitiator);
+            rmNode.lock(lockInitiator);
             this.eligibleNodes.remove(rmNode);
         } catch (SecurityException e) {
-            logger.warn("", e);
+            logger.warn("Lock node lockInitiator is not admin", e);
             return false;
         }
 
@@ -2118,7 +2122,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // updated in the intermediate RM cache (see RMListenerProxy#nodeEvent)
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
                                                              rmNode.getState(),
-                                                             this.caller.getName()));
+                                                             lockInitiator.getName()));
 
         return true;
     }
@@ -2305,7 +2309,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void selectCandidateNode(HashSet<RMNode> selectedRMNodes, RMNode candidateNode) {
-        if (this.internalLockNode(candidateNode)) {
+        if (this.internalLockNode(candidateNode, caller)) {
             selectedRMNodes.add(candidateNode);
         } else {
             // Unlock all previously locked nodes
@@ -2324,7 +2328,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     public boolean setDeploying(RMNode rmNode) {
-        nodesRecoveryManager.restoreLocks(rmNode);
+        nodesRecoveryManager.restoreLocks(rmNode, caller);
         return true;
     }
 

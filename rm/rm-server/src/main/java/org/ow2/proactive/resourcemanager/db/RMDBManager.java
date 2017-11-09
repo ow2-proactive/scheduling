@@ -287,14 +287,29 @@ public class RMDBManager {
 
     public boolean addNodeSource(final NodeSourceData nodeSourceData) {
         try {
-            return executeReadWriteTransaction(new SessionWork<Boolean>() {
+            boolean persisted = executeReadWriteTransaction(new SessionWork<Boolean>() {
                 @Override
                 public Boolean doInTransaction(Session session) {
-                    logger.debug("Adding a new node source " + nodeSourceData.getName() + " to the database");
-                    session.save(nodeSourceData);
-                    return true;
+                    boolean persisted = false;
+                    NodeSourceData retrievedNodeSource = session.get(NodeSourceData.class, nodeSourceData.getName());
+                    if (retrievedNodeSource == null) {
+                        logger.debug("Adding a new node source " + nodeSourceData.getName() + " to the database");
+                        session.save(nodeSourceData);
+                        persisted = true;
+                    }
+                    return persisted;
                 }
             });
+            if (!persisted) {
+                persisted = executeReadWriteTransaction(new SessionWork<Boolean>() {
+                    @Override
+                    public Boolean doInTransaction(Session session) {
+                        session.update(nodeSourceData);
+                        return true;
+                    }
+                });
+            }
+            return persisted;
         } catch (RuntimeException e) {
             throw new RuntimeException("Exception occurred while adding new node source " + nodeSourceData.getName(),
                                        e);

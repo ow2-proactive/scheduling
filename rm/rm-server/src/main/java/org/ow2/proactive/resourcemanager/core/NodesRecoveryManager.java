@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.core;
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 import com.google.common.base.Function;
@@ -74,8 +75,8 @@ public class NodesRecoveryManager {
         };
     }
 
-    public void restoreLocks(RMNode rmNode) {
-        nodesLockRestorationManager.handle(rmNode);
+    public void restoreLocks(RMNode rmNode, Client caller) {
+        nodesLockRestorationManager.handle(rmNode, caller);
     }
 
 }
