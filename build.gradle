@@ -1,3 +1,5 @@
+//pr test
+
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
