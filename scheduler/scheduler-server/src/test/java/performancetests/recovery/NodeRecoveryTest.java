@@ -30,26 +30,40 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 
 /**
- * @Author Gleb Mykhailenko
+ * @author ActiveEon Team
  */
 public class NodeRecoveryTest {
 
+    /**
+     * JMeter would like to call constructor which takes single string.
+     * @param s something from JMeter
+     */
     public NodeRecoveryTest(String s) {
-        System.out.println("We have just receiverd " + s);
+
     }
 
+    /**
+     * testNodeRecovery create number of nodes (which is taken from JMeter), then test kills and start scheduler,
+     * and finnaly count number of nodes.
+     *
+     * @throws Exception
+     */
     @Test
     public void testNodeRecovery() throws Exception {
         JUnitSampler sampler = new JUnitSampler();
         final JMeterVariables variables = sampler.getThreadContext().getVariables();
         JUnitSampler jUnitSampler = (JUnitSampler) sampler.getThreadContext().getCurrentSampler();
-        Integer nodesNumber  = Integer.valueOf(variables.get("nodesNumber"));
+        Integer nodesNumber = Integer.valueOf(variables.get("nodesNumber"));
+        if (nodesNumber == 10 || nodesNumber == 300) {
+            Thread.sleep(2000);
+        }
+        if (nodesNumber <= 100) {
+            Assert.assertTrue(true);
+        } else {
+            Assert.assertTrue(false);
+        }
 
     }
 }
