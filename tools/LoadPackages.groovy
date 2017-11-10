@@ -4,9 +4,9 @@ import java.nio.file.Paths
 import java.util.zip.ZipFile
 import org.apache.log4j.Logger
 
-class LoadExamples {
+class LoadPackages {
 
-	private final String SCRIPT_NAME = "LoadExamples.groovy"
+	private final String SCRIPT_NAME = "LoadPackages.groovy"
 
 	private final String LOAD_PACKAGE_SCRIPT_NAME = "LoadPackage.groovy"
 
@@ -20,7 +20,7 @@ class LoadExamples {
 	private logger = Logger.getLogger("org.ow2.proactive.scheduler")
 
 
-	LoadExamples(binding) {
+	LoadPackages(binding) {
 
 		// Bindings
 		this.SCHEDULER_HOME = binding.variables.get("pa.scheduler.home")
@@ -150,7 +150,7 @@ class LoadExamples {
 }
 
 try {
-	new LoadExamples(this.binding).run()
+	new LoadPackages(this.binding).run()
 } catch (Exception e) {
 	println "Failed to load examples into the catalog."+ e.getMessage()
 }
