@@ -96,7 +96,7 @@ class LoadPackage {
 
     def run(File package_dir) {
         def target_dir_path = ""
-        def bucket = ""
+        def package_buckets_list
         String sessionId = loginAdminUserCredToSchedulerAndGetSessionId()
         //If the package dir is a zip file, create a temporary directory that contains the unzipped package dir
         if (package_dir.getPath().endsWith(".zip")) {
@@ -142,142 +142,148 @@ class LoadPackage {
         // BUCKET SECTION /////////////////////////////
 
 
-        bucket = catalog_map.get("bucket")
+        //Transform a String to a List of String
+        if (catalog_map.get("bucket") instanceof String) {
+            package_buckets_list = [catalog_map.get("bucket")]
 
-        // Does the bucket already exist? -------------
-        // GET QUERY
-        def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
-        def response = new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: sessionId])
-        def buckets_list = slurper.parseText(response.toString())
-        def bucket_found = buckets_list.find { object -> object.name == bucket }
-
-        writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
-
-        // Create a bucket if needed -------------
-        def bucket_id = null
-        if (bucket_found) {
-            bucket_id = bucket_found.id
+        } else {
+            package_buckets_list = catalog_map.get("bucket")
         }
-        else {
-            // POST QUERY
-            def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
-            def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
-            post.addHeader("Accept", "application/json")
-            post.addHeader("Content-Type", "application/json")
-            post.addHeader("sessionId", sessionId)
+        package_buckets_list.each { bucket ->
+            // Does the bucket already exist? -------------
+            // GET QUERY
+            def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
+            def response = new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: sessionId])
+            def buckets_list = slurper.parseText(response.toString())
+            def bucket_found = buckets_list.find { object -> object.name == bucket }
 
-            response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
-            def bis = new BufferedInputStream(response.getEntity().getContent())
-            def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
-            bucket_id = slurper.parseText(result.toString()).get("id")
-            bis.close();
-            writeToOutput(" " + bucket + " created!")
-        }
+            writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
 
-        // OBJECTS SECTION /////////////////////////////
-
-        // GET QUERY
-        def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources"
-        response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: sessionId])
-        def bucket_resources_list = slurper.parseText(response.toString())
-
-        catalog_map.get("objects").each { object ->
-
-            def metadata_map = object.get("metadata")
-
-            // OBJECT SECTION /////////////////////////////
-
-            // Does the object already exist in the catalog ? -------------
-            def object_name = object.get("name")
-            def object_found = bucket_resources_list.find { resource -> resource.name == object_name }
-            writeToOutput(" " + object_name + " found? " + (object_found != null))
-
-            // Push the object to the bucket if it not exists
-            def object_relative_path = object.get("file")
-            def object_file = new File(package_dir.absolutePath, object_relative_path)
-            def object_absolute_path = object_file.absolutePath
-            if (!object_found) {
-                // Retrieve object metadata
-                def kind = metadata_map.get("kind")
-                def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage"), "UTF-8")
-                def contentType = metadata_map.get("contentType")
-
-                // For POST queries
-                this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.2.jar").absolutePath);
-                def boundary = "---------------" + UUID.randomUUID().toString();
-
+            // Create a bucket if needed -------------
+            def bucket_id = null
+            if (bucket_found) {
+                bucket_id = bucket_found.id
+            } else {
                 // POST QUERY
-                def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&contentType=" + contentType
-                def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
+                def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
+                def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
                 post.addHeader("Accept", "application/json")
-                post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)
+                post.addHeader("Content-Type", "application/json")
                 post.addHeader("sessionId", sessionId)
 
-                def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
-                builder.setBoundary(boundary);
-                builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
-                builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file))
-                post.setEntity(builder.build())
-
-                def result = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
-                writeToOutput(" " + object_file.getName() + " pushed!")
+                response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
+                def bis = new BufferedInputStream(response.getEntity().getContent())
+                def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+                bucket_id = slurper.parseText(result.toString()).get("id")
+                bis.close();
+                writeToOutput(" " + bucket + " created!")
             }
 
-            // Expose the workflow/object as a studio template
+            // OBJECTS SECTION /////////////////////////////
 
-            // Start by finding the next template dir index
-            def template_dir_name = "1"
-            // If the wkw template dir does not exist, let's create it
-            if (!this.WORKFLOW_TEMPLATES_DIR.exists()) {
-                this.WORKFLOW_TEMPLATES_DIR.mkdirs()
-            }
-            // If it exists, let's iterate over existing templates
-            else {
-                def templates_dirs_list = []
-                new File(this.WORKFLOW_TEMPLATES_DIR_PATH).eachDir { dir ->
-                    templates_dirs_list << dir.getName().toInteger()
-                }
-                if (!templates_dirs_list.isEmpty())
-                    template_dir_name = (templates_dirs_list.sort().last() + 1) + ""
-            }
-            writeToOutput(" Next template dir name " + template_dir_name)
+            // GET QUERY
+            def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources"
+            response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: sessionId])
+            def bucket_resources_list = slurper.parseText(response.toString())
 
-            def studio_template = object.get("studio_template")
-            if (studio_template != null) {
-                // Retrieve the studio template name
-                def studio_template_name = studio_template.get("name")
+            catalog_map.get("objects").each { object ->
 
-                // Is the workflow already exposed as a studio template ? -------------
-                def studio_template_found = isAStudioTemplate(studio_template_name, this.WORKFLOW_TEMPLATES_DIR_PATH)
-                writeToOutput(" " + studio_template_name + " found in studio templates ? " + studio_template_found)
+                def metadata_map = object.get("metadata")
 
-                if (!studio_template_found) {
-                    // Create a new template dir in the targeted directory and copy the workflow into it
-                    def template_dir = new File(this.WORKFLOW_TEMPLATES_DIR_PATH, template_dir_name)
-                    template_dir.mkdir()
-                    writeToOutput("] " + template_dir.absolutePath + " created!")
+                // OBJECT SECTION /////////////////////////////
 
-                    // Copy the workflow into it
-                    def file_dest = new File(template_dir, "job.xml")
-                    def file_dest_path = file_dest.absolutePath
-                    Files.copy(Paths.get(object_absolute_path), Paths.get(file_dest_path))
-                    writeToOutput(" " + file_dest_path + " created!")
+                // Does the object already exist in the catalog ? -------------
+                def object_name = object.get("name")
+                def object_found = bucket_resources_list.find { resource -> resource.name == object_name }
+                writeToOutput(" " + object_name + " found? " + (object_found != null))
 
-                    // Create a name file into it
-                    def name_file = new File(template_dir, "name")
-                    name_file.text = studio_template_name
-                    writeToOutput(" " + name_file.absolutePath + " created!")
+                // Push the object to the bucket if it not exists
+                def object_relative_path = object.get("file")
+                def object_file = new File(package_dir.absolutePath, object_relative_path)
+                def object_absolute_path = object_file.absolutePath
+                if (!object_found) {
+                    // Retrieve object metadata
+                    def kind = metadata_map.get("kind")
+                    def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage"), "UTF-8")
+                    def contentType = metadata_map.get("contentType")
 
-                    // Create the metadata file into it
-                    def studio_metadata_file = new File(template_dir, "metadata")
-                    studio_metadata_file.text = studio_template.get("offsets_json_string")
-                    writeToOutput(" " + studio_metadata_file.absolutePath + " created!")
+                    // For POST queries
+                    this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.2.jar").absolutePath);
+                    def boundary = "---------------" + UUID.randomUUID().toString();
 
-                    template_dir_name = (template_dir_name.toInteger() + 1) + ""
+                    // POST QUERY
+                    def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&contentType=" + contentType
+                    def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
+                    post.addHeader("Accept", "application/json")
+                    post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)
+                    post.addHeader("sessionId", sessionId)
+
+                    def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
+                    builder.setBoundary(boundary);
+                    builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
+                    builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file))
+                    post.setEntity(builder.build())
+
+                    def result = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
+                    writeToOutput(" " + object_file.getName() + " pushed!")
                 }
 
-            }
+                // Expose the workflow/object as a studio template
 
+                // Start by finding the next template dir index
+                def template_dir_name = "1"
+                // If the wkw template dir does not exist, let's create it
+                if (!this.WORKFLOW_TEMPLATES_DIR.exists()) {
+                    this.WORKFLOW_TEMPLATES_DIR.mkdirs()
+                }
+                // If it exists, let's iterate over existing templates
+                else {
+                    def templates_dirs_list = []
+                    new File(this.WORKFLOW_TEMPLATES_DIR_PATH).eachDir { dir ->
+                        templates_dirs_list << dir.getName().toInteger()
+                    }
+                    if (!templates_dirs_list.isEmpty())
+                        template_dir_name = (templates_dirs_list.sort().last() + 1) + ""
+                }
+                writeToOutput(" Next template dir name " + template_dir_name)
+
+                def studio_template = object.get("studio_template")
+                if (studio_template != null) {
+                    // Retrieve the studio template name
+                    def studio_template_name = studio_template.get("name")
+
+                    // Is the workflow already exposed as a studio template ? -------------
+                    def studio_template_found = isAStudioTemplate(studio_template_name, this.WORKFLOW_TEMPLATES_DIR_PATH)
+                    writeToOutput(" " + studio_template_name + " found in studio templates ? " + studio_template_found)
+
+                    if (!studio_template_found) {
+                        // Create a new template dir in the targeted directory and copy the workflow into it
+                        def template_dir = new File(this.WORKFLOW_TEMPLATES_DIR_PATH, template_dir_name)
+                        template_dir.mkdir()
+                        writeToOutput("] " + template_dir.absolutePath + " created!")
+
+                        // Copy the workflow into it
+                        def file_dest = new File(template_dir, "job.xml")
+                        def file_dest_path = file_dest.absolutePath
+                        Files.copy(Paths.get(object_absolute_path), Paths.get(file_dest_path))
+                        writeToOutput(" " + file_dest_path + " created!")
+
+                        // Create a name file into it
+                        def name_file = new File(template_dir, "name")
+                        name_file.text = studio_template_name
+                        writeToOutput(" " + name_file.absolutePath + " created!")
+
+                        // Create the metadata file into it
+                        def studio_metadata_file = new File(template_dir, "metadata")
+                        studio_metadata_file.text = studio_template.get("offsets_json_string")
+                        writeToOutput(" " + studio_metadata_file.absolutePath + " created!")
+
+                        template_dir_name = (template_dir_name.toInteger() + 1) + ""
+                    }
+
+                }
+
+            }
         }
     }
 }
