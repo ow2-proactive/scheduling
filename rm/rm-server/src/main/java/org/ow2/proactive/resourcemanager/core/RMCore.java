@@ -492,7 +492,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         makeSureNodeSourceHasNoNode(nodeSource, nodeSourceName);
 
         Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSourceName);
-        logger.info("Number of nodes to recover for the node source " + nodeSourceName + ": " + nodesData.size());
+        logger.info("Number of nodes found in database for node source " + nodeSourceName + ": " + nodesData.size());
+
+        Map<NodeState, Integer> nodeStates = new HashMap<>();
+        int totalEligibleRecoveredNodes = 0;
 
         // for each node found in database, try to lookup node or recreate is as down
         for (RMNodeData rmNodeData : nodesData) {
@@ -504,6 +507,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             if (node != null) {
                 rmnode = restoreInternalNode(nodeSource, rmNodeData, nodeUrl, node);
                 nodesRecoveryManager.restoreLocks(rmnode, rmNodeData.getProvider());
+                Integer nbNodesInState = nodeStates.get(rmnode.getState());
+                int newNbNodesInState = nbNodesInState == null ? 1 : nbNodesInState + 1;
+                nodeStates.put(rmnode.getState(), newNbNodesInState);
             } else {
                 // the node is not recoverable and does not appear in any data
                 // structures: we can remove it safely from database
@@ -514,8 +520,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // structure if we want it to be usable by a task
             if (isEligible(rmnode)) {
                 eligibleNodes.add(rmnode);
+                totalEligibleRecoveredNodes++;
             }
         }
+
+        int totalRecoveredNodes = 0;
+        logger.info("Recovered nodes:");
+        for (Entry<NodeState, Integer> nodeStateIntEntry : nodeStates.entrySet()) {
+            logger.info("- nodes in " + nodeStateIntEntry.getKey() + " state: " + nodeStateIntEntry.getValue());
+            totalRecoveredNodes += nodeStateIntEntry.getValue();
+        }
+        logger.info("Total number of nodes recovered: " + totalRecoveredNodes + ", including eligible nodes: " +
+                    totalEligibleRecoveredNodes);
     }
 
     private RMNode restoreInternalNode(NodeSource nodeSource, RMNodeData rmNodeData, String nodeUrl, Node node) {

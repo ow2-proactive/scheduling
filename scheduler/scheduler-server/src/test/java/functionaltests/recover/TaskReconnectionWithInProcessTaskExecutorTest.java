@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.restart;
+package functionaltests.recover;
 
 import java.net.URL;
 

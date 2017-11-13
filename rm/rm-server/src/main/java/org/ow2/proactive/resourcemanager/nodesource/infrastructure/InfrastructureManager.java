@@ -327,13 +327,24 @@ public abstract class InfrastructureManager implements Serializable {
     public void internalNotifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
         writeLock.lock();
         try {
-            getAcquiredNodesMap().remove(nodeName);
+            removeDownNodePriorToNotify(nodeName);
             this.notifyDownNode(nodeName, nodeUrl, node);
         } catch (Exception e) {
             logger.warn("Exception occurred while removing node " + node, e);
         } finally {
             writeLock.unlock();
         }
+    }
+
+    /**
+     * This method can be overriden by subclasses, especially if they do not
+     * want the node to be removed from the InfrastructureManager map when
+     * detected as down.
+     *
+     * @param nodeName the node to remove
+     */
+    protected void removeDownNodePriorToNotify(String nodeName) {
+        removeAcquiredNode(nodeName);
     }
 
     /**
@@ -1213,21 +1224,31 @@ public abstract class InfrastructureManager implements Serializable {
         return (Map<String, Node>) persistedInfraVariables.get(ACQUIRED_NODES_KEY);
     }
 
-    private void putAcquiredNode(final String nodeUrl, final Node deployingNode) {
+    private void putAcquiredNode(final String nodeName, final Node deployingNode) {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                getAcquiredNodesMap().put(nodeUrl, deployingNode);
+                getAcquiredNodesMap().put(nodeName, deployingNode);
                 return null;
             }
         });
     }
 
-    private boolean containsKeyAcquiredNode(final String nodeUrl) {
+    private boolean containsKeyAcquiredNode(final String nodeName) {
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
-                return getAcquiredNodesMap().containsKey(nodeUrl);
+                return getAcquiredNodesMap().containsKey(nodeName);
+            }
+        });
+    }
+
+    public void removeAcquiredNode(final String nodeName) {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                getAcquiredNodesMap().remove(nodeName);
+                return null;
             }
         });
     }

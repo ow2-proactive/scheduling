@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.restart;
+package functionaltests.recover;
 
 import java.io.File;
 import java.net.URL;
@@ -71,7 +71,7 @@ public abstract class TaskReconnectionToRecoveredNodeTest extends SchedulerFunct
 
     private static final long LOG_EVENT_TIMEOUT = 120000;
 
-    private static final int RESTART_SCHEDULER_INTER_TIME_IN_MILLISECONDS = 5000;
+    private static final int RESTART_SCHEDULER_INTER_TIME_IN_MILLISECONDS = 1000;
 
     private static final String TASK_NAME = "TwoMinutes_Task";
 
@@ -100,7 +100,6 @@ public abstract class TaskReconnectionToRecoveredNodeTest extends SchedulerFunct
 
     @Test
     public void action() throws Throwable {
-        ResourceManager rm = schedulerHelper.getResourceManager();
 
         nodes = schedulerHelper.createRMNodeStarterNodes(TaskReconnectionWithForkedTaskExecutorTest.class.getSimpleName(),
                                                          NB_NODES);
@@ -109,6 +108,8 @@ public abstract class TaskReconnectionToRecoveredNodeTest extends SchedulerFunct
         schedulerHelper.waitForEventJobRunning(jobid);
 
         TaskState taskState = schedulerHelper.getSchedulerInterface().getJobState(jobid).getTasks().get(0);
+        schedulerHelper.waitForEventTaskRunning(taskState.getJobId(), taskState.getName());
+        taskState = schedulerHelper.getSchedulerInterface().getJobState(jobid).getTasks().get(0);
         String firstExecutionHostInfo = taskState.getTaskInfo().getExecutionHostName();
 
         // wait and restart scheduler

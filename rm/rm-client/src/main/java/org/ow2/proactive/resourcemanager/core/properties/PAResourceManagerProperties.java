@@ -284,7 +284,7 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * updates will be batched together In milliseconds. If this property is
      * set to 0, then database operations are not delayed and are synchronous.
      */
-    RM_NODES_DB_OPERATIONS_DELAY("pa.rm.node.db.operations.delay", PropertyType.INTEGER, "500"),
+    RM_NODES_DB_OPERATIONS_DELAY("pa.rm.node.db.operations.delay", PropertyType.INTEGER, "100"),
 
     /**
      * Defines if, in the presence of a delay to execute node-related database
