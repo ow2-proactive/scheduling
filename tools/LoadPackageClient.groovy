@@ -26,7 +26,7 @@ class LoadPackageClient {
 
     }
 
-    def run(File package_dir) {
+    void run(package_dir) {
         package_loader.run(package_dir)
 
     }
