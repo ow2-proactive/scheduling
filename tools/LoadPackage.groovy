@@ -46,7 +46,7 @@ class LoadPackage {
     }
 
 
-    def writeToOutput(String output) {
+    void writeToOutput(output) {
         logger.info("[" + this.LOAD_PACKAGE_SCRIPT_NAME + "] " + output)
     }
 
@@ -63,7 +63,7 @@ class LoadPackage {
         }
     }
 
-    def unzipFile(src, dest) {
+    void unzipFile(src, dest) {
         def zipFile = new ZipFile(src)
         zipFile.entries().each { it ->
             def path = Paths.get(dest + "/" + it.name)
@@ -92,7 +92,7 @@ class LoadPackage {
         return sessionID
     }
 
-    File unzipPackage(File package_dir) {
+    def unzipPackage(package_dir) {
         if (!package_dir.exists()) {
             writeToOutput("] " + packager_dir + " not found!")
             return
@@ -109,10 +109,10 @@ class LoadPackage {
     }
 
 
-    void populateDataspace(Object catalog_map, File package_dir) {
+    void populateDataspace(metadata_file_map, package_dir) {
         def dataspace_map = null
         def target_dir_path = ""
-        if ((dataspace_map = catalog_map.get("dataspace")) != null) {
+        if ((dataspace_map = metadata_file_map.get("dataspace")) != null) {
             // Retrieve the targeted directory path
             def target = dataspace_map.get("target")
             if (target == "global")
@@ -130,7 +130,7 @@ class LoadPackage {
         }
     }
 
-    String getNextTemplateDirName() {
+    def getNextTemplateDirName() {
         String template_dir_name = "1"
         // If the wkw template dir does not exist, let's create it
         if (!this.WORKFLOW_TEMPLATES_DIR.exists()) {
@@ -150,7 +150,7 @@ class LoadPackage {
     }
 
 
-    void populateTemplateDir(Object object, Object object_absolute_path) {
+    void populateTemplateDir(object, object_absolute_path) {
         // Start by finding the next template dir index
         String template_dir_name = getNextTemplateDirName()
 
@@ -192,7 +192,7 @@ class LoadPackage {
 
     }
 
-    File pushObject(Object object, File package_dir, ArrayList bucket_resources_list, Integer bucket_id) {
+    def pushObject(object, package_dir, bucket_resources_list, bucket_id) {
         def metadata_map = object.get("metadata")
 
         // OBJECT SECTION /////////////////////////////
@@ -234,7 +234,7 @@ class LoadPackage {
         return object_file
     }
 
-    void populateBucket(Object catalog_map, Object slurper, File package_dir) {
+    void populateBucket(catalog_map, slurper, package_dir) {
         def buckets_list
         //Transform a String to a List of String
         if (catalog_map.get("bucket") instanceof String) {
@@ -291,7 +291,7 @@ class LoadPackage {
     }
 
 
-    void run(File package_dir) {
+    void run(package_dir) {
         if (sessionId == null) {
             sessionId = loginAdminUserCredToSchedulerAndGetSessionId()
         }
@@ -308,7 +308,7 @@ class LoadPackage {
 
         // POPULATE DATASPACE ////////////////////////////
 
-        populateDataspace(catalog_map, package_dir)
+        populateDataspace(metadata_file_map, package_dir)
 
         // POPULATE BUCKETS /////////////////////////////
 

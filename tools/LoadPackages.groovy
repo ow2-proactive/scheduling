@@ -43,7 +43,7 @@ class LoadPackages {
     }
 
 
-    def unzipFile(src, dest) {
+    void unzipFile(src, dest) {
         def zipFile = new ZipFile(src)
         zipFile.entries().each { it ->
             def path = Paths.get(dest + "/" + it.name)
@@ -59,7 +59,7 @@ class LoadPackages {
         }
     }
 
-    def writeToOutput(String output) {
+    void writeToOutput(output) {
         logger.info("[" + this.SCRIPT_NAME + "] " + output)
     }
 
