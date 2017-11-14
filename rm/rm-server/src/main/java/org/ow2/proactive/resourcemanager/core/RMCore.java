@@ -486,6 +486,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void restoreNodes(NodeSource nodeSource) {
+        logger.info("Start to recover nodes");
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
         String nodeSourceName = nodeSource.getName();
 
@@ -523,7 +524,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 totalEligibleRecoveredNodes++;
             }
         }
-
         int totalRecoveredNodes = 0;
         logger.info("Recovered nodes:");
         for (Entry<NodeState, Integer> nodeStateIntEntry : nodeStates.entrySet()) {
@@ -532,6 +532,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         logger.info("Total number of nodes recovered: " + totalRecoveredNodes + ", including eligible nodes: " +
                     totalEligibleRecoveredNodes);
+        logger.info("End of nodes recovery");
     }
 
     private RMNode restoreInternalNode(NodeSource nodeSource, RMNodeData rmNodeData, String nodeUrl, Node node) {

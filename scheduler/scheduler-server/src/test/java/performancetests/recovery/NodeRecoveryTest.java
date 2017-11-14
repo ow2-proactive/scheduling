@@ -25,45 +25,32 @@
  */
 package performancetests.recovery;
 
-import org.apache.jmeter.protocol.java.sampler.JUnitSampler;
-import org.apache.jmeter.threads.JMeterVariables;
-import org.junit.Assert;
-import org.junit.Test;
+import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
+import org.apache.jmeter.samplers.SampleResult;
+import org.apache.jmeter.threads.JMeterContextService;
+import performancetests.recovery.helper.NodeRecoveryHelper;
 
 
-/**
- * @author ActiveEon Team
- */
-public class NodeRecoveryTest {
+public class NodeRecoveryTest extends AbstractJavaSamplerClient {
 
-    /**
-     * JMeter would like to call constructor which takes single string.
-     * @param s something from JMeter
-     */
-    public NodeRecoveryTest(String s) {
+    @Override
+    public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
+        SampleResult sampleResult = null;
+        try {
+            final Integer nodesNumber = Integer.valueOf(JMeterContextService.getContext().getVariables().get("nodesNumber"));
 
-    }
+            NodeRecoveryHelper nodeRecoveryHelper = new NodeRecoveryHelper();
+            nodeRecoveryHelper.startKillStartScheduler();
 
-    /**
-     * testNodeRecovery create number of nodes (which is taken from JMeter), then test kills and start scheduler,
-     * and finnaly count number of nodes.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testNodeRecovery() throws Exception {
-        JUnitSampler sampler = new JUnitSampler();
-        final JMeterVariables variables = sampler.getThreadContext().getVariables();
-        JUnitSampler jUnitSampler = (JUnitSampler) sampler.getThreadContext().getCurrentSampler();
-        Integer nodesNumber = Integer.valueOf(variables.get("nodesNumber"));
-        if (nodesNumber == 10 || nodesNumber == 300) {
-            Thread.sleep(2000);
+            sampleResult = SampleResult.createTestSample(nodeRecoveryHelper.timeSpentToRecoverNodes());
+            sampleResult.setResponseCodeOK();
+            sampleResult.setSuccessful(true);
+            sampleResult.setResponseMessage("I'm Forever Blowing Bubbles");
+            nodeRecoveryHelper.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (nodesNumber <= 100) {
-            Assert.assertTrue(true);
-        } else {
-            Assert.assertTrue(false);
-        }
-
+        return sampleResult;
     }
 }

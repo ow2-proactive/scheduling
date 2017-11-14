@@ -40,7 +40,7 @@
             <stringProp name="classname">performancetests.recovery.NodeRecoveryTest2</stringProp>
           </JavaSampler>
           <hashTree>
-            <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Should be fast (less than 10s)" enabled="true">
+            <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Duration Assertion" enabled="true">
               <stringProp name="DurationAssertion.duration">10000</stringProp>
             </DurationAssertion>
             <hashTree/>

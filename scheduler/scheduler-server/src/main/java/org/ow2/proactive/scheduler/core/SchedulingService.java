@@ -932,6 +932,7 @@ public class SchedulingService {
     }
 
     private void recoverTasksState(Vector<InternalJob> jobs, boolean restoreInErrorTasks) {
+        logger.info("SchedulingService::recoverTasksState started");
         Iterator<InternalJob> iterJob = jobs.iterator();
         while (iterJob.hasNext()) {
             InternalJob job = iterJob.next();
@@ -960,6 +961,7 @@ public class SchedulingService {
             }
             job.getJobDescriptor().restoreRunningTasks();
         }
+        logger.info("SchedulingService::recoverTasksState finished");
     }
 
     private void jobsRecovered(Collection<InternalJob> jobs) {

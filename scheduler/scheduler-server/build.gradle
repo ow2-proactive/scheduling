@@ -39,6 +39,7 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'org.apache.jmeter:ApacheJMeter_junit:3.3'
+    testCompile 'org.apache.jmeter:ApacheJMeter_java:3.3'
 
     testCompile 'org.codehaus.groovy:groovy-all:2.4.12'
 
@@ -75,7 +76,7 @@ apply plugin: "net.foragerr.jmeter"
 /**
  * Prepares jar with tests to be run in JMeter.
  */
-task performanceTestsJar (type: Jar) {
+task performanceTestsJar(type: Jar) {
     archiveName = 'junit-performance-tests.jar'
 
     destinationDir = file("${buildDir}/resources/jars")
@@ -92,10 +93,11 @@ task performanceTestsJar (type: Jar) {
 task performanceTestsRun {
     dependsOn performanceTestsJar
 
-//    testResultsDir = file("${buildDir}/test-results")
     jmeter {
-        jmUserProperties = ["user.classpath=${buildDir}/resources/jars/junit-performance-tests.jar"] // specifies where to search for jar
-        jmTestFiles = [file("src/test/resources/jmeter/performance-test-plan.jmx")] // plan which should be executed by JMeter
+        jmUserProperties = ["user.classpath=${buildDir}/resources/jars/junit-performance-tests.jar"]
+        // specifies where to search for jar
+        jmTestFiles = [file("src/test/resources/jmeter/performance-java-plan.jmx")]
+        // plan which should be executed by JMeter
         jmLog = file("src/test/resources/jmeter/jmeter.log") // file path to log
         enableReports = true
         enableExtendedReports = false
