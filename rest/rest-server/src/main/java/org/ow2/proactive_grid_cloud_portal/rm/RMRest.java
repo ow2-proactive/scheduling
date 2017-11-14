@@ -42,8 +42,10 @@ import java.util.Set;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -430,7 +432,6 @@ public class RMRest implements RMRestInterface {
      * @return the ping frequency
      * @throws NotConnectedException 
      */
-
     @Override
     @POST
     @Path("nodesource/pingfrequency")
@@ -743,6 +744,39 @@ public class RMRest implements RMRestInterface {
 
         } else {
             return rm.getMBeanAttributes(name, attrs.toArray(new String[attrs.size()]));
+        }
+    }
+
+    /**
+     * Set a single JMX attribute of the MBean <code>name</code>.
+     * Only integer and string attributes are currently supported, see <code>type</code>.
+     *
+     * @param sessionId a valid session ID
+     * @param name      the object name of the MBean
+     * @param type      the type of the attribute to set ('int' and 'string' are currently supported)
+     * @param attr      the name of the attribute to set
+     * @param value     the new value of the attribute (defined as a String, it is automatically converted according to <code>type</code>)
+     * @throws InstanceNotFoundException
+     * @throws IntrospectionException
+     * @throws ReflectionException
+     * @throws IOException
+     * @throws NotConnectedException
+     * @throws MBeanException
+     * @throws AttributeNotFoundException
+     * @throws InvalidAttributeValueException
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("info/{name}")
+    @Produces("application/json")
+    public void setMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
+            @QueryParam("type") String type, @QueryParam("attr") String attr, @QueryParam("value") String value)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MBeanException, AttributeNotFoundException, InvalidAttributeValueException {
+        RMProxyUserInterface rm = checkAccess(sessionId);
+        if ((type != null) && (attr != null) && (value != null)) {
+            rm.setMBeanAttribute(name, type, attr, value);
         }
     }
 

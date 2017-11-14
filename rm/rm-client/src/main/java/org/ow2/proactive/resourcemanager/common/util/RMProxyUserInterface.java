@@ -30,9 +30,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.Attribute;
 import javax.management.AttributeList;
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.InvalidAttributeValueException;
+import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -289,6 +293,40 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public AttributeList getMBeanAttributes(ObjectName name, String[] attributes)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
         return this.jmxClient.getConnector().getMBeanServerConnection().getAttributes(name, attributes);
+    }
+
+    /**
+     * Set a single JMX attribute of the MBean <code>objectName</code>.
+     * Only integer and string attributes are currently supported, see <code>type</code>.
+     *
+     * @param objectName    the object name of the MBean
+     * @param type          the type of the attribute to set ('int' and 'string' are currently supported)
+     * @param name          the name of the attribute to set
+     * @param value         the new value of the attribute (defined as a String, it is automatically converted according to <code>type</code>)
+     * @throws InstanceNotFoundException
+     * @throws IntrospectionException
+     * @throws ReflectionException
+     * @throws IOException
+     * @throws MBeanException
+     * @throws InvalidAttributeValueException
+     * @throws AttributeNotFoundException
+     */
+    public void setMBeanAttribute(ObjectName objectName, String type, String name, String value)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException, MBeanException,
+            InvalidAttributeValueException, AttributeNotFoundException {
+        Object attributeValue;
+        switch (type.toLowerCase()) {
+            case "int":
+                attributeValue = Integer.valueOf(value);
+                break;
+            case "string":
+                attributeValue = value;
+                break;
+            default:
+                return;
+        }
+        this.jmxClient.getConnector().getMBeanServerConnection().setAttribute(objectName,
+                                                                              new Attribute(name, attributeValue));
     }
 
     public BooleanWrapper isNodeAdmin(String nodeUrl) {
