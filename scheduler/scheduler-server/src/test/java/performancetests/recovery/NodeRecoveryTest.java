@@ -44,6 +44,7 @@ public class NodeRecoveryTest extends AbstractJavaSamplerClient {
                                                                             .get("nodesNumber"));
 
             NodeRecoveryHelper nodeRecoveryHelper = new NodeRecoveryHelper();
+
             nodeRecoveryHelper.startKillStartScheduler();
 
             sampleResult = SampleResult.createTestSample(nodeRecoveryHelper.timeSpentToRecoverNodes());
@@ -51,6 +52,7 @@ public class NodeRecoveryTest extends AbstractJavaSamplerClient {
             sampleResult.setSuccessful(true);
             sampleResult.setResponseMessage("I'm Forever Blowing Bubbles");
             nodeRecoveryHelper.shutdown();
+
         } catch (Exception e) {
             e.printStackTrace();
         }

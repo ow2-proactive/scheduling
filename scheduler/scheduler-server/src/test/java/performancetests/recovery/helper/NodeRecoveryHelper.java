@@ -36,6 +36,11 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
+<<<<<<< f2f1e4ccdb1ba87d54bdad4f24b647fb37396949
+=======
+import functionaltests.recover.TaskReconnectionToRecoveredNodeTest;
+import functionaltests.recover.TaskReconnectionWithForkedTaskExecutorTest;
+>>>>>>> Use Java request instead of JUnit request
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestNode;
 import functionaltests.utils.TestScheduler;
@@ -46,7 +51,7 @@ public class NodeRecoveryHelper {
 
     private static final URL SCHEDULER_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
 
-    private static final URL RM_CONFIGURATION_START = TaskReconnectionToRecoveredNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
+    private static final URL RM_CONFIGURATION_START = NodeRecoveryHelper.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
 
     private SchedulerTHelper schedulerHelper;
 

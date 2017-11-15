@@ -37,7 +37,7 @@
             <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" enabled="true">
               <collectionProp name="Arguments.arguments"/>
             </elementProp>
-            <stringProp name="classname">performancetests.recovery.NodeRecoveryTest2</stringProp>
+            <stringProp name="classname">performancetests.recovery.NodeRecoveryTest</stringProp>
           </JavaSampler>
           <hashTree>
             <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Duration Assertion" enabled="true">
