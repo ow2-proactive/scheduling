@@ -76,11 +76,7 @@ apply plugin: "net.foragerr.jmeter"
 /**
  * Prepares jar with tests to be run in JMeter.
  */
-<<<<<<< f2f1e4ccdb1ba87d54bdad4f24b647fb37396949
-task performanceTestsJar(type: Jar) {
-=======
 task performanceTestJar(type: Jar) {
->>>>>>> Use Java request instead of JUnit request
     archiveName = 'junit-performance-tests.jar'
 
     destinationDir = file("${buildDir}/resources/jars")
@@ -113,15 +109,9 @@ task performanceTestRun {
     dependsOn performanceTestJar
 
     jmeter {
-<<<<<<< f2f1e4ccdb1ba87d54bdad4f24b647fb37396949
-        jmUserProperties = ["user.classpath=${buildDir}/resources/jars/junit-performance-tests.jar"]
-        // specifies where to search for jar
-        jmTestFiles = [file("src/test/resources/jmeter/performance-java-plan.jmx")]
-=======
         jmTestFiles = [file("src/test/resources/jmeter/performance-java-plan.jmx")]
         // specifies where to search for jar
         jmUserProperties = ["user.classpath=${buildDir}/resources/jars"]
->>>>>>> Use Java request instead of JUnit request
         // plan which should be executed by JMeter
         jmLog = file("src/test/resources/jmeter/jmeter.log") // file path to log
         enableReports = true

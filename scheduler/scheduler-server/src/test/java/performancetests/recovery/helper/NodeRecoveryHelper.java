@@ -25,8 +25,6 @@
  */
 package performancetests.recovery.helper;
 
-import functionaltests.recover.TaskReconnectionToRecoveredNodeTest;
-import functionaltests.recover.TaskReconnectionWithForkedTaskExecutorTest;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
@@ -36,11 +34,8 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-<<<<<<< f2f1e4ccdb1ba87d54bdad4f24b647fb37396949
-=======
 import functionaltests.recover.TaskReconnectionToRecoveredNodeTest;
 import functionaltests.recover.TaskReconnectionWithForkedTaskExecutorTest;
->>>>>>> Use Java request instead of JUnit request
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestNode;
 import functionaltests.utils.TestScheduler;
