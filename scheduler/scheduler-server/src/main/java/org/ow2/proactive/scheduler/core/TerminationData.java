@@ -80,28 +80,28 @@ final class TerminationData {
                 TaskResultImpl taskResult) {
             this.taskData = taskData;
             this.terminationStatus = terminationStatus;
-            taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(restoreNonInheritedTaskVariables(taskResult)));
+            taskResult.setPropagatedVariables(restoreNonInheritedTaskVariables(taskResult));
             this.taskResult = taskResult;
             this.internalJob = internalJob;
         }
 
-        private Map<String, Serializable> restoreNonInheritedTaskVariables(TaskResultImpl taskResult) {
+        private Map<String, byte[]> restoreNonInheritedTaskVariables(TaskResultImpl taskResult) {
             Map<String, Serializable> newPropagatedVariables = new HashMap<>();
             try {
                 Map<String, Serializable> propagatedVariables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
                 newPropagatedVariables = new HashMap<>(propagatedVariables);
                 for (Map.Entry<String, Serializable> variable : propagatedVariables.entrySet()) {
-                    if (variable.getKey().startsWith(SchedulerVars.PA_PROPAGATED_VARIABLE_PREFIX.toString())) {
+                    if (variable.getKey().startsWith(SchedulerVars.PA_FLAG_PROPAGATED_VAR_TO_RESTORE.toString())) {
                         newPropagatedVariables.remove(variable.getKey());
                         newPropagatedVariables.put(variable.getKey()
-                                                           .substring(SchedulerVars.PA_PROPAGATED_VARIABLE_PREFIX.toString()
-                                                                                                                 .length()),
+                                                           .substring(SchedulerVars.PA_FLAG_PROPAGATED_VAR_TO_RESTORE.toString()
+                                                                                                                     .length()),
                                                    variable.getValue());
-                    } else if (variable.getKey().startsWith(SchedulerVars.PA_TASK_VARIABLE_PREFIX.toString())) {
+                    } else if (variable.getKey().startsWith(SchedulerVars.PA_FLAG_TASK_VAR_TO_CLEAR.toString())) {
                         newPropagatedVariables.remove(variable.getKey());
                         newPropagatedVariables.remove(variable.getKey()
-                                                              .substring(SchedulerVars.PA_TASK_VARIABLE_PREFIX.toString()
-                                                                                                              .length()));
+                                                              .substring(SchedulerVars.PA_FLAG_TASK_VAR_TO_CLEAR.toString()
+                                                                                                                .length()));
                     }
                 }
             } catch (IOException e) {
@@ -109,7 +109,7 @@ final class TerminationData {
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage());
             }
-            return newPropagatedVariables;
+            return SerializationUtil.serializeVariableMap(newPropagatedVariables);
         }
 
         public boolean terminatedWhileRunning() {
