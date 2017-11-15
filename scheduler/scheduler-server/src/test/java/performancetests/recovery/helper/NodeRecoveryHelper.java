@@ -27,18 +27,20 @@ package performancetests.recovery.helper;
 
 import functionaltests.recover.TaskReconnectionToRecoveredNodeTest;
 import functionaltests.recover.TaskReconnectionWithForkedTaskExecutorTest;
-import functionaltests.utils.SchedulerTHelper;
-import functionaltests.utils.TestNode;
-import functionaltests.utils.TestScheduler;
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+
 import org.apache.jmeter.protocol.java.sampler.JUnitSampler;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+
+import functionaltests.utils.SchedulerTHelper;
+import functionaltests.utils.TestNode;
+import functionaltests.utils.TestScheduler;
 import performancetests.recovery.NodeRecoveryTest;
 
-import java.io.File;
-import java.net.URL;
-import java.util.List;
 
 public class NodeRecoveryHelper {
 
@@ -53,9 +55,9 @@ public class NodeRecoveryHelper {
     public void startKillStartScheduler() throws Exception {
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                new File(SCHEDULER_CONFIGURATION_START.toURI()).getAbsolutePath(),
-                new File(RM_CONFIGURATION_START.toURI()).getAbsolutePath(),
-                null);
+                                               new File(SCHEDULER_CONFIGURATION_START.toURI()).getAbsolutePath(),
+                                               new File(RM_CONFIGURATION_START.toURI()).getAbsolutePath(),
+                                               null);
 
         final JMeterVariables vars = new JUnitSampler().getThreadContext().getVariables();
         Integer nodesNumber = Integer.valueOf(vars.get("nodesNumber"));
@@ -64,22 +66,19 @@ public class NodeRecoveryHelper {
         ResourceManager rm = schedulerHelper.getResourceManager();
 
         nodes = schedulerHelper.createRMNodeStarterNodes(TaskReconnectionWithForkedTaskExecutorTest.class.getSimpleName(),
-                nodesNumber);
-
+                                                         nodesNumber);
 
         //schedulerHelper.getJobServerLogs()
         // kill server
         TestScheduler.kill();
 
-
         schedulerHelper = new SchedulerTHelper(false,
-                new File(SCHEDULER_CONFIGURATION_START.toURI()).getAbsolutePath(),
-                new File(RM_CONFIGURATION_START.toURI()).getAbsolutePath(),
-                null);
+                                               new File(SCHEDULER_CONFIGURATION_START.toURI()).getAbsolutePath(),
+                                               new File(RM_CONFIGURATION_START.toURI()).getAbsolutePath(),
+                                               null);
     }
 
     public int timeSpentToRecoverNodes() {
-
 
         return 9000;
     }
@@ -97,6 +96,5 @@ public class NodeRecoveryHelper {
         TestScheduler.kill();
 
     }
-
 
 }

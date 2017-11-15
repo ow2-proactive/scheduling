@@ -29,6 +29,7 @@ import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContextService;
+
 import performancetests.recovery.helper.NodeRecoveryHelper;
 
 
@@ -38,7 +39,9 @@ public class NodeRecoveryTest extends AbstractJavaSamplerClient {
     public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
         SampleResult sampleResult = null;
         try {
-            final Integer nodesNumber = Integer.valueOf(JMeterContextService.getContext().getVariables().get("nodesNumber"));
+            final Integer nodesNumber = Integer.valueOf(JMeterContextService.getContext()
+                                                                            .getVariables()
+                                                                            .get("nodesNumber"));
 
             NodeRecoveryHelper nodeRecoveryHelper = new NodeRecoveryHelper();
             nodeRecoveryHelper.startKillStartScheduler();
