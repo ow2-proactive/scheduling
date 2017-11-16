@@ -209,10 +209,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
 
-            for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
-                // load and Initialize the executable container
-                loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
-            }
+            //            for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
+            //                // load and Initialize the executable container
+            //                loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
+            //            }
 
             while (!taskRetrievedFromPolicy.isEmpty()) {
 
@@ -233,6 +233,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("tasksToSchedule : " + tasksToSchedule);
+                }
+
+                for (EligibleTaskDescriptor ets : tasksToSchedule) {
+                    // load and Initialize the executable container
+                    loadAndInit(((EligibleTaskDescriptorImpl) ets).getInternal());
                 }
 
                 logger.debug("required number of nodes : " + neededResourcesNumber);
