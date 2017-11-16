@@ -95,7 +95,6 @@ allprojects {
         resolutionStrategy.force "org.ow2.proactive:scheduler-api:${schedulingVersion}"
     }
 
-
     rootProject.buildscript.repositories.each {
         repositories.add(it)
     }
