@@ -95,10 +95,10 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         startTask(job, task2);
         dbManager.jobTaskStarted(job, task2, false);
 
-        expectedJob = job(job.getId(), JobStatus.STALLED)
+        expectedJob = job(job.getId(), JobStatus.RUNNING)
                                                          .withFinished(task("task1", TaskStatus.FINISHED)
                                                                                                          .checkFinished())
-                                                         .withPending(task("task2", TaskStatus.PENDING), true)
+                                                         .withRunning(task("task2", TaskStatus.RUNNING))
                                                          .withEligible("task2");
         recovered = stateRecoverHelper.recover(-1);
         checkRecoveredState(recovered, state().withRunning(expectedJob));
@@ -106,8 +106,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         job = recovered.getRunningJobs().get(0);
         task2 = job.getTask("task2");
 
-        startTask(job, task2);
-        dbManager.jobTaskStarted(job, task2, false);
+        // task is still running, we just need to terminate it
         terminateTask(job, task2, result);
         dbManager.updateAfterTaskFinished(job, task2, result);
 

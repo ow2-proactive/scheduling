@@ -27,7 +27,11 @@ package functionaltests.db;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.cfg.Configuration;
 import org.junit.After;
@@ -40,18 +44,28 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.tests.ProActiveTest;
 
 
 public class NodeSourcesTest extends ProActiveTest {
 
+    // Arbitrary values used for the test
+    private static final String INFRASTRUCTURE_VARIABLE_KEY = "key";
+
+    private static final String INFRASTRUCTURE_VARIABLE_VALUE = "value";
+
     protected static RMDBManager dbManager;
+
+    private Map<String, Serializable> infrastructureVariables;
 
     @Before
     public void setUp() throws Exception {
         PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.updateProperty("100");
         Configuration config = new Configuration().configure("/functionaltests/config/hibernate-unit.cfg.xml");
         dbManager = new RMDBManager(config, true, true);
+        infrastructureVariables = new HashMap<>();
+        infrastructureVariables.put(INFRASTRUCTURE_VARIABLE_KEY, INFRASTRUCTURE_VARIABLE_VALUE);
     }
 
     @After
@@ -74,6 +88,7 @@ public class NodeSourcesTest extends ProActiveTest {
     @Test
     public void addNodeSource() throws Exception {
         NodeSourceData nodeSourceData = createNodeSource();
+        nodeSourceData.setInfrastructureVariables(infrastructureVariables);
 
         assertThat(dbManager.getNodeSources()).isEmpty();
 
@@ -88,6 +103,9 @@ public class NodeSourcesTest extends ProActiveTest {
         Assert.assertEquals("infrastructure", nodeSource.getInfrastructureParameters()[0]);
         Assert.assertEquals(StaticPolicy.class.getName(), nodeSource.getPolicyType());
         Assert.assertEquals("policy", nodeSource.getPolicyParameters()[0]);
+        assertThat(nodeSource.getInfrastructureVariables()).hasSize(1);
+        Assert.assertEquals(INFRASTRUCTURE_VARIABLE_VALUE,
+                            nodeSource.getInfrastructureVariables().get(INFRASTRUCTURE_VARIABLE_KEY));
     }
 
     @Test
@@ -99,6 +117,47 @@ public class NodeSourcesTest extends ProActiveTest {
         dbManager.removeNodeSource("ns1");
 
         assertThat(dbManager.getNodeSources()).isEmpty();
+    }
+
+    @Test
+    public void testAddNodeSourceWithEmptyInfrastructureVariables() {
+        NodeSourceData nodeSourceData = createNodeSource();
+        nodeSourceData.setInfrastructureVariables(new HashMap<String, Serializable>());
+        dbManager.addNodeSource(nodeSourceData);
+
+        Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
+        assertThat(nodeSources).hasSize(1);
+
+        NodeSourceData nodeSource = nodeSources.iterator().next();
+        assertThat(nodeSource.getInfrastructureVariables()).hasSize(0);
+    }
+
+    @Test
+    public void testAddNodeSourceWithVariousObjectsInInfrastructureVariables() {
+        NodeSourceData nodeSourceData = createNodeSource();
+        Map<String, Serializable> infrastructureVariables = new HashMap<>();
+
+        Integer integer = new Integer(42);
+        AtomicBoolean atomicBoolean = new AtomicBoolean(true);
+        char c = 'z';
+        infrastructureVariables.put("anInteger", integer);
+        infrastructureVariables.put("aBoolean", atomicBoolean);
+        infrastructureVariables.put("aChar", c);
+
+        nodeSourceData.setInfrastructureVariables(infrastructureVariables);
+        dbManager.addNodeSource(nodeSourceData);
+
+        Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
+        assertThat(nodeSources).hasSize(1);
+
+        NodeSourceData nodeSource = nodeSources.iterator().next();
+        Map<String, Serializable> retrievedInfravariables = nodeSource.getInfrastructureVariables();
+        assertThat(retrievedInfravariables).hasSize(3);
+        assertThat(retrievedInfravariables.get("anInteger")).isEqualTo(integer);
+        // works with autoboxing
+        assertThat(retrievedInfravariables.get("anInteger")).isEqualTo(42);
+        assertThat(((AtomicBoolean) retrievedInfravariables.get("aBoolean")).get()).isEqualTo(atomicBoolean.get());
+        assertThat(retrievedInfravariables.get("aChar")).isEqualTo(c);
     }
 
     private NodeSourceData createNodeSource() {

@@ -46,7 +46,7 @@ import org.ow2.proactive.utils.Repeat;
 import org.ow2.proactive.utils.RepeatRule;
 
 
-public class KillTaskLauncherTest {
+public class KillTaskLauncherTest extends TaskLauncherTestAbstract {
 
     static final int repetitions = 10;
 
@@ -74,8 +74,8 @@ public class KillTaskLauncherTest {
 
         Semaphore taskRunning = new Semaphore(0);
 
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
-                                                                   new TestTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = createLauncherWithInjectedMocks(initializer,
+                                                                          new TestTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         taskLauncherPA.doTask(executableContainer, null, null);
@@ -98,8 +98,8 @@ public class KillTaskLauncherTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         Semaphore taskRunning = new Semaphore(0);
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
-                                                                   new TestTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = createLauncherWithInjectedMocks(initializer,
+                                                                          new TestTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         taskLauncherPA.doTask(executableContainer, null, null);
@@ -121,8 +121,8 @@ public class KillTaskLauncherTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
-                                                                   new TestTaskLauncherFactory(new Semaphore(0)));
+        final TaskLauncher taskLauncher = createLauncherWithInjectedMocks(initializer,
+                                                                          new TestTaskLauncherFactory(new Semaphore(0)));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
@@ -146,8 +146,8 @@ public class KillTaskLauncherTest {
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
-                                                                   new TestTaskLauncherFactory(new Semaphore(0)));
+        final TaskLauncher taskLauncher = createLauncherWithInjectedMocks(initializer,
+                                                                          new TestTaskLauncherFactory(new Semaphore(0)));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         TaskResultWaiter taskResultWaiter = new TaskResultWaiter();
@@ -178,8 +178,8 @@ public class KillTaskLauncherTest {
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
         Semaphore taskRunning = new Semaphore(0);
-        final TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer,
-                                                                   new SlowDataspacesTaskLauncherFactory(taskRunning));
+        final TaskLauncher taskLauncher = createLauncherWithInjectedMocks(initializer,
+                                                                          new SlowDataspacesTaskLauncherFactory(taskRunning));
         final TaskLauncher taskLauncherPA = PAActiveObject.turnActive(taskLauncher);
 
         taskLauncherPA.doTask(executableContainer, null, null);
