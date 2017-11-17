@@ -60,7 +60,7 @@ public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTestWithCus
 
     private TestNode startSchedulerAndRMWithOneNode() throws Exception {
         ResourceManager resourceManager = schedulerHelper.getResourceManager();
-        testNode = schedulerHelper.createRMNodeStarterNode("test1");
+        testNode = schedulerHelper.createRMNodeStarterNodes("test1", 1).get(0);
         resourceManager.addNode(testNode.getNode().getNodeInformation().getURL());
         return testNode;
     }

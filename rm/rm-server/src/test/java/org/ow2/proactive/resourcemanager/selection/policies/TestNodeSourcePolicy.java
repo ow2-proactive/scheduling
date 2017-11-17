@@ -266,6 +266,11 @@ public class TestNodeSourcePolicy {
         }
 
         @Override
+        public String[] getJmxUrls() {
+            return null;
+        }
+
+        @Override
         public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
             return null;
         }

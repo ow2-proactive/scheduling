@@ -68,7 +68,7 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     public RMDeployingNode(String name, NodeSource nodeSource, String command, Client provider) {
-        super(nodeSource, name, null, provider);
+        super(nodeSource, name, RMDeployingNode.PROTOCOL_ID + "://" + nodeSource.getName() + "/" + name, provider);
 
         changeState(NodeState.DEPLOYING);
 
@@ -353,6 +353,11 @@ public final class RMDeployingNode extends AbstractRMNode {
     @Override
     public String getJMXUrl(JMXTransportProtocol protocol) {
         return null;
+    }
+
+    @Override
+    public String[] getJmxUrls() {
+        return new String[] {};
     }
 
     @Override

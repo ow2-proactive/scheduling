@@ -91,7 +91,9 @@ public class RMTestUser {
                                          CredData.parseDomain(connectedUserName),
                                          connectedUserPassword);
 
-        rmProxy.init(rmUrl, credData);
+        // this is to prevent starting working with the rmProxy on the calling
+        // thread whereas it has not finished to be initialized
+        PAFuture.waitFor(rmProxy.init(rmUrl, credData));
     }
 
     public ResourceManager getResourceManager() {

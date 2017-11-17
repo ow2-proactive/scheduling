@@ -189,7 +189,11 @@ public abstract class CommonAttribute implements Serializable {
      * @param genericInformation the generic information to set.
      */
     public void setGenericInformation(Map<String, String> genericInformation) {
-        this.genericInformation = genericInformation;
+        if (genericInformation != null) {
+            this.genericInformation = genericInformation;
+        } else {
+            this.genericInformation = new HashMap<>();
+        }
 
     }
 

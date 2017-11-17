@@ -125,6 +125,18 @@ class LiveJobs {
 
     void jobRecovered(InternalJob job) {
         jobs.put(job.getId(), new JobData(job));
+        for (InternalTask task : job.getITasks()) {
+            if (task.getStatus() == TaskStatus.RUNNING) {
+                logger.info("Recover task " + task.getId() + " (" + task.getName() + ") of job " + job.getId() + " (" +
+                            job.getName() + ")");
+                runningTasksData.put(TaskIdWrapper.wrap(task.getId()), new RunningTaskData(task,
+                                                                                           job.getOwner(),
+                                                                                           job.getCredentials(),
+                                                                                           task.getExecuterInformation()
+                                                                                               .getLauncher()));
+            }
+        }
+
     }
 
     void unpauseAll() {
@@ -545,7 +557,11 @@ class LiveJobs {
             TaskIdWrapper taskIdWrapper = TaskIdWrapper.wrap(taskId);
             RunningTaskData taskData = runningTasksData.remove(taskIdWrapper);
             if (taskData == null) {
-                throw new IllegalStateException("No information for: " + taskId);
+                tlogger.info(taskId, "Task " + taskId + " terminates after a recovery of the scheduler");
+                taskData = new RunningTaskData(task,
+                                               jobData.job.getOwner(),
+                                               jobData.job.getCredentials(),
+                                               task.getExecuterInformation().getLauncher());
             }
 
             TerminationData terminationData = createAndFillTerminationData(result,
