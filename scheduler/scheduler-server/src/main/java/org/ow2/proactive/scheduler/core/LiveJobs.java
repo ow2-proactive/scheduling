@@ -919,6 +919,7 @@ class LiveJobs {
             // terminating job
             job.terminate();
             jlogger.debug(job.getId(), "terminated");
+            jobs.remove(job.getId());
             terminationData.addJobToTerminate(job.getId());
         }
 
