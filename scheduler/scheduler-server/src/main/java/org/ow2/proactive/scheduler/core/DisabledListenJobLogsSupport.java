@@ -35,19 +35,19 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 public class DisabledListenJobLogsSupport extends ListenJobLogsSupport {
 
     @Override
-    void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
+    public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException {
     }
 
     @Override
-    void activeLogsIfNeeded(JobId jobId, TaskLauncher launcher) throws LogForwardingException {
+    public void activeLogsIfNeeded(JobId jobId, TaskLauncher launcher) throws LogForwardingException {
     }
 
     @Override
-    void cleanLoggers(JobId jobId) {
+    public void cleanLoggers(JobId jobId) {
     }
 
     @Override
-    void shutdown() {
+    public void shutdown() {
     }
 
 }

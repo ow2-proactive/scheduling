@@ -70,7 +70,7 @@ public class TestScriptEngines extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testScriptEngines() throws Throwable {
-        testScriptEnginesWithGivenWorkflow(jobDescriptor, 4);
+        testScriptEnginesWithGivenWorkflow(jobDescriptor, 5);
     }
 
     @Test

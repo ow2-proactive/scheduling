@@ -213,7 +213,7 @@ public class SchedulerStateRecoverHelperTest {
         job = recoveredState.getRunningJobs().get(0);
 
         assertThat(job.getStatus()).isEqualTo(JobStatus.STALLED);
-        assertTasksStatus(job, TaskStatus.PENDING);
+        assertTasksStatus(job, TaskStatus.RUNNING);
     }
 
     @Test
