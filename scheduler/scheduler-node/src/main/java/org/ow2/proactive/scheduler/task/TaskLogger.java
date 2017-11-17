@@ -212,8 +212,7 @@ public class TaskLogger {
     public void close() {
         synchronized (this.loggersFinalized) {
             if (!loggersFinalized.get()) {
-                logger.debug("Terminating loggers for task " + this.taskId + " (" + taskId.getReadableName() + ")" +
-                             "...");
+                logger.debug("Terminate loggers for task " + this.taskId + " (" + taskId.getReadableName() + ")");
                 this.flushStreams();
 
                 this.loggersFinalized.set(true);

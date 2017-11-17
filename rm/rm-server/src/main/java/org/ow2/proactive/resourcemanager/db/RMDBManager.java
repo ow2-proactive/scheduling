@@ -52,6 +52,7 @@ import org.ow2.proactive.resourcemanager.core.history.LockHistory;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 import com.google.common.collect.Maps;
 
@@ -67,6 +68,8 @@ public class RMDBManager {
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
+
+    private final RMDBManagerBuffer rmdbManagerBuffer;
 
     private Scheduler houseKeepingScheduler;
 
@@ -146,6 +149,7 @@ public class RMDBManager {
             configuration.addAnnotatedClass(NodeHistory.class);
             configuration.addAnnotatedClass(NodeSourceData.class);
             configuration.addAnnotatedClass(UserHistory.class);
+            configuration.addAnnotatedClass(RMNodeData.class);
             if (drop) {
                 configuration.setProperty("hibernate.hbm2ddl.auto", "create");
 
@@ -163,6 +167,7 @@ public class RMDBManager {
 
             sessionFactory = configuration.buildSessionFactory();
             transactionHelper = new TransactionHelper(sessionFactory);
+            rmdbManagerBuffer = new RMDBManagerBuffer(this);
 
             Alive lastAliveTimeResult = findRmLastAliveEntry();
 
@@ -248,7 +253,7 @@ public class RMDBManager {
     /**
      * Should be used for insert/update/delete queries
      */
-    private <T> T executeReadWriteTransaction(SessionWork<T> sessionWork) {
+    protected <T> T executeReadWriteTransaction(SessionWork<T> sessionWork) {
         return executeReadWriteTransaction(sessionWork, true);
     }
 
@@ -282,21 +287,58 @@ public class RMDBManager {
 
     public boolean addNodeSource(final NodeSourceData nodeSourceData) {
         try {
-            return executeReadWriteTransaction(new SessionWork<Boolean>() {
+            boolean persisted = executeReadWriteTransaction(new SessionWork<Boolean>() {
                 @Override
                 public Boolean doInTransaction(Session session) {
-                    logger.info("Adding a new node source " + nodeSourceData.getName() + " to the database");
-                    session.save(nodeSourceData);
-                    return true;
+                    boolean persisted = false;
+                    NodeSourceData retrievedNodeSource = session.get(NodeSourceData.class, nodeSourceData.getName());
+                    if (retrievedNodeSource == null) {
+                        logger.debug("Adding a new node source " + nodeSourceData.getName() + " to the database");
+                        session.save(nodeSourceData);
+                        persisted = true;
+                    }
+                    return persisted;
                 }
             });
+            if (!persisted) {
+                persisted = executeReadWriteTransaction(new SessionWork<Boolean>() {
+                    @Override
+                    public Boolean doInTransaction(Session session) {
+                        session.update(nodeSourceData);
+                        return true;
+                    }
+                });
+            }
+            return persisted;
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occured while adding new node source '" + nodeSourceData.getName() +
-                                       "'");
+            throw new RuntimeException("Exception occurred while adding new node source " + nodeSourceData.getName(),
+                                       e);
         }
     }
 
+    public NodeSourceData getNodeSource(final String sourceName) {
+        try {
+            return executeReadTransaction(new SessionWork<NodeSourceData>() {
+                @Override
+                @SuppressWarnings("unchecked")
+                public NodeSourceData doInTransaction(Session session) {
+                    Query query = session.getNamedQuery("getNodeSourceDataByName").setParameter("name", sourceName);
+                    return (NodeSourceData) query.uniqueResult();
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occurred while getting a node source from name " + sourceName, e);
+        }
+    }
+
+    public void updateNodeSource(final NodeSourceData nodeSourceData) {
+        rmdbManagerBuffer.addUpdateNodeSourceToPendingDatabaseOperations(nodeSourceData);
+    }
+
     public void removeNodeSource(final String sourceName) {
+        final Collection<RMNodeData> relatedNodes = getNodesByNodeSource(sourceName);
+        logger.debug("Removing nodes linked to the node source " + sourceName + " from the database");
+        removeNodes(relatedNodes);
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -311,7 +353,7 @@ public class RMDBManager {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                logger.info("Removing all node sources from the database");
+                logger.debug("Removing all node sources from the database");
                 session.getNamedQuery("deleteAllNodeSourceData").executeUpdate();
                 return null;
             }
@@ -327,6 +369,162 @@ public class RMDBManager {
                 return (Collection<NodeSourceData>) query.list();
             }
         });
+    }
+
+    private boolean nodeRecoveryDisabled() {
+        return !PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
+    }
+
+    public void addNode(RMNodeData rmNodeData) {
+        if (nodeRecoveryDisabled()) {
+            return;
+        }
+
+        rmdbManagerBuffer.addCreateNodeToPendingDatabaseOperations(rmNodeData);
+    }
+
+    public void updateNode(final RMNodeData rmNodeData) {
+        if (nodeRecoveryDisabled()) {
+            return;
+        }
+
+        if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNode(rmNodeData)) {
+            try {
+                executeReadWriteTransaction(new SessionWork<Void>() {
+                    @Override
+                    public Void doInTransaction(Session session) {
+                        session.update(rmNodeData);
+                        return null;
+                    }
+                });
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Exception occurred while updating node " + rmNodeData.getName(), e);
+            }
+        } else {
+            rmdbManagerBuffer.addUpdateNodeToPendingDatabaseOperations(rmNodeData);
+        }
+    }
+
+    public void removeNode(RMNode rmNode) {
+        if (nodeRecoveryDisabled()) {
+            return;
+        }
+
+        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+        removeNode(rmNodeData);
+    }
+
+    public void removeNode(final RMNodeData rmNodeData) {
+        if (nodeRecoveryDisabled()) {
+            return;
+        }
+
+        if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNode(rmNodeData)) {
+            try {
+                executeReadWriteTransaction(new SessionWork<Void>() {
+                    @Override
+                    public Void doInTransaction(Session session) {
+                        session.delete(rmNodeData);
+                        return null;
+                    }
+                });
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Exception occurred while removing node " + rmNodeData.getName(), e);
+            }
+        } else {
+            rmdbManagerBuffer.addRemoveNodeToPendingDatabaseOperations(rmNodeData);
+        }
+    }
+
+    private void removeNodes(final Collection<RMNodeData> nodes) {
+        if (nodeRecoveryDisabled()) {
+            return;
+        }
+
+        if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNodes(nodes)) {
+            try {
+                executeReadWriteTransaction(new SessionWork<Void>() {
+                    @Override
+                    public Void doInTransaction(Session session) {
+                        for (RMNodeData rmNodeData : nodes) {
+                            session.delete(rmNodeData);
+                        }
+                        return null;
+                    }
+                });
+            } catch (RuntimeException e) {
+                throw new RuntimeException("Exception occurred while removing nodes", e);
+            }
+        } else {
+            rmdbManagerBuffer.addRemoveNodesToPendingDatabaseOperations(nodes);
+        }
+    }
+
+    public void removeAllNodes() {
+        try {
+            executeReadWriteTransaction(new SessionWork<Void>() {
+                @Override
+                public Void doInTransaction(Session session) {
+                    logger.debug("Removing all nodes from the database");
+                    session.getNamedQuery("deleteAllRMNodeData").executeUpdate();
+                    return null;
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occurred while removing all nodes in the database", e);
+        }
+    }
+
+    public RMNodeData getNodeByNameAndUrl(final String nodeName, final String nodeUrl) {
+        rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
+        try {
+            return executeReadTransaction(new SessionWork<RMNodeData>() {
+                @Override
+                public RMNodeData doInTransaction(Session session) {
+                    logger.debug("Retrieving the node " + nodeName + " from the database");
+                    Query query = session.getNamedQuery("getRMNodeDataByNameAndUrl")
+                                         .setParameter("name", nodeName)
+                                         .setParameter("url", nodeUrl);
+                    return (RMNodeData) query.uniqueResult();
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occurred while retrieving node " + nodeName, e);
+        }
+    }
+
+    public Collection<RMNodeData> getNodesByNodeSource(final String nodeSourceName) {
+        rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
+        try {
+            return executeReadTransaction(new SessionWork<Collection<RMNodeData>>() {
+                @Override
+                @SuppressWarnings("unchecked")
+                public Collection<RMNodeData> doInTransaction(Session session) {
+                    Query query = session.getNamedQuery("getRMNodeDataByNodeSource").setParameter("name",
+                                                                                                  nodeSourceName);
+                    return (Collection<RMNodeData>) query.list();
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occurred while getting node by node source name " + nodeSourceName,
+                                       e);
+        }
+    }
+
+    public Collection<RMNodeData> getAllNodes() {
+        rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
+        try {
+            return executeReadTransaction(new SessionWork<Collection<RMNodeData>>() {
+                @Override
+                @SuppressWarnings("unchecked")
+                public Collection<RMNodeData> doInTransaction(Session session) {
+                    Query query = session.getNamedQuery("getAllRMNodeData");
+                    return (Collection<RMNodeData>) query.list();
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occurred while getting all nodes from database", e);
+        }
     }
 
     public void saveUserHistory(final UserHistory history) {
@@ -559,4 +757,9 @@ public class RMDBManager {
             getInstance().deleteOldUserHistory();
         }
     }
+
+    public RMDBManagerBuffer getBuffer() {
+        return rmdbManagerBuffer;
+    }
+
 }

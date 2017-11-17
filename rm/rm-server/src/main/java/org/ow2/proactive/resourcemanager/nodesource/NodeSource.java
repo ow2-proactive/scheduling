@@ -53,11 +53,13 @@ import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
@@ -223,6 +225,10 @@ public class NodeSource implements InitActive, RunActive {
 
         stub = (NodeSource) PAActiveObject.getStubOnThis();
         infrastructureManager.setNodeSource(this);
+        // Infrastructure has been configured and linked to the node source, so we can now persist the runtime
+        // variables of the infrastructure for the first time (they have been initialized during the creation of the
+        // infrastructure, in its configuration.
+        infrastructureManager.persistInfraVariables();
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
         Thread.currentThread().setName("Node Source \"" + name + "\"");
@@ -269,6 +275,30 @@ public class NodeSource implements InitActive, RunActive {
         RMDeployingNode rmDeployingNode = infrastructureManager.internalRegisterAcquiredNode(node);
         nodes.put(nodeUrl, node);
         return rmDeployingNode;
+    }
+
+    /**
+     * Recover the internal data structure of the node source so that
+     * recovered nodes and RMnodes are linked again to the node source.
+     * @return the {@link RMNode} that could be recovered.
+     */
+    public RMNode internalAddNodeAfterRecovery(Node node, RMNodeData rmNodeData) {
+        RMNode recoveredRmNode;
+        String nodeUrl = node.getNodeInformation().getURL();
+        // the infrastructure manager is up to date already because it was
+        // saved in database, contrarily to the node source internal data structures
+        RMNode rmNode = infrastructureManager.searchForNotAcquiredRmNode(nodeUrl);
+        if (rmNode != null) {
+            // Deploying or lost RMNodes can be directly found in the saved infrastructure.
+            recoveredRmNode = rmNode;
+        } else {
+            // the node is acquired in the infrastructure. We can recreate the
+            // RMNode representation on top of it and save it in the node source
+            recoveredRmNode = buildRMNodeAfterRecovery(node, rmNodeData);
+        }
+        // we finally put back the node in the data structure of the node source
+        nodes.put(nodeUrl, node);
+        return recoveredRmNode;
     }
 
     /**
@@ -414,6 +444,32 @@ public class NodeSource implements InitActive, RunActive {
         return rmnode;
     }
 
+    /**
+     * Rebuild a RMNode from a node that could be looked up again after a
+     * recovery of the RM. This builder configures nothing for the node
+     * because it is configured already as it suppoesed to be recovered from
+     * the database.
+     * @return the expected RMNode
+     */
+    private RMNode buildRMNodeAfterRecovery(Node node, RMNodeData rmNodeData) {
+        RMNodeImpl rmNode = new RMNodeImpl(node,
+                                           stub,
+                                           rmNodeData.getName(),
+                                           rmNodeData.getNodeUrl(),
+                                           rmNodeData.getProvider(),
+                                           rmNodeData.getHostname(),
+                                           rmNodeData.getJmxUrls(),
+                                           rmNodeData.getJvmName(),
+                                           rmNodeData.getUserPermission(),
+                                           rmNodeData.getState());
+        if (rmNodeData.getState().equals(NodeState.BUSY)) {
+            logger.info("Node " + rmNodeData.getName() + " was found busy after scheduler recovery with owner " +
+                        rmNodeData.getOwner());
+            rmNode.setBusy(rmNodeData.getOwner());
+        }
+        return rmNode;
+    }
+
     public boolean setNodeAvailable(RMNode node) {
         Node proactiveProgrammingNode = node.getNode();
         String proactiveProgrammingNodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
@@ -463,7 +519,7 @@ public class NodeSource implements InitActive, RunActive {
      * @return node if it was successfully obtained, null otherwise
      * @throws Exception if node was not looked up
      */
-    private Node lookupNode(String nodeUrl, long timeout) throws Exception {
+    public Node lookupNode(String nodeUrl, long timeout) throws Exception {
         Future<Node> futureNode = threadPoolHolder.submit(INTERNAL_POOL, new NodeLocator(nodeUrl));
         return futureNode.get(timeout, TimeUnit.MILLISECONDS);
     }
@@ -541,13 +597,14 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Shutdowns the node source and releases all its nodes.
      */
-    public void shutdown(Client initiator) {
+    public BooleanWrapper shutdown(Client initiator) {
         logger.info("[" + name + "] is shutting down by " + initiator);
         toShutdown = true;
 
         if (nodes.size() == 0) {
             shutdownNodeSourceServices(initiator);
         }
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -691,9 +748,9 @@ public class NodeSource implements InitActive, RunActive {
     /**
      * Marks node as down. Remove it from node source node set. It remains in rmcore nodes list until
      * user decides to remove them or node source is shutdown.
-     * @see NodeSource#detectedPingedDownNode(String)
+     * @see NodeSource#detectedPingedDownNode(String, String)
      */
-    public void detectedPingedDownNode(String nodeUrl) {
+    public void detectedPingedDownNode(String nodeName, String nodeUrl) {
 
         if (toShutdown) {
             logger.warn("[" + name + "] detectedPingedDownNode request discarded because node source is shutting down");
@@ -706,9 +763,18 @@ public class NodeSource implements InitActive, RunActive {
             downNodes.put(nodeUrl, downNode);
             try {
                 RMCore.topologyManager.removeNode(downNode);
-                infrastructureManager.internalNotifyDownNode(downNode);
+                infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl, downNode);
             } catch (RMException e) {
                 logger.error("Error while removing down node: " + nodeUrl, e);
+            }
+        } else {
+            // the node could not be found in the nodes map so we are trying
+            // here to restore the nodes after a recovery of the RM: we have
+            // almost no information about the node apart from its name and url
+            try {
+                infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl, null);
+            } catch (RMException e) {
+                logger.error("New empty node " + nodeUrl + " could not be created to handle down node", e);
             }
         }
 
@@ -740,6 +806,7 @@ public class NodeSource implements InitActive, RunActive {
     public void pingNode(final Node node) {
         executeInParallel(new Runnable() {
             public void run() {
+                String nodeName = node.getNodeInformation().getName();
                 String nodeUrl = node.getNodeInformation().getURL();
 
                 try {
@@ -749,7 +816,7 @@ public class NodeSource implements InitActive, RunActive {
                     }
                 } catch (Throwable t) {
                     logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
-                    stub.detectedPingedDownNode(nodeUrl);
+                    stub.detectedPingedDownNode(nodeName, nodeUrl);
                 }
             }
         });

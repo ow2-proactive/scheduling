@@ -76,6 +76,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     private static final Logger logger = Logger.getLogger(SSHInfrastructureV2.class);
 
+    private static final int PROCESS_STILL_RUNNING_VALUE = -1;
+
     public static final int DEFAULT_OUTPUT_BUFFER_LENGTH = 1000;
 
     public static final int DEFAULT_SSH_PORT = 22;
@@ -104,13 +106,13 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     @Configurable(description = "Linux, Cygwin or Windows depending on the operating system of the remote hosts")
     protected String targetOs = "Linux";
 
-    protected OperatingSystem targetOSObj;
-
     @Configurable(description = "Options for the java command launching the node on the remote hosts")
     protected String javaOptions;
 
-    /** Shutdown flag */
-    protected volatile boolean shutdown;
+    private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
+
+    /** key of the shutdown flag */
+    private static final String SHUTDOWN_FLAG_KEY = "shutdownFlag";
 
     /**
      * Internal node acquisition method
@@ -126,7 +128,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      */
     public void startNodeImpl(final InetAddress host, final int nbNodes, final List<String> depNodeURLs)
             throws RMException {
-        String fs = this.targetOSObj.fs;
+        String fs = getTargetOSObj().fs;
         // we set the java security policy file
         ArrayList<String> sb = new ArrayList<>();
         final boolean containsSpace = schedulingPath.contains(" ");
@@ -169,7 +171,16 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         if (this.javaOptions != null && !this.javaOptions.trim().isEmpty()) {
             sb.add(this.javaOptions.trim());
         }
-        CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
+        CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
+
+        final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean();
+        if (deployNodesInDetachedMode) {
+            // if we do not want to kill the nodes when the RM exits or
+            // restarts, then we should launch the nodes in background and
+            // ignore the RM termination signal
+            clb.setDetached();
+        }
+
         clb.setJavaPath(this.javaPath);
         clb.setRmHome(this.schedulingPath);
         clb.setPaProperties(sb);
@@ -252,12 +263,15 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             Future<Void> deployResult = deployService.submit(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    while (!shutdown && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
+                    while (!getShutdownFlag() && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
                         if (anyTimedOut(depNodeURLs)) {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }
-                        if (chan.getExitStatus() != -1) { // -1 means process is
-                                                              // still running
+                        // we check the exit status of the session only in the
+                        // case where we link the current process to the one
+                        // that spawns the nodes. Otherwise, we let the two
+                        // processes live completely independently
+                        if (!deployNodesInDetachedMode && chan.getExitStatus() != PROCESS_STILL_RUNNING_VALUE) {
                             throw new IllegalStateException("The jvm process of the node has exited prematurely");
                         }
                         try {
@@ -367,10 +381,11 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         if (parameters[index] == null) {
             throw new IllegalArgumentException("Target OS parameter cannot be null");
         }
-        this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[index++].toString());
-        if (this.targetOSObj == null) {
+        OperatingSystem configuredTargetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
+        if (configuredTargetOs == null) {
             throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
         }
+        persistedInfraVariables.put(TARGET_OS_OBJ_KEY, configuredTargetOs);
 
         this.javaOptions = parameters[index++].toString();
     }
@@ -406,6 +421,44 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     @Override
     public void shutDown() {
-        this.shutdown = true;
+        setShutdownFlag(true);
     }
+
+    @Override
+    protected void initializePersistedInfraVariables() {
+        super.initializePersistedInfraVariables();
+        persistedInfraVariables.put(TARGET_OS_OBJ_KEY, null);
+        persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, false);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private OperatingSystem getTargetOSObj() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<OperatingSystem>() {
+            @Override
+            public OperatingSystem handle() {
+                return (OperatingSystem) persistedInfraVariables.get(TARGET_OS_OBJ_KEY);
+            }
+        });
+    }
+
+    private boolean getShutdownFlag() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return (boolean) persistedInfraVariables.get(SHUTDOWN_FLAG_KEY);
+            }
+        });
+    }
+
+    private void setShutdownFlag(final boolean isShutdown) {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
+                return null;
+            }
+        });
+    }
+
 }
