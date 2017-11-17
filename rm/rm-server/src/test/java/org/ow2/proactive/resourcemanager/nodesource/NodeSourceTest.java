@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -74,6 +75,7 @@ public class NodeSourceTest {
         PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.updateProperty("false");
 
         infrastructureManager = mock(InfrastructureManager.class);
+        when(infrastructureManager.isUsingDeployingNode()).thenReturn(false);
 
         NodeSourcePolicy nodeSourcePolicy = mock(NodeSourcePolicy.class);
 
@@ -94,9 +96,9 @@ public class NodeSourceTest {
 
         nodeSource.internalAddNode(node);
 
-        nodeSource.detectedPingedDownNode(node.getNodeInformation().getURL());
+        nodeSource.detectedPingedDownNode(node.getNodeInformation().getName(), node.getNodeInformation().getURL());
 
-        verify(infrastructureManager).internalNotifyDownNode(any(Node.class));
+        verify(infrastructureManager).internalNotifyDownNode(anyString(), anyString(), any(Node.class));
     }
 
     @Test
@@ -106,7 +108,7 @@ public class NodeSourceTest {
         RMNode rmNode = new RMNodeImpl(node, nodeSource, client, mock(Permission.class));
 
         nodeSource.internalAddNode(node);
-        nodeSource.detectedPingedDownNode(node.getNodeInformation().getURL());
+        nodeSource.detectedPingedDownNode(node.getNodeInformation().getName(), node.getNodeInformation().getURL());
 
         assertThat(nodeSource.getDownNodes()).hasSize(1);
 

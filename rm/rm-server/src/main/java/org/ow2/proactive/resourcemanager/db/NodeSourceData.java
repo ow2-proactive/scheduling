@@ -26,6 +26,8 @@
 package org.ow2.proactive.resourcemanager.db;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,18 +35,19 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.security.auth.Subject;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
 @Entity
 @NamedQueries({ @NamedQuery(name = "deleteNodeSourceDataByName", query = "delete from NodeSourceData where name=:name"),
                 @NamedQuery(name = "deleteAllNodeSourceData", query = "delete from NodeSourceData"),
-                @NamedQuery(name = "getNodeSourceData", query = "from NodeSourceData") })
+                @NamedQuery(name = "getNodeSourceData", query = "from NodeSourceData"),
+                @NamedQuery(name = "getNodeSourceDataByName", query = "from NodeSourceData where name=:name") })
 @Table(name = "NodeSourceData")
 public class NodeSourceData implements Serializable {
 
@@ -60,6 +63,11 @@ public class NodeSourceData implements Serializable {
 
     private Client provider;
 
+    /**
+     * name of the variable --> value of the variable
+     */
+    private Map<String, Serializable> infrastructureVariables;
+
     public NodeSourceData() {
     }
 
@@ -72,6 +80,7 @@ public class NodeSourceData implements Serializable {
         this.policyType = policyType;
         this.policyParameters = policyParameters;
         this.provider = provider;
+        this.infrastructureVariables = new HashMap<>();
     }
 
     @Id
@@ -131,4 +140,39 @@ public class NodeSourceData implements Serializable {
     public void setProvider(Client provider) {
         this.provider = provider;
     }
+
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Map<String, Serializable> getInfrastructureVariables() {
+        return infrastructureVariables;
+    }
+
+    public void setInfrastructureVariables(Map<String, Serializable> infrastructureVariables) {
+        this.infrastructureVariables = infrastructureVariables;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        if (obj instanceof NodeSourceData) {
+            NodeSourceData other = (NodeSourceData) obj;
+            return other.getName().equals(name);
+        } else {
+            return false;
+        }
+    }
+
 }

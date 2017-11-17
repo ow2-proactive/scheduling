@@ -139,13 +139,13 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
     public boolean configureNode() {
         try {
             Node node = PAActiveObject.getActiveObjectNode(PAActiveObject.getStubOnThis());
-            logger.info("Start of dataspace configuration for node " + node);
+            logger.info("Start configuration of data space for node " + node.getNodeInformation().getURL());
             // configure node for Data Spaces
             String baseScratchDir = getBaseScratchDir();
             final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration((String) null,
                                                                                                 baseScratchDir);
             DataSpacesNodes.configureNode(node, scratchConf);
-            logger.info("Dataspace configuration for node " + node + " successful.");
+            logger.info("Data space configuration for node " + node.getNodeInformation().getURL() + " successful");
         } catch (Throwable t) {
             logger.error("Cannot configure dataSpace", t);
             return false;

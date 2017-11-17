@@ -27,11 +27,13 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URL;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -41,11 +43,14 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -102,6 +107,8 @@ public class TaskLauncher implements InitActive {
 
     private Thread nodeShutdownHook;
 
+    private TaskLauncherRebinder taskLauncherRebinder = new TaskLauncherRebinder();
+
     /**
      * Needed for ProActive but should never be used manually to create an instance of the object.
      */
@@ -157,6 +164,8 @@ public class TaskLauncher implements InitActive {
 
         TaskContext context = null;
 
+        taskLauncherRebinder.saveTaskTerminateNotificationURL(taskId, terminateNotification);
+
         try {
             addShutdownHook();
             // lock the cache space cleaning mechanism
@@ -206,10 +215,16 @@ public class TaskLauncher implements InitActive {
             taskResult = taskExecutor.execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink());
             taskStopwatchForFailures.stop();
 
+            // by the time the task finishes, the scheduler might have had a
+            // transient failure, so we need to make sure that the placeholder
+            // for the task's result still exists, or get the new place for
+            // the result if it does not exist anymore.
+            TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.makeSureSchedulerIsConnected(terminateNotification);
+
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
                     taskResult = getWalltimedTaskResult(context, taskStopwatchForFailures);
-                    sendResultToScheduler(terminateNotification, taskResult);
+                    sendResultToScheduler(rebindedTerminateNotification, taskResult);
                     return;
                 case KILLED_MANUALLY:
                     // killed by Scheduler, no need to send results back
@@ -224,7 +239,7 @@ public class TaskLauncher implements InitActive {
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
             taskResult.setLogs(taskLogger.getLogs());
 
-            sendResultToScheduler(terminateNotification, taskResult);
+            sendResultToScheduler(rebindedTerminateNotification, taskResult);
         } catch (Throwable taskFailure) {
             wallTimer.stop();
 
@@ -365,27 +380,45 @@ public class TaskLauncher implements InitActive {
         int pingAttempts = initializer.getPingAttempts();
         int pingPeriodMs = initializer.getPingPeriod() * 1000;
 
+        // We are going to contact the recipient of the task result. This
+        // recipient is the TaskTerminateNotification, an active object on the
+        // scheduler side. If the scheduler experienced a transient failure
+        // while the task was computing, then the reference to this
+        // TaskTerminateNotification is obsolete and we need to update it. This
+        // is what the following code does.
+        TaskTerminateNotification currentTerminateNotification = terminateNotification;
         for (int i = 0; i < pingAttempts; i++) {
             try {
-                terminateNotification.terminate(taskId, taskResult);
+                currentTerminateNotification.terminate(taskId, taskResult);
                 logger.debug("Successfully notified task termination " + taskId);
+                // termination has succeeded, exit the method
                 return;
             } catch (Throwable t) {
-                logger.warn("Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms",
-                            t);
-
-                if (i != pingAttempts - 1) {
-                    try {
-                        Thread.sleep(pingPeriodMs);
-                    } catch (InterruptedException e) {
-                        logger.error("Interrupted while waiting to notify task termination", e);
-                    }
+                logger.warn("Cannot notify task termination, trying to rebind to the task termination handler", t);
+                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
+                if (rebindedTerminateNotification != null) {
+                    currentTerminateNotification = rebindedTerminateNotification;
+                    // we'll retry to call the terminate method
+                    continue;
                 }
+                decreasePingAttemptsAndWait(pingAttempts, pingPeriodMs, i, t);
             }
         }
 
         logger.error("Cannot notify task termination " + taskId + " after " + pingAttempts +
                      " attempts, terminating task launcher now");
+    }
+
+    private void decreasePingAttemptsAndWait(int pingAttempts, int pingPeriodMs, int i, Throwable t) {
+        logger.warn("Cannot notify task termination " + taskId + ", will try again in " + pingPeriodMs + " ms", t);
+
+        if (i != pingAttempts - 1) {
+            try {
+                Thread.sleep(pingPeriodMs);
+            } catch (InterruptedException e) {
+                logger.error("Interrupted while waiting to notify task termination", e);
+            }
+        }
     }
 
     private boolean isNodeShuttingDown() {
