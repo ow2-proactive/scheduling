@@ -78,6 +78,8 @@ public final class CommandLineBuilder implements Cloneable {
 
     private OperatingSystem targetOS = OperatingSystem.UNIX;
 
+    private boolean detached = false;
+
     /**
      * To get the RMHome from a previous call to the method {@link #setRmHome(String)}. If such a call has not been made,
      * one manages to retrieve it from the PAProperties set thanks to a previous call to the method {@link #setPaProperties(java.io.File)} of {@link #setPaProperties(java.util.Map)}.
@@ -138,6 +140,15 @@ public final class CommandLineBuilder implements Cloneable {
 
     public void setNumberOfNodes(int nbNodes) {
         this.nbNodes = nbNodes;
+    }
+
+    /** Call this method to indicate that the command should be run in
+     *  background and that the command will not catch the hangup signal.
+     *  This means that the spawned process won't be killed if the current
+     *  one exits.
+     */
+    public void setDetached() {
+        this.detached = true;
     }
 
     @Deprecated
@@ -265,6 +276,10 @@ public final class CommandLineBuilder implements Cloneable {
             rmHome = "";
         }
 
+        if (detached) {
+            makeDetachedCommand(command, os);
+        }
+
         final String libRoot = rmHome + "dist" + os.fs + "lib" + os.fs;
         String javaPath = this.javaPath;
         if (javaPath != null) {
@@ -337,6 +352,9 @@ public final class CommandLineBuilder implements Cloneable {
         }
         command.add("-" + RMNodeStarter.OPTION_WORKERS);
         command.add("" + nbNodes);
+        if (detached && os.equals(OperatingSystem.UNIX)) {
+            command.add("&");
+        }
         return command;
     }
 
@@ -346,6 +364,24 @@ public final class CommandLineBuilder implements Cloneable {
             return buildCommandLine(false);
         } catch (IOException e) {
             return CommandLineBuilder.class.getName() + " with invalid configuration";
+        }
+    }
+
+    private void makeDetachedCommand(ArrayList<String> command, OperatingSystem os) {
+        if (os.equals(OperatingSystem.UNIX)) {
+            // if the system is unix-based, we need to start the process with
+            // the nohup indicator it normally goes with the end of the
+            // command finished with the background indicator '&' (see the end
+            // of command building)
+            command.add("nohup");
+        } else if (os.equals(OperatingSystem.WINDOWS)) {
+            // Windows equivalent is to use the start command with /b option
+            command.add("start");
+            command.add("/b");
+            // we must set the title of the new command prompt, otherwise it
+            // takes the java command as the title of the new prompt, and the
+            // second parameter as the command to execute
+            command.add("\"\"");
         }
     }
 }

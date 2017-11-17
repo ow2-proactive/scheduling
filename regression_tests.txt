@@ -23,3 +23,6 @@ TestWorkflowLoopJobs2
 TestWorkflowReplicateJobs
 TestWorkflowReplicateJobs2
 TestWorkflowReplicateJobs3
+RecoverLocalInfrastructureTest
+TaskReconnectionWithForkedTaskExecutorTest
+TaskReconnectionWithInProcessTaskExecutorTest

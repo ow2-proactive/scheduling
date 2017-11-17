@@ -39,6 +39,8 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -80,7 +82,7 @@ public abstract class Script<E> implements Serializable {
     public static final String MD5 = "MD5";
 
     /** Name of the script engine or file path to script file (extension will be used to lookup) */
-    protected String scriptEngineLookup;
+    protected String scriptEngineLookupName;
 
     /** The script to evaluate */
     protected String script;
@@ -105,7 +107,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(String script, String engineName, Serializable[] parameters) throws InvalidScriptException {
-        this.scriptEngineLookup = engineName;
+        this.scriptEngineLookupName = engineName;
         this.script = script;
         this.id = script;
         this.parameters = parameters;
@@ -123,7 +125,7 @@ public abstract class Script<E> implements Serializable {
      */
     public Script(String script, String engineName, Serializable[] parameters, String scriptName)
             throws InvalidScriptException {
-        this.scriptEngineLookup = engineName;
+        this.scriptEngineLookupName = engineName;
         this.script = script;
         this.id = script;
         this.parameters = parameters;
@@ -156,7 +158,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(File file, Serializable[] parameters) throws InvalidScriptException {
-        this.scriptEngineLookup = FileUtils.getExtension(file.getPath());
+        this.scriptEngineLookupName = FileUtils.getExtension(file.getPath());
 
         try {
             script = readFile(file);
@@ -182,7 +184,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(URL url, Serializable[] parameters) throws InvalidScriptException {
-        this.scriptEngineLookup = FileUtils.getExtension(url.getFile());
+        this.scriptEngineLookupName = FileUtils.getExtension(url.getFile());
 
         try {
             storeScript(url);
@@ -208,7 +210,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(Script<?> script2) throws InvalidScriptException {
-        this(script2.getScript(), script2.scriptEngineLookup, script2.getParameters(), script2.getScriptName());
+        this(script2.getScript(), script2.scriptEngineLookupName, script2.getParameters(), script2.getScriptName());
     }
 
     /** Create a script from another script object
@@ -216,7 +218,7 @@ public abstract class Script<E> implements Serializable {
      * @throws InvalidScriptException if the creation fails.
      */
     public Script(Script<?> script2, String scriptName) throws InvalidScriptException {
-        this(script2.script, script2.scriptEngineLookup, script2.parameters, scriptName);
+        this(script2.script, script2.scriptEngineLookupName, script2.parameters, scriptName);
     }
 
     /**
@@ -279,7 +281,7 @@ public abstract class Script<E> implements Serializable {
 
         if (engine == null)
             return new ScriptResult<>(new Exception("No Script Engine Found for name or extension " +
-                                                    scriptEngineLookup));
+                                                    scriptEngineLookupName));
 
         // SCHEDULING-1532: redirect script output to a buffer (keep the latest DEFAULT_OUTPUT_MAX_SIZE)
         BoundedStringWriter outputBoundedWriter = new BoundedStringWriter(outputSink, DEFAULT_OUTPUT_MAX_SIZE);
@@ -347,20 +349,54 @@ public abstract class Script<E> implements Serializable {
 
     /** The Script Engine used to evaluate the script. */
     protected ScriptEngine createScriptEngine() {
+
+        Map<ScriptEngine, Integer> scriptEngineCandidates;
+        final boolean findByName = true;
+        scriptEngineCandidates = findScriptEngineCandidates(findByName);
+
+        if (scriptEngineCandidates.isEmpty()) {
+            scriptEngineCandidates = findScriptEngineCandidates(!findByName);
+        }
+
+        return findBestScriptEngine(scriptEngineCandidates);
+    }
+
+    private Map<ScriptEngine, Integer> findScriptEngineCandidates(boolean findByName) {
+        Map<ScriptEngine, Integer> matchPositionPerScriptEngineCandidate = new HashMap<>();
+        int matchPosition;
+        List<String> lookupCriteria;
+
         for (ScriptEngineFactory factory : new ScriptEngineManager().getEngineFactories()) {
-            for (String name : factory.getNames()) {
-                if (name.equalsIgnoreCase(scriptEngineLookup)) {
-                    return factory.getScriptEngine();
-                }
+            matchPosition = 0;
+            if (findByName) {
+                lookupCriteria = factory.getNames();
+            } else {
+                lookupCriteria = factory.getExtensions();
             }
-            for (String ext : factory.getExtensions()) {
-                String scriptEngineLookupLowercase = scriptEngineLookup.toLowerCase();
-                if (scriptEngineLookupLowercase.equalsIgnoreCase(ext.toLowerCase())) {
-                    return factory.getScriptEngine();
+
+            for (String criteria : lookupCriteria) {
+                if (criteria.equalsIgnoreCase(scriptEngineLookupName)) {
+                    matchPositionPerScriptEngineCandidate.put(factory.getScriptEngine(), matchPosition);
                 }
+                matchPosition++;
             }
         }
-        return null;
+
+        return matchPositionPerScriptEngineCandidate;
+    }
+
+    private ScriptEngine findBestScriptEngine(Map<ScriptEngine, Integer> scriptEngineCandidates) {
+        int minimumMatchingIndex = Integer.MAX_VALUE;
+        ScriptEngine bestScriptEngine = null;
+
+        for (Entry<ScriptEngine, Integer> candidate : scriptEngineCandidates.entrySet()) {
+            if (candidate.getValue() < minimumMatchingIndex) {
+                minimumMatchingIndex = candidate.getValue();
+                bestScriptEngine = candidate.getKey();
+            }
+        }
+
+        return bestScriptEngine;
     }
 
     /**
@@ -412,7 +448,7 @@ public abstract class Script<E> implements Serializable {
     }
 
     public String getEngineName() {
-        return scriptEngineLookup;
+        return scriptEngineLookupName;
     }
 
     @Override
@@ -459,9 +495,9 @@ public abstract class Script<E> implements Serializable {
 
     public String display() {
         String nl = System.lineSeparator();
-        return " { " + nl + "Script '" + getScriptName() + '\'' + nl + "\tscriptEngineLookup = '" + scriptEngineLookup +
-               '\'' + nl + "\tscript = " + nl + script + nl + "\tid = " + nl + id + nl + "\tparameters = " +
-               Arrays.toString(parameters) + nl + '}';
+        return " { " + nl + "Script '" + getScriptName() + '\'' + nl + "\tscriptEngineLookupName = '" +
+               scriptEngineLookupName + '\'' + nl + "\tscript = " + nl + script + nl + "\tid = " + nl + id + nl +
+               "\tparameters = " + Arrays.toString(parameters) + nl + '}';
     }
 
     public void overrideDefaultScriptName(String defaultScriptName) {

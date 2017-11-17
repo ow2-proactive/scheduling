@@ -41,9 +41,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
@@ -56,7 +54,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
 
-public class TaskLauncherDataSpacesTest {
+public class TaskLauncherDataSpacesTest extends TaskLauncherTestAbstract {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -81,8 +79,8 @@ public class TaskLauncherDataSpacesTest {
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_1000.txt");
         assertTrue(inputFile.createNewFile());
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, taskLauncherFactory);
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer, taskLauncherFactory),
+                                                executableContainer);
 
         assertFalse(taskResult.hadException());
         assertTrue(taskResult.getOutput().getAllLogs(false).contains("input_1000.txt"));
@@ -98,8 +96,8 @@ public class TaskLauncherDataSpacesTest {
         initializer.setTaskOutputFiles(singletonList(new OutputSelector(new FileSelector("output_${PA_TASK_ID}.txt"),
                                                                         OutputAccessMode.TransferToGlobalSpace)));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, taskLauncherFactory);
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer, taskLauncherFactory),
+                                                executableContainer);
 
         assertTaskResultOk(taskResult);
         assertTrue(new File(taskLauncherFactory.getDataSpaces().getGlobalURI(), "output_1000.txt").exists());
@@ -119,10 +117,11 @@ public class TaskLauncherDataSpacesTest {
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_foo_bar.txt");
         assertTrue(inputFile.createNewFile());
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, taskLauncherFactory);
         TaskResultImpl previousTaskResult = taskResult(Collections.<String, Serializable> singletonMap("aResultVar",
                                                                                                        "bar"));
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer, previousTaskResult);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer, taskLauncherFactory),
+                                                executableContainer,
+                                                previousTaskResult);
 
         assertTaskResultOk(taskResult);
         assertTrue(taskResult.getOutput().getAllLogs(false).contains("input_foo_bar.txt"));
@@ -138,18 +137,17 @@ public class TaskLauncherDataSpacesTest {
         copyOutputFile.setTaskOutputFiles(singletonList(new OutputSelector(new FileSelector("output_${aVar}_${aResultVar}.txt"),
                                                                            OutputAccessMode.TransferToGlobalSpace)));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(copyOutputFile, taskLauncherFactory);
         TaskResultImpl previousTaskResult = taskResult(Collections.<String, Serializable> singletonMap("aResultVar",
                                                                                                        "bar"));
-        TaskResult taskResult = runTaskLauncher(taskLauncher, createAFileAndWriteVariable, previousTaskResult);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(copyOutputFile, taskLauncherFactory),
+                                                createAFileAndWriteVariable,
+                                                previousTaskResult);
 
         assertTaskResultOk(taskResult);
         assertTrue(new File(taskLauncherFactory.getDataSpaces().getGlobalURI(), "output_foo_bar.txt").exists());
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer) {
-        TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
-
         taskLauncher.doTask(executableContainer, null, taskResult);
 
         return taskResult.result;
@@ -157,22 +155,9 @@ public class TaskLauncherDataSpacesTest {
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer,
             TaskResult... taskResults) {
-        TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
-
         taskLauncher.doTask(executableContainer, taskResults, taskResult);
 
         return taskResult.result;
-    }
-
-    private static class TaskTerminateNotificationVerifier implements TaskTerminateNotification {
-
-        TaskResult result;
-
-        @Override
-        public void terminate(TaskId taskId, TaskResult taskResult) {
-            this.result = taskResult;
-        }
-
     }
 
     private TaskResultImpl taskResult(Map<String, Serializable> variables) {

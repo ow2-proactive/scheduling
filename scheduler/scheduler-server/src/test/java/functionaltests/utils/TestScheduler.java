@@ -71,9 +71,12 @@ public class TestScheduler {
 
     private static boolean isStarted = false;
 
-    public static synchronized void start(SchedulerTestConfiguration configuration) throws Exception {
+    public static synchronized void start(SchedulerTestConfiguration configuration, boolean cleanTMP) throws Exception {
         kill();
-        cleanTMP();
+
+        if (cleanTMP) {
+            cleanTMP();
+        }
 
         startedConfiguration = configuration;
 

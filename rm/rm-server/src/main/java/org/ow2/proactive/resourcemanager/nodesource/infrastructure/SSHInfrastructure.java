@@ -104,8 +104,6 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     @Configurable(description = "Linux, Cygwin or Windows depending on\nthe operating system of the remote hosts")
     protected String targetOs = "Linux";
 
-    protected OperatingSystem targetOSObj = null;
-
     /**
      * Additional java options to append to the command executed on the remote
      * host
@@ -119,12 +117,12 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     @Configurable(credential = true, description = "Absolute path of the credential file")
     protected File rmCredentialsPath;
 
-    protected Credentials credentials = null;
+    private static final String CREDENTIALS_KEY = "credentials";
 
-    /**
-     * Shutdown flag
-     */
-    protected boolean shutdown = false;
+    private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
+
+    /** key of the shutdown flag */
+    private static final String SHUTDOWN_FLAG_KEY = "shutdownFlag";
 
     /**
      * Internal node acquisition method
@@ -139,8 +137,8 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      *             acquisition failed
      */
     protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
-        String fs = this.targetOSObj.fs;
-        CommandLineBuilder clb = super.getDefaultCommandLineBuilder(this.targetOSObj);
+        String fs = getTargetOSObj().fs;
+        CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
         // we take care of spaces in java path
         clb.setJavaPath(this.javaPath);
         // we set the rm.home prop
@@ -201,7 +199,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         // finally, the credential's value
         String credString = null;
         try {
-            credString = new String(this.credentials.getBase64());
+            credString = new String(getCredentials().getBase64());
         } catch (KeyException e1) {
             throw new RMException("Could not get base64 credentials", e1);
         }
@@ -325,10 +323,11 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             this.schedulingPath = parameters[index++].toString();
             // target OS
             if (parameters[index] != null) {
-                this.targetOSObj = OperatingSystem.getOperatingSystem(parameters[index++].toString());
-                if (this.targetOSObj == null) {
+                OperatingSystem configuredTargetOs = OperatingSystem.getOperatingSystem(parameters[index++].toString());
+                if (configuredTargetOs == null) {
                     throw new IllegalArgumentException("Only 'Linux', 'Windows' and 'Cygwin' are valid values for Target OS Property.");
                 }
+                persistedInfraVariables.put(TARGET_OS_OBJ_KEY, configuredTargetOs);
             } else {
                 throw new IllegalArgumentException("Target OS parameter cannot be null");
             }
@@ -340,7 +339,8 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
-                this.credentials = Credentials.getCredentialsBase64((byte[]) parameters[index++]);
+                persistedInfraVariables.put(CREDENTIALS_KEY,
+                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
@@ -381,6 +381,45 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
     @Override
     public void shutDown() {
-        this.shutdown = true;
+        setShutdownFlag(true);
     }
+
+    @Override
+    protected void initializePersistedInfraVariables() {
+        super.initializePersistedInfraVariables();
+        persistedInfraVariables.put(CREDENTIALS_KEY, null);
+        persistedInfraVariables.put(TARGET_OS_OBJ_KEY, null);
+        persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, false);
+    }
+
+    // Below are wrapper methods around the runtime variables map
+
+    private Credentials getCredentials() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Credentials>() {
+            @Override
+            public Credentials handle() {
+                return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
+            }
+        });
+    }
+
+    private OperatingSystem getTargetOSObj() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<OperatingSystem>() {
+            @Override
+            public OperatingSystem handle() {
+                return (OperatingSystem) persistedInfraVariables.get(TARGET_OS_OBJ_KEY);
+            }
+        });
+    }
+
+    private void setShutdownFlag(final boolean isShutdown) {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
+                return null;
+            }
+        });
+    }
+
 }
