@@ -192,7 +192,7 @@ class LoadPackage {
 
     }
 
-    def pushObject(object, package_dir, bucket_resources_list, bucket_id) {
+    def pushObject(object, package_dir, bucket_resources_list, bucket_name) {
         def metadata_map = object.get("metadata")
 
         // OBJECT SECTION /////////////////////////////
@@ -216,7 +216,7 @@ class LoadPackage {
             def boundary = "---------------" + UUID.randomUUID().toString();
 
             // POST QUERY
-            def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&contentType=" + contentType
+            def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&contentType=" + contentType
             def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
             post.addHeader("Accept", "application/json")
             post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)
@@ -254,9 +254,9 @@ class LoadPackage {
             writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
 
             // Create a bucket if needed -------------
-            Integer bucket_id = null
+            def bucket_name = null
             if (bucket_found) {
-                bucket_id = bucket_found.id
+                bucket_name = bucket_found.name
             } else {
                 // POST QUERY
                 def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
@@ -268,7 +268,7 @@ class LoadPackage {
                 response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
                 def bis = new BufferedInputStream(response.getEntity().getContent())
                 def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
-                bucket_id = slurper.parseText(result.toString()).get("id")
+                bucket_name = slurper.parseText(result.toString()).get("name")
                 bis.close();
                 writeToOutput(" " + bucket + " created!")
             }
@@ -276,13 +276,13 @@ class LoadPackage {
             // OBJECTS SECTION /////////////////////////////
 
             // GET QUERY
-            def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources"
+            def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources"
             response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: sessionId])
             ArrayList bucket_resources_list = slurper.parseText(response.toString())
 
             catalog_map.get("objects").each { object ->
                 //push object in the catalog
-                File object_file = pushObject(object, package_dir,bucket_resources_list, bucket_id)
+                File object_file = pushObject(object, package_dir,bucket_resources_list, bucket_name)
 
                 // Expose the workflow/object as a studio template
                 populateTemplateDir(object, object_file.absolutePath)
