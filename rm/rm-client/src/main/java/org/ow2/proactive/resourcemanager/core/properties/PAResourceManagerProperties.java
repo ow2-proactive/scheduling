@@ -247,7 +247,58 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * The approach is best effort and Node hostname is not considered.
      * As a result, Nodes are not necessarily locked on the same host.
      */
-    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true");
+    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true"),
+
+    /**
+     * Defines if the nodes should be kept when the resource manager exits.
+     * This property is defaulted to false as shutting down the RM should
+     * clean also its nodes.
+     */
+    RM_PRESERVE_NODES_ON_SHUTDOWN("pa.rm.preserve.nodes.on.shutdown", PropertyType.BOOLEAN, "false"),
+
+    /**
+     * Defines whether the node recovery mechanism is enabled on RM startup.
+     * If set to {@code true}, it indicates that the node states and the node
+     * source infrastructure states should be reloaded from database.
+     * This flag is only taken into account if the database cleaner indicators
+     * ({@link PAResourceManagerProperties#RM_DB_HIBERNATE_DROPDB} and
+     * {@link PAResourceManagerProperties#RM_DB_HIBERNATE_DROPDB_NODESOURCES})
+     * are not set to {@code true}.
+     */
+    RM_NODES_RECOVERY("pa.rm.nodes.recovery", PropertyType.BOOLEAN, "true"),
+
+    /**
+     * Defines the minimum inter-time in MILLISECONDS between database
+     * operations before a database transaction is triggered. In between
+     * such a delay, several database operations will be batched together.
+     *
+     * This delayed is applied for two different batches of database
+     * operations. It applies separately for node source updates and for node
+     * adds. If node adds are pending while other node operations are
+     * required, then the other node operations are also delayed to preserve
+     * operation ordering. Then, if no node adds are pending, the subsequent
+     * node operations are either executed synchronously or asynchronously,
+     * depending on the {@link PAResourceManagerProperties#RM_NODES_DB_SYNCHRONOUS_UPDATES}
+     * property.
+     *
+     * updates will be batched together In milliseconds. If this property is
+     * set to 0, then database operations are not delayed and are synchronous.
+     */
+    RM_NODES_DB_OPERATIONS_DELAY("pa.rm.node.db.operations.delay", PropertyType.INTEGER, "100"),
+
+    /**
+     * Defines if, in the presence of a delay to execute node-related database
+     * operations, the node update database operations must still be run
+     * synchronously whenever possible.
+     */
+    RM_NODES_DB_SYNCHRONOUS_UPDATES("pa.rm.nodes.db.operations.update.synchronous", PropertyType.BOOLEAN, "true"),
+
+    /**
+     * Defines whether all the resources of the deployed cloud instances
+     * should be destroyed along with the nodes termination when the scheduler 
+     * is shut down.
+     */
+    RM_CLOUD_INFRASTRUCTURES_DESTROY_INSTANCES_ON_SHUTDOWN("pa.rm.cloud.infrastructures.destroy.instances.on.shutdown", PropertyType.BOOLEAN, "false");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */

@@ -335,6 +335,13 @@ public interface RMNode extends Comparable<RMNode> {
     String getJMXUrl(JMXTransportProtocol protocol);
 
     /**
+     * Gets the JMX urls of the node.
+     *
+     * @return an array of jmx urls
+     */
+    String[] getJmxUrls();
+
+    /**
      * @return true if node is protected with token 
      */
     boolean isProtectedByToken();

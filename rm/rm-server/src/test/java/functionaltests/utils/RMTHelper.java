@@ -74,7 +74,7 @@ public class RMTHelper {
     /**
      * Timeout for local infrastructure
      */
-    public static final int DEFAULT_NODES_TIMEOUT = 60 * 1000; //60s
+    public static final int DEFAULT_NODES_TIMEOUT = 180 * 1000; //3minutes
 
     /**
      * Number of nodes deployed with default deployment descriptor
@@ -179,13 +179,11 @@ public class RMTHelper {
             ResourceManager resourceManager, RMMonitorsHandler monitor) throws Exception {
 
         Map<String, String> map = new HashMap<>();
-        List<TestNode> nodes = new ArrayList<>();
         map.put(CentralPAPropertyRepository.PA_HOME.getName(), CentralPAPropertyRepository.PA_HOME.getValue());
+
+        List<TestNode> nodes = createNodes("node", nodesNumber);
         for (int i = 0; i < nodesNumber; i++) {
-            String nodeName = "node-" + i;
-            TestNode node = createNode(nodeName, map, vmOptions != null ? vmOptions : setup.getJvmParametersAsList());
-            nodes.add(node);
-            resourceManager.addNode(node.getNode().getNodeInformation().getURL());
+            resourceManager.addNode(nodes.get(i).getNode().getNodeInformation().getURL());
         }
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT, monitor);
         for (int i = 0; i < nodesNumber; i++) {
@@ -249,7 +247,7 @@ public class RMTHelper {
     /**
      * Create several nodes on the same JVMProcess
      */
-    public List<TestNode> createNodes(final String nodeName, int number)
+    public static List<TestNode> createNodes(final String nodeName, int number)
             throws IOException, NodeException, ExecutionException, InterruptedException, AlreadyBoundException {
         if (number == 0) {
             throw new IllegalArgumentException("" + number);
@@ -655,7 +653,7 @@ public class RMTHelper {
         if (!rm.isStartedWithSameConfiguration(configurationFile)) {
             killRM();
             log("Starting RM");
-            rm.start(configurationFile, pnpPort, jvmArgs);
+            rm.start(configurationFile, pnpPort, testClasspath(), jvmArgs);
             currentTestConfiguration = configurationFile;
         }
         return rm.getUrl();

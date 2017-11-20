@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.MutableInteger;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
@@ -117,7 +118,7 @@ public class NodesLockRestorationManager {
      *
      * @param node the node to consider.
      */
-    public void handle(RMNode node) {
+    public void handle(RMNode node, Client caller) {
 
         if (!isNodeValidToBeRestored(node)) {
             if (log.isDebugEnabled()) {
@@ -141,7 +142,7 @@ public class NodesLockRestorationManager {
 
         if (nodeCount != null) {
 
-            lockNode(node);
+            lockNode(node, caller);
 
             int newNodeCount = nodeCount.add(-1);
 
@@ -152,7 +153,7 @@ public class NodesLockRestorationManager {
     }
 
     private boolean isNodeValidToBeRestored(RMNode node) {
-        return initialized && !node.isLocked() && !isRestorationCompleted();
+        return initialized && !node.isLocked() && !isRestorationCompleted() && !node.isBusy();
     }
 
     private void logSkipReason(String nodeUrl, String reason) {
@@ -163,10 +164,10 @@ public class NodesLockRestorationManager {
         return initialized && nodeLockedOnPreviousRun.isEmpty();
     }
 
-    boolean lockNode(RMNode node) {
+    boolean lockNode(RMNode node, Client caller) {
         String nodeUrl = node.getNodeURL();
 
-        if (rmCore.lockNodes(ImmutableSet.of(nodeUrl)).getBooleanValue()) {
+        if (rmCore.lockNodes(ImmutableSet.of(nodeUrl), caller).getBooleanValue()) {
             log.info("Node '" + nodeUrl + "' has been locked with success");
             return true;
         } else {

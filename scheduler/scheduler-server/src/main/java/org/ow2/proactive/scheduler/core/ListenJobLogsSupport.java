@@ -35,23 +35,23 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 
 
-abstract class ListenJobLogsSupport {
+public abstract class ListenJobLogsSupport {
 
     protected static final Logger logger = Logger.getLogger(SchedulingService.class);
 
-    abstract void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException;
+    public abstract void listenJobLogs(JobId jobId, AppenderProvider appenderProvider) throws UnknownJobException;
 
-    abstract void activeLogsIfNeeded(JobId jobId, TaskLauncher launcher) throws LogForwardingException;
+    public abstract void activeLogsIfNeeded(JobId jobId, TaskLauncher launcher) throws LogForwardingException;
 
-    abstract void cleanLoggers(JobId jobId);
+    public abstract void cleanLoggers(JobId jobId);
 
-    abstract void shutdown();
+    public abstract void shutdown();
 
-    boolean isEnabled() {
+    public boolean isEnabled() {
         return this instanceof EnabledListenJobLogsSupport;
     }
 
-    static ListenJobLogsSupport newInstance(SchedulerDBManager dbManager, LiveJobs liveJobs)
+    public static ListenJobLogsSupport newInstance(SchedulerDBManager dbManager, LiveJobs liveJobs)
             throws LogForwardingException {
         String providerClassname = PASchedulerProperties.LOGS_FORWARDING_PROVIDER.getValueAsString();
         if (providerClassname == null || providerClassname.equals("")) {
