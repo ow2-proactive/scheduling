@@ -53,15 +53,21 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
  */
 public class InstallPackageCommand extends AbstractCommand implements Command {
 
-    private final String PACKAGE_PATH_NAME;
+    //Source package which can be a local directory path or an URL
+    private final String SOURCE_PACKAGE;
+
+    private static final String REGEX_URL = "((https?://|ftp://|www\\.|[^\\s:=]+@www\\.).*?[a-zA-Z_\\/0-9\\-\\#=&])(?=(\\.|,|;|\\?|\\!)?(\"|'|«|»|\\[|\\s|\\r|\\n|$))";
 
     private static final String SCRIPT_PATH = "tools/LoadPackageClient.groovy";
 
     private static Logger logger = Logger.getLogger(InstallPackageCommand.class);
 
-    public InstallPackageCommand(String packagePathName) throws CLIException {
+    private PackageDownloader packageDownloader;
 
-        this.PACKAGE_PATH_NAME = packagePathName;
+    public InstallPackageCommand(String sourcePackagePath) throws CLIException {
+
+        this.SOURCE_PACKAGE = sourcePackagePath;
+        packageDownloader = new PackageDownloader();
 
     }
 
@@ -71,24 +77,27 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
         SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         ScriptResult scriptResult;
         Map<String, Object> schedulerProperties;
+        String packageDirPath;
         try {
-            validatePackagePath();
+            packageDirPath = retrievePackagePath();
 
             schedulerProperties = retrieveSchedulerProperties(currentContext, scheduler);
 
-            scriptResult = executeScript(schedulerProperties);
+            addSessionIdToSchedulerProperties(currentContext, schedulerProperties);
+
+            scriptResult = executeScript(schedulerProperties, packageDirPath);
 
             if (scriptResult.errorOccured()) {
                 logger.error("Failed to execute script: " + SCRIPT_PATH);
                 throw new InvalidScriptException("Failed to execute script: " +
                                                  scriptResult.getException().getMessage(), scriptResult.getException());
             } else {
-                writeLine(currentContext, "Package('%s') successfully installed in the catalog", PACKAGE_PATH_NAME);
+                writeLine(currentContext, "Package('%s') successfully installed in the catalog", SOURCE_PACKAGE);
             }
 
         } catch (Exception e) {
             handleError(String.format("An error occurred while attempting to install package('%s') in the catalog",
-                                      PACKAGE_PATH_NAME),
+                                      SOURCE_PACKAGE),
                         e,
                         currentContext);
 
@@ -96,28 +105,50 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
 
     }
 
-    private void validatePackagePath() {
-        File file = new File(PACKAGE_PATH_NAME);
-        if (file.exists()) {
-            if (!(file.isDirectory() || file.getPath().endsWith(".zip"))) {
-                logger.warn(PACKAGE_PATH_NAME + " must be a directory or a zip file.");
-                throw new CLIException(REASON_INVALID_ARGUMENTS,
-                                       String.format("'%s' must be a directory or a zip file.", PACKAGE_PATH_NAME));
+    /**
+     * This method returns the package source path depending on the nature of the source location which can be a local path or an url.
+     * If the source location is an url, the object packageDownloader locally downloads the package and returns its path.
+     * Otherwise, it returns the given local path.
+     * It throws an exception in three cases. When the given source location is not
+     * <ul>
+     *         <li>a directory or a zip file </li>
+     *         <li>a valid Url</li>
+     *         <li>a valid directory path</li>
+     *     </ul>
+     * @return
+     */
+    private String retrievePackagePath() {
+        File file = new File(SOURCE_PACKAGE);
+        if (!SOURCE_PACKAGE.matches(REGEX_URL)) {
+            //the source package is not an Url and can be a valid local path
+            if (file.exists()) {
+                if (!(file.isDirectory() || file.getPath().endsWith(".zip"))) {
+                    //the source package is not a directory or a zip file
+                    logger.warn(SOURCE_PACKAGE + " must be a directory or a zip file.");
+                    throw new CLIException(REASON_INVALID_ARGUMENTS,
+                                           String.format("'%s' must be a directory or a zip file.", SOURCE_PACKAGE));
+                } else {
+                    //the source package is a local path
+                    return SOURCE_PACKAGE;
+                }
+            } else {
+                //the source package is neither a valid Url nor a local path
+                logger.warn(SOURCE_PACKAGE + " does not exist.");
+                throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", SOURCE_PACKAGE));
             }
         } else {
-            logger.warn(PACKAGE_PATH_NAME + " is not a valid package.");
-            throw new CLIException(REASON_INVALID_ARGUMENTS,
-                                   String.format("'%s' is not a valid package.", PACKAGE_PATH_NAME));
-
+            //the source package is a valid Url
+            return packageDownloader.downloadPackage(SOURCE_PACKAGE);
         }
 
     }
 
-    private ScriptResult executeScript(Map<String, Object> schedulerProperties) throws InvalidScriptException {
+    private ScriptResult executeScript(Map<String, Object> schedulerProperties, String packageDirPath)
+            throws InvalidScriptException {
         ByteArrayOutputStream outputStream = null;
         PrintStream printStream = null;
         File scriptFile = new File(PASchedulerProperties.getAbsolutePath(SCRIPT_PATH));
-        String[] param = { PACKAGE_PATH_NAME };
+        String[] param = { packageDirPath };
         ScriptResult scriptResult = null;
         if (scriptFile.exists()) {
             outputStream = new ByteArrayOutputStream();
@@ -127,7 +158,7 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
             outputStream.reset();
 
         } else {
-            logger.warn("Install package script " + scriptFile.getPath() + " not found");
+            logger.warn("Load package script " + scriptFile.getPath() + " not found");
         }
 
         if (outputStream != null) {
@@ -149,4 +180,11 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
             SchedulerRestInterface scheduler) throws PermissionRestException, NotConnectedRestException {
         return scheduler.getSchedulerPropertiesFromSessionId(currentContext.getSessionId());
     }
+
+    private void addSessionIdToSchedulerProperties(ApplicationContext currentContext,
+            Map<String, Object> schedulerProperties) {
+        schedulerProperties.put("pa.scheduler.session.id", currentContext.getSessionId());
+
+    }
+
 }

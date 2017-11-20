@@ -78,26 +78,26 @@ public class InstallPackageCommandTest {
     }
 
     @Test(expected = CLIException.class)
-    public void testInvalidPackagePathProvided1() throws Exception {
+    public void testEmptyPackagePathProvided() throws Exception {
 
         packagePath = "";
 
         InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
         installPackageCommand.execute(currentContextMock);
-        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' is not a valid package."));
+        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' does not exist."));
 
         throw stack.get(0);
 
     }
 
     @Test(expected = CLIException.class)
-    public void testInvalidPackagePathProvided2() throws Exception {
+    public void testInvalidPackagePathProvided() throws Exception {
 
-        packagePath = "/src/test/java/config/package";
+        packagePath = "/path/to/non/existing/package";
 
         InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
         installPackageCommand.execute(currentContextMock);
-        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' is not a valid package."));
+        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' does not exist."));
 
         throw stack.get(0);
 
@@ -110,6 +110,99 @@ public class InstallPackageCommandTest {
         InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
         installPackageCommand.execute(currentContextMock);
         assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' must be a directory or a zip file."));
+
+        throw stack.get(0);
+
+    }
+
+    @Test(expected = CLIException.class)
+    public void testInvalidPackageUrlProvided() throws Exception {
+
+        packagePath = "invalid://github.com/ow2-proactive/proactive-examples/";
+
+        InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
+        installPackageCommand.execute(currentContextMock);
+        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' does not exist."));
+
+        throw stack.get(0);
+
+    }
+
+    @Test(expected = CLIException.class)
+    public void testInvalidPackageGithubUrlProvided() throws Exception {
+
+        packagePath = "http://github.com/ow2-proactive/proactive-examples/non/existing/url";
+
+        InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
+        installPackageCommand.execute(currentContextMock);
+        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' is not a reachable package URL."));
+
+        throw stack.get(0);
+
+    }
+
+    @Test(expected = CLIException.class)
+    public void testNotGithubPackageUrlProvided() throws Exception {
+
+        packagePath = "https://github.com/ow2-proactive/scheduling/issues";
+
+        InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
+        installPackageCommand.execute(currentContextMock);
+        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' is not a valid github URL."));
+
+        throw stack.get(0);
+
+    }
+
+    @Test(expected = CLIException.class)
+    public void testUnreachableURLProvided() throws Exception {
+
+        packagePath = "http://githunreachable.com/ow2-proactive/proactive-examples/";
+
+        InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
+        installPackageCommand.execute(currentContextMock);
+        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' is not a reachable package URL."));
+
+        throw stack.get(0);
+
+    }
+
+    @Test(expected = CLIException.class)
+    public void testUnreachableShortURLProvided() throws Exception {
+
+        packagePath = "http://bit.ly/2zK7FMk";
+
+        InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
+        installPackageCommand.execute(currentContextMock);
+        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' is not a reachable package URL."));
+
+        throw stack.get(0);
+
+    }
+
+    @Test(expected = CLIException.class)
+    public void testInvalidPackageWebbUrlProvided() throws Exception {
+
+        packagePath = "http://www.lamsade.dauphine.fr/~cornaz/Enseignement/ALGO-JAVA/";
+
+        InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
+        installPackageCommand.execute(currentContextMock);
+        assertThat(stack.get(0).getMessage(),
+                   is("'" + packagePath +
+                      "' is not a valid URL of a proactive package as it does not contain the METADATA.json and the resources folder required for installation."));
+
+        throw stack.get(0);
+
+    }
+
+    @Test(expected = CLIException.class)
+    public void testInvalidGithubUrlProvided() throws Exception {
+
+        packagePath = "https://github.com/Aminelouati/wrong_github_url/archive/master.zip";
+
+        InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
+        installPackageCommand.execute(currentContextMock);
+        assertThat(stack.get(0).getMessage(), is("'" + packagePath + "' is not a reachable package URL."));
 
         throw stack.get(0);
 

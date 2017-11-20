@@ -34,6 +34,7 @@ class LoadPackage {
         this.GLOBAL_SPACE_PATH = binding.variables.get("pa.scheduler.dataspace.defaultglobal.localpath")
         this.SCHEDULER_REST_URL = binding.variables.get("pa.scheduler.rest.url")
         this.SCHEDULER_HOME = binding.variables.get("pa.scheduler.home")
+        this.sessionId = binding.variables.get("pa.scheduler.session.id")
 
         // User variables
         this.WORKFLOW_TEMPLATES_DIR = new File(this.SCHEDULER_HOME, "config/workflows/templates")
