@@ -105,22 +105,39 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
 
     }
 
+    /**
+     * This method returns the package source path depending on the nature of the source location which can be a local path or an url.
+     * If the source location is an url, the object packageDownloader locally downloads the package and returns its path.
+     * Otherwise, it returns the given local path.
+     * It throws an exception in three cases. When the given source location is not
+     * <ul>
+     *         <li>a directory or a zip file </li>
+     *         <li>a valid Url</li>
+     *         <li>a valid directory path</li>
+     *     </ul>
+     * @return
+     */
     private String retrievePackagePath() {
         File file = new File(SOURCE_PACKAGE);
         if (!SOURCE_PACKAGE.matches(REGEX_URL)) {
+            //the source package is not an Url and can be a valid local path
             if (file.exists()) {
                 if (!(file.isDirectory() || file.getPath().endsWith(".zip"))) {
+                    //the source package is not a directory or a zip file
                     logger.warn(SOURCE_PACKAGE + " must be a directory or a zip file.");
                     throw new CLIException(REASON_INVALID_ARGUMENTS,
                                            String.format("'%s' must be a directory or a zip file.", SOURCE_PACKAGE));
                 } else {
+                    //the source package is a local path
                     return SOURCE_PACKAGE;
                 }
             } else {
+                //the source package is neither a valid Url nor a local path
                 logger.warn(SOURCE_PACKAGE + " does not exist.");
                 throw new CLIException(REASON_INVALID_ARGUMENTS, String.format("'%s' does not exist.", SOURCE_PACKAGE));
             }
         } else {
+            //the source package is a valid Url
             return packageDownloader.downloadPackage(SOURCE_PACKAGE);
         }
 
