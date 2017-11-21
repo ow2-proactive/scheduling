@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -83,6 +84,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * To notify the control loop of the deploying node timeout
      */
     private static final String PN_TIMEOUT_KEY = "pnTimeout";
+
+    private static final String HOST_PER_NODE_URL_KEY = "hostPerNodeUrlKey";
 
     protected HostsFileBasedInfrastructureManager() {
     }
@@ -225,14 +228,14 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             String host = elts[0];
             try {
                 InetAddress addr = InetAddress.getByName(host);
-                putFreeHostIfNotExist(num, addr);
+                putFreeHostIfNotExist(addr, num);
             } catch (UnknownHostException ex) {
                 throw new RuntimeException("Unknown host: " + host, ex);
             }
         }
     }
 
-    private void putFreeHostIfNotExist(int num, InetAddress addr) {
+    private void putFreeHostIfNotExist(InetAddress addr, int num) {
         // do not use the setPersistedInfraVariable method here because we cannot persist the variable yet: we need
         // the configuration to be over for that
         writeLock.lock();
@@ -265,7 +268,10 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Override
     protected void notifyAcquiredNode(Node node) throws RMException {
         String nodeName = node.getNodeInformation().getName();
-        putRegisteredNodes(nodeName, node.getVMInformation().getInetAddress());
+        String nodeUrl = node.getNodeInformation().getURL();
+        InetAddress nodeAddress = node.getVMInformation().getInetAddress();
+        putRegisteredNodes(nodeName, nodeAddress);
+        putHostForNodeUrl(nodeUrl, nodeAddress);
         if (logger.isDebugEnabled()) {
             logger.debug("New expected node registered: #freeHosts:" + getFreeHostsSize() + " #registered: " +
                          getRegisteredNodesSize());
@@ -283,11 +289,25 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Override
     public void notifyDownNode(final String nodeName, final String nodeUrl, final Node node) {
         InetAddress host = removeNodeAndReturnHost(nodeName, nodeUrl, node);
-        if (host != null && !getRegisteredNodes().containsValue(host)) {
-            removeRemovedHostAndPutIfAbsentFreeHosts(host);
+        if (host == null) {
+            logger.warn("Removed node " + nodeName + " was not registered before");
+            host = getHostAddressForNode(nodeUrl);
+            addRemovedHost(host);
         }
-        logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() + " #registered nodes: " +
-                    getRegisteredNodesSize());
+        if (host != null) {
+            int removedNbNodesForHost = getRemovedNodesNumberPerHost(host);
+            int expectedNbNodesForHost = computeExpectedNbNodesForHost(host);
+            logger.info("Host " + host + " should have " + expectedNbNodesForHost +
+                        " registered nodes. Number of nodes removed for this host is " + removedNbNodesForHost);
+            if (removedNbNodesForHost == expectedNbNodesForHost) {
+                logger.info("Host " + host + " is going to be redeployed");
+                removeRemovedHostAndPutIfAbsentFreeHosts(host);
+            }
+            logger.info("Node " + nodeName + " removed. #freeHosts:" + getFreeHostsSize() + " #registered nodes: " +
+                        getRegisteredNodesSize());
+        } else {
+            logger.error("Removed node " + nodeName + " could not be taken into account");
+        }
     }
 
     @Override
@@ -384,6 +404,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         persistedInfraVariables.put(REGISTERED_NODES_KEY, new HashMap<String, InetAddress>());
         persistedInfraVariables.put(REMOVED_HOSTS_KEY, new HashMap<InetAddress, Integer>());
         persistedInfraVariables.put(PN_TIMEOUT_KEY, new HashMap<String, Boolean>());
+        persistedInfraVariables.put(HOST_PER_NODE_URL_KEY, new HashMap<String, InetAddress>());
     }
 
     /**
@@ -427,8 +448,6 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                             logger.trace("An exception occurred during node kill", e);
                         }
                     }
-                } else {
-                    logger.error("Node " + nodeName + " is not known by this infrastructure manager");
                 }
                 return host;
             }
@@ -443,7 +462,41 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         getRemovedHosts().put(host, ++retrieved);
     }
 
+    private int computeExpectedNbNodesForHost(InetAddress host) {
+        Collection<InetAddress> address = getHostAddressPerNode().values();
+        int nbNodesForHost = 0;
+        for (InetAddress inetAddress : address) {
+            if (inetAddress.equals(host)) {
+                nbNodesForHost++;
+            }
+        }
+        return nbNodesForHost;
+    }
+
     // Below are wrapper methods around the runtime variables map
+
+    private Map<String, InetAddress> getHostAddressPerNode() {
+        return (Map<String, InetAddress>) persistedInfraVariables.get(HOST_PER_NODE_URL_KEY);
+    }
+
+    private InetAddress getHostAddressForNode(final String nodeUrl) {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<InetAddress>() {
+            @Override
+            public InetAddress handle() {
+                return getHostAddressPerNode().get(nodeUrl);
+            }
+        });
+    }
+
+    private void putHostForNodeUrl(final String nodeUrl, final InetAddress hostAddress) {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                getHostAddressPerNode().put(nodeUrl, hostAddress);
+                return null;
+            }
+        });
+    }
 
     private Map<InetAddress, Integer> getFreeHosts() {
         return (Map<InetAddress, Integer>) persistedInfraVariables.get(FREE_HOSTS_KEY);
