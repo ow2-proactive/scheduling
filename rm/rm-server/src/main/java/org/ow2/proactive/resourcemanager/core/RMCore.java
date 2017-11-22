@@ -173,16 +173,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private static final String CONTACT_UPGRADE_MESSAGE = "Number of nodes exceed the limitation from your contract. Please send an email to contact@activeeon.com for an upgrade.";
 
-    /**
-     * Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
+    /** Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
      * Explanation: This software can be licensed to a certain amount of nodes.
      * This variable is not final because the compiler inlines final variables and this variable is changed
      * by the gradle release build inside the .class files (after compilation).
+     * This variable is not static because under some circumstances the compiler put all static initializations
+     * into the cinit bytecode block and decided to set this variable to -1 (probably knowing that -1 has the same
+     * code path as null). But that made it impossible to overwrite it later on.
      * Long is used instead of long (primitive) because this variable is replaced inside the byte code after
      * optimization, which didn't work with a long value. Because that long value was initialized inside a
-     * static block in the byte code, that interfered with replacing it.
-     */
-    private static Long maximumNumberOfNodes;
+     * static block in the byte code, that interfered with replacing it.*/
+    private Long maximumNumberOfNodes;
 
     /**
      * Log4J logger name for RMCore
