@@ -753,7 +753,7 @@ public class RMRest implements RMRestInterface {
      *
      * @param sessionId a valid session ID
      * @param name      the object name of the MBean
-     * @param type      the type of the attribute to set ('int' and 'string' are currently supported)
+     * @param type      the type of the attribute to set ('integer' and 'string' are currently supported, see <code>RMProxyUserInterface</code>)
      * @param attr      the name of the attribute to set
      * @param value     the new value of the attribute (defined as a String, it is automatically converted according to <code>type</code>)
      * @throws InstanceNotFoundException
@@ -764,6 +764,7 @@ public class RMRest implements RMRestInterface {
      * @throws MBeanException
      * @throws AttributeNotFoundException
      * @throws InvalidAttributeValueException
+     * @throws IllegalArgumentException
      */
     @Override
     @GET
@@ -773,7 +774,8 @@ public class RMRest implements RMRestInterface {
     public void setMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
             @QueryParam("type") String type, @QueryParam("attr") String attr, @QueryParam("value") String value)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            NotConnectedException, MBeanException, AttributeNotFoundException, InvalidAttributeValueException {
+            NotConnectedException, MBeanException, AttributeNotFoundException, InvalidAttributeValueException,
+            IllegalArgumentException {
         RMProxyUserInterface rm = checkAccess(sessionId);
         if ((type != null) && (attr != null) && (value != null)) {
             rm.setMBeanAttribute(name, type, attr, value);

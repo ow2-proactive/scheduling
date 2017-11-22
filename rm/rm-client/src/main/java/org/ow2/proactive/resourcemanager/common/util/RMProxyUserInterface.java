@@ -72,6 +72,26 @@ import org.ow2.proactive.utils.NodeSet;
 @ActiveObject
 public class RMProxyUserInterface extends RMListenerProxy implements ResourceManager {
 
+    /**
+     * Enum of managed MBean attribute types
+     * Convert a String MBean attribute value to Object
+     */
+    public enum MBeanAttributeType {
+        INTEGER {
+            @Override
+            public Object convert(String value) {
+                return Integer.valueOf(value);
+            }
+        },
+        STRING {
+            @Override
+            public Object convert(String value) {
+                return value;
+            }
+        };
+        public abstract Object convert(String value);
+    }
+
     // Resource Manager delegation methods //
 
     /**
@@ -300,7 +320,7 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
      * Only integer and string attributes are currently supported, see <code>type</code>.
      *
      * @param objectName    the object name of the MBean
-     * @param type          the type of the attribute to set ('int' and 'string' are currently supported)
+     * @param type          the type of the attribute to set ('integer' and 'string' are currently supported, see <code>RMProxyUserInterface</code>)
      * @param name          the name of the attribute to set
      * @param value         the new value of the attribute (defined as a String, it is automatically converted according to <code>type</code>)
      * @throws InstanceNotFoundException
@@ -310,21 +330,12 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
      * @throws MBeanException
      * @throws InvalidAttributeValueException
      * @throws AttributeNotFoundException
+     * @throws IllegalArgumentException
      */
     public void setMBeanAttribute(ObjectName objectName, String type, String name, String value)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException, MBeanException,
-            InvalidAttributeValueException, AttributeNotFoundException {
-        Object attributeValue;
-        switch (type.toLowerCase()) {
-            case "int":
-                attributeValue = Integer.valueOf(value);
-                break;
-            case "string":
-                attributeValue = value;
-                break;
-            default:
-                return;
-        }
+            InvalidAttributeValueException, AttributeNotFoundException, IllegalArgumentException {
+        Object attributeValue = MBeanAttributeType.valueOf(type.toUpperCase()).convert(value);
         this.jmxClient.getConnector().getMBeanServerConnection().setAttribute(objectName,
                                                                               new Attribute(name, attributeValue));
     }
