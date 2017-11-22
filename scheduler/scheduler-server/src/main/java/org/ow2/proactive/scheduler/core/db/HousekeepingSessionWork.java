@@ -72,6 +72,7 @@ public class HousekeepingSessionWork implements SessionWork<Void> {
         session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
                .setParameterList("jobIdList", jobIdList)
                .executeUpdate();
+        session.getNamedQuery("deleteJobDataVariableInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
         session.getNamedQuery("deleteTaskDataVariableInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
         session.getNamedQuery("deleteSelectorDataInBulk").setParameterList("jobIdList", jobIdList).executeUpdate();
         session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in :jobIdList")
