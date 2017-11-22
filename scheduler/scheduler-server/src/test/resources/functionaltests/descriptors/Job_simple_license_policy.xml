@@ -9,11 +9,12 @@
         maxNumberOfExecution="2"
 >
   <taskFlow>
-    <task name="Split"
-    >
+    <task name="Groovy_Task">
+      <variables>
+        <variable name="REQUIRED_LICENSES" value="software_A,software_B" inherited="false" />
+      </variables>
       <scriptExecutable>
-        <script
-        >
+        <script>
           <code language="groovy">
             <![CDATA[
 println ""
@@ -21,46 +22,13 @@ println ""
           </code>
         </script>
       </scriptExecutable>
-      <controlFlow >
-        <replicate>
-          <script
-          >
-            <code language="groovy">
-              <![CDATA[
-runs=10
-]]>
-            </code>
-          </script>
-        </replicate>
-      </controlFlow>
     </task>
-    <task name="Process"
-    >
-      <genericInformation>
-        <info name="REQUIRED_LICENSES" value="software_A,software_B"/>
-      </genericInformation>
-      <depends>
-        <task ref="Split"/>
-      </depends>
+    <task name="Groovy_Task2">
+      <variables>
+        <variable name="REQUIRED_LICENSES" value="software_A,software_B" inherited="false" />
+      </variables>
       <scriptExecutable>
-        <script
-        >
-          <code language="groovy">
-            <![CDATA[
-print("")
-]]>
-          </code>
-        </script>
-      </scriptExecutable>
-    </task>
-    <task name="Merge"
-    >
-      <depends>
-        <task ref="Process"/>
-      </depends>
-      <scriptExecutable>
-        <script
-        >
+        <script>
           <code language="groovy">
             <![CDATA[
 println ""

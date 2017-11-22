@@ -26,16 +26,15 @@
 package functionaltests.policy.license;
 
 import static functionaltests.utils.SchedulerTHelper.log;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 
 import functionaltests.utils.SchedulerFunctionalTestLicensePolicy;
 
@@ -44,17 +43,26 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
 
     private static URL jobDescriptor = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_license_policy.xml");
 
+    /**
+     * Tests that two independent tasks do not run at the same time, due to license limitation.
+     *
+     * @throws Exception
+     */
     @Test
     public void testLicensePolicy() throws Throwable {
 
         JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
         log("Waiting for job finished");
-        JobInfo jInfo = schedulerHelper.waitForEventJobFinished(jobId);
+        schedulerHelper.waitForEventJobFinished(jobId);
 
-        JobResult res = schedulerHelper.getJobResult(jobId);
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+        TaskState taskState0 = scheduler.getJobState(jobId).getTasks().get(0);
+        TaskState taskState1 = scheduler.getJobState(jobId).getTasks().get(1);
 
-        assertThat(res.hadException(), is(false));
+        boolean tasksExecutedOneByOne = (taskState0.getFinishedTime() < taskState1.getStartTime()) ||
+                                        (taskState1.getFinishedTime() < taskState0.getStartTime());
+        Assert.assertTrue(tasksExecutedOneByOne);
     }
 
 }
