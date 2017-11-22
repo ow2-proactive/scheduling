@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.8"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.8 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.8/schedulerjob.xsd"
+        name="Untitled Workflow 1"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+  <taskFlow>
+    <task name="Split"
+    >
+      <scriptExecutable>
+        <script
+        >
+          <code language="groovy">
+            <![CDATA[
+println ""
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <controlFlow >
+        <replicate>
+          <script
+          >
+            <code language="groovy">
+              <![CDATA[
+runs=10
+]]>
+            </code>
+          </script>
+        </replicate>
+      </controlFlow>
+    </task>
+    <task name="Process"
+    >
+      <genericInformation>
+        <info name="REQUIRED_LICENSES" value="software_A,software_B"/>
+      </genericInformation>
+      <depends>
+        <task ref="Split"/>
+      </depends>
+      <scriptExecutable>
+        <script
+        >
+          <code language="groovy">
+            <![CDATA[
+print("")
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="Merge"
+    >
+      <depends>
+        <task ref="Process"/>
+      </depends>
+      <scriptExecutable>
+        <script
+        >
+          <code language="groovy">
+            <![CDATA[
+println ""
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>
