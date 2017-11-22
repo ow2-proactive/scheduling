@@ -25,10 +25,8 @@
  */
 package org.ow2.proactive.scheduler.policy.license;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -50,10 +48,30 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
     private static final Logger logger = Logger.getLogger(LicenseSchedulingPolicy.class);
 
-    public static final String REQUIRED_LICENSES = "REQUIRED_LICENSES";
+    private static final String REQUIRED_LICENSES = "REQUIRED_LICENSES";
 
     // A map of fixed size lists. A map entry per software license and a list per map entry to handle tasks using this software license.
-    private Map<String, FixedSizeArrayList> eligibleTasksDescriptorsLicenses = null;
+    private static Map<String, LinkedBlockingQueue<EligibleTaskDescriptor>> eligibleTasksDescriptorsLicenses = null;
+
+    // Will be initialize with the license properties file which includes the maximum licenses numbers per software
+    private static Properties properties = null;
+
+    private static void initialize() {
+        if (eligibleTasksDescriptorsLicenses == null) {
+            // Map initialization
+            eligibleTasksDescriptorsLicenses = new HashMap<String, LinkedBlockingQueue<EligibleTaskDescriptor>>();
+            // Retrieve properties from the license properties file ...
+            properties = LicenseConfiguration.getConfiguration().getProperties();
+            // ... and per software license, create a list handling all tasks using a this software license
+            Enumeration e = properties.propertyNames();
+            while (e.hasMoreElements()) {
+                String software = (String) e.nextElement();
+                int numberOfLicenses = Integer.parseInt(properties.getProperty(software));
+                eligibleTasksDescriptorsLicenses.put(software,
+                                                     new LinkedBlockingQueue<EligibleTaskDescriptor>(numberOfLicenses));
+            }
+        }
+    }
 
     @Override
     public boolean isTaskExecutable(NodeSet selectedNodes, EligibleTaskDescriptor task) {
@@ -70,32 +88,18 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         // If it requires software licenses
         if (requiredLicenses != null) {
 
-            // Initialize eligibleTasksDescriptorsLicenses
-            if (eligibleTasksDescriptorsLicenses == null)
-                eligibleTasksDescriptorsLicenses = new HashMap<String, FixedSizeArrayList>();
-
-            // Retrieve the maximum licenses numbers per software from the configuration file
-            final Properties properties = LicenseConfiguration.getConfiguration().getProperties();
-
+            initialize();
             logger.debug("Need to check licenses with " + properties.toString());
 
             // Iterate over required software licenses
             final String[] requiredLicensesArray = requiredLicenses.split(",");
             for (int i = 0; i < requiredLicensesArray.length; i++) {
-
                 // Retrieve the current software license name and its available number
                 final String currentRequiredLicense = requiredLicensesArray[i];
-                final int numberOfLicenses = Integer.parseInt(properties.getProperty(currentRequiredLicense));
-
-                // Per software license, create a list handling all tasks using a this software license
-                if (!eligibleTasksDescriptorsLicenses.containsKey(currentRequiredLicense)) {
-                    eligibleTasksDescriptorsLicenses.put(currentRequiredLicense,
-                                                         new FixedSizeArrayList(numberOfLicenses));
-                }
 
                 // To be executed (ie return true), a task must get a license per requiring software license
-                if (!canGetLicense(task, currentRequiredLicense, numberOfLicenses)) {
-                    logger.debug("License for " + currentRequiredLicense + " not available, returning false");
+                if (!canGetLicense(currentRequiredLicense)) {
+                    logger.debug("License for " + currentRequiredLicense + " not available, keep task pending");
                     return false;
                 }
             }
@@ -103,7 +107,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             for (int i = 0; i < requiredLicensesArray.length; i++) {
                 eligibleTasksDescriptorsLicenses.get(requiredLicensesArray[i]).add(task);
             }
-            logger.debug("All licenses are available, returning true");
+            logger.debug("All licenses are available, executing task");
             return true;
 
         } else {
@@ -112,27 +116,30 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
     }
 
-    private boolean canGetLicense(EligibleTaskDescriptor task, String currentRequiredLicense, int numberOfLicenses) {
+    private void removeFinishedTasks(LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense) {
+        Iterator<EligibleTaskDescriptor> iter = eligibleTasksDescriptorsLicense.iterator();
+        EligibleTaskDescriptorImpl current_task;
+        while (iter.hasNext()) {
+            current_task = (EligibleTaskDescriptorImpl) iter.next();
 
-        FixedSizeArrayList eligibleTasksDescriptorsLicense = eligibleTasksDescriptorsLicenses.get(currentRequiredLicense);
+            if (current_task.getInternal().getStatus().equals(TaskStatus.FINISHED)) {
+                iter.remove();
+            }
+        }
+    }
 
-        // if the maximum number of license is not reached, return true
-        if (!eligibleTasksDescriptorsLicense.isLimitReached()) {
+    private boolean canGetLicense(String currentRequiredLicense) {
+
+        LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense = eligibleTasksDescriptorsLicenses.get(currentRequiredLicense);
+        // if there are still remaining licenses return true
+        if (eligibleTasksDescriptorsLicense.remainingCapacity() > 0) {
             return true;
         }
-        // otherwise remove all terminated tasks and check again if the limit is reached
+        // otherwise remove all terminated tasks and check again if there are remaining licenses
         else {
-            Iterator<Object> iter = eligibleTasksDescriptorsLicense.iterator();
-            EligibleTaskDescriptorImpl current_task;
-            while (iter.hasNext()) {
-                current_task = (EligibleTaskDescriptorImpl) iter.next();
+            removeFinishedTasks(eligibleTasksDescriptorsLicense);
 
-                if (current_task.getInternal().getStatus().equals(TaskStatus.FINISHED)) {
-                    iter.remove();
-                }
-            }
-
-            if (!eligibleTasksDescriptorsLicense.isLimitReached()) {
+            if (eligibleTasksDescriptorsLicense.remainingCapacity() > 0) {
                 return true;
             }
             return false;
