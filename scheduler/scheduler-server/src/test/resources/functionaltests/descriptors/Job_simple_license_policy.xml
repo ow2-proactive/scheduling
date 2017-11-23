@@ -9,12 +9,14 @@
         maxNumberOfExecution="2"
 >
   <taskFlow>
-    <task name="Groovy_Task">
-      <variables>
-        <variable name="REQUIRED_LICENSES" value="software_A,software_B" inherited="false" />
-      </variables>
+    <task name="Groovy_Task"
+    >
+      <genericInformation>
+        <info name="REQUIRED_LICENSES" value="software_A,software_B"/>
+      </genericInformation>
       <scriptExecutable>
-        <script>
+        <script
+        >
           <code language="groovy">
             <![CDATA[
 println ""
@@ -23,12 +25,14 @@ println ""
         </script>
       </scriptExecutable>
     </task>
-    <task name="Groovy_Task2">
-      <variables>
-        <variable name="REQUIRED_LICENSES" value="software_A,software_B" inherited="false" />
-      </variables>
+    <task name="Groovy_Task2"
+    >
+      <genericInformation>
+        <info name="REQUIRED_LICENSES" value="software_A,software_B"/>
+      </genericInformation>
       <scriptExecutable>
-        <script>
+        <script
+        >
           <code language="groovy">
             <![CDATA[
 println ""
