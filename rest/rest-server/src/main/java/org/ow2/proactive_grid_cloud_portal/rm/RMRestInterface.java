@@ -31,8 +31,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -266,6 +268,15 @@ public interface RMRestInterface {
     Object getMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
             @QueryParam("attr") List<String> attrs) throws InstanceNotFoundException, IntrospectionException,
             ReflectionException, IOException, NotConnectedException;
+
+    @POST
+    @GZIP
+    @Path("info/{name}")
+    @Produces("application/json")
+    void setMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
+            @QueryParam("type") String type, @QueryParam("attr") String attr, @QueryParam("value") String value)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MBeanException, InvalidAttributeValueException, AttributeNotFoundException;
 
     @GET
     @GZIP
