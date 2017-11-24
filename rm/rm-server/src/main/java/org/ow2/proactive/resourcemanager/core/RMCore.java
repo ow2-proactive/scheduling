@@ -465,6 +465,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     boolean restoreNodesAndNodeSources() {
         Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
 
+        if (nodeSources.isEmpty()) {
+            logger.info("No node source found in database.");
+        } else {
+            logger.info("Number of node sources found in database " + nodeSources.size());
+        }
+
         for (NodeSourceData nodeSourceData : nodeSources) {
             String nodeSourceDataName = nodeSourceData.getName();
 
@@ -566,7 +572,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.info("Trying to lookup a node to recover: " + nodeUrl);
             node = nodeSource.lookupNode(nodeUrl, lookUpTimeout);
         } catch (Exception e) {
-            logger.warn("Node to recover could not be looked up at URL: " + nodeUrl, e);
+            logger.warn("Node to recover could not be looked up at URL: " + nodeUrl);
             node = null;
         }
         return node;
