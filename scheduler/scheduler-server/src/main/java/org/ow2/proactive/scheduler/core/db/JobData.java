@@ -138,7 +138,7 @@ public class JobData implements Serializable {
 
     private Map<String, String> genericInformation;
 
-    private List<JobDataVariable> variables;
+    private Map<String, JobDataVariable> variables;
 
     private String owner;
 
@@ -229,9 +229,9 @@ public class JobData implements Serializable {
     }
 
     private Map<String, String> createVariablesStringMap() {
-        List<JobDataVariable> jobDataVariablesMap = getVariables();
+        Map<String, JobDataVariable> jobDataVariablesMap = getVariables();
         Map<String, String> stringVariablesMap = new HashMap<>(jobDataVariablesMap.size());
-        for (JobDataVariable variable : getVariables()) {
+        for (JobDataVariable variable : getVariables().values()) {
             stringVariablesMap.put(variable.getName(), variable.getValue());
         }
         return stringVariablesMap;
@@ -285,9 +285,9 @@ public class JobData implements Serializable {
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
         jobRuntimeData.setUserSpace(job.getUserSpace());
         jobRuntimeData.setGenericInformation(job.getGenericInformation());
-        List<JobDataVariable> variables = new ArrayList<>();
+        Map<String, JobDataVariable> variables = new HashMap<>();
         for (Map.Entry<String, JobVariable> entry : job.getVariables().entrySet()) {
-            variables.add(JobDataVariable.create(entry.getKey(), entry.getValue(), jobRuntimeData));
+            variables.put(entry.getKey(), JobDataVariable.create(entry.getKey(), entry.getValue(), jobRuntimeData));
         }
         jobRuntimeData.setVariables(variables);
         jobRuntimeData.setStatus(job.getStatus());
@@ -332,11 +332,11 @@ public class JobData implements Serializable {
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "jobData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    public List<JobDataVariable> getVariables() {
+    public Map<String, JobDataVariable> getVariables() {
         return variables;
     }
 
-    public void setVariables(List<JobDataVariable> variables) {
+    public void setVariables(Map<String, JobDataVariable> variables) {
         this.variables = variables;
     }
 
@@ -649,7 +649,7 @@ public class JobData implements Serializable {
 
     private Map<String, JobVariable> variablesToJobVariables() {
         Map<String, JobVariable> jobVariables = new HashMap<>();
-        for (JobDataVariable variable : getVariables()) {
+        for (JobDataVariable variable : getVariables().values()) {
             jobVariables.put(variable.getName(), jobDataVariableToTaskVariable(variable));
         }
         return jobVariables;
