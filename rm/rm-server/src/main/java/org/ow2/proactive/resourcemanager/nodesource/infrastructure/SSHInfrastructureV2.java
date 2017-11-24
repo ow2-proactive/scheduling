@@ -42,6 +42,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -111,8 +112,10 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
 
-    /** key of the shutdown flag */
-    private static final String SHUTDOWN_FLAG_KEY = "shutdownFlag";
+    /**
+     * Indicates whether the infrastructure is shutting down.
+     */
+    private AtomicBoolean shutDown = new AtomicBoolean(false);
 
     /**
      * Internal node acquisition method
@@ -173,7 +176,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         }
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
 
-        final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean();
+        final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() ||
+                                                  PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean();
         if (deployNodesInDetachedMode) {
             // if we do not want to kill the nodes when the RM exits or
             // restarts, then we should launch the nodes in background and
@@ -263,7 +267,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             Future<Void> deployResult = deployService.submit(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    while (!getShutdownFlag() && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
+                    while (!shutDown.get() && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
                         if (anyTimedOut(depNodeURLs)) {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }
@@ -421,14 +425,13 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     @Override
     public void shutDown() {
-        setShutdownFlag(true);
+        shutDown.set(true);
     }
 
     @Override
     protected void initializePersistedInfraVariables() {
         super.initializePersistedInfraVariables();
         persistedInfraVariables.put(TARGET_OS_OBJ_KEY, null);
-        persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, false);
     }
 
     // Below are wrapper methods around the runtime variables map
@@ -438,25 +441,6 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             @Override
             public OperatingSystem handle() {
                 return (OperatingSystem) persistedInfraVariables.get(TARGET_OS_OBJ_KEY);
-            }
-        });
-    }
-
-    private boolean getShutdownFlag() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return (boolean) persistedInfraVariables.get(SHUTDOWN_FLAG_KEY);
-            }
-        });
-    }
-
-    private void setShutdownFlag(final boolean isShutdown) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
-                return null;
             }
         });
     }
