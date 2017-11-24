@@ -130,6 +130,10 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
     private boolean canGetLicense(String currentRequiredLicense) {
 
+        // If the required software is not specified in the license properties file
+        if (!eligibleTasksDescriptorsLicenses.containsKey(currentRequiredLicense))
+            return false;
+
         LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense = eligibleTasksDescriptorsLicenses.get(currentRequiredLicense);
         // if there are still remaining licenses return true
         if (eligibleTasksDescriptorsLicense.remainingCapacity() > 0) {
