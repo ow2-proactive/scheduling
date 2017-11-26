@@ -103,5 +103,5 @@ public class HostTrackerTest {
             hostTracker.putAliveNodeUrl(NODE_URL_BASE + i);
         }
     }
-    
+
 }
