@@ -28,13 +28,7 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -214,7 +208,20 @@ public abstract class InfrastructureManager implements Serializable {
      * @param infraVariablesToUpdate the runtime variables to recover.
      */
     public void recoverPersistedInfraVariables(Map<String, Serializable> infraVariablesToUpdate) {
-        persistedInfraVariables.putAll(infraVariablesToUpdate);
+        writeLock.lock();
+        try {
+            logger.info("Restoring persisted infrastructure variables");
+            for (Serializable s : infraVariablesToUpdate.values()) {
+                logger.info(s);
+            }
+            persistedInfraVariables.putAll(infraVariablesToUpdate);
+        } catch (RuntimeException e) {
+            logger.error("Exception while restoring infrastructure variables", e);
+            throw e;
+        } finally {
+            writeLock.unlock();
+        }
+
     }
 
     /**
