@@ -1028,7 +1028,7 @@ public abstract class InfrastructureManager implements Serializable {
      */
     protected abstract void initializePersistedInfraVariables();
 
-    public void setNodeSourceData(NodeSourceData nodeSourceData) {
+    public void setPersistedNodeSourceData(NodeSourceData nodeSourceData) {
         this.nodeSourceData = nodeSourceData;
     }
 
