@@ -129,7 +129,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         try {
             nodesFile = writeNodesFile(taskContext);
             VariablesMap variables = new VariablesMap();
-            variables.setInheritedMap(taskContextVariableExtractor.extractVariables(taskContext, nodesFile, false));
+            variables.setInheritedMap(taskContextVariableExtractor.extractVariables(taskContext, nodesFile, true));
             variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(taskContext));
             Map<String, String> resultMetadata = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);

@@ -41,6 +41,8 @@ import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
 
+import com.google.common.collect.ImmutableMap;
+
 
 public class TaskContextVariableExtractor implements Serializable {
 
@@ -97,11 +99,7 @@ public class TaskContextVariableExtractor implements Serializable {
 
             // task variables from workflow definition
             if (useTaskVariables && taskContext.getInitializer().getTaskVariables() != null) {
-                for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
-                    if (!taskVariable.isJobInherited()) {
-                        variables.put(taskVariable.getName(), taskVariable.getValue());
-                    }
-                }
+                addTaskVariablesAndBackupInheritedVariables(variables, taskContext.getInitializer().getTaskVariables());
             }
 
             // and from this task execution
@@ -118,6 +116,28 @@ public class TaskContextVariableExtractor implements Serializable {
 
         variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), taskContext.getSchedulerHome());
         return variables;
+    }
+
+    private void addTaskVariablesAndBackupInheritedVariables(Map<String, Serializable> variables,
+            ImmutableMap<String, TaskVariable> taskVariables) {
+        Map<String, Serializable> taskAndBackupVariables = new HashMap<>();
+        for (TaskVariable taskVariable : taskVariables.values()) {
+            String taskName = taskVariable.getName();
+            if (!taskVariable.isJobInherited() || (taskVariable.isJobInherited() && variables.get(taskName) == null)) {
+                if (variables.get(taskName) != null) {
+                    //propagated variable to be restored at the end of the task
+                    taskAndBackupVariables.put(SchedulerVars.PA_FLAG_PROPAGATED_VAR_TO_RESTORE.toString() + taskName,
+                                               variables.get(taskName));
+                } else {
+                    //task variable to be cleared at the end of the task
+                    taskAndBackupVariables.put(SchedulerVars.PA_FLAG_TASK_VAR_TO_CLEAR.toString() + taskName,
+                                               taskVariable.getValue());
+                }
+                taskAndBackupVariables.put(taskName, taskVariable.getValue());
+            }
+        }
+        variables.putAll(taskAndBackupVariables);
+        //return taskAndBackupVariables;
     }
 
     public Map<String, Serializable> extractScopeVariables(TaskContext taskContext)

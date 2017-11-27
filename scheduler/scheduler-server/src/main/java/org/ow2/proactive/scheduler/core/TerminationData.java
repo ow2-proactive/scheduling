@@ -80,8 +80,40 @@ final class TerminationData {
                 TaskResultImpl taskResult) {
             this.taskData = taskData;
             this.terminationStatus = terminationStatus;
+            if (taskResult != null) {
+                taskResult.setPropagatedVariables(restoreNonInheritedTaskVariables(taskResult));
+            }
             this.taskResult = taskResult;
             this.internalJob = internalJob;
+        }
+
+        private Map<String, byte[]> restoreNonInheritedTaskVariables(TaskResultImpl taskResult) {
+            Map<String, Serializable> newPropagatedVariables = new HashMap<>();
+            if (taskResult.getPropagatedVariables() != null) {
+                try {
+                    Map<String, Serializable> propagatedVariables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
+                    newPropagatedVariables = new HashMap<>(propagatedVariables);
+                    for (Map.Entry<String, Serializable> variable : propagatedVariables.entrySet()) {
+                        if (variable.getKey().startsWith(SchedulerVars.PA_FLAG_PROPAGATED_VAR_TO_RESTORE.toString())) {
+                            newPropagatedVariables.remove(variable.getKey());
+                            newPropagatedVariables.put(variable.getKey()
+                                                               .substring(SchedulerVars.PA_FLAG_PROPAGATED_VAR_TO_RESTORE.toString()
+                                                                                                                         .length()),
+                                                       variable.getValue());
+                        } else if (variable.getKey().startsWith(SchedulerVars.PA_FLAG_TASK_VAR_TO_CLEAR.toString())) {
+                            newPropagatedVariables.remove(variable.getKey());
+                            newPropagatedVariables.remove(variable.getKey()
+                                                                  .substring(SchedulerVars.PA_FLAG_TASK_VAR_TO_CLEAR.toString()
+                                                                                                                    .length()));
+                        }
+                    }
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                } catch (ClassNotFoundException e) {
+                    logger.error(e.getMessage());
+                }
+            }
+            return SerializationUtil.serializeVariableMap(newPropagatedVariables);
         }
 
         public boolean terminatedWhileRunning() {
