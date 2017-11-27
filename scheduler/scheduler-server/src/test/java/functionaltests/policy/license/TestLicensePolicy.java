@@ -48,21 +48,23 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
      *
      * @throws Exception
      */
-    /*@Test
-    public void testLicensePolicy() throws Throwable {
-
-        JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
-
-        log("Waiting for job finished");
-        schedulerHelper.waitForEventJobFinished(jobId);
-
-        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
-        TaskState taskState0 = scheduler.getJobState(jobId).getTasks().get(0);
-        TaskState taskState1 = scheduler.getJobState(jobId).getTasks().get(1);
-
-        boolean tasksExecutedOneByOne = (taskState0.getFinishedTime() < taskState1.getStartTime()) ||
-                                        (taskState1.getFinishedTime() < taskState0.getStartTime());
-        Assert.assertTrue(tasksExecutedOneByOne);
-    }*/
+    /*
+     * @Test
+     * public void testLicensePolicy() throws Throwable {
+     * 
+     * JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+     * 
+     * log("Waiting for job finished");
+     * schedulerHelper.waitForEventJobFinished(jobId);
+     * 
+     * Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+     * TaskState taskState0 = scheduler.getJobState(jobId).getTasks().get(0);
+     * TaskState taskState1 = scheduler.getJobState(jobId).getTasks().get(1);
+     * 
+     * boolean tasksExecutedOneByOne = (taskState0.getFinishedTime() < taskState1.getStartTime()) ||
+     * (taskState1.getFinishedTime() < taskState0.getStartTime());
+     * Assert.assertTrue(tasksExecutedOneByOne);
+     * }
+     */
 
 }
