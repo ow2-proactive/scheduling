@@ -292,7 +292,7 @@ public class NodeSource implements InitActive, RunActive {
             // Deploying or lost RMNodes can be directly found in the saved infrastructure.
             recoveredRmNode = rmNode;
         } else {
-            // the node is acquired in the infrastructure. We can recreate the
+            // the node is acquired in the infrastructure. We can recover the
             // RMNode representation on top of it and save it in the node source
             recoveredRmNode = buildRMNodeAfterRecovery(node, rmNodeData);
         }
