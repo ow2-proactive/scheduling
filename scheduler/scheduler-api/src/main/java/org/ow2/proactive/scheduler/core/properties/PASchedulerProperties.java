@@ -298,7 +298,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     /**
      * Catalog rest url 
      */
-    CATALOG_REST_URL("pa.catalog.rest.url", PropertyType.STRING, "http://localhost:8080/catalog"),
+    CATALOG_REST_URL("pa.catalog.rest.url", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************** RM PROPERTIES ************************ */
