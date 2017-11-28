@@ -181,6 +181,13 @@ public class SchedulerStarter {
                         if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
                             PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
                         }
+
+                    }
+                    if (applicationUrl.endsWith("/catalog")) {
+                        if (!PASchedulerProperties.CATALOG_REST_URL.isSet()) {
+                            PASchedulerProperties.CATALOG_REST_URL.updateProperty(applicationUrl);
+                        }
+
                     }
                 }
             }
