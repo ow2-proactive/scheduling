@@ -223,6 +223,18 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public JobId submitFromCatalog(String bucketId, String workflowName)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submitFromCatalog(bucketId, workflowName);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job, variables, headerParams);
+    }
+
+    @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return _getScheduler().submit(job, variables);
@@ -232,6 +244,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     public JobId submit(URL job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return _getScheduler().submit(job, variables);
+    }
+
+    @Override
+    public JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submitFromCatalog(bucketId, workflowName, variables);
     }
 
     @Override
@@ -623,6 +641,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     @Override
     public UserData getCurrentUserData() throws NotConnectedException {
         return ((ISchedulerClient) _getScheduler()).getCurrentUserData();
+    }
+
+    @Override
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
+        return ((ISchedulerClient) _getScheduler()).getSchedulerProperties();
     }
 
 }

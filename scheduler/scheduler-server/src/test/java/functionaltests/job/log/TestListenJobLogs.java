@@ -262,18 +262,19 @@ public class TestListenJobLogs extends SchedulerFunctionalTestWithCustomConfigAn
         logForwardingService.removeLogger(loggerName);
     }
 
-    public class TestAppender extends AppenderSkeleton {
+    public static class TestAppender extends AppenderSkeleton {
 
         private final String name;
 
         private final List<String> actualMessages;
 
-        TestAppender(String name) {
+        public TestAppender(String name) {
             this.name = name;
             this.actualMessages = new ArrayList<>();
         }
 
-        synchronized void waitForLoggingEvent(long timeout, String... expectedMessages) throws InterruptedException {
+        public synchronized void waitForLoggingEvent(long timeout, String... expectedMessages)
+                throws InterruptedException {
             List<String> expectedMessagesList = new ArrayList<>(expectedMessages.length);
 
             Collections.addAll(expectedMessagesList, expectedMessages);

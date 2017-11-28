@@ -34,7 +34,7 @@ import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.util.Object2ByteConverter;
+import org.ow2.proactive.scheduler.common.util.AllObjects2BytesConverterHandler;
 
 
 /**
@@ -124,17 +124,14 @@ public class JavaTask extends Task {
      * @throws IllegalArgumentException if the value cannot be serialized and stored in the task.
      */
     public void addArgument(String name, Serializable value) {
-        if (name != null && name.length() > 255) {
-            throw new IllegalArgumentException("Key is too long, it must have 255 chars length max: " + name);
-        } else {
-            byte[] serialized = null;
-            try {
-                serialized = Object2ByteConverter.convertObject2Byte(value);
-                this.serializedArguments.put(name, serialized);
-            } catch (IOException e) {
-                throw new IllegalArgumentException("Cannot add argument " + name + " in task " + this.name, e);
-            }
+        byte[] serialized = null;
+        try {
+            serialized = AllObjects2BytesConverterHandler.convertObject2Byte(name, value);
+            this.serializedArguments.put(name, serialized);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Cannot add argument " + name + " in task " + this.name, e);
         }
+
     }
 
     /**
@@ -147,7 +144,7 @@ public class JavaTask extends Task {
     public Serializable getArgument(String name) throws IOException, ClassNotFoundException {
         byte[] serializedValue = this.serializedArguments.get(name);
         if (serializedValue != null) {
-            return (Serializable) Object2ByteConverter.convertByte2Object(serializedValue);
+            return (Serializable) AllObjects2BytesConverterHandler.convertByte2Object(serializedValue);
         } else {
             return null;
         }
@@ -163,7 +160,7 @@ public class JavaTask extends Task {
     public Serializable removeArgument(String name) throws IOException, ClassNotFoundException {
         byte[] serializedValue = this.serializedArguments.remove(name);
         if (serializedValue != null) {
-            return (Serializable) Object2ByteConverter.convertByte2Object(serializedValue);
+            return (Serializable) AllObjects2BytesConverterHandler.convertByte2Object(serializedValue);
         } else {
             return null;
         }

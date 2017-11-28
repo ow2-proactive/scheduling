@@ -56,7 +56,7 @@ import org.ow2.proactive.scheduler.task.TaskInfoImpl;
  * 
  * @author esalagea
  */
-public final class ClientJobState extends JobState {
+public class ClientJobState extends JobState {
 
     private final ClientJobSerializationHelper clientJobSerializationHelper;
 
@@ -85,6 +85,7 @@ public final class ClientJobState extends JobState {
         this.priority = jobState.getPriority();
         this.inputSpace = jobState.getInputSpace();
         this.outputSpace = jobState.getOutputSpace();
+        this.variables = jobState.getVariables();
 
         this.maxNumberOfExecution = jobState.getMaxNumberOfExecution();
 

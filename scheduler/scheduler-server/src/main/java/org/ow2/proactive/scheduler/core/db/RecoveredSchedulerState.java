@@ -28,10 +28,15 @@ package org.ow2.proactive.scheduler.core.db;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
+import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.job.ClientJobState;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -39,20 +44,22 @@ import org.ow2.proactive.scheduler.job.InternalJob;
  */
 public class RecoveredSchedulerState {
 
+    private static final Logger logger = Logger.getLogger(RecoveredSchedulerState.class);
+
     private final Vector<InternalJob> pendingJobs;
 
     private final Vector<InternalJob> runningJobs;
 
     private final Vector<InternalJob> finishedJobs;
 
-    private final SchedulerStateImpl schedulerState;
+    private final SchedulerStateImpl<ClientJobState> schedulerState;
 
     public RecoveredSchedulerState(Vector<InternalJob> pendingJobs, Vector<InternalJob> runningJobs,
             Vector<InternalJob> finishedJobs) {
         this.pendingJobs = pendingJobs;
         this.runningJobs = runningJobs;
         this.finishedJobs = finishedJobs;
-        schedulerState = new SchedulerStateImpl();
+        schedulerState = new SchedulerStateImpl<>();
         schedulerState.setPendingJobs(convertToClientJobState(pendingJobs));
         schedulerState.setRunningJobs(convertToClientJobState(runningJobs));
         schedulerState.setFinishedJobs(convertToClientJobState(finishedJobs));
@@ -70,16 +77,36 @@ public class RecoveredSchedulerState {
         return finishedJobs;
     }
 
-    public SchedulerStateImpl getSchedulerState() {
+    public SchedulerStateImpl<ClientJobState> getSchedulerState() {
         return schedulerState;
     }
 
-    private Vector<JobState> convertToClientJobState(List<InternalJob> jobs) {
-        Vector<JobState> result = new Vector<>(jobs.size());
+    private Vector<ClientJobState> convertToClientJobState(List<InternalJob> jobs) {
+        Vector<ClientJobState> result = new Vector<>(jobs.size());
         for (InternalJob internalJob : jobs) {
             result.add(new ClientJobState(internalJob));
         }
         return result;
+    }
+
+    public void enableLiveLogsForRunningTasks(SchedulingService schedulingService) {
+        logger.info("Enable live logs for running tasks if needed");
+        for (InternalJob job : runningJobs) {
+            for (InternalTask task : job.getITasks()) {
+                enableLiveLogsForRunningTask(schedulingService, job, task);
+            }
+        }
+    }
+
+    private void enableLiveLogsForRunningTask(SchedulingService schedulingService, InternalJob job, InternalTask task) {
+        if (task.getStatus() == TaskStatus.RUNNING && task.getExecuterInformation() != null) {
+            try {
+                schedulingService.getListenJobLogsSupport()
+                                 .activeLogsIfNeeded(job.getId(), task.getExecuterInformation().getLauncher());
+            } catch (LogForwardingException e) {
+                logger.warn("Failed to activate logs for task " + task.getId(), e);
+            }
+        }
     }
 
 }

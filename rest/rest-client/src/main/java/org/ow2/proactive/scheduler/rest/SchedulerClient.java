@@ -42,6 +42,7 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,9 +51,12 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +72,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.catalogclient.service.CatalogClientLib;
+import org.ow2.proactive.catalogclient.service.CatalogObjectService;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -98,6 +104,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
@@ -136,6 +143,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     private SchedulerRestClient schedulerRestClient;
 
+    private CatalogObjectService catalogRestClient;
+
     private String sid;
 
     private ConnectionInfo connectionInfo;
@@ -147,6 +156,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerClient.class);
 
     private SchedulerClient() {
+        this.catalogRestClient = CatalogClientLib.getCatalogObjectService();
     }
 
     /**
@@ -705,16 +715,34 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submit(URL job)
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> requestHeaderParams)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
         try {
-            InputStream is = job.openStream();
-            jobIdData = restApiClient().submitXml(sid, is);
+            URLConnection urlConnection = job.openConnection();
+
+            for (Map.Entry<String, String> requestHeaderEntry : requestHeaderParams.entrySet()) {
+                urlConnection.addRequestProperty(requestHeaderEntry.getKey(), requestHeaderEntry.getValue());
+            }
+            InputStream is = urlConnection.getInputStream();
+            jobIdData = restApiClient().submitXml(sid, is, variables);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
         return jobId(jobIdData);
+    }
+
+    @Override
+    public JobId submit(URL job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return this.submit(job, Collections.<String, String> emptyMap(), Collections.<String, String> emptyMap());
+    }
+
+    @Override
+    public JobId submitFromCatalog(String bucketId, String workflowName)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return this.submitFromCatalog(bucketId, workflowName, Collections.<String, String> emptyMap());
+
     }
 
     @Override
@@ -733,14 +761,28 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public JobId submit(URL job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return this.submit(job, variables, Collections.<String, String> emptyMap());
+    }
+
+    @Override
+    public JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+
         JobIdData jobIdData = null;
         try {
-            InputStream is = job.openStream();
-            jobIdData = restApiClient().submitXml(sid, is, variables);
+            String workflow = catalogRestClient.getResolvedCatalogObject(PASchedulerProperties.CATALOG_REST_URL.getValueAsString(),
+                                                                         Long.valueOf(bucketId),
+                                                                         workflowName,
+                                                                         false,
+                                                                         sid);
+
+            InputStream stream = new ByteArrayInputStream(workflow.getBytes(StandardCharsets.UTF_8.name()));
+            jobIdData = restApiClient().submitXml(sid, stream, variables);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
         return jobId(jobIdData);
+
     }
 
     @Override
@@ -1198,4 +1240,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         return connectedUserData;
     }
 
+    @Override
+    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
+
+        try {
+            return restApi().getSchedulerPropertiesFromSessionId(sid);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException("Session " + sid + " is not connected");
+        } catch (PermissionRestException e) {
+            throw new PermissionException("Session " + sid + " doesnt have permission");
+        }
+    }
 }

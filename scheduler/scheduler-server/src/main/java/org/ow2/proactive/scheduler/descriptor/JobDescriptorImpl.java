@@ -685,6 +685,26 @@ public class JobDescriptorImpl implements JobDescriptor {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public void restoreRunningTasks() {
+        logger.info("Starting task recovery for job " + jobId);
+        final Iterator<Entry<TaskId, EligibleTaskDescriptor>> iterator = eligibleTasks.entrySet().iterator();
+
+        while (iterator.hasNext()) {
+            Entry<TaskId, EligibleTaskDescriptor> entry = iterator.next();
+            TaskId taskId = entry.getKey();
+            EligibleTaskDescriptor task = entry.getValue();
+
+            if (((EligibleTaskDescriptorImpl) task).getInternal().getStatus() == TaskStatus.RUNNING) {
+                logger.debug("Move task " + taskId + " from eligible tasks to running tasks");
+                runningTasks.put(taskId, task);
+                iterator.remove();
+            }
+        }
+    }
+
+    /**
      * Get a task descriptor that is in the running task.
      *
      * @param id the id of the task descriptor to retrieve.

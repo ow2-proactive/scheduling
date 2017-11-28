@@ -76,6 +76,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetTaskResultComma
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.UploadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.LiveLogCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.InstallPackageCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.JsVersionCommand);
 
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand);
@@ -404,6 +405,10 @@ function downloadfile(spaceName, pathName, localFile) {
 
 function livelog(jobId) {
     execute(new LiveLogCommand(string(jobId)));
+}
+
+function installpackage(packagePath) {
+    execute(new InstallPackageCommand(string(packagePath)));
 }
 
 function start() {

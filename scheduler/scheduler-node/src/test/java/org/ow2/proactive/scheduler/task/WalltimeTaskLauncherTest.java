@@ -46,7 +46,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
 
-public class WalltimeTaskLauncherTest {
+public class WalltimeTaskLauncherTest extends TaskLauncherTestAbstract {
 
     @Test(timeout = 5000)
     public void walltime_forked_task() throws Throwable {
@@ -57,9 +57,9 @@ public class WalltimeTaskLauncherTest {
         initializer.setWalltime(500);
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new ForkingTaskLauncherFactory());
-
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new ForkingTaskLauncherFactory()),
+                                                executableContainer);
 
         assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
     }
@@ -73,9 +73,9 @@ public class WalltimeTaskLauncherTest {
         initializer.setWalltime(500);
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new TestTaskLauncherFactory());
-
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new TestTaskLauncherFactory()),
+                                                executableContainer);
 
         assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
     }
@@ -89,28 +89,18 @@ public class WalltimeTaskLauncherTest {
         initializer.setWalltime(500);
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        TaskLauncher taskLauncher = TaskLauncherUtils.create(initializer, new SlowDataspacesTaskLauncherFactory());
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer,
+                                                                                new SlowDataspacesTaskLauncherFactory()),
+                                                executableContainer);
 
         assertEquals(WalltimeExceededException.class, taskResult.getException().getClass());
     }
 
     private TaskResult runTaskLauncher(TaskLauncher taskLauncher, ScriptExecutableContainer executableContainer)
             throws InterruptedException, ActiveObjectCreationException, NodeException {
-
-        TaskTerminateNotificationVerifier taskResult = new TaskTerminateNotificationVerifier();
         taskLauncher.doTask(executableContainer, null, taskResult);
 
         return taskResult.result;
-    }
-
-    private static class TaskTerminateNotificationVerifier implements TaskTerminateNotification {
-        TaskResult result;
-
-        @Override
-        public void terminate(TaskId taskId, TaskResult taskResult) {
-            this.result = taskResult;
-        }
     }
 
     private class ForkingTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory {

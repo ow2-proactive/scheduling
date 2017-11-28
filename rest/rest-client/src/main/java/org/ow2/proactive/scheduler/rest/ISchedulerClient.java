@@ -126,6 +126,27 @@ public interface ISchedulerClient extends Scheduler {
      * precious result.
      * <p>
      *
+     * @param job       a job provided as a url
+     * @param variables job variables to use during the job execution
+     * @param headerParams map with request header parameters
+     * @return the generated new job ID.
+     * @throws NotConnectedException
+     * @throws JobCreationException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     */
+    JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
      * @param job       a job provided as a local File
      * @param variables job variables to use during the job execution
      * @return the generated new job ID.
@@ -155,6 +176,48 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      */
     JobId submit(URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler from the catalog with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     * 
+     * @param bucketId
+     * @param workflowName
+     * @param variables
+     * @return
+     * @throws NotConnectedException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     * @throws JobCreationException
+     */
+    JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler from the catalog without variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     * 
+     * @param bucketId
+     * @param workflowName
+     * @param variables
+     * @return
+     * @throws NotConnectedException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     * @throws JobCreationException
+     */
+    JobId submitFromCatalog(String bucketId, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**

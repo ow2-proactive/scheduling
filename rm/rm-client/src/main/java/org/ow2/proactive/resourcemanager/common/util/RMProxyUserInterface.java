@@ -30,9 +30,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.management.Attribute;
 import javax.management.AttributeList;
+import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.IntrospectionException;
+import javax.management.InvalidAttributeValueException;
+import javax.management.MBeanException;
 import javax.management.MBeanInfo;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
@@ -67,6 +71,26 @@ import org.ow2.proactive.utils.NodeSet;
  */
 @ActiveObject
 public class RMProxyUserInterface extends RMListenerProxy implements ResourceManager {
+
+    /**
+     * Enum of managed MBean attribute types
+     * Convert a String MBean attribute value to Object
+     */
+    public enum MBeanAttributeType {
+        INTEGER {
+            @Override
+            public Object convert(String value) {
+                return Integer.valueOf(value);
+            }
+        },
+        STRING {
+            @Override
+            public Object convert(String value) {
+                return value;
+            }
+        };
+        public abstract Object convert(String value);
+    }
 
     // Resource Manager delegation methods //
 
@@ -289,6 +313,31 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public AttributeList getMBeanAttributes(ObjectName name, String[] attributes)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException {
         return this.jmxClient.getConnector().getMBeanServerConnection().getAttributes(name, attributes);
+    }
+
+    /**
+     * Set a single JMX attribute of the MBean <code>objectName</code>.
+     * Only integer and string attributes are currently supported, see <code>type</code>.
+     *
+     * @param objectName    the object name of the MBean
+     * @param type          the type of the attribute to set ('integer' and 'string' are currently supported, see <code>RMProxyUserInterface</code>)
+     * @param name          the name of the attribute to set
+     * @param value         the new value of the attribute (defined as a String, it is automatically converted according to <code>type</code>)
+     * @throws InstanceNotFoundException
+     * @throws IntrospectionException
+     * @throws ReflectionException
+     * @throws IOException
+     * @throws MBeanException
+     * @throws InvalidAttributeValueException
+     * @throws AttributeNotFoundException
+     * @throws IllegalArgumentException
+     */
+    public void setMBeanAttribute(ObjectName objectName, String type, String name, String value)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException, MBeanException,
+            InvalidAttributeValueException, AttributeNotFoundException, IllegalArgumentException {
+        Object attributeValue = MBeanAttributeType.valueOf(type.toUpperCase()).convert(value);
+        this.jmxClient.getConnector().getMBeanServerConnection().setAttribute(objectName,
+                                                                              new Attribute(name, attributeValue));
     }
 
     public BooleanWrapper isNodeAdmin(String nodeUrl) {
