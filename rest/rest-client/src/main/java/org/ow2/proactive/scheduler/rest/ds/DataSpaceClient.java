@@ -90,6 +90,9 @@ public class DataSpaceClient implements IDataSpaceClient {
                                                                              .build());
         this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
         this.sessionId = client.getSession();
+        if (log.isDebugEnabled()) {
+            log.debug("Error : trying to retrieve session from disconnected client.");
+        }
         this.schedulerClient = client;
     }
 
