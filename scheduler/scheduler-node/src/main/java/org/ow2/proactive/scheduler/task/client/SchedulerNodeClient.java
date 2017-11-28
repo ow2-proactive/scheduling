@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.task.client;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URL;
 import java.security.KeyException;
 import java.util.Date;
@@ -78,18 +79,17 @@ import org.ow2.proactive.scheduler.task.utils.Decrypter;
  * @author ActiveEon Team
  */
 @PublicAPI
-public class SchedulerNodeClient implements ISchedulerClient {
+public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     private Decrypter decrypter;
 
     private String schedulerRestUrl;
 
-    private ISchedulerClient client;
+    private transient ISchedulerClient client = null;
 
     public SchedulerNodeClient(Decrypter decrypter, String schedulerRestUrl) {
         SchedulerNodeClient.this.decrypter = decrypter;
         SchedulerNodeClient.this.schedulerRestUrl = schedulerRestUrl;
-        client = SchedulerClient.createInstance();
     }
 
     /**
@@ -108,6 +108,7 @@ public class SchedulerNodeClient implements ISchedulerClient {
      */
     public void connect(String url) throws Exception {
         CredData userCreds = decrypter.decrypt();
+        client = SchedulerClient.createInstance();
         client.init(new ConnectionInfo(url, userCreds.getLogin(), userCreds.getPassword(), null, true));
     }
 
@@ -300,6 +301,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
     @Override
     public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        if (client == null)
+            throw new NotConnectedException("Variable client is null, call connect() before using SchedulerNodeClient");
         return this.client.submit(job, variables, headerParams);
     }
 
@@ -498,6 +501,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
 
     @Override
     public void disconnect() throws NotConnectedException, PermissionException {
+        if (client == null)
+            throw new NotConnectedException("Variable client is null, call connect() before using SchedulerNodeClient");
         client.disconnect();
     }
 
@@ -526,6 +531,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
 
     @Override
     public void renewSession() throws NotConnectedException {
+        if (client == null)
+            throw new NotConnectedException("Variable client is null, call connect() before using SchedulerNodeClient");
         client.renewSession();
     }
 
@@ -607,6 +614,8 @@ public class SchedulerNodeClient implements ISchedulerClient {
 
     @Override
     public void init(ConnectionInfo connectionInfo) throws Exception {
+        if (client == null)
+            throw new NotConnectedException("Variable client is null, call connect() before using SchedulerNodeClient");
         client.init(connectionInfo);
     }
 
