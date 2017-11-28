@@ -60,6 +60,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Defines the maximum number of tasks to be scheduled in each scheduling loop. */
     SCHEDULER_POLICY_NBTASKPERLOOP("pa.scheduler.policy.nbtaskperloop", PropertyType.INTEGER, "10"),
 
+    /** Path of the license properties file. */
+    SCHEDULER_LICENSE_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),
+
     /** Scheduler main loop time out */
     SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PropertyType.INTEGER, "100"),
 
