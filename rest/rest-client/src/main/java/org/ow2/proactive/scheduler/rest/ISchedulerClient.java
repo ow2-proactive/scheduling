@@ -210,7 +210,6 @@ public interface ISchedulerClient extends Scheduler {
      * 
      * @param bucketId
      * @param workflowName
-     * @param variables
      * @return
      * @throws NotConnectedException
      * @throws PermissionException
