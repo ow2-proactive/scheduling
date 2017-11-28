@@ -179,6 +179,48 @@ public interface ISchedulerClient extends Scheduler {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
+     * Submit a new job to the scheduler from the catalog with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     * 
+     * @param bucketId
+     * @param workflowName
+     * @param variables
+     * @return
+     * @throws NotConnectedException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     * @throws JobCreationException
+     */
+    JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler from the catalog without variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     * 
+     * @param bucketId
+     * @param workflowName
+     * @param variables
+     * @return
+     * @throws NotConnectedException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     * @throws JobCreationException
+     */
+    JobId submitFromCatalog(String bucketId, String workflowName)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the
      * specified job.
      *

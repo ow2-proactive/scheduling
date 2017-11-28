@@ -42,6 +42,7 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,6 +52,7 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -70,6 +72,8 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.catalogclient.service.CatalogClientLib;
+import org.ow2.proactive.catalogclient.service.CatalogObjectService;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -100,6 +104,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
@@ -138,6 +143,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     private SchedulerRestClient schedulerRestClient;
 
+    private CatalogObjectService catalogRestClient;
+
     private String sid;
 
     private ConnectionInfo connectionInfo;
@@ -149,6 +156,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerClient.class);
 
     private SchedulerClient() {
+        this.catalogRestClient = CatalogClientLib.getCatalogObjectService();
     }
 
     /**
@@ -731,6 +739,13 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public JobId submitFromCatalog(String bucketId, String workflowName)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return this.submitFromCatalog(bucketId, workflowName, Collections.<String, String> emptyMap());
+
+    }
+
+    @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
@@ -747,6 +762,27 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public JobId submit(URL job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return this.submit(job, variables, Collections.<String, String> emptyMap());
+    }
+
+    @Override
+    public JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+
+        JobIdData jobIdData = null;
+        try {
+            String workflow = catalogRestClient.getResolvedCatalogObject(PASchedulerProperties.CATALOG_REST_URL.getValueAsString(),
+                                                                         Long.valueOf(bucketId),
+                                                                         workflowName,
+                                                                         false,
+                                                                         sid);
+
+            InputStream stream = new ByteArrayInputStream(workflow.getBytes(StandardCharsets.UTF_8.name()));
+            jobIdData = restApiClient().submitXml(sid, stream, variables);
+        } catch (Exception e) {
+            throwNCEOrPEOrSCEOrJCE(e);
+        }
+        return jobId(jobIdData);
+
     }
 
     @Override
@@ -1021,6 +1057,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private <K, V> Map.Entry<K, V> toEntry(final K k, final V v) {
         return new AbstractMap.SimpleEntry<>(k, v);
 
+    }
+
+    protected void setCatalogObjectService(CatalogObjectService catalogObjectService) {
+        this.catalogRestClient = catalogObjectService;
     }
 
     @Override
