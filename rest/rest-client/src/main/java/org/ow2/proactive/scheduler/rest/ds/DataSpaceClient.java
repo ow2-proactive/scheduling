@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,7 +65,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
 
-public class DataSpaceClient implements IDataSpaceClient {
+public class DataSpaceClient implements IDataSpaceClient, Serializable {
 
     private static final Logger log = Logger.getLogger(DataSpaceClient.class);
 
@@ -365,7 +366,7 @@ public class DataSpaceClient implements IDataSpaceClient {
                                    .toString();
     }
 
-    class RestRemoteSpace implements RemoteSpace {
+    class RestRemoteSpace implements RemoteSpace, Serializable {
 
         IDataSpaceClient.Dataspace space;
 

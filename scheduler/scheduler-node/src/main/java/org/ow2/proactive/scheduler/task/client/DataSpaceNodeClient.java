@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.task.client;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -46,7 +47,7 @@ import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
  * @author ActiveEon Team
  */
 @PublicAPI
-public class DataSpaceNodeClient implements RemoteSpace {
+public class DataSpaceNodeClient implements RemoteSpace, Serializable {
 
     private final SchedulerNodeClient schedulerNodeClient;
 
