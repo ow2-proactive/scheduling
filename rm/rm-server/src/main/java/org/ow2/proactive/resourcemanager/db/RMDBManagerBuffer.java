@@ -39,6 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.StaleStateException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.SessionWork;
 
@@ -126,23 +127,52 @@ public class RMDBManagerBuffer {
 
     private void buildNodeSourceTransactionAndCommit() {
         try {
-            rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
-                @Override
-                public Void doInTransaction(Session session) {
-                    pendingNodeSourceUpdatesLock.lock();
-                    try {
-                        for (NodeSourceData nodeSource : pendingNodeSourceUpdates) {
-                            session.update(nodeSource);
-                        }
-                        pendingNodeSourceUpdates.clear();
-                    } finally {
-                        pendingNodeSourceUpdatesLock.unlock();
-                    }
-                    return null;
-                }
-            });
+            executeNodeSourceUpdatesInBatch();
+        } catch (StaleStateException e) {
+            logger.warn("Some node source could not be updated because their state is staled, applying one node source update at a time");
+            executeNodeSourceUpdatesIndividually();
         } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while updating node sources", e);
+            throw new RuntimeException("Exception occurred while updating node sources in batch", e);
+        }
+    }
+
+    private void executeNodeSourceUpdatesInBatch() {
+        rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
+            @Override
+            public Void doInTransaction(Session session) {
+                pendingNodeSourceUpdatesLock.lock();
+                try {
+                    for (NodeSourceData nodeSource : pendingNodeSourceUpdates) {
+                        session.update(nodeSource);
+                    }
+                } finally {
+                    pendingNodeSourceUpdatesLock.unlock();
+                }
+                return null;
+            }
+        });
+        pendingNodeSourceUpdates.clear();
+    }
+
+    private void executeNodeSourceUpdatesIndividually() {
+        try {
+            pendingNodeSourceUpdatesLock.lock();
+            Iterator<NodeSourceData> nodeSourceDataIterator = pendingNodeSourceUpdates.iterator();
+            while (nodeSourceDataIterator.hasNext()) {
+                final NodeSourceData currentNodeSource = nodeSourceDataIterator.next();
+                rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
+                    @Override
+                    public Void doInTransaction(Session session) {
+                        session.update(currentNodeSource);
+                        return null;
+                    }
+                });
+                nodeSourceDataIterator.remove();
+            }
+        } catch (RuntimeException ex) {
+            throw new RuntimeException("Exception occurred while updating node sources individually", ex);
+        } finally {
+            pendingNodeSourceUpdatesLock.unlock();
         }
     }
 

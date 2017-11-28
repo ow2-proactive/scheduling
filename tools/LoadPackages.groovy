@@ -91,41 +91,19 @@ class LoadPackages {
         unzipFile(examples_zip, this.EXAMPLES_DIR_PATH)
         writeToOutput(this.EXAMPLES_ZIP_PATH + " extracted!")
 
+        // Connect to the scheduler
+        package_loader.loginAdminUserCredToSchedulerAndGetSessionId()
 
-        // Retrieve the ordered bucket list
-        def ordered_bucket_list_file = new File(examples_dir, "ordered_bucket_list")
-        ordered_bucket_list_file.text.split(",").each { bucket_name ->
-            // Define a specific filter on package directories to only consider those targeting the current bucket
-            def file_filter = new FileFilter() {
-                boolean accept(File package_dir) {
-                    //def package_dir = new File(pathname)
-                    def metadata_file = new File(package_dir.absolutePath, "METADATA.json")
-                    if (metadata_file.exists()) {
-                        // From json to map
-                        def slurper = new groovy.json.JsonSlurper()
-                        def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
-                        if (metadata_file_map.get("catalog").get("bucket") instanceof String) {
-                            return bucket_name == metadata_file_map.get("catalog").get("bucket")
-
-                        } else {
-                            def buckets_list = metadata_file_map.get("catalog").get("bucket")
-                            for (bucket in buckets_list) {
-                                if (bucket_name == bucket){
-                                    return true
-                                }
-                            }
-                        }
-                    }
-                    return false
-                }
-            }
-
-            // For each package targeting the current bucket call the package loader class
-            examples_dir.listFiles(file_filter).each { package_dir ->
-                package_loader.run(package_dir)
-            }
-
+        // Create buckets following the ordered bucket list
+        new File(examples_dir, "ordered_bucket_list").text.split(",").each { bucket ->
+            package_loader.createBucketIfNotExist(bucket)
         }
+
+        // Load each package
+        examples_dir.eachDir { package_dir ->
+            package_loader.run(package_dir)
+        }
+
         writeToOutput(" ... proactive packages deployed!")
         writeToOutput(" Terminated.")
     }
@@ -136,4 +114,3 @@ try {
 } catch (Exception e) {
     throw new Exception("Failed to load examples into the catalog." + e.getMessage())
 }
-
