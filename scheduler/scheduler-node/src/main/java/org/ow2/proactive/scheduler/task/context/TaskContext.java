@@ -136,10 +136,6 @@ public class TaskContext implements Serializable {
         return initializer;
     }
 
-    public String getCatalogRestUrl() {
-        return initializer.getCatalogRestUrl();
-    }
-
     public Decrypter getDecrypter() {
         return decrypter;
     }
