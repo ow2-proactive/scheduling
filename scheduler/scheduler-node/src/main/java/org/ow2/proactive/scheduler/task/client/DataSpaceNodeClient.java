@@ -102,7 +102,7 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
     /**
      * Connects to the dataspace at the default schedulerRestUrl, using the current user credentials
      *
-     * @throws Exception
+     * @throws Exception FileSystemException as required by @see RemoteSpace interface.
      */
     public void connect() throws Exception {
         connect(schedulerRestUrl);
@@ -120,9 +120,9 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
         this.dataSpaceClient.init(url, schedulerNodeClient);
     }
 
-    private void renewSession() throws NotConnectedException{
+    private void renewSession() throws FileSystemException {
         if(!isInitialized())
-            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
+            throw new FileSystemException("Client not connected, call connect() before using the scheduler client");
         try {
             schedulerNodeClient.renewSession();
         } catch (NotConnectedException e) {
@@ -131,43 +131,43 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
     }
 
     @Override
-    public List<String> listFiles(String remotePath, String pattern) throws FileSystemException, NotConnectedException {
+    public List<String> listFiles(String remotePath, String pattern) throws FileSystemException {
         renewSession();
         return spaceProxy.listFiles(remotePath, pattern);
     }
 
     @Override
-    public void pushFile(File localPath, String remotePath) throws FileSystemException, NotConnectedException {
+    public void pushFile(File localPath, String remotePath) throws FileSystemException {
         renewSession();
         spaceProxy.pushFile(localPath, remotePath);
     }
 
     @Override
-    public void pushFiles(File localDirectory, String pattern, String remotePath) throws FileSystemException, NotConnectedException {
+    public void pushFiles(File localDirectory, String pattern, String remotePath) throws FileSystemException {
         renewSession();
         spaceProxy.pushFiles(localDirectory, pattern, remotePath);
     }
 
     @Override
-    public File pullFile(String remotePath, File localPath) throws FileSystemException, NotConnectedException {
+    public File pullFile(String remotePath, File localPath) throws FileSystemException {
         renewSession();
         return spaceProxy.pullFile(remotePath, localPath);
     }
 
     @Override
-    public Set<File> pullFiles(String remotePath, String pattern, File localPath) throws FileSystemException, NotConnectedException {
+    public Set<File> pullFiles(String remotePath, String pattern, File localPath) throws FileSystemException {
         renewSession();
         return spaceProxy.pullFiles(remotePath, pattern, localPath);
     }
 
     @Override
-    public void deleteFile(String remotePath) throws FileSystemException, NotConnectedException {
+    public void deleteFile(String remotePath) throws FileSystemException {
         renewSession();
         spaceProxy.deleteFile(remotePath);
     }
 
     @Override
-    public void deleteFiles(String remotePath, String pattern) throws FileSystemException, NotConnectedException {
+    public void deleteFiles(String remotePath, String pattern) throws FileSystemException {
         renewSession();
         spaceProxy.deleteFiles(remotePath, pattern);
     }
@@ -179,13 +179,13 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
     }
 
     @Override
-    public InputStream getInputStream(String remotePath) throws FileSystemException, NotConnectedException {
+    public InputStream getInputStream(String remotePath) throws FileSystemException {
         renewSession();
         return spaceProxy.getInputStream(remotePath);
     }
 
     @Override
-    public OutputStream getOutputStream(String remotePath) throws FileSystemException, NotConnectedException {
+    public OutputStream getOutputStream(String remotePath) throws FileSystemException {
         renewSession();
         return spaceProxy.getOutputStream(remotePath);
     }
