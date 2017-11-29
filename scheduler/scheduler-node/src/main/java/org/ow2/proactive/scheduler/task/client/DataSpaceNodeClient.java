@@ -51,20 +51,28 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
 
     private final SchedulerNodeClient schedulerNodeClient;
 
-    private final DataSpaceClient dataSpaceClient;
+    private transient DataSpaceClient dataSpaceClient;
 
     private final IDataSpaceClient.Dataspace space;
 
     private final String schedulerRestUrl;
 
-    private final RemoteSpace spaceProxy;
+    private transient RemoteSpace spaceProxy;
 
     public DataSpaceNodeClient(SchedulerNodeClient schedulerNodeClient, IDataSpaceClient.Dataspace space,
             String schedulerRestUrl) {
         this.schedulerNodeClient = schedulerNodeClient;
-        this.dataSpaceClient = new DataSpaceClient();
         this.space = space;
         this.schedulerRestUrl = schedulerRestUrl;
+    }
+
+    /**
+     * Initialize dataSpaceClient and spaceProxy when connect is called. This late initialization will garantee
+     * that this object upon restore (from a Serialized source) will be able to reconstruct the needed objects
+     * to work properly.
+     */
+    private void lazyInit(){
+        this.dataSpaceClient = new DataSpaceClient();
         switch (space) {
             case GLOBAL:
                 spaceProxy = dataSpaceClient.getGlobalSpace();
@@ -73,8 +81,22 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
                 spaceProxy = dataSpaceClient.getUserSpace();
                 break;
             default:
-                throw new IllegalStateException("Unkown space : " + space);
+                throw new IllegalStateException("Unknown space : " + space);
         }
+    }
+
+    /**
+     * Test if this object was previously initialized. Use lazy initialization to reconstruct this object
+     * after deserialization.
+     *
+     * @see this.lazyInit
+     *
+     * @return true if this object has been initialized, false otherwise.
+     */
+    private boolean isInitialized(){
+        if(dataSpaceClient != null && spaceProxy != null)
+            return true;
+        return false;
     }
 
     /**
@@ -93,11 +115,14 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
      * @throws Exception
      */
     public void connect(String url) throws Exception {
+        lazyInit();
         schedulerNodeClient.connect(url);
         this.dataSpaceClient.init(url, schedulerNodeClient);
     }
 
-    private void renewSession() {
+    private void renewSession() throws NotConnectedException{
+        if(!isInitialized())
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         try {
             schedulerNodeClient.renewSession();
         } catch (NotConnectedException e) {
@@ -106,43 +131,43 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
     }
 
     @Override
-    public List<String> listFiles(String remotePath, String pattern) throws FileSystemException {
+    public List<String> listFiles(String remotePath, String pattern) throws FileSystemException, NotConnectedException {
         renewSession();
         return spaceProxy.listFiles(remotePath, pattern);
     }
 
     @Override
-    public void pushFile(File localPath, String remotePath) throws FileSystemException {
+    public void pushFile(File localPath, String remotePath) throws FileSystemException, NotConnectedException {
         renewSession();
         spaceProxy.pushFile(localPath, remotePath);
     }
 
     @Override
-    public void pushFiles(File localDirectory, String pattern, String remotePath) throws FileSystemException {
+    public void pushFiles(File localDirectory, String pattern, String remotePath) throws FileSystemException, NotConnectedException {
         renewSession();
         spaceProxy.pushFiles(localDirectory, pattern, remotePath);
     }
 
     @Override
-    public File pullFile(String remotePath, File localPath) throws FileSystemException {
+    public File pullFile(String remotePath, File localPath) throws FileSystemException, NotConnectedException {
         renewSession();
         return spaceProxy.pullFile(remotePath, localPath);
     }
 
     @Override
-    public Set<File> pullFiles(String remotePath, String pattern, File localPath) throws FileSystemException {
+    public Set<File> pullFiles(String remotePath, String pattern, File localPath) throws FileSystemException, NotConnectedException {
         renewSession();
         return spaceProxy.pullFiles(remotePath, pattern, localPath);
     }
 
     @Override
-    public void deleteFile(String remotePath) throws FileSystemException {
+    public void deleteFile(String remotePath) throws FileSystemException, NotConnectedException {
         renewSession();
         spaceProxy.deleteFile(remotePath);
     }
 
     @Override
-    public void deleteFiles(String remotePath, String pattern) throws FileSystemException {
+    public void deleteFiles(String remotePath, String pattern) throws FileSystemException, NotConnectedException {
         renewSession();
         spaceProxy.deleteFiles(remotePath, pattern);
     }
@@ -154,13 +179,13 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
     }
 
     @Override
-    public InputStream getInputStream(String remotePath) throws FileSystemException {
+    public InputStream getInputStream(String remotePath) throws FileSystemException, NotConnectedException {
         renewSession();
         return spaceProxy.getInputStream(remotePath);
     }
 
     @Override
-    public OutputStream getOutputStream(String remotePath) throws FileSystemException {
+    public OutputStream getOutputStream(String remotePath) throws FileSystemException, NotConnectedException {
         renewSession();
         return spaceProxy.getOutputStream(remotePath);
     }
