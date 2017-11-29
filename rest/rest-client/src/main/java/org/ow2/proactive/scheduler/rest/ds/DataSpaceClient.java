@@ -65,7 +65,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 
 
-public class DataSpaceClient implements IDataSpaceClient, Serializable {
+public class DataSpaceClient implements IDataSpaceClient {
 
     private static final Logger log = Logger.getLogger(DataSpaceClient.class);
 
