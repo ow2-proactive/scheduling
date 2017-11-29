@@ -1855,9 +1855,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             //remove down nodes handled by the source
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
-            // here we need the shutdown to be completed before the node source is removed from the database
-            // so we must ensure that the next call is blocking
-            PAFuture.waitFor(nodeSource.shutdown(caller));
+            nodeSource.shutdown(caller);
             dbManager.removeNodeSource(sourceName);
 
             return new BooleanWrapper(true);

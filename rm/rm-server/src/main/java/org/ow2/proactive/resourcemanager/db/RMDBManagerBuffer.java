@@ -28,7 +28,12 @@ package org.ow2.proactive.resourcemanager.db;
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_DB_OPERATIONS_DELAY;
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_DB_SYNCHRONOUS_UPDATES;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -39,7 +44,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.StaleStateException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.SessionWork;
 
@@ -51,6 +55,8 @@ import org.ow2.proactive.db.SessionWork;
 public class RMDBManagerBuffer {
 
     private static final Logger logger = ProActiveLogger.getLogger(RMDBManagerBuffer.class);
+
+    private static final int NODE_SOURCE_REMOVED_FLAG_LIFETIME = 10000;
 
     private RMDBManager rmdbManager;
 
@@ -72,6 +78,16 @@ public class RMDBManagerBuffer {
      */
     private Set<NodeSourceData> pendingNodeSourceUpdates;
 
+    /**
+     * The set of node sources names that have been removed within the past
+     * seconds.
+     */
+    private Set<String> recentlyRemovedNodeSources;
+
+    /**
+     * The database transaction regarding node sources that is currently
+     * scheduled for later.
+     */
     private ScheduledFuture<?> scheduledNodeSourceTransaction;
 
     private final Lock pendingNodeSourceUpdatesLock = new ReentrantLock();
@@ -80,33 +96,85 @@ public class RMDBManagerBuffer {
      * The set of nodes to persist in database. One entry of this map
      * corresponds to the successive updates to apply for one node.
      */
-    private List<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> pendingNodesOperations;
+    private List<NodeOperation> pendingNodesOperations;
 
-    private Map<RMNodeData, Integer> nbPendingOperationsPerNode = new HashMap<>();
-
+    /**
+     * The database transaction regarding nodes that is currently
+     * scheduled for later.
+     */
     private ScheduledFuture<?> scheduledNodeTransaction;
 
     private final Lock pendingNodeOperationsLock = new ReentrantLock();
 
     private final Condition pendingNodeOperationsCondition = pendingNodeOperationsLock.newCondition();
 
-    public RMDBManagerBuffer(RMDBManager rmdbManager) {
+    protected RMDBManagerBuffer(RMDBManager rmdbManager) {
         this.rmdbManager = rmdbManager;
         delayEqualsToZero = RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt() == 0;
         databaseTransactionExecutor = Executors.newSingleThreadScheduledExecutor();
         pendingNodeSourceUpdates = new HashSet<>();
+        recentlyRemovedNodeSources = new HashSet<>();
         pendingNodesOperations = new LinkedList<>();
     }
 
     ////// Node Source Database Operations //////
 
-    public void addUpdateNodeSourceToPendingDatabaseOperations(final NodeSourceData nodeSourceData) {
-        cancelScheduledNodeSourceTransaction();
-        registerPendingNodeSourceUpdate(nodeSourceData);
-        if (delayEqualsToZero) {
-            buildNodeSourceTransactionAndCommit();
-        } else {
-            scheduleNodeSourceTransaction();
+    /**
+     * Add the node source name to the set of removed node source and
+     * schedules its removal from the set. This is in order to let remaining
+     * node source updates being canceled before the node source is
+     * effectively removed. The removal delay is set to the delay that is used
+     * to delay node source updates plus {@link RMDBManagerBuffer#NODE_SOURCE_REMOVED_FLAG_LIFETIME}
+     * milliseconds, so that all updates are applied or cancelled before the
+     * node source removal flag is removed.
+     *
+     * @param nodeSourceName the name of the node source that has been removed
+     */
+    protected void setNodeSourceRemovedFlag(final String nodeSourceName) {
+        pendingNodeSourceUpdatesLock.lock();
+        try {
+            recentlyRemovedNodeSources.add(nodeSourceName);
+            scheduleRemovedNodeSourceFlagRemoval(nodeSourceName);
+        } finally {
+            pendingNodeSourceUpdatesLock.unlock();
+        }
+    }
+
+    /**
+     * Removes the node source name entry that is checked to know whether the
+     * node source has been removed
+     *
+     * @param nodeSourceName the removed node source name that will not be
+     *                       tracked anymore
+     */
+    private void scheduleRemovedNodeSourceFlagRemoval(final String nodeSourceName) {
+        scheduledNodeSourceTransaction = databaseTransactionExecutor.schedule(new Runnable() {
+            @Override
+            public void run() {
+                pendingNodeSourceUpdatesLock.lock();
+                try {
+                    recentlyRemovedNodeSources.remove(nodeSourceName);
+                } finally {
+                    pendingNodeSourceUpdatesLock.unlock();
+                }
+            }
+        }, RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt() + NODE_SOURCE_REMOVED_FLAG_LIFETIME, TimeUnit.MILLISECONDS);
+    }
+
+    protected void addUpdateNodeSourceToPendingDatabaseOperations(final NodeSourceData nodeSourceData) {
+        pendingNodeSourceUpdatesLock.lock();
+        try {
+            if (!recentlyRemovedNodeSources.contains(nodeSourceData.getName())) {
+                cancelScheduledNodeSourceTransaction();
+                pendingNodeSourceUpdates.add(nodeSourceData);
+                if (delayEqualsToZero) {
+                    buildNodeSourceTransactionAndCommit();
+                } else {
+                    scheduleNodeSourceTransaction();
+                }
+            }
+        } finally {
+            pendingNodeSourceUpdatesLock.unlock();
         }
     }
 
@@ -116,84 +184,43 @@ public class RMDBManagerBuffer {
         }
     }
 
-    private void registerPendingNodeSourceUpdate(NodeSourceData nodeSourceData) {
-        pendingNodeSourceUpdatesLock.lock();
-        try {
-            pendingNodeSourceUpdates.add(nodeSourceData);
-        } finally {
-            pendingNodeSourceUpdatesLock.unlock();
-        }
-    }
-
     private void buildNodeSourceTransactionAndCommit() {
-        try {
-            executeNodeSourceUpdatesInBatch();
-        } catch (StaleStateException e) {
-            logger.warn("Some node source could not be updated because their state is staled, applying one node source update at a time");
-            executeNodeSourceUpdatesIndividually();
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while updating node sources in batch", e);
-        }
-    }
-
-    private void executeNodeSourceUpdatesInBatch() {
         rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                pendingNodeSourceUpdatesLock.lock();
-                try {
-                    for (NodeSourceData nodeSource : pendingNodeSourceUpdates) {
+                for (NodeSourceData nodeSource : pendingNodeSourceUpdates) {
+                    if (!recentlyRemovedNodeSources.contains(nodeSource.getName())) {
                         session.update(nodeSource);
                     }
-                } finally {
-                    pendingNodeSourceUpdatesLock.unlock();
                 }
+                pendingNodeSourceUpdates.clear();
                 return null;
             }
         });
-        pendingNodeSourceUpdates.clear();
-    }
-
-    private void executeNodeSourceUpdatesIndividually() {
-        try {
-            pendingNodeSourceUpdatesLock.lock();
-            Iterator<NodeSourceData> nodeSourceDataIterator = pendingNodeSourceUpdates.iterator();
-            while (nodeSourceDataIterator.hasNext()) {
-                final NodeSourceData currentNodeSource = nodeSourceDataIterator.next();
-                rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
-                    @Override
-                    public Void doInTransaction(Session session) {
-                        session.update(currentNodeSource);
-                        return null;
-                    }
-                });
-                nodeSourceDataIterator.remove();
-            }
-        } catch (RuntimeException ex) {
-            throw new RuntimeException("Exception occurred while updating node sources individually", ex);
-        } finally {
-            pendingNodeSourceUpdatesLock.unlock();
-        }
     }
 
     private void scheduleNodeSourceTransaction() {
         scheduledNodeSourceTransaction = databaseTransactionExecutor.schedule(new Runnable() {
             @Override
             public void run() {
-                buildNodeSourceTransactionAndCommit();
+                pendingNodeSourceUpdatesLock.lock();
+                try {
+                    buildNodeSourceTransactionAndCommit();
+                } finally {
+                    pendingNodeSourceUpdatesLock.unlock();
+                }
             }
         }, RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt(), TimeUnit.MILLISECONDS);
     }
 
     ////// Node Database Operations //////
 
-    public boolean canOperateDatabaseSynchronouslyWithNode(RMNodeData rmNodeData) {
+    protected boolean canOperateDatabaseSynchronouslyWithNode(RMNodeData rmNodeData) {
         boolean canOperateNodeSynchronously = true;
         if (!delayEqualsToZero) {
             pendingNodeOperationsLock.lock();
             try {
-                canOperateNodeSynchronously = synchronousOperationsRequired() &&
-                                              !nbPendingOperationsPerNode.containsKey(rmNodeData);
+                canOperateNodeSynchronously = synchronousOperationsRequired() && !nodeHasPendingOperations(rmNodeData);
             } finally {
                 pendingNodeOperationsLock.unlock();
             }
@@ -201,7 +228,7 @@ public class RMDBManagerBuffer {
         return canOperateNodeSynchronously;
     }
 
-    public boolean canOperateDatabaseSynchronouslyWithNodes(Collection<RMNodeData> nodes) {
+    protected boolean canOperateDatabaseSynchronouslyWithNodes(Collection<RMNodeData> nodes) {
         boolean canOperateAllNodesSynchronously = true;
         if (!delayEqualsToZero) {
             for (RMNodeData rmNodeData : nodes) {
@@ -218,7 +245,7 @@ public class RMDBManagerBuffer {
         return RM_NODES_DB_SYNCHRONOUS_UPDATES.getValueAsBoolean();
     }
 
-    public void addCreateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    protected void addCreateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.CREATE, rmNodeData);
         if (delayEqualsToZero) {
@@ -228,7 +255,7 @@ public class RMDBManagerBuffer {
         }
     }
 
-    public void addUpdateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    protected void addUpdateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.UPDATE, rmNodeData);
         if (delayEqualsToZero) {
@@ -238,7 +265,7 @@ public class RMDBManagerBuffer {
         }
     }
 
-    public void addRemoveNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    protected void addRemoveNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData);
         if (delayEqualsToZero) {
@@ -248,7 +275,7 @@ public class RMDBManagerBuffer {
         }
     }
 
-    public void addRemoveNodesToPendingDatabaseOperations(Collection<RMNodeData> nodes) {
+    protected void addRemoveNodesToPendingDatabaseOperations(Collection<RMNodeData> nodes) {
         cancelScheduledNodeTransaction();
         for (RMNodeData rmNodeData : nodes) {
             registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData);
@@ -260,7 +287,7 @@ public class RMDBManagerBuffer {
         }
     }
 
-    public void debounceNodeUpdatesIfNeeded() {
+    protected void debounceNodeUpdatesIfNeeded() {
         if (!delayEqualsToZero) {
             pendingNodeOperationsLock.lock();
             try {
@@ -277,8 +304,8 @@ public class RMDBManagerBuffer {
         }
     }
 
-    public List<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> listPendingNodeOperations() {
-        List<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> listCopy;
+    public List<NodeOperation> listPendingNodeOperations() {
+        List<NodeOperation> listCopy;
         pendingNodeOperationsLock.lock();
         try {
             listCopy = new LinkedList<>(pendingNodesOperations);
@@ -297,11 +324,7 @@ public class RMDBManagerBuffer {
     private void registerPendingNodeOperations(DatabaseOperation databaseOperation, RMNodeData rmNodeData) {
         pendingNodeOperationsLock.lock();
         try {
-            pendingNodesOperations.add(new AbstractMap.SimpleImmutableEntry<>(rmNodeData, databaseOperation));
-            if (!nbPendingOperationsPerNode.containsKey(rmNodeData)) {
-                nbPendingOperationsPerNode.put(rmNodeData, 0);
-            }
-            nbPendingOperationsPerNode.put(rmNodeData, nbPendingOperationsPerNode.get(rmNodeData) + 1);
+            pendingNodesOperations.add(new NodeOperation(rmNodeData, databaseOperation));
         } finally {
             pendingNodeOperationsLock.unlock();
         }
@@ -319,27 +342,29 @@ public class RMDBManagerBuffer {
     private void buildNodesTransactionAndCommit() {
         pendingNodeOperationsLock.lock();
         try {
-            List<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> effectiveNodesOperations = extractOperationsOfNextTransaction();
+            List<NodeOperation> effectiveNodesOperations = extractOperationsOfNextTransaction();
             while (!effectiveNodesOperations.isEmpty()) {
-                final List<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> currentNodesOperations = effectiveNodesOperations;
+                final List<NodeOperation> currentNodesOperations = effectiveNodesOperations;
                 rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
                     @Override
                     public Void doInTransaction(Session session) {
                         logger.debug("Executing database transaction with " + currentNodesOperations.size() +
                                      " operations");
                         try {
-                            for (Map.Entry<RMNodeData, DatabaseOperation> operationEntry : currentNodesOperations) {
-                                RMNodeData rmNodeData = operationEntry.getKey();
-                                DatabaseOperation databaseOperation = operationEntry.getValue();
+                            for (NodeOperation nodeOperation : currentNodesOperations) {
+                                RMNodeData rmNodeData = nodeOperation.node;
+                                DatabaseOperation databaseOperation = nodeOperation.operation;
                                 switch (databaseOperation) {
                                     case CREATE:
                                         session.save(rmNodeData);
+                                        logger.info("Adding a new node " + rmNodeData.getName() + " to the database");
                                         break;
                                     case UPDATE:
                                         session.update(rmNodeData);
                                         break;
                                     case DELETE:
                                         session.delete(rmNodeData);
+                                        logger.info("Removing a node " + rmNodeData.getName() + " from the database");
                                         break;
                                     case RETRIEVE:
                                         // currently retrieval are not enqueued
@@ -366,50 +391,47 @@ public class RMDBManagerBuffer {
         }
     }
 
-    private List<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> extractOperationsOfNextTransaction() {
+    private List<NodeOperation> extractOperationsOfNextTransaction() {
         Set<RMNodeData> nodesOfNextTransaction = new HashSet<>();
-        List<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> operationsOfNextTransaction = new LinkedList<>();
-        Iterator<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> pendingOperationsIterator = pendingNodesOperations.iterator();
+        List<NodeOperation> operationsOfNextTransaction = new LinkedList<>();
+        Iterator<NodeOperation> pendingOperationsIterator = pendingNodesOperations.iterator();
 
         boolean canContinueAddingOperationsToTransaction = true;
 
         while (pendingOperationsIterator.hasNext() && canContinueAddingOperationsToTransaction) {
-            AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation> operation = pendingOperationsIterator.next();
+            NodeOperation nodeOperation = pendingOperationsIterator.next();
             canContinueAddingOperationsToTransaction = addOperationToNextTransactionIfPossible(nodesOfNextTransaction,
                                                                                                operationsOfNextTransaction,
                                                                                                pendingOperationsIterator,
-                                                                                               operation);
+                                                                                               nodeOperation);
         }
         return operationsOfNextTransaction;
     }
 
     private boolean addOperationToNextTransactionIfPossible(Set<RMNodeData> nodesOfNextTransaction,
-            List<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> operationsOfNextTransaction,
-            Iterator<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> pendingOperationsIterator,
-            AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation> operation) {
+            List<NodeOperation> operationsOfNextTransaction, Iterator<NodeOperation> pendingOperationsIterator,
+            NodeOperation nodeOperation) {
 
         boolean operationAddedToNextTransaction = false;
-        RMNodeData rmNodeData = operation.getKey();
-        DatabaseOperation databaseOperation = operation.getValue();
+        RMNodeData rmNodeData = nodeOperation.node;
+        DatabaseOperation databaseOperation = nodeOperation.operation;
 
         if (!nodesOfNextTransaction.contains(rmNodeData)) {
             nodesOfNextTransaction.add(rmNodeData);
-            operationsOfNextTransaction.add(new AbstractMap.SimpleImmutableEntry<>(rmNodeData, databaseOperation));
-            removeOperationFromPendingOperations(pendingOperationsIterator, rmNodeData);
+            operationsOfNextTransaction.add(new NodeOperation(rmNodeData, databaseOperation));
+            pendingOperationsIterator.remove();
             operationAddedToNextTransaction = true;
         }
         return operationAddedToNextTransaction;
     }
 
-    private void removeOperationFromPendingOperations(
-            Iterator<AbstractMap.SimpleImmutableEntry<RMNodeData, DatabaseOperation>> pendingOperationsIterator,
-            RMNodeData rmNodeData) {
-
-        pendingOperationsIterator.remove();
-        int updatedNbOperationsForNode = nbPendingOperationsPerNode.get(rmNodeData) - 1;
-        if (updatedNbOperationsForNode == 0) {
-            nbPendingOperationsPerNode.remove(rmNodeData);
+    private boolean nodeHasPendingOperations(RMNodeData searchedNode) {
+        for (NodeOperation nodeOperation : pendingNodesOperations) {
+            if (searchedNode.equals(nodeOperation.node)) {
+                return true;
+            }
         }
+        return false;
     }
 
     public enum DatabaseOperation {
@@ -417,6 +439,18 @@ public class RMDBManagerBuffer {
         RETRIEVE,
         UPDATE,
         DELETE
+    }
+
+    public static class NodeOperation {
+
+        protected final RMNodeData node;
+
+        protected final DatabaseOperation operation;
+
+        protected NodeOperation(RMNodeData node, DatabaseOperation operation) {
+            this.node = node;
+            this.operation = operation;
+        }
     }
 
 }
