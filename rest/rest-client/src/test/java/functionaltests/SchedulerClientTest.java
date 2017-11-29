@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -248,6 +249,28 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
+    public void testSchedulerNodeClientCleanScript() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
+                "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
+        JobId jobId = submitJob(job, client);
+        JobResult jres = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(5));
+        Assert.assertNotNull(jres);
+
+        String jobLog = client.getJobServerLogs("" + jobId);
+
+        //assert schedulerapi.connect() worked
+        Assert.assertThat(jobLog,
+                CoreMatchers.containsString("ISEMPTY_SCHEDULERAPI_URI_LIST=false"));
+        //assert userspaceapi.connect() worked
+        Assert.assertThat(jobLog,
+                CoreMatchers.containsString("ISEMPTY_USERSPACE_FILE_LIST=true"));
+        //assert globalspaceapi.connect() worked
+        Assert.assertThat(jobLog,
+                CoreMatchers.containsString("ISEMPTY_GLOBALPACE_FILE_LIST=true"));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
     public void testDataSpaceNodeClientPushPull() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_pull.groovy",
@@ -284,6 +307,20 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         forkEnvironment.setEnvScript(new SimpleScript(IOUtils.toString(forkScriptURL.toURI()), "groovy"));
         task.setForkEnvironment(forkEnvironment);
         task.setScript(new TaskScript(new SimpleScript(IOUtils.toString(scriptURL.toURI()), "groovy")));
+        //add CleanScript to test external APIs
+        task.setCleaningScript(new SimpleScript(""+
+                "schedulerapi.connect()\n" +
+                "print(\"SCHEDULERAPI_URI_LIST=\"+schedulerapi.getGlobalSpaceURIs());\n" +
+                "print(\"ISEMPTY_SCHEDULERAPI_URI_LIST=\"+schedulerapi.getGlobalSpaceURIs().isEmpty());\n" +
+                "\n" +
+                "userspaceapi.connect();\n" +
+                "print(\"USERSPACE_FILE_LIST=\"+userspaceapi.listFiles(\".\", \"*\"));\n" +
+                "print(\"ISEMPTY_USERSPACE_FILE_LIST=\"+userspaceapi.listFiles(\".\", \"*\").isEmpty());\n" +
+                "\n" +
+                "globalspaceapi.connect();\n" +
+                "print(\"GLOBALSPACE_FILE_LIST=\"+globalspaceapi.listFiles(\".\", \"*\"));\n" +
+                "print(\"ISEMPTY_GLOBALPACE_FILE_LIST=\"+globalspaceapi.listFiles(\".\", \"*\").isEmpty());"
+                , "js"));
         job.addTask(task);
         return job;
     }
