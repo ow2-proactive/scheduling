@@ -212,7 +212,6 @@ public interface ISchedulerClient extends Scheduler {
      * @param catalogRestURL
      * @param bucketId
      * @param workflowName
-     * @param variables
      * @return
      * @throws NotConnectedException
      * @throws PermissionException
