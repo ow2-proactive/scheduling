@@ -260,11 +260,11 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         String jobLog = client.getJobServerLogs("" + jobId);
 
         //assert schedulerapi.connect() worked
-        Assert.assertThat(jobLog, CoreMatchers.containsString("ISEMPTY_SCHEDULERAPI_URI_LIST=false"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("SCHEDULERAPI_URI_LIST_NOT_NULL=true"));
         //assert userspaceapi.connect() worked
-        Assert.assertThat(jobLog, CoreMatchers.containsString("ISEMPTY_USERSPACE_FILE_LIST=true"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("USERSPACE_FILE_LIST_NOT_NULL=true"));
         //assert globalspaceapi.connect() worked
-        Assert.assertThat(jobLog, CoreMatchers.containsString("ISEMPTY_GLOBALPACE_FILE_LIST=true"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("GLOBALSPACE_FILE_LIST_NOT_NULL=true"));
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -306,14 +306,11 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         task.setScript(new TaskScript(new SimpleScript(IOUtils.toString(scriptURL.toURI()), "groovy")));
         //add CleanScript to test external APIs
         task.setCleaningScript(new SimpleScript("" + "schedulerapi.connect()\n" +
-                                                "print(\"SCHEDULERAPI_URI_LIST=\"+schedulerapi.getGlobalSpaceURIs());\n" +
-                                                "print(\"ISEMPTY_SCHEDULERAPI_URI_LIST=\"+schedulerapi.getGlobalSpaceURIs().isEmpty());\n" +
+                                                "print(\"SCHEDULERAPI_URI_LIST_NOT_NULL=\"+(schedulerapi.getGlobalSpaceURIs()!=null));\n" +
                                                 "\n" + "userspaceapi.connect();\n" +
-                                                "print(\"USERSPACE_FILE_LIST=\"+userspaceapi.listFiles(\".\", \"*\"));\n" +
-                                                "print(\"ISEMPTY_USERSPACE_FILE_LIST=\"+userspaceapi.listFiles(\".\", \"*\").isEmpty());\n" +
+                                                "print(\"USERSPACE_FILE_LIST_NOT_NULL=\"+(userspaceapi.listFiles(\".\", \"*\")!=null));\n" +
                                                 "\n" + "globalspaceapi.connect();\n" +
-                                                "print(\"GLOBALSPACE_FILE_LIST=\"+globalspaceapi.listFiles(\".\", \"*\"));\n" +
-                                                "print(\"ISEMPTY_GLOBALPACE_FILE_LIST=\"+globalspaceapi.listFiles(\".\", \"*\").isEmpty());",
+                                                "print(\"GLOBALSPACE_FILE_LIST_NOT_NULL=\"+(globalspaceapi.listFiles(\".\", \"*\")!=null));\n" ,
                                                 "js"));
         job.addTask(task);
         return job;
