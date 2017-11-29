@@ -302,7 +302,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         if (client == null)
-            throw new NotConnectedException("Variable client is null, call connect() before using SchedulerNodeClient");
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         return this.client.submit(job, variables, headerParams);
     }
 
@@ -502,7 +502,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     @Override
     public void disconnect() throws NotConnectedException, PermissionException {
         if (client == null)
-            throw new NotConnectedException("Variable client is null, call connect() before using SchedulerNodeClient");
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         client.disconnect();
     }
 
@@ -532,7 +532,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     @Override
     public void renewSession() throws NotConnectedException {
         if (client == null)
-            throw new NotConnectedException("Variable client is null, call connect() before using SchedulerNodeClient");
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         client.renewSession();
     }
 
@@ -615,7 +615,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     @Override
     public void init(ConnectionInfo connectionInfo) throws Exception {
         if (client == null)
-            throw new NotConnectedException("Variable client is null, call connect() before using SchedulerNodeClient");
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         client.init(connectionInfo);
     }
 
