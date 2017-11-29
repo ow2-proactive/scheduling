@@ -67,6 +67,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -566,9 +567,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @param task the task to be initialized
      */
     protected void loadAndInit(InternalTask task) {
-        tlogger.debug(task.getId(), "initializing the executable container");
-        ExecutableContainer container = getDBManager().loadExecutableContainer(task);
-        task.setExecutableContainer(container);
+        if ((task.getExecutableContainer() == null) ||
+            ((ScriptExecutableContainer) task.getExecutableContainer()).getScript() == null) {
+            tlogger.debug(task.getId(), "initializing the executable container");
+            ExecutableContainer container = getDBManager().loadExecutableContainer(task);
+            task.setExecutableContainer(container);
+        }
     }
 
     /**
