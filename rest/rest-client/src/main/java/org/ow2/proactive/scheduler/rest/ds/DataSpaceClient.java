@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -366,7 +365,7 @@ public class DataSpaceClient implements IDataSpaceClient {
                                    .toString();
     }
 
-    class RestRemoteSpace implements RemoteSpace, Serializable {
+    class RestRemoteSpace implements RemoteSpace {
 
         IDataSpaceClient.Dataspace space;
 
