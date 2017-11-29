@@ -26,9 +26,6 @@
 package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.io.Serializable;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
