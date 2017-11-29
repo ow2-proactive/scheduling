@@ -73,7 +73,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.catalogclient.service.CatalogClientLib;
-import org.ow2.proactive.catalogclient.service.CatalogObjectService;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -104,7 +103,6 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
@@ -143,8 +141,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     private SchedulerRestClient schedulerRestClient;
 
-    private CatalogObjectService catalogRestClient;
-
     private String sid;
 
     private ConnectionInfo connectionInfo;
@@ -156,7 +152,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     private static final Logger logger = ProActiveLogger.getLogger(SchedulerClient.class);
 
     private SchedulerClient() {
-        this.catalogRestClient = CatalogClientLib.getCatalogObjectService();
     }
 
     /**
@@ -739,9 +734,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submitFromCatalog(String bucketId, String workflowName)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return this.submitFromCatalog(bucketId, workflowName, Collections.<String, String> emptyMap());
+        return this.submitFromCatalog(catalogRestURL, bucketId, workflowName, Collections.<String, String> emptyMap());
 
     }
 
@@ -765,16 +760,17 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName,
+            Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
 
         JobIdData jobIdData = null;
         try {
-            String workflow = catalogRestClient.getResolvedCatalogObject(PASchedulerProperties.CATALOG_REST_URL.getValueAsString(),
-                                                                         Long.valueOf(bucketId),
-                                                                         workflowName,
-                                                                         false,
-                                                                         sid);
+            String workflow = CatalogClientLib.getCatalogObjectService().getResolvedCatalogObject(catalogRestURL,
+                                                                                                  Long.valueOf(bucketId),
+                                                                                                  workflowName,
+                                                                                                  false,
+                                                                                                  sid);
 
             InputStream stream = new ByteArrayInputStream(workflow.getBytes(StandardCharsets.UTF_8.name()));
             jobIdData = restApiClient().submitXml(sid, stream, variables);

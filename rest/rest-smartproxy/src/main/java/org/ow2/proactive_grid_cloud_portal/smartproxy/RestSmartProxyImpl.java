@@ -223,9 +223,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public JobId submitFromCatalog(String bucketId, String workflowName)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return _getScheduler().submitFromCatalog(bucketId, workflowName);
+        return _getScheduler().submitFromCatalog(catalogRestURL, bucketId, workflowName);
     }
 
     @Override
@@ -247,9 +247,10 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName,
+            Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return _getScheduler().submitFromCatalog(bucketId, workflowName, variables);
+        return _getScheduler().submitFromCatalog(catalogRestURL, bucketId, workflowName, variables);
     }
 
     @Override

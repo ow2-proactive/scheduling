@@ -75,6 +75,8 @@ public class TaskLauncherInitializer implements Serializable {
 
     private String schedulerRestUrl;
 
+    private String catalogRestUrl;
+
     /** replication index: task was replicated in parallel */
     private int replicationIndex = 0;
 
@@ -314,6 +316,14 @@ public class TaskLauncherInitializer implements Serializable {
 
     public String getSchedulerRestUrl() {
         return schedulerRestUrl;
+    }
+
+    public void setCatalogRestUrl(String catalogRestUrl) {
+        this.catalogRestUrl = catalogRestUrl;
+    }
+
+    public String getCatalogRestUrl() {
+        return catalogRestUrl;
     }
 
     /**
