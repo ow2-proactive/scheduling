@@ -252,7 +252,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testSchedulerNodeClientCleanScript() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
-                "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
+                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
         JobId jobId = submitJob(job, client);
         JobResult jres = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(5));
         Assert.assertNotNull(jres);
@@ -260,14 +260,11 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         String jobLog = client.getJobServerLogs("" + jobId);
 
         //assert schedulerapi.connect() worked
-        Assert.assertThat(jobLog,
-                CoreMatchers.containsString("ISEMPTY_SCHEDULERAPI_URI_LIST=false"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("ISEMPTY_SCHEDULERAPI_URI_LIST=false"));
         //assert userspaceapi.connect() worked
-        Assert.assertThat(jobLog,
-                CoreMatchers.containsString("ISEMPTY_USERSPACE_FILE_LIST=true"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("ISEMPTY_USERSPACE_FILE_LIST=true"));
         //assert globalspaceapi.connect() worked
-        Assert.assertThat(jobLog,
-                CoreMatchers.containsString("ISEMPTY_GLOBALPACE_FILE_LIST=true"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("ISEMPTY_GLOBALPACE_FILE_LIST=true"));
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -308,19 +305,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         task.setForkEnvironment(forkEnvironment);
         task.setScript(new TaskScript(new SimpleScript(IOUtils.toString(scriptURL.toURI()), "groovy")));
         //add CleanScript to test external APIs
-        task.setCleaningScript(new SimpleScript(""+
-                "schedulerapi.connect()\n" +
-                "print(\"SCHEDULERAPI_URI_LIST=\"+schedulerapi.getGlobalSpaceURIs());\n" +
-                "print(\"ISEMPTY_SCHEDULERAPI_URI_LIST=\"+schedulerapi.getGlobalSpaceURIs().isEmpty());\n" +
-                "\n" +
-                "userspaceapi.connect();\n" +
-                "print(\"USERSPACE_FILE_LIST=\"+userspaceapi.listFiles(\".\", \"*\"));\n" +
-                "print(\"ISEMPTY_USERSPACE_FILE_LIST=\"+userspaceapi.listFiles(\".\", \"*\").isEmpty());\n" +
-                "\n" +
-                "globalspaceapi.connect();\n" +
-                "print(\"GLOBALSPACE_FILE_LIST=\"+globalspaceapi.listFiles(\".\", \"*\"));\n" +
-                "print(\"ISEMPTY_GLOBALPACE_FILE_LIST=\"+globalspaceapi.listFiles(\".\", \"*\").isEmpty());"
-                , "js"));
+        task.setCleaningScript(new SimpleScript("" + "schedulerapi.connect()\n" +
+                                                "print(\"SCHEDULERAPI_URI_LIST=\"+schedulerapi.getGlobalSpaceURIs());\n" +
+                                                "print(\"ISEMPTY_SCHEDULERAPI_URI_LIST=\"+schedulerapi.getGlobalSpaceURIs().isEmpty());\n" +
+                                                "\n" + "userspaceapi.connect();\n" +
+                                                "print(\"USERSPACE_FILE_LIST=\"+userspaceapi.listFiles(\".\", \"*\"));\n" +
+                                                "print(\"ISEMPTY_USERSPACE_FILE_LIST=\"+userspaceapi.listFiles(\".\", \"*\").isEmpty());\n" +
+                                                "\n" + "globalspaceapi.connect();\n" +
+                                                "print(\"GLOBALSPACE_FILE_LIST=\"+globalspaceapi.listFiles(\".\", \"*\"));\n" +
+                                                "print(\"ISEMPTY_GLOBALPACE_FILE_LIST=\"+globalspaceapi.listFiles(\".\", \"*\").isEmpty());",
+                                                "js"));
         job.addTask(task);
         return job;
     }

@@ -71,7 +71,7 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
      * that this object upon restore (from a Serialized source) will be able to reconstruct the needed objects
      * to work properly.
      */
-    private void lazyInit(){
+    private void lazyInit() {
         this.dataSpaceClient = new DataSpaceClient();
         switch (space) {
             case GLOBAL:
@@ -93,8 +93,8 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
      *
      * @return true if this object has been initialized, false otherwise.
      */
-    private boolean isInitialized(){
-        if(dataSpaceClient != null && spaceProxy != null)
+    private boolean isInitialized() {
+        if (dataSpaceClient != null && spaceProxy != null)
             return true;
         return false;
     }
@@ -121,7 +121,7 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
     }
 
     private void renewSession() throws FileSystemException {
-        if(!isInitialized())
+        if (!isInitialized())
             throw new FileSystemException("Client not connected, call connect() before using the scheduler client");
         try {
             schedulerNodeClient.renewSession();
