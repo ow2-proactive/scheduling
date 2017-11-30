@@ -292,10 +292,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public JobId submitFromCatalog(String bucketId, String workflowName)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        return client.submitFromCatalog(bucketId, workflowName);
+        return client.submitFromCatalog(catalogRestURL, bucketId, workflowName);
     }
 
     @Override
@@ -321,10 +321,11 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName,
+            Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        return client.submitFromCatalog(bucketId, workflowName, variables);
+        return client.submitFromCatalog(catalogRestURL, bucketId, workflowName, variables);
     }
 
     @Override

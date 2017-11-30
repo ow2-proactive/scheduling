@@ -1096,6 +1096,7 @@ public abstract class InternalTask extends TaskState {
         tli.setTaskId(getId());
         tli.setJobOwner(internalJob.getJobInfo().getJobOwner());
         tli.setSchedulerRestUrl(PASchedulerProperties.SCHEDULER_REST_URL.getValueAsStringOrNull());
+        tli.setCatalogRestUrl(PASchedulerProperties.CATALOG_REST_URL.getValueAsStringOrNull());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
         tli.setControlFlowScript(getFlowScript());
