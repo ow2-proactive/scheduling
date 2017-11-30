@@ -27,10 +27,8 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -53,14 +51,12 @@ public class InfrastructureManagerFactory {
     /**
      * Creates new infrastructure manager using reflection mechanism.
      *
-     * @param infrastructureType a full class name of an infrastructure manager
-     * @param infrastructureParameters parameters for nodes acquisition
      * @return new infrastructure manager
      */
-    public static InfrastructureManager create(String infrastructureType, Object[] infrastructureParameters,
-            NodeSourceData nodeSourceData) {
-
+    public static InfrastructureManager create(NodeSourceData nodeSourceData) {
         InfrastructureManager im = null;
+        String infrastructureType = nodeSourceData.getInfrastructureType();
+        Object[] infrastructureParameters = nodeSourceData.getInfrastructureParameters();
         try {
 
             boolean supported = false;
@@ -77,7 +73,7 @@ public class InfrastructureManagerFactory {
             Class<?> imClass = Class.forName(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
             im.internalConfigure(infrastructureParameters);
-            im.setNodeSourceData(nodeSourceData);
+            im.setPersistedNodeSourceData(nodeSourceData);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -88,16 +84,12 @@ public class InfrastructureManagerFactory {
      * Creates a new infrastructure manager and recovers its state thanks to
      * the variables contained in {@param infrastructureVariables}.
      *
-     * @param infrastructureType a full class name of an infrastructure manager
-     * @param infrastructureParameters parameters for nodes acquisition
-     * @param infrastructureVariables runtime variable values of the infrastructure to recover
-     * @param nodeSourceData
+     * @param nodeSourceData the persisted information about the node source
      * @return recovered infrastructure manager
      */
-    public static InfrastructureManager recreate(String infrastructureType, Object[] infrastructureParameters,
-            Map<String, Serializable> infrastructureVariables, NodeSourceData nodeSourceData) {
-        InfrastructureManager infrastructure = create(infrastructureType, infrastructureParameters, nodeSourceData);
-        infrastructure.recoverPersistedInfraVariables(infrastructureVariables);
+    public static InfrastructureManager recover(NodeSourceData nodeSourceData) {
+        InfrastructureManager infrastructure = create(nodeSourceData);
+        infrastructure.recoverPersistedInfraVariables(nodeSourceData.getInfrastructureVariables());
         return infrastructure;
     }
 
