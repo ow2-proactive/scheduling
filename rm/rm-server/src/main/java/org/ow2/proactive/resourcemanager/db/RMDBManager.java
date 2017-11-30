@@ -295,6 +295,7 @@ public class RMDBManager {
                     if (retrievedNodeSource == null) {
                         logger.info("Adding a new node source " + nodeSourceData.getName() + " to the database");
                         session.save(nodeSourceData);
+                        rmdbManagerBuffer.addKnownNodeSource(nodeSourceData.getName());
                         persisted = true;
                     }
                     return persisted;
@@ -336,7 +337,7 @@ public class RMDBManager {
     }
 
     public void removeNodeSource(final String sourceName) {
-        rmdbManagerBuffer.setNodeSourceRemovedFlag(sourceName);
+        rmdbManagerBuffer.removeKnownNodeSourceAndPendingUpdates(sourceName);
         final Collection<RMNodeData> relatedNodes = getNodesByNodeSource(sourceName);
         logger.info("Removing nodes linked to the node source " + sourceName + " from the database");
         removeNodes(relatedNodes);

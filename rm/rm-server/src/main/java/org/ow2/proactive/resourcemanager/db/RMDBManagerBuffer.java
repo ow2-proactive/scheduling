@@ -29,10 +29,12 @@ import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManage
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_DB_SYNCHRONOUS_UPDATES;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,8 +58,6 @@ public class RMDBManagerBuffer {
 
     private static final Logger logger = ProActiveLogger.getLogger(RMDBManagerBuffer.class);
 
-    private static final int NODE_SOURCE_REMOVED_FLAG_LIFETIME = 10000;
-
     private RMDBManager rmdbManager;
 
     /**
@@ -73,16 +73,16 @@ public class RMDBManagerBuffer {
     private ScheduledExecutorService databaseTransactionExecutor;
 
     /**
-     * The set of node sources to persist in database. This represents one
-     * update to do per node source (i.e. the latest state of the node source).
+     * The set of node source names that have been added and not removed.
      */
-    private Set<NodeSourceData> pendingNodeSourceUpdates;
+    private Set<String> knownNodeSources;
 
     /**
-     * The set of node sources names that have been removed within the past
-     * seconds.
+     * The map of node sources to persist in database per node source name.
+     * This represents one update to do per node source (i.e. the latest
+     * state of the node source).
      */
-    private Set<String> recentlyRemovedNodeSources;
+    private Map<String, NodeSourceData> pendingNodeSourceUpdates;
 
     /**
      * The database transaction regarding node sources that is currently
@@ -112,61 +112,46 @@ public class RMDBManagerBuffer {
         this.rmdbManager = rmdbManager;
         delayEqualsToZero = RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt() == 0;
         databaseTransactionExecutor = Executors.newSingleThreadScheduledExecutor();
-        pendingNodeSourceUpdates = new HashSet<>();
-        recentlyRemovedNodeSources = new HashSet<>();
+        pendingNodeSourceUpdates = new HashMap<>();
         pendingNodesOperations = new LinkedList<>();
+        knownNodeSources = new HashSet<>();
+
+        // populate the set of node source names that were existing in the
+        // previous execution of the RM
+        Collection<NodeSourceData> nodeSources = rmdbManager.getNodeSources();
+        for (NodeSourceData nodeSource : nodeSources) {
+            knownNodeSources.add(nodeSource.getName());
+        }
     }
 
     ////// Node Source Database Operations //////
 
-    /**
-     * Add the node source name to the set of removed node source and
-     * schedules its removal from the set. This is in order to let remaining
-     * node source updates being canceled before the node source is
-     * effectively removed. The removal delay is set to the delay that is used
-     * to delay node source updates plus {@link RMDBManagerBuffer#NODE_SOURCE_REMOVED_FLAG_LIFETIME}
-     * milliseconds, so that all updates are applied or cancelled before the
-     * node source removal flag is removed.
-     *
-     * @param nodeSourceName the name of the node source that has been removed
-     */
-    protected void setNodeSourceRemovedFlag(final String nodeSourceName) {
+    protected void addKnownNodeSource(final String nodeSourceName) {
         pendingNodeSourceUpdatesLock.lock();
         try {
-            recentlyRemovedNodeSources.add(nodeSourceName);
-            scheduleRemovedNodeSourceFlagRemoval(nodeSourceName);
+            knownNodeSources.add(nodeSourceName);
         } finally {
             pendingNodeSourceUpdatesLock.unlock();
         }
     }
 
-    /**
-     * Removes the node source name entry that is checked to know whether the
-     * node source has been removed
-     *
-     * @param nodeSourceName the removed node source name that will not be
-     *                       tracked anymore
-     */
-    private void scheduleRemovedNodeSourceFlagRemoval(final String nodeSourceName) {
-        scheduledNodeSourceTransaction = databaseTransactionExecutor.schedule(new Runnable() {
-            @Override
-            public void run() {
-                pendingNodeSourceUpdatesLock.lock();
-                try {
-                    recentlyRemovedNodeSources.remove(nodeSourceName);
-                } finally {
-                    pendingNodeSourceUpdatesLock.unlock();
-                }
-            }
-        }, RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt() + NODE_SOURCE_REMOVED_FLAG_LIFETIME, TimeUnit.MILLISECONDS);
-    }
-
-    protected void addUpdateNodeSourceToPendingDatabaseOperations(final NodeSourceData nodeSourceData) {
+    protected void removeKnownNodeSourceAndPendingUpdates(final String nodeSourceName) {
         pendingNodeSourceUpdatesLock.lock();
         try {
-            if (!recentlyRemovedNodeSources.contains(nodeSourceData.getName())) {
+            knownNodeSources.remove(nodeSourceName);
+            pendingNodeSourceUpdates.remove(nodeSourceName);
+        } finally {
+            pendingNodeSourceUpdatesLock.unlock();
+        }
+    }
+
+    protected void addUpdateNodeSourceToPendingDatabaseOperations(final NodeSourceData nodeSource) {
+        pendingNodeSourceUpdatesLock.lock();
+        try {
+            String nodeSourceName = nodeSource.getName();
+            if (knownNodeSources.contains(nodeSourceName)) {
                 cancelScheduledNodeSourceTransaction();
-                pendingNodeSourceUpdates.add(nodeSourceData);
+                pendingNodeSourceUpdates.put(nodeSourceName, nodeSource);
                 if (delayEqualsToZero) {
                     buildNodeSourceTransactionAndCommit();
                 } else {
@@ -188,8 +173,8 @@ public class RMDBManagerBuffer {
         rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                for (NodeSourceData nodeSource : pendingNodeSourceUpdates) {
-                    if (!recentlyRemovedNodeSources.contains(nodeSource.getName())) {
+                for (NodeSourceData nodeSource : pendingNodeSourceUpdates.values()) {
+                    if (knownNodeSources.contains(nodeSource.getName())) {
                         session.update(nodeSource);
                     }
                 }
