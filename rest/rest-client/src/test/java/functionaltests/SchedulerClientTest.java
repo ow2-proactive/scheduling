@@ -305,7 +305,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         task.setForkEnvironment(forkEnvironment);
         task.setScript(new TaskScript(new SimpleScript(IOUtils.toString(scriptURL.toURI()), "groovy")));
         //add CleanScript to test external APIs
-        task.setCleaningScript(new SimpleScript("" + "schedulerapi.connect()\n" +
+        task.setCleaningScript(new SimpleScript("" + "schedulerapi.connect();\n" +
                                                 "print(\"SCHEDULERAPI_URI_LIST_NOT_NULL=\"+(schedulerapi.getGlobalSpaceURIs()!=null));\n" +
                                                 "\n" + "userspaceapi.connect();\n" +
                                                 "print(\"USERSPACE_FILE_LIST_NOT_NULL=\"+(userspaceapi.listFiles(\".\", \"*\")!=null));\n" +
