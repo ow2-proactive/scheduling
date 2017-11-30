@@ -291,9 +291,14 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_HOME("pa.scheduler.home", PropertyType.STRING),
 
     /**
-     * Scheduler rest url directory
+     * Scheduler rest url
      */
     SCHEDULER_REST_URL("pa.scheduler.rest.url", PropertyType.STRING),
+
+    /**
+     * Catalog rest url 
+     */
+    CATALOG_REST_URL("pa.catalog.rest.url", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************** RM PROPERTIES ************************ */
@@ -361,6 +366,15 @@ public enum PASchedulerProperties implements PACommonProperties {
             "pa.scheduler.notifications.email.from",
             PropertyType.STRING,
             "example@username.com"),
+
+    /* ***************************************************************** */
+    /* ***************** LICENSE SCHEDULING POLICY PROPERTIES ***************** */
+    /* ***************************************************************** */
+
+    LICENSE_SCHEDULING_POLICY_CONFIGURATION(
+            "pa.scheduler.license.policy",
+            PropertyType.STRING,
+            "config/scheduler/license.properties"),
 
     /* ***************************************************************** */
     /* ******************* PORTAL DISPLAY PROPERTIES ******************* */

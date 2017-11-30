@@ -214,8 +214,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private Map<String, NodeSource> nodeSources;
 
-    private Map<String, NodeSourceData> nodeSourcesData;
-
     private List<String> brokenNodeSources;
 
     /**
@@ -302,7 +300,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.nodeRM = nodeRM;
 
         nodeSources = new HashMap<>();
-        nodeSourcesData = new HashMap<>();
         brokenNodeSources = new ArrayList<>();
         allNodes = new HashMap<>();
         eligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
@@ -498,7 +495,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         Map<NodeState, Integer> nodeStates = new HashMap<>();
         int totalEligibleRecoveredNodes = 0;
 
-        // for each node found in database, try to lookup node or recreate is as down
+        // for each node found in database, try to lookup node or recover it
+        // as down node
         for (RMNodeData rmNodeData : nodesData) {
             String nodeUrl = rmNodeData.getNodeUrl();
             RMNode rmnode = null;
@@ -506,7 +504,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             Node node = tryToLookupNode(nodeSource, lookUpTimeout, nodeUrl);
 
             if (node != null) {
-                rmnode = restoreInternalNode(nodeSource, rmNodeData, nodeUrl, node);
+                rmnode = recoverInternalNode(nodeSource, rmNodeData, nodeUrl, node);
                 nodesRecoveryManager.restoreLocks(rmnode, rmNodeData.getProvider());
                 Integer nbNodesInState = nodeStates.get(rmnode.getState());
                 int newNbNodesInState = nbNodesInState == null ? 1 : nbNodesInState + 1;
@@ -535,7 +533,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         logger.info("End of nodes recovery");
     }
 
-    private RMNode restoreInternalNode(NodeSource nodeSource, RMNodeData rmNodeData, String nodeUrl, Node node) {
+    private RMNode recoverInternalNode(NodeSource nodeSource, RMNodeData rmNodeData, String nodeUrl, Node node) {
         RMNode rmNode = null;
         // the node has been successfully looked up, we compare its
         // information to the node data retrieved in database.
@@ -1270,7 +1268,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                            policyParameters,
                                                            caller);
         boolean added = dbManager.addNodeSource(nodeSourceData);
-        nodeSourcesData.put(nodeSourceName, nodeSourceData);
 
         try {
             return createNodeSource(nodeSourceData, false);
@@ -1283,8 +1280,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    protected BooleanWrapper createNodeSource(NodeSourceData data, boolean isRecovery) {
-        String nodeSourceName = data.getName();
+    protected BooleanWrapper createNodeSource(NodeSourceData nodeSourceData, boolean isRecovery) {
+        String nodeSourceName = nodeSourceData.getName();
 
         //checking that nsname doesn't contain invalid characters and doesn't exist yet
         checkNodeSourceName(nodeSourceName);
@@ -1304,22 +1301,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // we need to reload the infrastructure variables saved in database if
         // we recover the nodes
         if (recoverNodes) {
-            im = InfrastructureManagerFactory.recreate(data.getInfrastructureType(),
-                                                       data.getInfrastructureParameters(),
-                                                       data.getInfrastructureVariables(),
-                                                       nodeSourcesData.get(nodeSourceName));
+            im = InfrastructureManagerFactory.recover(nodeSourceData);
         } else {
-            im = InfrastructureManagerFactory.create(data.getInfrastructureType(),
-                                                     data.getInfrastructureParameters(),
-                                                     nodeSourcesData.get(nodeSourceName));
+            im = InfrastructureManagerFactory.create(nodeSourceData);
         }
 
-        NodeSourcePolicy policy = NodeSourcePolicyFactory.create(data.getPolicyType(),
-                                                                 data.getInfrastructureType(),
-                                                                 data.getPolicyParameters());
+        NodeSourcePolicy policy = NodeSourcePolicyFactory.create(nodeSourceData.getPolicyType(),
+                                                                 nodeSourceData.getInfrastructureType(),
+                                                                 nodeSourceData.getPolicyParameters());
 
         NodeSource nodeSource;
-        Client provider = data.getProvider();
+        Client provider = nodeSourceData.getProvider();
 
         try {
             nodeSource = new NodeSource(this.getUrl(),
@@ -1335,7 +1327,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
         }
 
-        // finally recreate the nodes from a saved state if needed
+        // finally recover the nodes from a saved state if needed
         if (recoverNodes) {
             restoreNodes(nodeSource);
         }
