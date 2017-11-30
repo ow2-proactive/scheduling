@@ -207,23 +207,16 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             schedulingService.unlockJobsToSchedule(toUnlock.values());
             toUnlock = null;
 
-            int subTasksListFrom = 0;
-            int subTasksListTo = Math.min(fullListOfTaskRetrievedFromPolicy.size(),
-                                          subTasksListFrom + freeResources.size());
+            int subTasksListFromInclusive = 0;
+            int subTasksListToExclusive = Math.min(fullListOfTaskRetrievedFromPolicy.size(),
+                                          subTasksListFromInclusive + freeResources.size());
             LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy;
 
-            while (subTasksListFrom < subTasksListTo) {
-                taskRetrievedFromPolicy = new LinkedList<>(fullListOfTaskRetrievedFromPolicy.subList(subTasksListFrom,
-                                                                                                     subTasksListTo));
+            while (subTasksListFromInclusive < subTasksListToExclusive) {
+                taskRetrievedFromPolicy = new LinkedList<>(fullListOfTaskRetrievedFromPolicy.subList(subTasksListFromInclusive,
+                                                                                                     subTasksListToExclusive));
                 if (logger.isDebugEnabled()) {
-                    logger.debug("full list of eligible tasks: " +
-                                 (fullListOfTaskRetrievedFromPolicy.size() < 5 ? fullListOfTaskRetrievedFromPolicy
-                                                                               : fullListOfTaskRetrievedFromPolicy.size()));
-                    logger.debug("working list of eligible tasks: " +
-                                 (taskRetrievedFromPolicy.size() < 5 ? taskRetrievedFromPolicy
-                                                                     : taskRetrievedFromPolicy.size()));
-                    logger.debug("                       sublist: from=" + subTasksListFrom + " , to=" +
-                                 subTasksListTo);
+                    loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, subTasksListFromInclusive, subTasksListToExclusive, taskRetrievedFromPolicy);
                 }
 
                 updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
@@ -320,11 +313,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         }
                     }
                 }
-                subTasksListFrom += subTasksListTo;
-                subTasksListTo = Math.min(fullListOfTaskRetrievedFromPolicy.size(),
-                                          subTasksListFrom + freeResources.size());
+                subTasksListFromInclusive += subTasksListToExclusive;
+                subTasksListToExclusive = Math.min(fullListOfTaskRetrievedFromPolicy.size(),
+                                          subTasksListFromInclusive + freeResources.size());
                 logger.debug("Number of eligible tasks to work with for the next loop (if there some free resources remain): " +
-                             (subTasksListTo - subTasksListFrom));
+                             (subTasksListToExclusive - subTasksListFromInclusive));
             }
             return numberOfTaskStarted;
         } finally {
@@ -332,6 +325,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 schedulingService.unlockJobsToSchedule(toUnlock.values());
             }
         }
+    }
+
+    private void loggingEligibleTasksDetails(LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy, int subTasksListFromInclusive, int subTasksListToExclusive, LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy) {
+        logger.debug("full list of eligible tasks: " +
+                     (fullListOfTaskRetrievedFromPolicy.size() < 5 ? fullListOfTaskRetrievedFromPolicy
+                                                                   : fullListOfTaskRetrievedFromPolicy.size()));
+        logger.debug("working list of eligible tasks: " +
+                     (taskRetrievedFromPolicy.size() < 5 ? taskRetrievedFromPolicy
+                                                         : taskRetrievedFromPolicy.size()));
+        logger.debug("                       sublist: from=" + subTasksListFromInclusive + " , to=" +
+                     subTasksListToExclusive);
     }
 
     /**
