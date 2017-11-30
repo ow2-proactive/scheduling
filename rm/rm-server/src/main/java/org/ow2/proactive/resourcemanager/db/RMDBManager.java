@@ -293,8 +293,9 @@ public class RMDBManager {
                     boolean persisted = false;
                     NodeSourceData retrievedNodeSource = session.get(NodeSourceData.class, nodeSourceData.getName());
                     if (retrievedNodeSource == null) {
-                        logger.debug("Adding a new node source " + nodeSourceData.getName() + " to the database");
+                        logger.info("Adding a new node source " + nodeSourceData.getName() + " to the database");
                         session.save(nodeSourceData);
+                        rmdbManagerBuffer.addKnownNodeSource(nodeSourceData.getName());
                         persisted = true;
                     }
                     return persisted;
@@ -336,8 +337,9 @@ public class RMDBManager {
     }
 
     public void removeNodeSource(final String sourceName) {
+        rmdbManagerBuffer.removeKnownNodeSourceAndPendingUpdates(sourceName);
         final Collection<RMNodeData> relatedNodes = getNodesByNodeSource(sourceName);
-        logger.debug("Removing nodes linked to the node source " + sourceName + " from the database");
+        logger.info("Removing nodes linked to the node source " + sourceName + " from the database");
         removeNodes(relatedNodes);
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
