@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.task.client;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -46,24 +47,32 @@ import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
  * @author ActiveEon Team
  */
 @PublicAPI
-public class DataSpaceNodeClient implements RemoteSpace {
+public class DataSpaceNodeClient implements RemoteSpace, Serializable {
 
     private final SchedulerNodeClient schedulerNodeClient;
 
-    private final DataSpaceClient dataSpaceClient;
+    private transient DataSpaceClient dataSpaceClient;
 
     private final IDataSpaceClient.Dataspace space;
 
     private final String schedulerRestUrl;
 
-    private final RemoteSpace spaceProxy;
+    private transient RemoteSpace spaceProxy;
 
     public DataSpaceNodeClient(SchedulerNodeClient schedulerNodeClient, IDataSpaceClient.Dataspace space,
             String schedulerRestUrl) {
         this.schedulerNodeClient = schedulerNodeClient;
-        this.dataSpaceClient = new DataSpaceClient();
         this.space = space;
         this.schedulerRestUrl = schedulerRestUrl;
+    }
+
+    /**
+     * Initialize dataSpaceClient and spaceProxy when connect is called. This late initialization will garantee
+     * that this object upon restore (from a Serialized source) will be able to reconstruct the needed objects
+     * to work properly.
+     */
+    private void lazyInit() {
+        this.dataSpaceClient = new DataSpaceClient();
         switch (space) {
             case GLOBAL:
                 spaceProxy = dataSpaceClient.getGlobalSpace();
@@ -72,14 +81,28 @@ public class DataSpaceNodeClient implements RemoteSpace {
                 spaceProxy = dataSpaceClient.getUserSpace();
                 break;
             default:
-                throw new IllegalStateException("Unkown space : " + space);
+                throw new IllegalStateException("Unknown space : " + space);
         }
+    }
+
+    /**
+     * Test if this object was previously initialized. Use lazy initialization to reconstruct this object
+     * after deserialization.
+     *
+     * @see this.lazyInit
+     *
+     * @return true if this object has been initialized, false otherwise.
+     */
+    private boolean isInitialized() {
+        if (dataSpaceClient != null && spaceProxy != null)
+            return true;
+        return false;
     }
 
     /**
      * Connects to the dataspace at the default schedulerRestUrl, using the current user credentials
      *
-     * @throws Exception
+     * @throws Exception FileSystemException as required by @see RemoteSpace interface.
      */
     public void connect() throws Exception {
         connect(schedulerRestUrl);
@@ -92,11 +115,14 @@ public class DataSpaceNodeClient implements RemoteSpace {
      * @throws Exception
      */
     public void connect(String url) throws Exception {
+        lazyInit();
         schedulerNodeClient.connect(url);
         this.dataSpaceClient.init(url, schedulerNodeClient);
     }
 
-    private void renewSession() {
+    private void renewSession() throws FileSystemException {
+        if (!isInitialized())
+            throw new FileSystemException("Client not connected, call connect() before using the scheduler client");
         try {
             schedulerNodeClient.renewSession();
         } catch (NotConnectedException e) {
