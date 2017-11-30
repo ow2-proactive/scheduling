@@ -310,7 +310,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                 "\n" + "userspaceapi.connect();\n" +
                                                 "print(\"USERSPACE_FILE_LIST_NOT_NULL=\"+(userspaceapi.listFiles(\".\", \"*\")!=null));\n" +
                                                 "\n" + "globalspaceapi.connect();\n" +
-                                                "print(\"GLOBALSPACE_FILE_LIST_NOT_NULL=\"+(globalspaceapi.listFiles(\".\", \"*\")!=null));\n" ,
+                                                "print(\"GLOBALSPACE_FILE_LIST_NOT_NULL=\"+(globalspaceapi.listFiles(\".\", \"*\")!=null));\n",
                                                 "js"));
         job.addTask(task);
         return job;
