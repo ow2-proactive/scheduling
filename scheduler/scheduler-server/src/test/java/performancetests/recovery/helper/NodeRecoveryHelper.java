@@ -29,12 +29,9 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.jmeter.protocol.java.sampler.JUnitSampler;
-import org.apache.jmeter.threads.JMeterVariables;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
-import functionaltests.recover.TaskReconnectionToRecoveredNodeTest;
 import functionaltests.recover.TaskReconnectionWithForkedTaskExecutorTest;
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestNode;
@@ -59,8 +56,9 @@ public class NodeRecoveryHelper {
                                                new File(RM_CONFIGURATION_START.toURI()).getAbsolutePath(),
                                                null);
 
-        final JMeterVariables vars = new JUnitSampler().getThreadContext().getVariables();
-        Integer nodesNumber = Integer.valueOf(vars.get("nodesNumber"));
+        //        final JMeterVariables vars = new JUnitSampler().getThreadContext().getVariables();
+        //        Integer nodesNumber = Integer.valueOf(vars.get("nodesNumber"));
+        Integer nodesNumber = 10;
 
         // start nodes
         ResourceManager rm = schedulerHelper.getResourceManager();

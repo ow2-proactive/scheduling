@@ -25,37 +25,32 @@
  */
 package performancetests.recovery;
 
-import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
-import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.threads.JMeterContextService;
-
 import performancetests.recovery.helper.NodeRecoveryHelper;
 
 
-public class NodeRecoveryTest extends AbstractJavaSamplerClient {
+public class NodeRecoveryTest {
 
-    @Override
-    public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
-        SampleResult sampleResult = null;
-        try {
-            final Integer nodesNumber = Integer.valueOf(JMeterContextService.getContext()
-                                                                            .getVariables()
-                                                                            .get("nodesNumber"));
-
-            NodeRecoveryHelper nodeRecoveryHelper = new NodeRecoveryHelper();
-
-            nodeRecoveryHelper.startKillStartScheduler();
-
-            sampleResult = SampleResult.createTestSample(nodeRecoveryHelper.timeSpentToRecoverNodes());
-            sampleResult.setResponseCodeOK();
-            sampleResult.setSuccessful(true);
-            sampleResult.setResponseMessage("I'm Forever Blowing Bubbles");
-            nodeRecoveryHelper.shutdown();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sampleResult;
-    }
+    //    @Override
+    //    public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
+    //        SampleResult sampleResult = null;
+    //        try {
+    //            final Integer nodesNumber = Integer.valueOf(JMeterContextService.getContext()
+    //                                                                            .getVariables()
+    //                                                                            .get("nodesNumber"));
+    //
+    //            NodeRecoveryHelper nodeRecoveryHelper = new NodeRecoveryHelper();
+    //
+    //            nodeRecoveryHelper.startKillStartScheduler();
+    //
+    //            sampleResult = SampleResult.createTestSample(nodeRecoveryHelper.timeSpentToRecoverNodes());
+    //            sampleResult.setResponseCodeOK();
+    //            sampleResult.setSuccessful(true);
+    //            sampleResult.setResponseMessage("I'm Forever Blowing Bubbles");
+    //            nodeRecoveryHelper.shutdown();
+    //
+    //        } catch (Exception e) {
+    //            e.printStackTrace();
+    //        }
+    //        return sampleResult;
+    //    }
 }
