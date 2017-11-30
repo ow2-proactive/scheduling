@@ -90,7 +90,6 @@ public class SchedulerNodeClient implements ISchedulerClient {
         SchedulerNodeClient.this.decrypter = decrypter;
         SchedulerNodeClient.this.schedulerRestUrl = schedulerRestUrl;
         client = SchedulerClient.createInstance();
-
     }
 
     /**
@@ -292,6 +291,13 @@ public class SchedulerNodeClient implements ISchedulerClient {
     }
 
     @Override
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        renewSession();
+        return client.submitFromCatalog(catalogRestURL, bucketId, workflowName);
+    }
+
+    @Override
     public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return this.client.submit(job, variables, headerParams);
@@ -309,6 +315,14 @@ public class SchedulerNodeClient implements ISchedulerClient {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job, variables);
+    }
+
+    @Override
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName,
+            Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        renewSession();
+        return client.submitFromCatalog(catalogRestURL, bucketId, workflowName, variables);
     }
 
     @Override
@@ -738,4 +752,5 @@ public class SchedulerNodeClient implements ISchedulerClient {
         renewSession();
         return client.getSchedulerProperties();
     }
+
 }

@@ -31,12 +31,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -121,7 +116,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         nbNodes = tmpEntry.getValue();
         logger.info("Acquiring a new node. #freeHosts:" + getFreeHostsSize() + " #registered: " +
                     getRegisteredNodesSize());
-
+        removeExistingNodeUrlsForHost(tmpHost);
         this.nodeSource.executeInParallel(new Runnable() {
             public void run() {
                 try {
@@ -463,7 +458,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private int computeExpectedNbNodesForHost(InetAddress host) {
-        Collection<InetAddress> address = getHostAddressPerNode().values();
+        Collection<InetAddress> address = getHostAddressPerNodeUrl().values();
         int nbNodesForHost = 0;
         for (InetAddress inetAddress : address) {
             if (inetAddress.equals(host)) {
@@ -475,7 +470,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     // Below are wrapper methods around the runtime variables map
 
-    private Map<String, InetAddress> getHostAddressPerNode() {
+    private Map<String, InetAddress> getHostAddressPerNodeUrl() {
         return (Map<String, InetAddress>) persistedInfraVariables.get(HOST_PER_NODE_URL_KEY);
     }
 
@@ -483,7 +478,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<InetAddress>() {
             @Override
             public InetAddress handle() {
-                return getHostAddressPerNode().get(nodeUrl);
+                return getHostAddressPerNodeUrl().get(nodeUrl);
             }
         });
     }
@@ -492,7 +487,25 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                getHostAddressPerNode().put(nodeUrl, hostAddress);
+                getHostAddressPerNodeUrl().put(nodeUrl, hostAddress);
+                return null;
+            }
+        });
+    }
+
+    private void removeExistingNodeUrlsForHost(final InetAddress host) {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                List<String> nodeUrlsToRemove = new LinkedList<>();
+                for (Map.Entry<String, InetAddress> entry : getHostAddressPerNodeUrl().entrySet()) {
+                    if (entry.getValue().equals(host)) {
+                        nodeUrlsToRemove.add(entry.getKey());
+                    }
+                }
+                for (String nodeUrlToRemove : nodeUrlsToRemove) {
+                    getHostAddressPerNodeUrl().remove(nodeUrlToRemove);
+                }
                 return null;
             }
         });
