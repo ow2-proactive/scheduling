@@ -190,16 +190,11 @@ public class SchedulerStarter {
         List<String> applicationUrls = (new JettyStarter().deployWebApplications(rmUrl, scheduleUrl));
         if (applicationUrls != null) {
             for (String applicationUrl : applicationUrls) {
-                if (applicationUrl.endsWith("/rest")) {
-                    if (!PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
-                        PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
-                    }
+                if (applicationUrl.endsWith("/rest") && !PASchedulerProperties.SCHEDULER_REST_URL.isSet()) {
+                    PASchedulerProperties.SCHEDULER_REST_URL.updateProperty(applicationUrl);
                 }
-                if (applicationUrl.endsWith("/catalog")) {
-                    if (!PASchedulerProperties.CATALOG_REST_URL.isSet()) {
-                        PASchedulerProperties.CATALOG_REST_URL.updateProperty(applicationUrl);
-                    }
-
+                if (applicationUrl.endsWith("/catalog") && !PASchedulerProperties.CATALOG_REST_URL.isSet()) {
+                    PASchedulerProperties.CATALOG_REST_URL.updateProperty(applicationUrl);
                 }
             }
         }
