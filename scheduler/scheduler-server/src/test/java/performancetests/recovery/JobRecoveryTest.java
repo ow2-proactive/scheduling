@@ -57,10 +57,10 @@ import performancetests.helper.LogProcessor;
 public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     private static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
-                                                                                      .getPath();
+                                                                                     .getPath();
 
     private static final String SCHEDULER_CONFIGURATION_RESTART = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-restart.ini")
-                                                                                        .getPath();
+                                                                                       .getPath();
 
     private static URL runningJob = JobRecoveryTest.class.getResource("/functionaltests/descriptors/Job_running.xml");
 
