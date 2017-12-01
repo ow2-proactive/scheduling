@@ -64,12 +64,22 @@ public class ScriptHandler implements Serializable {
         try {
             return script.execute(additionalBindings, outputSink, errorSink);
         } catch (Throwable t) {
-            ScriptException se = new ScriptException("An exception occurred while executing the script " +
-                                                     script.getClass().getSimpleName() +
-                                                     ((script.parameters != null) ? " with parameters=" +
-                                                                                    Arrays.asList(script.parameters)
-                                                                                  : "") +
-                                                     ", and content:\n" + script.getScript(), t);
+            ScriptException se;
+            if (script.getScript() == null && script.getScriptUrl() != null) {
+                se = new ScriptException("An exception occurred while executing the script " +
+                                         script.getClass().getSimpleName() +
+                                         ((script.parameters != null) ? " with parameters=" +
+                                                                        Arrays.asList(script.parameters)
+                                                                      : "") +
+                                         ", at url:\n" + script.getScriptUrl(), t);
+            } else {
+                se = new ScriptException("An exception occurred while executing the script " +
+                                         script.getClass().getSimpleName() +
+                                         ((script.parameters != null) ? " with parameters=" +
+                                                                        Arrays.asList(script.parameters)
+                                                                      : "") +
+                                         ", and content:\n" + script.getScript(), t);
+            }
 
             return new ScriptResult<>(se);
         }

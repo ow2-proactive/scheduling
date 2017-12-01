@@ -52,6 +52,7 @@ import javax.script.ScriptEngineManager;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.http.CommonHttpResourceDownloader;
 import org.ow2.proactive.utils.BoundedStringWriter;
 import org.ow2.proactive.utils.FileUtils;
 
@@ -86,6 +87,9 @@ public abstract class Script<E> implements Serializable {
 
     /** The script to evaluate */
     protected String script;
+
+    /** url used to define this script, if aaplicable **/
+    protected URL url;
 
     /** Id of this script */
     protected String id;
@@ -181,28 +185,54 @@ public abstract class Script<E> implements Serializable {
     /** Create a script from an URL.
      * @param url representing a script source code.
      * @param parameters execution arguments.
+     * @param fetchImmediately true if the script at the given url must be fetched when the job is parsed by the server, false if the script must be fetch only at execution time.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(URL url, Serializable[] parameters) throws InvalidScriptException {
-        this.scriptEngineLookupName = FileUtils.getExtension(url.getFile());
+    public Script(URL url, Serializable[] parameters, boolean fetchImmediately) throws InvalidScriptException {
+        this(url, null, parameters, fetchImmediately);
 
-        try {
-            storeScript(url);
-        } catch (IOException e) {
-            throw new InvalidScriptException("Unable to read script : " + url.getPath(), e);
-        }
-
-        this.id = url.toExternalForm();
-        this.parameters = parameters;
-        this.scriptName = url.getFile();
     }
 
     /** Create a script from an URL.
      * @param url representing a script source code.
+     * @param engineName String representing the execution engine
+     * @param parameters execution arguments.
+     * @param fetchImmediately true if the script at the given url must be fetched when the job is parsed by the server, false if the script must be fetch only at execution time.
      * @throws InvalidScriptException if the creation fails.
      */
-    public Script(URL url) throws InvalidScriptException {
-        this(url, null);
+    public Script(URL url, String engineName, Serializable[] parameters, boolean fetchImmediately)
+            throws InvalidScriptException {
+        this.url = url;
+        this.id = url.toExternalForm();
+        this.scriptEngineLookupName = engineName;
+        this.parameters = parameters;
+        this.scriptName = url.getPath();
+        if (fetchImmediately) {
+            try {
+                fetchUrlIfNeeded();
+            } catch (IOException e) {
+                throw new InvalidScriptException(e);
+            }
+        }
+    }
+
+    /** Create a script from an URL.
+     * @param url representing a script source code.
+     * @param fetchImmediately true if the script at the given url must be fetched when the job is parsed by the server, false if the script must be fetch only at execution time.
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public Script(URL url, boolean fetchImmediately) throws InvalidScriptException {
+        this(url, (String) null, fetchImmediately);
+    }
+
+    /** Create a script from an URL.
+     * @param url representing a script source code.
+     * @param engineName String representing the execution engine
+     * @param fetchImmediately true if the script at the given url must be fetched when the job is parsed by the server, false if the script must be fetch only at execution time.
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public Script(URL url, String engineName, boolean fetchImmediately) throws InvalidScriptException {
+        this(url, engineName, null, fetchImmediately);
     }
 
     /** Create a script from another script object
@@ -211,6 +241,8 @@ public abstract class Script<E> implements Serializable {
      */
     public Script(Script<?> script2) throws InvalidScriptException {
         this(script2.getScript(), script2.scriptEngineLookupName, script2.getParameters(), script2.getScriptName());
+        this.url = script2.url;
+        this.id = script2.id;
     }
 
     /** Create a script from another script object
@@ -219,6 +251,8 @@ public abstract class Script<E> implements Serializable {
      */
     public Script(Script<?> script2, String scriptName) throws InvalidScriptException {
         this(script2.script, script2.scriptEngineLookupName, script2.parameters, scriptName);
+        this.url = script2.url;
+        this.id = script2.id;
     }
 
     /**
@@ -231,12 +265,42 @@ public abstract class Script<E> implements Serializable {
     }
 
     /**
+     * If the script is defined by an url, in fetchImmediately=false mode, retrieve and return the script content from the url.
+     *
+     * The script internal definition will not be modified, thus allowing fetching again the url prior to execution.
+     *
+     * Otherwise, return the inline script definition
+     *
+     * @return the script, or null if the script could not be downloaded from the provided url.
+     */
+    public String fetchScript() {
+        if (script == null && url != null) {
+            ScriptContentAndEngineName fetchedInformation = null;
+            try {
+                fetchedInformation = getScriptContentAndEngineName();
+            } catch (Exception e) {
+                logger.trace("Could not fetch script at " + url, e);
+            }
+            return fetchedInformation.getScriptContent();
+        }
+        return script;
+    }
+
+    /**
      * Get the script name.
      *
      * @return the script name.
      */
     public String getScriptName() {
         return scriptName;
+    }
+
+    /**
+     * Get the script url, if applicable
+     * @return the script url
+     */
+    public URL getScriptUrl() {
+        return url;
     }
 
     /**
@@ -277,6 +341,15 @@ public abstract class Script<E> implements Serializable {
      * @return a ScriptResult object.
      */
     public ScriptResult<E> execute(Map<String, Object> aBindings, PrintStream outputSink, PrintStream errorSink) {
+        try {
+            fetchUrlIfNeeded();
+        } catch (Throwable t) {
+            String stack = Throwables.getStackTraceAsString(t);
+            if (t.getMessage() != null) {
+                stack = t.getMessage() + System.lineSeparator() + stack;
+            }
+            return new ScriptResult<>(new Exception(stack));
+        }
         ScriptEngine engine = createScriptEngine();
 
         if (engine == null)
@@ -333,6 +406,64 @@ public abstract class Script<E> implements Serializable {
             }
             return new ScriptResult<>(new Exception(stack));
         }
+    }
+
+    protected void fetchUrlIfNeeded() throws IOException {
+        if (script == null && url != null) {
+            ScriptContentAndEngineName fetchedInformation = getScriptContentAndEngineName();
+            script = fetchedInformation.getScriptContent();
+            scriptEngineLookupName = fetchedInformation.getEngineName();
+            if (scriptEngineLookupName == null) {
+                throw new IllegalStateException("Could not determine script engine for script " + url);
+            }
+        }
+    }
+
+    private Script.ScriptContentAndEngineName getScriptContentAndEngineName() throws IOException {
+        Script.ScriptContentAndEngineName fetchedInformation;
+        if (url.getProtocol().equals("http") || url.getProtocol().equals("https")) {
+            fetchedInformation = fetchScriptUsingHttpDownloader(url);
+        } else {
+            fetchedInformation = fetchScriptUsingOpenStream(url);
+        }
+        return fetchedInformation;
+    }
+
+    private ScriptContentAndEngineName fetchScriptUsingHttpDownloader(URL url) throws IOException {
+        CommonHttpResourceDownloader.UrlContent content = CommonHttpResourceDownloader.getInstance()
+                                                                                      .getResourceContent(null,
+                                                                                                          url.toExternalForm(),
+                                                                                                          true);
+        ScriptContentAndEngineName answer = new ScriptContentAndEngineName();
+        answer.setScriptContent(content.getContent());
+        answer.setEngineName(scriptEngineLookupName);
+        if (content.getFileName() != null) {
+            if (scriptEngineLookupName == null) {
+                answer.setEngineName(FileUtils.getExtension(scriptName));
+            }
+        }
+        return answer;
+    }
+
+    /** Create string script from url */
+    private ScriptContentAndEngineName fetchScriptUsingOpenStream(URL url) throws IOException {
+        ScriptContentAndEngineName answer = new ScriptContentAndEngineName();
+        try (BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()))) {
+            StringBuilder builder = new StringBuilder();
+            String tmp;
+
+            while ((tmp = buf.readLine()) != null) {
+                builder.append(tmp).append("\n");
+            }
+
+            answer.setScriptContent(builder.toString());
+        }
+        answer.setEngineName(scriptEngineLookupName);
+
+        if (scriptEngineLookupName == null) {
+            answer.setEngineName(FileUtils.getExtension(FileUtils.getFileNameWithExtension(url)));
+        }
+        return answer;
     }
 
     /** String identifying the script.
@@ -419,20 +550,6 @@ public abstract class Script<E> implements Serializable {
         this.prepareSpecialBindings(bindings);
     }
 
-    /** Create string script from url */
-    protected void storeScript(URL url) throws IOException {
-        try (BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()))) {
-            StringBuilder builder = new StringBuilder();
-            String tmp;
-
-            while ((tmp = buf.readLine()) != null) {
-                builder.append(tmp).append("\n");
-            }
-
-            script = builder.toString();
-        }
-    }
-
     /** Create string script from file */
     public static String readFile(File file) throws IOException {
         try (BufferedReader buf = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
@@ -503,6 +620,31 @@ public abstract class Script<E> implements Serializable {
     public void overrideDefaultScriptName(String defaultScriptName) {
         if (getScriptName().equals(getDefaultScriptName())) {
             scriptName = defaultScriptName;
+        }
+    }
+
+    private static class ScriptContentAndEngineName {
+        private String scriptContent;
+
+        private String engineName;
+
+        public ScriptContentAndEngineName() {
+        }
+
+        public String getScriptContent() {
+            return scriptContent;
+        }
+
+        public String getEngineName() {
+            return engineName;
+        }
+
+        public void setScriptContent(String scriptContent) {
+            this.scriptContent = scriptContent;
+        }
+
+        public void setEngineName(String engineName) {
+            this.engineName = engineName;
         }
     }
 }
