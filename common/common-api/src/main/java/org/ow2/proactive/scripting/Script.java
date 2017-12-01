@@ -434,20 +434,20 @@ public abstract class Script<E> implements Serializable {
                                                                                       .getResourceContent(null,
                                                                                                           url.toExternalForm(),
                                                                                                           true);
-        ScriptContentAndEngineName answer = new ScriptContentAndEngineName();
-        answer.setScriptContent(content.getContent());
-        answer.setEngineName(scriptEngineLookupName);
+        String scriptContent = content.getContent();
+        String engineName = scriptEngineLookupName;
         if (content.getFileName() != null) {
             if (scriptEngineLookupName == null) {
-                answer.setEngineName(FileUtils.getExtension(scriptName));
+                engineName = FileUtils.getExtension(content.getFileName());
             }
         }
-        return answer;
+        return new ScriptContentAndEngineName(scriptContent, engineName);
     }
 
     /** Create string script from url */
     private ScriptContentAndEngineName fetchScriptUsingOpenStream(URL url) throws IOException {
-        ScriptContentAndEngineName answer = new ScriptContentAndEngineName();
+        String scriptContent = null;
+        String engineName = scriptEngineLookupName;
         try (BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()))) {
             StringBuilder builder = new StringBuilder();
             String tmp;
@@ -456,14 +456,13 @@ public abstract class Script<E> implements Serializable {
                 builder.append(tmp).append("\n");
             }
 
-            answer.setScriptContent(builder.toString());
+            scriptContent = builder.toString();
         }
-        answer.setEngineName(scriptEngineLookupName);
 
         if (scriptEngineLookupName == null) {
-            answer.setEngineName(FileUtils.getExtension(FileUtils.getFileNameWithExtension(url)));
+            engineName = FileUtils.getExtension(FileUtils.getFileNameWithExtension(url));
         }
-        return answer;
+        return new ScriptContentAndEngineName(scriptContent, engineName);
     }
 
     /** String identifying the script.
@@ -624,11 +623,13 @@ public abstract class Script<E> implements Serializable {
     }
 
     private static class ScriptContentAndEngineName {
-        private String scriptContent;
+        private final String scriptContent;
 
-        private String engineName;
+        private final String engineName;
 
-        public ScriptContentAndEngineName() {
+        public ScriptContentAndEngineName(String scriptContent, String engineName) {
+            this.scriptContent = scriptContent;
+            this.engineName = engineName;
         }
 
         public String getScriptContent() {
@@ -637,14 +638,6 @@ public abstract class Script<E> implements Serializable {
 
         public String getEngineName() {
             return engineName;
-        }
-
-        public void setScriptContent(String scriptContent) {
-            this.scriptContent = scriptContent;
-        }
-
-        public void setEngineName(String engineName) {
-            this.engineName = engineName;
         }
     }
 }

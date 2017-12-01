@@ -74,18 +74,7 @@ public class CommonHttpResourceDownloader {
                                                                        .useSystemProperties()
                                                                        .insecure(insecure);
         try (CloseableHttpClient client = builder.build()) {
-            HttpGet request = new HttpGet(url);
-
-            if (sessionId != null) {
-                request.setHeader("sessionid", sessionId);
-            }
-            CloseableHttpResponse response = client.execute(request);
-
-            StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() != HttpStatus.SC_OK) {
-                throw new IOException(String.format("Cannot access resource %s: code %d", url, status.getStatusCode()));
-            }
-
+            CloseableHttpResponse response = createAndExecuteRequest(sessionId, url, client);
             return readContent(response.getEntity().getContent());
         }
     }
@@ -96,17 +85,7 @@ public class CommonHttpResourceDownloader {
                                                                        .useSystemProperties()
                                                                        .insecure(insecure);
         try (CloseableHttpClient client = builder.build()) {
-            HttpGet request = new HttpGet(url);
-
-            if (sessionId != null) {
-                request.setHeader("sessionid", sessionId);
-            }
-            CloseableHttpResponse response = client.execute(request);
-
-            StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() != HttpStatus.SC_OK) {
-                throw new IOException(String.format("Cannot access resource %s: code %d", url, status.getStatusCode()));
-            }
+            CloseableHttpResponse response = createAndExecuteRequest(sessionId, url, client);
 
             Header contentDispositionHeader = response.getFirstHeader("Content-Disposition");
             String filename;
@@ -116,9 +95,24 @@ public class CommonHttpResourceDownloader {
             } else {
                 filename = FileUtils.getFileNameWithExtension(new URL(url));
             }
-            //System.out.println("BILOU: Fetched script filename " + filename);
             return new UrlContent(readContent(response.getEntity().getContent()), filename);
         }
+    }
+
+    private CloseableHttpResponse createAndExecuteRequest(String sessionId, String url, CloseableHttpClient client)
+            throws IOException {
+        HttpGet request = new HttpGet(url);
+
+        if (sessionId != null) {
+            request.setHeader("sessionid", sessionId);
+        }
+        CloseableHttpResponse response = client.execute(request);
+
+        StatusLine status = response.getStatusLine();
+        if (status.getStatusCode() != HttpStatus.SC_OK) {
+            throw new IOException(String.format("Cannot access resource %s: code %d", url, status.getStatusCode()));
+        }
+        return response;
     }
 
     private String readContent(InputStream input) throws IOException {
@@ -135,9 +129,9 @@ public class CommonHttpResourceDownloader {
     }
 
     public static class UrlContent {
-        private String content;
+        private final String content;
 
-        private String fileName;
+        private final String fileName;
 
         public UrlContent(String content, String fileName) {
             this.content = content;
