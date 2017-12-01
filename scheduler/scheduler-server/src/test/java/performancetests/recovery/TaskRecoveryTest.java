@@ -43,9 +43,9 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.core.SchedulingService;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 
 import functionaltests.utils.*;
-import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import performancetests.helper.LogProcessor;
 
 

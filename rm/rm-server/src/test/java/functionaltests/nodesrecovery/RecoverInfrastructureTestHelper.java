@@ -48,7 +48,6 @@ public class RecoverInfrastructureTestHelper {
         NodesRecoveryProcessHelper.findPidAndSendSigKill(RMStarterForFunctionalTest.class.getSimpleName());
     }
 
-
     public static void killRmAndNodesWithStrongSigKill() throws Exception {
         killRmWithStrongSigKill();
         killNodesWithStrongSigKill();
