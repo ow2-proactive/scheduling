@@ -393,7 +393,7 @@ public class SchedulerStarter {
         Option schedulerUrl = new Option("s",
                                          "scheduler-url",
                                          true,
-                                         "bind to a given scheduler URL (default: localhost)");
+                                         "bind to a given scheduler URL. Must be combined with --rmURL (default: localhost)");
         schedulerUrl.setArgName("scheduler-url");
         schedulerUrl.setRequired(false);
         options.addOption(schedulerUrl);
