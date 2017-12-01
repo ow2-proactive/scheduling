@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,6 +41,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -74,6 +78,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -369,7 +374,7 @@ public class RMRest implements RMRestInterface {
     @POST
     @Path("nodesource/create")
     @Produces("application/json")
-    public boolean createNodeSource(@HeaderParam("sessionid") String sessionId,
+    public NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
@@ -379,7 +384,7 @@ public class RMRest implements RMRestInterface {
         ResourceManager rm = checkAccess(sessionId);
         Object[] infraParams = new Object[infrastructureParameters.length + infrastructureFileParameters.length];
         Object[] policyParams = new Object[policyParameters.length + policyFileParameters.length];
-
+        NSState nsState = new NSState();
         /*
          * we need to merge both infrastructureParameters and infrastructureFileParameters into one
          * to do so we need the infrastructure parameter order from the RM
@@ -420,8 +425,33 @@ public class RMRest implements RMRestInterface {
                 }
             }
         }
-        return rm.createNodeSource(nodeSourceName, infrastructureType, infraParams, policyType, policyParams)
-                 .getBooleanValue();
+        try {
+            nsState.setResult(rm.createNodeSource(nodeSourceName,
+                                                  infrastructureType,
+                                                  infraParams,
+                                                  policyType,
+                                                  policyParams)
+                                .getBooleanValue());
+            return nsState;
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(getStackTrace(ex));
+            return nsState;
+        }
+
+    }
+
+    private String cleanDisplayedErrorMessage(String errorMessage) {
+        String regex = "^[^:]*:(.*)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(errorMessage);
+        if (errorMessage.matches(regex) && matcher.find()) {
+            if (errorMessage.matches(regex)) {
+                errorMessage = matcher.group(1);
+            }
+        }
+        return (errorMessage);
     }
 
     /**
