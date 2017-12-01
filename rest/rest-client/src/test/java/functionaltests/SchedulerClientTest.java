@@ -257,6 +257,9 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         JobResult jres = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(5));
         Assert.assertNotNull(jres);
 
+        // wait 10 seconds because it is possible clean script executes after job
+        Thread.sleep(10000);
+
         String jobLog = client.getJobServerLogs("" + jobId);
 
         //assert schedulerapi.connect() worked
