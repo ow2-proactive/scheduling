@@ -120,6 +120,8 @@ public class RMRest implements RMRestInterface {
 
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
+    private static final String REGEX = "^[^:]*:(.*)";;
+
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         Session session = sessionStore.get(sessionId);
         if (session == null) {
@@ -432,24 +434,22 @@ public class RMRest implements RMRestInterface {
                                                   policyType,
                                                   policyParams)
                                 .getBooleanValue());
-            return nsState;
         } catch (RuntimeException ex) {
             nsState.setResult(false);
             nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
             nsState.setStackTrace(getStackTrace(ex));
+
+        } finally {
             return nsState;
         }
 
     }
 
     private String cleanDisplayedErrorMessage(String errorMessage) {
-        String regex = "^[^:]*:(.*)";
-        Pattern pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(REGEX);
         Matcher matcher = pattern.matcher(errorMessage);
-        if (errorMessage.matches(regex) && matcher.find()) {
-            if (errorMessage.matches(regex)) {
-                errorMessage = matcher.group(1);
-            }
+        if (matcher.find()) {
+            errorMessage = matcher.group(1);
         }
         return (errorMessage);
     }
