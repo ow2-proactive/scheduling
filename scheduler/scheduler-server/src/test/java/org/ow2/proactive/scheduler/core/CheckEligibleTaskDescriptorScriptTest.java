@@ -110,7 +110,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         FlowScript fs = flowScriptWithoutApiBinding();
         Mockito.when(it.getPreScript()).thenReturn(s);
         Mockito.when(it.getPostScript()).thenReturn(s2);
-        Mockito.when(it.getCleaningScript()).thenReturn(s);
+        Mockito.when(it.getCleaningScript()).thenReturn(s2);
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
@@ -124,7 +124,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         FlowScript fs = flowScriptWithoutApiBinding();
         Mockito.when(it.getPreScript()).thenReturn(s2);
         Mockito.when(it.getPostScript()).thenReturn(s);
-        Mockito.when(it.getCleaningScript()).thenReturn(s);
+        Mockito.when(it.getCleaningScript()).thenReturn(s2);
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
