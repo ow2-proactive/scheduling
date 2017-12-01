@@ -73,6 +73,11 @@ public class CheckEligibleTaskDescriptorScript {
                isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getPostScript());
     }
 
+    private boolean isCleanScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+        return (((EligibleTaskDescriptorImpl) etd).getInternal().getCleaningScript() != null) &&
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getCleaningScript());
+    }
+
     private boolean isFlowScriptContainsApiBinding(EligibleTaskDescriptor etd) {
         return (((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript() != null) &&
                isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript());
@@ -95,6 +100,7 @@ public class CheckEligibleTaskDescriptorScript {
 
     private boolean isPrePostFlowEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
         return isPresScriptContainsApiBinding(etd) || isPostScriptContainsApiBinding(etd) ||
-               isFlowScriptContainsApiBinding(etd) || isEnvironmentScriptContainsApiBinding(etd);
+               isFlowScriptContainsApiBinding(etd) || isEnvironmentScriptContainsApiBinding(etd) ||
+               isCleanScriptContainsApiBinding(etd);
     }
 }
