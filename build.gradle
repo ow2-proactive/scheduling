@@ -272,6 +272,29 @@ ext.schedulingFunctionalTestConfiguration = {
 
 }
 
+ext.schedulingPerformanceTestConfiguration = {
+
+    include 'performancetests/**'
+
+    systemProperties << ['pa.rm.home': rootDir.absolutePath]
+    systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+    systemProperties << ['proactive.communication.protocol': 'pnp']
+    systemProperties << ['proactive.test.timeout': 800000]
+    systemProperties << ['java.awt.headless': 'true']
+    systemProperties << ['java.library.path': project.nativeLibsDir]
+    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['file.encoding': 'UTF-8']
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    beforeTest { descriptor ->
+        logger.lifecycle("Running: " + descriptor)
+    }
+
+}
+
+
 dependencies {
     distLib(project(':scheduler:scheduler-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
@@ -379,6 +402,7 @@ createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-route
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn dist
+    tasks.withType(Test).matching { it.name == 'performanceTest' }*.dependsOn dist
 }
 
 subprojects {

@@ -48,6 +48,13 @@ dependencies {
     testCompile project(':common:common-api').sourceSets.test.output
     testCompile project(':rm:rm-policy:rm-policy-scheduler')
     testCompile project(':scheduler:scheduler-examples')
+//    testCompile project(':rm:rm-server')
+//    testRuntime project(':rm:rm-server')
+//    compile project(':rm:rm-server')
+//    runtime project(':rm:rm-server')
+
+    testCompile 'org.apache.sshd:sshd-core:0.14.0'
+
 
     runtime 'org.hsqldb:hsqldb:2.4.0'
 
@@ -55,11 +62,13 @@ dependencies {
     runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
-    runtime project(':rest:rest-server')
+
+
+    runtime 'com.googlecode.grep4j:grep4j:1.8.7'
 }
 
 task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration
-
+task('performanceTest', type: Test).configure schedulingPerformanceTestConfiguration
 
 task testJar(type: Jar) {
     classifier = 'tests'
@@ -91,4 +100,5 @@ artifacts {
 }
 
 functionalTest.dependsOn rootProject.dist, dist
+performanceTest.dependsOn rootProject.dist, dist
 clean.dependsOn rootProject.cleanDist

@@ -83,6 +83,9 @@ public class SchedulingService {
 
     static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() *
                                                     1000;
+    public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED = "SchedulingService::recoverTasksState started";
+
+    public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED = "SchedulingService::recoverTasksState finished";
 
     private final SchedulingInfrastructure infrastructure;
 
@@ -903,7 +906,11 @@ public class SchedulingService {
         jobsRecovered(runningJobs);
 
         recoverTasksState(finishedJobs, false);
+
+        logger.info(SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED); // this log is important for performance tests
         recoverTasksState(runningJobs, true);
+        logger.info(SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED); // this log is important for performance tests
+
         recoverTasksState(pendingJobs, true);
 
         if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
@@ -932,7 +939,6 @@ public class SchedulingService {
     }
 
     private void recoverTasksState(Vector<InternalJob> jobs, boolean restoreInErrorTasks) {
-        logger.info("SchedulingService::recoverTasksState started");
         Iterator<InternalJob> iterJob = jobs.iterator();
         while (iterJob.hasNext()) {
             InternalJob job = iterJob.next();
@@ -961,7 +967,6 @@ public class SchedulingService {
             }
             job.getJobDescriptor().restoreRunningTasks();
         }
-        logger.info("SchedulingService::recoverTasksState finished");
     }
 
     private void jobsRecovered(Collection<InternalJob> jobs) {

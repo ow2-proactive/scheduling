@@ -25,6 +25,7 @@ log4j.appender.CONSOLE.layout.ConversionPattern=[%d{ISO8601} %-5p] [%C{1}.%M] %m
 log4j.appender.FILE=org.apache.log4j.RollingFileAppender
 log4j.appender.FILE.File=${pa.rm.home}/logs/Scheduler-tests.log
 log4j.appender.FILE.MaxFileSize=100MB
+log4j.appender.FILE.Append=false
 log4j.appender.FILE.MaxBackupIndex=10
 log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
 log4j.appender.FILE.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n

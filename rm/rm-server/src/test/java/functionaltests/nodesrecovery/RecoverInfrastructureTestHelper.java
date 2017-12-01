@@ -36,19 +36,20 @@ import functionaltests.utils.RMTHelper;
  * @author ActiveEon Team
  * @since 20/07/17
  */
-class RecoverInfrastructureTestHelper {
+public class RecoverInfrastructureTestHelper {
 
-    static void killNodesWithStrongSigKill() throws Exception {
+    public static void killNodesWithStrongSigKill() throws Exception {
         RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill(RMNodeStarter.class.getSimpleName());
+        NodesRecoveryProcessHelper.findPidAndSendSigKill(RMNodeStarter.class.getSimpleName());
     }
 
-    static void killRmWithStrongSigKill() throws Exception {
+    public static void killRmWithStrongSigKill() throws Exception {
         RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findRmPidAndSendSigKill(RMStarterForFunctionalTest.class.getSimpleName());
+        NodesRecoveryProcessHelper.findPidAndSendSigKill(RMStarterForFunctionalTest.class.getSimpleName());
     }
 
-    static void killRmAndNodesWithStrongSigKill() throws Exception {
+
+    public static void killRmAndNodesWithStrongSigKill() throws Exception {
         killRmWithStrongSigKill();
         killNodesWithStrongSigKill();
     }
