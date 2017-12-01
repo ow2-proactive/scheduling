@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NamedQueries;
@@ -136,7 +138,7 @@ public class JobData implements Serializable {
 
     private Map<String, String> genericInformation;
 
-    private Map<String, JobVariable> variables;
+    private Map<String, JobDataVariable> variables;
 
     private String owner;
 
@@ -227,9 +229,9 @@ public class JobData implements Serializable {
     }
 
     private Map<String, String> createVariablesStringMap() {
-        Map<String, JobVariable> jobDataVariablesMap = getVariables();
+        Map<String, JobDataVariable> jobDataVariablesMap = getVariables();
         Map<String, String> stringVariablesMap = new HashMap<>(jobDataVariablesMap.size());
-        for (JobVariable variable : getVariables().values()) {
+        for (JobDataVariable variable : getVariables().values()) {
             stringVariablesMap.put(variable.getName(), variable.getValue());
         }
         return stringVariablesMap;
@@ -250,7 +252,7 @@ public class JobData implements Serializable {
         internalJob.setCredentials(getCredentials());
         internalJob.setJobInfo(jobInfo);
         internalJob.setGenericInformation(getGenericInformation());
-        internalJob.setVariables(getVariables());
+        internalJob.setVariables(variablesToJobVariables());
         internalJob.setProjectName(getProjectName());
         internalJob.setOwner(getOwner());
         internalJob.setDescription(getDescription());
@@ -283,7 +285,11 @@ public class JobData implements Serializable {
         jobRuntimeData.setGlobalSpace(job.getGlobalSpace());
         jobRuntimeData.setUserSpace(job.getUserSpace());
         jobRuntimeData.setGenericInformation(job.getGenericInformation());
-        jobRuntimeData.setVariables(job.getVariables());
+        Map<String, JobDataVariable> variables = new HashMap<>();
+        for (Map.Entry<String, JobVariable> entry : job.getVariables().entrySet()) {
+            variables.put(entry.getKey(), JobDataVariable.create(entry.getKey(), entry.getValue(), jobRuntimeData));
+        }
+        jobRuntimeData.setVariables(variables);
         jobRuntimeData.setStatus(job.getStatus());
         jobRuntimeData.setOwner(job.getOwner());
         jobRuntimeData.setCredentials(job.getCredentials());
@@ -311,16 +317,6 @@ public class JobData implements Serializable {
         this.genericInformation = genericInformation;
     }
 
-    @Column(name = "VARIABLES", length = Integer.MAX_VALUE)
-    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Map<String, JobVariable> getVariables() {
-        return variables;
-    }
-
-    public void setVariables(Map<String, JobVariable> variables) {
-        this.variables = variables;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "JOBID_SEQUENCE")
     @SequenceGenerator(name = "JOBID_SEQUENCE", sequenceName = "JOBID_SEQUENCE")
@@ -331,6 +327,17 @@ public class JobData implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "jobData")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    public Map<String, JobDataVariable> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, JobDataVariable> variables) {
+        this.variables = variables;
     }
 
     @Column(name = "MAX_NUMBER_OF_EXEC", updatable = false, nullable = false)
@@ -638,5 +645,26 @@ public class JobData implements Serializable {
             jobUsage.add(taskUsage);
         }
         return jobUsage;
+    }
+
+    private Map<String, JobVariable> variablesToJobVariables() {
+        Map<String, JobVariable> jobVariables = new HashMap<>();
+        for (JobDataVariable variable : getVariables().values()) {
+            jobVariables.put(variable.getName(), jobDataVariableToTaskVariable(variable));
+        }
+        return jobVariables;
+    }
+
+    private static JobVariable jobDataVariableToTaskVariable(JobDataVariable jobDataVariable) {
+        if (jobDataVariable == null) {
+            return null;
+        }
+
+        JobVariable jobVariable = new JobVariable();
+        jobVariable.setModel(jobDataVariable.getModel());
+        jobVariable.setValue(jobDataVariable.getValue());
+        jobVariable.setName(jobDataVariable.getName());
+
+        return jobVariable;
     }
 }
