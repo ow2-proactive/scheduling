@@ -54,15 +54,15 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class TaskRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-    private static final String SCHEDULER_CONFIGURATION_START = TaskRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
+    private static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
                                                                                       .getPath();
 
-    private static final String SCHEDULER_CONFIGURATION_RESTART = TaskRecoveryTest.class.getResource("/performancetests/config/scheduler-restart.ini")
+    private static final String SCHEDULER_CONFIGURATION_RESTART = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-restart.ini")
                                                                                         .getPath();
 
-    private static URL runningJob = TaskRecoveryTest.class.getResource("/functionaltests/descriptors/Job_running.xml");
+    private static URL runningJob = JobRecoveryTest.class.getResource("/functionaltests/descriptors/Job_running.xml");
 
     @Parameters
     public static Collection<Object[]> data() {
@@ -75,7 +75,7 @@ public class TaskRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
     // time limit in milliseconds for test to pass
     int timeLimit;
 
-    public TaskRecoveryTest(int jobsNumber, int timeLimit) {
+    public JobRecoveryTest(int jobsNumber, int timeLimit) {
         this.jobsNumber = jobsNumber;
         this.timeLimit = timeLimit;
     }
