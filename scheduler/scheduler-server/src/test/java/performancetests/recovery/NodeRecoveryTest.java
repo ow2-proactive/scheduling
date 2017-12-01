@@ -63,7 +63,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 10, 1000 }, { 100, 1000 }, { 200, 2000 } });
+        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 2000 }, { 200, 1000 }, { 300, 3000 } });
     }
 
     // number of nodes
@@ -111,7 +111,9 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
     @Test
     public void test() {
         assertEquals(nodesNumber, nodesRecovered());
-        assertThat("Nodes recovery time", (int) timeSpentToRecoverNodes(), lessThan(timeLimit));
+        assertThat("Nodes recovery time for " + nodesNumber + " nodes",
+                   (int) timeSpentToRecoverNodes(),
+                   lessThan(timeLimit));
     }
 
     private long nodesRecovered() {

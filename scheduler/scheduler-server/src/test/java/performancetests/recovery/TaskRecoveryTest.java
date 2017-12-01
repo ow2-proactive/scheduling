@@ -66,7 +66,7 @@ public class TaskRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 10, 1000 }, { 100, 1000 }, { 200, 2000 } });
+        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 1000 }, { 200, 1000 }, { 300, 2000 } });
     }
 
     // number of jobs
@@ -116,7 +116,9 @@ public class TaskRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
     @Test
     public void test() {
         assertEquals(jobsNumber, numberOfJobsRecovered());
-        assertThat("Task recovery time", (int) timeSpentToRecoverJobs(), lessThan(timeLimit));
+        assertThat("Jobs recovery time for " + jobsNumber + " jobs",
+                   (int) timeSpentToRecoverJobs(),
+                   lessThan(timeLimit));
     }
 
     private long numberOfJobsRecovered() {
