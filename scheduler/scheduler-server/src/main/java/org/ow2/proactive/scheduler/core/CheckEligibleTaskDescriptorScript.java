@@ -93,9 +93,12 @@ public class CheckEligibleTaskDescriptorScript {
     }
 
     private boolean isScriptContainsApiBinding(Script script) {
-        return script.getScript().contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
-               script.getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
-               script.getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME);
+
+        String scriptContent = script.fetchScript();
+
+        return (scriptContent != null) && (scriptContent.contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
+                                           scriptContent.contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
+                                           scriptContent.contains(SchedulerConstants.DS_USER_API_BINDING_NAME));
     }
 
     private boolean isPrePostFlowEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {

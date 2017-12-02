@@ -27,9 +27,11 @@ package org.ow2.proactive.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
@@ -122,11 +124,49 @@ public class FileUtils {
     public static String getExtension(String fileName) {
         String extension = "";
 
-        int i = fileName.lastIndexOf('.');
-        if (i > 0) {
-            extension = fileName.substring(i + 1);
+        int extensionStart = fileName.lastIndexOf('.');
+        if (extensionStart > 0) {
+            extension = fileName.substring(extensionStart + 1);
         }
         return extension;
+    }
+
+    /**
+     * Extract a file name with it's extension from the given URL.
+     * This file name is computed based on the last occurence of the dot character inside the URL path
+     * It follows the general rule:
+     * protocol://host:port/leading_path/filename.extension/trailing_path?query
+     *
+     * If there is no dot character inside the URL path, the file name returned is based on the last occurrence of
+     * the slash character:
+     * protocol://host:port/leading_path/filename?query
+     *
+     * @param url input url
+     * @return a filename with its extension.
+     */
+    public static String getFileNameWithExtension(URL url) {
+        String pathSegment = url.getPath();
+        String extension = "";
+        String filename = "";
+
+        int extensionStart = pathSegment.lastIndexOf('.');
+        if (extensionStart > 0) {
+            extension = pathSegment.substring(extensionStart + 1);
+            int trailingPath = extension.indexOf("/");
+            if (trailingPath >= 0) {
+                extension = extension.substring(0, trailingPath);
+            }
+            pathSegment = pathSegment.substring(0, extensionStart);
+        }
+
+        int pathEnd = pathSegment.lastIndexOf('/');
+        if (pathEnd >= 0) {
+            filename = pathSegment.substring(pathEnd + 1);
+        }
+        if (extension.length() > 0) {
+            return filename + "." + extension;
+        }
+        return filename;
     }
 
 }
