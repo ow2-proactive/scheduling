@@ -25,22 +25,13 @@
  */
 package performancetests.helper;
 
-import static org.grep4j.core.Grep4j.constantExpression;
-import static org.grep4j.core.Grep4j.grep;
-import static org.grep4j.core.fluent.Dictionary.on;
-
-import java.io.File;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.grep4j.core.model.Profile;
-import org.grep4j.core.model.ProfileBuilder;
-import org.grep4j.core.result.GrepResult;
-import org.grep4j.core.result.GrepResults;
 
 
 public class LogProcessor {
@@ -60,45 +51,38 @@ public class LogProcessor {
         LogProcessor.pathToLogFile = pathToLogFile;
     }
 
+    public static List<String> linesThatMatch(String matcher) {
+        try (BufferedReader br = new BufferedReader(new FileReader(getPathToLogFile()))) {
+            List<String> result = new ArrayList<>();
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.contains(matcher)) {
+                    result.add(line);
+                }
+            }
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static int numberOfLinesWhichMatch(String matcher) {
-        Profile localProfile = ProfileBuilder.newBuilder()
-                                             .name("Local server log" + System.currentTimeMillis())
-                                             .filePath(getPathToLogFile())
-                                             .onLocalhost()
-                                             .build();
-        final GrepResults grepResults = grep(constantExpression(matcher), on(localProfile));
-        return grepResults.totalLines();
+        return linesThatMatch(matcher).size();
     }
 
     public static String getLastLineThatMatch(String matcher) {
-        Profile localProfile = ProfileBuilder.newBuilder()
-                                             .name("Local server log" + System.currentTimeMillis())
-                                             .filePath(getPathToLogFile())
-                                             .onLocalhost()
-                                             .build();
-        final Iterator<GrepResult> iterator = grep(constantExpression(matcher), on(localProfile)).iterator();
-        String lastLine = null;
-
-        while (iterator.hasNext()) {
-            lastLine = iterator.next().getText();
-        }
-
-        if (lastLine != null) {
-            return lastLine;
+        List<String> lines = linesThatMatch(matcher);
+        if (!lines.isEmpty()) {
+            return lines.get(lines.size() - 1);
         } else {
             throw new RuntimeException("There are no lines in " + getPathToLogFile() + " which matches " + matcher);
         }
     }
 
     public static String getFirstLineThatMatch(String matcher) {
-        Profile localProfile = ProfileBuilder.newBuilder()
-                                             .name("Local server log" + System.currentTimeMillis())
-                                             .filePath(getPathToLogFile())
-                                             .onLocalhost()
-                                             .build();
-        final Iterator<GrepResult> iterator = grep(constantExpression(matcher), on(localProfile)).iterator();
-        if (iterator.hasNext()) {
-            return iterator.next().getText();
+        List<String> lines = linesThatMatch(matcher);
+        if (!lines.isEmpty()) {
+            return lines.get(0);
         } else {
             throw new RuntimeException("There are no lines in " + getPathToLogFile() + " which matches " + matcher);
         }

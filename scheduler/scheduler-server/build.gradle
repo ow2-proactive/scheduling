@@ -58,9 +58,6 @@ dependencies {
     runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 
-
-
-    runtime 'com.googlecode.grep4j:grep4j:1.8.7'
 }
 
 task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration
