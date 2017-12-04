@@ -47,7 +47,7 @@ public class HostTrackerTest {
     @Before
     public void setup() {
         try {
-            hostTracker = new HostTracker(InetAddress.getByName(HOSTNAME), CONFIGURED_NODE_NUMBER);
+            hostTracker = new HostTracker(HOSTNAME, CONFIGURED_NODE_NUMBER, InetAddress.getByName(HOSTNAME));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

@@ -25,22 +25,14 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -83,9 +75,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     private static final String PN_TIMEOUT_KEY = "pnTimeout";
 
+    protected NodeNameBuilder nodeNameBuilder = new NodeNameBuilder();
+
     @Override
     protected void initializePersistedInfraVariables() {
-        persistedInfraVariables.put(HOST_TRACKER_PER_HOST_KEY, new HashMap<InetAddress, HostTracker>());
+        persistedInfraVariables.put(HOST_TRACKER_PER_HOST_KEY, new HashMap<String, HostTracker>());
         persistedInfraVariables.put(PN_TIMEOUT_KEY, new HashMap<String, Boolean>());
     }
 
@@ -171,13 +165,13 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                     configuredNodeNumber = 1;
                 }
             }
-            String host = elts[0];
+            String hostNameInFile = elts[0];
             try {
-                InetAddress reifiedHost = InetAddress.getByName(host);
-                HostTracker hostTracker = new HostTracker(reifiedHost, configuredNodeNumber);
-                putHostTrackerForHost(reifiedHost, hostTracker);
+                InetAddress reifiedHost = InetAddress.getByName(hostNameInFile);
+                HostTracker hostTracker = new HostTracker(hostNameInFile, configuredNodeNumber, reifiedHost);
+                putHostTrackerForHost(hostNameInFile, hostTracker);
             } catch (UnknownHostException ex) {
-                throw new RuntimeException("Unknown host: " + host, ex);
+                throw new RuntimeException("Unknown host: " + hostNameInFile, ex);
             }
         }
     }
@@ -202,8 +196,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             return;
         }
 
-        for (Map.Entry<InetAddress, HostTracker> hostEntry : getHostTrackerPerHostEntrySetWithLock()) {
-            final InetAddress host = hostEntry.getKey();
+        for (Map.Entry<String, HostTracker> hostEntry : getHostTrackerPerHostEntrySetWithLock()) {
+            final String host = hostEntry.getKey();
             final HostTracker hostTracker = hostEntry.getValue();
 
             if (getHostNeedsNodesWithLock(host)) {
@@ -213,7 +207,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                 this.nodeSource.executeInParallel(new Runnable() {
                     public void run() {
                         try {
-                            startNodeImplWithRetries(host, neededNodeNumber, maxDeploymentFailure);
+                            startNodeImplWithRetries(hostTracker, neededNodeNumber, maxDeploymentFailure);
                         } catch (Exception e) {
                             logger.error("Could not acquire nodes on host " + hostTracker, e);
                         }
@@ -240,11 +234,12 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     @Override
     protected void notifyAcquiredNode(Node node) throws RMException {
+        String nodeName = node.getNodeInformation().getName();
         String nodeUrl = node.getNodeInformation().getURL();
         InetAddress nodeHost = node.getVMInformation().getInetAddress();
 
-        InetAddress configuredNodeHost = findConfiguredHostForNodeHost(nodeHost);
-        putAliveNodeUrlForHostWithLockAndPersist(configuredNodeHost, nodeUrl);
+        String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
+        putAliveNodeUrlForHostWithLockAndPersist(parsedHost, nodeUrl);
         logger.info("New acquired node " + nodeUrl + " on host " + nodeHost);
     }
 
@@ -253,15 +248,17 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     @Override
     public void removeNode(Node node) {
+        String nodeName = node.getNodeInformation().getName();
         String nodeUrl = node.getNodeInformation().getURL();
         InetAddress nodeHost = node.getVMInformation().getInetAddress();
-        InetAddress configuredNodeHost = findConfiguredHostForNodeHost(nodeHost);
-        putRemovedNodeUrlForHostWithLockAndPersist(configuredNodeHost, node.getNodeInformation().getURL());
+
+        String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
+        putRemovedNodeUrlForHostWithLockAndPersist(parsedHost, node.getNodeInformation().getURL());
         logger.info("Removed node " + nodeUrl + " on host " + nodeHost);
 
-        if (!getHostHasAliveNodesWithLock(configuredNodeHost)) {
+        if (!getHostHasAliveNodesWithLock(parsedHost)) {
             killNodeProcess(node, nodeHost);
-            setHostNeedsNodesWithLockAndPersist(configuredNodeHost);
+            setHostNeedsNodesWithLockAndPersist(parsedHost);
             logger.info("Host " + nodeHost + " has no more alive nodes. Need nodes flag is set.");
         }
     }
@@ -271,53 +268,50 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     @Override
     public void notifyDownNode(final String nodeName, final String nodeUrl, final Node node) {
-        InetAddress configuredNodeHost;
         InetAddress nodeHost = null;
         if (node != null) {
             nodeHost = node.getVMInformation().getInetAddress();
-            configuredNodeHost = findConfiguredHostForNodeHost(nodeHost);
-        } else {
-            configuredNodeHost = findConfiguredHostForNodeUrl(nodeUrl);
         }
-        if (configuredNodeHost != null) {
-            putDownNodeUrlForHostWithLockAndPersist(configuredNodeHost, nodeUrl);
-            logger.info("Down node " + nodeUrl + " on host " + nodeHost);
+        String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
+        putDownNodeUrlForHostWithLockAndPersist(parsedHost, nodeUrl);
+        logger.info("Down node " + nodeUrl + " on host " + nodeHost);
 
-            if (!getHostHasAliveNodesWithLock(configuredNodeHost)) {
-                if (node != null) { // the node object can be null in case of a recovery
-                    killNodeProcess(node, nodeHost);
-                }
-                setHostNeedsNodesWithLockAndPersist(configuredNodeHost);
-                logger.info("Host " + configuredNodeHost + " has no more alive nodes. Need nodes flag is set.");
+        if (!getHostHasAliveNodesWithLock(parsedHost)) {
+            if (node != null) { // the node object can be null in case of a recovery
+                killNodeProcess(node, nodeHost);
             }
-        } else {
-            logger.warn("Down node " + nodeUrl + " could not be taken into account. Node is unknown");
+            setHostNeedsNodesWithLockAndPersist(parsedHost);
+            logger.info("Host " + parsedHost + " has no more alive nodes. Need nodes flag is set.");
         }
     }
 
     @Override
     public void onDownNodeReconnection(Node node) {
+        String nodeName = node.getNodeInformation().getName();
         String nodeUrl = node.getNodeInformation().getURL();
         InetAddress nodeHost = node.getVMInformation().getInetAddress();
-        InetAddress configuredNodeHost = findConfiguredHostForNodeHost(nodeHost);
-        putAliveNodeUrlForHostWithLockAndPersist(configuredNodeHost, node.getNodeInformation().getURL());
+
+        String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
+        putAliveNodeUrlForHostWithLockAndPersist(parsedHost, node.getNodeInformation().getURL());
         logger.info("Reconnected node " + nodeUrl + " on host " + nodeHost);
     }
 
-    protected void startNodeImplWithRetries(final InetAddress host, final int nbNodes, int retries) throws RMException {
+    protected void startNodeImplWithRetries(final HostTracker hostTracker, final int nbNodes, int retries)
+            throws RMException {
         while (true) {
             final List<String> depNodeURLs = new ArrayList<>(nbNodes);
             try {
-                startNodeImpl(host, nbNodes, depNodeURLs);
+                startNodeImpl(hostTracker, nbNodes, depNodeURLs);
                 return;
             } catch (Exception e) {
-                logger.warn("Failed nodes deployment in host : " + host + ", retries left : " + retries);
+                logger.warn("Failed nodes deployment in host : " + hostTracker.getHost() + ", retries left : " +
+                            retries);
                 if (isInfiniteRetries(retries) || retries > 0) {
                     removeNodes(depNodeURLs);
                     waitPeriodBeforeRetry();
                     retries = getRetriesLeft(retries);
                 } else {
-                    logger.error("Tries threshold reached for host " + host +
+                    logger.error("Tries threshold reached for host " + hostTracker.getHost() +
                                  ". This host is not part of the deployment process anymore.");
 
                     throw e;
@@ -352,93 +346,13 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * Check whether any host needs nodes to be deployed
      */
     private boolean hostTrackersNeedNodes() {
-        for (Map.Entry<InetAddress, HostTracker> entry : getHostTrackerPerHostEntrySetWithLock()) {
-            InetAddress host = entry.getKey();
+        for (Map.Entry<String, HostTracker> entry : getHostTrackerPerHostEntrySetWithLock()) {
+            String host = entry.getKey();
             if (getHostNeedsNodesWithLock(host)) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * Find the {@link InetAddress} under which the host was registered the
-     * first time (this is the host written in the file)
-     *
-     * @param nodeHost the host address that is searched
-     * @return the host address that was configured initially and that
-     * corresponds to the host address given in parameter, or the host address
-     * given in parameter if the host that was configured initially could not
-     * be inferred.
-     */
-    private InetAddress findConfiguredHostForNodeHost(InetAddress nodeHost) {
-        InetAddress configuredNodeHost = null;
-        for (Map.Entry<InetAddress, HostTracker> hostEntry : getHostTrackerPerHostEntrySetWithLock()) {
-            final InetAddress host = hostEntry.getKey();
-            if (areSameHost(host, nodeHost)) {
-                configuredNodeHost = host;
-                break;
-            }
-        }
-        if (configuredNodeHost == null) {
-            logger.warn("Node host " + nodeHost + " could not be mapped to any of the configured hosts");
-            configuredNodeHost = nodeHost;
-        }
-        return configuredNodeHost;
-    }
-
-    /**
-     * Find the {@link InetAddress} of the host that manages the given node URL.
-     *
-     * @param nodeUrl the URL of the node for which the host is searched
-     * @return the host of the node identified by its URL
-     */
-    private InetAddress findConfiguredHostForNodeUrl(String nodeUrl) {
-        InetAddress configuredNodeHost = null;
-        for (Map.Entry<InetAddress, HostTracker> hostEntry : getHostTrackerPerHostEntrySetWithLock()) {
-            final InetAddress host = hostEntry.getKey();
-            if (getHostTrackerManagesNodeUrlWithLock(host, nodeUrl)) {
-                configuredNodeHost = host;
-            }
-        }
-        if (configuredNodeHost == null) {
-            logger.error("Node URL " + nodeUrl + " could not be mapped to any of the configured hosts");
-        }
-        return configuredNodeHost;
-    }
-
-    /**
-     * Determines whether two {@link InetAddress} lead to the same host. The
-     * host configured initially in the file may not appear the same in nodes
-     * URL because of multiple network interfaces.
-     */
-    private boolean areSameHost(InetAddress host, InetAddress nodeHost) {
-        boolean areSameHost = false;
-        if (host.equals(nodeHost)) {
-            logger.debug("Host " + host + " and node host " + nodeHost + " are the same");
-            areSameHost = true;
-        } else {
-            if (isLocalAddress(host) && isLocalAddress(nodeHost)) {
-                logger.debug("Host " + host + " and node host " + nodeHost + " refer to localhost");
-                areSameHost = true;
-            }
-        }
-        return areSameHost;
-    }
-
-    private boolean isLocalAddress(InetAddress address) {
-        boolean localAddress = false;
-        if (address.isAnyLocalAddress() || address.isLoopbackAddress()) {
-            localAddress = true;
-        }
-        try {
-            if (NetworkInterface.getByInetAddress(address) != null) {
-                localAddress = true;
-            }
-        } catch (SocketException e) {
-            return false;
-        }
-        return localAddress;
     }
 
     private void killNodeProcess(Node node, InetAddress nodeHost) {
@@ -478,13 +392,14 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     /**
      * Launch the node on the host passed as parameter
-     * @param host The host on which one the node will be started
+     * @param hostTracker The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
      * @param depNodeURLs list of deploying or lost nodes urls created 
      * @throws RMException If the node hasn't been started. Very important to take care of that
      * in implementations to keep the infrastructure in a coherent state.
      */
-    protected abstract void startNodeImpl(InetAddress host, int nbNodes, List<String> depNodeURLs) throws RMException;
+    protected abstract void startNodeImpl(HostTracker hostTracker, int nbNodes, List<String> depNodeURLs)
+            throws RMException;
 
     /**
      * Kills the node passed as parameter
@@ -494,6 +409,47 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     protected abstract void killNodeImpl(Node node, InetAddress host) throws RMException;
 
+    /**
+     * Utility class to encapsulate node name building and node name parsing.
+     * The node name involves the host that was written in the host file, and
+     * that si used as a identifying key to track the node afterwards.
+     */
+    protected class NodeNameBuilder implements Serializable {
+
+        private static final String SSH_NODE_NAME_PREFIX = "SSH";
+
+        private static final String NODE_NAME_BUILDING_BLOCK_SEPARATOR = "-";
+
+        private static final int HOST_BUILDING_BLOCK_POSITION = 2;
+
+        private static final char HOST_ADDRESS_COMPONENT_SEPARATOR = '.';
+
+        private static final char CONVERTED_HOST_ADDRESS_COMPONENT_SEPARATOR = '_';
+
+        protected String generateNodeName(HostTracker hostTracker) {
+            String hostInFile = hostTracker.getHostInFile();
+            String compliantNodeName = convertHostInFileIntoCompliantNodeName(hostInFile);
+            return SSH_NODE_NAME_PREFIX + NODE_NAME_BUILDING_BLOCK_SEPARATOR + nodeSource.getName() +
+                   NODE_NAME_BUILDING_BLOCK_SEPARATOR + compliantNodeName + NODE_NAME_BUILDING_BLOCK_SEPARATOR +
+                   ProActiveCounter.getUniqID();
+        }
+
+        protected String extractHostFromNodeName(String nodeName) {
+            String[] nodeNameBuildingBlocks = nodeName.split(NODE_NAME_BUILDING_BLOCK_SEPARATOR);
+            String compliantNodeName = nodeNameBuildingBlocks[HOST_BUILDING_BLOCK_POSITION];
+            return convertCompliantNodeNameIntoHostInFile(compliantNodeName);
+        }
+
+        private String convertHostInFileIntoCompliantNodeName(String hostInFile) {
+            return hostInFile.replace(HOST_ADDRESS_COMPONENT_SEPARATOR, CONVERTED_HOST_ADDRESS_COMPONENT_SEPARATOR);
+        }
+
+        private String convertCompliantNodeNameIntoHostInFile(String hostInFile) {
+            return hostInFile.replace(CONVERTED_HOST_ADDRESS_COMPONENT_SEPARATOR, HOST_ADDRESS_COMPONENT_SEPARATOR);
+        }
+
+    }
+
     // Below are wrapper methods around the map that holds all the persisted
     // infrastructure variables. Some of them acquire a read or write lock
     // before manipulating the variables. In this case, the name of the method
@@ -501,114 +457,105 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     // also persist them to database at the end. In this case, the name of the
     // method is further suffixed with "AndPersist"
 
-    private Map<InetAddress, HostTracker> getHostTrackerPerHost() {
-        return (Map<InetAddress, HostTracker>) persistedInfraVariables.get(HOST_TRACKER_PER_HOST_KEY);
+    private Map<String, HostTracker> getHostTrackerPerHost() {
+        return (Map<String, HostTracker>) persistedInfraVariables.get(HOST_TRACKER_PER_HOST_KEY);
     }
 
-    private void putHostTrackerForHost(final InetAddress host, final HostTracker hostTracker) {
-        getHostTrackerPerHost().put(host, hostTracker);
+    private void putHostTrackerForHost(final String hostInFile, final HostTracker hostTracker) {
+        getHostTrackerPerHost().put(hostInFile, hostTracker);
     }
 
-    private Set<Map.Entry<InetAddress, HostTracker>> getHostTrackerPerHostEntrySetWithLock() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Set<Map.Entry<InetAddress, HostTracker>>>() {
+    private Set<Map.Entry<String, HostTracker>> getHostTrackerPerHostEntrySetWithLock() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Set<Map.Entry<String, HostTracker>>>() {
             @Override
-            public Set<Map.Entry<InetAddress, HostTracker>> handle() {
+            public Set<Map.Entry<String, HostTracker>> handle() {
                 return getHostTrackerPerHost().entrySet();
             }
         });
     }
 
-    private boolean getHostNeedsNodesWithLock(final InetAddress host) {
+    private boolean getHostNeedsNodesWithLock(final String hostInFile) {
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
-                return getHostTrackerPerHost().get(host).getNeedNodesFlag();
+                return getHostTrackerPerHost().get(hostInFile).getNeedNodesFlag();
             }
         });
     }
 
-    private int getHostNeededNodeNumberWithLock(final InetAddress host) {
+    private int getHostNeededNodeNumberWithLock(final String hostInFile) {
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
             @Override
             public Integer handle() {
-                return getHostTrackerPerHost().get(host).getNeededNodeNumber();
+                return getHostTrackerPerHost().get(hostInFile).getNeededNodeNumber();
             }
         });
     }
 
-    private void setHostNeedsNodesWithLockAndPersist(final InetAddress host) {
+    private void setHostNeedsNodesWithLockAndPersist(final String hostInFile) {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(host);
+                HostTracker hostTracker = getHostTrackerPerHost().get(hostInFile);
                 hostTracker.setNeedNodesFlag(true);
-                getHostTrackerPerHost().put(host, hostTracker);
+                getHostTrackerPerHost().put(hostInFile, hostTracker);
                 return null;
             }
         });
     }
 
-    private void setHostDoesNotNeedsNodesWithLockAndPersist(final InetAddress host) {
+    private void setHostDoesNotNeedsNodesWithLockAndPersist(final String hostInFile) {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(host);
+                HostTracker hostTracker = getHostTrackerPerHost().get(hostInFile);
                 hostTracker.setNeedNodesFlag(false);
-                getHostTrackerPerHost().put(host, hostTracker);
+                getHostTrackerPerHost().put(hostInFile, hostTracker);
                 return null;
             }
         });
     }
 
-    private boolean getHostTrackerManagesNodeUrlWithLock(final InetAddress host, final String nodeUrl) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return getHostTrackerPerHost().get(host).managesNodeUrl(nodeUrl);
-            }
-        });
-    }
-
-    private void putAliveNodeUrlForHostWithLockAndPersist(final InetAddress host, final String aliveNodeUrl) {
+    private void putAliveNodeUrlForHostWithLockAndPersist(final String hostInFile, final String aliveNodeUrl) {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(host);
+                HostTracker hostTracker = getHostTrackerPerHost().get(hostInFile);
                 hostTracker.putAliveNodeUrl(aliveNodeUrl);
-                getHostTrackerPerHost().put(host, hostTracker);
+                getHostTrackerPerHost().put(hostInFile, hostTracker);
                 return null;
             }
         });
     }
 
-    private boolean getHostHasAliveNodesWithLock(final InetAddress host) {
+    private boolean getHostHasAliveNodesWithLock(final String hostInFile) {
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
-                return getHostTrackerPerHost().get(host).hasAliveNodes();
+                return getHostTrackerPerHost().get(hostInFile).hasAliveNodes();
             }
         });
     }
 
-    private void putRemovedNodeUrlForHostWithLockAndPersist(final InetAddress host, final String removedNodeUrl) {
+    private void putRemovedNodeUrlForHostWithLockAndPersist(final String hostInFile, final String removedNodeUrl) {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(host);
+                HostTracker hostTracker = getHostTrackerPerHost().get(hostInFile);
                 hostTracker.putRemovedNodeUrl(removedNodeUrl);
-                getHostTrackerPerHost().put(host, hostTracker);
+                getHostTrackerPerHost().put(hostInFile, hostTracker);
                 return null;
             }
         });
     }
 
-    private void putDownNodeUrlForHostWithLockAndPersist(final InetAddress host, final String downNodeUrl) {
+    private void putDownNodeUrlForHostWithLockAndPersist(final String hostInFile, final String downNodeUrl) {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(host);
+                HostTracker hostTracker = getHostTrackerPerHost().get(hostInFile);
                 hostTracker.putDownNodeUrl(downNodeUrl);
-                getHostTrackerPerHost().put(host, hostTracker);
+                getHostTrackerPerHost().put(hostInFile, hostTracker);
                 return null;
             }
         });

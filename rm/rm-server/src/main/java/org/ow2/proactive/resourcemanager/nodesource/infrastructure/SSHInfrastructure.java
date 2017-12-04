@@ -37,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.ssh.SSHClient;
-import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -130,13 +129,14 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using SSH, register it manually in the
      * nodesource.
      *
-     * @param host The host on which one the node will be started
+     * @param hostTracker The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
      * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
+    protected void startNodeImpl(HostTracker hostTracker, int nbNodes, final List<String> depNodeURLs)
+            throws RMException {
         String fs = getTargetOSObj().fs;
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
         // we take care of spaces in java path
@@ -193,7 +193,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         // afterwards, node's name
         // generate the node name
         // current rmcore shortID should be added to ensure uniqueness
-        final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
+        final String nodeName = nodeNameBuilder.generateNodeName(hostTracker);
         clb.setNodeName(nodeName);
         clb.setNumberOfNodes(nbNodes);
         // finally, the credential's value
@@ -224,13 +224,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      obfuscatedCmdLine,
-                                                     "Deploying nodes on host " + host,
+                                                     "Deploying nodes on host " + hostTracker.getHost(),
                                                      super.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
         Process p = null;
         try {
-            p = Utils.runSSHCommand(host, cmdLine, sshOptions);
+            p = Utils.runSSHCommand(hostTracker.getHost(), cmdLine, sshOptions);
         } catch (IOException e1) {
             multipleDeclareDeployingNodeLost(depNodeURLs,
                                              "Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions +
@@ -246,15 +246,16 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("SSH subprocess at " + host.getHostName() + " exited abnormally (" + exitCode + ").");
+                    logger.error("SSH subprocess at " + hostTracker.getHost().getHostName() + " exited abnormally (" +
+                                 exitCode + ").");
                 } else {
                     logger.error("Launching node process has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
-                final String description = "SSH command failed to launch node on host " + host.getHostName() + lf +
-                                           "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut +
-                                           "   >Output: " + pOutPut;
+                final String description = "SSH command failed to launch node on host " +
+                                           hostTracker.getHost().getHostName() + lf + "   >Error code: " + exitCode +
+                                           lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkAllNodesAreAcquiredAndDo(createdNodeNames, null, new Runnable() {
                     public void run() {

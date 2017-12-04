@@ -47,7 +47,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -123,13 +122,13 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using SSH, register it manually in the
      * nodesource.
      * 
-     * @param host The host on which one the node will be started
+     * @param hostTracker The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
      * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws RMException
      *             acquisition failed
      */
-    public void startNodeImpl(final InetAddress host, final int nbNodes, final List<String> depNodeURLs)
+    public void startNodeImpl(final HostTracker hostTracker, final int nbNodes, final List<String> depNodeURLs)
             throws RMException {
         String fs = getTargetOSObj().fs;
         // we set the java security policy file
@@ -188,7 +187,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         clb.setJavaPath(this.javaPath);
         clb.setRmHome(this.schedulingPath);
         clb.setPaProperties(sb);
-        final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
+        final String nodeName = nodeNameBuilder.generateNodeName(hostTracker);
         clb.setNodeName(nodeName);
         clb.setNumberOfNodes(nbNodes);
         // finally, the credential's value
@@ -227,7 +226,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
         JSch jsch = new JSch();
 
-        final String msg = "deploy on " + host;
+        final String msg = "deploy on " + hostTracker.getHost();
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, msg, super.nodeTimeOut));
@@ -235,7 +234,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
         Session session;
         try { // Create ssh session to the hostname
-            session = jsch.getSession(this.sshUsername, host.getHostName(), this.sshPort);
+            session = jsch.getSession(this.sshUsername, hostTracker.getHost().getHostName(), this.sshPort);
             if (this.sshPassword == null) {
                 jsch.addIdentity(this.sshUsername, this.sshPrivateKey, null, null);
             } else {

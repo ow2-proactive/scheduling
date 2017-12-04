@@ -45,9 +45,11 @@ public class HostTracker implements Serializable {
 
     protected static final Logger logger = Logger.getLogger(HostTracker.class);
 
-    private final InetAddress host;
+    private final String hostInFile;
 
     private final int configuredNodeNumber;
+
+    private final InetAddress host;
 
     private Map<String, NodeStatus> nodeStatusPerNodeUrl;
 
@@ -59,9 +61,10 @@ public class HostTracker implements Serializable {
 
     private AtomicBoolean needNodesFlag;
 
-    protected HostTracker(InetAddress host, int configuredNodeNumber) {
-        this.host = host;
+    protected HostTracker(String hostInFile, int configuredNodeNumber, InetAddress host) {
+        this.hostInFile = hostInFile;
         this.configuredNodeNumber = configuredNodeNumber;
+        this.host = host;
         nodeStatusPerNodeUrl = new HashMap<>();
         aliveNodeCounter = new AtomicInteger(0);
         downNodeCounter = new AtomicInteger(0);
@@ -69,6 +72,14 @@ public class HostTracker implements Serializable {
         // a newly created host tracker requires nodes because it has not
         // been deployed yet
         needNodesFlag = new AtomicBoolean(true);
+    }
+
+    protected String getHostInFile() {
+        return hostInFile;
+    }
+
+    protected InetAddress getHost() {
+        return host;
     }
 
     protected boolean getNeedNodesFlag() {
@@ -113,13 +124,6 @@ public class HostTracker implements Serializable {
         return aliveNodeCounter.get() > 0;
     }
 
-    protected boolean managesNodeUrl(String nodeUrl) {
-        NodeStatus nodeStatusForNodeUrl = nodeStatusPerNodeUrl.get(nodeUrl);
-        boolean isNodeUrlManaged = nodeStatusForNodeUrl != null;
-        logger.debug("Node URL " + (isNodeUrlManaged ? " has state " + nodeStatusForNodeUrl : " is not managed"));
-        return isNodeUrlManaged;
-    }
-
     protected void putAliveNodeUrl(String aliveNodeUrl) {
         decrementCounterForPreviousStatus(aliveNodeUrl);
         nodeStatusPerNodeUrl.put(aliveNodeUrl, NodeStatus.ALIVE);
@@ -161,7 +165,7 @@ public class HostTracker implements Serializable {
 
     @Override
     public String toString() {
-        String minimalInfo = "Host " + host.getHostAddress() + ". Configured with " + configuredNodeNumber +
+        String minimalInfo = "Host " + hostInFile + ". Configured with " + configuredNodeNumber +
                              " nodes. Current state: [alive node number=" + aliveNodeCounter.get() +
                              ", down node number=" + downNodeCounter.get() + ", removed node number=" +
                              removedNodeCounter.get() + "].";

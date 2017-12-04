@@ -81,13 +81,14 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
      * Starts a PA runtime on remote host using a custom script, register it
      * manually in the nodesource.
      *
-     * @param host The host on which one the node will be started
+     * @param hostTracker The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
      * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws org.ow2.proactive.resourcemanager.exception.RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
+    protected void startNodeImpl(HostTracker hostTracker, int nbNodes, final List<String> depNodeURLs)
+            throws RMException {
 
         final String nodeName = this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
 
@@ -101,7 +102,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
 
         Properties localProperties = new Properties();
         localProperties.put(NODE_NAME, nodeName);
-        localProperties.put(HOST_NAME, host.getHostName());
+        localProperties.put(HOST_NAME, hostTracker.getHost().getHostName());
         localProperties.put(NODESOURCE_CREDENTIALS, credentials);
         localProperties.put(NODESOURCE_NAME, nodeSource.getName());
         localProperties.put(NB_NODES, nbNodes);
@@ -112,7 +113,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      filledCommand,
-                                                     "Deploying node on host " + host,
+                                                     "Deploying node on host " + hostTracker.getHost(),
                                                      this.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
@@ -136,15 +137,16 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("Child process at " + host.getHostName() + " exited abnormally (" + exitCode + ").");
+                    logger.error("Child process at " + hostTracker.getHost().getHostName() + " exited abnormally (" +
+                                 exitCode + ").");
                 } else {
                     logger.error("Launching node script has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
-                final String description = "Script failed to launch a node on host " + host.getHostName() + lf +
-                                           "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut +
-                                           "   >Output: " + pOutPut;
+                final String description = "Script failed to launch a node on host " +
+                                           hostTracker.getHost().getHostName() + lf + "   >Error code: " + exitCode +
+                                           lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
