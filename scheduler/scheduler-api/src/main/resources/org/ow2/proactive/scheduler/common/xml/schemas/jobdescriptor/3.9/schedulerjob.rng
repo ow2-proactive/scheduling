@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<grammar ns="urn:proactive:jobdescriptor:3.9" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:jd="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+<grammar ns="urn:proactive:jobdescriptor:3.9" xmlns:doc="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns:jd="urn:proactive:jobdescriptor:3.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
   <start>
     <ref name="job"/>
   </start>
@@ -510,11 +510,7 @@
   <define name="codeScript">
     <element name="code">
       <doc:documentation>Definition of a script by writing directly the code inside the descriptor </doc:documentation>
-      <attribute name="language">
-        <data type="string">
-          <param name = "minLength">1</param>
-        </data>
-      </attribute>
+      <ref name="language"/>
       <text/>
     </element>
   </define>
@@ -526,9 +522,20 @@
         <ref name="url"/>
       </choice>
       <optional>
+        <ref name="language"/>
+      </optional>
+      <optional>
         <ref name="fileScriptArguments"/>
       </optional>
     </element>
+  </define>
+  <define name="language">
+    <!-- script engine language -->
+    <attribute name="language">
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
+    </attribute>
   </define>
   <define name="path">
     <attribute name="path">
