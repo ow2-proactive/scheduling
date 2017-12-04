@@ -36,6 +36,7 @@ import javax.script.ScriptEngineManager;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.ow2.proactive.http.CommonHttpClientBuilder;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
 import org.ow2.proactive_grid_cloud_portal.cli.json.PluginView;
@@ -106,7 +107,7 @@ public class ApplicationContextImpl implements ApplicationContext {
 
     @Override
     public SchedulerRestClient getRestClient() {
-        HttpClientBuilder httpClientBuilder = new HttpClientBuilder().useSystemProperties();
+        CommonHttpClientBuilder httpClientBuilder = new HttpClientBuilder().useSystemProperties();
         if (canInsecureAccess()) {
             httpClientBuilder.insecure(true);
         }

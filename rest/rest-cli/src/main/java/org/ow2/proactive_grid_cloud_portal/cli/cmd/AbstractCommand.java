@@ -41,6 +41,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.codehaus.jackson.type.TypeReference;
+import org.ow2.proactive.http.CommonHttpClientBuilder;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
@@ -101,7 +102,7 @@ public abstract class AbstractCommand implements Command {
         if (sessionId != null) {
             request.setHeader("sessionid", sessionId);
         }
-        HttpClientBuilder httpClientBuilder = new HttpClientBuilder().useSystemProperties();
+        CommonHttpClientBuilder httpClientBuilder = new HttpClientBuilder().useSystemProperties();
         try {
             if ("https".equals(request.getURI().getScheme()) && currentContext.canInsecureAccess()) {
                 httpClientBuilder.insecure(true);

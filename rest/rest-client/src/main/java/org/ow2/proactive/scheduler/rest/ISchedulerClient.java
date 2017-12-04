@@ -179,7 +179,7 @@ public interface ISchedulerClient extends Scheduler {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
-     * Submit a new job to the scheduler from the catalog with provided variables.
+     * Submit a new job to the scheduler from the catalogRestURL with provided variables.
      * <p>
      * It will execute the tasks of the jobs as soon as resources are available.
      * The job will be considered as finished once every tasks have finished
@@ -187,6 +187,7 @@ public interface ISchedulerClient extends Scheduler {
      * precious result.
      * <p>
      * 
+     * @param catalogRestURL
      * @param bucketId
      * @param workflowName
      * @param variables
@@ -196,11 +197,11 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId submitFromCatalog(String bucketId, String workflowName, Map<String, String> variables)
+    JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
-     * Submit a new job to the scheduler from the catalog without variables.
+     * Submit a new job to the scheduler from the catalogRestURL without variables.
      * <p>
      * It will execute the tasks of the jobs as soon as resources are available.
      * The job will be considered as finished once every tasks have finished
@@ -208,16 +209,16 @@ public interface ISchedulerClient extends Scheduler {
      * precious result.
      * <p>
      * 
+     * @param catalogRestURL
      * @param bucketId
      * @param workflowName
-     * @param variables
      * @return
      * @throws NotConnectedException
      * @throws PermissionException
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId submitFromCatalog(String bucketId, String workflowName)
+    JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
