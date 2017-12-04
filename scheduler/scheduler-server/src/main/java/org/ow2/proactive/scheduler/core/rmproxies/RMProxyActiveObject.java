@@ -48,7 +48,14 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.rest.SchedulerClient;
+import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
+import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
+import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.Script;
@@ -153,17 +160,16 @@ public class RMProxyActiveObject {
      */
     @ImmediateService
     public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId) {
+            Map<String, String> genericInformation, TaskId taskId, Credentials creds) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes).booleanValue();
-            } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript)) {
-                handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId);
-
-            } else {
+            } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript))
+                handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId, creds);
+            else {
                 TaskLogger.getInstance().error(taskId,
                                                "Unauthorized clean script: " + System.getProperty("line.separator") +
-                                                       cleaningScript.getScript());
+                                                       cleaningScript.fetchScript());
                 releaseNodes(nodes).booleanValue();
             }
         }
@@ -176,15 +182,41 @@ public class RMProxyActiveObject {
      * @param cleaningScript the script to be executed
      * @param variables
      * @param genericInformation
+     * @param taskId
+     * @param creds credentials from RMProxy to authenticate with SchedulerNodeClient
      */
     private void handleCleaningScript(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId) {
+            Map<String, String> genericInformation, TaskId taskId, Credentials creds) {
         TaskLogger instance = TaskLogger.getInstance();
+
         try {
             this.nodesTaskId.put(nodes, taskId);
             ScriptHandler handler = ScriptLoader.createHandler(nodes.get(0));
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
+
+            //retrieve scheduler URL to bind with schedulerapi, globalspaceapi, and userspaceapi
+            String schedulerUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
+
+            logger.debug("Biding schedulerapi...");
+            String privateKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+            Decrypter decrypter = new Decrypter(Credentials.getPrivateKey(privateKeyPath));
+            decrypter.setCredentials(creds);
+            SchedulerNodeClient client = new SchedulerNodeClient(decrypter, schedulerUrl);
+            handler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, (Serializable) client);
+
+            logger.debug("Biding globalspaceapi...");
+            RemoteSpace globalSpaceClient = new DataSpaceNodeClient(client,
+                                                                    IDataSpaceClient.Dataspace.GLOBAL,
+                                                                    schedulerUrl);
+            handler.addBinding(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME, (Serializable) globalSpaceClient);
+
+            logger.debug("Biding userspaceapi...");
+            RemoteSpace userSpaceClient = new DataSpaceNodeClient(client,
+                                                                  IDataSpaceClient.Dataspace.USER,
+                                                                  schedulerUrl);
+            handler.addBinding(SchedulerConstants.DS_USER_API_BINDING_NAME, (Serializable) userSpaceClient);
+
             ScriptResult<?> future = handler.handle(cleaningScript);
             try {
                 PAEventProgramming.addActionOnFuture(future, "cleanCallBack", nodes);
@@ -210,7 +242,7 @@ public class RMProxyActiveObject {
      * Called when a script has returned (call is made as an active object call)
      * <p>
      * Check the nodes to release and release the one that have to (clean script has returned)
-     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map,TaskId)}
+     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map, TaskId, Credentials)}
      */
     @ImmediateService
     public synchronized void cleanCallBack(Future<ScriptResult<?>> future, NodeSet nodes) {
