@@ -25,88 +25,21 @@
  */
 package org.ow2.proactive.http;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-
-import javax.net.ssl.SSLContext;
-
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.ow2.proactive.web.WebProperties;
 
 
-public class HttpClientBuilder {
-
-    private static final AllowAllTrustStrategy ACCEPT_ANY_CERTIFICATE_TRUST_STRATEGY = new AllowAllTrustStrategy();
-
-    private Boolean allowAnyHostname;
-
-    private Boolean allowAnyCertificate;
-
-    private int maxConnections;
-
-    private RequestConfig requestConfig;
-
-    private boolean useContentCompression;
-
-    private boolean useSystemProperties;
+/**
+ * Addition to CommonHttpClientBuilder which can handle trust strategy with WebProperties
+ */
+public class HttpClientBuilder extends CommonHttpClientBuilder {
 
     public HttpClientBuilder() {
-        this.useContentCompression = true;
-    }
 
-    public HttpClientBuilder allowAnyHostname(boolean acceptAnyHostname) {
-        this.allowAnyHostname = acceptAnyHostname;
-        return this;
-    }
-
-    public HttpClientBuilder allowAnyCertificate(boolean acceptAnyCertificate) {
-        this.allowAnyCertificate = acceptAnyCertificate;
-        return this;
-    }
-
-    public HttpClientBuilder disableContentCompression() {
-        this.useContentCompression = false;
-        return this;
-    }
-
-    public HttpClientBuilder insecure(boolean insecure) {
-        allowAnyHostname(insecure);
-        allowAnyCertificate(insecure);
-        return this;
-    }
-
-    public HttpClientBuilder maxConnections(int maxConnections) {
-        this.maxConnections = maxConnections;
-        return this;
-    }
-
-    public HttpClientBuilder setDefaultRequestConfig(RequestConfig requestConfig) {
-        this.requestConfig = requestConfig;
-        return this;
-    }
-
-    public HttpClientBuilder useSystemProperties() {
-        return useSystemProperties(true);
-    }
-
-    public HttpClientBuilder useSystemProperties(boolean useSystemProperties) {
-        this.useSystemProperties = useSystemProperties;
-        return this;
     }
 
     public CloseableHttpClient build() {
-        org.apache.http.impl.client.HttpClientBuilder internalHttpClientBuilder = createInternalHttpClientBuilder();
-
-        boolean acceptAnyCertificate = false;
-        boolean acceptAnyHostname = false;
-
         if (useSystemProperties) {
-            internalHttpClientBuilder.useSystemProperties();
-
             if (WebProperties.WEB_HTTPS_ALLOW_ANY_CERTIFICATE.getValueAsBoolean()) {
                 acceptAnyCertificate = true;
             }
@@ -115,63 +48,6 @@ public class HttpClientBuilder {
                 acceptAnyHostname = true;
             }
         }
-
-        if (allowAnyHostname != null) {
-            if (allowAnyHostname) {
-                acceptAnyHostname = true;
-            } else {
-                acceptAnyHostname = false;
-            }
-        }
-
-        if (allowAnyCertificate != null) {
-            if (allowAnyCertificate) {
-                acceptAnyCertificate = true;
-            } else {
-                acceptAnyCertificate = false;
-            }
-        }
-
-        if (acceptAnyCertificate) {
-            internalHttpClientBuilder.setSslcontext(createSslContext());
-        }
-
-        if (acceptAnyHostname) {
-            internalHttpClientBuilder.setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        }
-
-        if (maxConnections > 0) {
-            internalHttpClientBuilder.setMaxConnPerRoute(maxConnections);
-            internalHttpClientBuilder.setMaxConnTotal(maxConnections);
-        }
-
-        if (requestConfig != null) {
-            internalHttpClientBuilder.setDefaultRequestConfig(requestConfig);
-        }
-
-        if (!useContentCompression) {
-            internalHttpClientBuilder.disableContentCompression();
-        }
-
-        return internalHttpClientBuilder.build();
+        return super.build();
     }
-
-    public org.apache.http.impl.client.HttpClientBuilder createInternalHttpClientBuilder() {
-        org.apache.http.impl.client.HttpClientBuilder result = org.apache.http.impl.client.HttpClientBuilder.create();
-
-        result.setUserAgent("ProActive");
-
-        return result;
-    }
-
-    protected SSLContext createSslContext() {
-        try {
-            SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
-            sslContextBuilder.loadTrustMaterial(null, ACCEPT_ANY_CERTIFICATE_TRUST_STRATEGY);
-            return sslContextBuilder.build();
-        } catch (KeyManagementException | KeyStoreException | NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
 }

@@ -609,8 +609,13 @@ public abstract class InternalTask extends TaskState {
 
     public static synchronized boolean isScriptAuthorized(TaskId id, Script script) {
         updateAuthorizedScriptsSignatures(id);
-        return authorizedSelectionScripts == null ||
-               authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()));
+        if (authorizedSelectionScripts != null) {
+            String scriptContent = script.fetchScript();
+            if (scriptContent != null) {
+                return authorizedSelectionScripts.contains(Script.digest(scriptContent.trim()));
+            }
+        }
+        return true;
     }
 
     @Override

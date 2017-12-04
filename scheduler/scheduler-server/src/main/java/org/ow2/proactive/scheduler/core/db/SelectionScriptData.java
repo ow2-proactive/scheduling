@@ -26,6 +26,8 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,6 +57,8 @@ public class SelectionScriptData {
 
     private String script;
 
+    private String url;
+
     private List<Serializable> scriptParameters;
 
     private boolean selectionScriptDynamic;
@@ -81,7 +85,15 @@ public class SelectionScriptData {
     }
 
     SelectionScript createSelectionScript() throws InvalidScriptException {
-        return new SelectionScript(getScript(), getScriptEngine(), parameters(), isSelectionScriptDynamic());
+        if (script == null && url != null) {
+            try {
+                return new SelectionScript(new URL(url), getScriptEngine(), parameters(), isSelectionScriptDynamic());
+            } catch (MalformedURLException e) {
+                throw new InvalidScriptException(e);
+            }
+        } else {
+            return new SelectionScript(getScript(), getScriptEngine(), parameters(), isSelectionScriptDynamic());
+        }
     }
 
     private Serializable[] parameters() {
@@ -94,6 +106,9 @@ public class SelectionScriptData {
 
     protected static void initCommonAttributes(SelectionScriptData scriptData, Script<?> script) {
         scriptData.setScript(script.getScript());
+        if (script.getScriptUrl() != null) {
+            scriptData.setURL(script.getScriptUrl().toExternalForm());
+        }
         scriptData.setScriptEngine(script.getEngineName());
         if (script.getParameters() != null) {
             scriptData.setScriptParameters(Arrays.asList(script.getParameters()));
@@ -112,7 +127,7 @@ public class SelectionScriptData {
         this.id = id;
     }
 
-    @Column(name = "ENGINE", nullable = false)
+    @Column(name = "ENGINE")
     public String getScriptEngine() {
         return scriptEngine;
     }
@@ -129,6 +144,16 @@ public class SelectionScriptData {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    @Column(name = "URL", length = Integer.MAX_VALUE)
+    @Lob
+    public String getURL() {
+        return url;
+    }
+
+    public void setURL(String url) {
+        this.url = url;
     }
 
     @Column(name = "PARAMETERS")
