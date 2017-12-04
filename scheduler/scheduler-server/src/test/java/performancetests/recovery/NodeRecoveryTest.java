@@ -93,11 +93,11 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
         ResourceManager resourceManager = rmHelper.getResourceManager();
 
-        assertEquals(resourceManager.getState().getAllNodes().size(), 0);
+        assertEquals(0, resourceManager.getState().getAllNodes().size());
 
         rmHelper.createNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME, nodesNumber);
 
-        assertEquals(resourceManager.getState().getAllNodes().size(), nodesNumber);
+        assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
 
         RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
 
@@ -105,7 +105,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
         resourceManager = rmHelper.getResourceManager();
 
-        assertEquals(resourceManager.getState().getAllNodes().size(), nodesNumber);
+        assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
     }
 
     @Test
