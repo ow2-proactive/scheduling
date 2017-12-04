@@ -861,7 +861,8 @@ public class TaskData {
         }
     }
 
-    @Column(name = "DESCRIPTION", updatable = false)
+    @Lob
+    @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE, updatable = false)
     public String getDescription() {
         return description;
     }
