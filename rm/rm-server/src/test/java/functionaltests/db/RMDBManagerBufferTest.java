@@ -245,13 +245,13 @@ public class RMDBManagerBufferTest {
     }
 
     private void checkPendingNodeOperationsIsEmpty() {
-        List<AbstractMap.SimpleImmutableEntry<RMNodeData, RMDBManagerBuffer.DatabaseOperation>> pendingNodeOperations;
+        List<RMDBManagerBuffer.NodeOperation> pendingNodeOperations;
         pendingNodeOperations = dbManagerBuffer.listPendingNodeOperations();
         assertThat(pendingNodeOperations.size()).isEqualTo(0);
     }
 
     private void checkPendingNodeOperationsNbOperations(int nb) {
-        List<AbstractMap.SimpleImmutableEntry<RMNodeData, RMDBManagerBuffer.DatabaseOperation>> pendingNodeOperations;
+        List<RMDBManagerBuffer.NodeOperation> pendingNodeOperations;
         pendingNodeOperations = dbManagerBuffer.listPendingNodeOperations();
         assertThat(pendingNodeOperations.size()).isEqualTo(nb);
     }

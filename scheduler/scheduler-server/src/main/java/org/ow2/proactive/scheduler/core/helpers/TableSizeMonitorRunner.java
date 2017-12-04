@@ -52,6 +52,7 @@ public class TableSizeMonitorRunner implements Runnable {
 
     private final ArrayList<String> tableNames = new ArrayList<String>(Arrays.asList("JobData (All)",
                                                                                      "JobData (Finished)",
+                                                                                     "JobDataVariable",
                                                                                      "JobContent",
                                                                                      "TaskData",
                                                                                      "TaskDataNotFinished",
@@ -90,6 +91,7 @@ public class TableSizeMonitorRunner implements Runnable {
     private void monitorTables() {
         counts.put("JobData (All)", getCount("countJobData"));
         counts.put("JobData (Finished)", getCount("countJobDataFinished"));
+        counts.put("JobDataVariable", getCount("countJobDataVariable"));
         counts.put("JobContent", getCount("countJobContent"));
         counts.put("TaskData", getCount("countTaskData"));
         counts.put("TaskDataNotFinished", getCount("countTaskDataNotFinished"));
