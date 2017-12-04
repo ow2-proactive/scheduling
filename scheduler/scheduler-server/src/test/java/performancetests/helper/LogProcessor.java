@@ -41,7 +41,7 @@ public class LogProcessor {
     static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss,SSS";
 
     static private String pathToLogFile = System.getProperty("pa.rm.home") + File.separatorChar + "logs" +
-                                          File.separatorChar + "Scheduler-tests.log";
+                                          File.separatorChar + "Scheduler-tests-last.log";
 
     public static String getPathToLogFile() {
         return pathToLogFile;
