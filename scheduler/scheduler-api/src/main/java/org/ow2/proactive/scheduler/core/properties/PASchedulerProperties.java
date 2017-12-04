@@ -374,10 +374,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     /* ***************** LICENSE SCHEDULING POLICY PROPERTIES ***************** */
     /* ***************************************************************** */
 
-    LICENSE_SCHEDULING_POLICY_CONFIGURATION(
-            "pa.scheduler.license.policy",
-            PropertyType.STRING,
-            "config/scheduler/license.properties"),
+    LICENSE_SCHEDULING_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ******************* PORTAL DISPLAY PROPERTIES ******************* */
