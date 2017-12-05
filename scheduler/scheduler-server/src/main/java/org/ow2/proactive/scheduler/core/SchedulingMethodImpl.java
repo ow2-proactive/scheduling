@@ -57,6 +57,7 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.core.helpers.VariableBatchSizeIterator;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
@@ -158,7 +159,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     public int schedule() {
         Policy currentPolicy = schedulingService.getPolicy();
 
-        int numberOfTaskStarted = 0;
         //Number of time to retry an active object creation before leaving scheduling loop
         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
@@ -175,9 +175,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
-        // we wait for next scheduling loop
+        // we wait for next scheduling loop and don't start any task
         if (jobMap.isEmpty()) {
-            return numberOfTaskStarted;
+            return 0;
         }
 
         try {
@@ -190,135 +190,34 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             if (logger.isDebugEnabled()) {
                 logger.debug("eligible nodes : " + (freeResources.size() < 5 ? freeResources : freeResources.size()));
             }
-            //if there is no free resources, stop it right now
+            //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
-                return numberOfTaskStarted;
+                return 0;
             }
 
             // ask the policy all the tasks to be schedule according to the jobs list.
-
             LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy = currentPolicy.getOrderedTasks(descriptors);
 
-            //if there is no task to scheduled, return
+            //if there is no task to scheduled, return without starting any task
             if (fullListOfTaskRetrievedFromPolicy == null || fullListOfTaskRetrievedFromPolicy.isEmpty()) {
-                return numberOfTaskStarted;
+                return 0;
             }
 
             schedulingService.unlockJobsToSchedule(toUnlock.values());
             toUnlock = null;
 
-            int subTasksListFromInclusive = 0;
-            int subTasksListToExclusive = Math.min(fullListOfTaskRetrievedFromPolicy.size(),
-                                          subTasksListFromInclusive + freeResources.size());
-            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy;
+            int numberOfTaskStarted = selectAndStartTasks(currentPolicy,
+                                                          jobMap,
+                                                          freeResources,
+                                                          fullListOfTaskRetrievedFromPolicy);
 
-            while (subTasksListFromInclusive < subTasksListToExclusive) {
-                taskRetrievedFromPolicy = new LinkedList<>(fullListOfTaskRetrievedFromPolicy.subList(subTasksListFromInclusive,
-                                                                                                     subTasksListToExclusive));
-                if (logger.isDebugEnabled()) {
-                    loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, subTasksListFromInclusive, subTasksListToExclusive, taskRetrievedFromPolicy);
-                }
-
-                updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
-
-                for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
-                    // load and Initialize the executable container
-                    loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
-                }
-
-                while (!taskRetrievedFromPolicy.isEmpty()) {
-
-                    if (freeResources.isEmpty()) {
-                        return numberOfTaskStarted;
-                    }
-
-                    //get the next compatible tasks from the whole returned policy tasks
-                    LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
-                    int neededResourcesNumber = 0;
-
-                    while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
-                        //the loop will search for next compatible task until it find something
-                        neededResourcesNumber = getNextcompatibleTasks(jobMap,
-                                                                       taskRetrievedFromPolicy,
-                                                                       freeResources.size(),
-                                                                       tasksToSchedule);
-                    }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("tasksToSchedule : " + tasksToSchedule);
-                    }
-
-                    logger.debug("required number of nodes : " + neededResourcesNumber);
-                    if (neededResourcesNumber == 0 || tasksToSchedule.isEmpty()) {
-                        break;
-                    }
-
-                    NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule, freeResources);
-
-                    if (nodeSet != null) {
-                        freeResources.removeAll(nodeSet.getAllNodesUrls());
-                    }
-
-                    //start selected tasks
-                    Node node = null;
-                    InternalJob currentJob = null;
-                    try {
-                        while (nodeSet != null && !nodeSet.isEmpty()) {
-                            EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
-                            currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
-                            InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
-
-                            if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
-                                //create launcher and try to start the task
-                                node = nodeSet.get(0);
-
-                                if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
-                                    numberOfTaskStarted++;
-                                }
-
-                            }
-
-                            //if every task that should be launched have been removed
-                            if (tasksToSchedule.isEmpty()) {
-                                //get back unused nodes to the RManager
-                                if (!nodeSet.isEmpty()) {
-                                    releaseNodes(currentJob, nodeSet);
-                                    freeResources.addAll(nodeSet.getAllNodesUrls());
-                                }
-                                //and leave the loop
-                                break;
-                            }
-                        }
-                    } catch (ActiveObjectCreationException e1) {
-                        //Something goes wrong with the active object creation (createLauncher)
-                        logger.warn("An exception occured while creating the task launcher.", e1);
-                        //so try to get back every remaining nodes to the resource manager
-                        try {
-                            releaseNodes(currentJob, nodeSet);
-                            freeResources.addAll(nodeSet.getAllNodesUrls());
-                        } catch (Exception e2) {
-                            logger.info("Unable to get back the nodeSet to the RM", e2);
-                        }
-                        if (--activeObjectCreationRetryTimeNumber == 0) {
-                            return numberOfTaskStarted;
-                        }
-                    } catch (Exception e1) {
-                        //if we are here, it is that something append while launching the current task.
-                        logger.warn("An exception occured while starting task.", e1);
-                        //so try to get back every remaining nodes to the resource manager
-                        try {
-                            releaseNodes(currentJob, nodeSet);
-                            freeResources.addAll(nodeSet.getAllNodesUrls());
-                        } catch (Exception e2) {
-                            logger.info("Unable to get back the nodeSet to the RM", e2);
-                        }
-                    }
-                }
-                subTasksListFromInclusive += subTasksListToExclusive;
-                subTasksListToExclusive = Math.min(fullListOfTaskRetrievedFromPolicy.size(),
-                                          subTasksListFromInclusive + freeResources.size());
-                logger.debug("Number of eligible tasks to work with for the next loop (if there some free resources remain): " +
-                             (subTasksListToExclusive - subTasksListFromInclusive));
+            if (freeResources.isEmpty()) {
+                return numberOfTaskStarted;
             }
+            if (activeObjectCreationRetryTimeNumber == 0) {
+                return numberOfTaskStarted;
+            }
+
             return numberOfTaskStarted;
         } finally {
             if (toUnlock != null) {
@@ -327,15 +226,131 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
     }
 
-    private void loggingEligibleTasksDetails(LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy, int subTasksListFromInclusive, int subTasksListToExclusive, LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy) {
+    private int selectAndStartTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Set<String> freeResources,
+            LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy) {
+        int numberOfTaskStarted = 0;
+
+        VariableBatchSizeIterator progressiveIterator = new VariableBatchSizeIterator(fullListOfTaskRetrievedFromPolicy);
+
+        while (progressiveIterator.hasMoreElements() && !freeResources.isEmpty()) {
+
+            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = new LinkedList<>(progressiveIterator.getNextElements(freeResources.size()));
+
+            if (logger.isDebugEnabled()) {
+                loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
+            }
+
+            updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
+
+            for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
+                // load and Initialize the executable container
+                loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
+            }
+
+            while (!taskRetrievedFromPolicy.isEmpty()) {
+
+                if (freeResources.isEmpty()) {
+                    break;
+                }
+
+                //get the next compatible tasks from the whole returned policy tasks
+                LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
+                int neededResourcesNumber = 0;
+
+                while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
+                    //the loop will search for next compatible task until it find something
+                    neededResourcesNumber = getNextcompatibleTasks(jobMap,
+                                                                   taskRetrievedFromPolicy,
+                                                                   freeResources.size(),
+                                                                   tasksToSchedule);
+                }
+                if (logger.isDebugEnabled()) {
+                    logger.debug("tasksToSchedule : " + tasksToSchedule);
+                }
+
+                logger.debug("required number of nodes : " + neededResourcesNumber);
+                if (neededResourcesNumber == 0 || tasksToSchedule.isEmpty()) {
+                    break;
+                }
+
+                NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule, freeResources);
+
+                if (nodeSet != null) {
+                    freeResources.removeAll(nodeSet.getAllNodesUrls());
+                }
+
+                //start selected tasks
+                Node node = null;
+                InternalJob currentJob = null;
+                try {
+                    while (nodeSet != null && !nodeSet.isEmpty()) {
+                        EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
+                        currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
+                        InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
+
+                        if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
+                            //create launcher and try to start the task
+                            node = nodeSet.get(0);
+
+                            if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
+                                numberOfTaskStarted++;
+                            }
+
+                        }
+
+                        //if every task that should be launched have been removed
+                        if (tasksToSchedule.isEmpty()) {
+                            //get back unused nodes to the RManager
+                            if (!nodeSet.isEmpty()) {
+                                releaseNodes(currentJob, nodeSet);
+                                freeResources.addAll(nodeSet.getAllNodesUrls());
+                            }
+                            //and leave the loop
+                            break;
+                        }
+                    }
+                } catch (ActiveObjectCreationException e1) {
+                    //Something goes wrong with the active object creation (createLauncher)
+                    logger.warn("An exception occured while creating the task launcher.", e1);
+                    //so try to get back every remaining nodes to the resource manager
+                    try {
+                        releaseNodes(currentJob, nodeSet);
+                        freeResources.addAll(nodeSet.getAllNodesUrls());
+                    } catch (Exception e2) {
+                        logger.info("Unable to get back the nodeSet to the RM", e2);
+                    }
+                    if (--activeObjectCreationRetryTimeNumber == 0) {
+                        break;
+                    }
+                } catch (Exception e1) {
+                    //if we are here, it is that something append while launching the current task.
+                    logger.warn("An exception occured while starting task.", e1);
+                    //so try to get back every remaining nodes to the resource manager
+                    try {
+                        releaseNodes(currentJob, nodeSet);
+                        freeResources.addAll(nodeSet.getAllNodesUrls());
+                    } catch (Exception e2) {
+                        logger.info("Unable to get back the nodeSet to the RM", e2);
+                    }
+                }
+            }
+            if (freeResources.isEmpty()) {
+                break;
+            }
+            if (activeObjectCreationRetryTimeNumber == 0) {
+                break;
+            }
+        }
+        return numberOfTaskStarted;
+    }
+
+    private void loggingEligibleTasksDetails(LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy,
+            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy) {
         logger.debug("full list of eligible tasks: " +
                      (fullListOfTaskRetrievedFromPolicy.size() < 5 ? fullListOfTaskRetrievedFromPolicy
                                                                    : fullListOfTaskRetrievedFromPolicy.size()));
         logger.debug("working list of eligible tasks: " +
-                     (taskRetrievedFromPolicy.size() < 5 ? taskRetrievedFromPolicy
-                                                         : taskRetrievedFromPolicy.size()));
-        logger.debug("                       sublist: from=" + subTasksListFromInclusive + " , to=" +
-                     subTasksListToExclusive);
+                     (taskRetrievedFromPolicy.size() < 5 ? taskRetrievedFromPolicy : taskRetrievedFromPolicy.size()));
     }
 
     /**
