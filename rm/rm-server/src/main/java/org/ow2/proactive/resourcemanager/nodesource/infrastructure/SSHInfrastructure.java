@@ -224,13 +224,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      obfuscatedCmdLine,
-                                                     "Deploying nodes on host " + hostTracker.getHost(),
+                                                     "Deploying nodes on host " + hostTracker.getResolvedAddress(),
                                                      super.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
         Process p = null;
         try {
-            p = Utils.runSSHCommand(hostTracker.getHost(), cmdLine, sshOptions);
+            p = Utils.runSSHCommand(hostTracker.getResolvedAddress(), cmdLine, sshOptions);
         } catch (IOException e1) {
             multipleDeclareDeployingNodeLost(depNodeURLs,
                                              "Cannot run command: " + cmdLine + ", with ssh options: " + sshOptions +
@@ -246,16 +246,16 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("SSH subprocess at " + hostTracker.getHost().getHostName() + " exited abnormally (" +
-                                 exitCode + ").");
+                    logger.error("SSH subprocess at " + hostTracker.getResolvedAddress().getHostName() +
+                                 " exited abnormally (" + exitCode + ").");
                 } else {
                     logger.error("Launching node process has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
                 final String description = "SSH command failed to launch node on host " +
-                                           hostTracker.getHost().getHostName() + lf + "   >Error code: " + exitCode +
-                                           lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
+                                           hostTracker.getResolvedAddress().getHostName() + lf + "   >Error code: " +
+                                           exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkAllNodesAreAcquiredAndDo(createdNodeNames, null, new Runnable() {
                     public void run() {

@@ -36,8 +36,8 @@ import org.apache.log4j.Logger;
 
 /**
  * This class tracks the information related to node deployment on a host.
- * It is used by {@link HostsFileBasedInfrastructureManager} and objects of
- * this class are persisted along with the node source data.
+ * It is used by {@link HostsFileBasedInfrastructureManager} and HostTracker
+ * instances are persisted along with the node source data.
  *
  * All non-final fields of this class should be thread-safe.
  */
@@ -47,61 +47,61 @@ public class HostTracker implements Serializable {
 
     protected static final Logger logger = Logger.getLogger(HostTracker.class);
 
-    private final String hostInFile;
+    private final String configuredAddress;
 
     private final int configuredNodeNumber;
 
-    private final InetAddress host;
+    private final InetAddress resolvedAddress;
 
     private Map<String, NodeStatus> nodeStatusPerNodeUrl;
 
-    private AtomicInteger aliveNodeCounter;
+    private AtomicInteger aliveNodesCounter;
 
-    private AtomicInteger downNodeCounter;
+    private AtomicInteger downNodesCounter;
 
-    private AtomicInteger removedNodeCounter;
+    private AtomicInteger removedNodesCounter;
 
-    private AtomicBoolean needNodesFlag;
+    private AtomicBoolean needsNodesFlag;
 
-    protected HostTracker(String hostInFile, int configuredNodeNumber, InetAddress host) {
-        this.hostInFile = hostInFile;
+    protected HostTracker(String configuredAddress, int configuredNodeNumber, InetAddress resolvedAddress) {
+        this.configuredAddress = configuredAddress;
         this.configuredNodeNumber = configuredNodeNumber;
-        this.host = host;
+        this.resolvedAddress = resolvedAddress;
         nodeStatusPerNodeUrl = new HashMap<>();
-        aliveNodeCounter = new AtomicInteger(0);
-        downNodeCounter = new AtomicInteger(0);
-        removedNodeCounter = new AtomicInteger(0);
+        aliveNodesCounter = new AtomicInteger(0);
+        downNodesCounter = new AtomicInteger(0);
+        removedNodesCounter = new AtomicInteger(0);
         // a newly created host tracker requires nodes because it has not
         // been deployed yet
-        needNodesFlag = new AtomicBoolean(true);
+        needsNodesFlag = new AtomicBoolean(true);
     }
 
     /**
      * @return the host as it is written in the hosts file supplied by the user
      */
-    protected String getHostInFile() {
-        return hostInFile;
+    protected String getConfiguredAddress() {
+        return configuredAddress;
     }
 
     /**
      * @return the {@link InetAddress} representation of the host
      */
-    protected InetAddress getHost() {
-        return host;
+    protected InetAddress getResolvedAddress() {
+        return resolvedAddress;
     }
 
     /**
-     * @return whether this host is marked as requiring nodes
+     * @return whether this host requires nodes
      */
-    protected boolean getNeedNodesFlag() {
-        return needNodesFlag.get();
+    protected boolean needsNodes() {
+        return needsNodesFlag.get();
     }
 
     /**
-     * Mark this host either with a requiring nodes flag.
+     * Say whether this host requires nodes.
      */
-    protected void setNeedNodesFlag(boolean needNodesFlag) {
-        this.needNodesFlag.set(needNodesFlag);
+    protected void setNeedsNodes(boolean needNodesFlag) {
+        this.needsNodesFlag.set(needNodesFlag);
     }
 
     /**
@@ -112,51 +112,51 @@ public class HostTracker implements Serializable {
      * nodes are the result of a remove action by the user, we should not
      * redeploy removed node).
      */
-    protected int getNeededNodeNumber() {
-        int neededNodeNumber = 0;
-        if (needNodesFlag.get()) {
-            int computedNeededNodeNumber = configuredNodeNumber - aliveNodeCounter.get() - removedNodeCounter.get();
+    protected int getNeededNodesNumber() {
+        int neededNodesNumber = 0;
+        if (needsNodesFlag.get()) {
+            int computedNeededNodeNumber = configuredNodeNumber - aliveNodesCounter.get() - removedNodesCounter.get();
             if (computedNeededNodeNumber > configuredNodeNumber) {
-                neededNodeNumber = configuredNodeNumber;
+                neededNodesNumber = configuredNodeNumber;
                 logger.warn("Computed needed node number " + computedNeededNodeNumber +
                             " is bigger than the configured number of nodes " + configuredNodeNumber + ". Requiring " +
-                            neededNodeNumber + " nodes.");
+                            neededNodesNumber + " nodes.");
             } else {
                 if (computedNeededNodeNumber < 0) {
-                    neededNodeNumber = 0;
+                    neededNodesNumber = 0;
                     logger.warn("Computed needed node number " + computedNeededNodeNumber +
                                 " is negative. Requiring no nodes.");
                 } else {
-                    neededNodeNumber = computedNeededNodeNumber;
+                    neededNodesNumber = computedNeededNodeNumber;
                 }
             }
         }
-        return neededNodeNumber;
+        return neededNodesNumber;
     }
 
     /**
      * @return whether the host still has nodes alive
      */
     protected boolean hasAliveNodes() {
-        return aliveNodeCounter.get() > 0;
+        return aliveNodesCounter.get() > 0;
     }
 
     /**
      * Registers the URL of an alive node and increment the alive node counter.
      */
     protected void putAliveNodeUrl(String aliveNodeUrl) {
-        decrementCounterForPreviousStatus(aliveNodeUrl);
+        decrementPreviousNodesCounter(aliveNodeUrl);
         nodeStatusPerNodeUrl.put(aliveNodeUrl, NodeStatus.ALIVE);
-        aliveNodeCounter.incrementAndGet();
+        aliveNodesCounter.incrementAndGet();
     }
 
     /**
      * Registers the URL of a down node and increment the down node counter.
      */
     protected void putDownNodeUrl(String downNodeUrl) {
-        decrementCounterForPreviousStatus(downNodeUrl);
+        decrementPreviousNodesCounter(downNodeUrl);
         nodeStatusPerNodeUrl.put(downNodeUrl, NodeStatus.DOWN);
-        downNodeCounter.incrementAndGet();
+        downNodesCounter.incrementAndGet();
     }
 
     /**
@@ -164,26 +164,26 @@ public class HostTracker implements Serializable {
      * counter.
      */
     protected void putRemovedNodeUrl(String removedNodeUrl) {
-        decrementCounterForPreviousStatus(removedNodeUrl);
+        decrementPreviousNodesCounter(removedNodeUrl);
         nodeStatusPerNodeUrl.put(removedNodeUrl, NodeStatus.REMOVED);
-        removedNodeCounter.incrementAndGet();
+        removedNodesCounter.incrementAndGet();
     }
 
-    private void decrementCounterForPreviousStatus(String aliveNodeUrl) {
-        NodeStatus previousStatus = nodeStatusPerNodeUrl.get(aliveNodeUrl);
+    private void decrementPreviousNodesCounter(String nodeUrl) {
+        NodeStatus previousStatus = nodeStatusPerNodeUrl.get(nodeUrl);
         if (previousStatus != null) {
-            findCounterForStatus(previousStatus).decrementAndGet();
+            findNodesCounter(previousStatus).decrementAndGet();
         }
     }
 
-    private AtomicInteger findCounterForStatus(NodeStatus nodeStatus) {
+    private AtomicInteger findNodesCounter(NodeStatus nodeStatus) {
         switch (nodeStatus) {
             case ALIVE:
-                return aliveNodeCounter;
+                return aliveNodesCounter;
             case DOWN:
-                return downNodeCounter;
+                return downNodesCounter;
             case REMOVED:
-                return removedNodeCounter;
+                return removedNodesCounter;
             default:
                 throw new IllegalStateException("Searched node status " + nodeStatus + " is none of the following: " +
                                                 Arrays.toString(NodeStatus.values()));
@@ -192,14 +192,14 @@ public class HostTracker implements Serializable {
 
     @Override
     public String toString() {
-        String minimalInfo = "Host " + hostInFile + ". Configured with " + configuredNodeNumber +
-                             " nodes. Current state: [alive node number=" + aliveNodeCounter.get() +
-                             ", down node number=" + downNodeCounter.get() + ", removed node number=" +
-                             removedNodeCounter.get() + "].";
+        String minimalInfo = "Host " + configuredAddress + ". Configured with " + configuredNodeNumber +
+                             " nodes. Current state: [alive node number=" + aliveNodesCounter.get() +
+                             ", down node number=" + downNodesCounter.get() + ", removed node number=" +
+                             removedNodesCounter.get() + "].";
         if (logger.isDebugEnabled()) {
-            List<String> allAliveNodeUrls = findAllNodeUrlsWithStatus(NodeStatus.ALIVE);
-            List<String> allDownNodeUrls = findAllNodeUrlsWithStatus(NodeStatus.DOWN);
-            List<String> allRemovedNodeUrls = findAllNodeUrlsWithStatus(NodeStatus.REMOVED);
+            List<String> allAliveNodeUrls = listNodesUrlWithStatus(NodeStatus.ALIVE);
+            List<String> allDownNodeUrls = listNodesUrlWithStatus(NodeStatus.DOWN);
+            List<String> allRemovedNodeUrls = listNodesUrlWithStatus(NodeStatus.REMOVED);
             return minimalInfo + " Alive node URLs (" + allAliveNodeUrls.size() + "): " +
                    Arrays.toString(allAliveNodeUrls.toArray()) + ". Down node URLs (" + allDownNodeUrls.size() + "): " +
                    Arrays.toString(allDownNodeUrls.toArray()) + ". Removed node URLs (" + allRemovedNodeUrls.size() +
@@ -209,7 +209,7 @@ public class HostTracker implements Serializable {
         }
     }
 
-    private List<String> findAllNodeUrlsWithStatus(NodeStatus status) {
+    private List<String> listNodesUrlWithStatus(NodeStatus status) {
         List<String> nodeUrlsWithStatus = new LinkedList<>();
         for (Map.Entry<String, NodeStatus> entry : nodeStatusPerNodeUrl.entrySet()) {
             if (entry.getValue().equals(status)) {

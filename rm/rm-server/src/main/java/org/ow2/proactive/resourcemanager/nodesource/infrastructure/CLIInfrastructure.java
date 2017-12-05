@@ -128,13 +128,13 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
 
         final String nodeName = "SCR-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
         final String commandLine = interpreter + " " + deploymentScript.getAbsolutePath() + " " +
-                                   hostTracker.getHost().getHostName() + " " + nodeName + " " +
+                                   hostTracker.getResolvedAddress().getHostName() + " " + nodeName + " " +
                                    this.nodeSource.getName() + " " + getRmUrl() + " " + nbNodes;
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      commandLine,
-                                                     "Deploying node on host " + hostTracker.getHost(),
+                                                     "Deploying node on host " + hostTracker.getResolvedAddress(),
                                                      this.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
@@ -157,16 +157,16 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("Child process at " + hostTracker.getHost().getHostName() + " exited abnormally (" +
-                                 exitCode + ").");
+                    logger.error("Child process at " + hostTracker.getResolvedAddress().getHostName() +
+                                 " exited abnormally (" + exitCode + ").");
                 } else {
                     logger.error("Launching node script has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
                 final String description = "Script failed to launch a node on host " +
-                                           hostTracker.getHost().getHostName() + lf + "   >Error code: " + exitCode +
-                                           lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
+                                           hostTracker.getResolvedAddress().getHostName() + lf + "   >Error code: " +
+                                           exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {

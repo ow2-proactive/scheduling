@@ -226,7 +226,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
         JSch jsch = new JSch();
 
-        final String msg = "deploy on " + hostTracker.getHost();
+        final String msg = "deploy on " + hostTracker.getResolvedAddress();
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, msg, super.nodeTimeOut));
@@ -234,7 +234,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
         Session session;
         try { // Create ssh session to the hostname
-            session = jsch.getSession(this.sshUsername, hostTracker.getHost().getHostName(), this.sshPort);
+            session = jsch.getSession(this.sshUsername, hostTracker.getResolvedAddress().getHostName(), this.sshPort);
             if (this.sshPassword == null) {
                 jsch.addIdentity(this.sshUsername, this.sshPrivateKey, null, null);
             } else {

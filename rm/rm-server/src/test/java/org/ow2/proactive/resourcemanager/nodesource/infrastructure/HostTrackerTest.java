@@ -55,30 +55,30 @@ public class HostTrackerTest {
 
     @Test
     public void testNewHostTrackerNeedsNodes() {
-        assertThat(hostTracker.getNeedNodesFlag()).isTrue();
+        assertThat(hostTracker.needsNodes()).isTrue();
     }
 
     @Test
     public void testHostTrackerWithTrueNeedNodesFlagNeedsNodes() {
-        hostTracker.setNeedNodesFlag(true);
-        assertThat(hostTracker.getNeedNodesFlag()).isTrue();
+        hostTracker.setNeedsNodes(true);
+        assertThat(hostTracker.needsNodes()).isTrue();
     }
 
     @Test
     public void testHostTrackerWithFalseNeedNodesFlagDoesNotNeedNodes() {
-        hostTracker.setNeedNodesFlag(false);
-        assertThat(hostTracker.getNeedNodesFlag()).isFalse();
+        hostTracker.setNeedsNodes(false);
+        assertThat(hostTracker.needsNodes()).isFalse();
     }
 
     @Test
     public void testAllNodesNotAliveMakeNeededNodeNumberEqualToConfiguredNumber() {
-        assertThat(hostTracker.getNeededNodeNumber()).isEqualTo(CONFIGURED_NODE_NUMBER);
+        assertThat(hostTracker.getNeededNodesNumber()).isEqualTo(CONFIGURED_NODE_NUMBER);
     }
 
     @Test
     public void testAllNodesAliveMakeNeededNodeNumberEqualToZero() {
         putAllNodesAlive();
-        assertThat(hostTracker.getNeededNodeNumber()).isEqualTo(0);
+        assertThat(hostTracker.getNeededNodesNumber()).isEqualTo(0);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class HostTrackerTest {
         putAllNodesAlive();
         hostTracker.putRemovedNodeUrl(NODE_URL_BASE + "1");
         hostTracker.putRemovedNodeUrl(NODE_URL_BASE + "2");
-        assertThat(hostTracker.getNeededNodeNumber()).isEqualTo(0);
+        assertThat(hostTracker.getNeededNodesNumber()).isEqualTo(0);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class HostTrackerTest {
         putAllNodesAlive();
         hostTracker.putDownNodeUrl(NODE_URL_BASE + "1");
         hostTracker.putDownNodeUrl(NODE_URL_BASE + "3");
-        assertThat(hostTracker.getNeededNodeNumber()).isEqualTo(2);
+        assertThat(hostTracker.getNeededNodesNumber()).isEqualTo(2);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class HostTrackerTest {
         hostTracker.putRemovedNodeUrl(NODE_URL_BASE + "1");
         hostTracker.putDownNodeUrl(NODE_URL_BASE + "2");
         hostTracker.putDownNodeUrl(NODE_URL_BASE + "3");
-        assertThat(hostTracker.getNeededNodeNumber()).isEqualTo(2);
+        assertThat(hostTracker.getNeededNodesNumber()).isEqualTo(2);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class HostTrackerTest {
         hostTracker.putDownNodeUrl(NODE_URL_BASE + "2");
         hostTracker.putDownNodeUrl(NODE_URL_BASE + "3");
         hostTracker.putAliveNodeUrl(NODE_URL_BASE + "2");
-        assertThat(hostTracker.getNeededNodeNumber()).isEqualTo(1);
+        assertThat(hostTracker.getNeededNodesNumber()).isEqualTo(1);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class HostTrackerTest {
         for (int i = 0; i < twiceTheNumberOfConfiguredNodes; i++) {
             hostTracker.putRemovedNodeUrl(NODE_URL_BASE + i);
         }
-        assertThat(hostTracker.getNeededNodeNumber()).isEqualTo(0);
+        assertThat(hostTracker.getNeededNodesNumber()).isEqualTo(0);
     }
 
     @Test

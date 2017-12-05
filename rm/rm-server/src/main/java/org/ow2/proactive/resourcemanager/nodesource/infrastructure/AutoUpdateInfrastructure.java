@@ -102,7 +102,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
 
         Properties localProperties = new Properties();
         localProperties.put(NODE_NAME, nodeName);
-        localProperties.put(HOST_NAME, hostTracker.getHost().getHostName());
+        localProperties.put(HOST_NAME, hostTracker.getResolvedAddress().getHostName());
         localProperties.put(NODESOURCE_CREDENTIALS, credentials);
         localProperties.put(NODESOURCE_NAME, nodeSource.getName());
         localProperties.put(NB_NODES, nbNodes);
@@ -113,7 +113,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      filledCommand,
-                                                     "Deploying node on host " + hostTracker.getHost(),
+                                                     "Deploying node on host " + hostTracker.getResolvedAddress(),
                                                      this.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
@@ -137,16 +137,16 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("Child process at " + hostTracker.getHost().getHostName() + " exited abnormally (" +
-                                 exitCode + ").");
+                    logger.error("Child process at " + hostTracker.getResolvedAddress().getHostName() +
+                                 " exited abnormally (" + exitCode + ").");
                 } else {
                     logger.error("Launching node script has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
                 final String description = "Script failed to launch a node on host " +
-                                           hostTracker.getHost().getHostName() + lf + "   >Error code: " + exitCode +
-                                           lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
+                                           hostTracker.getResolvedAddress().getHostName() + lf + "   >Error code: " +
+                                           exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {
