@@ -56,7 +56,9 @@ public class SchedulerTasksStateRecoverIntegrationTest extends BaseSchedulerDBTe
 
         JobStateMatcher expectedJob;
 
-        expectedJob = job(job.getId(), JobStatus.STALLED).withPending(task("task1", TaskStatus.PENDING), true)
+        // A running job recovered from database should be recovered as
+        // running, and not stalled anymore (task recovery feature)
+        expectedJob = job(job.getId(), JobStatus.RUNNING).withRunning(task("task1", TaskStatus.RUNNING))
                                                          .withEligible("task1");
 
         RecoveredSchedulerState state;
@@ -72,6 +74,9 @@ public class SchedulerTasksStateRecoverIntegrationTest extends BaseSchedulerDBTe
         job.newWaitingTask();
         job.reStartTask(task);
         dbManager.taskRestarted(job, task, null);
+
+        expectedJob = job(job.getId(), JobStatus.STALLED).withPending(task("task1", TaskStatus.PENDING), true)
+                                                         .withEligible("task1");
 
         state = checkRecoveredState(recoverHelper.recover(-1), state().withRunning(expectedJob));
 

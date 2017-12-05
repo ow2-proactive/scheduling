@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeHelper;
@@ -56,14 +57,18 @@ public class NodesLockRestorationManagerTest {
 
     private RMCore rmCore;
 
+    private Client caller;
+
     @Before
     public void setUp() {
         dbManager = mock(RMDBManager.class);
         rmCore = mock(RMCore.class);
+        caller = mock(Client.class);
 
         nodesLockRestorationManager = Mockito.spy(new NodesLockRestorationManager(rmCore));
 
         doReturn(dbManager).when(rmCore).getDbManager();
+        doReturn("admin").when(caller).getName();
     }
 
     @Test
@@ -99,7 +104,7 @@ public class NodesLockRestorationManagerTest {
         assertThat(table).hasSize(1);
         verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
-        nodesLockRestorationManager.handle(rmNode);
+        nodesLockRestorationManager.handle(rmNode, caller);
 
         assertThat(table).hasSize(1);
         verify(rmCore, never()).lockNodes(anySetOf(String.class));
@@ -123,7 +128,7 @@ public class NodesLockRestorationManagerTest {
         assertThat(table).hasSize(1);
         verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
-        nodesLockRestorationManager.handle(rmNode);
+        nodesLockRestorationManager.handle(rmNode, caller);
 
         assertThat(table).hasSize(1);
         verify(rmCore, never()).lockNodes(anySetOf(String.class));
@@ -144,7 +149,7 @@ public class NodesLockRestorationManagerTest {
         assertThat(table).hasSize(0);
         verify(rmCore, never()).lockNodes(anySetOf(String.class));
 
-        nodesLockRestorationManager.handle(rmNode);
+        nodesLockRestorationManager.handle(rmNode, caller);
 
         assertThat(table).hasSize(0);
         verify(rmCore, never()).lockNodes(anySetOf(String.class));
@@ -152,7 +157,7 @@ public class NodesLockRestorationManagerTest {
 
     @Test
     public void testHandleMatchingNode() {
-        doReturn(new BooleanWrapper(true)).when(rmCore).lockNodes(anySetOf(String.class));
+        doReturn(new BooleanWrapper(true)).when(rmCore).lockNodes(anySetOf(String.class), eq(caller));
 
         RMNodeImpl rmNode = RMNodeHelper.basicWithMockedInternals("ns1", "n1", "h1", "nurl1", "parurl1").getLeft();
         assertThat(rmNode.isLocked()).isFalse();
@@ -163,16 +168,16 @@ public class NodesLockRestorationManagerTest {
         doReturn(table).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
         assertThat(table).hasSize(1);
-        verify(rmCore, never()).lockNodes(anySetOf(String.class));
+        verify(rmCore, never()).lockNodes(anySetOf(String.class), eq(caller));
 
         nodesLockRestorationManager.initialize();
         assertThat(nodesLockRestorationManager.isInitialized()).isTrue();
         verify(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
-        nodesLockRestorationManager.handle(rmNode);
+        nodesLockRestorationManager.handle(rmNode, caller);
 
         assertThat(table).hasSize(0);
-        verify(rmCore).lockNodes(anySetOf(String.class));
+        verify(rmCore).lockNodes(anySetOf(String.class), eq(caller));
     }
 
     @Test
@@ -192,7 +197,7 @@ public class NodesLockRestorationManagerTest {
         assertThat(nodesLockRestorationManager.isInitialized()).isTrue();
         verify(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
-        nodesLockRestorationManager.handle(rmNode);
+        nodesLockRestorationManager.handle(rmNode, caller);
 
         assertThat(table).hasSize(1);
         verify(rmCore, never()).lockNodes(anySetOf(String.class));
@@ -226,26 +231,26 @@ public class NodesLockRestorationManagerTest {
 
     @Test
     public void testLockNodeSucceeds() {
-        doReturn(new BooleanWrapper(true)).when(rmCore).lockNodes(anySetOf(String.class));
-        verify(rmCore, never()).lockNodes(anySetOf(String.class));
+        doReturn(new BooleanWrapper(true)).when(rmCore).lockNodes(anySetOf(String.class), eq(caller));
+        verify(rmCore, never()).lockNodes(anySetOf(String.class), eq(caller));
 
         RMNode rmNode = RMNodeHelper.basicWithMockedInternals().getLeft();
-        boolean lockResult = nodesLockRestorationManager.lockNode(rmNode);
+        boolean lockResult = nodesLockRestorationManager.lockNode(rmNode, caller);
 
         assertThat(lockResult).isTrue();
-        verify(rmCore).lockNodes(anySetOf(String.class));
+        verify(rmCore).lockNodes(anySetOf(String.class), eq(caller));
     }
 
     @Test
     public void testLockNodeFails() {
-        doReturn(new BooleanWrapper(false)).when(rmCore).lockNodes(anySetOf(String.class));
-        verify(rmCore, never()).lockNodes(anySetOf(String.class));
+        doReturn(new BooleanWrapper(false)).when(rmCore).lockNodes(anySetOf(String.class), eq(caller));
+        verify(rmCore, never()).lockNodes(anySetOf(String.class), eq(caller));
 
         RMNode rmNode = RMNodeHelper.basicWithMockedInternals().getLeft();
-        boolean lockResult = nodesLockRestorationManager.lockNode(rmNode);
+        boolean lockResult = nodesLockRestorationManager.lockNode(rmNode, caller);
 
         assertThat(lockResult).isFalse();
-        verify(rmCore).lockNodes(anySetOf(String.class));
+        verify(rmCore).lockNodes(anySetOf(String.class), eq(caller));
     }
 
 }

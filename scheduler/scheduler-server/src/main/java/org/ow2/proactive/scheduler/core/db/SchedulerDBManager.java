@@ -188,6 +188,7 @@ public class SchedulerDBManager {
         try {
             configuration.addAnnotatedClass(JobData.class);
             configuration.addAnnotatedClass(JobContent.class);
+            configuration.addAnnotatedClass(JobDataVariable.class);
             configuration.addAnnotatedClass(TaskData.class);
             configuration.addAnnotatedClass(TaskDataVariable.class);
             configuration.addAnnotatedClass(TaskResultData.class);
@@ -742,6 +743,8 @@ public class SchedulerDBManager {
 
         session.getNamedQuery("deleteEnvironmentModifierData").setParameter("jobId", jobId).executeUpdate();
 
+        session.getNamedQuery("deleteJobDataVariable").setParameter("jobId", jobId).executeUpdate();
+
         session.getNamedQuery("deleteTaskDataVariable").setParameter("jobId", jobId).executeUpdate();
 
         session.getNamedQuery("deleteSelectorData").setParameter("jobId", jobId).executeUpdate();
@@ -958,7 +961,7 @@ public class SchedulerDBManager {
 
         try {
             for (TaskData taskData : taskRuntimeDataList) {
-                InternalTask internalTask = taskData.toInternalTask(internalJob);
+                InternalTask internalTask = taskData.toInternalTask(internalJob, loadFullState);
                 if (loadFullState) {
                     internalTask.setParallelEnvironment(taskData.getParallelEnvironment());
                     internalTask.setGenericInformation(taskData.getGenericInformation());
@@ -1062,14 +1065,17 @@ public class SchedulerDBManager {
 
                 TaskInfo taskInfo = task.getTaskInfo();
 
+                ExecuterInformationData executerInfo = new ExecuterInformationData(taskId.getTaskId(),
+                                                                                   task.getExecuterInformation());
+
                 session.getNamedQuery("updateTaskDataTaskStarted")
                        .setParameter("taskStatus", taskInfo.getStatus())
                        .setParameter("startTime", taskInfo.getStartTime())
                        .setParameter("finishedTime", taskInfo.getFinishedTime())
                        .setParameter("executionHostName", taskInfo.getExecutionHostName())
+                       .setParameter("executerInformationData", executerInfo)
                        .setParameter("taskId", taskId)
                        .executeUpdate();
-
                 return null;
             }
 
@@ -1682,7 +1688,7 @@ public class SchedulerDBManager {
 
             return container;
         } catch (Exception e) {
-            throw new DatabaseManagerException(e);
+            throw new DatabaseManagerException("Failed to query script data for task " + task.getId(), e);
         }
     }
 

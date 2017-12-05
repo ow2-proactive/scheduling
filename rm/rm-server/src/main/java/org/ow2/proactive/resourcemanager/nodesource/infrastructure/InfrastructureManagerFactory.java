@@ -33,7 +33,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 
 
 /**
@@ -51,13 +51,12 @@ public class InfrastructureManagerFactory {
     /**
      * Creates new infrastructure manager using reflection mechanism.
      *
-     * @param infrastructureType a full class name of an infrastructure manager
-     * @param infrastructureParameters parameters for nodes acquisition
      * @return new infrastructure manager
      */
-    public static InfrastructureManager create(String infrastructureType, Object[] infrastructureParameters) {
-
+    public static InfrastructureManager create(NodeSourceData nodeSourceData) {
         InfrastructureManager im = null;
+        String infrastructureType = nodeSourceData.getInfrastructureType();
+        Object[] infrastructureParameters = nodeSourceData.getInfrastructureParameters();
         try {
 
             boolean supported = false;
@@ -74,10 +73,24 @@ public class InfrastructureManagerFactory {
             Class<?> imClass = Class.forName(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
             im.internalConfigure(infrastructureParameters);
+            im.setPersistedNodeSourceData(nodeSourceData);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return im;
+    }
+
+    /**
+     * Creates a new infrastructure manager and recovers its state thanks to
+     * the variables contained in {@param infrastructureVariables}.
+     *
+     * @param nodeSourceData the persisted information about the node source
+     * @return recovered infrastructure manager
+     */
+    public static InfrastructureManager recover(NodeSourceData nodeSourceData) {
+        InfrastructureManager infrastructure = create(nodeSourceData);
+        infrastructure.recoverPersistedInfraVariables(nodeSourceData.getInfrastructureVariables());
+        return infrastructure;
     }
 
     /**

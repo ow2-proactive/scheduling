@@ -26,6 +26,7 @@
 package org.ow2.proactive.scripting;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -145,12 +146,46 @@ public class SelectionScript extends Script<Boolean> {
 
     /** Create a selection script from an URL.
      * @param url an URL representing a script code
+     * @throws InvalidScriptException if the creation fails
+     */
+    public SelectionScript(URL url) throws InvalidScriptException {
+        this(url, true);
+    }
+
+    /** Create a selection script from an URL.
+     * @param url an URL representing a script code
+     * @throws InvalidScriptException if the creation fails
+     */
+    public SelectionScript(URL url, boolean dynamic) throws InvalidScriptException {
+        this(url, (String) null, dynamic);
+    }
+
+    /** Create a selection script from an URL.
+     * @param url an URL representing a script code
+     * @param engineName script's engine execution name.
+     * @throws InvalidScriptException if the creation fails
+     */
+    public SelectionScript(URL url, String engineName) throws InvalidScriptException {
+        this(url, engineName, true);
+    }
+
+    /** Create a selection script from an URL.
+     * @param url an URL representing a script code
+     * @param engineName script's engine execution name.
+     * @param dynamic true if the script is dynamic
+     * @throws InvalidScriptException if the creation fails
+     */
+    public SelectionScript(URL url, String engineName, boolean dynamic) throws InvalidScriptException {
+        this(url, engineName, null, dynamic);
+    }
+
+    /** Create a selection script from an URL.
+     * @param url an URL representing a script code
      * @param parameters script execution argument.
      * @throws InvalidScriptException if the creation fails
      */
-    public SelectionScript(URL url, String[] parameters) throws InvalidScriptException {
-        super(url, parameters);
-        buildSelectionScriptId();
+    public SelectionScript(URL url, Serializable[] parameters) throws InvalidScriptException {
+        this(url, parameters, true);
     }
 
     /** Create a selection script from an URL.
@@ -159,8 +194,31 @@ public class SelectionScript extends Script<Boolean> {
      * @param dynamic true if the script is dynamic
      * @throws InvalidScriptException if the creation fails.
      */
-    public SelectionScript(URL url, String[] parameters, boolean dynamic) throws InvalidScriptException {
-        super(url, parameters);
+    public SelectionScript(URL url, Serializable[] parameters, boolean dynamic) throws InvalidScriptException {
+        this(url, null, parameters, dynamic);
+    }
+
+    /** Create a selection script from an URL.
+     * @param url an URL representing a script code
+     * @param engineName script's engine execution name.
+     * @param parameters script execution argument.
+     * @throws InvalidScriptException if the creation fails
+     */
+    public SelectionScript(URL url, String engineName, Serializable[] parameters) throws InvalidScriptException {
+        this(url, engineName, parameters, true);
+    }
+
+    /** Create a selection script from an URL.
+     * @param url an URL representing a script code
+     * @param engineName script's engine execution name.
+     * @param parameters execution arguments
+     * @param dynamic true if the script is dynamic
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public SelectionScript(URL url, String engineName, Serializable[] parameters, boolean dynamic)
+            throws InvalidScriptException {
+        // Selection scripts cannot use url late binding, i.e. fetchImmediately must be false.
+        super(url, engineName, parameters, true);
         this.dynamic = dynamic;
         buildSelectionScriptId();
     }
@@ -172,6 +230,12 @@ public class SelectionScript extends Script<Boolean> {
      */
     public SelectionScript(Script<?> script, boolean dynamic) throws InvalidScriptException {
         super(script);
+        // The script passed in parameter can be defined by its url only, in that case, as late binding is disabled for selection scripts, the url must be resolved immediately.
+        try {
+            fetchUrlIfNeeded();
+        } catch (IOException e) {
+            throw new InvalidScriptException(e);
+        }
         this.dynamic = dynamic;
         buildSelectionScriptId();
     }

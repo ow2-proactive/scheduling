@@ -46,6 +46,7 @@ import org.apache.commons.lang3.SerializationUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.util.ByteCompressionUtils;
@@ -67,6 +68,7 @@ public class JobContent implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(JobContent.class);
 
     @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
     @Column(name = "CONTENT", length = Integer.MAX_VALUE)
     private byte[] jobContentAsByteArray;
 

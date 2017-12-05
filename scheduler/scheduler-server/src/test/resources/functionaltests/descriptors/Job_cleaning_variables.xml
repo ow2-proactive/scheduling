@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <job
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xmlns="urn:proactive:jobdescriptor:3.4"
-		xsi:schemaLocation="urn:proactive:jobdescriptor:3.4 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.4/schedulerjob.xsd"
+		xmlns="urn:proactive:jobdescriptor:dev"
+		xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
 		name="Job_cleaning_variables"
 		priority="normal"
 		onTaskError="continueJobExecution"
@@ -11,6 +11,8 @@
 	<variables>
 		<variable name="path" value="path_to_dir"/>
 		<variable name="test" value="value_of_test"/>
+		<variable name="var1" value="jobVar1"/>
+		<variable name="var2" value="jobVar2"/>
 	</variables>
 	<taskFlow>
 		<task name="SuccessTask">
@@ -88,6 +90,8 @@ print("ok");
 					<code language="javascript">
 						<![CDATA[
 variables.put("test", "newValue");
+variables.put("var3", "propagatedVar3");
+variables.put("var4", "propagatedVar4");
 ]]>
 					</code>
 				</script>
@@ -196,6 +200,78 @@ a=b;
 			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
 			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
 			check_var_equals("test","newNewValue",path2)
+                    	]]>
+					</code>
+				</script>
+			</cleaning>
+		</task>
+		<task name="inheritedVarsTask">
+			<variables>
+				<variable name="var1" value="taskVar1" inherited="false" model=""/>
+				<variable name="var2" value="taskVar2" inherited="true" model=""/>
+				<variable name="var3" value="taskVar3" inherited="false" model=""/>
+				<variable name="var4" value="taskVar4" inherited="true" model=""/>
+				<variable name="var5" value="taskVar5" inherited="false" model=""/>
+				<variable name="var6" value="taskVar6" inherited="true" model=""/>
+			</variables>
+			<depends>
+				<task ref="ChangeVariableTask"/>
+			</depends>
+			<scriptExecutable>
+				<script>
+					<code language="javascript">
+						<![CDATA[
+a=b;
+]]>
+					</code>
+				</script>
+			</scriptExecutable>
+			<cleaning>
+				<script>
+					<code language="groovy">
+						<![CDATA[
+            			import org.ow2.proactive.scheduler.task.SchedulerVars
+		 	def writeFile = {
+							   path, text ->
+							   	def f = new File(path)
+							   	f.append("\n"+text)
+							}
+ 			def check_defined_var = {
+ 			 							name, path ->
+ 			 								if (variables.get(name) == null)
+ 			 								{
+ 			 									writeFile(path,(name + " is not defined"))
+ 			 								}
+ 			 						}
+			def check_var_equals = {
+										name, value, path ->
+											if (!value.equals(variables.get(name)))
+											{
+											writeFile(path,("Variables: " + name + " is not equal to " + variables.get(name)))
+											}
+									}
+			def check_gi_equals = {
+										name, value, path ->
+											if (!value.equals(genericInformation.get(name)))
+											{
+											writeFile(path,("GenericInformation : " + name + " is not equal to " + variables.get(name)))
+											}
+								  }
+			path2=variables.get("path")
+			check_defined_var(SchedulerVars.PA_JOB_ID.toString(),path2)
+			check_var_equals(SchedulerVars.PA_JOB_NAME.toString(), "Job_cleaning_variables",path2)
+			check_defined_var(SchedulerVars.PA_TASK_ID.toString(),path2)
+			check_var_equals(SchedulerVars.PA_TASK_NAME.toString(), "inheritedVarsTask",path2)
+			check_defined_var(SchedulerVars.PA_TASK_ITERATION.toString(),path2)
+			check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString(),path2)
+			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
+			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
+			check_var_equals("var1","taskVar1",path2)
+			check_var_equals("var2","jobVar2",path2)
+			check_var_equals("var3","taskVar3",path2)
+			check_var_equals("var4","propagatedVar4",path2)
+			check_var_equals("var5","taskVar5",path2)
+			check_var_equals("var6","taskVar6",path2)
                     	]]>
 					</code>
 				</script>

@@ -609,8 +609,13 @@ public abstract class InternalTask extends TaskState {
 
     public static synchronized boolean isScriptAuthorized(TaskId id, Script script) {
         updateAuthorizedScriptsSignatures(id);
-        return authorizedSelectionScripts == null ||
-               authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()));
+        if (authorizedSelectionScripts != null) {
+            String scriptContent = script.fetchScript();
+            if (scriptContent != null) {
+                return authorizedSelectionScripts.contains(Script.digest(scriptContent.trim()));
+            }
+        }
+        return true;
     }
 
     @Override
@@ -1096,6 +1101,7 @@ public abstract class InternalTask extends TaskState {
         tli.setTaskId(getId());
         tli.setJobOwner(internalJob.getJobInfo().getJobOwner());
         tli.setSchedulerRestUrl(PASchedulerProperties.SCHEDULER_REST_URL.getValueAsStringOrNull());
+        tli.setCatalogRestUrl(PASchedulerProperties.CATALOG_REST_URL.getValueAsStringOrNull());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
         tli.setControlFlowScript(getFlowScript());
@@ -1189,14 +1195,28 @@ public abstract class InternalTask extends TaskState {
 
     private void updateVariablesWithTaskResults(Map<TaskId, TaskResult> taskResults) {
         for (TaskResult taskResult : taskResults.values()) {
+            Map<String, Serializable> propagatedVariables = new HashMap<>();
             if (taskResult.getPropagatedVariables() != null) {
                 try {
-                    updatedVariables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
+                    propagatedVariables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());
+                    if (propagatedVariables != null) {
+                        updateInheritedPropagatedVariables(propagatedVariables);
+                    }
                 } catch (Exception e) {
                     throw new IllegalStateException("Could not deserialize variable map", e);
                 }
             }
         }
+    }
+
+    private void updateInheritedPropagatedVariables(Map<String, Serializable> propagatedVariables) {
+        for (Map.Entry<String, Serializable> propagatedVariable : propagatedVariables.entrySet()) {
+            if (variables.get(propagatedVariable.getKey()) == null ||
+                variables.get(propagatedVariable.getKey()).isJobInherited()) {
+                updatedVariables.put(propagatedVariable.getKey(), propagatedVariable.getValue());
+            }
+        }
+
     }
 
     /**

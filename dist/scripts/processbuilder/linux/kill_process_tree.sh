@@ -19,7 +19,7 @@ done
 # Iterate in seconds
 for iteration in $(seq 1 $1)
 do
-    if [ `pgrep -u $LOGIN -f $PROCESS_KILL_TOKEN -c` -eq "0" ]
+    if [ "$(pgrep -u $LOGIN -f $PROCESS_KILL_TOKEN | wc -l)" -eq 0 ]
     # means nothing else than the killing procedure is running
     then
         break # Processes don't exist -> so don't wait

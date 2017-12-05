@@ -429,8 +429,11 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      */
     public Map<String, Serializable> getScopeVariables() {
         Map<String, Serializable> scopeVariables = new HashMap<>();
+        Map<String, String> jobVariables = getTaskInfo().getJobInfo().getVariables();
         for (TaskVariable variable : variables.values()) {
-            if (!variable.isJobInherited()) {
+            if (!variable.isJobInherited() ||
+                (variable.isJobInherited() &&
+                 (jobVariables == null || !jobVariables.containsKey(variable.getName())))) {
                 scopeVariables.put(variable.getName(), variable.getValue());
             }
         }

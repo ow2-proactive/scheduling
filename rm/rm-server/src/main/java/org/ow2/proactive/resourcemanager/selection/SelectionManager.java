@@ -413,11 +413,15 @@ public abstract class SelectionManager {
             return;
 
         for (SelectionScript script : scripts) {
-            if (!authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()))) {
-                // unauthorized selection script
-                throw new SecurityException("Cannot execute unauthorized script: " +
-                                            System.getProperty("line.separator") + script.getScript());
-            }
+            checkContentAuthorization(script.fetchScript());
+        }
+    }
+
+    private void checkContentAuthorization(String content) {
+        if (content != null && !authorizedSelectionScripts.contains(Script.digest(content.trim()))) {
+            // unauthorized selection script
+            throw new SecurityException("Cannot execute unauthorized script: " + System.getProperty("line.separator") +
+                                        content);
         }
     }
 
