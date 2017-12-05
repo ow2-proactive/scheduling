@@ -26,6 +26,8 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,6 +57,8 @@ public class ScriptData {
     private String scriptEngine;
 
     private String script;
+
+    private String url;
 
     private List<Serializable> scriptParameters;
 
@@ -121,7 +125,15 @@ public class ScriptData {
     }
 
     SimpleScript createSimpleScript() throws InvalidScriptException {
-        return new SimpleScript(script, scriptEngine, parameters());
+        if (script == null && url != null) {
+            try {
+                return new SimpleScript(new URL(url), scriptEngine, parameters());
+            } catch (MalformedURLException e) {
+                throw new InvalidScriptException(e);
+            }
+        } else {
+            return new SimpleScript(script, scriptEngine, parameters());
+        }
     }
 
     private Serializable[] parameters() {
@@ -135,6 +147,9 @@ public class ScriptData {
     protected static void initCommonAttributes(ScriptData scriptData, Script<?> script) {
         scriptData.setScript(script.getScript());
         scriptData.setScriptEngine(script.getEngineName());
+        if (script.getScriptUrl() != null) {
+            scriptData.setURL(script.getScriptUrl().toExternalForm());
+        }
         if (script.getParameters() != null) {
             scriptData.setScriptParameters(Arrays.asList(script.getParameters()));
         }
@@ -152,7 +167,7 @@ public class ScriptData {
         this.id = id;
     }
 
-    @Column(name = "ENGINE", nullable = false)
+    @Column(name = "ENGINE")
     public String getScriptEngine() {
         return scriptEngine;
     }
@@ -169,6 +184,16 @@ public class ScriptData {
 
     public void setScript(String script) {
         this.script = script;
+    }
+
+    @Column(name = "URL", length = Integer.MAX_VALUE)
+    @Lob
+    public String getURL() {
+        return url;
+    }
+
+    public void setURL(String url) {
+        this.url = url;
     }
 
     @Column(name = "PARAMETERS", length = Integer.MAX_VALUE)

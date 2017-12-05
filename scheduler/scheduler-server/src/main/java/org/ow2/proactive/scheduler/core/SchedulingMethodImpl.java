@@ -562,7 +562,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     public static SelectionScript replaceBindingsInsideScript(SelectionScript script,
             Map<String, Serializable> bindings) {
-        String scriptContent = script.getScript();
+        String scriptContent = script.fetchScript();
         if (bindings != null) {
             for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
                 scriptContent = scriptContent.replace(entry.getKey(), entry.getValue().toString());
