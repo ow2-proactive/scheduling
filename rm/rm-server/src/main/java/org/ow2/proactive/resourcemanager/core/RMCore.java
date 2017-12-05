@@ -188,12 +188,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Log4J logger name for RMCore
      */
-    private final static Logger logger = Logger.getLogger(RMCore.class);
+    private static final Logger logger = Logger.getLogger(RMCore.class);
 
     /**
      * Log4J logger name dedicated to nodes recovery
      */
-    private final static Logger nodesRecoveryLogger = Logger.getLogger(RMCore.class + " Nodes Recovery");
+    private static final Logger nodesRecoveryLogger = Logger.getLogger(RMCore.class + " Nodes Recovery");
 
     /**
      * If RMCore Active object
