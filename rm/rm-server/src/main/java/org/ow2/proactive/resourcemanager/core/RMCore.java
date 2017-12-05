@@ -466,16 +466,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private void recoverNodeSourcesAndNodes() {
         Collection<NodeSourceData> nodeSources = dbManager.getNodeSources();
-
-        if (nodeSources.isEmpty()) {
-            nodesRecoveryLogger.info("No node source found in database");
-        } else {
-            if (nodeSources.size() < 10) {
-                nodesRecoveryLogger.info("Node sources found in database: " + Arrays.toString(nodeSources.toArray()));
-            } else {
-                nodesRecoveryLogger.info("Number of node sources found in database: " + nodeSources.size());
-            }
-        }
+        logPersistedNodeSourceInfo(nodeSources);
 
         for (NodeSourceData nodeSourceData : nodeSources) {
             String nodeSourceDataName = nodeSourceData.getName();
@@ -491,6 +482,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     nodesRecoveryLogger.error(t.getMessage(), t);
                     brokenNodeSources.add(nodeSourceDataName);
                 }
+            }
+        }
+    }
+
+    private void logPersistedNodeSourceInfo(Collection<NodeSourceData> nodeSources) {
+        if (nodeSources.isEmpty()) {
+            nodesRecoveryLogger.info("No node source found in database");
+        } else {
+            if (nodeSources.size() < 10) {
+                nodesRecoveryLogger.info("Node sources found in database: " + Arrays.toString(nodeSources.toArray()));
+            } else {
+                nodesRecoveryLogger.info("Number of node sources found in database: " + nodeSources.size());
             }
         }
     }

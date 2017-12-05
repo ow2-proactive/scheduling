@@ -74,18 +74,30 @@ public class HostTracker implements Serializable {
         needNodesFlag = new AtomicBoolean(true);
     }
 
+    /**
+     * @return the host as it is written in the hosts file supplied by the user
+     */
     protected String getHostInFile() {
         return hostInFile;
     }
 
+    /**
+     * @return the {@link InetAddress} representation of the host
+     */
     protected InetAddress getHost() {
         return host;
     }
 
+    /**
+     * @return whether this host is marked as requiring nodes
+     */
     protected boolean getNeedNodesFlag() {
         return needNodesFlag.get();
     }
 
+    /**
+     * Mark this host either with a requiring nodes flag.
+     */
     protected void setNeedNodesFlag(boolean needNodesFlag) {
         this.needNodesFlag.set(needNodesFlag);
     }
@@ -107,35 +119,48 @@ public class HostTracker implements Serializable {
                 logger.warn("Computed needed node number " + computedNeededNodeNumber +
                             " is bigger than the configured number of nodes " + configuredNodeNumber + ". Requiring " +
                             neededNodeNumber + " nodes.");
-            }
-            if (computedNeededNodeNumber < 0) {
-                neededNodeNumber = 0;
-                logger.warn("Computed needed node number " + computedNeededNodeNumber +
-                            " is negative. Requiring no nodes.");
-            }
-            if (computedNeededNodeNumber <= configuredNodeNumber && computedNeededNodeNumber >= 0) {
-                neededNodeNumber = computedNeededNodeNumber;
+            } else {
+                if (computedNeededNodeNumber < 0) {
+                    neededNodeNumber = 0;
+                    logger.warn("Computed needed node number " + computedNeededNodeNumber +
+                                " is negative. Requiring no nodes.");
+                } else {
+                    neededNodeNumber = computedNeededNodeNumber;
+                }
             }
         }
         return neededNodeNumber;
     }
 
+    /**
+     * @return whether the host still has nodes alive
+     */
     protected boolean hasAliveNodes() {
         return aliveNodeCounter.get() > 0;
     }
 
+    /**
+     * Registers the URL of an alive node and increment the alive node counter.
+     */
     protected void putAliveNodeUrl(String aliveNodeUrl) {
         decrementCounterForPreviousStatus(aliveNodeUrl);
         nodeStatusPerNodeUrl.put(aliveNodeUrl, NodeStatus.ALIVE);
         aliveNodeCounter.incrementAndGet();
     }
 
+    /**
+     * Registers the URL of a down node and increment the down node counter.
+     */
     protected void putDownNodeUrl(String downNodeUrl) {
         decrementCounterForPreviousStatus(downNodeUrl);
         nodeStatusPerNodeUrl.put(downNodeUrl, NodeStatus.DOWN);
         downNodeCounter.incrementAndGet();
     }
 
+    /**
+     * Registers the URL of a removed node and increment the removed node
+     * counter.
+     */
     protected void putRemovedNodeUrl(String removedNodeUrl) {
         decrementCounterForPreviousStatus(removedNodeUrl);
         nodeStatusPerNodeUrl.put(removedNodeUrl, NodeStatus.REMOVED);
