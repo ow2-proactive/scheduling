@@ -43,6 +43,8 @@ import org.apache.log4j.Logger;
  */
 public class HostTracker implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     protected static final Logger logger = Logger.getLogger(HostTracker.class);
 
     private final String hostInFile;
