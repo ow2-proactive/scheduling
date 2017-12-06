@@ -42,11 +42,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -111,8 +111,10 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
 
-    /** key of the shutdown flag */
-    private static final String SHUTDOWN_FLAG_KEY = "shutdownFlag";
+    /**
+     * Indicates whether the infrastructure is shutting down.
+     */
+    private AtomicBoolean shutDown = new AtomicBoolean(false);
 
     /**
      * Internal node acquisition method
@@ -120,13 +122,13 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using SSH, register it manually in the
      * nodesource.
      * 
-     * @param host The host on which one the node will be started
+     * @param hostTracker The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
      * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws RMException
      *             acquisition failed
      */
-    public void startNodeImpl(final InetAddress host, final int nbNodes, final List<String> depNodeURLs)
+    public void startNodeImpl(final HostTracker hostTracker, final int nbNodes, final List<String> depNodeURLs)
             throws RMException {
         String fs = getTargetOSObj().fs;
         // we set the java security policy file
@@ -173,7 +175,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         }
         CommandLineBuilder clb = super.getDefaultCommandLineBuilder(getTargetOSObj());
 
-        final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean();
+        final boolean deployNodesInDetachedMode = PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() ||
+                                                  PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean();
         if (deployNodesInDetachedMode) {
             // if we do not want to kill the nodes when the RM exits or
             // restarts, then we should launch the nodes in background and
@@ -184,7 +187,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         clb.setJavaPath(this.javaPath);
         clb.setRmHome(this.schedulingPath);
         clb.setPaProperties(sb);
-        final String nodeName = "SSH-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
+        final String nodeName = nodeNameBuilder.generateNodeName(hostTracker);
         clb.setNodeName(nodeName);
         clb.setNumberOfNodes(nbNodes);
         // finally, the credential's value
@@ -223,7 +226,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
         JSch jsch = new JSch();
 
-        final String msg = "deploy on " + host;
+        final String msg = "deploy on " + hostTracker.getResolvedAddress();
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames, obfuscatedCmdLine, msg, super.nodeTimeOut));
@@ -231,7 +234,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
         Session session;
         try { // Create ssh session to the hostname
-            session = jsch.getSession(this.sshUsername, host.getHostName(), this.sshPort);
+            session = jsch.getSession(this.sshUsername, hostTracker.getResolvedAddress().getHostName(), this.sshPort);
             if (this.sshPassword == null) {
                 jsch.addIdentity(this.sshUsername, this.sshPrivateKey, null, null);
             } else {
@@ -263,7 +266,7 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             Future<Void> deployResult = deployService.submit(new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    while (!getShutdownFlag() && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
+                    while (!shutDown.get() && !checkAllNodesAreAcquiredAndDo(createdNodeNames, null, null)) {
                         if (anyTimedOut(depNodeURLs)) {
                             throw new IllegalStateException("The upper infrastructure has issued a timeout");
                         }
@@ -421,14 +424,13 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     @Override
     public void shutDown() {
-        setShutdownFlag(true);
+        shutDown.set(true);
     }
 
     @Override
     protected void initializePersistedInfraVariables() {
         super.initializePersistedInfraVariables();
         persistedInfraVariables.put(TARGET_OS_OBJ_KEY, null);
-        persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, false);
     }
 
     // Below are wrapper methods around the runtime variables map
@@ -438,25 +440,6 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
             @Override
             public OperatingSystem handle() {
                 return (OperatingSystem) persistedInfraVariables.get(TARGET_OS_OBJ_KEY);
-            }
-        });
-    }
-
-    private boolean getShutdownFlag() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return (boolean) persistedInfraVariables.get(SHUTDOWN_FLAG_KEY);
-            }
-        });
-    }
-
-    private void setShutdownFlag(final boolean isShutdown) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                persistedInfraVariables.put(SHUTDOWN_FLAG_KEY, isShutdown);
-                return null;
             }
         });
     }
