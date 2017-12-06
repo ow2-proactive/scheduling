@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -63,7 +65,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 2000 }, { 200, 1000 }, { 300, 3000 } });
+        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 2000 }, { 200, 2000 } });
     }
 
     // number of nodes
@@ -77,6 +79,8 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
         this.timeLimit = timeLimit;
     }
 
+    private RMTHelper rmHelper;
+
     /**
      * This method tests performance of node recovery using local infrastructure.
      *
@@ -85,7 +89,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
     @Before
     public void startKillStartRM() throws Exception {
         ProActiveConfiguration.load();
-        RMTHelper rmHelper = new RMTHelper();
+        rmHelper = new RMTHelper();
         rmHelper.startRM(RM_CONFIGURATION_START);
 
         assertTrue(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean());
@@ -114,6 +118,17 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
         assertThat("Nodes recovery time for " + nodesNumber + " nodes",
                    (int) timeSpentToRecoverNodes(),
                    lessThan(timeLimit));
+    }
+
+    @After
+    public void shutdownRmHelper() throws Exception {
+        try {
+            rmHelper.removeNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+            rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+        } catch (Exception ignored) {
+
+        }
+        rmHelper.shutdownRM();
     }
 
     private long nodesRecovered() {
