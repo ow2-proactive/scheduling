@@ -734,9 +734,9 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return this.submitFromCatalog(catalogRestURL, bucketId, workflowName, Collections.<String, String> emptyMap());
+        return this.submitFromCatalog(catalogRestURL, bucketName, workflowName, Collections.<String, String> emptyMap());
 
     }
 
@@ -760,14 +760,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName,
-            Map<String, String> variables)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
+                                   Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
 
         JobIdData jobIdData = null;
         try {
             String workflow = CatalogClientLib.getCatalogObjectService().getResolvedCatalogObject(catalogRestURL,
-                                                                                                  Long.valueOf(bucketId),
+                                                                                                  bucketName,
                                                                                                   workflowName,
                                                                                                   false,
                                                                                                   sid);

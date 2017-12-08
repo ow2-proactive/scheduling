@@ -188,7 +188,7 @@ public interface ISchedulerClient extends Scheduler {
      * <p>
      * 
      * @param catalogRestURL
-     * @param bucketId
+     * @param bucketName
      * @param workflowName
      * @param variables
      * @return
@@ -197,7 +197,7 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName, Map<String, String> variables)
+    JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
@@ -210,7 +210,7 @@ public interface ISchedulerClient extends Scheduler {
      * <p>
      * 
      * @param catalogRestURL
-     * @param bucketId
+     * @param bucketName
      * @param workflowName
      * @return
      * @throws NotConnectedException
@@ -218,7 +218,7 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
+    JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
