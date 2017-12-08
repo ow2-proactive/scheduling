@@ -253,7 +253,7 @@ class LoadPackage {
 
         // Create a bucket if needed -------------
         if (bucket_found) {
-            return bucket_found.id
+            return bucket_found.name
         } else {
             // POST QUERY
             def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
@@ -265,10 +265,10 @@ class LoadPackage {
             response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
             def bis = new BufferedInputStream(response.getEntity().getContent())
             def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
-            def bucket_id = slurper.parseText(result.toString()).get("id")
+            def bucket_name = slurper.parseText(result.toString()).get("name")
             bis.close();
             writeToOutput(" " + bucket + " created!")
-            return bucket_id
+            return bucket_name
         }
     }
 
@@ -286,18 +286,18 @@ class LoadPackage {
 
             // BUCKET SECTION /////////////////////////////
 
-            def bucket_id = createBucketIfNotExist(bucket)
+            def bucket_name = createBucketIfNotExist(bucket)
 
             // OBJECTS SECTION /////////////////////////////
 
             // GET QUERY
-            def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources"
+            def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources"
             def response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: this.sessionId])
             def bucket_resources_list = slurper.parseText(response.toString())
 
             catalog_map.get("objects").each { object ->
                 //push object in the catalog
-                def object_file = pushObject(object, package_dir,bucket_resources_list, bucket_id)
+                def object_file = pushObject(object, package_dir,bucket_resources_list, bucket_name)
 
                 // Expose the workflow/object as a studio template
                 populateTemplateDir(object, object_file.absolutePath)
