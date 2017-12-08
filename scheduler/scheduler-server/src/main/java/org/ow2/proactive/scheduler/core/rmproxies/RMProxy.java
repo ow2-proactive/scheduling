@@ -138,7 +138,7 @@ public class RMProxy {
         }
 
         if (proxyActiveObject != null) {
-            proxyActiveObject.releaseNodes(nodeSet, cleaningScript, variables, genericInformation, taskId);
+            proxyActiveObject.releaseNodes(nodeSet, cleaningScript, variables, genericInformation, taskId, creds);
         } else {
             logger.warn("Didn't find RM to release NodeSet (RM is down or all NodeSet's Nodes are down)");
         }

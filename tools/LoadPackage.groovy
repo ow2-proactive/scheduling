@@ -27,6 +27,8 @@ class LoadPackage {
 
     private logger = Logger.getLogger("org.ow2.proactive.scheduler")
 
+    private static groovy.json.JsonSlurper slurper = new groovy.json.JsonSlurper()
+
 
     LoadPackage(binding) {
 
@@ -34,6 +36,7 @@ class LoadPackage {
         this.GLOBAL_SPACE_PATH = binding.variables.get("pa.scheduler.dataspace.defaultglobal.localpath")
         this.SCHEDULER_REST_URL = binding.variables.get("pa.scheduler.rest.url")
         this.SCHEDULER_HOME = binding.variables.get("pa.scheduler.home")
+        this.sessionId = binding.variables.get("pa.scheduler.session.id")
 
         // User variables
         this.WORKFLOW_TEMPLATES_DIR = new File(this.SCHEDULER_HOME, "config/workflows/templates")
@@ -43,6 +46,9 @@ class LoadPackage {
         // Deduced variables
         this.CATALOG_URL = this.SCHEDULER_REST_URL.substring(0, this.SCHEDULER_REST_URL.length() - 4) + "catalog"
 
+        writeToOutput("SCHEDULER_HOME " + this.SCHEDULER_HOME)
+        writeToOutput("SCHEDULER_REST_URL " + this.SCHEDULER_REST_URL)
+        writeToOutput("CATALOG_URL " + this.CATALOG_URL)
     }
 
 
@@ -80,16 +86,16 @@ class LoadPackage {
     }
 
 
-    def loginAdminUserCredToSchedulerAndGetSessionId() {
-        writeToOutput("Scheduler home: " + this.SCHEDULER_HOME)
-        writeToOutput("Scheduler rest: " + this.SCHEDULER_REST_URL)
-        writeToOutput("CATALOG_URL " + this.CATALOG_URL)
-        def schedulerClient = SchedulerClient.createInstance()
-        def schedulerConnectionSettings = new ConnectionInfo(this.SCHEDULER_REST_URL, null, null, new File(this.SCHEDULER_HOME, this.PATH_TO_SCHEDULER_CREDENTIALS_FILE), false)
-        schedulerClient.init(schedulerConnectionSettings)
-        String sessionID = schedulerClient.getSession()
-        writeToOutput("SessionId: " + sessionID)
-        return sessionID
+    void loginAdminUserCredToSchedulerAndGetSessionId() {
+
+        if (this.sessionId == null) {
+            def schedulerClient = SchedulerClient.createInstance()
+            def schedulerConnectionSettings = new ConnectionInfo(this.SCHEDULER_REST_URL, null, null, new File(this.SCHEDULER_HOME, this.PATH_TO_SCHEDULER_CREDENTIALS_FILE), false)
+            schedulerClient.init(schedulerConnectionSettings)
+
+            this.sessionId = schedulerClient.getSession()
+            writeToOutput("sessionId " + this.sessionId)
+        }
     }
 
     def unzipPackage(package_dir) {
@@ -220,7 +226,7 @@ class LoadPackage {
             def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
             post.addHeader("Accept", "application/json")
             post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)
-            post.addHeader("sessionId", sessionId)
+            post.addHeader("sessionId", this.sessionId)
 
             def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
             builder.setBoundary(boundary);
@@ -234,7 +240,40 @@ class LoadPackage {
         return object_file
     }
 
-    void populateBucket(catalog_map, slurper, package_dir) {
+    def createBucketIfNotExist(bucket){
+
+        // Does the bucket already exist? -------------
+        // GET QUERY
+        def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
+        def response = new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: this.sessionId])
+        def buckets = slurper.parseText(response.toString())
+        def bucket_found = buckets.find { object -> object.name == bucket }
+
+        writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
+
+        // Create a bucket if needed -------------
+        if (bucket_found) {
+            return bucket_found.id
+        } else {
+            // POST QUERY
+            def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
+            def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
+            post.addHeader("Accept", "application/json")
+            post.addHeader("Content-Type", "application/json")
+            post.addHeader("sessionId", this.sessionId)
+
+            response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
+            def bis = new BufferedInputStream(response.getEntity().getContent())
+            def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+            def bucket_id = slurper.parseText(result.toString()).get("id")
+            bis.close();
+            writeToOutput(" " + bucket + " created!")
+            return bucket_id
+        }
+    }
+
+
+    void populateBucket(catalog_map, package_dir) {
         def buckets_list
         //Transform a String to a List of String
         if (catalog_map.get("bucket") instanceof String) {
@@ -244,45 +283,21 @@ class LoadPackage {
             buckets_list = catalog_map.get("bucket")
         }
         buckets_list.each { bucket ->
-            // Does the bucket already exist? -------------
-            // GET QUERY
-            def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
-            def response = new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: sessionId])
-            def buckets = slurper.parseText(response.toString())
-            def bucket_found = buckets.find { object -> object.name == bucket }
 
-            writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
+            // BUCKET SECTION /////////////////////////////
 
-            // Create a bucket if needed -------------
-            def bucket_name = null
-            if (bucket_found) {
-                bucket_name = bucket_found.name
-            } else {
-                // POST QUERY
-                def create_bucket_query = this.CATALOG_URL + "/buckets?name=" + bucket + "&owner=" + this.BUCKET_OWNER
-                def post = new org.apache.http.client.methods.HttpPost(create_bucket_query)
-                post.addHeader("Accept", "application/json")
-                post.addHeader("Content-Type", "application/json")
-                post.addHeader("sessionId", sessionId)
-
-                response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
-                def bis = new BufferedInputStream(response.getEntity().getContent())
-                def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
-                bucket_name = slurper.parseText(result.toString()).get("name")
-                bis.close();
-                writeToOutput(" " + bucket + " created!")
-            }
+            def bucket_id = createBucketIfNotExist(bucket)
 
             // OBJECTS SECTION /////////////////////////////
 
             // GET QUERY
-            def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources"
-            response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: sessionId])
-            ArrayList bucket_resources_list = slurper.parseText(response.toString())
+            def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_id + "/resources"
+            def response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: this.sessionId])
+            def bucket_resources_list = slurper.parseText(response.toString())
 
             catalog_map.get("objects").each { object ->
                 //push object in the catalog
-                File object_file = pushObject(object, package_dir,bucket_resources_list, bucket_name)
+                def object_file = pushObject(object, package_dir,bucket_resources_list, bucket_id)
 
                 // Expose the workflow/object as a studio template
                 populateTemplateDir(object, object_file.absolutePath)
@@ -292,17 +307,18 @@ class LoadPackage {
 
 
     void run(package_dir) {
-        if (sessionId == null) {
-            sessionId = loginAdminUserCredToSchedulerAndGetSessionId()
-        }
-        //If the package dir is a zip file, create a temporary directory that contains the unzipped package dir
+
+        // Connect to the scheduler
+        loginAdminUserCredToSchedulerAndGetSessionId()
+
+        // If the package dir is a zip file, create a temporary directory that contains the unzipped package dir
         if (package_dir.getPath().endsWith(".zip")) {
             package_dir = unzipPackage(package_dir)
         }
+        // Parse the metadata json file
         def metadata_file = new File(package_dir.absolutePath, "METADATA.json")
         writeToOutput(" Parsing " + metadata_file.absolutePath)
         // From json to map
-        def slurper = new groovy.json.JsonSlurper()
         def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
         def catalog_map = metadata_file_map.get("catalog")
 
@@ -312,8 +328,7 @@ class LoadPackage {
 
         // POPULATE BUCKETS /////////////////////////////
 
-        populateBucket(catalog_map, slurper, package_dir)
+        populateBucket(catalog_map, package_dir)
 
     }
 }
-

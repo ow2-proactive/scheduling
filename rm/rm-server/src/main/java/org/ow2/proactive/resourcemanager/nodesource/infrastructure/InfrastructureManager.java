@@ -106,8 +106,6 @@ public abstract class InfrastructureManager implements Serializable {
 
     private static final String USING_DEPLOYING_NODES_KEY = "usingDeployingNodes";
 
-    private static final String NB_DOWN_NODES_KEY = "infrastructureManagerNbDownNodes";
-
     protected static final String RM_URL_KEY = "infrastructureManagerRmUrl";
 
     /**
@@ -211,10 +209,23 @@ public abstract class InfrastructureManager implements Serializable {
     /**
      * Copy all the runtime variables map given in parameter to the runtime
      * variables map of this infrastructure.
-     * @param infraVariablesToUpdate the runtime variables to recover.
+     * @param persistedInfrastructureVariables the runtime variables to recover.
      */
-    public void recoverPersistedInfraVariables(Map<String, Serializable> infraVariablesToUpdate) {
-        persistedInfraVariables.putAll(infraVariablesToUpdate);
+    public void recoverPersistedInfraVariables(Map<String, Serializable> persistedInfrastructureVariables) {
+        writeLock.lock();
+        try {
+            logger.info("Recovering persisted infrastructure variables");
+            for (Map.Entry<String, Serializable> entry : persistedInfrastructureVariables.entrySet()) {
+                logger.info("[" + entry.getKey() + " ; " + entry.getValue() + "]");
+            }
+            persistedInfraVariables.putAll(persistedInfrastructureVariables);
+        } catch (RuntimeException e) {
+            logger.error("Exception while recovering infrastructure variables", e);
+            throw e;
+        } finally {
+            writeLock.unlock();
+        }
+
     }
 
     /**
@@ -594,15 +605,24 @@ public abstract class InfrastructureManager implements Serializable {
      * the infrastructure, and then update in database the {@link NodeSourceData}.
      */
     public void persistInfraVariables() {
-        if (!nodeSource.getName().equals(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
+        String nodeSourceName = nodeSource.getName();
+        if (!nodeSourceName.equals(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
             readLock.lock();
             try {
                 if (dbManager == null) {
                     setRmDbManager(RMDBManager.getInstance());
                 }
+                if (nodeSourceData == null) {
+                    logger.debug("Node source data of node source " + nodeSourceName +
+                                 " needs to be retrieved from database");
+                    nodeSourceData = dbManager.getNodeSource(nodeSourceName);
+                }
                 if (nodeSourceData != null) {
                     nodeSourceData.setInfrastructureVariables(persistedInfraVariables);
                     dbManager.updateNodeSource(nodeSourceData);
+                } else {
+                    logger.warn("Node source " + nodeSourceName +
+                                " is unknown. Cannot persist infrastructure variables");
                 }
             } catch (RuntimeException e) {
                 logger.error("Exception while persisting runtime variables: " + e.getMessage());
@@ -1007,7 +1027,6 @@ public abstract class InfrastructureManager implements Serializable {
         persistedInfraVariables.put(ACQUIRED_NODES_KEY, new HashMap<String, Node>());
         persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, false);
         persistedInfraVariables.put(RM_URL_KEY, "");
-        persistedInfraVariables.put(NB_DOWN_NODES_KEY, 0);
     }
 
     /**
@@ -1019,7 +1038,7 @@ public abstract class InfrastructureManager implements Serializable {
      */
     protected abstract void initializePersistedInfraVariables();
 
-    public void setNodeSourceData(NodeSourceData nodeSourceData) {
+    public void setPersistedNodeSourceData(NodeSourceData nodeSourceData) {
         this.nodeSourceData = nodeSourceData;
     }
 

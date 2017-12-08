@@ -83,6 +83,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         FlowScript fs = flowScriptWithApiBindingClient();
         Mockito.when(it.getPreScript()).thenReturn(s1);
         Mockito.when(it.getPostScript()).thenReturn(s2);
+        Mockito.when(it.getCleaningScript()).thenReturn(s2);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
@@ -95,6 +96,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         FlowScript fs = flowScriptWithoutApiBinding();
         Mockito.when(it.getPreScript()).thenReturn(s);
         Mockito.when(it.getPostScript()).thenReturn(s);
+        Mockito.when(it.getCleaningScript()).thenReturn(s);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
@@ -108,6 +110,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         FlowScript fs = flowScriptWithoutApiBinding();
         Mockito.when(it.getPreScript()).thenReturn(s);
         Mockito.when(it.getPostScript()).thenReturn(s2);
+        Mockito.when(it.getCleaningScript()).thenReturn(s2);
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
@@ -121,6 +124,21 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         FlowScript fs = flowScriptWithoutApiBinding();
         Mockito.when(it.getPreScript()).thenReturn(s2);
         Mockito.when(it.getPostScript()).thenReturn(s);
+        Mockito.when(it.getCleaningScript()).thenReturn(s2);
+        Mockito.when(sec.getScript()).thenReturn(s2);
+        Mockito.when(fe.getEnvScript()).thenReturn(s2);
+        Mockito.when(it.getFlowScript()).thenReturn(fs);
+        assertTrue(new CheckEligibleTaskDescriptorScript().isTaskContainsAPIBinding(etd));
+    }
+
+    @Test
+    public void testOnlyCleanScriptContainsAPIBinding() throws InvalidScriptException {
+        Script s = scriptWithApiBindingClient();
+        Script s2 = scriptWithoutApiBinding();
+        FlowScript fs = flowScriptWithoutApiBinding();
+        Mockito.when(it.getPreScript()).thenReturn(s2);
+        Mockito.when(it.getPostScript()).thenReturn(s2);
+        Mockito.when(it.getCleaningScript()).thenReturn(s);
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
@@ -135,6 +153,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Mockito.when(((EligibleTaskDescriptorImpl) etd).getInternal()).thenReturn(ist);
         Mockito.when(ist.getPreScript()).thenReturn(s2);
         Mockito.when(ist.getPostScript()).thenReturn(s2);
+        Mockito.when(it.getCleaningScript()).thenReturn(s2);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s2);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
@@ -148,6 +167,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         Script s2 = scriptWithoutApiBinding();
         Mockito.when(it.getPreScript()).thenReturn(s2);
         Mockito.when(it.getPostScript()).thenReturn(s2);
+        Mockito.when(it.getCleaningScript()).thenReturn(s2);
         Mockito.when(sec.getScript()).thenReturn(s2);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
@@ -160,6 +180,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         FlowScript fs = flowScriptWithApiBindingUser();
         Mockito.when(it.getPreScript()).thenReturn(s);
         Mockito.when(it.getPostScript()).thenReturn(s);
+        Mockito.when(it.getCleaningScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);
@@ -172,6 +193,7 @@ public class CheckEligibleTaskDescriptorScriptTest extends ProActiveTestClean {
         FlowScript fs = null;
         Mockito.when(it.getPreScript()).thenReturn(s);
         Mockito.when(it.getPostScript()).thenReturn(s);
+        Mockito.when(it.getCleaningScript()).thenReturn(s);
         Mockito.when(fe.getEnvScript()).thenReturn(s);
         Mockito.when(sec.getScript()).thenReturn(s);
         Mockito.when(it.getFlowScript()).thenReturn(fs);

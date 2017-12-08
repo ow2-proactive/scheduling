@@ -609,8 +609,13 @@ public abstract class InternalTask extends TaskState {
 
     public static synchronized boolean isScriptAuthorized(TaskId id, Script script) {
         updateAuthorizedScriptsSignatures(id);
-        return authorizedSelectionScripts == null ||
-               authorizedSelectionScripts.contains(Script.digest(script.getScript().trim()));
+        if (authorizedSelectionScripts != null) {
+            String scriptContent = script.fetchScript();
+            if (scriptContent != null) {
+                return authorizedSelectionScripts.contains(Script.digest(scriptContent.trim()));
+            }
+        }
+        return true;
     }
 
     @Override
@@ -1096,6 +1101,7 @@ public abstract class InternalTask extends TaskState {
         tli.setTaskId(getId());
         tli.setJobOwner(internalJob.getJobInfo().getJobOwner());
         tli.setSchedulerRestUrl(PASchedulerProperties.SCHEDULER_REST_URL.getValueAsStringOrNull());
+        tli.setCatalogRestUrl(PASchedulerProperties.CATALOG_REST_URL.getValueAsStringOrNull());
         tli.setPreScript(getPreScript());
         tli.setPostScript(getPostScript());
         tli.setControlFlowScript(getFlowScript());

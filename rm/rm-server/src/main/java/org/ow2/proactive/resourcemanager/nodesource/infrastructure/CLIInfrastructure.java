@@ -117,22 +117,24 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
      * Starts a PA runtime on remote host using a custom script, register it
      * manually in the nodesource.
      *
-     * @param host The host on which one the node will be started
+     * @param hostTracker The host on which one the node will be started
      * @param nbNodes number of nodes to deploy
      * @param depNodeURLs list of deploying or lost nodes urls created      
      * @throws RMException
      *             acquisition failed
      */
-    protected void startNodeImpl(InetAddress host, int nbNodes, final List<String> depNodeURLs) throws RMException {
+    protected void startNodeImpl(HostTracker hostTracker, int nbNodes, final List<String> depNodeURLs)
+            throws RMException {
 
         final String nodeName = "SCR-" + this.nodeSource.getName() + "-" + ProActiveCounter.getUniqID();
-        final String commandLine = interpreter + " " + deploymentScript.getAbsolutePath() + " " + host.getHostName() +
-                                   " " + nodeName + " " + this.nodeSource.getName() + " " + getRmUrl() + " " + nbNodes;
+        final String commandLine = interpreter + " " + deploymentScript.getAbsolutePath() + " " +
+                                   hostTracker.getResolvedAddress().getHostName() + " " + nodeName + " " +
+                                   this.nodeSource.getName() + " " + getRmUrl() + " " + nbNodes;
 
         final List<String> createdNodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, nbNodes);
         depNodeURLs.addAll(addMultipleDeployingNodes(createdNodeNames,
                                                      commandLine,
-                                                     "Deploying node on host " + host,
+                                                     "Deploying node on host " + hostTracker.getResolvedAddress(),
                                                      this.nodeTimeOut));
         addTimeouts(depNodeURLs);
 
@@ -155,15 +157,16 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
             try {
                 int exitCode = p.exitValue();
                 if (exitCode != 0) {
-                    logger.error("Child process at " + host.getHostName() + " exited abnormally (" + exitCode + ").");
+                    logger.error("Child process at " + hostTracker.getResolvedAddress().getHostName() +
+                                 " exited abnormally (" + exitCode + ").");
                 } else {
                     logger.error("Launching node script has exited normally whereas it shouldn't.");
                 }
                 String pOutPut = Utils.extractProcessOutput(p);
                 String pErrPut = Utils.extractProcessErrput(p);
-                final String description = "Script failed to launch a node on host " + host.getHostName() + lf +
-                                           "   >Error code: " + exitCode + lf + "   >Errput: " + pErrPut +
-                                           "   >Output: " + pOutPut;
+                final String description = "Script failed to launch a node on host " +
+                                           hostTracker.getResolvedAddress().getHostName() + lf + "   >Error code: " +
+                                           exitCode + lf + "   >Errput: " + pErrPut + "   >Output: " + pOutPut;
                 logger.error(description);
                 if (super.checkNodeIsAcquiredAndDo(nodeName, null, new Runnable() {
                     public void run() {

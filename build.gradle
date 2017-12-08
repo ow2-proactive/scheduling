@@ -28,7 +28,7 @@ buildscript {
 
         classpath 'com.qmino:miredot-plugin:2.0-RC3'
 
-        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:1.2"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.1"
         classpath "com.diffplug.gradle.spotless:spotless:2.4.0"
         classpath "org.ow2.proactive:coding-rules:1.0.0"
         classpath "gradle.plugin.net.foragerr.jmeter:jmeter-gradle-plugin:1.0.7-2.13" // plugin which is used to run jmeter which launches our performance tests
@@ -89,6 +89,10 @@ allprojects {
         configurations.all {
             resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
         }
+    }
+
+    configurations.all {
+        resolutionStrategy.force "org.ow2.proactive:scheduler-api:${schedulingVersion}"
     }
 
     rootProject.buildscript.repositories.each {

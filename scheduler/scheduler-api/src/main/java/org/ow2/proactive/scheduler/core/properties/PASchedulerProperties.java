@@ -60,6 +60,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Defines the maximum number of tasks to be scheduled in each scheduling loop. */
     SCHEDULER_POLICY_NBTASKPERLOOP("pa.scheduler.policy.nbtaskperloop", PropertyType.INTEGER, "10"),
 
+    /** Path of the license properties file. */
+    SCHEDULER_LICENSE_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),
+
     /** Scheduler main loop time out */
     SCHEDULER_TIME_OUT("pa.scheduler.core.timeout", PropertyType.INTEGER, "100"),
 
@@ -291,9 +294,14 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_HOME("pa.scheduler.home", PropertyType.STRING),
 
     /**
-     * Scheduler rest url directory
+     * Scheduler rest url
      */
     SCHEDULER_REST_URL("pa.scheduler.rest.url", PropertyType.STRING),
+
+    /**
+     * Catalog rest url 
+     */
+    CATALOG_REST_URL("pa.catalog.rest.url", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************** RM PROPERTIES ************************ */
@@ -361,6 +369,12 @@ public enum PASchedulerProperties implements PACommonProperties {
             "pa.scheduler.notifications.email.from",
             PropertyType.STRING,
             "example@username.com"),
+
+    /* ***************************************************************** */
+    /* ***************** LICENSE SCHEDULING POLICY PROPERTIES ***************** */
+    /* ***************************************************************** */
+
+    LICENSE_SCHEDULING_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ******************* PORTAL DISPLAY PROPERTIES ******************* */

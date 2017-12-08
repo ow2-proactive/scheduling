@@ -73,6 +73,11 @@ public class CheckEligibleTaskDescriptorScript {
                isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getPostScript());
     }
 
+    private boolean isCleanScriptContainsApiBinding(EligibleTaskDescriptor etd) {
+        return (((EligibleTaskDescriptorImpl) etd).getInternal().getCleaningScript() != null) &&
+               isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getCleaningScript());
+    }
+
     private boolean isFlowScriptContainsApiBinding(EligibleTaskDescriptor etd) {
         return (((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript() != null) &&
                isScriptContainsApiBinding(((EligibleTaskDescriptorImpl) etd).getInternal().getFlowScript());
@@ -88,13 +93,17 @@ public class CheckEligibleTaskDescriptorScript {
     }
 
     private boolean isScriptContainsApiBinding(Script script) {
-        return script.getScript().contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
-               script.getScript().contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
-               script.getScript().contains(SchedulerConstants.DS_USER_API_BINDING_NAME);
+
+        String scriptContent = script.fetchScript();
+
+        return (scriptContent != null) && (scriptContent.contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
+                                           scriptContent.contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
+                                           scriptContent.contains(SchedulerConstants.DS_USER_API_BINDING_NAME));
     }
 
     private boolean isPrePostFlowEnvironmentScriptContainsApiBinding(EligibleTaskDescriptor etd) {
         return isPresScriptContainsApiBinding(etd) || isPostScriptContainsApiBinding(etd) ||
-               isFlowScriptContainsApiBinding(etd) || isEnvironmentScriptContainsApiBinding(etd);
+               isFlowScriptContainsApiBinding(etd) || isEnvironmentScriptContainsApiBinding(etd) ||
+               isCleanScriptContainsApiBinding(etd);
     }
 }

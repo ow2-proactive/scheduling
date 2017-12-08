@@ -42,6 +42,7 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
+import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,6 +52,7 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -70,6 +72,7 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.catalogclient.service.CatalogClientLib;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -731,6 +734,13 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return this.submitFromCatalog(catalogRestURL, bucketId, workflowName, Collections.<String, String> emptyMap());
+
+    }
+
+    @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
@@ -747,6 +757,28 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public JobId submit(URL job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return this.submit(job, variables, Collections.<String, String> emptyMap());
+    }
+
+    @Override
+    public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName,
+            Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+
+        JobIdData jobIdData = null;
+        try {
+            String workflow = CatalogClientLib.getCatalogObjectService().getResolvedCatalogObject(catalogRestURL,
+                                                                                                  Long.valueOf(bucketId),
+                                                                                                  workflowName,
+                                                                                                  false,
+                                                                                                  sid);
+
+            InputStream stream = new ByteArrayInputStream(workflow.getBytes(StandardCharsets.UTF_8.name()));
+            jobIdData = restApiClient().submitXml(sid, stream, variables);
+        } catch (Exception e) {
+            throwNCEOrPEOrSCEOrJCE(e);
+        }
+        return jobId(jobIdData);
+
     }
 
     @Override

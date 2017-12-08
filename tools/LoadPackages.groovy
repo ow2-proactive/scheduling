@@ -91,11 +91,20 @@ class LoadPackages {
         unzipFile(examples_zip, this.EXAMPLES_DIR_PATH)
         writeToOutput(this.EXAMPLES_ZIP_PATH + " extracted!")
 
-        // For each package dir
+        // Connect to the scheduler
+        package_loader.loginAdminUserCredToSchedulerAndGetSessionId()
+
+        // Create buckets following the ordered bucket list
+        new File(examples_dir, "ordered_bucket_list").text.split(",").each { bucket ->
+            package_loader.createBucketIfNotExist(bucket)
+        }
+
+        // Load each package
         examples_dir.eachDir { package_dir ->
             package_loader.run(package_dir)
         }
 
+        }
         writeToOutput(" ... proactive packages deployed!")
         writeToOutput(" Terminated.")
     }
@@ -106,4 +115,3 @@ try {
 } catch (Exception e) {
     throw new Exception("Failed to load examples into the catalog." + e.getMessage())
 }
-
