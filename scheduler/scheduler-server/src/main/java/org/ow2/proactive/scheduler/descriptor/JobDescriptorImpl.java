@@ -757,6 +757,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("squid:S1452") // it makes sonar to ignore "Generic wildcard types should not be used in return parameters" rule.
     public Map<TaskId, ? extends TaskDescriptor> getPausedTasks() {
         return pausedTasks;
     }
