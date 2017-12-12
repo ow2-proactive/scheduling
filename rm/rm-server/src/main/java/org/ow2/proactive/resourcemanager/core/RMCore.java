@@ -174,6 +174,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private static final String CONTACT_UPGRADE_MESSAGE = "Number of nodes exceed the limitation from your contract. Please send an email to contact@activeeon.com for an upgrade.";
 
+    public static final String START_TO_RECOVER_NODES = "Start to recover nodes";
+
+    public static final String END_OF_NODES_RECOVERY = "Total number of nodes recovered: ";
+
     /**
      * Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
      * Explanation: This software can be licensed to a certain amount of nodes.
@@ -494,6 +498,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void recoverNodes(NodeSource nodeSource) {
+        logger.info(START_TO_RECOVER_NODES); // this log line is important for performance tests
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
         String nodeSourceName = nodeSource.getName();
 
@@ -590,8 +595,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.info("- Nodes in " + nodeStateIntEntry.getKey() + " state: " + nodeStateIntEntry.getValue());
             totalRecoveredNodes += nodeStateIntEntry.getValue();
         }
-        logger.info("Total number of nodes recovered: " + totalRecoveredNodes + ", including eligible nodes: " +
-                    totalEligibleRecoveredNodes);
+        logger.info(END_OF_NODES_RECOVERY + totalRecoveredNodes + ", including eligible nodes: " +
+                    totalEligibleRecoveredNodes); // this line is important for performance tests
     }
 
     /**
