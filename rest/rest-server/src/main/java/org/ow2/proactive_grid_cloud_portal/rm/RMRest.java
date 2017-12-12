@@ -68,6 +68,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -120,7 +121,7 @@ public class RMRest implements RMRestInterface {
 
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
-    private static final String REGEX = "^[^:]*:(.*)";;
+    private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         Session session = sessionStore.get(sessionId);
@@ -437,7 +438,7 @@ public class RMRest implements RMRestInterface {
         } catch (RuntimeException ex) {
             nsState.setResult(false);
             nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
-            nsState.setStackTrace(getStackTrace(ex));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
 
         } finally {
             return nsState;
@@ -446,8 +447,7 @@ public class RMRest implements RMRestInterface {
     }
 
     private String cleanDisplayedErrorMessage(String errorMessage) {
-        Pattern pattern = Pattern.compile(REGEX);
-        Matcher matcher = pattern.matcher(errorMessage);
+        Matcher matcher = PATTERN.matcher(errorMessage);
         if (matcher.find()) {
             errorMessage = matcher.group(1);
         }
