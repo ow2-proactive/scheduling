@@ -1,6 +1,6 @@
 dependencies {
     compile(
-            project(':scheduler:scheduler-node'),
+            project(':scheduler:scheduler-api'),
     )
 }
 
