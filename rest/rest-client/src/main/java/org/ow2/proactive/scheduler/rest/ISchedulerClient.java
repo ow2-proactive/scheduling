@@ -95,8 +95,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(File job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+    JobId submit(File job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler.
@@ -114,8 +114,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(URL job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+    JobId submit(URL job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler with provided variables.
@@ -136,8 +136,7 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      */
     JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
-            throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler with provided variables.
@@ -156,8 +155,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(File job, Map<String, String> variables) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException;
+    JobId submit(File job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler with provided variables.
@@ -176,8 +175,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(URL job, Map<String, String> variables) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException;
+    JobId submit(URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler from the catalogRestURL with provided variables.
@@ -198,9 +197,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName,
-            Map<String, String> variables) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException;
+    JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Submit a new job to the scheduler from the catalogRestURL without variables.
@@ -221,8 +219,7 @@ public interface ISchedulerClient extends Scheduler {
      * @throws JobCreationException
      */
     JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
-            throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException;
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
      * Returns <tt>true</tt>, if the scheduler has finished the execution of the
@@ -250,8 +247,7 @@ public interface ISchedulerClient extends Scheduler {
      *
      * @see #isJobFinished(JobId)
      */
-    boolean isJobFinished(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException;
+    boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
      * Causes the current thread to wait until the scheduler has finished the
@@ -503,8 +499,7 @@ public interface ISchedulerClient extends Scheduler {
      *             if the user does not have permission to retrieve the
      *             specified file from the server
      */
-    void pullFile(String space, String pathname, String outputFile)
-            throws NotConnectedException, PermissionException;
+    void pullFile(String space, String pathname, String outputFile) throws NotConnectedException, PermissionException;
 
     /**
      * Deletes the specified file from the server.
