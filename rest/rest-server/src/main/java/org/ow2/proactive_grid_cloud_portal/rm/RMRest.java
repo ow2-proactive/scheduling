@@ -797,7 +797,7 @@ public class RMRest implements RMRestInterface {
      * @throws IllegalArgumentException
      */
     @Override
-    @GET
+    @POST
     @GZIP
     @Path("info/{name}")
     @Produces("application/json")
