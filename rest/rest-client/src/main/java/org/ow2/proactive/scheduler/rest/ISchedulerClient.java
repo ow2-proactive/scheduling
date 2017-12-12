@@ -197,7 +197,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName, Map<String, String> variables)
+    JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
+            Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
