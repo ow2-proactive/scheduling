@@ -139,8 +139,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public JobResult getJobResult(JobId jobId)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public JobResult getJobResult(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         renewSession();
         return client.getJobResult(jobId);
     }
@@ -174,8 +173,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean removeJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.removeJob(jobId);
     }
@@ -188,29 +186,26 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean killJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.killJob(jobId);
     }
 
     @Override
-    public boolean pauseJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.pauseJob(jobId);
     }
 
     @Override
-    public boolean resumeJob(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.resumeJob(jobId);
     }
 
     @Override
-    public void changeJobPriority(JobId jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(JobId jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         renewSession();
         client.changeJobPriority(jobId, priority);
     }
@@ -276,69 +271,65 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public JobId submit(Job job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+    public JobId submit(Job job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job);
     }
 
     @Override
-    public JobId submit(File job) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException {
+    public JobId submit(File job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job);
     }
 
     @Override
-    public JobId submit(URL job) throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+    public JobId submit(URL job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job);
     }
 
     @Override
     public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
-            throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submitFromCatalog(catalogRestURL, bucketId, workflowName);
     }
 
     @Override
     public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
-            throws NotConnectedException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         if (client == null)
-            throw new NotConnectedException(
-                "Client not connected, call connect() before using the scheduler client");
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         return this.client.submit(job, variables, headerParams);
     }
 
     @Override
-    public JobId submit(File job, Map<String, String> variables) throws NotConnectedException,
-            PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId submit(File job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job, variables);
     }
 
     @Override
-    public JobId submit(URL job, Map<String, String> variables) throws NotConnectedException,
-            PermissionException, SubmissionClosedException, JobCreationException {
+    public JobId submit(URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job, variables);
     }
 
     @Override
     public JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName,
-            Map<String, String> variables) throws NotConnectedException, PermissionException,
-            SubmissionClosedException, JobCreationException {
+            Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submitFromCatalog(catalogRestURL, bucketId, workflowName, variables);
     }
 
     @Override
-    public JobResult getJobResult(String jobId)
-            throws NotConnectedException, PermissionException, UnknownJobException {
+    public JobResult getJobResult(String jobId) throws NotConnectedException, PermissionException, UnknownJobException {
         renewSession();
         return client.getJobResult(jobId);
     }
@@ -379,8 +370,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean removeJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.removeJob(jobId);
     }
@@ -393,8 +383,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean killJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.killJob(jobId);
     }
@@ -435,8 +424,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean pauseJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.pauseJob(jobId);
     }
@@ -449,22 +437,20 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean resumeJob(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.resumeJob(jobId);
     }
 
     @Override
-    public void changeJobPriority(String jobId, JobPriority priority) throws NotConnectedException,
-            UnknownJobException, PermissionException, JobAlreadyFinishedException {
+    public void changeJobPriority(String jobId, JobPriority priority)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         renewSession();
         client.changeJobPriority(jobId, priority);
     }
 
     @Override
-    public JobState getJobState(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.getJobState(jobId);
     }
@@ -476,8 +462,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public JobState getJobState(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.getJobState(jobId);
     }
@@ -502,9 +487,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            boolean getCurrentState, SchedulerEvent... events)
-            throws NotConnectedException, PermissionException {
+    public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
+            SchedulerEvent... events) throws NotConnectedException, PermissionException {
         renewSession();
         return client.addEventListener(sel, myEventsOnly, getCurrentState, events);
     }
@@ -518,8 +502,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     @Override
     public void disconnect() throws NotConnectedException, PermissionException {
         if (client == null)
-            throw new NotConnectedException(
-                "Client not connected, call connect() before using the scheduler client");
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         client.disconnect();
     }
 
@@ -549,14 +532,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     @Override
     public void renewSession() throws NotConnectedException {
         if (client == null)
-            throw new NotConnectedException(
-                "Client not connected, call connect() before using the scheduler client");
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         client.renewSession();
     }
 
     @Override
-    public String getJobServerLogs(String id)
-            throws UnknownJobException, NotConnectedException, PermissionException {
+    public String getJobServerLogs(String id) throws UnknownJobException, NotConnectedException, PermissionException {
         renewSession();
         return client.getJobServerLogs(id);
     }
@@ -577,8 +558,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     @Override
     public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
-            List<SortParameter<JobSortParameter>> sortParameters)
-            throws NotConnectedException, PermissionException {
+            List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         renewSession();
         return client.getJobs(offset, limit, filterCriteria, sortParameters);
     }
@@ -608,13 +588,11 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
             boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
             throws NotConnectedException, PermissionException {
         renewSession();
-        return client.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit,
-                sortParams);
+        return client.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit, sortParams);
     }
 
     @Override
-    public JobInfo getJobInfo(String jobId)
-            throws UnknownJobException, NotConnectedException, PermissionException {
+    public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         renewSession();
         return client.getJobInfo(jobId);
     }
@@ -637,8 +615,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     @Override
     public void init(ConnectionInfo connectionInfo) throws Exception {
         if (client == null)
-            throw new NotConnectedException(
-                "Client not connected, call connect() before using the scheduler client");
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         client.init(connectionInfo);
     }
 
@@ -653,15 +630,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean isJobFinished(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.isJobFinished(jobId);
     }
 
     @Override
-    public boolean isJobFinished(String jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.isJobFinished(jobId);
     }
@@ -717,9 +692,9 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public List<Map.Entry<String, TaskResult>> waitForAllTasks(String jobId, List<String> taskNames,
-            long timeout) throws UnknownJobException, NotConnectedException, PermissionException,
-            UnknownTaskException, TimeoutException {
+    public List<Map.Entry<String, TaskResult>> waitForAllTasks(String jobId, List<String> taskNames, long timeout)
+            throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
+            TimeoutException {
         renewSession();
         return client.waitForAllTasks(jobId, taskNames, timeout);
     }
@@ -739,8 +714,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public boolean deleteFile(String space, String pathname)
-            throws NotConnectedException, PermissionException {
+    public boolean deleteFile(String space, String pathname) throws NotConnectedException, PermissionException {
         renewSession();
         return client.deleteFile(space, pathname);
     }
