@@ -104,7 +104,6 @@ class LoadPackages {
             package_loader.run(package_dir)
         }
 
-
         writeToOutput(" ... proactive packages deployed!")
         writeToOutput(" Terminated.")
     }
