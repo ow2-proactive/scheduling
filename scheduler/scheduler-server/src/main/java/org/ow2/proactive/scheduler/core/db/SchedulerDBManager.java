@@ -188,6 +188,7 @@ public class SchedulerDBManager {
         try {
             configuration.addAnnotatedClass(JobData.class);
             configuration.addAnnotatedClass(JobContent.class);
+            configuration.addAnnotatedClass(JobDataVariable.class);
             configuration.addAnnotatedClass(TaskData.class);
             configuration.addAnnotatedClass(TaskDataVariable.class);
             configuration.addAnnotatedClass(TaskResultData.class);
@@ -741,6 +742,8 @@ public class SchedulerDBManager {
         removeJobScripts(session, jobId);
 
         session.getNamedQuery("deleteEnvironmentModifierData").setParameter("jobId", jobId).executeUpdate();
+
+        session.getNamedQuery("deleteJobDataVariable").setParameter("jobId", jobId).executeUpdate();
 
         session.getNamedQuery("deleteTaskDataVariable").setParameter("jobId", jobId).executeUpdate();
 

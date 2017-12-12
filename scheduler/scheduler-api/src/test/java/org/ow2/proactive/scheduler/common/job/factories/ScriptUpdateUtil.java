@@ -70,7 +70,7 @@ public class ScriptUpdateUtil {
 
     private static void resolveScript(Script<?> script, Map<String, String> variables) {
         if (script != null) {
-            script.setScript(filterAndUpdate(script.getScript(), variables));
+            script.setScript(filterAndUpdate(script.fetchScript(), variables));
             Serializable[] parameters = script.getParameters();
             if (parameters != null) {
                 for (int i = 0; i < parameters.length; i++) {

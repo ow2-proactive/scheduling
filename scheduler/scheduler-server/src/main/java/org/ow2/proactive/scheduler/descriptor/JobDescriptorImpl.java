@@ -69,6 +69,8 @@ public class JobDescriptorImpl implements JobDescriptor {
 
     public static final Logger logger = Logger.getLogger(JobDescriptorImpl.class);
 
+    public static final String STARTING_TASK_RECOVERY_FOR_JOB = "Starting task recovery for job ";
+
     /** Job Id  */
     private JobId jobId;
 
@@ -688,7 +690,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * {@inheritDoc}
      */
     public void restoreRunningTasks() {
-        logger.info("Starting task recovery for job " + jobId);
+        logger.info(STARTING_TASK_RECOVERY_FOR_JOB + jobId);
         final Iterator<Entry<TaskId, EligibleTaskDescriptor>> iterator = eligibleTasks.entrySet().iterator();
 
         while (iterator.hasNext()) {
@@ -755,6 +757,7 @@ public class JobDescriptorImpl implements JobDescriptor {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("squid:S1452") // it makes sonar to ignore "Generic wildcard types should not be used in return parameters" rule.
     public Map<TaskId, ? extends TaskDescriptor> getPausedTasks() {
         return pausedTasks;
     }
