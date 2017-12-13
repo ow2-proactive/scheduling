@@ -67,7 +67,7 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 5000 }, { 200, 10000 } });
+        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 5000 }, { 101, 10000 } });
     }
 
     // number of jobs
