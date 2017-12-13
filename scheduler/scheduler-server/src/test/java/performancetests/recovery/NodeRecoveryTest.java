@@ -65,7 +65,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 10000 }, { 101, 10000 } });
+        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 10000 }, { 200, 10000 } });
     }
 
     // number of nodes
