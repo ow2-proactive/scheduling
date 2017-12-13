@@ -41,9 +41,10 @@ import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class TaskContextSerializerTest {
+public class TaskContextSerializerTest extends ProActiveTestClean {
 
     @Test
     public void testSerializeContextToFile() throws Exception {
