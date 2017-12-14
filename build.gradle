@@ -78,6 +78,7 @@ configurations {
 
 allprojects {
     apply plugin: 'maven'
+    apply plugin: 'project-report'
 
 
     group = 'org.ow2.proactive'
