@@ -37,6 +37,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.json.NSStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
@@ -67,7 +68,8 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
         request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
-            boolean success = readValue(response, Boolean.TYPE, currentContext);
+            NSStateView nsState = readValue(response, NSStateView.class, currentContext);
+            boolean success = nsState.isResult();
             resultStack(currentContext).push(success);
             if (success) {
                 writeLine(currentContext, "Node source successfully created.");
