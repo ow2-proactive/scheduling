@@ -59,9 +59,10 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class ForkedProcessBuilderCreatorTest {
+public class ForkedProcessBuilderCreatorTest extends ProActiveTestClean {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 

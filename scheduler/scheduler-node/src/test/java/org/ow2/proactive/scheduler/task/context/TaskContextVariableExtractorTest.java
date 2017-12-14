@@ -46,9 +46,10 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class TaskContextVariableExtractorTest {
+public class TaskContextVariableExtractorTest extends ProActiveTestClean {
     private String jobNameValue = "TestJobName";
 
     private String jobOwnerValue = "TestOwner";
