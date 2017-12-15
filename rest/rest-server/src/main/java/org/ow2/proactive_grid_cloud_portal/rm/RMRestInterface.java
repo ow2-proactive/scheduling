@@ -57,6 +57,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -154,7 +155,7 @@ public interface RMRestInterface {
     @POST
     @Path("nodesource/create")
     @Produces("application/json")
-    boolean createNodeSource(@HeaderParam("sessionid") String sessionId,
+    NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
             @FormParam("infrastructureParameters") String[] infrastructureParameters,

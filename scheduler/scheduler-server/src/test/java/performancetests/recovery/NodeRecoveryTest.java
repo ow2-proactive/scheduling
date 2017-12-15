@@ -25,37 +25,132 @@
  */
 package performancetests.recovery;
 
-import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
-import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.threads.JMeterContextService;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import performancetests.recovery.helper.NodeRecoveryHelper;
+import java.util.*;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.RMCore;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+
+import functionaltests.nodesrecovery.RecoverInfrastructureTestHelper;
+import functionaltests.utils.*;
+import performancetests.helper.LogProcessor;
 
 
-public class NodeRecoveryTest extends AbstractJavaSamplerClient {
+/**
+ * @author ActiveEon Team
+ * @since 01/12/17
+ */
+@RunWith(Parameterized.class)
+public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-    @Override
-    public SampleResult runTest(JavaSamplerContext javaSamplerContext) {
-        SampleResult sampleResult = null;
-        try {
-            final Integer nodesNumber = Integer.valueOf(JMeterContextService.getContext()
-                                                                            .getVariables()
-                                                                            .get("nodesNumber"));
+    static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
+                                                                       .getPath();
 
-            NodeRecoveryHelper nodeRecoveryHelper = new NodeRecoveryHelper();
+    static final String RM_CONFIGURATION_RESTART = NodeRecoveryTest.class.getResource("/performancetests/config/rm-restart.ini")
+                                                                         .getPath();
 
-            nodeRecoveryHelper.startKillStartScheduler();
-
-            sampleResult = SampleResult.createTestSample(nodeRecoveryHelper.timeSpentToRecoverNodes());
-            sampleResult.setResponseCodeOK();
-            sampleResult.setSuccessful(true);
-            sampleResult.setResponseMessage("I'm Forever Blowing Bubbles");
-            nodeRecoveryHelper.shutdown();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sampleResult;
+    @Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 10000 } });
     }
+
+    // number of nodes
+    int nodesNumber;
+
+    // time limit in milliseconds for test to pass
+    int timeLimit;
+
+    public NodeRecoveryTest(int nodesNumber, int timeLimit) {
+        this.nodesNumber = nodesNumber;
+        this.timeLimit = timeLimit;
+    }
+
+    private RMTHelper rmHelper;
+
+    /**
+     * This method tests performance of node recovery using local infrastructure.
+     *
+     * @throws Exception
+     */
+    @Before
+    public void startKillStartRM() throws Exception {
+        ProActiveConfiguration.load();
+        rmHelper = new RMTHelper();
+        rmHelper.startRM(RM_CONFIGURATION_START);
+
+        assertTrue(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean());
+        assertTrue(rmHelper.isRMStarted());
+
+        ResourceManager resourceManager = rmHelper.getResourceManager();
+
+        assertEquals(0, resourceManager.getState().getAllNodes().size());
+
+        rmHelper.createNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME, nodesNumber);
+
+        assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
+
+        RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
+
+        rmHelper.startRM(RM_CONFIGURATION_RESTART);
+
+        resourceManager = rmHelper.getResourceManager();
+
+        assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
+    }
+
+    @Test
+    public void test() {
+        assertEquals(nodesNumber, nodesRecovered());
+        assertThat("Nodes recovery time for " + nodesNumber + " nodes",
+                   (int) timeSpentToRecoverNodes(),
+                   lessThan(timeLimit));
+    }
+
+    @After
+    public void shutdownRmHelper() throws Exception {
+        try {
+            rmHelper.removeNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+            rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+        } catch (Exception ignored) {
+
+        }
+        rmHelper.shutdownRM();
+    }
+
+    private long nodesRecovered() {
+        final String line = LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY);
+        final List<Integer> numbersFromLine = LogProcessor.getNumbersFromLine(line);
+
+        if (!numbersFromLine.isEmpty()) {
+            return numbersFromLine.get(0);
+        } else {
+            throw new RuntimeException("Cannot retrieve number of nodes recovered from this line: " + line);
+        }
+    }
+
+    private long timeSpentToRecoverNodes() {
+        long time = LogProcessor.millisecondsFromTo(RMCore.START_TO_RECOVER_NODES, RMCore.END_OF_NODES_RECOVERY);
+
+        if (time < 0) {
+            throw new RuntimeException("First occurence of " + RMCore.START_TO_RECOVER_NODES + " goes after " +
+                                       RMCore.END_OF_NODES_RECOVERY);
+        }
+
+        return time;
+    }
+
 }

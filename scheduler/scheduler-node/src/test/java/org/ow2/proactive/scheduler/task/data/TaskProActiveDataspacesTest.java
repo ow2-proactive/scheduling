@@ -48,12 +48,13 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.tests.ProActiveTestClean;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 
-public class TaskProActiveDataspacesTest {
+public class TaskProActiveDataspacesTest extends ProActiveTestClean {
 
     @Test(expected = Exception.class)
     public void testCopyEmptyListFromInputDataToScratchThrown() throws Exception {

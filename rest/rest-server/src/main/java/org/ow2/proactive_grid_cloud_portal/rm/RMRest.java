@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive_grid_cloud_portal.rm;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,6 +41,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -64,6 +68,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -74,6 +79,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -114,6 +120,8 @@ public class RMRest implements RMRestInterface {
     };
 
     private SessionStore sessionStore = SharedSessionStore.getInstance();
+
+    private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         Session session = sessionStore.get(sessionId);
@@ -369,7 +377,7 @@ public class RMRest implements RMRestInterface {
     @POST
     @Path("nodesource/create")
     @Produces("application/json")
-    public boolean createNodeSource(@HeaderParam("sessionid") String sessionId,
+    public NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
@@ -379,7 +387,7 @@ public class RMRest implements RMRestInterface {
         ResourceManager rm = checkAccess(sessionId);
         Object[] infraParams = new Object[infrastructureParameters.length + infrastructureFileParameters.length];
         Object[] policyParams = new Object[policyParameters.length + policyFileParameters.length];
-
+        NSState nsState = new NSState();
         /*
          * we need to merge both infrastructureParameters and infrastructureFileParameters into one
          * to do so we need the infrastructure parameter order from the RM
@@ -420,8 +428,30 @@ public class RMRest implements RMRestInterface {
                 }
             }
         }
-        return rm.createNodeSource(nodeSourceName, infrastructureType, infraParams, policyType, policyParams)
-                 .getBooleanValue();
+        try {
+            nsState.setResult(rm.createNodeSource(nodeSourceName,
+                                                  infrastructureType,
+                                                  infraParams,
+                                                  policyType,
+                                                  policyParams)
+                                .getBooleanValue());
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
+
+        } finally {
+            return nsState;
+        }
+
+    }
+
+    private String cleanDisplayedErrorMessage(String errorMessage) {
+        Matcher matcher = PATTERN.matcher(errorMessage);
+        if (matcher.find()) {
+            errorMessage = matcher.group(1);
+        }
+        return (errorMessage);
     }
 
     /**
@@ -767,7 +797,7 @@ public class RMRest implements RMRestInterface {
      * @throws IllegalArgumentException
      */
     @Override
-    @GET
+    @POST
     @GZIP
     @Path("info/{name}")
     @Produces("application/json")

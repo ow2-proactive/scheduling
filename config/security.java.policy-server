@@ -38,6 +38,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
+    
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -112,6 +115,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
+    
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -160,6 +166,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getGlobalSpaceURIs";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getUserSpaceURIs";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getSchedulerProperties";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.putThirdPartyCredential";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.thirdPartyCredentialsKeySet";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.removeThirdPartyCredential";
 
 };
 
@@ -195,6 +204,9 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
+    
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -245,9 +257,12 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getSupportedNodeSourceInfrastructures";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getSupportedNodeSourcePolicies";
-	permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUser";
 
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.disconnect";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExistingNodeSourcesList";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getCurrentUserData";
+
 
     // AuthPermission is requires for those who would like to access any mbean
     permission javax.security.auth.AuthPermission "getSubject";
@@ -278,8 +293,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.addEventListener";
     permission org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission "false";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.scheduler.core.SchedulerFrontend.getStatus";
-	permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
-	permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getTopology";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getMonitoring";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getTopology";
 };
 //
 // OTHER PERMISSIONS

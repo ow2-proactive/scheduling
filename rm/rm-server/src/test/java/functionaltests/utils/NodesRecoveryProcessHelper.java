@@ -41,7 +41,7 @@ import org.ow2.tests.ProcessKiller;
  */
 public class NodesRecoveryProcessHelper {
 
-    public static void findRmPidAndSendSigKill(String javaProcessName)
+    public static void findPidAndSendSigKill(String javaProcessName)
             throws IOException, InterruptedException, ProcessNotFoundException {
         int pidToKill;
         OperatingSystem os = OperatingSystem.UNIX;

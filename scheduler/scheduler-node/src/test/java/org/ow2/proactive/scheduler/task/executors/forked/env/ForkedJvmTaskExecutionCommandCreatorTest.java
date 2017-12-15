@@ -53,9 +53,10 @@ import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class ForkedJvmTaskExecutionCommandCreatorTest {
+public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean {
     private String jobNameValue = "TestJobName";
 
     private String jobOwnerValue = "TestOwner";
