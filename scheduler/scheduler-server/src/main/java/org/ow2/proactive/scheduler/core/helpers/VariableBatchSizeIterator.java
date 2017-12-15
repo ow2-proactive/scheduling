@@ -29,7 +29,7 @@ import java.util.List;
 
 
 public class VariableBatchSizeIterator<T> {
-    private List<T> rawList;
+    final private List<T> rawList;
 
     private int offset;
 
