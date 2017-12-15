@@ -480,8 +480,23 @@ public class JobComparator {
             return false;
         }
 
+        if ((s1.getScriptUrl() == null) ^ (s2.getScriptUrl() == null)) {
+            stack.push("One of 2 scripts urls is null and the other is not");
+            return false;
+        }
+
+        if ((s1.getScriptUrl() != null) && (s2.getScriptUrl() != null) && (s1.getScriptUrl() != s2.getScriptUrl())) {
+            stack.push("The script urls are different");
+            return false;
+        }
+
+        if ((s1.getScriptUrl() != null) && (s2.getScriptUrl() != null)) {
+            // both url are the same
+            return true;
+        }
+
         if (!s1.getEngineName().equals(s2.getEngineName())) {
-            stack.push("engine name");
+            stack.push("engine names are different");
             return false;
         }
 

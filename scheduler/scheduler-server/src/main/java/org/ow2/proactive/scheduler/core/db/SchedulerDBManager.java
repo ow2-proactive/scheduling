@@ -188,6 +188,7 @@ public class SchedulerDBManager {
         try {
             configuration.addAnnotatedClass(JobData.class);
             configuration.addAnnotatedClass(JobContent.class);
+            configuration.addAnnotatedClass(JobDataVariable.class);
             configuration.addAnnotatedClass(TaskData.class);
             configuration.addAnnotatedClass(TaskDataVariable.class);
             configuration.addAnnotatedClass(TaskResultData.class);
@@ -742,6 +743,8 @@ public class SchedulerDBManager {
 
         session.getNamedQuery("deleteEnvironmentModifierData").setParameter("jobId", jobId).executeUpdate();
 
+        session.getNamedQuery("deleteJobDataVariable").setParameter("jobId", jobId).executeUpdate();
+
         session.getNamedQuery("deleteTaskDataVariable").setParameter("jobId", jobId).executeUpdate();
 
         session.getNamedQuery("deleteSelectorData").setParameter("jobId", jobId).executeUpdate();
@@ -1158,16 +1161,11 @@ public class SchedulerDBManager {
                 List<TaskData> tasksToUpdate = tasksQuery.list();
                 Set<TaskId> newTasks = changesInfo.getNewTasks();
 
-                int newListSize = tasksToUpdate.size() + newTasks.size();
-                List<TaskData> taskRuntimeDataList = new ArrayList<>(newListSize);
-                List<InternalTask> tasks = new ArrayList<>(newListSize);
-
                 for (TaskData taskData : tasksToUpdate) {
                     InternalTask task = job.getIHMTasks().get(taskData.createTaskId(job));
                     taskData.updateMutableAttributes(task);
                     session.update(taskData);
-                    taskRuntimeDataList.add(taskData);
-                    tasks.add(task);
+                    saveSingleTaskDependencies(session, task, taskData);
                 }
 
                 int counter = 0;
@@ -1182,15 +1180,12 @@ public class SchedulerDBManager {
                         task.setExecutableContainer(container);
                     }
                     TaskData taskData = saveNewTask(session, jobRuntimeData, task);
-                    taskRuntimeDataList.add(taskData);
-                    tasks.add(task);
+                    saveSingleTaskDependencies(session, task, taskData);
                     if (++counter % 50 == 0) {
                         session.flush();
                         session.clear();
                     }
                 }
-
-                saveTaskDependencies(session, tasks, taskRuntimeDataList);
 
                 TaskData.DBTaskId taskId = taskId(result.getTaskId());
                 saveTaskResult(taskId, result, session);
@@ -1627,30 +1622,34 @@ public class SchedulerDBManager {
         for (int i = 0; i < tasks.size(); i++) {
             InternalTask task = tasks.get(i);
             TaskData taskRuntimeData = taskRuntimeDataList.get(i);
-            if (task.hasDependences()) {
-                List<DBTaskId> dependencies = new ArrayList<>(task.getDependences().size());
-                for (Task dependency : task.getDependences()) {
-                    dependencies.add(taskId((InternalTask) dependency));
-                }
-                taskRuntimeData.setDependentTasks(dependencies);
-            } else {
-                taskRuntimeData.setDependentTasks(Collections.<DBTaskId> emptyList());
+            saveSingleTaskDependencies(session, task, taskRuntimeData);
+        }
+    }
+
+    private void saveSingleTaskDependencies(Session session, InternalTask task, TaskData taskRuntimeData) {
+        if (task.hasDependences()) {
+            List<DBTaskId> dependencies = new ArrayList<>(task.getDependences().size());
+            for (Task dependency : task.getDependences()) {
+                dependencies.add(taskId((InternalTask) dependency));
             }
-            if (task.getIfBranch() != null) {
-                InternalTask ifBranch = task.getIfBranch();
-                taskRuntimeData.setIfBranch(getTaskReference(session, ifBranch));
-            } else {
-                taskRuntimeData.setIfBranch(null);
+            taskRuntimeData.setDependentTasks(dependencies);
+        } else {
+            taskRuntimeData.setDependentTasks(Collections.<DBTaskId> emptyList());
+        }
+        if (task.getIfBranch() != null) {
+            InternalTask ifBranch = task.getIfBranch();
+            taskRuntimeData.setIfBranch(getTaskReference(session, ifBranch));
+        } else {
+            taskRuntimeData.setIfBranch(null);
+        }
+        if (task.getJoinedBranches() != null && !task.getJoinedBranches().isEmpty()) {
+            List<DBTaskId> joinedBranches = new ArrayList<>(task.getJoinedBranches().size());
+            for (InternalTask joinedBranch : task.getJoinedBranches()) {
+                joinedBranches.add(taskId(joinedBranch));
             }
-            if (task.getJoinedBranches() != null && !task.getJoinedBranches().isEmpty()) {
-                List<DBTaskId> joinedBranches = new ArrayList<>(task.getJoinedBranches().size());
-                for (InternalTask joinedBranch : task.getJoinedBranches()) {
-                    joinedBranches.add(taskId(joinedBranch));
-                }
-                taskRuntimeData.setJoinedBranches(joinedBranches);
-            } else {
-                taskRuntimeData.setJoinedBranches(Collections.<DBTaskId> emptyList());
-            }
+            taskRuntimeData.setJoinedBranches(joinedBranches);
+        } else {
+            taskRuntimeData.setJoinedBranches(Collections.<DBTaskId> emptyList());
         }
     }
 
