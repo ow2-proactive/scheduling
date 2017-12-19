@@ -56,7 +56,12 @@ public class StringPropagatedVariablesCustomConverter extends DozerConverter<Map
         Map<String, String> converted = new HashMap<>();
         for (Map.Entry<String, byte[]> entry : ((Map<String, byte[]>) source).entrySet()) {
             try {
-                converted.put(entry.getKey(), ObjectByteConverter.byteArrayToObject(entry.getValue()).toString());
+                Object valueAsObject = ObjectByteConverter.byteArrayToObject(entry.getValue());
+                if (valueAsObject != null) {
+                    converted.put(entry.getKey(), valueAsObject.toString());
+                } else if (entry.getValue() != null) {
+                    logger.debug("Could not convert " + entry.toString());
+                }
             } catch (Exception e) {
                 logger.error("Error when converting variables to json", e);
                 return null;

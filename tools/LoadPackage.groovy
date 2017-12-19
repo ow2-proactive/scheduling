@@ -222,7 +222,7 @@ class LoadPackage {
             def boundary = "---------------" + UUID.randomUUID().toString();
 
             // POST QUERY
-            def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&contentType=" + contentType
+            def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&objectContentType=" + contentType
             def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
             post.addHeader("Accept", "application/json")
             post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)

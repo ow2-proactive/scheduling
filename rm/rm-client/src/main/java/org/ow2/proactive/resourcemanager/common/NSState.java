@@ -23,33 +23,51 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.nodesrecovery;
+package org.ow2.proactive.resourcemanager.common;
 
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+import java.io.Serializable;
 
-import functionaltests.utils.NodesRecoveryProcessHelper;
-import functionaltests.utils.RMStarterForFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
  * @author ActiveEon Team
- * @since 20/07/17
+ * @since 30/11/2017
  */
-public class RecoverInfrastructureTestHelper {
 
-    public static void killNodesWithStrongSigKill() throws Exception {
-        RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findPidAndSendSigKill(RMNodeStarter.class.getSimpleName());
+@PublicAPI
+@XmlRootElement
+public class NSState implements Serializable {
+
+    private boolean result;
+
+    private String errorMessage;
+
+    private String stackTrace;
+
+    public boolean isResult() {
+        return result;
     }
 
-    public static void killRmWithStrongSigKill() throws Exception {
-        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findPidAndSendSigKill(RMStarterForFunctionalTest.class.getSimpleName());
+    public void setResult(boolean result) {
+        this.result = result;
     }
 
-    public static void killRmAndNodesWithStrongSigKill() throws Exception {
-        killRmWithStrongSigKill();
-        killNodesWithStrongSigKill();
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public String getStackTrace() {
+        return stackTrace;
+    }
+
+    public void setStackTrace(String stackTrace) {
+        this.stackTrace = stackTrace;
     }
 }

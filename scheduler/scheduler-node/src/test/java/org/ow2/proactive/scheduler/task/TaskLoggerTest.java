@@ -52,9 +52,10 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class TaskLoggerTest {
+public class TaskLoggerTest extends ProActiveTestClean {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();

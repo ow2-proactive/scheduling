@@ -23,33 +23,21 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.nodesrecovery;
+package org.ow2.tests;
 
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
-
-import functionaltests.utils.NodesRecoveryProcessHelper;
-import functionaltests.utils.RMStarterForFunctionalTest;
-import functionaltests.utils.RMTHelper;
+import org.junit.AfterClass;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 
 /**
  * @author ActiveEon Team
- * @since 20/07/17
+ * @since 19/07/2017
  */
-public class RecoverInfrastructureTestHelper {
+public class ProActiveTestClean {
 
-    public static void killNodesWithStrongSigKill() throws Exception {
-        RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findPidAndSendSigKill(RMNodeStarter.class.getSimpleName());
-    }
-
-    public static void killRmWithStrongSigKill() throws Exception {
-        RMTHelper.log("Kill Resource Manager abruptly (for the sake of RM recovery test -- expect exceptions)");
-        NodesRecoveryProcessHelper.findPidAndSendSigKill(RMStarterForFunctionalTest.class.getSimpleName());
-    }
-
-    public static void killRmAndNodesWithStrongSigKill() throws Exception {
-        killRmWithStrongSigKill();
-        killNodesWithStrongSigKill();
+    @AfterClass
+    public static void cleanupProActive() {
+        // ProActive active objects may be started in this test.
+        ProActiveRuntimeImpl.getProActiveRuntime().cleanJvmFromPA();
     }
 }

@@ -63,9 +63,10 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class ForkedTaskVariablesManagerTest {
+public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
     private String jobNameValue = "TestJobName";
 
     private String taskNameValue = "TestTaskName";
