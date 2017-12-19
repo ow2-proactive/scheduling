@@ -48,11 +48,11 @@ import org.atmosphere.wasync.Socket;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.rest.data.DataUtility;
 import org.ow2.proactive.scheduler.rest.utils.EventCodecUtil;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification.Action;
@@ -242,7 +242,8 @@ public class SchedulerEventReceiver {
                                                                                DataUtility.taskInfo((TaskInfoData) eventData.getData())));
                     break;
                 case USERS_UPDATED:
-                    eventListener.usersUpdatedEvent((NotificationData<UserIdentification>) eventData.getData());
+                    eventListener.usersUpdatedEvent(new NotificationData<>(SchedulerEvent.valueOf(eventData.getSchedulerEvent()),
+                                                                           DataUtility.userIdentification((SchedulerUserData) eventData.getData())));
                     break;
                 default:
                     throw new RuntimeException(String.format("Unknown action: %s", action));
