@@ -37,9 +37,10 @@ import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class TaskContextTest {
+public class TaskContextTest extends ProActiveTestClean {
 
     @Test
     public void nodesURLsAndHostsCanBeRepeated() throws Exception {

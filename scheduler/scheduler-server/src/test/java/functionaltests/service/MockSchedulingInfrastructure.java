@@ -48,7 +48,6 @@ import org.mockito.stubbing.Answer;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.DataSpaceServiceStarter;
-import org.ow2.proactive.scheduler.core.JobRemoveHandler;
 import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.SchedulingInfrastructure;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -139,7 +138,8 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
                                         (Script<?>) anyObject(),
                                         (VariablesMap) anyObject(),
                                         (Map<String, String>) anyObject(),
-                                        (TaskId) anyObject());
+                                        (TaskId) anyObject(),
+                                        (Credentials) anyObject());
 
         rmProxiesManager = mock(RMProxiesManager.class);
         when(rmProxiesManager.getUserRMProxy(anyString(), (Credentials) anyObject())).thenReturn(userProxy);
