@@ -39,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scripting.helper.progress.ProgressFile;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**

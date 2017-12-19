@@ -28,6 +28,7 @@ dependencies {
             "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}",
+            project(':scheduler:scheduler-examples')
     )
 
     runtime fileTree(dir: project.nativeLibsDir, exclude: '*.jar')
