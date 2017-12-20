@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,7 +67,7 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 1000 }, { 200, 2000 } });
+        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 5000 } });
     }
 
     // number of jobs
@@ -119,6 +120,14 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
         assertThat("Jobs recovery time for " + jobsNumber + " jobs",
                    (int) timeSpentToRecoverJobs(),
                    lessThan(timeLimit));
+    }
+
+    @After
+    public void after() throws Exception {
+        if (schedulerHelper != null) {
+            schedulerHelper.log("Kill Scheduler after test.");
+            schedulerHelper.killScheduler();
+        }
     }
 
     private long numberOfJobsRecovered() {
