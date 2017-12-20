@@ -50,6 +50,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
@@ -155,8 +156,6 @@ public class RMProxyActiveObject {
      * @param nodes          the node set to release
      * @param cleaningScript the cleaning script to apply to each node before releasing
      * @param variables
-     * @param taskId
-     * @param creds Credentials containing the user's unencrypted 3rd party credentials
      * @see #releaseNodes(NodeSet)
      */
     @ImmediateService
@@ -184,7 +183,7 @@ public class RMProxyActiveObject {
      * @param variables
      * @param genericInformation
      * @param taskId
-     * @param creds credentials with CredData containing third party credentials
+     * @param creds credentials from RMProxy to authenticate with SchedulerNodeClient
      */
     private void handleCleaningScript(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
             Map<String, String> genericInformation, TaskId taskId, Credentials creds) {
@@ -192,13 +191,6 @@ public class RMProxyActiveObject {
 
         try {
             this.nodesTaskId.put(nodes, taskId);
-
-            //create a decrypter to access scheduler and retrieve Third Party User Credentials
-            String privateKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
-            Decrypter decrypter = new Decrypter(Credentials.getPrivateKey(privateKeyPath));
-            decrypter.setCredentials(creds);
-
-            //start handler for binding
             ScriptHandler handler = ScriptLoader.createHandler(nodes.get(0));
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
@@ -206,25 +198,24 @@ public class RMProxyActiveObject {
             //retrieve scheduler URL to bind with schedulerapi, globalspaceapi, and userspaceapi
             String schedulerUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
 
-            logger.debug("Binding schedulerapi...");
+            logger.debug("Biding schedulerapi...");
+            String privateKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+            Decrypter decrypter = new Decrypter(Credentials.getPrivateKey(privateKeyPath));
+            decrypter.setCredentials(creds);
             SchedulerNodeClient client = new SchedulerNodeClient(decrypter, schedulerUrl);
             handler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, (Serializable) client);
 
-            logger.debug("Binding globalspaceapi...");
+            logger.debug("Biding globalspaceapi...");
             RemoteSpace globalSpaceClient = new DataSpaceNodeClient(client,
                                                                     IDataSpaceClient.Dataspace.GLOBAL,
                                                                     schedulerUrl);
             handler.addBinding(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME, (Serializable) globalSpaceClient);
 
-            logger.debug("Binding userspaceapi...");
+            logger.debug("Biding userspaceapi...");
             RemoteSpace userSpaceClient = new DataSpaceNodeClient(client,
                                                                   IDataSpaceClient.Dataspace.USER,
                                                                   schedulerUrl);
             handler.addBinding(SchedulerConstants.DS_USER_API_BINDING_NAME, (Serializable) userSpaceClient);
-
-            logger.debug("Binding credentials...");
-            handler.addBinding(SchedulerConstants.CREDENTIALS_VARIABLE,
-                               (Serializable) decrypter.decrypt().getThirdPartyCredentials());
 
             ScriptResult<?> future = handler.handle(cleaningScript);
             try {
@@ -251,8 +242,7 @@ public class RMProxyActiveObject {
      * Called when a script has returned (call is made as an active object call)
      * <p>
      * Check the nodes to release and release the one that have to (clean script has returned)
-     * Take care when renaming this method, method name is linked to
-     * {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map, TaskId, Credentials)}
+     * Take care when renaming this method, method name is linked to {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map, TaskId, Credentials)}
      */
     @ImmediateService
     public synchronized void cleanCallBack(Future<ScriptResult<?>> future, NodeSet nodes) {

@@ -121,15 +121,15 @@ public class RMProxy {
     }
 
     public void releaseNodes(NodeSet nodeSet) {
-        releaseNodes(nodeSet, null, null, null, null, null);
+        releaseNodes(nodeSet, null, null, null, null);
     }
 
-    public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, Credentials creds) {
-        releaseNodes(nodeSet, cleaningScript, null, null, null, creds);
+    public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript) {
+        releaseNodes(nodeSet, cleaningScript, null, null, null);
     }
 
     public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId, Credentials creds) {
+            Map<String, String> genericInformation, TaskId taskId) {
 
         if (nodeSet.size() == 0) {
             if (nodeSet.getExtraNodes() == null || nodeSet.getExtraNodes().size() == 0) {

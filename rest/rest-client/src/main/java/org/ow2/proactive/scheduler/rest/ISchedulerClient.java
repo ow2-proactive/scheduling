@@ -66,17 +66,16 @@ public interface ISchedulerClient extends Scheduler {
     void init(ConnectionInfo connectionInfo) throws Exception;
 
     /**
-     * Sets the session identifier explicitly. This might run on an uninitialized
-     * client.
+     * Sets the session identifier explicitly.
      *
      * @param sid session identifier
      */
     void setSession(String sid);
 
     /**
-     * Retrieves the current session identifier, or null if the session was not initialized yet.
+     * Retrieves the current session identifier.
      *
-     * @return the current session identifier if initialize, null otherwise
+     * @return the current session identifier
      */
     String getSession();
 
