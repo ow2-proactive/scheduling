@@ -139,4 +139,8 @@
 		</field>
 	</mapping>
 
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.job.UserIdentification</class-b>
+	</mapping>
 </mappings>
