@@ -37,9 +37,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.deser.std.StdDeserializer;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.node.ObjectNode;
-import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobStateData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.SchedulerUserData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification.Action;
@@ -105,7 +105,7 @@ public class EventCodecUtil {
                     notification.setData(mapper.readValue(data, TaskInfoData.class));
                     break;
                 case USERS_UPDATED:
-                    notification.setData(mapper.readValue(data, UserIdentification.class));
+                    notification.setData(mapper.readValue(data, SchedulerUserData.class));
                     break;
                 default:
                     break;

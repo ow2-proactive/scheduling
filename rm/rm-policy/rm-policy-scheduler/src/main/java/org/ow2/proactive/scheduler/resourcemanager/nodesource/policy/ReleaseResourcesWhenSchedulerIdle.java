@@ -68,7 +68,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy
         super.configure(policyParameters);
         try {
             timer = new Timer("ReleaseResourcesWhenSchedulerIdle Timer(1)", true);
-            idleTime = Long.parseLong(policyParameters[4].toString());
+            idleTime = Long.parseLong(policyParameters[6].toString());
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(e);
         }
