@@ -42,7 +42,7 @@ import org.apache.commons.codec.binary.Base64;
 
 /**
  * Utility functions for converting object to a byte array,
- * and vis versa.
+ * and vice versa.
  * <p>
  * This class can also compress stream
  *
@@ -220,6 +220,9 @@ public final class ObjectByteConverter {
     }
 
     public static Map<String, byte[]> mapOfBase64StringToByteArray(Map<String, String> input) {
+        if (input == null) {
+            return null;
+        }
         HashMap<String, byte[]> answer = new HashMap<>(input.size());
         for (Map.Entry<String, String> entry : input.entrySet()) {
             answer.put(entry.getKey(), base64StringToByteArray(entry.getValue()));
@@ -229,6 +232,9 @@ public final class ObjectByteConverter {
 
     public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input)
             throws IOException, ClassNotFoundException {
+        if (input == null) {
+            return null;
+        }
         HashMap<String, Serializable> answer = new HashMap<>(input.size());
         for (Map.Entry<String, byte[]> entry : input.entrySet()) {
             answer.put(entry.getKey(), (Serializable) byteArrayToObject(entry.getValue()));
