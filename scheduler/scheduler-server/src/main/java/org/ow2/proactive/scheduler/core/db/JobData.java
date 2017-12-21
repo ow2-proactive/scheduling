@@ -26,7 +26,6 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -407,7 +406,8 @@ public class JobData implements Serializable {
         this.userSpace = userSpace;
     }
 
-    @Column(name = "DESCRIPTION", length = 1000, updatable = false)
+    @Lob
+    @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE, updatable = false)
     public String getDescription() {
         return description;
     }

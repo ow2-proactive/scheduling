@@ -169,7 +169,7 @@ public class RMProxyActiveObject {
             else {
                 TaskLogger.getInstance().error(taskId,
                                                "Unauthorized clean script: " + System.getProperty("line.separator") +
-                                                       cleaningScript.getScript());
+                                                       cleaningScript.fetchScript());
                 releaseNodes(nodes).booleanValue();
             }
         }

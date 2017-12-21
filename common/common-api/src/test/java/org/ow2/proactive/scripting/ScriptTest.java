@@ -27,11 +27,14 @@ package org.ow2.proactive.scripting;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.net.URL;
 
 import javax.script.Bindings;
 
@@ -71,6 +74,82 @@ public class ScriptTest {
     }
 
     @Test
+    public void testScriptCanBeCreatedWithoutScriptEngines_Script_URL() throws Exception {
+        ScriptForTests script = new ScriptForTests(File.createTempFile("script", ".blahblah").toURI().toURL(),
+                                                   null,
+                                                   true);
+
+        assertNull(script.createScriptEngine());
+
+        ScriptResult<Object> result = script.execute();
+
+        assertNotNull(result.getException());
+    }
+
+    @Test
+    public void testScriptCanBeCreatedWithoutScriptEngines_Script_URL_WrongEngine() throws Exception {
+        ScriptForTests script = new ScriptForTests(File.createTempFile("script", ".blahblah").toURI().toURL(),
+                                                   "neverheardofthis",
+                                                   true);
+
+        assertNull(script.createScriptEngine());
+
+        ScriptResult<Object> result = script.execute();
+
+        assertNotNull(result.getException());
+    }
+
+    @Test
+    public void testScriptURLInferEngineName() throws Exception {
+        ScriptForTests script = new ScriptForTests(File.createTempFile("script", ".groovy").toURI().toURL(),
+                                                   null,
+                                                   true);
+
+        assertEquals("groovy", script.getEngineName());
+    }
+
+    @Test
+    public void testScriptURLOverrideEngineName() throws Exception {
+        ScriptForTests script = new ScriptForTests(File.createTempFile("script", ".groovy").toURI().toURL(),
+                                                   "javascript",
+                                                   true);
+
+        assertEquals("javascript", script.getEngineName());
+    }
+
+    @Test
+    public void testScriptURL_FetchLately() throws Exception {
+        String scriptContent = "result = \"Hello World\"";
+        File scriptFile = File.createTempFile("script", ".groovy");
+        try (PrintWriter out = new PrintWriter(scriptFile)) {
+            out.println(scriptContent);
+        }
+        ScriptForTests script = new ScriptForTests(scriptFile.toURI().toURL(), null, false);
+
+        // script definition should be empty before execution
+        assertNull(script.getScript());
+        assertNull(script.getEngineName());
+
+        // the call to fetchScript can retrieve the script definition without modifying the script instance
+        assertNotNull(script.fetchScript());
+        assertEquals(scriptContent, script.fetchScript().trim());
+        assertNull(script.getScript());
+        assertNull(script.getEngineName());
+
+        ScriptResult<Object> result = script.execute();
+
+        // After the execution the instance should be updated
+        assertNotNull(script.getScript());
+        assertNotNull(script.getReader());
+
+        assertNull(result.getException());
+        assertNotNull(result.getResult());
+
+        assertEquals(String.class, result.getResult().getClass());
+        assertEquals("Hello World", ((String) result.getResult()).trim());
+    }
+
+    @Test
     public void testJavaScriptEngine_Script_Inlined() throws Exception {
         SimpleScript script = new SimpleScript("1+1", "javascript");
 
@@ -107,9 +186,13 @@ public class ScriptTest {
             super(file);
         }
 
+        public ScriptForTests(URL url, String engine, boolean fetchImmediately) throws InvalidScriptException {
+            super(url, engine, fetchImmediately);
+        }
+
         @Override
         protected Reader getReader() {
-            return null;
+            return super.getReader();
         }
 
         @Override
@@ -119,7 +202,12 @@ public class ScriptTest {
 
         @Override
         protected ScriptResult<Object> getResult(Object evalResult, Bindings bindings) {
-            return null;
+            Object result = bindings.get("result");
+            if (result == null) {
+                return new ScriptResult<>(null);
+            } else {
+                return new ScriptResult<>((Object) result);
+            }
         }
     }
 }

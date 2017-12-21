@@ -62,7 +62,7 @@ public class SimpleScript extends Script<Object> {
      * @param parameters execution parameters
      * @throws InvalidScriptException if creation fails.
      */
-    public SimpleScript(File file, String[] parameters) throws InvalidScriptException {
+    public SimpleScript(File file, Serializable[] parameters) throws InvalidScriptException {
         super(file, parameters);
     }
 
@@ -71,18 +71,29 @@ public class SimpleScript extends Script<Object> {
      * @param parameters execution parameters
      * @throws InvalidScriptException if the creation fails.
      */
-    public SimpleScript(URL url, String[] parameters) throws InvalidScriptException {
-        super(url, parameters);
+    public SimpleScript(URL url, Serializable[] parameters) throws InvalidScriptException {
+        // standard scripts (i.e. other than Selection scripts) use url late binding by default
+        super(url, parameters, false);
+    }
+
+    /** Create a script from an URL.
+     * @param url an URL containing script code.
+     * @param engineName script's engine execution name.
+     * @param parameters execution parameters
+     * @throws InvalidScriptException if the creation fails.
+     */
+    public SimpleScript(URL url, String engineName, Serializable[] parameters) throws InvalidScriptException {
+        super(url, engineName, parameters, false);
     }
 
     /** Directly create a script with a string.
      * @param script a String containing script code
-     * @param engine script's engine execution name.
+     * @param engineName script's engine execution name.
      * @param parameters execution parameters
      * @throws InvalidScriptException if the creation fails.
      */
-    public SimpleScript(String script, String engine, Serializable[] parameters) throws InvalidScriptException {
-        super(script, engine, parameters);
+    public SimpleScript(String script, String engineName, Serializable[] parameters) throws InvalidScriptException {
+        super(script, engineName, parameters);
     }
 
     @Override

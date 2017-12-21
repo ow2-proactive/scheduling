@@ -175,8 +175,9 @@ public class TaskResultData {
         this.resultTime = resultTime;
     }
 
-    @Column(name = "RESULT_VALUE", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
+    @Column(name = "RESULT_VALUE", length = Integer.MAX_VALUE)
     public byte[] getSerializedValue() {
         return serializedValue;
     }
@@ -185,8 +186,9 @@ public class TaskResultData {
         this.serializedValue = serializedValue;
     }
 
-    @Column(name = "RESULT_EXCEPTION", length = Integer.MAX_VALUE)
     @Lob
+    @Type(type = "org.hibernate.type.BinaryType")
+    @Column(name = "RESULT_EXCEPTION", length = Integer.MAX_VALUE)
     public byte[] getSerializedException() {
         return serializedException;
     }

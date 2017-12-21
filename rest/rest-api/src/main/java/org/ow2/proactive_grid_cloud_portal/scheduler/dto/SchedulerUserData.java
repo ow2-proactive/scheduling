@@ -25,12 +25,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.util.Set;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 
 @XmlRootElement
 public class SchedulerUserData {
     private String hostName;
+
+    private Set<String> groups;
 
     private String username;
 
@@ -40,11 +44,17 @@ public class SchedulerUserData {
 
     private int submitNumber;
 
+    private boolean myEventsOnly;
+
     public SchedulerUserData() {
     }
 
     public String getHostName() {
         return hostName;
+    }
+
+    public Set<String> getGroups() {
+        return groups;
     }
 
     public String getUsername() {
@@ -67,6 +77,10 @@ public class SchedulerUserData {
         this.hostName = hostName;
     }
 
+    public void setGroups(Set<String> groups) {
+        this.groups = groups;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
@@ -81,6 +95,14 @@ public class SchedulerUserData {
 
     public void setSubmitNumber(int submitNumber) {
         this.submitNumber = submitNumber;
+    }
+
+    public boolean isMyEventsOnly() {
+        return myEventsOnly;
+    }
+
+    public void setMyEventsOnly(boolean myEventsOnly) {
+        this.myEventsOnly = myEventsOnly;
     }
 
     @Override

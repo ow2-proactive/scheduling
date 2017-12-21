@@ -68,11 +68,12 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.proactive.utils.ClasspathUtils;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.tests.ProActiveTestClean;
 
 import com.google.common.collect.ImmutableMap;
 
 
-public class InProcessTaskExecutorTest {
+public class InProcessTaskExecutorTest extends ProActiveTestClean {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();

@@ -28,10 +28,12 @@ package org.ow2.proactive.scheduler.task.executors.forked.env;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -49,6 +51,8 @@ import com.google.common.base.Strings;
 public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     private final static String javaHomePostfixJavaExecutable = File.separatorChar + "bin" + File.separatorChar +
                                                                 "java";
+
+    private static final Logger logger = Logger.getLogger(ForkedJvmTaskExecutionCommandCreator.class);
 
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
@@ -84,6 +88,8 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         // set the task fork property so that script engines have a mean to know
         // if they are running in a forked task or not
         jvmArguments.add(PASchedulerProperties.TASK_FORK.getCmdLine() + "true");
+
+        configureLogging(jvmArguments, variables);
 
         StringBuilder classpath = new StringBuilder("." + File.pathSeparatorChar);
         if (!System.getProperty("java.class.path", "").contains("node.jar")) {
@@ -126,13 +132,40 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         return javaCommand;
     }
 
-    private StringBuilder getStandardClassPathEntries(Map<String, Serializable> variables) throws IOException {
-        StringBuilder classpathEntries = new StringBuilder();
+    private void configureLogging(ArrayList<String> jvmArguments, Map<String, Serializable> variables) {
+        String log4jFileUrl = null;
+        String schedulerHome = getSchedulerHome(variables);
+        String log4jConfig = schedulerHome + File.separator + "config" + File.separator + "log" + File.separator +
+                             "scriptengines.properties";
+
+        if (new File(log4jConfig).exists()) {
+            log4jFileUrl = "file:" + log4jConfig;
+        } else {
+            URL log4jConfigFromJar = ForkedJvmTaskExecutionCommandCreator.class.getResource("/config/log/scriptengines.properties");
+            if (log4jConfigFromJar != null) {
+                log4jFileUrl = log4jConfigFromJar.toString();
+            } else {
+                logger.warn("Cannot find log4j configuration file for forked JVM, logging disabled");
+            }
+        }
+        if (log4jFileUrl != null) {
+            jvmArguments.add(CentralPAPropertyRepository.LOG4J.getCmdLine() + log4jFileUrl);
+        }
+    }
+
+    private String getSchedulerHome(Map<String, Serializable> variables) {
         String schedulerHome;
         schedulerHome = System.getProperty(CentralPAPropertyRepository.PA_HOME.getName());
         if (schedulerHome == null) {
             schedulerHome = (String) variables.get("PA_SCHEDULER_HOME");
         }
+        return schedulerHome;
+    }
+
+    private StringBuilder getStandardClassPathEntries(Map<String, Serializable> variables) throws IOException {
+        StringBuilder classpathEntries = new StringBuilder();
+        String schedulerHome = getSchedulerHome(variables);
+
         if (schedulerHome != null) {
             File paHome = new File(schedulerHome).getCanonicalFile();
             File distLib = new File(paHome, "dist/lib").getCanonicalFile();

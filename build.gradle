@@ -7,7 +7,6 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url 'http://repository.activeeon.com/content/groups/proactive/' }
         maven { url "http://nexus.qmino.com/content/repositories/miredot" }
-        maven { url "https://plugins.gradle.org/m2/" }
     }
 
     dependencies {
@@ -31,7 +30,6 @@ buildscript {
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.1"
         classpath "com.diffplug.gradle.spotless:spotless:2.4.0"
         classpath "org.ow2.proactive:coding-rules:1.0.0"
-        classpath "gradle.plugin.net.foragerr.jmeter:jmeter-gradle-plugin:1.0.7-2.13" // plugin which is used to run jmeter which launches our performance tests
 
         delete "gradle/ext"
         ant.unjar src: configurations.classpath.find { it.name.startsWith("coding-rules") }, dest: 'gradle/ext'
@@ -80,6 +78,7 @@ configurations {
 
 allprojects {
     apply plugin: 'maven'
+    apply plugin: 'project-report'
 
 
     group = 'org.ow2.proactive'
@@ -274,6 +273,29 @@ ext.schedulingFunctionalTestConfiguration = {
 
 }
 
+ext.schedulingPerformanceTestConfiguration = {
+
+    include 'performancetests/**'
+
+    systemProperties << ['pa.rm.home': rootDir.absolutePath]
+    systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+    systemProperties << ['proactive.communication.protocol': 'pnp']
+    systemProperties << ['proactive.test.timeout': 800000]
+    systemProperties << ['java.awt.headless': 'true']
+    systemProperties << ['java.library.path': project.nativeLibsDir]
+    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['file.encoding': 'UTF-8']
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    beforeTest { descriptor ->
+        logger.lifecycle("Running: " + descriptor)
+    }
+
+}
+
+
 dependencies {
     distLib(project(':scheduler:scheduler-server')) {
         exclude group: 'javassist', module: 'javassist' // to avoid duplicate (artifact named differently)
@@ -381,6 +403,7 @@ createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-route
 
 subprojects {
     tasks.withType(Test).matching { it.name == 'functionalTest' }*.dependsOn dist
+    tasks.withType(Test).matching { it.name == 'performanceTest' }*.dependsOn dist
 }
 
 subprojects {

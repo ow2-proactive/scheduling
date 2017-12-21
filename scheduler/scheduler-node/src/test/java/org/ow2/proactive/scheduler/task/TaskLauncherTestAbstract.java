@@ -34,13 +34,14 @@ import org.mockito.MockitoAnnotations;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.tests.ProActiveTestClean;
 
 
 /**
  * @author ActiveEon Team
  * @since 25/09/17
  */
-public class TaskLauncherTestAbstract {
+public class TaskLauncherTestAbstract extends ProActiveTestClean {
 
     @InjectMocks
     protected TaskLauncher taskLauncher;
