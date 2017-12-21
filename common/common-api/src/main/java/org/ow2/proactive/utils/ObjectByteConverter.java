@@ -221,7 +221,7 @@ public final class ObjectByteConverter {
 
     public static Map<String, byte[]> mapOfBase64StringToByteArray(Map<String, String> input) {
         if (input == null) {
-            return null;
+            return new HashMap<>();
         }
         HashMap<String, byte[]> answer = new HashMap<>(input.size());
         for (Map.Entry<String, String> entry : input.entrySet()) {
@@ -233,7 +233,7 @@ public final class ObjectByteConverter {
     public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input)
             throws IOException, ClassNotFoundException {
         if (input == null) {
-            return null;
+            return new HashMap<>();
         }
         HashMap<String, Serializable> answer = new HashMap<>(input.size());
         for (Map.Entry<String, byte[]> entry : input.entrySet()) {
