@@ -626,13 +626,7 @@
       <xs:documentation>Definition of a script by writing directly the code inside the descriptor </xs:documentation>
     </xs:annotation>
     <xs:complexType mixed="true">
-      <xs:attribute name="language" use="required">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
+      <xs:attributeGroup ref="jd:language"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="file">
@@ -657,8 +651,24 @@
           <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="language">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <xs:attributeGroup name="language">
+    <xs:attribute name="language" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
   <xs:attributeGroup name="path">
     <xs:attribute name="path" use="required">
       <xs:annotation>

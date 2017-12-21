@@ -46,9 +46,10 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
+import org.ow2.tests.ProActiveTestClean;
 
 
-public class JavaClassScriptEngineFactoryTest {
+public class JavaClassScriptEngineFactoryTest extends ProActiveTestClean {
 
     @Test
     public void executable_with_output_and_result() throws Exception {

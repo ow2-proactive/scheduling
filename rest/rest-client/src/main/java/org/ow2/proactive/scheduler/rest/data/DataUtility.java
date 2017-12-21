@@ -30,12 +30,7 @@ import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -174,6 +169,16 @@ public class DataUtility {
                                                          sud.getSubmitNumber()));
         }
         return schedulerUserInfos;
+    }
+
+    public static UserIdentification userIdentification(SchedulerUserData d) {
+        return new UserIdentificationImpl(d.getUsername(),
+                                          d.getGroups(),
+                                          d.getSubmitNumber(),
+                                          d.getHostName(),
+                                          d.getConnectionTime(),
+                                          d.getLastSubmitTime(),
+                                          d.isMyEventsOnly());
     }
 
     public static TaskId taskId(JobId jobId, TaskIdData taskIdData) {

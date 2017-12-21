@@ -1248,12 +1248,19 @@ public class StaxJobFactory extends JobFactory {
                         } else if (XMLTags.SCRIPT_FILE.matches(current)) {
                             String path = null;
                             String url = null;
-                            if (XMLAttributes.SCRIPT_URL.matches(cursorScript.getAttributeLocalName(0))) {
-                                url = replace(cursorScript.getAttributeValue(0), variables);
-                            } else {
-                                path = checkPath(cursorScript.getAttributeValue(0), variables);
+                            String language = null;
+                            for (int i = 0; i < cursorScript.getAttributeCount(); i++) {
+                                attrtmp = cursorScript.getAttributeLocalName(i);
+                                if (XMLAttributes.SCRIPT_URL.matches(attrtmp)) {
+                                    url = replace(cursorScript.getAttributeValue(i), variables);
+                                } else if (XMLAttributes.LANGUAGE.matches(attrtmp)) {
+                                    language = replace(cursorScript.getAttributeValue(i), variables);
+                                } else if (XMLAttributes.PATH.matches(attrtmp)) {
+                                    path = checkPath(cursorScript.getAttributeValue(i), variables);
+                                } else {
+                                    throw new JobCreationException("Unrecognized attribute : " + attrtmp);
+                                }
                             }
-                            attrtmp = cursorScript.getAttributeLocalName(0);
 
                             //go to the next 'arguments' start element or the 'file' end element
                             while (true) {
@@ -1266,9 +1273,17 @@ public class StaxJobFactory extends JobFactory {
                             }
 
                             if (url != null) {
-                                toReturn = new SimpleScript(new URL(url), getArguments(cursorScript));
-                            } else {
+                                if (language != null) {
+                                    toReturn = new SimpleScript(new URL(url), language, getArguments(cursorScript));
+                                } else {
+                                    toReturn = new SimpleScript(new URL(url), getArguments(cursorScript));
+                                }
+                            } else if (path != null) {
+                                // language is ignored if a File is provided, the script language will be determined based on the file extension
                                 toReturn = new SimpleScript(new File(path), getArguments(cursorScript));
+                            } else {
+                                attrtmp = null;
+                                throw new JobCreationException("Invalid script file definition, one of path/url attributes must be declared");
                             }
                         } else if (XMLTags.SCRIPT_SCRIPT.matches(current)) {
                             if (cursorScript.getAttributeCount() > 0) {

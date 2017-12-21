@@ -39,11 +39,12 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.tests.ProActiveTestClean;
 
 import com.google.common.collect.ImmutableSet;
 
 
-public class TaskLauncherInitializerTest {
+public class TaskLauncherInitializerTest extends ProActiveTestClean {
 
     private TaskLauncherInitializer initializer;
 

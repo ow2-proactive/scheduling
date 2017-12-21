@@ -363,13 +363,15 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testJobSubmissionEventListener() throws Exception {
         ISchedulerClient client = clientInstance();
         SchedulerEventListenerImpl listener = new SchedulerEventListenerImpl();
-        client.addEventListener(listener, true, SchedulerEvent.JOB_SUBMITTED);
+        client.addEventListener(listener, true, SchedulerEvent.JOB_SUBMITTED, SchedulerEvent.USERS_UPDATE);
         Job job = defaultJob();
         JobId jobId = client.submit(job);
         JobState submittedJob = listener.getSubmittedJob();
         while (!submittedJob.getId().value().equals(jobId.value())) {
             submittedJob = listener.getSubmittedJob();
         }
+        UserIdentification userIdentification = listener.getLastUserUpdate();
+        assertTrue(userIdentification.getLastSubmitTime() != -1);
         client.removeEventListener();
 
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));
@@ -443,6 +445,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
         private Stack<TaskInfo> taskStateStack = new Stack<>();
 
+        private Stack<UserIdentification> userIdentificationStack = new Stack<>();
+
         @Override
         public void jobSubmittedEvent(JobState jobState) {
             System.out.println("JobSubmittedEvent()");
@@ -465,6 +469,21 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                     }
                 }
                 return jobStateStack.pop();
+            }
+        }
+
+        public UserIdentification getLastUserUpdate() {
+            System.out.println("getLastUserUpdate");
+            synchronized (this) {
+                if (userIdentificationStack.isEmpty()) {
+                    System.out.println("Stack is empty");
+                    try {
+                        System.out.println("wait");
+                        wait();
+                    } catch (InterruptedException ie) {
+                    }
+                }
+                return userIdentificationStack.pop();
             }
         }
 
@@ -501,7 +520,12 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         }
 
         @Override
-        public void usersUpdatedEvent(NotificationData<UserIdentification> arg0) {
+        public void usersUpdatedEvent(NotificationData<UserIdentification> data) {
+            System.out.println("userIdentificationUpdatedEvent() : " + data);
+            synchronized (this) {
+                userIdentificationStack.push(data.getData());
+                notifyAll();
+            }
         }
 
         @Override
