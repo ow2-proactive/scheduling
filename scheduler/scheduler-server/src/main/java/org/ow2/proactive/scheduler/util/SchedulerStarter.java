@@ -101,6 +101,32 @@ public class SchedulerStarter {
 
     private static Logger logger = Logger.getLogger(SchedulerStarter.class);
 
+    private static final String OPTION_HELP = "help";
+
+    private static final String OPTION_RMURL = "rmURL";
+
+    private static final String OPTION_SCHEDULER_URL = "scheduler-url";
+
+    private static final String OPTION_POLICY = "policy";
+
+    private static final String OPTION_LOCALNODES = "localNodes";
+
+    private static final String OPTION_TIMEOUT = "timeout";
+
+    private static final String OPTION_CLEAN = "clean";
+
+    private static final String OPTION_CLEAN_NODESOURCES = "clean-nodesources";
+
+    private static final String OPTION_RM_ONLY = "rm-only";
+
+    private static final String OPTION_NO_REST = "no-rest";
+
+    private static final String OPTION_NO_ROUTER = "no-router";
+
+    private static final String OPTION_NO_DISCOVERY = "no-discovery";
+
+    private static final String OPTION_DISCOVERY_PORT = "discovery-port";
+
     private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
 
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
@@ -132,7 +158,7 @@ public class SchedulerStarter {
 
         try {
             CommandLine commandLine = getCommandLine(args, options);
-            if (commandLine.hasOption("h")) {
+            if (commandLine.hasOption(OPTION_HELP)) {
                 displayHelp(options);
             } else {
                 start(commandLine);
@@ -152,7 +178,7 @@ public class SchedulerStarter {
     protected static void start(CommandLine commandLine) throws Exception {
         ProActiveConfiguration.load(); // force properties loading to find out if PAMR router should be started
 
-        if (!commandLine.hasOption("no-router")) {
+        if (!commandLine.hasOption(OPTION_NO_ROUTER)) {
             startRouter();
         }
 
@@ -160,24 +186,23 @@ public class SchedulerStarter {
         hsqldbServer.startIfNeeded();
 
         rmURL = getRmUrl(commandLine);
-        //        rmURL = rmUrl;
         setCleanDatabaseProperties(commandLine);
         setCleanNodesourcesProperty(commandLine);
 
         rmURL = connectToOrStartResourceManager(commandLine, rmURL);
 
-        if (commandLine.hasOption("rm-only")) {
+        if (commandLine.hasOption(OPTION_RM_ONLY)) {
             return;
         }
 
         schedulerURL = getSchedulerUrl(commandLine);
-        if (!commandLine.hasOption("scheduler-url")) {
+        if (!commandLine.hasOption(OPTION_SCHEDULER_URL)) {
             SchedulerAuthenticationInterface schedulerAuthenticationInterface = startScheduler(commandLine, rmURL);
             schedulerURL = schedulerAuthenticationInterface.getHostURL();
             schedAuthInter = schedulerAuthenticationInterface;
         }
 
-        if (!commandLine.hasOption("no-rest")) {
+        if (!commandLine.hasOption(OPTION_NO_REST)) {
             startJetty(rmURL, schedulerURL);
         }
 
@@ -257,8 +282,8 @@ public class SchedulerStarter {
 
     private static void startDiscovery(CommandLine commandLine, String urlToDiscover)
             throws ParseException, SocketException, UnknownHostException {
-        if (!commandLine.hasOption("no-discovery")) {
-            int discoveryPort = readIntOption(commandLine, "discovery-port", DISCOVERY_DEFAULT_PORT);
+        if (!commandLine.hasOption(OPTION_NO_DISCOVERY)) {
+            int discoveryPort = readIntOption(commandLine, OPTION_DISCOVERY_PORT, DISCOVERY_DEFAULT_PORT);
             discoveryService = new BroadcastDiscovery(discoveryPort, urlToDiscover);
             discoveryService.start();
         }
@@ -290,8 +315,8 @@ public class SchedulerStarter {
                     defaultNodesNumber = RMStarter.DEFAULT_NODES_NUMBER;
                 }
 
-                int numberLocalNodes = readIntOption(commandLine, "localNodes", defaultNodesNumber);
-                int nodeTimeoutValue = readIntOption(commandLine, "timeout", DEFAULT_NODES_TIMEOUT);
+                int numberLocalNodes = readIntOption(commandLine, OPTION_LOCALNODES, defaultNodesNumber);
+                int nodeTimeoutValue = readIntOption(commandLine, OPTION_TIMEOUT, DEFAULT_NODES_TIMEOUT);
 
                 startResourceManager(numberLocalNodes, nodeTimeoutValue);
             }
@@ -307,7 +332,7 @@ public class SchedulerStarter {
     }
 
     private static void setCleanNodesourcesProperty(CommandLine commandLine) {
-        if (commandLine.hasOption("clean-nodesources")) {
+        if (commandLine.hasOption(OPTION_CLEAN_NODESOURCES)) {
             PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB_NODESOURCES.updateProperty("true");
         }
     }
@@ -315,8 +340,8 @@ public class SchedulerStarter {
     private static String getRmUrl(CommandLine commandLine) {
         String rmUrl = null;
 
-        if (commandLine.hasOption("u")) {
-            rmUrl = commandLine.getOptionValue("u");
+        if (commandLine.hasOption(OPTION_RMURL)) {
+            rmUrl = commandLine.getOptionValue(OPTION_RMURL);
             logger.info("RM URL : " + rmUrl);
         }
         return rmUrl;
@@ -325,8 +350,8 @@ public class SchedulerStarter {
     private static String getSchedulerUrl(CommandLine commandLine) {
         String schedulerUrl = null;
 
-        if (commandLine.hasOption("scheduler-url")) {
-            schedulerUrl = commandLine.getOptionValue("scheduler-url");
+        if (commandLine.hasOption(OPTION_SCHEDULER_URL)) {
+            schedulerUrl = commandLine.getOptionValue(OPTION_SCHEDULER_URL);
             logger.info("Scheduler URL : " + schedulerUrl);
         }
         return schedulerUrl;
@@ -335,8 +360,8 @@ public class SchedulerStarter {
     private static String getPolicyFullName(CommandLine commandLine) {
         String policyFullName = PASchedulerProperties.SCHEDULER_DEFAULT_POLICY.getValueAsString();
 
-        if (commandLine.hasOption("p")) {
-            policyFullName = commandLine.getOptionValue("p");
+        if (commandLine.hasOption(OPTION_POLICY)) {
+            policyFullName = commandLine.getOptionValue(OPTION_POLICY);
             logger.info("Used policy : " + policyFullName);
         }
         return policyFullName;
@@ -380,81 +405,89 @@ public class SchedulerStarter {
     protected static Options getOptions() {
         Options options = new Options();
 
-        Option help = new Option("h", "help", false, "to display this help");
-        help.setArgName("help");
-        help.setRequired(false);
-        options.addOption(help);
+        options.addOption(Option.builder("h")
+                                .longOpt(OPTION_HELP)
+                                .hasArg(false)
+                                .argName(OPTION_HELP)
+                                .required(false)
+                                .desc("to display this help")
+                                .build());
 
-        Option rmURL = new Option("u", "rmURL", true, "bind to a given resource manager URL (default: localhost)\");");
-        rmURL.setArgName("rmURL");
-        rmURL.setRequired(false);
-        options.addOption(rmURL);
+        options.addOption(Option.builder("u")
+                                .longOpt(OPTION_RMURL)
+                                .hasArg(true)
+                                .argName(OPTION_RMURL)
+                                .required(false)
+                                .desc("bind to a given resource manager URL (default: localhost)")
+                                .build());
 
-        Option schedulerUrl = new Option("s",
-                                         "scheduler-url",
-                                         true,
-                                         "bind to a given scheduler URL. Must be combined with --rmURL (default: localhost)");
-        schedulerUrl.setArgName("scheduler-url");
-        schedulerUrl.setRequired(false);
-        options.addOption(schedulerUrl);
+        options.addOption(Option.builder("s")
+                                .longOpt(OPTION_SCHEDULER_URL)
+                                .hasArg(true)
+                                .argName(OPTION_SCHEDULER_URL)
+                                .required(false)
+                                .desc("bind to a given scheduler URL. Must be combined with " + OPTION_RMURL +
+                                      " (default: localhost)")
+                                .build());
 
-        Option policy = new Option("p",
-                                   "policy",
-                                   true,
-                                   "the complete name of the scheduling policy to use (default: org.ow2.proactive.scheduler.policy.DefaultPolicy)");
-        policy.setArgName("policy");
-        policy.setRequired(false);
-        options.addOption(policy);
+        options.addOption(Option.builder("p")
+                                .longOpt(OPTION_POLICY)
+                                .hasArg(true)
+                                .argName(OPTION_POLICY)
+                                .required(false)
+                                .desc("the complete name of the scheduling policy to use (default: org.ow2.proactive.scheduler.policy.DefaultPolicy)")
+                                .build());
 
-        Option noDeploy = new Option("ln",
-                                     "localNodes",
-                                     true,
-                                     "the number of local nodes to start (can be 0; default: " +
-                                           RMStarter.DEFAULT_NODES_NUMBER + ")");
-        noDeploy.setArgName("localNodes");
-        noDeploy.setRequired(false);
-        options.addOption(noDeploy);
+        options.addOption(Option.builder("ln")
+                                .longOpt(OPTION_LOCALNODES)
+                                .hasArg(true)
+                                .argName(OPTION_LOCALNODES)
+                                .required(false)
+                                .desc("the number of local nodes to start (can be 0; default: " +
+                                      RMStarter.DEFAULT_NODES_NUMBER + ")")
+                                .build());
 
-        Option nodeTimeout = new Option("t",
-                                        "timeout",
-                                        true,
-                                        "timeout used to start the nodes (only useful with local nodes; default: " +
-                                              DEFAULT_NODES_TIMEOUT + "ms)");
-        nodeTimeout.setArgName("timeout");
-        nodeTimeout.setRequired(false);
-        options.addOption(nodeTimeout);
+        options.addOption(Option.builder("t")
+                                .longOpt(OPTION_TIMEOUT)
+                                .hasArg(true)
+                                .argName(OPTION_TIMEOUT)
+                                .required(false)
+                                .desc("timeout used to start the nodes (only useful with local nodes; default: " +
+                                      DEFAULT_NODES_TIMEOUT + "ms)")
+                                .build());
 
-        options.addOption(new Option("c",
-                                     "clean",
-                                     false,
-                                     "clean scheduler and resource manager databases (default: false)"));
+        options.addOption(Option.builder("c")
+                                .longOpt(OPTION_CLEAN)
+                                .hasArg(false)
+                                .desc("clean scheduler and resource manager databases (default: false)")
+                                .build());
 
         options.addOption(Option.builder()
-                                .longOpt("clean-nodesources")
+                                .longOpt(OPTION_CLEAN_NODESOURCES)
                                 .desc("drop all previously created nodesources from resource manager database (default: false)")
                                 .build());
 
         options.addOption(Option.builder()
-                                .longOpt("rm-only")
-                                .desc("start only resource manager (implies --no-rest; default: false)")
+                                .longOpt(OPTION_RM_ONLY)
+                                .desc("start only resource manager (implies " + OPTION_NO_REST + "; default: false)")
                                 .build());
 
         options.addOption(Option.builder()
-                                .longOpt("no-rest")
+                                .longOpt(OPTION_NO_REST)
                                 .desc("do not deploy REST server and wars from dist/war (default: false)")
                                 .build());
 
         options.addOption(Option.builder()
-                                .longOpt("no-router")
+                                .longOpt(OPTION_NO_ROUTER)
                                 .desc("do not deploy PAMR Router (default: false)")
                                 .build());
 
         options.addOption(Option.builder()
-                                .longOpt("no-discovery")
+                                .longOpt(OPTION_NO_DISCOVERY)
                                 .desc("do not run discovery service for nodes (default: false)")
                                 .build());
         options.addOption(Option.builder("dp")
-                                .longOpt("discovery-port")
+                                .longOpt(OPTION_DISCOVERY_PORT)
                                 .desc("discovery service port for nodes (default: " + DISCOVERY_DEFAULT_PORT + ")")
                                 .hasArg()
                                 .argName("port")
