@@ -185,14 +185,21 @@ public class SchedulerEventReceiver {
         @Override
         public EventNotification decode(Event event, String message) {
             EventNotification notification = null;
-            if (Event.MESSAGE == event) {
+            if (Event.MESSAGE == event && !"X".equals(message)) {
+                // org.atmosphere.interceptor.HeartbeatInterceptor sends messages containing "X", discarding it to avoid polluting the output
                 try {
                     notification = EventCodecUtil.fromJsonString(message, EventNotification.class);
                 } catch (Exception e) {
-                    logger.error(String.format("Cannot construct %s type object from: %n%s",
-                                               EventNotification.class.getName(),
-                                               message),
-                                 e);
+                    if (logger.isDebugEnabled()) {
+                        logger.warn(String.format("Cannot construct %s type object from: %n%s",
+                                                  EventNotification.class.getName(),
+                                                  message),
+                                    e);
+                    } else {
+                        logger.warn(String.format("Cannot construct %s type object from: %n%s",
+                                                  EventNotification.class.getName(),
+                                                  message));
+                    }
                 }
             }
             return notification;
