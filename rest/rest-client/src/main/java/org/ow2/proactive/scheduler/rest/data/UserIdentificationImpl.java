@@ -23,66 +23,99 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
+package org.ow2.proactive.scheduler.rest.data;
 
 import java.util.Set;
+import java.util.TimerTask;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import org.ow2.proactive.scheduler.common.job.UserIdentification;
 
 
-@XmlRootElement
-public class SchedulerUserData {
-    private String hostName;
-
-    private Set<String> groups;
+public class UserIdentificationImpl extends UserIdentification {
 
     private String username;
 
-    private long connectionTime;
-
-    private long lastSubmitTime;
+    private Set<String> groups;
 
     private int submitNumber;
 
+    private String hostName;
+
+    private long connectionTime;
+
+    private long lastSubmitTime = -1;
+
     private boolean myEventsOnly;
 
-    public SchedulerUserData() {
+    public UserIdentificationImpl() {
+
     }
 
-    public String getHostName() {
-        return hostName;
+    public UserIdentificationImpl(String username, Set<String> groups, int submitNumber, String hostName,
+            long connectionTime, long lastSubmitTime, boolean myEventsOnly) {
+        this.username = username;
+        this.groups = groups;
+        this.submitNumber = submitNumber;
+        this.hostName = hostName;
+        this.connectionTime = connectionTime;
+        this.lastSubmitTime = lastSubmitTime;
+        this.myEventsOnly = myEventsOnly;
     }
 
-    public Set<String> getGroups() {
-        return groups;
-    }
-
+    @Override
     public String getUsername() {
         return username;
     }
 
-    public long getConnectionTime() {
-        return connectionTime;
+    @Override
+    public Set<String> getGroups() {
+        return groups;
     }
 
-    public long getLastSubmitTime() {
-        return lastSubmitTime;
-    }
-
+    @Override
     public int getSubmitNumber() {
         return submitNumber;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
+    @Override
+    public String getHostName() {
+        return hostName;
+    }
+
+    @Override
+    public long getConnectionTime() {
+        return connectionTime;
+    }
+
+    @Override
+    public long getLastSubmitTime() {
+        return lastSubmitTime;
+    }
+
+    @Override
+    public boolean isMyEventsOnly() {
+        return myEventsOnly;
+    }
+
+    @Override
+    public TimerTask getSession() {
+        return null;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setGroups(Set<String> groups) {
         this.groups = groups;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setSubmitNumber(int submitNumber) {
+        this.submitNumber = submitNumber;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
     }
 
     public void setConnectionTime(long connectionTime) {
@@ -93,22 +126,8 @@ public class SchedulerUserData {
         this.lastSubmitTime = lastSubmitTime;
     }
 
-    public void setSubmitNumber(int submitNumber) {
-        this.submitNumber = submitNumber;
-    }
-
-    public boolean isMyEventsOnly() {
-        return myEventsOnly;
-    }
-
     public void setMyEventsOnly(boolean myEventsOnly) {
         this.myEventsOnly = myEventsOnly;
     }
 
-    @Override
-    public String toString() {
-        return "SchedulerUserData{" + "hostName='" + hostName + '\'' + ", username='" + username + '\'' +
-               ", connectionTime=" + connectionTime + ", lastSubmitTime=" + lastSubmitTime + ", submitNumber=" +
-               submitNumber + '}';
-    }
 }

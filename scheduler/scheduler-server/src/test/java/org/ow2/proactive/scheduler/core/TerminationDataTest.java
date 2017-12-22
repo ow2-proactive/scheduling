@@ -30,21 +30,17 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
-import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
@@ -80,21 +76,12 @@ public class TerminationDataTest extends ProActiveTestClean {
     @Mock
     private RMProxy rmProxy;
 
-    @Mock
-    private Map<String, HybridEncryptedData> thirdPartyCredentials;
-
-    @Mock
-    private SchedulerDBManager dbManager;
-
     @Before
     public void init() throws RMProxyCreationException {
         MockitoAnnotations.initMocks(this);
         Mockito.when(service.getInfrastructure()).thenReturn(schedulingInfrastructure);
         Mockito.when(schedulingInfrastructure.getRMProxiesManager()).thenReturn(proxiesManager);
         Mockito.when(proxiesManager.getUserRMProxy("user", null)).thenReturn(rmProxy);
-        Mockito.when(service.getInfrastructure().getDBManager()).thenReturn(dbManager);
-        Mockito.when(service.getInfrastructure().getDBManager().thirdPartyCredentialsMap(Mockito.any(String.class)))
-               .thenReturn(thirdPartyCredentials);
 
         terminationData = TerminationData.newTerminationData();
     }
@@ -201,13 +188,12 @@ public class TerminationDataTest extends ProActiveTestClean {
         terminationData.addTaskData(null, taskData, TerminationData.TerminationStatus.NORMAL, null);
         terminationData.handleTermination(service);
         Mockito.verify(proxiesManager, Mockito.times(1)).getUserRMProxy("user", null);
-        Mockito.verify(rmProxy, Mockito.times(1))
-               .releaseNodes(org.mockito.Matchers.any(NodeSet.class),
-                             org.mockito.Matchers.any(org.ow2.proactive.scripting.Script.class),
-                             Mockito.any(VariablesMap.class),
-                             Mockito.any(HashMap.class),
-                             Mockito.any(TaskId.class),
-                             Mockito.any(Credentials.class));
+        Mockito.verify(rmProxy, Mockito.times(1)).releaseNodes(org.mockito.Matchers.any(NodeSet.class),
+                                                               org.mockito.Matchers.any(org.ow2.proactive.scripting.Script.class),
+                                                               Mockito.any(VariablesMap.class),
+                                                               Mockito.any(HashMap.class),
+                                                               Mockito.any(TaskId.class));
+
     }
 
     @Test

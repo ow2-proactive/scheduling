@@ -66,17 +66,16 @@ public interface ISchedulerClient extends Scheduler {
     void init(ConnectionInfo connectionInfo) throws Exception;
 
     /**
-     * Sets the session identifier explicitly. This might run on an uninitialized
-     * client.
+     * Sets the session identifier explicitly.
      *
      * @param sid session identifier
      */
     void setSession(String sid);
 
     /**
-     * Retrieves the current session identifier, or null if the session was not initialized yet.
+     * Retrieves the current session identifier.
      *
-     * @return the current session identifier if initialize, null otherwise
+     * @return the current session identifier
      */
     String getSession();
 
@@ -189,7 +188,7 @@ public interface ISchedulerClient extends Scheduler {
      * <p>
      * 
      * @param catalogRestURL
-     * @param bucketId
+     * @param bucketName
      * @param workflowName
      * @param variables
      * @return
@@ -198,7 +197,8 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName, Map<String, String> variables)
+    JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
+            Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
@@ -211,7 +211,7 @@ public interface ISchedulerClient extends Scheduler {
      * <p>
      * 
      * @param catalogRestURL
-     * @param bucketId
+     * @param bucketName
      * @param workflowName
      * @return
      * @throws NotConnectedException
@@ -219,7 +219,7 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      * @throws JobCreationException
      */
-    JobId submitFromCatalog(String catalogRestURL, String bucketId, String workflowName)
+    JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
