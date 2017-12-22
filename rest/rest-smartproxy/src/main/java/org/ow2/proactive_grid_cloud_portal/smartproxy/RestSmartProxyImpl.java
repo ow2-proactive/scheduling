@@ -62,6 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
+import org.ow2.proactive.scheduler.rest.DisconnectionAwareSchedulerEventListener;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive.scheduler.rest.ds.DataSpaceClient;
@@ -91,7 +92,7 @@ import com.google.common.collect.Lists;
  * @author The ProActive Team
  */
 public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
-        implements ISchedulerClient, SchedulerEventListener {
+        implements ISchedulerClient, SchedulerEventListener, DisconnectionAwareSchedulerEventListener {
 
     private static final Logger logger = Logger.getLogger(RestSmartProxyImpl.class);
 
@@ -419,7 +420,7 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
 
     @Override
     public void registerAsListener() throws NotConnectedException, PermissionException {
-        _getScheduler().addEventListener(this, true, PROXY_SCHED_EVENTS);
+        _getScheduler().addEventListener(this, true, configuredEvents);
     }
 
     /*
@@ -647,6 +648,27 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     @Override
     public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
         return ((ISchedulerClient) _getScheduler()).getSchedulerProperties();
+    }
+
+    /**
+     * notify the socket disconnection
+     */
+    @Override
+    public void notifyDisconnection() {
+        if (!terminating) {
+            logger.warn("Websocket disconnection notification received.");
+            for (SchedulerEventListenerExtended listener : eventListeners) {
+                if (listener instanceof DisconnectionAwareSchedulerEventListener) {
+                    ((DisconnectionAwareSchedulerEventListener) listener).notifyDisconnection();
+                }
+            }
+            try {
+                registerAsListener();
+                syncAwaitedJobs();
+            } catch (Exception e) {
+                logger.error("Error while reconnecting", e);
+            }
+        }
     }
 
 }
