@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +58,8 @@ import performancetests.helper.LogProcessor;
 @RunWith(Parameterized.class)
 public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
+    private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
+
     static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
                                                                        .getPath();
 
@@ -65,7 +68,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 10000 } });
+        return Arrays.asList(new Object[][] { { 1, 1000 }, { 2, 10000 } });
     }
 
     // number of nodes
@@ -114,7 +117,11 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Test
     public void test() {
-        assertEquals(nodesNumber, nodesRecovered());
+        long recovered = nodesRecovered();
+        long timeSpent = timeSpentToRecoverNodes();
+        LOGGER.info("NodeRecoveryTest;" + recovered + ";" + timeLimit
+                + ";" + recovered + ";" + timeSpent + ";" + ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE"));
+        assertEquals(nodesNumber, recovered );
         assertThat("Nodes recovery time for " + nodesNumber + " nodes",
                    (int) timeSpentToRecoverNodes(),
                    lessThan(timeLimit));

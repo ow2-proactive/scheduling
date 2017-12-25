@@ -27,11 +27,13 @@ package functionaltests.utils;
 
 import static org.junit.Assert.fail;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
@@ -40,14 +42,23 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.tests.ProActiveTest;
+import performancetests.recovery.JobRecoveryTest;
 
 
 /**
- * 
  * The parent class for all consecutive functional tests.
- *
  */
 public class SchedulerFunctionalTest extends ProActiveTest {
+
+    static {
+        configureLog4jForPerformanceTests();
+    }
+
+    private static final void configureLog4jForPerformanceTests(){
+        PropertyConfigurator.configure(
+                SchedulerFunctionalTest.class
+                        .getResource("/performancetests/config/log4j.properties"));
+    }
 
     protected static final Logger logger = Logger.getLogger("SchedulerTests");
 
@@ -59,7 +70,7 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
-                                             TimeUnit.MILLISECONDS);
+            TimeUnit.MILLISECONDS);
 
     protected Job parseXml(String workflowFile) throws JobCreationException {
         return Jobs.parseXml(getClass().getResource(workflowFile).getPath());
@@ -99,7 +110,7 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
             if (resourceManager.listAliveNodeUrls().size() != RMTHelper.DEFAULT_NODES_NUMBER) {
                 SchedulerTHelper.log("Unexpected number of nodes after test: " + numberOfNodesAfterTest +
-                                     ", scheduler will be restarted and test declared failing.");
+                        ", scheduler will be restarted and test declared failing.");
                 schedulerHelper.killScheduler();
                 fail("Unexpected number of nodes after test : " + numberOfNodesAfterTest);
             }

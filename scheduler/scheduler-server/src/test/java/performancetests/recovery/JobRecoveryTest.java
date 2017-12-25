@@ -28,12 +28,18 @@ package performancetests.recovery;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Properties;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,16 +64,18 @@ import performancetests.helper.LogProcessor;
 public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     private static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
-                                                                                     .getPath();
+            .getPath();
 
     private static final String SCHEDULER_CONFIGURATION_RESTART = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-restart.ini")
-                                                                                       .getPath();
+            .getPath();
 
     private static URL runningJob = JobRecoveryTest.class.getResource("/functionaltests/descriptors/Job_running.xml");
 
+    private static final Logger LOGGER = Logger.getLogger(JobRecoveryTest.class);
+
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 5000 } });
+        return Arrays.asList(new Object[][]{{1, 1000}, {2, 5000}});
     }
 
     // number of jobs
@@ -91,9 +99,9 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                                               SCHEDULER_CONFIGURATION_START,
-                                               NodeRecoveryTest.RM_CONFIGURATION_START,
-                                               null);
+                SCHEDULER_CONFIGURATION_START,
+                NodeRecoveryTest.RM_CONFIGURATION_START,
+                null);
 
         schedulerHelper.createNodeSource("local", jobsNumber);
         JobId[] jobIds = new JobId[jobsNumber];
@@ -108,17 +116,22 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
         NodesRecoveryProcessHelper.findPidAndSendSigKill(SchedulerStartForFunctionalTest.class.getSimpleName());
 
         schedulerHelper = new SchedulerTHelper(false,
-                                               SCHEDULER_CONFIGURATION_RESTART,
-                                               NodeRecoveryTest.RM_CONFIGURATION_RESTART,
-                                               null);
+                SCHEDULER_CONFIGURATION_RESTART,
+                NodeRecoveryTest.RM_CONFIGURATION_RESTART,
+                null);
 
     }
 
+
     @Test
     public void test() {
-        assertEquals(jobsNumber, numberOfJobsRecovered());
+        long recovered = numberOfJobsRecovered();
+        long timeSpent = timeSpentToRecoverJobs();
+        LOGGER.info("JobRecoveryTest;" + jobsNumber + ";" + timeLimit
+                + ";" + recovered + ";" + timeSpent + ";" + ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE"));
+        assertEquals(jobsNumber, recovered);
         assertThat("Jobs recovery time for " + jobsNumber + " jobs",
-                   (int) timeSpentToRecoverJobs(),
+                   (int) timeSpent,
                    lessThan(timeLimit));
     }
 
@@ -136,16 +149,16 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     private long timeSpentToRecoverJobs() {
         final long startedToRecover = LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED))
-                                                  .getTime();
+                .getTime();
         final long recoveryEnded = LogProcessor.getDateOfLine(LogProcessor.getLastLineThatMatch(SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED))
-                                               .getTime();
+                .getTime();
 
         long time = recoveryEnded - startedToRecover;
         if (time < 0) {
             throw new RuntimeException("First occurence of " +
-                                       SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED +
-                                       " goes after " +
-                                       SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED);
+                    SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED +
+                    " goes after " +
+                    SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED);
         }
 
         return time;
