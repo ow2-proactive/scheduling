@@ -400,6 +400,7 @@ public class SchedulerStarter {
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(120);
         hf.printHelp("proactive-server" + Tools.shellExtension(), options, true);
+        System.exit(0);
     }
 
     protected static Options getOptions() {
