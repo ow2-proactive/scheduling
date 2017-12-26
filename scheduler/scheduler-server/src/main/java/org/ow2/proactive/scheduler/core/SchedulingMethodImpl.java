@@ -156,6 +156,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      *
      * @return the number of tasks that have been started
      */
+    @SuppressWarnings("squid:S3776")
     public int schedule() {
         Policy currentPolicy = schedulingService.getPolicy();
 
