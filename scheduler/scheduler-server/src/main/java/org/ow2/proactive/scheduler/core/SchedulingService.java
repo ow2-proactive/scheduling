@@ -26,6 +26,9 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.net.URI;
+import java.security.KeyException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +41,10 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -53,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -259,6 +267,44 @@ public class SchedulingService {
         return true;
     }
 
+    /**
+     * Create a new Credential object containing users' 3rd Party Credentials.
+     *
+     * @param creds credentials for specific user
+     * @return in case of success new object containing the 3rd party credentials used to create bindings
+     * at clean script
+     */
+    Credentials addThirdPartyCredentials(Credentials creds) throws KeyException, IllegalAccessException {
+        //retrieve scheduler key pair
+        String privateKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+        String publicKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString());
+
+        //get keys from task
+        PrivateKey privateKey = Credentials.getPrivateKey(privateKeyPath);
+        PublicKey publicKey = Credentials.getPublicKey(publicKeyPath);
+
+        //retrieve the current creData from task
+        CredData credData = creds.decrypt(privateKey);
+
+        //retrive database to get third party credentials from
+        SchedulerDBManager dbManager = getInfrastructure().getDBManager();
+        if (dbManager != null) {
+            Map<String, HybridEncryptedData> thirdPartyCredentials = dbManager.thirdPartyCredentialsMap(credData.getLogin());
+            if (thirdPartyCredentials == null) {
+                logger.error("Failed to retrieve Third Party Credentials!");
+                throw new KeyException("Failed to retrieve thirdPartyCredentials!");
+            } else {
+                //cycle third party credentials, add one-by-one to the decrypter
+                for (Map.Entry<String, HybridEncryptedData> thirdPartyCredential : thirdPartyCredentials.entrySet()) {
+                    String decryptedValue = HybridEncryptionUtil.decryptString(thirdPartyCredential.getValue(),
+                                                                               privateKey);
+                    credData.addThirdPartyCredential(thirdPartyCredential.getKey(), decryptedValue);
+                }
+            }
+        }
+        return Credentials.createCredentials(credData, publicKey);
+    }
+
     public boolean kill() {
         if (status.isKilled()) {
             return false;
@@ -280,7 +326,9 @@ public class SchedulingService {
             try {
                 infrastructure.getRMProxiesManager()
                               .getUserRMProxy(taskData.getUser(), taskData.getCredentials())
-                              .releaseNodes(nodes, taskData.getTask().getCleaningScript());
+                              .releaseNodes(nodes,
+                                            taskData.getTask().getCleaningScript(),
+                                            addThirdPartyCredentials(taskData.getCredentials()));
             } catch (Throwable t) {
                 logger.error("Failed to release nodes", t);
             }
