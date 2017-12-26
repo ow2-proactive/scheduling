@@ -365,8 +365,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         }
     }
 
-    private void releaseBusyNodesWithNoRunningTask(RMProxy rmProxy,
-                                                   RecoveredSchedulerState recoveredState) {
+    private void releaseBusyNodesWithNoRunningTask(RMProxy rmProxy, RecoveredSchedulerState recoveredState) {
 
         Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
 

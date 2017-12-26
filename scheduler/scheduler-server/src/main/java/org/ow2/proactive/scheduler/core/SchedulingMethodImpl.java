@@ -118,6 +118,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
+    private final Lock finalizeStartingLock = new ReentrantLock();
+
+    private final Condition finalizeStartingCondition = finalizeStartingLock.newCondition();
+
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
         this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
@@ -656,17 +660,19 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
-                    // doTask is called downstream here "Task started" --> node logs
                     threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                        taskDescriptor,
                                                                        launcher,
                                                                        schedulingService,
                                                                        terminateNotification,
-                                                                       corePrivateKey),
+                                                                       corePrivateKey,
+                                                                       finalizeStartingLock,
+                                                                       finalizeStartingCondition),
                                                  DOTASK_ACTION_TIMEOUT,
                                                  TimeUnit.MILLISECONDS);
 
-                    Thread.sleep(500);
+                    waitForTaskStartedNotification();
+
                     finalizeStarting(job, task, node, launcher);
 
                     return true;
@@ -690,6 +696,19 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
         }
 
+    }
+
+    private void waitForTaskStartedNotification() {
+        finalizeStartingLock.lock();
+        try {
+            try {
+                finalizeStartingCondition.await();
+            } catch (InterruptedException e) {
+                logger.warn("Task start is going to be notified earlier than expected");
+            }
+        } finally {
+            finalizeStartingLock.unlock();
+        }
     }
 
     /**

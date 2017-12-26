@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -76,6 +78,10 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final PrivateKey corePrivateKey;
 
+    private final Lock finalizeStartingLock;
+
+    private final Condition finalizeStartingCondition;
+
     private boolean taskWasRestarted;
 
     private final InternalTaskParentFinder internalTaskParentFinder;
@@ -84,10 +90,12 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      * Create a new instance of TimedDoTaskAction
      *
      * @param launcher the launcher of the task
+     * @param finalizeStartingLock
+     * @param finalizeStartingCondition
      */
     public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            PrivateKey corePrivateKey) {
+            PrivateKey corePrivateKey, Lock finalizeStartingLock, Condition finalizeStartingCondition) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
         this.task = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
@@ -96,6 +104,8 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         this.terminateNotification = terminateNotification;
         this.corePrivateKey = corePrivateKey;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
+        this.finalizeStartingLock = finalizeStartingLock;
+        this.finalizeStartingCondition = finalizeStartingCondition;
     }
 
     /**
@@ -135,6 +145,9 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             schedulingService.getListenJobLogsSupport().activeLogsIfNeeded(job.getId(), launcher);
 
             fillContainer();
+
+            notifyExecutionCreatorTaskStarted();
+
             // try launch the task
             launcher.doTask(task.getExecutableContainer(), params, terminateNotification);
         } catch (Throwable e) {
@@ -142,6 +155,15 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             restartTask();
         }
         return null;
+    }
+
+    private void notifyExecutionCreatorTaskStarted() {
+        finalizeStartingLock.lock();
+        try {
+            finalizeStartingCondition.signal();
+        } finally {
+            finalizeStartingLock.unlock();
+        }
     }
 
     protected void fillContainer() throws KeyException, NoSuchAlgorithmException {

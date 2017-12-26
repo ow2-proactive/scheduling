@@ -120,8 +120,10 @@ public class TaskRecoveryWhenNodesAreReservedInBatchTest extends SchedulerFuncti
         assertThat(jobInfo.getNumberOfFailedTasks()).isEqualTo(0);
         assertThat(jobInfo.getNumberOfInErrorTasks()).isEqualTo(0);
 
-        // wait for the last busy node to be removed
-        schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        // wait for all nodes released
+        while (printRmStateAndReturnNotFreeNodeNumber() != 0) {
+            schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+        }
 
         // all nodes should be free now
         int notFreeNodeNumber = printRmStateAndReturnNotFreeNodeNumber();
