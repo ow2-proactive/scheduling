@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -123,6 +124,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccountsManager;
@@ -134,6 +136,7 @@ import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.IdentifiedJob;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -142,9 +145,11 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
+import org.ow2.proactive.utils.NodeSet;
 import org.ow2.proactive.utils.Tools;
 
 
@@ -294,7 +299,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             // at this point we must wait the resource manager
             RMConnection.waitAndJoin(rmURL.toString());
             RMProxiesManager rmProxiesManager = RMProxiesManager.createRMProxiesManager(rmURL);
-            rmProxiesManager.getRmProxy();
+            RMProxy rmProxy = rmProxiesManager.getRmProxy();
 
             long loadJobPeriod = -1;
             if (PASchedulerProperties.SCHEDULER_DB_LOAD_JOB_PERIOD.isSet()) {
@@ -333,6 +338,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                                            null);
 
             recoveredState.enableLiveLogsForRunningTasks(schedulingService);
+            releaseBusyNodesWithNoRunningTask(rmProxy, recoveredState);
 
             logger.debug("Registering scheduler...");
             PAActiveObject.registerByName(authentication, SchedulerConstants.SCHEDULER_DEFAULT_NAME);
@@ -357,6 +363,33 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private void releaseBusyNodesWithNoRunningTask(RMProxy rmProxy,
+                                                   RecoveredSchedulerState recoveredState) {
+
+        Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
+
+        List<NodeSet> busyNodesWithTask = findBusyNodesCorrespondingToRunningTasks(runningJobs);
+
+        rmProxy.releaseDanglingBusyNodes(busyNodesWithTask);
+    }
+
+    private List<NodeSet> findBusyNodesCorrespondingToRunningTasks(Vector<InternalJob> runningJobs) {
+        List<NodeSet> busyNodesWithTask = new LinkedList<>();
+
+        for (InternalJob runningJob : runningJobs) {
+            List<InternalTask> tasks = runningJob.getITasks();
+
+            for (InternalTask task : tasks) {
+
+                if (task.getStatus().equals(TaskStatus.RUNNING)) {
+                    busyNodesWithTask.add(task.getExecuterInformation().getNodes());
+                }
+            }
+        }
+
+        return busyNodesWithTask;
     }
 
     /**

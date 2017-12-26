@@ -2375,6 +2375,33 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return userData;
     }
 
+    @Override
+    public void releaseDanglingBusyNodes(List<NodeSet> busyNodesWithTask) {
+        List<RMNode> busyNodesToRelease = new LinkedList<>();
+        Set<String> busyNodesWithTaskUrls = new HashSet<>();
+
+        for (NodeSet nodeSet : busyNodesWithTask) {
+            busyNodesWithTaskUrls.addAll(nodeSet.getAllNodesUrls());
+
+        }
+
+        findDanglingBusyNodes(busyNodesToRelease, busyNodesWithTaskUrls);
+
+        nodesCleaner.cleanAndRelease(busyNodesToRelease);
+    }
+
+    private void findDanglingBusyNodes(List<RMNode> busyNodesToRelease, Set<String> busyNodesWithTaskUrls) {
+        for (Entry<String, RMNode> nodeEntry : allNodes.entrySet()) {
+            String nodeUrl = nodeEntry.getKey();
+            RMNode node = nodeEntry.getValue();
+
+            if (node.isBusy() && !busyNodesWithTaskUrls.contains(nodeUrl)) {
+                logger.info("Dangling busy node found: " + node.getNodeName());
+                busyNodesToRelease.add(node);
+            }
+        }
+    }
+
     /**
      * Add the information of the given node to the database.
      *

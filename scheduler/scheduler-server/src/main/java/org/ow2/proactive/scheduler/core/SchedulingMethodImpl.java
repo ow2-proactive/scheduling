@@ -37,6 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -653,8 +656,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
-                    finalizeStarting(job, task, node, launcher);
-
+                    // doTask is called downstream here "Task started" --> node logs
                     threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                        taskDescriptor,
                                                                        launcher,
@@ -663,6 +665,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                        corePrivateKey),
                                                  DOTASK_ACTION_TIMEOUT,
                                                  TimeUnit.MILLISECONDS);
+
+                    Thread.sleep(500);
+                    finalizeStarting(job, task, node, launcher);
+
                     return true;
                 } catch (Exception t) {
                     try {

@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.8"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.8 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.8/schedulerjob.xsd"
+        name="Untitled Workflow 1"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+    <taskFlow>
+        <task name="Groovy_Task">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+                            println "first task"
+                        ]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task2">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task3">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task4">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task5">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task6">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task7">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task8">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task9">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task10">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task11">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task12">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task13">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task14">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task15">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task16">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task17">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task18">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task19">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task20">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task21">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task22">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task23">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task24">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task25">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task26">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>            </description>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[Thread.sleep(60000)]]>                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task27">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+            </description>
+            <depends>
+                <task ref="Groovy_Task2"/>
+                <task ref="Groovy_Task3"/>
+                <task ref="Groovy_Task4"/>
+                <task ref="Groovy_Task5"/>
+                <task ref="Groovy_Task6"/>
+                <task ref="Groovy_Task7"/>
+                <task ref="Groovy_Task8"/>
+                <task ref="Groovy_Task9"/>
+                <task ref="Groovy_Task10"/>
+                <task ref="Groovy_Task11"/>
+                <task ref="Groovy_Task12"/>
+                <task ref="Groovy_Task13"/>
+                <task ref="Groovy_Task14"/>
+                <task ref="Groovy_Task15"/>
+                <task ref="Groovy_Task16"/>
+                <task ref="Groovy_Task17"/>
+                <task ref="Groovy_Task18"/>
+                <task ref="Groovy_Task19"/>
+                <task ref="Groovy_Task20"/>
+                <task ref="Groovy_Task21"/>
+                <task ref="Groovy_Task22"/>
+                <task ref="Groovy_Task23"/>
+                <task ref="Groovy_Task24"/>
+                <task ref="Groovy_Task25"/>
+                <task ref="Groovy_Task26"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+                            println "last task"
+                        ]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+    </taskFlow>
+</job>

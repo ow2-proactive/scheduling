@@ -381,4 +381,9 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return this.target.getCurrentUserData();
     }
 
+    @Override
+    public void releaseDanglingBusyNodes(List<NodeSet> verifiedBusyNodes) {
+        target.releaseDanglingBusyNodes(verifiedBusyNodes);
+    }
+
 }
