@@ -31,8 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -84,46 +82,17 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      */
     Map<JobId, T> jobs = new HashMap<>();
 
-    public SchedulerStateImpl(Set<JobState> pendingJobs, Set<JobState> runningJobs, Set<JobState> finishedJobs) {
-        this.pendingJobs = (pendingJobs != null ? pendingJobs
-                                                : Collections.synchronizedSet(new LinkedHashSet<JobState>()));
-        this.runningJobs = (runningJobs != null ? runningJobs
-                                                : Collections.synchronizedSet(new LinkedHashSet<JobState>()));
-        this.finishedJobs = (finishedJobs != null ? finishedJobs
-                                                  : Collections.synchronizedSet(new LinkedHashSet<JobState>()));
-        addJobsToMapAndPerUser(this.pendingJobs, pendingJobsPerUser);
-        addJobsToMapAndPerUser(this.runningJobs, runningJobsPerUser);
-        addJobsToMapAndPerUser(this.finishedJobs, finishedJobsPerUser);
-    }
+    /**
+     * indicates if the <code>jobs</code> field has already been
+     * initialized. Used only when this state is updated through
+     * events.
+     */
+    private boolean initialized = false;
 
-    private void addJobsToMapAndPerUser(Set<JobState> jobSet, Map<String, Set<JobState>> perUserJobMap) {
-        for (JobState jobState : jobSet) {
-            jobs.put(jobState.getId(), jobState);
-            addJobToPerUserMap(jobState, perUserJobMap);
-        }
-    }
-
-    private void addJobToPerUserMap(JobState jobState, Map<String, Set<JobState>> perUserJobMap) {
-        String userName = jobState.getOwner();
-        if (userName == null) {
-            throw new IllegalArgumentException("Job " + jobState.toString() + " does not have a owner.");
-        }
-        Set<JobState> perUserStoredSet = perUserJobMap.get(userName);
-        if (perUserStoredSet == null) {
-            perUserStoredSet = Collections.synchronizedSet(new LinkedHashSet<JobState>());
-        }
-        perUserStoredSet.add(jobState);
-        perUserJobMap.put(userName, perUserStoredSet);
-    }
-
-    private void removeJobFromPerUserMap(JobState jobState, Map<String, Set<JobState>> perUserJobMap) {
-        String userName = jobState.getOwner();
-        Set<JobState> perUserStoredSet = perUserJobMap.get(userName);
-        if (perUserStoredSet == null) {
-            perUserStoredSet = Collections.synchronizedSet(new LinkedHashSet<JobState>());
-        }
-        perUserStoredSet.remove(jobState);
-        perUserJobMap.put(userName, perUserStoredSet);
+    /**
+     * ProActive Empty constructor.
+     */
+    public SchedulerStateImpl() {
     }
 
     /**
@@ -204,11 +173,6 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
         return sUsers;
     }
 
-    @Override
-    public int getTotalNbJobs() {
-        return jobs.size();
-    }
-
     /**
      * Returns the total number of jobs.
      *
@@ -235,7 +199,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      * @param name username to be filtered
      * @return a new state filtered on job owner name
      */
-    SchedulerStateImpl filterOnUser(String name) {
+    public SchedulerStateImpl filterOnUser(String name) {
         SchedulerStateImpl ssi = new SchedulerStateImpl();
         ssi.setState(getStatus());
         ssi.setUsers(getUsers());

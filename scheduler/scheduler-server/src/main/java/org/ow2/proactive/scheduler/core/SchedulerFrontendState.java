@@ -1127,7 +1127,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     sState.removeFinished(js);
                     jobsMap.remove(js.getId());
                     jobs.remove(notification.getData().getJobId());
-                    logger.debug("HOUSEKEEPING removed the finished job " + js.getId() + " from the SchedulerFrontEndState" );
+                    logger.debug("HOUSEKEEPING removed the finished job " + js.getId() +
+                                 " from the SchedulerFrontEndState");
                     break;
                 default:
                     logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
