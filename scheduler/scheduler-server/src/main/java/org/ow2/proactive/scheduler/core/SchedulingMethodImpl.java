@@ -209,19 +209,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private int getNumberOfTaskStarted(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap,
             Set<String> freeResources, LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy) {
-        int numberOfTaskStarted = selectAndStartTasks(currentPolicy,
-                                                      jobMap,
-                                                      freeResources,
-                                                      fullListOfTaskRetrievedFromPolicy);
+        return selectAndStartTasks(currentPolicy, jobMap, freeResources, fullListOfTaskRetrievedFromPolicy);
 
-        if (freeResources.isEmpty()) {
-            return numberOfTaskStarted;
-        }
-        if (activeObjectCreationRetryTimeNumber == 0) {
-            return numberOfTaskStarted;
-        }
-
-        return numberOfTaskStarted;
     }
 
     private Map<JobId, JobDescriptor> unlockResources(Map<JobId, JobDescriptor> toUnlock) {
