@@ -156,7 +156,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      *
      * @return the number of tasks that have been started
      */
-    @SuppressWarnings("squid:S3776")
     public int schedule() {
         Policy currentPolicy = schedulingService.getPolicy();
 
@@ -168,12 +167,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         Map<JobId, JobDescriptor> toUnlock = jobMap;
 
-        if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
-            logger.trace("No jobs selected to be scheduled");
-        }
-        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
-            logger.debug("jobs selected to be scheduled : " + (jobMap.size() < 5 ? jobMap : jobMap.size()));
-        }
+        logSelectedJobs(jobMap);
 
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
         // we wait for next scheduling loop and don't start any task
@@ -181,16 +175,15 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             return 0;
         }
 
+        return startTasks(currentPolicy, jobMap, toUnlock);
+    }
+
+    private int startTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Map<JobId, JobDescriptor> toUnlock) {
         try {
             List<JobDescriptor> descriptors = new ArrayList<>(jobMap.values());
 
             //get rmState and update it in scheduling policy
-            RMState rmState = getRMProxiesManager().getRmProxy().getState();
-            currentPolicy.setRMState(rmState);
-            Set<String> freeResources = rmState.getFreeNodes();
-            if (logger.isDebugEnabled()) {
-                logger.debug("eligible nodes : " + (freeResources.size() < 5 ? freeResources : freeResources.size()));
-            }
+            Set<String> freeResources = getFreeResources(currentPolicy);
             //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
                 return 0;
@@ -204,26 +197,55 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 return 0;
             }
 
-            schedulingService.unlockJobsToSchedule(toUnlock.values());
-            toUnlock = null;
+            toUnlock = unlockResources(toUnlock);
 
-            int numberOfTaskStarted = selectAndStartTasks(currentPolicy,
-                                                          jobMap,
-                                                          freeResources,
-                                                          fullListOfTaskRetrievedFromPolicy);
-
-            if (freeResources.isEmpty()) {
-                return numberOfTaskStarted;
-            }
-            if (activeObjectCreationRetryTimeNumber == 0) {
-                return numberOfTaskStarted;
-            }
-
-            return numberOfTaskStarted;
+            return getNumberOfTaskStarted(currentPolicy, jobMap, freeResources, fullListOfTaskRetrievedFromPolicy);
         } finally {
             if (toUnlock != null) {
                 schedulingService.unlockJobsToSchedule(toUnlock.values());
             }
+        }
+    }
+
+    private int getNumberOfTaskStarted(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap,
+            Set<String> freeResources, LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy) {
+        int numberOfTaskStarted = selectAndStartTasks(currentPolicy,
+                                                      jobMap,
+                                                      freeResources,
+                                                      fullListOfTaskRetrievedFromPolicy);
+
+        if (freeResources.isEmpty()) {
+            return numberOfTaskStarted;
+        }
+        if (activeObjectCreationRetryTimeNumber == 0) {
+            return numberOfTaskStarted;
+        }
+
+        return numberOfTaskStarted;
+    }
+
+    private Map<JobId, JobDescriptor> unlockResources(Map<JobId, JobDescriptor> toUnlock) {
+        schedulingService.unlockJobsToSchedule(toUnlock.values());
+        toUnlock = null;
+        return toUnlock;
+    }
+
+    private Set<String> getFreeResources(Policy currentPolicy) {
+        RMState rmState = getRMProxiesManager().getRmProxy().getState();
+        currentPolicy.setRMState(rmState);
+        Set<String> freeResources = rmState.getFreeNodes();
+        if (logger.isDebugEnabled()) {
+            logger.debug("eligible nodes : " + (freeResources.size() < 5 ? freeResources : freeResources.size()));
+        }
+        return freeResources;
+    }
+
+    private void logSelectedJobs(Map<JobId, JobDescriptor> jobMap) {
+        if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
+            logger.trace("No jobs selected to be scheduled");
+        }
+        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
+            logger.debug("jobs selected to be scheduled : " + (jobMap.size() < 5 ? jobMap : jobMap.size()));
         }
     }
 
