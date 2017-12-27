@@ -112,6 +112,8 @@ public class SchedulerDBManager {
 
     private static final int RECOVERY_LOAD_JOBS_BATCH_SIZE = PASchedulerProperties.SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE.getValueAsInt();
 
+    private static final int SCHEDULER_DB_NEW_TASKS_BATCH = PASchedulerProperties.SCHEDULER_DB_NEW_TASKS_BATCH_SIZE.getValueAsInt();
+
     private static final Logger logger = Logger.getLogger(SchedulerDBManager.class);
 
     public static final Set<JobStatus> FINISHED_JOB_STATUSES = ImmutableSet.of(JobStatus.CANCELED,
@@ -1181,7 +1183,7 @@ public class SchedulerDBManager {
                     }
                     TaskData taskData = saveNewTask(session, jobRuntimeData, task);
                     saveSingleTaskDependencies(session, task, taskData);
-                    if (++counter % 50 == 0) {
+                    if (++counter % SCHEDULER_DB_NEW_TASKS_BATCH == 0) {
                         session.flush();
                         session.clear();
                     }
