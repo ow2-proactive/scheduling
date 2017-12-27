@@ -57,6 +57,7 @@ import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.core.helpers.VariableBatchSizeIterator;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
@@ -67,6 +68,7 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
+import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
@@ -157,7 +159,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     public int schedule() {
         Policy currentPolicy = schedulingService.getPolicy();
 
-        int numberOfTaskStarted = 0;
         //Number of time to retry an active object creation before leaving scheduling loop
         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
@@ -166,49 +167,90 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         Map<JobId, JobDescriptor> toUnlock = jobMap;
 
-        if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
-            logger.trace("No jobs selected to be scheduled");
-        }
-        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
-            logger.debug("jobs selected to be scheduled : " + jobMap);
-        }
+        logSelectedJobs(jobMap);
 
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
-        // we wait for next scheduling loop
+        // we wait for next scheduling loop and don't start any task
         if (jobMap.isEmpty()) {
-            return numberOfTaskStarted;
+            return 0;
         }
 
+        return startTasks(currentPolicy, jobMap, toUnlock);
+    }
+
+    private int startTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Map<JobId, JobDescriptor> toUnlock) {
         try {
             List<JobDescriptor> descriptors = new ArrayList<>(jobMap.values());
 
             //get rmState and update it in scheduling policy
-            RMState rmState = getRMProxiesManager().getRmProxy().getState();
-            currentPolicy.setRMState(rmState);
-            Set<String> freeResources = rmState.getFreeNodes();
-            if (logger.isDebugEnabled()) {
-                logger.debug("eligible nodes : " + freeResources);
-            }
-            //if there is no free resources, stop it right now
+            Set<String> freeResources = getFreeResources(currentPolicy);
+            //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
-                return numberOfTaskStarted;
+                return 0;
             }
 
             // ask the policy all the tasks to be schedule according to the jobs list.
+            LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy = currentPolicy.getOrderedTasks(descriptors);
 
-            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = currentPolicy.getOrderedTasks(descriptors);
-
-            //if there is no task to scheduled, return
-            if (taskRetrievedFromPolicy == null || taskRetrievedFromPolicy.isEmpty()) {
-                return numberOfTaskStarted;
+            //if there is no task to scheduled, return without starting any task
+            if (fullListOfTaskRetrievedFromPolicy == null || fullListOfTaskRetrievedFromPolicy.isEmpty()) {
+                return 0;
             }
+
+            toUnlock = unlockResources(toUnlock);
+
+            return getNumberOfTaskStarted(currentPolicy, jobMap, freeResources, fullListOfTaskRetrievedFromPolicy);
+        } finally {
+            if (toUnlock != null) {
+                schedulingService.unlockJobsToSchedule(toUnlock.values());
+            }
+        }
+    }
+
+    private int getNumberOfTaskStarted(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap,
+            Set<String> freeResources, LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy) {
+        return selectAndStartTasks(currentPolicy, jobMap, freeResources, fullListOfTaskRetrievedFromPolicy);
+
+    }
+
+    private Map<JobId, JobDescriptor> unlockResources(Map<JobId, JobDescriptor> toUnlock) {
+        schedulingService.unlockJobsToSchedule(toUnlock.values());
+        toUnlock = null;
+        return toUnlock;
+    }
+
+    private Set<String> getFreeResources(Policy currentPolicy) {
+        RMState rmState = getRMProxiesManager().getRmProxy().getState();
+        currentPolicy.setRMState(rmState);
+        Set<String> freeResources = rmState.getFreeNodes();
+        if (logger.isDebugEnabled()) {
+            logger.debug("eligible nodes : " + (freeResources.size() < 5 ? freeResources : freeResources.size()));
+        }
+        return freeResources;
+    }
+
+    private void logSelectedJobs(Map<JobId, JobDescriptor> jobMap) {
+        if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
+            logger.trace("No jobs selected to be scheduled");
+        }
+        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
+            logger.debug("jobs selected to be scheduled : " + (jobMap.size() < 5 ? jobMap : jobMap.size()));
+        }
+    }
+
+    private int selectAndStartTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Set<String> freeResources,
+            LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy) {
+        int numberOfTaskStarted = 0;
+
+        VariableBatchSizeIterator progressiveIterator = new VariableBatchSizeIterator(fullListOfTaskRetrievedFromPolicy);
+
+        while (progressiveIterator.hasMoreElements() && !freeResources.isEmpty()) {
+
+            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy = new LinkedList<>(progressiveIterator.getNextElements(freeResources.size()));
 
             if (logger.isDebugEnabled()) {
-                logger.debug("eligible tasks : " + taskRetrievedFromPolicy);
+                loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
             }
-
-            schedulingService.unlockJobsToSchedule(toUnlock.values());
-            toUnlock = null;
 
             updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
 
@@ -220,7 +262,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             while (!taskRetrievedFromPolicy.isEmpty()) {
 
                 if (freeResources.isEmpty()) {
-                    return numberOfTaskStarted;
+                    break;
                 }
 
                 //get the next compatible tasks from the whole returned policy tasks
@@ -290,7 +332,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         logger.info("Unable to get back the nodeSet to the RM", e2);
                     }
                     if (--activeObjectCreationRetryTimeNumber == 0) {
-                        return numberOfTaskStarted;
+                        break;
                     }
                 } catch (Exception e1) {
                     //if we are here, it is that something append while launching the current task.
@@ -304,13 +346,23 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     }
                 }
             }
-
-            return numberOfTaskStarted;
-        } finally {
-            if (toUnlock != null) {
-                schedulingService.unlockJobsToSchedule(toUnlock.values());
+            if (freeResources.isEmpty()) {
+                break;
+            }
+            if (activeObjectCreationRetryTimeNumber == 0) {
+                break;
             }
         }
+        return numberOfTaskStarted;
+    }
+
+    private void loggingEligibleTasksDetails(LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy,
+            LinkedList<EligibleTaskDescriptor> taskRetrievedFromPolicy) {
+        logger.debug("full list of eligible tasks: " +
+                     (fullListOfTaskRetrievedFromPolicy.size() < 5 ? fullListOfTaskRetrievedFromPolicy
+                                                                   : fullListOfTaskRetrievedFromPolicy.size()));
+        logger.debug("working list of eligible tasks: " +
+                     (taskRetrievedFromPolicy.size() < 5 ? taskRetrievedFromPolicy : taskRetrievedFromPolicy.size()));
     }
 
     /**
@@ -546,9 +598,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @param task the task to be initialized
      */
     protected void loadAndInit(InternalTask task) {
-        tlogger.debug(task.getId(), "initializing the executable container");
-        ExecutableContainer container = getDBManager().loadExecutableContainer(task);
-        task.setExecutableContainer(container);
+        if ((task.getExecutableContainer() == null) ||
+            ((ScriptExecutableContainer) task.getExecutableContainer()).getScript() == null) {
+            tlogger.debug(task.getId(), "initializing the executable container");
+            ExecutableContainer container = getDBManager().loadExecutableContainer(task);
+            task.setExecutableContainer(container);
+        }
     }
 
     /**

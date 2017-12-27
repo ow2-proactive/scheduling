@@ -83,6 +83,12 @@ public interface SchedulerState<T extends JobState> extends Serializable {
     SchedulerUsers getUsers();
 
     /**
+     * Returns the total number of jobs (pending, running and finished)
+     * @return the total number of jobs accessible from the scheduler
+     */
+    int getTotalNbJobs();
+
+    /**
      * Updates the scheduler state given the event passed as a parameter
      */
     void update(SchedulerEvent eventType);
@@ -96,4 +102,13 @@ public interface SchedulerState<T extends JobState> extends Serializable {
      * Updates the scheduler state given the event passed as a parameter
      */
     void update(T jobState);
+
+    /**
+     * Filter the state on the given user name and return a new instance of scheduler state impl
+     * After this call, this instance remains the same.
+     *
+     * @param name username to be filtered
+     * @return a new state filtered on job owner name
+     */
+    SchedulerState filterOnUser(String name);
 }

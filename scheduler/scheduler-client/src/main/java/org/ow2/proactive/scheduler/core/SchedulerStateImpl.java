@@ -35,6 +35,7 @@ import java.util.Vector;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -72,6 +73,8 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
 
     /** List of connected user. */
     private SchedulerUsers sUsers = new SchedulerUsers();
+
+    private static final Logger logger = Logger.getLogger(SchedulerStateImpl.class);
 
     /**
      * keep a map of all jobs (pending, running finished) to facilitate
@@ -171,6 +174,16 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     }
 
     /**
+     * Returns the total number of jobs.
+     *
+     * @return the total number of jobs.
+     */
+    @Override
+    public int getTotalNbJobs() {
+        return jobs.size();
+    }
+
+    /**
      * Sets the list of connected users to the given users value.
      *
      * @param users the list of connected users to set.
@@ -186,7 +199,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      * @param name username to be filtered
      * @return a new state filtered on job owner name
      */
-    SchedulerStateImpl filterOnUser(String name) {
+    public SchedulerStateImpl filterOnUser(String name) {
         SchedulerStateImpl ssi = new SchedulerStateImpl();
         ssi.setState(getStatus());
         ssi.setUsers(getUsers());
@@ -275,6 +288,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
                 break;
             case JOB_REMOVE_FINISHED:
                 removeFinished(js);
+                logger.info("HOUSEKEEPING SchedulerStateImpl removed " + js.getId());
                 break;
             case JOB_PENDING_TO_RUNNING:
                 pendingToRunning(js);

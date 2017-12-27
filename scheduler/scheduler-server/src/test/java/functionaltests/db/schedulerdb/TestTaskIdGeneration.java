@@ -73,7 +73,7 @@ public class TestTaskIdGeneration extends BaseSchedulerDBTest {
         job = jobs.iterator().next();
         checkIds(job);
 
-        JobState jobState = state.getSchedulerState().getPendingJobs().get(0);
+        JobState jobState = state.getSchedulerState().getPendingJobs().iterator().next();
         checkIds(jobState);
     }
 

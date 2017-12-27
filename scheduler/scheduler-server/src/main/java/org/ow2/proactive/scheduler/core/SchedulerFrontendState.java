@@ -336,12 +336,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         // checking permissions
         checkPermission("getStatus", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS);
-
         return sState.getStatus();
     }
 
     synchronized SchedulerState getState() throws NotConnectedException, PermissionException {
         return getState(false);
+    }
+
+    synchronized SchedulerState getStateInternally() {
+        return sState;
     }
 
     synchronized SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
@@ -381,7 +384,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      *            generic information of the job. In order to have the
      *            authorisation, this generic information need to contains the
      *            keys-values specified in the security file.
-     * 
+     *
      * @param ui
      *            the user identification
      * @throws PermissionException
@@ -776,7 +779,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     /*
-     * ######################################################################### ##################
+     * ###########################################################################################
      */
     /*                                                                                             */
     /*
@@ -784,7 +787,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     /*                                                                                             */
     /*
-     * ######################################################################### ##################
+     * ###########################################################################################
      */
 
     /**
@@ -1123,6 +1126,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     sState.removeFinished(js);
                     jobsMap.remove(js.getId());
                     jobs.remove(notification.getData().getJobId());
+                    logger.debug("HOUSEKEEPING removed the finished job " + js.getId() +
+                                 " from the SchedulerFrontEndState");
                     break;
                 default:
                     logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
