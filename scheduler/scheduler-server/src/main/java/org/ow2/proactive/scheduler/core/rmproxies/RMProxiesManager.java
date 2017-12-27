@@ -102,7 +102,7 @@ public abstract class RMProxiesManager {
      *
      * @param rmURI The URI of a started Resource Manager
      */
-    public abstract void rebindRMProxiesManager(final URI rmURI) throws RMException, RMProxyCreationException;
+    public abstract boolean rebindRMProxiesManager(final URI rmURI) throws RMException, RMProxyCreationException;
 
     /**
      * Return the Scheduler RM proxy.

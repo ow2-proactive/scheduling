@@ -66,14 +66,14 @@ public final class PerUserConnectionRMProxiesManager extends RMProxiesManager {
     }
 
     @Override
-    public void rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
+    public boolean rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
         synchronized (connectionStateLock) {
             synchronized (userProxiesMap) {
                 for (RMProxy userProxy : userProxiesMap.values()) {
                     userProxy.rebind(rmURI);
                 }
             }
-            schedulerRMProxy.rebind(rmURI);
+            return schedulerRMProxy.rebind(rmURI);
         }
     }
 

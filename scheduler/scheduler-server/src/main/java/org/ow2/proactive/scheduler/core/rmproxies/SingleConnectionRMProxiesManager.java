@@ -52,9 +52,9 @@ public final class SingleConnectionRMProxiesManager extends RMProxiesManager {
     }
 
     @Override
-    synchronized public void rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
+    synchronized public boolean rebindRMProxiesManager(URI rmURI) throws RMException, RMProxyCreationException {
         this.rmURI = rmURI;
-        rmProxy.rebind(rmURI);
+        return rmProxy.rebind(rmURI);
     }
 
     @Override
