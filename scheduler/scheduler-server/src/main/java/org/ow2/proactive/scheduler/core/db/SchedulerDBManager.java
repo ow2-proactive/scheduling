@@ -83,6 +83,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
+import org.ow2.proactive.scheduler.core.helpers.JobsMemoryMonitorRunner;
 import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
@@ -152,8 +153,6 @@ public class SchedulerDBManager {
 
     private final TransactionHelper transactionHelper;
 
-    private Scheduler tableSizeMonitorScheduler;
-
     public static SchedulerDBManager createUsingProperties() {
         if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
             return createInMemorySchedulerDBManager();
@@ -212,19 +211,9 @@ public class SchedulerDBManager {
             sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             transactionHelper = new TransactionHelper(sessionFactory);
 
-            setupTableSizeMonitoring();
         } catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed", ex);
             throw new DatabaseManagerException("Initial SessionFactory creation failed", ex);
-        }
-    }
-
-    public void setupTableSizeMonitoring() {
-        if (PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.isSet()) {
-            tableSizeMonitorScheduler = new Scheduler();
-            tableSizeMonitorScheduler.schedule(PASchedulerProperties.SCHEDULER_DB_SIZE_MONITORING_FREQ.getValueAsString(),
-                                               new TableSizeMonitorRunner(transactionHelper));
-            tableSizeMonitorScheduler.start();
         }
     }
 
@@ -285,7 +274,7 @@ public class SchedulerDBManager {
                                 sortOrder = new GroupByStatusSortOrder(param.getSortOrder(), "status");
                                 break;
                             default:
-                                throw new IllegalArgumentException("Unsupported sort paramter: " +
+                                throw new IllegalArgumentException("Unsupported sort parameter: " +
                                                                    param.getParameter());
                         }
                         criteria.addOrder(sortOrder);
@@ -1885,4 +1874,7 @@ public class SchedulerDBManager {
         });
     }
 
+    public TransactionHelper getTransactionHelper() {
+        return transactionHelper;
+    }
 }
