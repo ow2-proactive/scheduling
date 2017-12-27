@@ -284,7 +284,7 @@ public enum PASchedulerProperties implements PACommonProperties {
             "[%X{job.id}t%X{task.id}@%X{host};%d{HH:mm:ss}] %m %n"),
 
     /** Defines the cron expression for the db sizes polling */
-    SCHEDULER_DB_SIZE_MONITORING_FREQ("pa.scheduler.db.size.monitoring.freq", PropertyType.STRING),
+    SCHEDULER_MEM_MONITORING_FREQ("pa.scheduler.mem.monitoring.freq", PropertyType.STRING),
 
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */
