@@ -280,7 +280,6 @@ public class SchedulerStarter {
             startDiscovery(commandLine, rmUrl);
             logger.info("The scheduler created on " + sai.getHostURL());
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
