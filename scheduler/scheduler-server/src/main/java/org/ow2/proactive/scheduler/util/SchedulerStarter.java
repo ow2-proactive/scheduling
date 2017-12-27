@@ -270,14 +270,22 @@ public class SchedulerStarter {
     }
 
     private static SchedulerAuthenticationInterface startScheduler(CommandLine commandLine, String rmUrl)
-            throws URISyntaxException, InternalSchedulerException, Exception {
+            throws URISyntaxException, InternalSchedulerException, ParseException, SocketException,
+            UnknownHostException, IllegalArgumentException {
         String policyFullName = getPolicyFullName(commandLine);
         logger.info("Starting the scheduler...");
-        SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
+        SchedulerAuthenticationInterface sai = null;
+        try {
+            sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
 
-        startDiscovery(commandLine, rmUrl);
+            startDiscovery(commandLine, rmUrl);
 
-        logger.info("The scheduler created on " + sai.getHostURL());
+            logger.info("The scheduler created on " + sai.getHostURL());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         return sai;
     }
 
