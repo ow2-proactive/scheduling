@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -55,6 +56,7 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -66,6 +68,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.rest.data.JobStateImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -947,9 +950,9 @@ public class SchedulingService {
     }
 
     private void recover(RecoveredSchedulerState recoveredState) {
-        Vector<InternalJob> finishedJobs = recoveredState.getFinishedJobs();
-        Vector<InternalJob> pendingJobs = recoveredState.getPendingJobs();
-        Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
+        List<InternalJob> finishedJobs = recoveredState.getFinishedJobs();
+        List<InternalJob> pendingJobs = recoveredState.getPendingJobs();
+        List<InternalJob> runningJobs = recoveredState.getRunningJobs();
 
         jobsRecovered(pendingJobs);
         jobsRecovered(runningJobs);
@@ -987,7 +990,7 @@ public class SchedulingService {
         }
     }
 
-    private void recoverTasksState(Vector<InternalJob> jobs, boolean restoreInErrorTasks) {
+    private void recoverTasksState(List<InternalJob> jobs, boolean restoreInErrorTasks) {
         Iterator<InternalJob> iterJob = jobs.iterator();
         while (iterJob.hasNext()) {
             InternalJob job = iterJob.next();
@@ -1129,8 +1132,9 @@ public class SchedulingService {
                                                   new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
                                                                                 new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
                     getListener().jobUpdatedFullData(job);
+                    longList.add(job.getId().longValue());
+                    logger.info("HOUSEKEEPING sent JOB_REMOVE_FINISHED notification for job " + job.getId());
                 }
-                longList.add(job.getId().longValue());
             }
 
             wakeUpSchedulingThread();

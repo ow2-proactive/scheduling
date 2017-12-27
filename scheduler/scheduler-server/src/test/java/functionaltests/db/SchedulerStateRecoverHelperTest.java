@@ -460,6 +460,7 @@ public class SchedulerStateRecoverHelperTest {
 
         InternalJob internalJob = InternalJobFactory.createJob(job, null);
         internalJob.setStatus(jobStatus);
+        internalJob.setOwner("toto");
 
         return internalJob;
     }
