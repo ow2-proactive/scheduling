@@ -38,9 +38,9 @@ import org.ow2.proactive.scheduler.common.SchedulerState;
  */
 public class JobsMemoryMonitorRunner implements Runnable {
 
-    private static Statistics stats;
+    private Statistics stats;
 
-    private static SchedulerState schedulerState;
+    private SchedulerState schedulerState;
 
     private static final Logger logger = Logger.getLogger(JobsMemoryMonitorRunner.class);
 

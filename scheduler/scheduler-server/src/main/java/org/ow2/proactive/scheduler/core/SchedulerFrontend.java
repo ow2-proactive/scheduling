@@ -349,11 +349,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 metricsMonitorScheduler.schedule(cronExpr,
                                                  new JobsMemoryMonitorRunner(dbManager.getSessionFactory()
                                                                                       .getStatistics(),
-                                                                             frontendState.getState()));
+                                                                             recoveredState.getSchedulerState()));
                 metricsMonitorScheduler.start();
             }
-
-            // run !!
         } catch (Exception e) {
             logger.error("Failed to start Scheduler", e);
             e.printStackTrace();
@@ -361,19 +359,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         }
     }
 
-    /*
-     * #########################################################################
-     * ##################
-     */
-    /*                                                                                             */
-    /*
-     * ################################### SCHEDULING MANAGEMENT
-     * #################################
-     */
-    /*                                                                                             */
-    /*
-     * #########################################################################
-     * ##################
+    /**
+     * *******************************
+     *
+     *  SCHEDULING MANAGEMENT
+     *
+     * *******************************
      */
 
     /**

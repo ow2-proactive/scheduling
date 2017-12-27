@@ -336,7 +336,6 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         // checking permissions
         checkPermission("getStatus", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS);
-
         return sState.getStatus();
     }
 
