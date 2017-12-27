@@ -277,9 +277,7 @@ public class SchedulerStarter {
         SchedulerAuthenticationInterface sai = null;
         try {
             sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
-
             startDiscovery(commandLine, rmUrl);
-
             logger.info("The scheduler created on " + sai.getHostURL());
         } catch (Exception e) {
             // TODO Auto-generated catch block
