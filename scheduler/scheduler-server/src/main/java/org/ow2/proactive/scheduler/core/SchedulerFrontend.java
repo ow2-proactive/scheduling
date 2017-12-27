@@ -63,7 +63,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -366,23 +365,21 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     private void releaseBusyNodesWithNoRunningTask(RMProxy rmProxy, RecoveredSchedulerState recoveredState) {
-
-        Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
-
+        List<InternalJob> runningJobs = recoveredState.getRunningJobs();
         List<NodeSet> busyNodesWithTask = findBusyNodesCorrespondingToRunningTasks(runningJobs);
 
         rmProxy.releaseDanglingBusyNodes(busyNodesWithTask);
     }
 
-    private List<NodeSet> findBusyNodesCorrespondingToRunningTasks(Vector<InternalJob> runningJobs) {
+    private List<NodeSet> findBusyNodesCorrespondingToRunningTasks(List<InternalJob> runningJobs) {
         List<NodeSet> busyNodesWithTask = new LinkedList<>();
 
         for (InternalJob runningJob : runningJobs) {
             List<InternalTask> tasks = runningJob.getITasks();
 
             for (InternalTask task : tasks) {
-
                 if (task.getStatus().equals(TaskStatus.RUNNING)) {
+
                     busyNodesWithTask.add(task.getExecuterInformation().getNodes());
                 }
             }

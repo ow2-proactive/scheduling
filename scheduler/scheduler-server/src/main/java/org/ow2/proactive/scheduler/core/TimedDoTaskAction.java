@@ -33,8 +33,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -78,9 +76,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final PrivateKey corePrivateKey;
 
-    private final Lock finalizeStartingLock;
-
-    private final Condition finalizeStartingCondition;
+    private final SchedulingMethodImpl.TaskStartedNotifier taskStartedNotifier;
 
     private boolean taskWasRestarted;
 
@@ -90,12 +86,10 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      * Create a new instance of TimedDoTaskAction
      *
      * @param launcher the launcher of the task
-     * @param finalizeStartingLock
-     * @param finalizeStartingCondition
      */
     public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            PrivateKey corePrivateKey, Lock finalizeStartingLock, Condition finalizeStartingCondition) {
+            PrivateKey corePrivateKey, SchedulingMethodImpl.TaskStartedNotifier taskStartedNotifier) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
         this.task = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
@@ -104,8 +98,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         this.terminateNotification = terminateNotification;
         this.corePrivateKey = corePrivateKey;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
-        this.finalizeStartingLock = finalizeStartingLock;
-        this.finalizeStartingCondition = finalizeStartingCondition;
+        this.taskStartedNotifier = taskStartedNotifier;
     }
 
     /**
@@ -158,11 +151,11 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
     }
 
     private void notifyExecutionCreatorTaskStarted() {
-        finalizeStartingLock.lock();
+        taskStartedNotifier.getLock().lock();
         try {
-            finalizeStartingCondition.signal();
+            taskStartedNotifier.getCondition().signal();
         } finally {
-            finalizeStartingLock.unlock();
+            taskStartedNotifier.getLock().unlock();
         }
     }
 

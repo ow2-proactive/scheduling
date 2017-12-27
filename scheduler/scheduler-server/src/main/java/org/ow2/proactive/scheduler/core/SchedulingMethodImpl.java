@@ -118,9 +118,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
-    private final Lock finalizeStartingLock = new ReentrantLock();
-
-    private final Condition finalizeStartingCondition = finalizeStartingLock.newCondition();
+    private final TaskStartedNotifier taskStartedNotifier = new TaskStartedNotifier();
 
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
@@ -666,12 +664,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                        schedulingService,
                                                                        terminateNotification,
                                                                        corePrivateKey,
-                                                                       finalizeStartingLock,
-                                                                       finalizeStartingCondition),
+                                                                       taskStartedNotifier),
                                                  DOTASK_ACTION_TIMEOUT,
                                                  TimeUnit.MILLISECONDS);
 
-                    waitForTaskStartedNotification();
+                    taskStartedNotifier.waitForTaskStartedNotification(launcher);
 
                     finalizeStarting(job, task, node, launcher);
 
@@ -696,19 +693,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
         }
 
-    }
-
-    private void waitForTaskStartedNotification() {
-        finalizeStartingLock.lock();
-        try {
-            try {
-                finalizeStartingCondition.await();
-            } catch (InterruptedException e) {
-                logger.warn("Task start is going to be notified earlier than expected");
-            }
-        } finally {
-            finalizeStartingLock.unlock();
-        }
     }
 
     /**
@@ -743,6 +727,44 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             VariableSubstitutor.filterAndUpdate(script, variables);
         }
         return selectionScripts;
+    }
+
+    class TaskStartedNotifier {
+
+        private final Lock finalizeTaskStartedLock = new ReentrantLock();
+
+        private final Condition finalizeTaskStartedCondition = finalizeTaskStartedLock.newCondition();
+
+        Lock getLock() {
+            return finalizeTaskStartedLock;
+        }
+
+        Condition getCondition() {
+            return finalizeTaskStartedCondition;
+        }
+
+        private void waitForTaskStartedNotification(TaskLauncher launcher) {
+            finalizeTaskStartedLock.lock();
+            try {
+                waitForTaskStartedNotificationLockAcquired(launcher);
+            } catch (Exception e) {
+                logger.warn("Task start could not be awaited", e);
+            } finally {
+                finalizeTaskStartedLock.unlock();
+            }
+        }
+
+        private void waitForTaskStartedNotificationLockAcquired(TaskLauncher launcher) throws InterruptedException {
+            try {
+                while (!launcher.isActivated()) {
+                    finalizeTaskStartedCondition.await();
+                }
+            } catch (InterruptedException e) {
+                logger.warn("Task start awaiting has been interrupted", e);
+                throw e;
+            }
+        }
+
     }
 
 }
