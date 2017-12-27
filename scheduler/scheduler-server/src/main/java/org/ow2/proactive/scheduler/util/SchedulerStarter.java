@@ -73,6 +73,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolic
 import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -269,7 +270,7 @@ public class SchedulerStarter {
     }
 
     private static SchedulerAuthenticationInterface startScheduler(CommandLine commandLine, String rmUrl)
-            throws Exception {
+            throws URISyntaxException, InternalSchedulerException, Exception {
         String policyFullName = getPolicyFullName(commandLine);
         logger.info("Starting the scheduler...");
         SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
