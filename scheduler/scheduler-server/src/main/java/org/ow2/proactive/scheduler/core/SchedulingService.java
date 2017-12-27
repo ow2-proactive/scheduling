@@ -862,7 +862,10 @@ public class SchedulingService {
 
         while (!alive && nbAttempts <= maxAttempts) {
             try {
-                infrastructure.getRMProxiesManager().rebindRMProxiesManager(new URI(rmURL));
+                if (infrastructure.getRMProxiesManager().rebindRMProxiesManager(new URI(rmURL))) {
+                    jobs.restartAllRunningJobs();
+                    logger.info("All running jobs were restarted");
+                }
                 logger.info("Successfully reconnected to Resource Manager at " + rmURL);
                 alive = true;
             } catch (Exception rme) {

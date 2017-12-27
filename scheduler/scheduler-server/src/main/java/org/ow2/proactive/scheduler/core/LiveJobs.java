@@ -139,6 +139,17 @@ class LiveJobs {
 
     }
 
+    void restartAllRunningJobs() {
+        this.runningTasksData.clear();
+        for (JobId jobId : jobs.keySet()) {
+            JobData jobData = lockJob(jobId);
+            if (jobData != null) {
+                jobData.job.restartAllRunningTasks();
+                jobData.unlock();
+            }
+        }
+    }
+
     void unpauseAll() {
         for (JobId jobId : jobs.keySet()) {
             JobData jobData = lockJob(jobId);

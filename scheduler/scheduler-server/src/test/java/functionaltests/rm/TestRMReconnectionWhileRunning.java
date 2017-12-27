@@ -25,11 +25,15 @@
  */
 package functionaltests.rm;
 
-import functionaltests.utils.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.net.URL;
+
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -38,23 +42,20 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
-import java.io.File;
-import java.net.URL;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import functionaltests.utils.*;
 
 
+public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
 
-public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
-
-    static final Logger logger = Logger.getLogger(TestRMReconnectioWhileRunning.class);
+    static final Logger logger = Logger.getLogger(TestRMReconnectionWhileRunning.class);
 
     private SchedulerTHelper schedulerHelper;
 
-    private static URL runningJob = TestRMReconnectioWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s.xml");
-    private static URL runningJob1 = TestRMReconnectioWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-1.xml");
-    private static URL runningJob2 = TestRMReconnectioWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-2.xml");
+    private static URL runningJob = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s.xml");
+
+    private static URL runningJob1 = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-1.xml");
+
+    private static URL runningJob2 = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-2.xml");
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -65,8 +66,10 @@ public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
         initConfigs();
     }
 
-
-    @Ignore
+    /**
+     * This test case checks that reconnecting to RM restarts running tasks.
+     * @throws Exception
+     */
     @Test
     public void test() throws Exception {
         ProActiveConfiguration.load();
@@ -84,7 +87,7 @@ public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
 
         assertJobFinished(jobId2);
         assertJobFinished(jobId3);
-        assertJobFinished(jobId); // but this job is never finished
+        assertJobFinished(jobId);
     }
 
     private void assertJobFinished(JobId jobId) throws Exception {
@@ -97,7 +100,7 @@ public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
 
     @After
     public void stopRMs() throws Exception {
-        if(schedulerHelper != null){
+        if (schedulerHelper != null) {
             schedulerHelper.killScheduler();
         }
     }
