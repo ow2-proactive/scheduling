@@ -73,6 +73,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolic
 import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -269,14 +270,19 @@ public class SchedulerStarter {
     }
 
     private static SchedulerAuthenticationInterface startScheduler(CommandLine commandLine, String rmUrl)
-            throws Exception {
+            throws URISyntaxException, InternalSchedulerException, ParseException, SocketException,
+            UnknownHostException, IllegalArgumentException {
         String policyFullName = getPolicyFullName(commandLine);
         logger.info("Starting the scheduler...");
-        SchedulerAuthenticationInterface sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
+        SchedulerAuthenticationInterface sai = null;
+        try {
+            sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
+            startDiscovery(commandLine, rmUrl);
+            logger.info("The scheduler created on " + sai.getHostURL());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        startDiscovery(commandLine, rmUrl);
-
-        logger.info("The scheduler created on " + sai.getHostURL());
         return sai;
     }
 
@@ -400,6 +406,7 @@ public class SchedulerStarter {
         HelpFormatter hf = new HelpFormatter();
         hf.setWidth(120);
         hf.printHelp("proactive-server" + Tools.shellExtension(), options, true);
+        System.exit(0);
     }
 
     protected static Options getOptions() {
