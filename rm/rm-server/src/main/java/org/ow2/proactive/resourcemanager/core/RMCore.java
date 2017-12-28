@@ -2377,29 +2377,31 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     public void releaseDanglingBusyNodes(List<NodeSet> busyNodesWithTask) {
-        List<RMNode> busyNodesToRelease = new LinkedList<>();
-        Set<String> busyNodesWithTaskUrls = new HashSet<>();
+        Set<String> busyNodesUrlWithTask = new HashSet<>();
 
         for (NodeSet nodeSet : busyNodesWithTask) {
-            busyNodesWithTaskUrls.addAll(nodeSet.getAllNodesUrls());
-
+            busyNodesUrlWithTask.addAll(nodeSet.getAllNodesUrls());
         }
 
-        findDanglingBusyNodes(busyNodesToRelease, busyNodesWithTaskUrls);
+        List<RMNode> busyNodesToRelease = findDanglingBusyNodes(busyNodesUrlWithTask);
 
         nodesCleaner.cleanAndRelease(busyNodesToRelease);
     }
 
-    private void findDanglingBusyNodes(List<RMNode> busyNodesToRelease, Set<String> busyNodesWithTaskUrls) {
+    private List<RMNode> findDanglingBusyNodes(Set<String> busyNodesUrlWithTask) {
+        List<RMNode> busyNodesToRelease = new LinkedList<>();
+
         for (Entry<String, RMNode> nodeEntry : allNodes.entrySet()) {
             String nodeUrl = nodeEntry.getKey();
             RMNode node = nodeEntry.getValue();
 
-            if (node.isBusy() && !busyNodesWithTaskUrls.contains(nodeUrl)) {
+            if (node.isBusy() && !busyNodesUrlWithTask.contains(nodeUrl)) {
                 logger.info("Dangling busy node found: " + node.getNodeName());
                 busyNodesToRelease.add(node);
             }
         }
+
+        return busyNodesToRelease;
     }
 
     /**
