@@ -143,8 +143,13 @@ public class TaskLauncher implements InitActive {
         return true;
     }
 
-    public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
+    void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
+        doTask(executableContainer, previousTasksResults, terminateNotification, null);
+    }
+
+    public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
+            TaskTerminateNotification terminateNotification, TaskStartedPersister taskStartedPersister) {
         logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
 
         this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
@@ -205,6 +210,10 @@ public class TaskLauncher implements InitActive {
             }
 
             TaskExecutor taskExecutor = factory.createTaskExecutor(workingDir);
+
+            if (taskStartedPersister != null) {
+                taskStartedPersister.persistTaskStarted(taskId);
+            }
 
             taskStopwatchForFailures.start();
             taskResult = taskExecutor.execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink());

@@ -495,21 +495,15 @@ class LiveJobs {
         runningTasksData.put(TaskIdWrapper.wrap(task.getId()),
                              new RunningTaskData(task, job.getOwner(), job.getCredentials(), launcher));
 
-        boolean firstTaskStarted;
-
         if (job.getStartTime() < 0) {
             // if it is the first task of this job
             job.start();
             updateJobInSchedulerState(job, SchedulerEvent.JOB_PENDING_TO_RUNNING);
             jlogger.info(job.getId(), "started");
-            firstTaskStarted = true;
-        } else {
-            firstTaskStarted = false;
         }
 
         // set the different informations on task
         job.startTask(task);
-        dbManager.jobTaskStarted(job, task, firstTaskStarted);
 
         listener.taskStateUpdated(job.getOwner(),
                                   new NotificationData<TaskInfo>(SchedulerEvent.TASK_PENDING_TO_RUNNING,

@@ -47,6 +47,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskStartedPersister;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTaskParentFinder;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
@@ -76,7 +77,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final PrivateKey corePrivateKey;
 
-    private final SchedulingMethodImpl.TaskStartedNotifier taskStartedNotifier;
+    private final TaskStartedPersister taskStartedPersister;
 
     private boolean taskWasRestarted;
 
@@ -89,7 +90,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      */
     public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            PrivateKey corePrivateKey, SchedulingMethodImpl.TaskStartedNotifier taskStartedNotifier) {
+            PrivateKey corePrivateKey, TaskStartedPersister taskStartedPersister) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
         this.task = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
@@ -98,7 +99,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         this.terminateNotification = terminateNotification;
         this.corePrivateKey = corePrivateKey;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
-        this.taskStartedNotifier = taskStartedNotifier;
+        this.taskStartedPersister = taskStartedPersister;
     }
 
     /**
@@ -139,24 +140,13 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
             fillContainer();
 
-            notifyExecutionCreatorTaskStarted();
-
             // try launch the task
-            launcher.doTask(task.getExecutableContainer(), params, terminateNotification);
+            launcher.doTask(task.getExecutableContainer(), params, terminateNotification, taskStartedPersister);
         } catch (Throwable e) {
             logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();
         }
         return null;
-    }
-
-    private void notifyExecutionCreatorTaskStarted() {
-        taskStartedNotifier.getLock().lock();
-        try {
-            taskStartedNotifier.getCondition().signal();
-        } finally {
-            taskStartedNotifier.getLock().unlock();
-        }
     }
 
     protected void fillContainer() throws KeyException, NoSuchAlgorithmException {

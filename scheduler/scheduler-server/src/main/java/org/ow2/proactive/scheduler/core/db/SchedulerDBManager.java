@@ -83,8 +83,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
-import org.ow2.proactive.scheduler.core.helpers.JobsMemoryMonitorRunner;
-import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -102,8 +100,6 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-
-import it.sauronsoftware.cron4j.Scheduler;
 
 
 @SuppressWarnings("JpaQueryApiInspection")
@@ -150,6 +146,8 @@ public class SchedulerDBManager {
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
+
+    private Map<TaskId, JobTaskPair> jobTaskPairByTaskId = new HashMap<>();
 
     public static SchedulerDBManager createUsingProperties() {
         if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
@@ -1025,6 +1023,31 @@ public class SchedulerDBManager {
         });
     }
 
+    /**
+     * Save the task and job in a map in order to be able to persist their
+     * updated state once the task has been started on the node side.
+     */
+    public void registerUpcomingTaskStartedPersistence(InternalJob job, InternalTask task) {
+        jobTaskPairByTaskId.put(task.getId(), new JobTaskPair(job, task));
+    }
+
+    public void jobTaskStarted(TaskId taskId) {
+        JobTaskPair jobTaskPair = jobTaskPairByTaskId.get(taskId);
+
+        if (jobTaskPair == null) {
+            throw new IllegalStateException("Cannot retrieve the task and job associated to the task id " + taskId +
+                                            ". Task has never been registered or has been persisted already");
+        }
+
+        final InternalJob job = jobTaskPair.job;
+        final InternalTask task = jobTaskPair.task;
+        final boolean taskStatusToPending = job.getStartTime() < 0;
+
+        jobTaskStarted(job, task, taskStatusToPending);
+
+        jobTaskPairByTaskId.remove(taskId);
+    }
+
     public void jobTaskStarted(final InternalJob job, final InternalTask task, final boolean taskStatusToPending) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
@@ -1875,4 +1898,18 @@ public class SchedulerDBManager {
     public TransactionHelper getTransactionHelper() {
         return transactionHelper;
     }
+
+    private class JobTaskPair {
+
+        private InternalJob job;
+
+        private InternalTask task;
+
+        private JobTaskPair(InternalJob job, InternalTask task) {
+            this.job = job;
+            this.task = task;
+        }
+
+    }
+
 }

@@ -37,9 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -70,6 +67,7 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
+import org.ow2.proactive.scheduler.task.TaskStartedPersister;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -118,7 +116,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
-    private final TaskStartedNotifier taskStartedNotifier = new TaskStartedNotifier();
+    private TaskStartedPersister taskStartedPersister;
 
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
@@ -129,6 +127,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                           NodeFactory.createLocalNode("taskTerminationNode",
                                                                                       true,
                                                                                       "taskTerminationVNode"));
+        taskStartedPersister = new TaskStartedPersisterImpl(schedulingService);
+        taskStartedPersister = PAActiveObject.turnActive(taskStartedPersister,
+                                                         TaskStartedPersister.class.getName(),
+                                                         NodeFactory.createLocalNode("TaskStartedPersisterNode",
+                                                                                     true,
+                                                                                     "TaskStartedPersisterVNode"));
 
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
                                                                        new NamedThreadFactory("DoTask_Action"));
@@ -658,17 +662,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
+                    getDBManager().registerUpcomingTaskStartedPersistence(job, task);
+
                     threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                        taskDescriptor,
                                                                        launcher,
                                                                        schedulingService,
                                                                        terminateNotification,
                                                                        corePrivateKey,
-                                                                       taskStartedNotifier),
+                                                                       taskStartedPersister),
                                                  DOTASK_ACTION_TIMEOUT,
                                                  TimeUnit.MILLISECONDS);
-
-                    taskStartedNotifier.waitForTaskStartedNotification(launcher);
 
                     finalizeStarting(job, task, node, launcher);
 
@@ -727,44 +731,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             VariableSubstitutor.filterAndUpdate(script, variables);
         }
         return selectionScripts;
-    }
-
-    class TaskStartedNotifier {
-
-        private final Lock finalizeTaskStartedLock = new ReentrantLock();
-
-        private final Condition finalizeTaskStartedCondition = finalizeTaskStartedLock.newCondition();
-
-        Lock getLock() {
-            return finalizeTaskStartedLock;
-        }
-
-        Condition getCondition() {
-            return finalizeTaskStartedCondition;
-        }
-
-        private void waitForTaskStartedNotification(TaskLauncher launcher) {
-            finalizeTaskStartedLock.lock();
-            try {
-                waitForTaskStartedNotificationLockAcquired(launcher);
-            } catch (Exception e) {
-                logger.warn("Task start could not be awaited", e);
-            } finally {
-                finalizeTaskStartedLock.unlock();
-            }
-        }
-
-        private void waitForTaskStartedNotificationLockAcquired(TaskLauncher launcher) throws InterruptedException {
-            try {
-                while (!launcher.isActivated()) {
-                    finalizeTaskStartedCondition.await();
-                }
-            } catch (InterruptedException e) {
-                logger.warn("Task start awaiting has been interrupted", e);
-                throw e;
-            }
-        }
-
     }
 
 }
