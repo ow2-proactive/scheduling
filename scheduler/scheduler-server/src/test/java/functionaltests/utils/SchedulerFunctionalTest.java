@@ -42,6 +42,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.tests.ProActiveTest;
+
 import performancetests.recovery.JobRecoveryTest;
 
 
@@ -54,10 +55,8 @@ public class SchedulerFunctionalTest extends ProActiveTest {
         configureLog4jForPerformanceTests();
     }
 
-    private static final void configureLog4jForPerformanceTests(){
-        PropertyConfigurator.configure(
-                SchedulerFunctionalTest.class
-                        .getResource("/performancetests/config/log4j.properties"));
+    private static final void configureLog4jForPerformanceTests() {
+        PropertyConfigurator.configure(SchedulerFunctionalTest.class.getResource("/performancetests/config/log4j.properties"));
     }
 
     protected static final Logger logger = Logger.getLogger("SchedulerTests");
@@ -70,7 +69,7 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
-            TimeUnit.MILLISECONDS);
+                                             TimeUnit.MILLISECONDS);
 
     protected Job parseXml(String workflowFile) throws JobCreationException {
         return Jobs.parseXml(getClass().getResource(workflowFile).getPath());
@@ -110,7 +109,7 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
             if (resourceManager.listAliveNodeUrls().size() != RMTHelper.DEFAULT_NODES_NUMBER) {
                 SchedulerTHelper.log("Unexpected number of nodes after test: " + numberOfNodesAfterTest +
-                        ", scheduler will be restarted and test declared failing.");
+                                     ", scheduler will be restarted and test declared failing.");
                 schedulerHelper.killScheduler();
                 fail("Unexpected number of nodes after test : " + numberOfNodesAfterTest);
             }
