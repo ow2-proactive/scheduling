@@ -119,12 +119,26 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
     public void test() {
         long recovered = nodesRecovered();
         long timeSpent = timeSpentToRecoverNodes();
-        LOGGER.info("NodeRecoveryTest;" + recovered + ";" + timeLimit
-                + ";" + recovered + ";" + timeSpent + ";" + ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE"));
-        assertEquals(nodesNumber, recovered );
+        LOGGER.info(makeCSVString("NodeRecoveryTest",
+                                  nodesNumber,
+                                  timeLimit,
+                                  recovered,
+                                  timeSpent,
+                                  ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE")));
+        assertEquals(nodesNumber, recovered);
         assertThat("Nodes recovery time for " + nodesNumber + " nodes",
                    (int) timeSpentToRecoverNodes(),
                    lessThan(timeLimit));
+    }
+
+    public static String makeCSVString(Object... strings) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(strings[0].toString());
+        for (int i = 1; i < strings.length; ++i) {
+            builder.append(',');
+            builder.append(strings[i].toString());
+        }
+        return builder.toString();
     }
 
     @After
