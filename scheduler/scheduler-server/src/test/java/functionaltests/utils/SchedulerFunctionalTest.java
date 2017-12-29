@@ -27,7 +27,6 @@ package functionaltests.utils;
 
 import static org.junit.Assert.fail;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -42,8 +41,6 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.tests.ProActiveTest;
-
-import performancetests.recovery.JobRecoveryTest;
 
 
 /**
