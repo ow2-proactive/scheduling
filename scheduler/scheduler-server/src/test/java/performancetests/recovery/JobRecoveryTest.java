@@ -28,18 +28,13 @@ package performancetests.recovery;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +70,7 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 1, 1000 }, { 2, 5000 } });
+        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 5000 } });
     }
 
     // number of jobs
