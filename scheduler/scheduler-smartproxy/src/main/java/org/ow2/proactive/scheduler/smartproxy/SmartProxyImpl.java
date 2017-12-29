@@ -344,7 +344,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
     @Override
     public void registerAsListener() throws NotConnectedException, PermissionException {
-        schedulerProxy.addEventListener(stubOnThis, true, PROXY_SCHED_EVENTS);
+        schedulerProxy.addEventListener(stubOnThis, true, configuredEvents);
     }
 
     @Override

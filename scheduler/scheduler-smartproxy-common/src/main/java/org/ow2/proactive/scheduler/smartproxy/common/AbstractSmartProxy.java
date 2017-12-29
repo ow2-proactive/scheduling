@@ -113,6 +113,8 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     protected static final SchedulerEvent[] PROXY_SCHED_EVENTS = SchedulerEvent.values();
 
+    protected SchedulerEvent[] configuredEvents = PROXY_SCHED_EVENTS;
+
     private static final Logger log = Logger.getLogger(AbstractSmartProxy.class);
 
     protected T jobTracker;
@@ -128,7 +130,9 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     private boolean initialized = false;
 
-    private boolean terminated = false;
+    protected boolean terminated = false;
+
+    protected boolean terminating = false;
 
     public AbstractSmartProxy() {
     }
@@ -149,13 +153,14 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * Terminate the SmartProxy, and release all resources used.
      */
     public void terminate() {
-        jobTracker.close();
-        threadPool.shutdownNow();
+        terminating = true;
         try {
             removeEventListener();
         } catch (Exception e) {
             log.trace(e);
         }
+        jobTracker.close();
+        threadPool.shutdownNow();
         terminated = true;
     }
 
@@ -167,6 +172,15 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      */
     public void setSessionName(String name) {
         jobTracker.setSessionName(name);
+    }
+
+    /**
+     * Configure the scheduler events this smart proxy is listening to. Default is all events
+     * Call to this method must be done before initialization of the proxy
+     * @param events
+     */
+    public void configureEvents(SchedulerEvent... events) {
+        this.configuredEvents = events;
     }
 
     /**
@@ -405,7 +419,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * handled. It is called either during the proxy initialization, or after a
      * manual reconnection.
      */
-    protected void syncAwaitedJobs() {
+    public void syncAwaitedJobs() {
         // we make a copy of the awaitedJobsIds set in order to iterate over it.
         Set<String> awaitedJobsIds = jobTracker.getAwaitedJobsIds();
         for (String id : awaitedJobsIds) {

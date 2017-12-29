@@ -76,8 +76,15 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
         this.broadcasterUUID = broadcasterUuid;
     }
 
+    private <T> void logEvent(T event) {
+        if (log.isTraceEnabled()) {
+            log.trace("Sending Event : " + event);
+        }
+    }
+
     @Override
     public void jobStateUpdatedEvent(NotificationData<JobInfo> notification) {
+        logEvent(notification);
         broadcast(new EventNotification(EventNotification.Action.JOB_STATE_UPDATED,
                                         eventTypeName(notification),
                                         notification.getData()));
@@ -85,6 +92,7 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
 
     @Override
     public void jobUpdatedFullDataEvent(JobState jobState) {
+        logEvent(jobState);
         broadcast(new EventNotification(EventNotification.Action.JOB_FULL_DATA_UPDATED,
                                         SchedulerEvent.JOB_UPDATED.name(),
                                         jobState));
@@ -92,6 +100,7 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
 
     @Override
     public void jobSubmittedEvent(JobState jobState) {
+        logEvent(jobState);
         broadcast(new EventNotification(EventNotification.Action.JOB_SUBMITTED,
                                         SchedulerEvent.JOB_SUBMITTED.name(),
                                         jobState));
@@ -99,11 +108,13 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
 
     @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent schedulerEvent) {
+        logEvent(schedulerEvent);
         broadcast(new EventNotification(EventNotification.Action.SCHEDULER_STATE_UPDATED, schedulerEvent.name(), null));
     }
 
     @Override
     public void taskStateUpdatedEvent(NotificationData<TaskInfo> notification) {
+        logEvent(notification);
         TaskInfoData taskInfoData = dozerMapper.map(notification.getData(), TaskInfoData.class);
 
         broadcast(new EventNotification(EventNotification.Action.TASK_STATE_UPDATED,
@@ -113,6 +124,7 @@ public class SchedulerEventBroadcaster implements SchedulerEventListener {
 
     @Override
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
+        logEvent(notification);
         broadcast(new EventNotification(EventNotification.Action.USERS_UPDATED,
                                         eventTypeName(notification),
                                         notification.getData()));

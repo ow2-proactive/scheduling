@@ -26,8 +26,8 @@
 package org.ow2.proactive.scheduler.smartproxy.common;
 
 import java.io.*;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 
@@ -69,6 +69,12 @@ public class JobDatabase {
      */
     protected RecordManager recMan;
 
+    ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+
+    ReentrantReadWriteLock.ReadLock readLock = readWriteLock.readLock();
+
+    ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
+
     /**
      * A map of jobs that have been launched and which results are awaited each
      * time a new job is sent to the scheduler for computation, it will be added
@@ -80,46 +86,63 @@ public class JobDatabase {
     protected PrimaryHashMap<String, AwaitedJob> awaitedJobs;
 
     public void cleanDataBase() {
-        if (recMan != null) {
-            throw new IllegalStateException("Connection to a DB is established, cannot clean it");
-        }
+        try {
+            writeLock.lock();
 
-        log.info("Cleaning database");
+            if (recMan != null) {
+                throw new IllegalStateException("Connection to a DB is established, cannot clean it");
+            }
 
-        // delete all db files
-        File[] dbJobFiles = new File(TMPDIR).listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                if (name.startsWith(sessionName)) {
-                    return true;
+            log.info("Cleaning database");
+
+            // delete all db files
+            File[] dbJobFiles = new File(TMPDIR).listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    if (name.startsWith(sessionName)) {
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
+            });
+            for (File file : dbJobFiles) {
+                try {
+                    log.info("Deleting " + file);
+                    file.delete();
+                } catch (Exception e) {
+                    log.info("Error while deleting file during database cleanup", e);
+                }
             }
-        });
-        for (File file : dbJobFiles) {
-            try {
-                log.info("Deleting " + file);
-                file.delete();
-            } catch (Exception e) {
-                log.info("Error while deleting file during database cleanup", e);
-            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
     public void commit() throws IOException {
-        recMan.commit();
+        try {
+            writeLock.lock();
+
+            recMan.commit();
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
      * This call "reset" the current proxy by removing all knowledge of awaited jobs
      */
     public void discardAllJobs() {
-        awaitedJobs.clear();
-        log.info("Proxy's database has been reseted.");
         try {
-            recMan.commit();
-        } catch (IOException e) {
-            log.error("Exception occured while closing connection to status file:", e);
+            writeLock.lock();
+            awaitedJobs.clear();
+            log.info("Proxy's database has been reseted.");
+            try {
+                recMan.commit();
+            } catch (IOException e) {
+                log.error("Exception occured while closing connection to status file:", e);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -127,24 +150,39 @@ public class JobDatabase {
      * Removes the given job of the awaited job list (should rarely be used)
      */
     public void discardJob(String jobID) {
-        if (awaitedJobs.containsKey(jobID)) {
-            awaitedJobs.remove(jobID);
-            try {
-                recMan.commit();
-            } catch (IOException e) {
-                log.error("Exception occured while closing connection to status file:", e);
+        try {
+            writeLock.lock();
+            if (awaitedJobs.containsKey(jobID)) {
+                awaitedJobs.remove(jobID);
+                try {
+                    recMan.commit();
+                } catch (IOException e) {
+                    log.error("Exception occured while closing connection to status file:", e);
+                }
+            } else {
+                log.warn("Job " + jobID + " is not handled by the proxy.");
             }
-        } else {
-            log.warn("Job " + jobID + " is not handled by the proxy.");
+        } finally {
+            writeLock.unlock();
         }
     }
 
     public Set<String> getAwaitedJobsIds() {
-        return awaitedJobs.keySet();
+        try {
+            readLock.lock();
+            return new LinkedHashSet<>(awaitedJobs.keySet());
+        } finally {
+            readLock.unlock();
+        }
     }
 
     public AwaitedJob getAwaitedJob(String id) {
-        return awaitedJobs.get(id);
+        try {
+            readLock.lock();
+            return awaitedJobs.get(id);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     /**
@@ -152,56 +190,72 @@ public class JobDatabase {
      * if a InvalidClassException occur, we clean the database
      */
     public void loadJobs() {
-        if (recMan != null) {
-            try {
-                recMan.close();
-            } catch (Exception e) {
-            }
-        }
         try {
-            recMan = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
-            awaitedJobs = recMan.hashMap(STATUS_RECORD_NAME);
-            // This empty loop triggers InvalidClassException in case of serial version uid problems
-            for (Map.Entry<String, AwaitedJob> job : awaitedJobs.entrySet())
-                ;
-            recMan.commit();
-        } catch (IOError e) {
-            // we track invalid class exceptions
-            if (e.getCause() instanceof InvalidClassException) {
+            writeLock.lock();
+            if (recMan != null) {
                 try {
                     recMan.close();
-                } catch (IOException e1) {
-
+                } catch (Exception e) {
                 }
-                recMan = null;
-                cleanDataBase();
-                loadJobs();
-            } else {
-                throw e;
             }
+            try {
+                recMan = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
+                awaitedJobs = recMan.hashMap(STATUS_RECORD_NAME);
+                // This empty loop triggers InvalidClassException in case of serial version uid problems
+                for (Map.Entry<String, AwaitedJob> job : awaitedJobs.entrySet())
+                    ;
+                recMan.commit();
+            } catch (IOError e) {
+                // we track invalid class exceptions
+                if (e.getCause() instanceof InvalidClassException) {
+                    try {
+                        recMan.close();
+                    } catch (IOException e1) {
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+                    }
+                    recMan = null;
+                    cleanDataBase();
+                    loadJobs();
+                } else {
+                    throw e;
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
     public void putAwaitedJob(String id, AwaitedJob awaitedJob) {
-        if (!awaitedJob.getJobId().equals(id)) {
-            throw new IllegalArgumentException("given id " + id + " is different from job id : " +
-                                               awaitedJob.getJobId());
-        }
-
-        this.awaitedJobs.put(id, awaitedJob);
-
         try {
-            this.recMan.commit();
-        } catch (IOException e) {
-            log.error("Could not save status file after adding job on awaited jobs list " + awaitedJob.getJobId(), e);
+            writeLock.lock();
+            if (!awaitedJob.getJobId().equals(id)) {
+                throw new IllegalArgumentException("given id " + id + " is different from job id : " +
+                                                   awaitedJob.getJobId());
+            }
+
+            this.awaitedJobs.put(id, awaitedJob);
+
+            try {
+                this.recMan.commit();
+            } catch (IOException e) {
+                log.error("Could not save status file after adding job on awaited jobs list " + awaitedJob.getJobId(),
+                          e);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
     public AwaitedJob removeAwaitedJob(String id) {
-        return this.awaitedJobs.remove(id);
+        try {
+            writeLock.lock();
+            return this.awaitedJobs.remove(id);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     /**
@@ -211,18 +265,23 @@ public class JobDatabase {
      * @param name alphanumerical word
      */
     public void setSessionName(String name) {
-        if (awaitedJobs != null) {
-            throw new IllegalStateException("Session already started, try calling setSessionName before calling init");
+        try {
+            writeLock.lock();
+            if (awaitedJobs != null) {
+                throw new IllegalStateException("Session already started, try calling setSessionName before calling init");
+            }
+            if (name != null && !name.matches("\\w+")) {
+                throw new IllegalArgumentException("Session Name must be an alphanumerical word.");
+            }
+            if (name == null) {
+                sessionName = DEFAULT_STATUS_FILENAME;
+            } else {
+                sessionName = name;
+            }
+            statusFile = new File(TMPDIR, sessionName);
+        } finally {
+            writeLock.unlock();
         }
-        if (name != null && !name.matches("\\w+")) {
-            throw new IllegalArgumentException("Session Name must be an alphanumerical word.");
-        }
-        if (name == null) {
-            sessionName = DEFAULT_STATUS_FILENAME;
-        } else {
-            sessionName = name;
-        }
-        statusFile = new File(TMPDIR, sessionName);
     }
 
     /**
@@ -233,38 +292,48 @@ public class JobDatabase {
      * @param transferring
      */
     public void setTaskTransferring(String id, String taskName, boolean transferring) {
-        AwaitedJob aj = awaitedJobs.get(id);
-        if (aj == null) {
-            log.warn("Job " + id + " not in the awaited list");
-            return;
-        }
-
-        AwaitedTask at = aj.getAwaitedTask(taskName);
-
-        if (at == null) {
-            log.warn("Task " + taskName + " from Job " + id + " not in the awaited list");
-            return;
-        }
-
-        at.setTransferring(transferring);
-        awaitedJobs.put(id, aj);
-
         try {
-            this.recMan.commit();
-        } catch (IOException e) {
-            log.error("Could not save status file after setting transferring mode to task Task " + taskName +
-                      " from Job" + id, e);
+            writeLock.lock();
+            AwaitedJob aj = awaitedJobs.get(id);
+            if (aj == null) {
+                log.warn("Job " + id + " not in the awaited list");
+                return;
+            }
+
+            AwaitedTask at = aj.getAwaitedTask(taskName);
+
+            if (at == null) {
+                log.warn("Task " + taskName + " from Job " + id + " not in the awaited list");
+                return;
+            }
+
+            at.setTransferring(transferring);
+            awaitedJobs.put(id, aj);
+
+            try {
+                this.recMan.commit();
+            } catch (IOException e) {
+                log.error("Could not save status file after setting transferring mode to task Task " + taskName +
+                          " from Job" + id, e);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
     public void close() {
-        if (recMan != null) {
-            try {
-                recMan.close();
-                recMan = null;
-            } catch (IOException e) {
+        try {
+            writeLock.lock();
+            if (recMan != null) {
+                try {
+                    recMan.close();
+                    recMan = null;
+                } catch (IOException e) {
 
+                }
             }
+        } finally {
+            writeLock.unlock();
         }
     }
 

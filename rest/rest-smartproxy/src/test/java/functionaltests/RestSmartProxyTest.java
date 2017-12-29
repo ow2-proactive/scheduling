@@ -151,16 +151,21 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     @Test(timeout = TEN_MINUTES)
     public void testNoAutomaticTransfer() throws Exception {
+        System.out.println("Begin testNoAutomaticTransfer");
         testJobSubmission(false, false);
+        System.out.println("End testNoAutomaticTransfer");
     }
 
     @Test(timeout = TEN_MINUTES)
     public void testAutomaticTransfer() throws Exception {
+        System.out.println("Begin testAutomaticTransfer");
         testJobSubmission(false, true);
+        System.out.println("End testAutomaticTransfer");
     }
 
     @Test(timeout = TEN_MINUTES)
     public void testInErrorEventsReception() throws Exception {
+        System.out.println("Begin testInErrorEventsReception ");
         TaskFlowJob job = createInErrorJob();
 
         final Semaphore semaphore = new Semaphore(0);
@@ -254,6 +259,8 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         assertThat(taskHasBeenInError.booleanValue()).isTrue();
         assertThat(taskMarkedAsFinished.booleanValue()).isTrue();
 
+        System.out.println("End testInErrorEventsReception");
+
     }
 
     private JobState waitForJobFinishState(String jobIdAsString)
@@ -309,6 +316,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testReconnection() throws Exception {
+        System.out.println("Begin testReconnection");
         restSmartProxy.reconnect();
         Assert.assertTrue(restSmartProxy.isConnected());
 
@@ -317,6 +325,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         restSmartProxy.disconnect();
         Assert.assertFalse(restSmartProxy.isConnected());
+        System.out.println("End testReconnection");
     }
 
     private void testJobSubmission(boolean isolateTaskOutput, boolean automaticTransfer) throws Exception {
