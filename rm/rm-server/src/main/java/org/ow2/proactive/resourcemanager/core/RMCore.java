@@ -2376,32 +2376,32 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
-    public void releaseDanglingBusyNodes(List<NodeSet> busyNodesWithTask) {
-        Set<String> busyNodesUrlWithTask = new HashSet<>();
+    public void releaseBusyNodesNotInList(List<NodeSet> nodesToNotRelease) {
+        Set<String> nodesUrlToNotRelease = new HashSet<>();
 
-        for (NodeSet nodeSet : busyNodesWithTask) {
-            busyNodesUrlWithTask.addAll(nodeSet.getAllNodesUrls());
+        for (NodeSet nodeSet : nodesToNotRelease) {
+            nodesUrlToNotRelease.addAll(nodeSet.getAllNodesUrls());
         }
 
-        List<RMNode> busyNodesToRelease = findDanglingBusyNodes(busyNodesUrlWithTask);
+        List<RMNode> busyNodesToRelease = findBusyNodesNotInSet(nodesUrlToNotRelease);
 
         nodesCleaner.cleanAndRelease(busyNodesToRelease);
     }
 
-    private List<RMNode> findDanglingBusyNodes(Set<String> busyNodesUrlWithTask) {
-        List<RMNode> busyNodesToRelease = new LinkedList<>();
+    private List<RMNode> findBusyNodesNotInSet(Set<String> nodesUrlToNotRelease) {
+        List<RMNode> busyNodesNotInGivenSet = new LinkedList<>();
 
         for (Entry<String, RMNode> nodeEntry : allNodes.entrySet()) {
             String nodeUrl = nodeEntry.getKey();
             RMNode node = nodeEntry.getValue();
 
-            if (node.isBusy() && !busyNodesUrlWithTask.contains(nodeUrl)) {
-                logger.info("Dangling busy node found: " + node.getNodeName());
-                busyNodesToRelease.add(node);
+            if (node.isBusy() && !nodesUrlToNotRelease.contains(nodeUrl)) {
+                logger.debug("Dangling busy node found: " + node.getNodeName());
+                busyNodesNotInGivenSet.add(node);
             }
         }
 
-        return busyNodesToRelease;
+        return busyNodesNotInGivenSet;
     }
 
     /**

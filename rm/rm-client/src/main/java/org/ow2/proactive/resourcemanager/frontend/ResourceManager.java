@@ -445,6 +445,6 @@ public interface ResourceManager {
      * Release the nodes that are busy and that are not part of the given node set
      * @param verifiedBusyNodes nodes that should not be released
      */
-    void releaseDanglingBusyNodes(List<NodeSet> verifiedBusyNodes);
+    void releaseBusyNodesNotInList(List<NodeSet> verifiedBusyNodes);
 
 }

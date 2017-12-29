@@ -382,8 +382,8 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
-    public void releaseDanglingBusyNodes(List<NodeSet> verifiedBusyNodes) {
-        target.releaseDanglingBusyNodes(verifiedBusyNodes);
+    public void releaseBusyNodesNotInList(List<NodeSet> verifiedBusyNodes) {
+        target.releaseBusyNodesNotInList(verifiedBusyNodes);
     }
 
 }
