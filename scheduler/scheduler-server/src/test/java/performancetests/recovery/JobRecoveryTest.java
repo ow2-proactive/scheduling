@@ -37,6 +37,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -70,7 +71,7 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 5000 } });
+        return Arrays.asList(new Object[][] {  { 5, 10000 } });
     }
 
     // number of jobs
