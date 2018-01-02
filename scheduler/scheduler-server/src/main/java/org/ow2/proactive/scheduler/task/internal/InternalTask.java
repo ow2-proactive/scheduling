@@ -1131,8 +1131,8 @@ public abstract class InternalTask extends TaskState {
         tli.setJobVariables(internalJob.getVariables());
         tli.setTaskVariables(getVariables());
 
-        tli.setPingPeriod(PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt());
-        tli.setPingAttempts(PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt());
+        tli.setPingPeriod(PASchedulerProperties.SCHEDULER_NODE_TERMINATE_TASK_FREQUENCY.getValueAsInt());
+        tli.setPingAttempts(PASchedulerProperties.SCHEDULER_NODE_TERMINATE_TASK_ATTEMPTS.getValueAsInt());
 
         return tli;
     }
