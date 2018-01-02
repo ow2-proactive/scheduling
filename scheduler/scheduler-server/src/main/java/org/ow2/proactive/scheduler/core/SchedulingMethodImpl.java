@@ -67,7 +67,6 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
-import org.ow2.proactive.scheduler.task.TaskStartedPersister;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -116,8 +115,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
-    private TaskStartedPersister taskStartedPersister;
-
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
         this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
@@ -127,12 +124,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                           NodeFactory.createLocalNode("taskTerminationNode",
                                                                                       true,
                                                                                       "taskTerminationVNode"));
-        taskStartedPersister = new TaskStartedPersisterImpl(schedulingService);
-        taskStartedPersister = PAActiveObject.turnActive(taskStartedPersister,
-                                                         TaskStartedPersister.class.getName(),
-                                                         NodeFactory.createLocalNode("TaskStartedPersisterNode",
-                                                                                     true,
-                                                                                     "TaskStartedPersisterVNode"));
 
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
                                                                        new NamedThreadFactory("DoTask_Action"));
@@ -664,13 +655,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     getDBManager().registerUpcomingTaskStartedPersistence(job, task);
 
+                    String terminateNotificationURL = PAActiveObject.getActiveObjectNode(terminateNotification)
+                                                                    .getNodeInformation()
+                                                                    .getURL();
+
                     threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                        taskDescriptor,
                                                                        launcher,
                                                                        schedulingService,
                                                                        terminateNotification,
                                                                        corePrivateKey,
-                                                                       taskStartedPersister),
+                                                                       terminateNotificationURL),
                                                  DOTASK_ACTION_TIMEOUT,
                                                  TimeUnit.MILLISECONDS);
 

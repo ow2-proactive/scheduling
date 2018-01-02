@@ -52,18 +52,11 @@ public class TaskLauncherRebinder {
 
     private TaskId taskId;
 
-    private String taskTerminateNotificationHandlerNodeURL;
+    private String terminateNotificationURL;
 
-    public void saveTaskTerminateNotificationURL(TaskId taskId, TaskTerminateNotification terminateNotification) {
+    void saveTerminateNotificationURL(TaskId taskId, String terminateNotificationURL) {
         this.taskId = taskId;
-        try {
-            this.taskTerminateNotificationHandlerNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
-                                                                         .getNodeInformation()
-                                                                         .getURL();
-        } catch (NodeException e) {
-            logger.warn("The URL of TaskTerminatedNotification handler of task " + taskId.getReadableName() +
-                        " cannot be retrieved", e);
-        }
+        this.terminateNotificationURL = terminateNotificationURL;
     }
 
     /**
@@ -73,7 +66,7 @@ public class TaskLauncherRebinder {
      * @param terminateNotification The TaskTerminateNotification that was used at the time the task was launched
      * @return a correct reference to a TaskTerminateNotification, or null if none can be retrieved
      */
-    public TaskTerminateNotification makeSureSchedulerIsConnected(TaskTerminateNotification terminateNotification) {
+    TaskTerminateNotification makeSureSchedulerIsConnected(TaskTerminateNotification terminateNotification) {
         try {
             PAActiveObject.lookupActive(TaskTerminateNotification.class, PAActiveObject.getUrl(terminateNotification));
             return terminateNotification;
@@ -90,12 +83,12 @@ public class TaskLauncherRebinder {
      *
      * @return a correct reference to a TaskTerminateNotification, or null if none can be retrieved
      */
-    public TaskTerminateNotification getRebindedTaskTerminateNotificationHandler() {
+    TaskTerminateNotification getRebindedTaskTerminateNotificationHandler() {
         try {
-            logger.debug("List AOs on " + taskTerminateNotificationHandlerNodeURL + " (expect only one): " +
-                         Arrays.toString(NodeFactory.getNode(taskTerminateNotificationHandlerNodeURL)
+            logger.debug("List AOs on " + terminateNotificationURL + " (expect only one): " +
+                         Arrays.toString(NodeFactory.getNode(terminateNotificationURL)
                                                     .getActiveObjects(TaskTerminateNotification.class.getName())));
-            Node node = NodeFactory.getNode(taskTerminateNotificationHandlerNodeURL);
+            Node node = NodeFactory.getNode(terminateNotificationURL);
             Object[] aos = node.getActiveObjects(TaskTerminateNotification.class.getName());
             logger.info("On node " + node.getNodeInformation().getName() + " number of active objects found is " +
                         aos.length + " and the first one " + aos[0] + " will be used to send back the task result");
@@ -103,7 +96,7 @@ public class TaskLauncherRebinder {
         } catch (Throwable e) {
             // error when retrieving the termination handler after reconnection
             logger.error("Failed to rebind TaskTerminatedNotification handler of task " + taskId.getReadableName() +
-                         " from URL " + taskTerminateNotificationHandlerNodeURL, e);
+                         " from URL " + terminateNotificationURL, e);
             return null;
         }
     }

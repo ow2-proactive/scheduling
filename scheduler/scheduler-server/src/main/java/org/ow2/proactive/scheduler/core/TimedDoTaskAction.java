@@ -47,7 +47,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
-import org.ow2.proactive.scheduler.task.TaskStartedPersister;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTaskParentFinder;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
@@ -77,7 +76,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final PrivateKey corePrivateKey;
 
-    private final TaskStartedPersister taskStartedPersister;
+    private final String terminateNotificationURL;
 
     private boolean taskWasRestarted;
 
@@ -90,7 +89,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      */
     public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            PrivateKey corePrivateKey, TaskStartedPersister taskStartedPersister) {
+            PrivateKey corePrivateKey, String terminateNotificationURL) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
         this.task = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
@@ -99,7 +98,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         this.terminateNotification = terminateNotification;
         this.corePrivateKey = corePrivateKey;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
-        this.taskStartedPersister = taskStartedPersister;
+        this.terminateNotificationURL = terminateNotificationURL;
     }
 
     /**
@@ -141,7 +140,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             fillContainer();
 
             // try launch the task
-            launcher.doTask(task.getExecutableContainer(), params, terminateNotification, taskStartedPersister);
+            launcher.doTask(task.getExecutableContainer(), params, terminateNotification, terminateNotificationURL);
         } catch (Throwable e) {
             logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();

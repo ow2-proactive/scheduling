@@ -149,24 +149,25 @@ public class TaskLauncher implements InitActive {
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
-            TaskTerminateNotification terminateNotification, TaskStartedPersister taskStartedPersister) {
-        logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
-
-        this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
-
-        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
-
-        Stopwatch taskStopwatchForFailures = Stopwatch.createUnstarted();
+            TaskTerminateNotification terminateNotification, String terminateNotificationURL) {
 
         TaskResultImpl taskResult;
-
+        WallTimer wallTimer = null;
+        TaskContext context = null;
+        Stopwatch taskStopwatchForFailures = null;
         TaskDataspaces dataspaces = null;
 
-        TaskContext context = null;
-
-        taskLauncherRebinder.saveTaskTerminateNotificationURL(taskId, terminateNotification);
-
         try {
+            logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
+
+            this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
+
+            wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
+
+            taskStopwatchForFailures = Stopwatch.createUnstarted();
+
+            taskLauncherRebinder.saveTerminateNotificationURL(taskId, terminateNotificationURL);
+
             addShutdownHook();
             // lock the cache space cleaning mechanism
             DataSpaceNodeConfigurationAgent.lockCacheSpaceCleaning();
@@ -211,10 +212,6 @@ public class TaskLauncher implements InitActive {
 
             TaskExecutor taskExecutor = factory.createTaskExecutor(workingDir);
 
-            if (taskStartedPersister != null) {
-                taskStartedPersister.persistTaskStarted(taskId);
-            }
-
             taskStopwatchForFailures.start();
             taskResult = taskExecutor.execute(context, taskLogger.getOutputSink(), taskLogger.getErrorSink());
             taskStopwatchForFailures.stop();
@@ -245,7 +242,9 @@ public class TaskLauncher implements InitActive {
 
             sendResultToScheduler(rebindedTerminateNotification, taskResult);
         } catch (Throwable taskFailure) {
-            wallTimer.stop();
+            if (wallTimer != null) {
+                wallTimer.stop();
+            }
 
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
@@ -257,12 +256,15 @@ public class TaskLauncher implements InitActive {
                     return;
                 default:
                     logger.info("Failed to execute task", taskFailure);
+
+                    long elapsedTime = 0;
+                    if (taskStopwatchForFailures != null) {
+                        elapsedTime = taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS);
+                    }
+
                     taskFailure.printStackTrace(taskLogger.getErrorSink());
                     Map<String, byte[]> serializedVariables = extractVariablesFromContext(context);
-                    taskResult = new TaskResultImpl(taskId,
-                                                    taskFailure,
-                                                    taskLogger.getLogs(),
-                                                    taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+                    taskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(), elapsedTime);
                     taskResult.setPropagatedVariables(serializedVariables);
 
                     sendResultToScheduler(terminateNotification, taskResult);
@@ -332,10 +334,11 @@ public class TaskLauncher implements InitActive {
 
         Map<String, byte[]> serializedVariables = extractVariablesFromContext(context);
 
-        TaskResultImpl result = new TaskResultImpl(taskId,
-                                                   exception,
-                                                   taskLogger.getLogs(),
-                                                   taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+        long elapsedTime = 0;
+        if (taskStopwatchForFailures != null) {
+            elapsedTime = taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS);
+        }
+        TaskResultImpl result = new TaskResultImpl(taskId, exception, taskLogger.getLogs(), elapsedTime);
 
         result.setPropagatedVariables(serializedVariables);
         return result;
