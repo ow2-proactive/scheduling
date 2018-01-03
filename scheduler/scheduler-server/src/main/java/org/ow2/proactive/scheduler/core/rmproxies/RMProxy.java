@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -121,15 +122,15 @@ public class RMProxy {
     }
 
     public void releaseNodes(NodeSet nodeSet) {
-        releaseNodes(nodeSet, null, null, null, null);
+        releaseNodes(nodeSet, null, null, null, null, null);
     }
 
-    public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript) {
-        releaseNodes(nodeSet, cleaningScript, null, null, null);
+    public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, Credentials creds) {
+        releaseNodes(nodeSet, cleaningScript, null, null, null, creds);
     }
 
     public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId) {
+            Map<String, String> genericInformation, TaskId taskId, Credentials creds) {
 
         if (nodeSet.size() == 0) {
             if (nodeSet.getExtraNodes() == null || nodeSet.getExtraNodes().size() == 0) {
@@ -143,4 +144,13 @@ public class RMProxy {
             logger.warn("Didn't find RM to release NodeSet (RM is down or all NodeSet's Nodes are down)");
         }
     }
+
+    public void releaseDanglingBusyNodes(List<NodeSet> verifiedBusyNodes) {
+        if (proxyActiveObject != null) {
+            proxyActiveObject.releaseDanglingBusyNodes(verifiedBusyNodes);
+        } else {
+            logger.warn("Didn't find RM to release NodeSet (RM is down or all NodeSet's Nodes are down)");
+        }
+    }
+
 }

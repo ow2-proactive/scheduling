@@ -78,7 +78,7 @@ public class TaskLauncherTestAbstract extends ProActiveTestClean {
     private void injectTaskTerminateNotificationMock() {
         MockitoAnnotations.initMocks(this);
         when(taskLauncherRebinder.makeSureSchedulerIsConnected(taskResult)).thenReturn(taskResult);
-        when(taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler()).thenReturn(taskResult);
+        when(taskLauncherRebinder.getReboundTaskTerminateNotificationHandler()).thenReturn(taskResult);
     }
 
     protected static class TaskTerminateNotificationVerifier implements TaskTerminateNotification {

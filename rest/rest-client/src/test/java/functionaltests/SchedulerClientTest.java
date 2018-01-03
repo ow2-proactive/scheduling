@@ -251,6 +251,9 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test(timeout = MAX_WAIT_TIME)
     public void testSchedulerNodeClientCleanScript() throws Throwable {
         ISchedulerClient client = clientInstance();
+
+        client.putThirdPartyCredential("TEST_CREDS", "mypassword");
+
         Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
                                 "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
         JobId jobId = submitJob(job, client);
@@ -268,6 +271,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertThat(jobLog, CoreMatchers.containsString("USERSPACE_FILE_LIST_NOT_NULL=true"));
         //assert globalspaceapi.connect() worked
         Assert.assertThat(jobLog, CoreMatchers.containsString("GLOBALSPACE_FILE_LIST_NOT_NULL=true"));
+        //assert globalspaceapi.connect() worked
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TEST_CREDS=mypassword"));
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -313,8 +318,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                 "\n" + "userspaceapi.connect();\n" +
                                                 "print(\"USERSPACE_FILE_LIST_NOT_NULL=\"+(userspaceapi.listFiles(\".\", \"*\")!=null));\n" +
                                                 "\n" + "globalspaceapi.connect();\n" +
-                                                "print(\"GLOBALSPACE_FILE_LIST_NOT_NULL=\"+(globalspaceapi.listFiles(\".\", \"*\")!=null));\n",
-                                                "js"));
+                                                "print(\"GLOBALSPACE_FILE_LIST_NOT_NULL=\"+(globalspaceapi.listFiles(\".\", \"*\")!=null));\n" +
+                                                "print(\"TEST_CREDS=\"+(credentials.get(\"TEST_CREDS\")));\n", "js"));
         job.addTask(task);
         return job;
     }

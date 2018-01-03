@@ -2375,6 +2375,35 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return userData;
     }
 
+    @Override
+    public void releaseBusyNodesNotInList(List<NodeSet> nodesToNotRelease) {
+        Set<String> nodesUrlToNotRelease = new HashSet<>();
+
+        for (NodeSet nodeSet : nodesToNotRelease) {
+            nodesUrlToNotRelease.addAll(nodeSet.getAllNodesUrls());
+        }
+
+        List<RMNode> busyNodesToRelease = findBusyNodesNotInSet(nodesUrlToNotRelease);
+
+        nodesCleaner.cleanAndRelease(busyNodesToRelease);
+    }
+
+    private List<RMNode> findBusyNodesNotInSet(Set<String> nodesUrlToNotRelease) {
+        List<RMNode> busyNodesNotInGivenSet = new LinkedList<>();
+
+        for (Entry<String, RMNode> nodeEntry : allNodes.entrySet()) {
+            String nodeUrl = nodeEntry.getKey();
+            RMNode node = nodeEntry.getValue();
+
+            if (node.isBusy() && !nodesUrlToNotRelease.contains(nodeUrl)) {
+                logger.debug("Dangling busy node found: " + node.getNodeName());
+                busyNodesNotInGivenSet.add(node);
+            }
+        }
+
+        return busyNodesNotInGivenSet;
+    }
+
     /**
      * Add the information of the given node to the database.
      *

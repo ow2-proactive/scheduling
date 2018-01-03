@@ -26,18 +26,26 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.net.URI;
+import java.security.KeyException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
+import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -48,16 +56,19 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.rest.data.JobStateImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -259,6 +270,44 @@ public class SchedulingService {
         return true;
     }
 
+    /**
+     * Create a new Credential object containing users' 3rd Party Credentials.
+     *
+     * @param creds credentials for specific user
+     * @return in case of success new object containing the 3rd party credentials used to create bindings
+     * at clean script
+     */
+    Credentials addThirdPartyCredentials(Credentials creds) throws KeyException, IllegalAccessException {
+        //retrieve scheduler key pair
+        String privateKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+        String publicKeyPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString());
+
+        //get keys from task
+        PrivateKey privateKey = Credentials.getPrivateKey(privateKeyPath);
+        PublicKey publicKey = Credentials.getPublicKey(publicKeyPath);
+
+        //retrieve the current creData from task
+        CredData credData = creds.decrypt(privateKey);
+
+        //retrive database to get third party credentials from
+        SchedulerDBManager dbManager = getInfrastructure().getDBManager();
+        if (dbManager != null) {
+            Map<String, HybridEncryptedData> thirdPartyCredentials = dbManager.thirdPartyCredentialsMap(credData.getLogin());
+            if (thirdPartyCredentials == null) {
+                logger.error("Failed to retrieve Third Party Credentials!");
+                throw new KeyException("Failed to retrieve thirdPartyCredentials!");
+            } else {
+                //cycle third party credentials, add one-by-one to the decrypter
+                for (Map.Entry<String, HybridEncryptedData> thirdPartyCredential : thirdPartyCredentials.entrySet()) {
+                    String decryptedValue = HybridEncryptionUtil.decryptString(thirdPartyCredential.getValue(),
+                                                                               privateKey);
+                    credData.addThirdPartyCredential(thirdPartyCredential.getKey(), decryptedValue);
+                }
+            }
+        }
+        return Credentials.createCredentials(credData, publicKey);
+    }
+
     public boolean kill() {
         if (status.isKilled()) {
             return false;
@@ -280,7 +329,9 @@ public class SchedulingService {
             try {
                 infrastructure.getRMProxiesManager()
                               .getUserRMProxy(taskData.getUser(), taskData.getCredentials())
-                              .releaseNodes(nodes, taskData.getTask().getCleaningScript());
+                              .releaseNodes(nodes,
+                                            taskData.getTask().getCleaningScript(),
+                                            addThirdPartyCredentials(taskData.getCredentials()));
             } catch (Throwable t) {
                 logger.error("Failed to release nodes", t);
             }
@@ -899,9 +950,9 @@ public class SchedulingService {
     }
 
     private void recover(RecoveredSchedulerState recoveredState) {
-        Vector<InternalJob> finishedJobs = recoveredState.getFinishedJobs();
-        Vector<InternalJob> pendingJobs = recoveredState.getPendingJobs();
-        Vector<InternalJob> runningJobs = recoveredState.getRunningJobs();
+        List<InternalJob> finishedJobs = recoveredState.getFinishedJobs();
+        List<InternalJob> pendingJobs = recoveredState.getPendingJobs();
+        List<InternalJob> runningJobs = recoveredState.getRunningJobs();
 
         jobsRecovered(pendingJobs);
         jobsRecovered(runningJobs);
@@ -939,7 +990,7 @@ public class SchedulingService {
         }
     }
 
-    private void recoverTasksState(Vector<InternalJob> jobs, boolean restoreInErrorTasks) {
+    private void recoverTasksState(List<InternalJob> jobs, boolean restoreInErrorTasks) {
         Iterator<InternalJob> iterJob = jobs.iterator();
         while (iterJob.hasNext()) {
             InternalJob job = iterJob.next();
@@ -1081,8 +1132,9 @@ public class SchedulingService {
                                                   new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
                                                                                 new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
                     getListener().jobUpdatedFullData(job);
+                    longList.add(job.getId().longValue());
+                    logger.info("HOUSEKEEPING sent JOB_REMOVE_FINISHED notification for job " + job.getId());
                 }
-                longList.add(job.getId().longValue());
             }
 
             wakeUpSchedulingThread();

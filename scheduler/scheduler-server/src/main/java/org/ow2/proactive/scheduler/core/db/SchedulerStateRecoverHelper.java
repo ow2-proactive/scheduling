@@ -122,17 +122,21 @@ public class SchedulerStateRecoverHelper {
         int pendingTasksCount = 0;
         int runningTasksCount = 0;
         for (InternalTask task : tasks) {
-            // we only need to take into account the tasks that were running 
-            // and recount the number of pending tasks, because if we do not 
-            // manage to recover a running task, it will be recovered as a 
+            // we only need to take into account the tasks that were running
+            // and recount the number of pending tasks, because if we do not
+            // manage to recover a running task, it will be recovered as a
             // pending task
             if ((task.getStatus() == TaskStatus.RUNNING || task.getStatus() == TaskStatus.PAUSED) &&
                 task.getExecuterInformation() != null) {
                 try {
                     TaskLauncher launcher = task.getExecuterInformation().getLauncher();
-                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
-                                ") successfully. Launcher: " + launcher);
-                    runningTasksCount++;
+                    // attempt to talk to the task launcher to see if it is
+                    // still alive. If this call throws an exception, the task
+                    // will be reset to pending
+                    if (launcher.isActivated()) {
+                        logger.info("Recover running task " + task.getId() + " (" + task.getName() + ") successfully.");
+                        runningTasksCount++;
+                    }
                 } catch (Throwable e) {
                     logger.info("Recover running task " + task.getId() + " (" + task.getName() +
                                 ") failed. Moving back task from status RUNNING TO PENDING.", e);
@@ -140,7 +144,7 @@ public class SchedulerStateRecoverHelper {
                     pendingTasksCount++;
                 }
             } else {
-                // recount existing pending tasks. We base this number on the 
+                // recount existing pending tasks. We base this number on the
                 // definition provided in SchedulerDBManager#PENDING_TASKS
                 if (task.getStatus().equals(TaskStatus.PENDING) || task.getStatus().equals(TaskStatus.SUBMITTED) ||
                     task.getStatus().equals(TaskStatus.NOT_STARTED)) {

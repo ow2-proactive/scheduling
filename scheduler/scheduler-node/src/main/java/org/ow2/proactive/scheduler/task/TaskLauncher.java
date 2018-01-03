@@ -27,13 +27,11 @@ package org.ow2.proactive.scheduler.task;
 
 import java.io.File;
 import java.io.Serializable;
-import java.net.URL;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -43,14 +41,11 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
-import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -148,25 +143,31 @@ public class TaskLauncher implements InitActive {
         return true;
     }
 
-    public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
+    void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
-        logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
+        doTask(executableContainer, previousTasksResults, terminateNotification, null);
+    }
 
-        this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
-
-        WallTimer wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
-
-        Stopwatch taskStopwatchForFailures = Stopwatch.createUnstarted();
+    public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
+            TaskTerminateNotification terminateNotification, String terminateNotificationNodeURL) {
 
         TaskResultImpl taskResult;
-
+        WallTimer wallTimer = null;
+        TaskContext context = null;
+        Stopwatch taskStopwatchForFailures = null;
         TaskDataspaces dataspaces = null;
 
-        TaskContext context = null;
-
-        taskLauncherRebinder.saveTaskTerminateNotificationURL(taskId, terminateNotification);
-
         try {
+            logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
+
+            this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
+
+            wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
+
+            taskStopwatchForFailures = Stopwatch.createUnstarted();
+
+            taskLauncherRebinder.saveTerminateNotificationNodeURL(taskId, terminateNotificationNodeURL);
+
             addShutdownHook();
             // lock the cache space cleaning mechanism
             DataSpaceNodeConfigurationAgent.lockCacheSpaceCleaning();
@@ -241,7 +242,9 @@ public class TaskLauncher implements InitActive {
 
             sendResultToScheduler(rebindedTerminateNotification, taskResult);
         } catch (Throwable taskFailure) {
-            wallTimer.stop();
+            if (wallTimer != null) {
+                wallTimer.stop();
+            }
 
             switch (taskKiller.getStatus()) {
                 case WALLTIME_REACHED:
@@ -253,12 +256,15 @@ public class TaskLauncher implements InitActive {
                     return;
                 default:
                     logger.info("Failed to execute task", taskFailure);
+
+                    long elapsedTime = 0;
+                    if (taskStopwatchForFailures != null) {
+                        elapsedTime = taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS);
+                    }
+
                     taskFailure.printStackTrace(taskLogger.getErrorSink());
                     Map<String, byte[]> serializedVariables = extractVariablesFromContext(context);
-                    taskResult = new TaskResultImpl(taskId,
-                                                    taskFailure,
-                                                    taskLogger.getLogs(),
-                                                    taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+                    taskResult = new TaskResultImpl(taskId, taskFailure, taskLogger.getLogs(), elapsedTime);
                     taskResult.setPropagatedVariables(serializedVariables);
 
                     sendResultToScheduler(terminateNotification, taskResult);
@@ -328,10 +334,11 @@ public class TaskLauncher implements InitActive {
 
         Map<String, byte[]> serializedVariables = extractVariablesFromContext(context);
 
-        TaskResultImpl result = new TaskResultImpl(taskId,
-                                                   exception,
-                                                   taskLogger.getLogs(),
-                                                   taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS));
+        long elapsedTime = 0;
+        if (taskStopwatchForFailures != null) {
+            elapsedTime = taskStopwatchForFailures.elapsed(TimeUnit.MILLISECONDS);
+        }
+        TaskResultImpl result = new TaskResultImpl(taskId, exception, taskLogger.getLogs(), elapsedTime);
 
         result.setPropagatedVariables(serializedVariables);
         return result;
@@ -395,7 +402,7 @@ public class TaskLauncher implements InitActive {
                 return;
             } catch (Throwable t) {
                 logger.warn("Cannot notify task termination, trying to rebind to the task termination handler", t);
-                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
+                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getReboundTaskTerminateNotificationHandler();
                 if (rebindedTerminateNotification != null) {
                     currentTerminateNotification = rebindedTerminateNotification;
                     // we'll retry to call the terminate method

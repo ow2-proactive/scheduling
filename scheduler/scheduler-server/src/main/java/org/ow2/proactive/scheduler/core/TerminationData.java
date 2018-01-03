@@ -264,7 +264,8 @@ final class TerminationData {
                                                                                         : null,
                                         variables,
                                         genericInformation,
-                                        taskToTerminate.taskData.getTask().getId());
+                                        taskToTerminate.taskData.getTask().getId(),
+                                        service.addThirdPartyCredentials(taskData.getCredentials()));
 
         } catch (Throwable t) {
             logger.info("Failed to release nodes for task '" + taskData.getTask().getId() + "'", t);
