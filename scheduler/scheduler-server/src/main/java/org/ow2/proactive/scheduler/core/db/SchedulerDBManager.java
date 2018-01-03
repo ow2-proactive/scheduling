@@ -147,8 +147,6 @@ public class SchedulerDBManager {
 
     private final TransactionHelper transactionHelper;
 
-    private Map<TaskId, JobTaskPair> jobTaskPairByTaskId = new HashMap<>();
-
     public static SchedulerDBManager createUsingProperties() {
         if (System.getProperty(JAVA_PROPERTYNAME_NODB) != null) {
             return createInMemorySchedulerDBManager();
@@ -1023,31 +1021,6 @@ public class SchedulerDBManager {
         });
     }
 
-    /**
-     * Save the task and job in a map in order to be able to persist their
-     * updated state once the task has been started on the node side.
-     */
-    public void registerUpcomingTaskStartedPersistence(InternalJob job, InternalTask task) {
-        jobTaskPairByTaskId.put(task.getId(), new JobTaskPair(job, task));
-    }
-
-    public void jobTaskStarted(TaskId taskId) {
-        JobTaskPair jobTaskPair = jobTaskPairByTaskId.get(taskId);
-
-        if (jobTaskPair == null) {
-            throw new IllegalStateException("Cannot retrieve the task and job associated to the task id " + taskId +
-                                            ". Task has never been registered or has been persisted already");
-        }
-
-        final InternalJob job = jobTaskPair.job;
-        final InternalTask task = jobTaskPair.task;
-        final boolean taskStatusToPending = job.getStartTime() < 0;
-
-        jobTaskStarted(job, task, taskStatusToPending);
-
-        jobTaskPairByTaskId.remove(taskId);
-    }
-
     public void jobTaskStarted(final InternalJob job, final InternalTask task, final boolean taskStatusToPending) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
@@ -1898,18 +1871,4 @@ public class SchedulerDBManager {
     public TransactionHelper getTransactionHelper() {
         return transactionHelper;
     }
-
-    private class JobTaskPair {
-
-        private InternalJob job;
-
-        private InternalTask task;
-
-        private JobTaskPair(InternalJob job, InternalTask task) {
-            this.job = job;
-            this.task = task;
-        }
-
-    }
-
 }

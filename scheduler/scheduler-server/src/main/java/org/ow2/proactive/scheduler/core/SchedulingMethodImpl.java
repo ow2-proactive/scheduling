@@ -653,8 +653,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
-                    getDBManager().registerUpcomingTaskStartedPersistence(job, task);
-
                     String terminateNotificationURL = PAActiveObject.getActiveObjectNode(terminateNotification)
                                                                     .getNodeInformation()
                                                                     .getURL();
