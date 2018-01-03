@@ -138,6 +138,10 @@ public class RMTHelper {
         createNodeSource(name, nodeNumber, getResourceManager(), getMonitorsHandler());
     }
 
+    public void createNodeSourceWithInfiniteTimeout(String name, int nodeNumber) throws Exception {
+        createNodeSourceWithInfiniteTimeout(name, nodeNumber, getResourceManager(), getMonitorsHandler());
+    }
+
     public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
             RMMonitorsHandler monitor) throws Exception {
         RMFactory.setOsJavaProperty();
@@ -156,12 +160,35 @@ public class RMTHelper {
         waitForNodeSourceCreation(name, nodeNumber, monitor);
     }
 
+    public static void createNodeSourceWithInfiniteTimeout(String name, int nodeNumber, List<String> vmOptions,
+            ResourceManager rm, RMMonitorsHandler monitor) throws Exception {
+        RMFactory.setOsJavaProperty();
+        log("Creating a node source " + name);
+        //first emtpy im parameter is default rm url
+        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        rm.createNodeSource(name,
+                            LocalInfrastructure.class.getName(),
+                            new Object[] { creds, nodeNumber, Integer.MAX_VALUE,
+                                           vmOptions != null ? setup.listToString(vmOptions)
+                                                             : setup.getJvmParameters() },
+                            StaticPolicy.class.getName(),
+                            null);
+        rm.setNodeSourcePingFrequency(5000, name);
+
+        waitForNodeSourceCreation(name, nodeNumber, monitor);
+    }
+
     /**
      * Creates a Local node source with specified name
      */
     public static void createNodeSource(String name, int nodeNumber, ResourceManager rm, RMMonitorsHandler monitor)
             throws Exception {
         createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor);
+    }
+
+    public static void createNodeSourceWithInfiniteTimeout(String name, int nodeNumber, ResourceManager rm,
+            RMMonitorsHandler monitor) throws Exception {
+        createNodeSourceWithInfiniteTimeout(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor);
     }
 
     public List<TestNode> addNodesToDefaultNodeSource(int nodesNumber) throws Exception {
