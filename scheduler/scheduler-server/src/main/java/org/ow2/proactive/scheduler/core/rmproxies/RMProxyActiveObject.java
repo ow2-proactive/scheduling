@@ -284,4 +284,10 @@ public class RMProxyActiveObject {
             }
         }
     }
+
+    @ImmediateService
+    public void releaseDanglingBusyNodes(List<NodeSet> verifiedBusyNodes) {
+        rm.releaseBusyNodesNotInList(verifiedBusyNodes);
+    }
+
 }

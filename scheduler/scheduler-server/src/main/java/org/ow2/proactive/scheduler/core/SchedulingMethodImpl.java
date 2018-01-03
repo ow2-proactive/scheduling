@@ -653,16 +653,22 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
-                    finalizeStarting(job, task, node, launcher);
+                    String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
+                                                                        .getNodeInformation()
+                                                                        .getURL();
 
                     threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                        taskDescriptor,
                                                                        launcher,
                                                                        schedulingService,
                                                                        terminateNotification,
-                                                                       corePrivateKey),
+                                                                       corePrivateKey,
+                                                                       terminateNotificationNodeURL),
                                                  DOTASK_ACTION_TIMEOUT,
                                                  TimeUnit.MILLISECONDS);
+
+                    finalizeStarting(job, task, node, launcher);
+
                     return true;
                 } catch (Exception t) {
                     try {

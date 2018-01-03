@@ -83,8 +83,6 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
-import org.ow2.proactive.scheduler.core.helpers.JobsMemoryMonitorRunner;
-import org.ow2.proactive.scheduler.core.helpers.TableSizeMonitorRunner;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -102,8 +100,6 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-
-import it.sauronsoftware.cron4j.Scheduler;
 
 
 @SuppressWarnings("JpaQueryApiInspection")

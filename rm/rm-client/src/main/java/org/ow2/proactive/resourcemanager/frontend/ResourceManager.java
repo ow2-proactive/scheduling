@@ -440,4 +440,11 @@ public interface ResourceManager {
      * @return a set of groups
      */
     UserData getCurrentUserData();
+
+    /**
+     * Release the nodes that are busy and that are not part of the given node set
+     * @param verifiedBusyNodes nodes that should not be released
+     */
+    void releaseBusyNodesNotInList(List<NodeSet> verifiedBusyNodes);
+
 }

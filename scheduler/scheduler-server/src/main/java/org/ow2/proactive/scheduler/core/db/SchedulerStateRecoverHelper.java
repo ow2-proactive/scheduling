@@ -130,9 +130,13 @@ public class SchedulerStateRecoverHelper {
                 task.getExecuterInformation() != null) {
                 try {
                     TaskLauncher launcher = task.getExecuterInformation().getLauncher();
-                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
-                                ") successfully. Launcher: " + launcher);
-                    runningTasksCount++;
+                    // attempt to talk to the task launcher to see if it is
+                    // still alive. If this call throws an exception, the task
+                    // will be reset to pending
+                    if (launcher.isActivated()) {
+                        logger.info("Recover running task " + task.getId() + " (" + task.getName() + ") successfully.");
+                        runningTasksCount++;
+                    }
                 } catch (Throwable e) {
                     logger.info("Recover running task " + task.getId() + " (" + task.getName() +
                                 ") failed. Moving back task from status RUNNING TO PENDING.", e);

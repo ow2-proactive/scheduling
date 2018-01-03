@@ -214,7 +214,7 @@ public abstract class InfrastructureManager implements Serializable {
     public void recoverPersistedInfraVariables(Map<String, Serializable> persistedInfrastructureVariables) {
         writeLock.lock();
         try {
-            logger.info("Recovering persisted infrastructure variables");
+            logger.debug("Recovering persisted infrastructure variables");
             for (Map.Entry<String, Serializable> entry : persistedInfrastructureVariables.entrySet()) {
                 logger.info("[" + entry.getKey() + " ; " + entry.getValue() + "]");
             }

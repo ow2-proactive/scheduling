@@ -579,7 +579,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
             if (matcher.find()) {
                 try {
                     compliantNodeName = matcher.group(1);
-                    logger.info("Extracted configured host address " + compliantNodeName);
+                    logger.debug("Extracted configured host address " + compliantNodeName);
                 } catch (IndexOutOfBoundsException e) {
                     throw new IllegalStateException("Configured host address could not be extracted from the node name " +
                                                     nodeName, e);
