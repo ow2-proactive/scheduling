@@ -653,9 +653,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
-                    String terminateNotificationURL = PAActiveObject.getActiveObjectNode(terminateNotification)
-                                                                    .getNodeInformation()
-                                                                    .getURL();
+                    String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
+                                                                        .getNodeInformation()
+                                                                        .getURL();
 
                     threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                        taskDescriptor,
@@ -663,7 +663,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                        schedulingService,
                                                                        terminateNotification,
                                                                        corePrivateKey,
-                                                                       terminateNotificationURL),
+                                                                       terminateNotificationNodeURL),
                                                  DOTASK_ACTION_TIMEOUT,
                                                  TimeUnit.MILLISECONDS);
 

@@ -76,7 +76,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final PrivateKey corePrivateKey;
 
-    private final String terminateNotificationURL;
+    private final String terminateNotificationNodeURL;
 
     private boolean taskWasRestarted;
 
@@ -89,7 +89,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      */
     public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            PrivateKey corePrivateKey, String terminateNotificationURL) {
+            PrivateKey corePrivateKey, String terminateNotificationNodeURL) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
         this.task = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
@@ -98,7 +98,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         this.terminateNotification = terminateNotification;
         this.corePrivateKey = corePrivateKey;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
-        this.terminateNotificationURL = terminateNotificationURL;
+        this.terminateNotificationNodeURL = terminateNotificationNodeURL;
     }
 
     /**
@@ -140,7 +140,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             fillContainer();
 
             // try launch the task
-            launcher.doTask(task.getExecutableContainer(), params, terminateNotification, terminateNotificationURL);
+            launcher.doTask(task.getExecutableContainer(), params, terminateNotification, terminateNotificationNodeURL);
         } catch (Throwable e) {
             logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();

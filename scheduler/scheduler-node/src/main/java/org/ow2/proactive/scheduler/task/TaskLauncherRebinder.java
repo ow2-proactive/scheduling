@@ -51,11 +51,11 @@ public class TaskLauncherRebinder {
 
     private TaskId taskId;
 
-    private String terminateNotificationURL;
+    private String terminateNotificationNodeURL;
 
-    void saveTerminateNotificationURL(TaskId taskId, String terminateNotificationURL) {
+    void saveTerminateNotificationNodeURL(TaskId taskId, String terminateNotificationNodeURL) {
         this.taskId = taskId;
-        this.terminateNotificationURL = terminateNotificationURL;
+        this.terminateNotificationNodeURL = terminateNotificationNodeURL;
     }
 
     /**
@@ -72,7 +72,7 @@ public class TaskLauncherRebinder {
         } catch (Exception e) {
             logger.warn("TaskTerminatedNotification handler of task " + taskId.getReadableName() +
                         " is disconnected from the scheduler, try to rebind it", e);
-            return getRebindedTaskTerminateNotificationHandler();
+            return getReboundTaskTerminateNotificationHandler();
         }
     }
 
@@ -82,12 +82,12 @@ public class TaskLauncherRebinder {
      *
      * @return a correct reference to a TaskTerminateNotification, or null if none can be retrieved
      */
-    TaskTerminateNotification getRebindedTaskTerminateNotificationHandler() {
+    TaskTerminateNotification getReboundTaskTerminateNotificationHandler() {
         try {
-            logger.debug("List AOs on " + terminateNotificationURL + " (expect only one): " +
-                         Arrays.toString(NodeFactory.getNode(terminateNotificationURL)
+            logger.debug("List AOs on " + terminateNotificationNodeURL + " (expect only one): " +
+                         Arrays.toString(NodeFactory.getNode(terminateNotificationNodeURL)
                                                     .getActiveObjects(TaskTerminateNotification.class.getName())));
-            Node node = NodeFactory.getNode(terminateNotificationURL);
+            Node node = NodeFactory.getNode(terminateNotificationNodeURL);
             Object[] aos = node.getActiveObjects(TaskTerminateNotification.class.getName());
             logger.info("On node " + node.getNodeInformation().getName() + " number of active objects found is " +
                         aos.length + " and the first one " + aos[0] + " will be used to send back the task result");
@@ -95,7 +95,7 @@ public class TaskLauncherRebinder {
         } catch (Throwable e) {
             // error when retrieving the termination handler after reconnection
             logger.error("Failed to rebind TaskTerminatedNotification handler of task " + taskId.getReadableName() +
-                         " from URL " + terminateNotificationURL, e);
+                         " from URL " + terminateNotificationNodeURL, e);
             return null;
         }
     }

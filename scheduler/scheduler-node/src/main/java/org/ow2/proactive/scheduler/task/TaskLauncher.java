@@ -149,7 +149,7 @@ public class TaskLauncher implements InitActive {
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
-            TaskTerminateNotification terminateNotification, String terminateNotificationURL) {
+            TaskTerminateNotification terminateNotification, String terminateNotificationNodeURL) {
 
         TaskResultImpl taskResult;
         WallTimer wallTimer = null;
@@ -166,7 +166,7 @@ public class TaskLauncher implements InitActive {
 
             taskStopwatchForFailures = Stopwatch.createUnstarted();
 
-            taskLauncherRebinder.saveTerminateNotificationURL(taskId, terminateNotificationURL);
+            taskLauncherRebinder.saveTerminateNotificationNodeURL(taskId, terminateNotificationNodeURL);
 
             addShutdownHook();
             // lock the cache space cleaning mechanism
@@ -402,7 +402,7 @@ public class TaskLauncher implements InitActive {
                 return;
             } catch (Throwable t) {
                 logger.warn("Cannot notify task termination, trying to rebind to the task termination handler", t);
-                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getRebindedTaskTerminateNotificationHandler();
+                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getReboundTaskTerminateNotificationHandler();
                 if (rebindedTerminateNotification != null) {
                     currentTerminateNotification = rebindedTerminateNotification;
                     // we'll retry to call the terminate method
