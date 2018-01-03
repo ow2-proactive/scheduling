@@ -35,7 +35,6 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -69,7 +68,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 200, 10000 } });
+        return Arrays.asList(new Object[][] { { 10, 5000 }, { 100, 5000 }, { 500, 10000 }, { 1000, 20000 } });
     }
 
     // number of nodes
@@ -103,7 +102,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
         assertEquals(0, resourceManager.getState().getAllNodes().size());
 
-        rmHelper.createNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME, nodesNumber);
+        rmHelper.createNodeSourceWithInfiniteTimeout(RMConstants.DEFAULT_STATIC_SOURCE_NAME, nodesNumber);
 
         assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
 
@@ -116,7 +115,6 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
         assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
     }
 
-    @Ignore
     @Test
     public void test() {
         long recovered = nodesRecovered();

@@ -95,8 +95,6 @@ public class SchedulingService {
     static final long SCHEDULER_REMOVED_JOB_DELAY = PASchedulerProperties.SCHEDULER_REMOVED_JOB_DELAY.getValueAsInt() *
                                                     1000;
 
-    public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED = "SchedulingService::recoverTasksState started";
-
     public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED = "SchedulingService::recoverTasksState finished";
 
     private final SchedulingInfrastructure infrastructure;
@@ -959,7 +957,6 @@ public class SchedulingService {
 
         recoverTasksState(finishedJobs, false);
 
-        logger.info(SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED); // this log is important for performance tests
         recoverTasksState(runningJobs, true);
         logger.info(SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED); // this log is important for performance tests
 

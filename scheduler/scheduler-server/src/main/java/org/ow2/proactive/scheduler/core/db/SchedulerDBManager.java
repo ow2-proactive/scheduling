@@ -143,6 +143,8 @@ public class SchedulerDBManager {
                                                                          TaskStatus.FINISHED,
                                                                          TaskStatus.SKIPPED);
 
+    public static final String ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED = "All required Jobs have been fetched"; // important for JobRecoveryTest
+
     private final SessionFactory sessionFactory;
 
     private final TransactionHelper transactionHelper;
@@ -919,7 +921,7 @@ public class SchedulerDBManager {
             batchLoadJobs(session, fullState, jobQuery, batchLoadIds, result);
         }
 
-        logger.info("All required Jobs have been fetched");
+        logger.info(ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED);
 
         return result;
     }
