@@ -275,7 +275,7 @@ ext.schedulingFunctionalTestConfiguration = {
 
 ext.schedulingPerformanceTestConfiguration = {
 
-    include 'performancetests/**'
+    include 'performancetests/recovery/**'
 
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
