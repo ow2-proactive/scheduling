@@ -1,8 +1,29 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package performancetests.verification;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,6 +31,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.*;
 import java.util.*;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.junit.Test;
+
 
 public class VerifyChangeTest {
 
@@ -39,17 +65,23 @@ public class VerifyChangeTest {
         final Map<String, Double> compared = compareReports(prediousReport, newReport);
 
         boolean toNotify = false;
-        String notifyReport = "Some performance metrics have been changed bigger than " + (THRESHOLD * 100) + "%:\n";
+        String notifyReport = String.format("Two last performance reports were compared: \n\t\t'%s' \n\tand\n\t\t'%s'\n",
+                                            previousFile.getName(),
+                                            newFile.getName());
+        notifyReport += "Some performance metrics have been changed bigger than " + (THRESHOLD * 100) + "%:\n";
         final Iterator<Map.Entry<String, Double>> iterator = compared.entrySet().iterator();
         while (iterator.hasNext()) {
             final Map.Entry<String, Double> entry = iterator.next();
-            if(Math.abs(entry.getValue()) > THRESHOLD){
+            if (Math.abs(entry.getValue()) > THRESHOLD) {
                 toNotify = true;
-                notifyReport += entry.getKey() + " has changed by " + String.format("%.2f", entry.getValue())  +
-                        "% from " + prediousReport.get(entry.getKey()) + "ms to " + newReport.get(entry.getKey()) +  "ms;\n";
+                notifyReport += String.format("%s has changed by %.2f%% from %dms to %dms;\n",
+                                              entry.getKey(),
+                                              entry.getValue(),
+                                              prediousReport.get(entry.getKey()),
+                                              newReport.get(entry.getKey()));
             }
         }
-        if(toNotify){
+        if (toNotify) {
             LOGGER.info(notifyReport);
         }
 
@@ -119,6 +151,4 @@ public class VerifyChangeTest {
         return result;
     }
 
-
 }
-

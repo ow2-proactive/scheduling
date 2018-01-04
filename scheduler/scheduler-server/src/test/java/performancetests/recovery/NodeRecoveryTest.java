@@ -61,14 +61,14 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
     private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
 
     static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
-            .getPath();
+                                                                       .getPath();
 
     static final String RM_CONFIGURATION_RESTART = NodeRecoveryTest.class.getResource("/performancetests/config/rm-restart.ini")
-            .getPath();
+                                                                         .getPath();
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{10, 5000}, {100, 5000}, {500, 10000}, {1000, 20000}});
+        return Arrays.asList(new Object[][] { { 10, 5000 }, { 100, 5000 }, { 500, 10000 }, { 1000, 20000 } });
     }
 
     // number of nodes
@@ -121,15 +121,15 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
             long recovered = nodesRecovered();
             long timeSpent = timeSpentToRecoverNodes();
             LOGGER.info(makeCSVString("NodeRecoveryTest",
-                    nodesNumber,
-                    timeLimit,
-                    recovered,
-                    timeSpent,
-                    ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE")));
+                                      nodesNumber,
+                                      timeLimit,
+                                      recovered,
+                                      timeSpent,
+                                      ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE")));
             assertEquals(nodesNumber, recovered);
             assertThat("Nodes recovery time for " + nodesNumber + " nodes",
-                    (int) timeSpentToRecoverNodes(),
-                    lessThan(timeLimit));
+                       (int) timeSpentToRecoverNodes(),
+                       lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.info(NodeRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, "ERROR"));
@@ -173,7 +173,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
         if (time < 0) {
             throw new RuntimeException("First occurence of " + RMCore.START_TO_RECOVER_NODES + " goes after " +
-                    RMCore.END_OF_NODES_RECOVERY);
+                                       RMCore.END_OF_NODES_RECOVERY);
         }
 
         return time;
