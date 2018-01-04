@@ -133,7 +133,7 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
             assertThat("Jobs recovery time for " + jobsNumber + " jobs", (int) timeSpent, lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(NodeRecoveryTest.makeCSVString("JobRecoveryTest", jobsNumber, timeLimit, -1, -1, "FAILURE"));
+            LOGGER.info(NodeRecoveryTest.makeCSVString("JobRecoveryTest", jobsNumber, timeLimit, -1, -1, "ERROR"));
         }
     }
 
