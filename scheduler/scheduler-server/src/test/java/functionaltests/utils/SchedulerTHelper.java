@@ -170,6 +170,15 @@ public class SchedulerTHelper {
         }
     }
 
+    public SchedulerTHelper(boolean deployLocalNodes, String schedPropertiesFilePath, String rmPropertiesFilePath,
+            String rmUrl, boolean cleanTMP) throws Exception {
+        if (cleanTMP) {
+            startScheduler(deployLocalNodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
+        } else {
+            startSchedulerWithoutCleaningTMP(deployLocalNodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
+        }
+    }
+
     /**
      * Creates a test scheduler with a given number of nodes,
      * and given scheduler and resource manager configurations
@@ -182,15 +191,6 @@ public class SchedulerTHelper {
     public SchedulerTHelper(boolean localnodes, String schedPropertiesFilePath, String rmPropertiesFilePath,
             String rmUrl) throws Exception {
         startScheduler(localnodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
-    }
-
-    public SchedulerTHelper(boolean deployLocalNodes, String schedPropertiesFilePath, String rmPropertiesFilePath,
-            String rmUrl, boolean cleanTMP) throws Exception {
-        if (cleanTMP) {
-            startScheduler(deployLocalNodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
-        } else {
-            startSchedulerWithoutCleaningTMP(deployLocalNodes, schedPropertiesFilePath, rmPropertiesFilePath, rmUrl);
-        }
     }
 
     private void startScheduler(String configuration) throws Exception {
@@ -1053,6 +1053,14 @@ public class SchedulerTHelper {
 
     public void createNodeSource(String name, int nbNodes) throws Exception {
         RMTHelper.createNodeSource(name, nbNodes, null, getResourceManager(), getRMMonitorsHandler());
+    }
+
+    public void createNodeSourceWithInfiniteTimeout(String name, int nbNodes) throws Exception {
+        RMTHelper.createNodeSourceWithInfiniteTimeout(name,
+                                                      nbNodes,
+                                                      null,
+                                                      getResourceManager(),
+                                                      getRMMonitorsHandler());
     }
 
     public void createNodeSource(String name, int nbNodes, List<String> vmOptions) throws Exception {

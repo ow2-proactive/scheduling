@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +45,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.core.SchedulingService;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 
 import functionaltests.utils.*;
@@ -65,9 +67,11 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     private static URL runningJob = JobRecoveryTest.class.getResource("/functionaltests/descriptors/Job_running.xml");
 
+    private static final Logger LOGGER = Logger.getLogger(JobRecoveryTest.class);
+
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 5000 } });
+        return Arrays.asList(new Object[][] { { 10, 1000 }, { 100, 2000 }, { 500, 5000 }, { 1000, 10000 } });
     }
 
     // number of jobs
@@ -95,7 +99,7 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
                                                NodeRecoveryTest.RM_CONFIGURATION_START,
                                                null);
 
-        schedulerHelper.createNodeSource("local", jobsNumber);
+        schedulerHelper.createNodeSourceWithInfiniteTimeout("local", jobsNumber);
         JobId[] jobIds = new JobId[jobsNumber];
         for (int i = 0; i < jobsNumber; ++i) {
             jobIds[i] = schedulerHelper.submitJob(new File(runningJob.toURI()).getAbsolutePath());
@@ -116,10 +120,21 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     @Test
     public void test() {
-        assertEquals(jobsNumber, numberOfJobsRecovered());
-        assertThat("Jobs recovery time for " + jobsNumber + " jobs",
-                   (int) timeSpentToRecoverJobs(),
-                   lessThan(timeLimit));
+        try {
+            long recovered = numberOfJobsRecovered();
+            long timeSpent = timeSpentToRecoverJobs();
+            LOGGER.info(NodeRecoveryTest.makeCSVString("JobRecoveryTest",
+                                                       jobsNumber,
+                                                       timeLimit,
+                                                       recovered,
+                                                       timeSpent,
+                                                       ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE")));
+            assertEquals(jobsNumber, recovered);
+            assertThat("Jobs recovery time for " + jobsNumber + " jobs", (int) timeSpent, lessThan(timeLimit));
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.info(NodeRecoveryTest.makeCSVString("JobRecoveryTest", jobsNumber, timeLimit, -1, -1, "ERROR"));
+        }
     }
 
     @After
@@ -135,16 +150,15 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
     }
 
     private long timeSpentToRecoverJobs() {
-        final long startedToRecover = LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED))
+        final long startedToRecover = LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(SchedulerDBManager.ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED))
                                                   .getTime();
         final long recoveryEnded = LogProcessor.getDateOfLine(LogProcessor.getLastLineThatMatch(SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED))
                                                .getTime();
 
         long time = recoveryEnded - startedToRecover;
         if (time < 0) {
-            throw new RuntimeException("First occurence of " +
-                                       SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_STARTED +
-                                       " goes after " +
+            throw new RuntimeException("First occurence of " + " goes after " +
+                                       SchedulerDBManager.ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED +
                                        SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED);
         }
 

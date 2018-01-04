@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +58,8 @@ import performancetests.helper.LogProcessor;
 @RunWith(Parameterized.class)
 public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
+    private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
+
     static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
                                                                        .getPath();
 
@@ -65,7 +68,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 5, 1000 }, { 100, 10000 } });
+        return Arrays.asList(new Object[][] { { 10, 5000 }, { 100, 5000 }, { 500, 10000 }, { 1000, 20000 } });
     }
 
     // number of nodes
@@ -99,7 +102,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
         assertEquals(0, resourceManager.getState().getAllNodes().size());
 
-        rmHelper.createNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME, nodesNumber);
+        rmHelper.createNodeSourceWithInfiniteTimeout(RMConstants.DEFAULT_STATIC_SOURCE_NAME, nodesNumber);
 
         assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
 
@@ -114,10 +117,33 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     @Test
     public void test() {
-        assertEquals(nodesNumber, nodesRecovered());
-        assertThat("Nodes recovery time for " + nodesNumber + " nodes",
-                   (int) timeSpentToRecoverNodes(),
-                   lessThan(timeLimit));
+        try {
+            long recovered = nodesRecovered();
+            long timeSpent = timeSpentToRecoverNodes();
+            LOGGER.info(makeCSVString("NodeRecoveryTest",
+                                      nodesNumber,
+                                      timeLimit,
+                                      recovered,
+                                      timeSpent,
+                                      ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE")));
+            assertEquals(nodesNumber, recovered);
+            assertThat("Nodes recovery time for " + nodesNumber + " nodes",
+                       (int) timeSpentToRecoverNodes(),
+                       lessThan(timeLimit));
+        } catch (Exception e) {
+            e.printStackTrace();
+            LOGGER.info(NodeRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, "ERROR"));
+        }
+    }
+
+    public static String makeCSVString(Object... strings) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(strings[0].toString());
+        for (int i = 1; i < strings.length; ++i) {
+            builder.append(',');
+            builder.append(strings[i].toString());
+        }
+        return builder.toString();
     }
 
     @After
