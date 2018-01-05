@@ -246,6 +246,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     private int selectAndStartTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Set<String> freeResources,
             LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy) {
         int numberOfTaskStarted = 0;
+        logger.info("SMI active 1 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
 
         VariableBatchSizeIterator progressiveIterator = new VariableBatchSizeIterator(fullListOfTaskRetrievedFromPolicy);
 
@@ -256,14 +257,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             if (logger.isDebugEnabled()) {
                 loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
             }
+            logger.info("SMI active 2 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
 
             updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
 
+            logger.info("SMI active 3 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
             for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
                 // load and Initialize the executable container
                 loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
             }
 
+            logger.info("SMI active 4 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
             while (!taskRetrievedFromPolicy.isEmpty()) {
 
                 if (freeResources.isEmpty()) {
@@ -290,8 +294,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     break;
                 }
 
+                logger.info("SMI active 5 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
                 NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule, freeResources);
 
+                logger.info("SMI active 6 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
                 if (nodeSet != null) {
                     freeResources.removeAll(nodeSet.getAllNodesUrls());
                 }
@@ -462,7 +468,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     protected NodeSet getRMNodes(Map<JobId, JobDescriptor> jobMap, int neededResourcesNumber,
             LinkedList<EligibleTaskDescriptor> tasksToSchedule, Set<String> freeResources) {
         NodeSet nodeSet = new NodeSet();
-
+        logger.info("SMI active 51 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
         if (neededResourcesNumber <= 0) {
             throw new IllegalArgumentException("'neededResourcesNumber' must be greater than 0");
         }
@@ -470,7 +476,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
         InternalJob currentJob = ((JobDescriptorImpl) jobMap.get(etd.getJobId())).getInternal();
         InternalTask internalTask0 = currentJob.getIHMTasks().get(etd.getTaskId());
-
+        logger.info("SMI active 52 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
         try {
 
             TopologyDescriptor descriptor = null;
@@ -483,10 +489,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     logger.debug("Topology is not defined for the task " + internalTask0.getName());
                 }
             }
+            logger.info("SMI active 53 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
             if (descriptor == null) {
                 // descriptor is not defined, use default
                 descriptor = TopologyDescriptor.ARBITRARY;
             }
+
 
             try {
                 Criteria criteria = new Criteria(neededResourcesNumber);
@@ -499,7 +507,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setBestEffort(bestEffort);
                 criteria.setAcceptableNodesUrls(freeResources);
                 criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0));
-
+                logger.info("SMI active 54 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
                 if (internalTask0.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask0.getRuntimeGenericInformation()
                                                              .get(SchedulerConstants.NODE_ACCESS_TOKEN));
@@ -512,16 +520,20 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 criteria.setComputationDescriptors(computationDescriptors);
 
+                logger.info("SMI active 55 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
                 nodeSet = getRMProxiesManager().getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials())
                                                .getNodes(criteria);
+                logger.info("SMI active 56 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
             } catch (TopologyDisabledException tde) {
                 jlogger.warn(currentJob.getId(), "will be canceled as the topology is disabled");
                 schedulingService.simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");
                 return null;
             }
+            logger.info("SMI active 57 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
             //the following line is used to unwrap the future, warning when moving or removing
             //it may also throw a ScriptException which is a RuntimeException
             PAFuture.waitFor(nodeSet, true);
+            logger.info("SMI active 58 " + this.getRMProxiesManager().getRmProxy().isActive().getBooleanValue());
             logger.debug("provided nodes " + nodeSet.size());
             return nodeSet;
 

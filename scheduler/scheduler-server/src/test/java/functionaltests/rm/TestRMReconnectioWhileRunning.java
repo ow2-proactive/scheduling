@@ -69,6 +69,7 @@ public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
         initConfigs();
     }
 
+    @Ignore
     @Test
     public void testTaskIsNotStuckRunning() throws Exception {
         ProActiveConfiguration.load();
@@ -108,9 +109,9 @@ public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
         assertJobFinished(jobId3);
 
         int numberOfAttemptsToReconnect = LogProcessor.linesThatMatch("Successfully reconnected to Resource Manager ")
-                                                      .size();
+                .size();
         int attemptsThatDidNotCauseReconnection = LogProcessor.linesThatMatch("Do not reconnect to the RM as connection is active for ")
-                                                              .size();
+                .size();
         int actualNumberOfReconnections = numberOfAttemptsToReconnect - attemptsThatDidNotCauseReconnection;
 
         assertEquals(0, actualNumberOfReconnections);
