@@ -658,27 +658,26 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
+                    Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
+                                                                                                                   taskDescriptor,
+                                                                                                                   launcher,
+                                                                                                                   schedulingService,
+                                                                                                                   terminateNotification,
+                                                                                                                   corePrivateKey,
+                                                                                                                   terminateNotificationNodeURL),
+                                                                                             DOTASK_ACTION_TIMEOUT,
+                                                                                             TimeUnit.MILLISECONDS);
                     try {
-                        Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
-                                                                                                                       taskDescriptor,
-                                                                                                                       launcher,
-                                                                                                                       schedulingService,
-                                                                                                                       terminateNotification,
-                                                                                                                       corePrivateKey,
-                                                                                                                       terminateNotificationNodeURL),
-                                                                                                 DOTASK_ACTION_TIMEOUT,
-                                                                                                 TimeUnit.MILLISECONDS);
-
                         // before signaling that the task is started, we need
                         // to make sure the task is correctly submitted to the
-                        // task launcher, or not accounting the task as
-                        // started if any exception or a timeout occurs
+                        // task launcher
                         taskExecutionSubmittedFuture.get(DOTASK_ACTION_TIMEOUT, TimeUnit.MILLISECONDS);
-                        finalizeStarting(job, task, node, launcher);
-                        return true;
                     } catch (Exception e) {
-                        return false;
+                        logger.warn("Could not wait for the task to be started on TaskLauncher.", e);
                     }
+
+                    finalizeStarting(job, task, node, launcher);
+                    return true;
                 } catch (Exception t) {
                     try {
                         //if there was a problem, free nodeSet for multi-nodes task
