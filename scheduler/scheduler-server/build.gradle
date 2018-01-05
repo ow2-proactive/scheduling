@@ -63,6 +63,14 @@ dependencies {
 task('functionalTest', type: Test).configure schedulingFunctionalTestConfiguration
 task('performanceTest', type: Test).configure schedulingPerformanceTestConfiguration
 
+task verifyPerformanceChange(type: Test){
+    systemProperty 'pathToStorage', System.getProperty('pathToStorage')
+    systemProperty 'threshold', '0.3'
+
+    include 'performancetests/verification/**'
+
+}
+
 task testJar(type: Jar) {
     classifier = 'tests'
     from sourceSets.test.output
