@@ -52,7 +52,7 @@ public class VerifyChangeTest {
     private static final Double THRESHOLD = Double.parseDouble(System.getProperty("threshold"));
 
     @Test
-    public void changeShouldNotBeThanThreshold() throws IOException {
+    public void changeShouldBeLessThanThreshold() throws IOException {
 
         final List<File> twoLastFiles = getTwoLastFiles();
 
@@ -68,7 +68,7 @@ public class VerifyChangeTest {
         String notifyReport = String.format("Two last performance reports were compared: \n\t\t'%s' \n\tand\n\t\t'%s'\n",
                                             previousFile.getName(),
                                             newFile.getName());
-        notifyReport += "Some performance metrics have been changed bigger than " + (THRESHOLD * 100) + "%:\n";
+        notifyReport += "Some performance metrics have become bigger than " + (THRESHOLD * 100) + "%:\n";
         final Iterator<Map.Entry<String, Double>> iterator = compared.entrySet().iterator();
         while (iterator.hasNext()) {
             final Map.Entry<String, Double> entry = iterator.next();

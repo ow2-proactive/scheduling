@@ -66,6 +66,10 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
     static final String RM_CONFIGURATION_RESTART = NodeRecoveryTest.class.getResource("/performancetests/config/rm-restart.ini")
                                                                          .getPath();
 
+    /**
+     * @return an array of parameters which is used by JUnit to create objects of NodeRecoveryTest,
+     *         where first value represents nodes number to recover, and second value sets time limit to recovery.
+     */
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] { { 10, 5000 }, { 100, 5000 }, { 500, 10000 }, { 1000, 20000 } });

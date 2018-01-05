@@ -69,6 +69,10 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     private static final Logger LOGGER = Logger.getLogger(JobRecoveryTest.class);
 
+    /**
+     * @return an array of parameters which is used by JUnit to create objects of JobRecoveryTest,
+     *         where first value represents jobs number to recover, and second value sets time limit to recovery.
+     */
     @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] { { 10, 1000 }, { 100, 2000 }, { 500, 5000 }, { 1000, 10000 } });
