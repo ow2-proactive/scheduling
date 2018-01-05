@@ -700,7 +700,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             // task launcher
             taskExecutionSubmittedFuture.get(DOTASK_ACTION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            logger.warn("Could not wait for the task to be started on TaskLauncher.", e);
+            logger.warn("Error while waiting for the task to be started.", e);
         }
     }
 
