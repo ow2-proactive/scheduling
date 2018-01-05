@@ -667,14 +667,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                                                                    terminateNotificationNodeURL),
                                                                                              DOTASK_ACTION_TIMEOUT,
                                                                                              TimeUnit.MILLISECONDS);
-                    try {
-                        // before signaling that the task is started, we need
-                        // to make sure the task is correctly submitted to the
-                        // task launcher
-                        taskExecutionSubmittedFuture.get(DOTASK_ACTION_TIMEOUT, TimeUnit.MILLISECONDS);
-                    } catch (Exception e) {
-                        logger.warn("Could not wait for the task to be started on TaskLauncher.", e);
-                    }
+                    waitForTaskToBeStarted(taskExecutionSubmittedFuture);
 
                     finalizeStarting(job, task, node, launcher);
                     return true;
@@ -698,6 +691,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
         }
 
+    }
+
+    private void waitForTaskToBeStarted(Future<Void> taskExecutionSubmittedFuture) {
+        try {
+            // before signaling that the task is started, we need
+            // to make sure the task is correctly submitted to the
+            // task launcher
+            taskExecutionSubmittedFuture.get(DOTASK_ACTION_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            logger.warn("Could not wait for the task to be started on TaskLauncher.", e);
+        }
     }
 
     /**
