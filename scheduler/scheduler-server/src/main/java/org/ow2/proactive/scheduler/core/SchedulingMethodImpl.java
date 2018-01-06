@@ -36,6 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -115,15 +116,19 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
+    private final String terminateNotificationNodeURL;
+
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
         this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
         terminateNotification = new TerminateNotification(schedulingService);
+        Node terminateNotificationNode = NodeFactory.createLocalNode("taskTerminationNode",
+                                                                     true,
+                                                                     "taskTerminationVNode");
         terminateNotification = PAActiveObject.turnActive(terminateNotification,
                                                           TaskTerminateNotification.class.getName(),
-                                                          NodeFactory.createLocalNode("taskTerminationNode",
-                                                                                      true,
-                                                                                      "taskTerminationVNode"));
+                                                          terminateNotificationNode);
+        terminateNotificationNodeURL = terminateNotificationNode.getNodeInformation().getURL();
 
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
                                                                        new NamedThreadFactory("DoTask_Action"));
@@ -653,22 +658,18 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
-                    String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
-                                                                        .getNodeInformation()
-                                                                        .getURL();
-
-                    threadPool.submitWithTimeout(new TimedDoTaskAction(job,
-                                                                       taskDescriptor,
-                                                                       launcher,
-                                                                       schedulingService,
-                                                                       terminateNotification,
-                                                                       corePrivateKey,
-                                                                       terminateNotificationNodeURL),
-                                                 DOTASK_ACTION_TIMEOUT,
-                                                 TimeUnit.MILLISECONDS);
+                    Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
+                                                                                                                   taskDescriptor,
+                                                                                                                   launcher,
+                                                                                                                   schedulingService,
+                                                                                                                   terminateNotification,
+                                                                                                                   corePrivateKey,
+                                                                                                                   terminateNotificationNodeURL),
+                                                                                             DOTASK_ACTION_TIMEOUT,
+                                                                                             TimeUnit.MILLISECONDS);
+                    waitForTaskToBeStarted(taskExecutionSubmittedFuture);
 
                     finalizeStarting(job, task, node, launcher);
-
                     return true;
                 } catch (Exception t) {
                     try {
@@ -690,6 +691,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
         }
 
+    }
+
+    private void waitForTaskToBeStarted(Future<Void> taskExecutionSubmittedFuture) {
+        try {
+            // before signaling that the task is started, we need
+            // to make sure the task is correctly submitted to the
+            // task launcher
+            taskExecutionSubmittedFuture.get(DOTASK_ACTION_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            logger.warn("Error while waiting for the task to be started.", e);
+        }
     }
 
     /**
