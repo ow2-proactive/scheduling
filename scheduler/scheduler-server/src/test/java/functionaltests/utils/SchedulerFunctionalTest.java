@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
@@ -43,11 +44,17 @@ import org.ow2.tests.ProActiveTest;
 
 
 /**
- * 
  * The parent class for all consecutive functional tests.
- *
  */
 public class SchedulerFunctionalTest extends ProActiveTest {
+
+    static {
+        configureLog4jForPerformanceTests();
+    }
+
+    private static final void configureLog4jForPerformanceTests() {
+        PropertyConfigurator.configure(SchedulerFunctionalTest.class.getResource("/performancetests/config/log4j.properties"));
+    }
 
     protected static final Logger logger = Logger.getLogger("SchedulerTests");
 
