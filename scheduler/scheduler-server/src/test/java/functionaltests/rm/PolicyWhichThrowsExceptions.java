@@ -30,23 +30,23 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
+import performancetests.helper.LogProcessor;
+
 
 public class PolicyWhichThrowsExceptions extends ExtendedSchedulerPolicy {
 
     static final Logger logger = Logger.getLogger(PolicyWhichThrowsExceptions.class);
 
-    private int counter = 0;
+    boolean thrown = false;
 
     @Override
     public boolean isTaskExecutable(NodeSet selectedNodes, EligibleTaskDescriptor task) {
-        logger.info("PolicyWhichThrowsExceptions::isTaskExecutable is called " + counter);
-        if (1 <= counter && counter <= 4) {
-            ++counter;
+        if (LogProcessor.linesThatMatch("job 1 started").size() == 1 &&
+            LogProcessor.linesThatMatch("job 1 finished").size() == 0 && thrown == false) {
+            thrown = true;
             throw new Error("This error is thrown to perform reconnection to RM");
         } else {
-            ++counter;
             return super.isTaskExecutable(selectedNodes, task);
         }
     }
-
 }

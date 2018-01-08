@@ -495,7 +495,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 descriptor = TopologyDescriptor.ARBITRARY;
             }
 
-
             try {
                 Criteria criteria = new Criteria(neededResourcesNumber);
                 criteria.setTopology(descriptor);
