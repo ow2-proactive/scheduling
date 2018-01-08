@@ -11,7 +11,6 @@ log4j.logger.org.ow2.proactive.scheduler=INFO
 log4j.logger.org.ow2.proactive.resourcemanager=INFO
 
 log4j.logger.org.ow2.proactive.scheduler.db=INFO
-log4j.logger.org.ow2.proactive.scheduler.core=INFO
 log4j.logger.org.ow2.proactive.scheduler.core.jmx=INFO
 log4j.logger.org.ow2.proactive.resourcemanager.core.jmx=INFO
 log4j.logger.org.ow2.proactive.resourcemanager.db=INFO
