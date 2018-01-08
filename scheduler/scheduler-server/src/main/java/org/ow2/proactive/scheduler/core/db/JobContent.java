@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -44,6 +45,8 @@ import javax.persistence.Transient;
 
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -59,9 +62,12 @@ import org.ow2.proactive.scheduler.util.ByteCompressionUtils;
  *
  */
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteJobContentInBulk", query = "delete from JobContent where id in :jobIdList"),
-                @NamedQuery(name = "loadJobContent", query = "from JobContent as content where content.jobId = :id"),
-                @NamedQuery(name = "countJobContent", query = "select count (*) from JobContent") })
+@Cacheable
+@Cache(include = "non-lazy", usage = CacheConcurrencyStrategy.READ_WRITE)
+@NamedQueries({
+        @NamedQuery(name = "deleteJobContentInBulk", query = "delete from JobContent where id in :jobIdList"),
+        @NamedQuery(name = "loadJobContent", query = "from JobContent as content where content.jobId = :id"),
+        @NamedQuery(name = "countJobContent", query = "select count (*) from JobContent") })
 @Table(name = "JOB_CONTENT", indexes = { @Index(name = "INITIAL_JOB_INDEX", columnList = "JOB_ID") })
 public class JobContent implements Serializable {
 
@@ -75,7 +81,8 @@ public class JobContent implements Serializable {
     @Id
     @Column(name = "JOB_ID", unique = true, nullable = false)
     @GeneratedValue(generator = "keyGenerator")
-    @GenericGenerator(name = "keyGenerator", strategy = "foreign", parameters = { @Parameter(value = "jobData", name = "property") })
+    @GenericGenerator(name = "keyGenerator", strategy = "foreign", parameters = {
+            @Parameter(value = "jobData", name = "property") })
     private Long jobId;
 
     @ManyToOne(fetch = FetchType.LAZY)

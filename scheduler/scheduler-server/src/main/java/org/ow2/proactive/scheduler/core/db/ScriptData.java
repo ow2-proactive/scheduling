@@ -28,12 +28,27 @@ package org.ow2.proactive.scheduler.core.db;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
 
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
@@ -46,11 +61,14 @@ import org.ow2.proactive.scripting.SimpleScript;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteScriptData", query = "delete from ScriptData where taskData.id.jobId = :jobId"),
-                @NamedQuery(name = "deleteScriptDataInBulk", query = "delete from ScriptData where taskData.id.jobId in :jobIdList"),
-                @NamedQuery(name = "countScriptData", query = "select count (*) from ScriptData") })
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@NamedQueries({
+        @NamedQuery(name = "deleteScriptData", query = "delete from ScriptData where taskData.id.jobId = :jobId"),
+        @NamedQuery(name = "deleteScriptDataInBulk", query = "delete from ScriptData where taskData.id.jobId in :jobIdList"),
+        @NamedQuery(name = "countScriptData", query = "select count (*) from ScriptData") })
 @BatchSize(size = 100)
-public class ScriptData {
+public class ScriptData implements Serializable {
 
     private long id;
 
@@ -60,7 +78,7 @@ public class ScriptData {
 
     private String url;
 
-    private List<Serializable> scriptParameters;
+    private List<String> scriptParameters;
 
     private String flowScriptActionType;
 
@@ -74,7 +92,7 @@ public class ScriptData {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-                           @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskData() {
         return taskData;
     }
@@ -109,11 +127,8 @@ public class ScriptData {
         if (flowScriptActionType.equals(FlowActionType.CONTINUE.toString())) {
             return FlowScript.createContinueFlowScript();
         } else if (flowScriptActionType.equals(FlowActionType.IF.toString())) {
-            return FlowScript.createIfFlowScript(getScript(),
-                                                 getScriptEngine(),
-                                                 getFlowScriptTarget(),
-                                                 getFlowScriptTargetElse(),
-                                                 getFlowScriptTargetContinuation());
+            return FlowScript.createIfFlowScript(getScript(), getScriptEngine(), getFlowScriptTarget(),
+                    getFlowScriptTargetElse(), getFlowScriptTargetContinuation());
         } else if (flowScriptActionType.equals(FlowActionType.LOOP.toString())) {
             return FlowScript.createLoopFlowScript(getScript(), getScriptEngine(), getFlowScriptTarget());
         }
@@ -151,7 +166,11 @@ public class ScriptData {
             scriptData.setURL(script.getScriptUrl().toExternalForm());
         }
         if (script.getParameters() != null) {
-            scriptData.setScriptParameters(Arrays.asList(script.getParameters()));
+            List<String> parameters = new ArrayList<String>();
+            for (Serializable scriptParameter : script.getParameters()) {
+                parameters.add(scriptParameter.toString());
+            }
+            scriptData.setScriptParameters(parameters);
         }
     }
 
@@ -198,11 +217,11 @@ public class ScriptData {
 
     @Column(name = "PARAMETERS", length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public List<Serializable> getScriptParameters() {
+    public List<String> getScriptParameters() {
         return scriptParameters;
     }
 
-    public void setScriptParameters(List<Serializable> scriptParameters) {
+    public void setScriptParameters(List<String> scriptParameters) {
         this.scriptParameters = scriptParameters;
     }
 

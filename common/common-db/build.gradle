@@ -16,6 +16,10 @@ dependencies {
     compile('org.hibernate:hibernate-core:5.1.0.Final') {
         exclude group: 'org.javassist', module: 'javassist'
     }
+    compile('org.hibernate:hibernate-ehcache:5.1.0.Final') {
+        exclude group: 'org.javassist', module: 'javassist'
+    }
+    
     runtime('org.hibernate:hibernate-hikaricp:5.1.0.Final') {
         exclude group: 'org.javassist', module: 'javassist'
     }

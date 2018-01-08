@@ -25,11 +25,11 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.SchedulerStateImpl;
@@ -42,7 +42,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 /**
  * @author ActiveEon Team
  */
-public class RecoveredSchedulerState {
+public class RecoveredSchedulerState implements Serializable {
 
     private static final Logger logger = Logger.getLogger(RecoveredSchedulerState.class);
 
@@ -98,11 +98,12 @@ public class RecoveredSchedulerState {
         }
     }
 
-    private void enableLiveLogsForRunningTask(SchedulingService schedulingService, InternalJob job, InternalTask task) {
+    private void enableLiveLogsForRunningTask(SchedulingService schedulingService, InternalJob job,
+            InternalTask task) {
         if (task.getStatus() == TaskStatus.RUNNING && task.getExecuterInformation() != null) {
             try {
-                schedulingService.getListenJobLogsSupport()
-                                 .activeLogsIfNeeded(job.getId(), task.getExecuterInformation().getLauncher());
+                schedulingService.getListenJobLogsSupport().activeLogsIfNeeded(job.getId(),
+                        task.getExecuterInformation().getLauncher());
             } catch (LogForwardingException e) {
                 logger.warn("Failed to activate logs for task " + task.getId(), e);
             }

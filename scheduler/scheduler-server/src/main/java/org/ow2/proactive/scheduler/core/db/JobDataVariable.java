@@ -25,17 +25,35 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import javax.persistence.*;
+import java.io.Serializable;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteJobDataVariable", query = "delete from JobDataVariable where jobData.id = :jobId"),
-                @NamedQuery(name = "deleteJobDataVariableInBulk", query = "delete from JobDataVariable where jobData.id in :jobIdList"),
-                @NamedQuery(name = "countJobDataVariable", query = "select count (*) from JobDataVariable") })
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@NamedQueries({
+        @NamedQuery(name = "deleteJobDataVariable", query = "delete from JobDataVariable where jobData.id = :jobId"),
+        @NamedQuery(name = "deleteJobDataVariableInBulk", query = "delete from JobDataVariable where jobData.id in :jobIdList"),
+        @NamedQuery(name = "countJobDataVariable", query = "select count (*) from JobDataVariable") })
 @Table(name = "JOB_DATA_VARIABLE")
-public class JobDataVariable {
+public class JobDataVariable implements Serializable {
 
     private long id;
 

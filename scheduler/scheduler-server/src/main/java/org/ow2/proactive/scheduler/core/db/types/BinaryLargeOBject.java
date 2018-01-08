@@ -75,8 +75,7 @@ public class BinaryLargeOBject implements UserType {
     public Object nullSafeGet(ResultSet rs, String[] names, SessionImplementor s, Object owner)
             throws HibernateException, SQLException {
         /*
-         * Blob blob = rs.getBlob(names[0]);
-         * return deserialize(blob);
+         * Blob blob = rs.getBlob(names[0]); return deserialize(blob);
          */
         byte[] bytes = rs.getBytes(names[0]);
         try {
@@ -151,34 +150,14 @@ public class BinaryLargeOBject implements UserType {
     }
 
     /*
-     * private Blob serialize(Object o) {
-     * try {
-     * return new SerialBlob(ObjectToByteConverter.ObjectStream.convert(o));
-     * } catch (Exception e) {
-     * logger.error("", e);
-     * return null;
-     * }
-     * }
+     * private Blob serialize(Object o) { try { return new
+     * SerialBlob(ObjectToByteConverter.ObjectStream.convert(o)); } catch (Exception e) {
+     * logger.error("", e); return null; } }
      * 
-     * private Object deserialize(Blob blob) {
-     * ObjectInputStream ois = null;
-     * try {
-     * ois = new ObjectInputStream(blob.getBinaryStream());
-     * Object o = ois.readObject();
-     * return o;
-     * } catch (Exception e) {
-     * logger.error("", e);
-     * return null;
-     * } finally {
-     * if (ois != null) {
-     * try {
-     * ois.close();
-     * } catch (IOException e) {
-     * // Nothing to do
-     * }
-     * }
-     * }
-     * }
+     * private Object deserialize(Blob blob) { ObjectInputStream ois = null; try { ois = new
+     * ObjectInputStream(blob.getBinaryStream()); Object o = ois.readObject(); return o; } catch
+     * (Exception e) { logger.error("", e); return null; } finally { if (ois != null) { try {
+     * ois.close(); } catch (IOException e) { // Nothing to do } } } }
      */
 
 }

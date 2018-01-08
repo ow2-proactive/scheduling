@@ -25,18 +25,39 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import javax.persistence.*;
+import java.io.Serializable;
 
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteTaskDataVariable", query = "delete from TaskDataVariable where taskData.id.jobId = :jobId"),
-                @NamedQuery(name = "deleteTaskDataVariableInBulk", query = "delete from TaskDataVariable where taskData.id.jobId in :jobIdList"),
-                @NamedQuery(name = "countTaskDataVariable", query = "select count (*) from TaskDataVariable") })
-@Table(name = "TASK_DATA_VARIABLE", indexes = { @Index(name = "TASK_DATA_VARIABLE_JOB_ID", columnList = "JOB_ID"),
-                                                @Index(name = "TASK_DATA_VARIABLE_TASK_ID", columnList = "TASK_ID") })
-public class TaskDataVariable {
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@NamedQueries({
+        @NamedQuery(name = "deleteTaskDataVariable", query = "delete from TaskDataVariable where taskData.id.jobId = :jobId"),
+        @NamedQuery(name = "deleteTaskDataVariableInBulk", query = "delete from TaskDataVariable where taskData.id.jobId in :jobIdList"),
+        @NamedQuery(name = "countTaskDataVariable", query = "select count (*) from TaskDataVariable") })
+@Table(name = "TASK_DATA_VARIABLE", indexes = {
+        @Index(name = "TASK_DATA_VARIABLE_JOB_ID", columnList = "JOB_ID"),
+        @Index(name = "TASK_DATA_VARIABLE_TASK_ID", columnList = "TASK_ID") })
+public class TaskDataVariable implements Serializable {
 
     private long id;
 
@@ -73,7 +94,7 @@ public class TaskDataVariable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-                           @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskData() {
         return taskData;
     }

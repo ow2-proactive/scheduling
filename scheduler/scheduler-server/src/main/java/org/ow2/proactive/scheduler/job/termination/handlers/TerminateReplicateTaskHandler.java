@@ -64,9 +64,13 @@ public class TerminateReplicateTaskHandler {
         int runs = action.getDupNumber();
 
         logger.info("Control Flow Action REPLICATE (runs:" + runs + ")");
+        logger.info("XXXXXXX START ALL...");
+        long startAll = System.currentTimeMillis();
         List<InternalTask> toReplicate = new ArrayList<>();
 
         // find the tasks that need to be replicated
+        logger.info("XXXXXXX START 1...");
+        long start1 = System.currentTimeMillis();
         for (InternalTask internalTask : internalJob.getIHMTasks().values()) {
             List<InternalTask> internalTaskDependencies = internalTask.getIDependences() == null ? new ArrayList<InternalTask>()
                                                                                                  : internalTask.getIDependences();
@@ -81,8 +85,11 @@ public class TerminateReplicateTaskHandler {
                 }
             }
         }
+        logger.info("XXXXXXX END 1 :" + (System.currentTimeMillis() - start1));
 
         // for each initial task to replicate
+        logger.info("XXXXXXX START 2...");
+        long start2 = System.currentTimeMillis();
         for (InternalTask internalTaskToReplicate : toReplicate) {
 
             // determine the target of the replication whether it is a block or
@@ -112,6 +119,8 @@ public class TerminateReplicateTaskHandler {
             }
 
             // for each number of parallel run
+            logger.info("XXXXXXX START 3...");
+            long start3 = System.currentTimeMillis();
             for (int i = 1; i < runs; i++) {
 
                 // accumulates the tasks between the initiator and the target
@@ -139,6 +148,8 @@ public class TerminateReplicateTaskHandler {
                 InternalTask newEnd = null;
 
                 // configure the new tasks
+                logger.info("XXXXXXX START 4...");
+                long start4 = System.currentTimeMillis();
                 for (InternalTask internalTask : tasksBetweenInitiatorAndTarget.values()) {
                     internalTask.setJobInfo(((JobInfoImpl) internalJob.getJobInfo()));
                     int dupIndex = getNextReplicationIndex(InternalTask.getInitialName(internalTask.getName()),
@@ -147,9 +158,12 @@ public class TerminateReplicateTaskHandler {
                     internalTask.setReplicationIndex(dupIndex);
                     assignReplicationTag(internalTask, initiator, false, action);
                 }
+                logger.info("XXXXXXX END 4 :" + (System.currentTimeMillis() - start4));
                 changesInfo.newTasksAdded(tasksBetweenInitiatorAndTarget.values());
 
                 // find the beginning and the ending of the replicated block
+                logger.info("XXXXXXX START 5...");
+                long start5 = System.currentTimeMillis();
                 for (Entry<TaskId, InternalTask> tasksBetweenInitiatorAndTargetEntry : tasksBetweenInitiatorAndTarget.entrySet()) {
                     InternalTask internalBlockTask = tasksBetweenInitiatorAndTargetEntry.getValue();
 
@@ -163,6 +177,8 @@ public class TerminateReplicateTaskHandler {
                         // have added them all
                     }
                     // connect the last task of the block with the merge task(s)
+                    logger.info("XXXXXXX START 6...");
+                    long start6 = System.currentTimeMillis();
                     if (target.getId().equals(tasksBetweenInitiatorAndTargetEntry.getKey())) {
                         newEnd = internalBlockTask;
 
@@ -184,7 +200,9 @@ public class TerminateReplicateTaskHandler {
                             changesInfo.taskUpdated(internalTask);
                         }
                     }
+                    logger.info("XXXXXXX END 6 :" + (System.currentTimeMillis() - start6));
                 }
+                logger.info("XXXXXXX END 5 :" + (System.currentTimeMillis() - start5));
 
                 // propagate the changes on the JobDescriptor
                 internalJob.getJobDescriptor().doReplicate(taskId,
@@ -194,9 +212,14 @@ public class TerminateReplicateTaskHandler {
                                                            newEnd.getId());
 
             }
+            logger.info("XXXXXXX END 3 :" + (System.currentTimeMillis() - start3));
         }
 
+        logger.info("XXXXXXX END 2 :" + (System.currentTimeMillis() - start2));
+
         // notify frontend that tasks were added to the job
+        logger.info("XXXXXXX START 7...");
+        long start7 = System.currentTimeMillis();
         ((JobInfoImpl) internalJob.getJobInfo()).setTasksChanges(changesInfo, internalJob);
         if (frontend != null) {
             frontend.jobStateUpdated(internalJob.getOwner(),
@@ -206,10 +229,13 @@ public class TerminateReplicateTaskHandler {
             frontend.jobUpdatedFullData(internalJob);
         }
         ((JobInfoImpl) internalJob.getJobInfo()).clearTasksChanges();
+        logger.info("XXXXXXX END 7 :" + (System.currentTimeMillis() - start7));
 
         // no jump is performed ; now that the tasks have been replicated and
         // configured, the flow can continue its normal operation
         internalJob.getJobDescriptor().terminate(taskId);
+
+        logger.info("XXXXXXX END ALL :" + (System.currentTimeMillis() - startAll));
 
         return true;
     }

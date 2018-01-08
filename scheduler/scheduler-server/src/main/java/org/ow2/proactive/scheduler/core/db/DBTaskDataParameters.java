@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,7 +41,7 @@ import com.google.common.base.Strings;
  *
  * @author ActiveEon Team
  */
-public class DBTaskDataParameters {
+public class DBTaskDataParameters implements Serializable {
 
     private final String tag;
 
@@ -235,19 +236,13 @@ public class DBTaskDataParameters {
         }
 
         public Builder but() {
-            return create().setTag(tag)
-                           .setFrom(from)
-                           .setTo(to)
-                           .setOffset(offset)
-                           .setLimit(limit)
-                           .setPending(pending)
-                           .setRunning(running)
-                           .setFinished(finished)
-                           .setSortParams(sortParams);
+            return create().setTag(tag).setFrom(from).setTo(to).setOffset(offset).setLimit(limit)
+                    .setPending(pending).setRunning(running).setFinished(finished).setSortParams(sortParams);
         }
 
         public DBTaskDataParameters build() {
-            return new DBTaskDataParameters(tag, from, to, offset, limit, user, pending, running, finished, sortParams);
+            return new DBTaskDataParameters(tag, from, to, offset, limit, user, pending, running, finished,
+                sortParams);
         }
     }
 

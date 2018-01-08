@@ -27,16 +27,29 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteThirdPartyCredentialsKeySetByUsernameAndKey", query = "delete from ThirdPartyCredentialData where username = :username and key = :key"),
-                @NamedQuery(name = "findThirdPartyCredentialsKeySetByUsername", query = "select key from ThirdPartyCredentialData where username = :username"),
-                @NamedQuery(name = "findThirdPartyCredentialsMapByUsername", query = "select key, encryptedSymmetricKey, encryptedValue " +
-                                                                                     "from ThirdPartyCredentialData " + "where username = :username"),
-                @NamedQuery(name = "hasThirdPartyCredentials", query = "select count(*) from ThirdPartyCredentialData where username = :username"),
-                @NamedQuery(name = "countThirdPartyCredentialData", query = "select count (*) from ThirdPartyCredentialData") })
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@NamedQueries({
+        @NamedQuery(name = "deleteThirdPartyCredentialsKeySetByUsernameAndKey", query = "delete from ThirdPartyCredentialData where username = :username and key = :key"),
+        @NamedQuery(name = "findThirdPartyCredentialsKeySetByUsername", query = "select key from ThirdPartyCredentialData where username = :username"),
+        @NamedQuery(name = "findThirdPartyCredentialsMapByUsername", query = "select key, encryptedSymmetricKey, encryptedValue " +
+            "from ThirdPartyCredentialData " + "where username = :username"),
+        @NamedQuery(name = "hasThirdPartyCredentials", query = "select count(*) from ThirdPartyCredentialData where username = :username"),
+        @NamedQuery(name = "countThirdPartyCredentialData", query = "select count (*) from ThirdPartyCredentialData") })
 @Table(name = "THIRD_PARTY_CREDENTIAL_DATA")
 public class ThirdPartyCredentialData implements Serializable {
 
@@ -62,7 +75,8 @@ public class ThirdPartyCredentialData implements Serializable {
     public ThirdPartyCredentialData() {
     }
 
-    public ThirdPartyCredentialData(String username, String key, byte[] encryptedSymmetricKey, byte[] encryptedValue) {
+    public ThirdPartyCredentialData(String username, String key, byte[] encryptedSymmetricKey,
+            byte[] encryptedValue) {
         this.username = username;
         this.key = key;
         this.encryptedSymmetricKey = encryptedSymmetricKey;
@@ -81,7 +95,7 @@ public class ThirdPartyCredentialData implements Serializable {
         ThirdPartyCredentialData that = (ThirdPartyCredentialData) o;
 
         return !(key != null ? !key.equals(that.key) : that.key != null) &&
-               !(username != null ? !username.equals(that.username) : that.username != null);
+            !(username != null ? !username.equals(that.username) : that.username != null);
 
     }
 

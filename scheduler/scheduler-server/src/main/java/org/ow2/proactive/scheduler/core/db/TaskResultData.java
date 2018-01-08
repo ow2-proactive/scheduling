@@ -25,10 +25,29 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
 import java.util.Map;
 
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
@@ -41,16 +60,23 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteTaskResultDataInBulk", query = "delete from TaskResultData where taskRuntimeData.jobData.id in :jobIdList"),
-                @NamedQuery(name = "loadJobResult", query = "select taskResult, " + "task.id, " + "task.taskName, " +
-                                                            "task.preciousResult from TaskResultData as taskResult left outer join taskResult.taskRuntimeData as task " + "where task.jobData = :job order by task.id, taskResult.resultTime desc"),
-                @NamedQuery(name = "loadTasksResultByJobAndTaskName", query = "select id, taskName from TaskData where taskName = :taskName and jobData = :job"),
-                @NamedQuery(name = "loadTasksResultByTask", query = "from TaskResultData result where result.taskRuntimeData = :task order by result.resultTime desc"),
-                @NamedQuery(name = "loadTasksResults", query = "select taskResult, " + "task.id, " + "task.taskName, " +
-                                                               "task.preciousResult from TaskResultData as taskResult join taskResult.taskRuntimeData as task " + "where task.id in (:tasksIds) order by task.id, taskResult.resultTime desc"),
-                @NamedQuery(name = "countTaskResultData", query = "select count (*) from TaskResultData") })
-@Table(name = "TASK_RESULT_DATA", indexes = { @Index(name = "TASK_RESULT_DATA_RUNTIME_DATA", columnList = "JOB_ID,TASK_ID") })
-public class TaskResultData {
+@Cacheable
+@Cache(include = "non-lazy", usage = CacheConcurrencyStrategy.READ_WRITE)
+@NamedQueries({
+        @NamedQuery(name = "deleteTaskResultDataInBulk", query = "delete from TaskResultData where taskRuntimeData.jobData.id in :jobIdList"),
+        @NamedQuery(name = "loadJobResult", query = "select taskResult, " + "task.id, " + "task.taskName, " +
+            "task.preciousResult from TaskResultData as taskResult left outer join taskResult.taskRuntimeData as task " +
+            "where task.jobData = :job order by task.id, taskResult.resultTime desc"),
+        @NamedQuery(name = "loadTasksResultByJobAndTaskName", query = "select id, taskName from TaskData where taskName = :taskName and jobData = :job"),
+        @NamedQuery(name = "loadTasksResultByTask", query = "from TaskResultData result where result.taskRuntimeData = :task order by result.resultTime desc"),
+        @NamedQuery(name = "loadTasksResults", query = "select taskResult, " + "task.id, " +
+            "task.taskName, " +
+            "task.preciousResult from TaskResultData as taskResult join taskResult.taskRuntimeData as task " +
+            "where task.id in (:tasksIds) order by task.id, taskResult.resultTime desc"),
+        @NamedQuery(name = "countTaskResultData", query = "select count (*) from TaskResultData") })
+@Table(name = "TASK_RESULT_DATA", indexes = {
+        @Index(name = "TASK_RESULT_DATA_RUNTIME_DATA", columnList = "JOB_ID,TASK_ID") })
+public class TaskResultData implements Serializable {
 
     private long id;
 
@@ -76,13 +102,8 @@ public class TaskResultData {
 
     TaskResultImpl toTaskResult(TaskId taskId) {
 
-        TaskResultImpl result = new TaskResultImpl(taskId,
-                                                   getSerializedValue(),
-                                                   getSerializedException(),
-                                                   getLogs(),
-                                                   getMetadata(),
-                                                   getPropagatedVariables(),
-                                                   isRaw());
+        TaskResultImpl result = new TaskResultImpl(taskId, getSerializedValue(), getSerializedException(),
+            getLogs(), getMetadata(), getPropagatedVariables(), isRaw());
 
         result.setPreviewerClassName(getPreviewerClassName());
         FlowActionData actionData = getFlowAction();
@@ -157,7 +178,7 @@ public class TaskResultData {
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-                           @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskRuntimeData() {
         return taskRuntimeData;
     }

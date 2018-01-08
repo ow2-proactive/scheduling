@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -32,7 +34,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 
 
 @Embeddable
-public class FlowActionData {
+public class FlowActionData implements Serializable {
 
     private FlowActionType type;
 

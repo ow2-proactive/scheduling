@@ -231,13 +231,15 @@ public class TaskLauncher implements InitActive {
                     return;
             }
 
+            logger.info("XXXXXXX START 20...");
+            long start20 = System.currentTimeMillis();
             dataspaces.copyScratchDataToOutput(initializer.getFilteredOutputFiles(fileSelectorsFilters(context,
                                                                                                        taskResult)));
-
             wallTimer.stop();
 
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
             taskResult.setLogs(taskLogger.getLogs());
+            logger.info("XXXXXXX END 20 :" + (System.currentTimeMillis() - start20));
 
             sendResultToScheduler(rebindedTerminateNotification, taskResult);
         } catch (Throwable taskFailure) {

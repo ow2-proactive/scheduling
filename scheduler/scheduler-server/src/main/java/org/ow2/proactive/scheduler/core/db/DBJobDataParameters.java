@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +40,7 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
  * Utility container to pass multiple parameters for jobs requests.
  *
  */
-public class DBJobDataParameters {
+public class DBJobDataParameters implements Serializable {
     private final int offset;
 
     private final int limit;
@@ -56,8 +57,8 @@ public class DBJobDataParameters {
 
     private final Set<JobStatus> status;
 
-    DBJobDataParameters(int offset, int limit, String user, boolean pending, boolean running, boolean finished,
-            List<SortParameter<JobSortParameter>> sortParameters) {
+    DBJobDataParameters(int offset, int limit, String user, boolean pending, boolean running,
+            boolean finished, List<SortParameter<JobSortParameter>> sortParameters) {
         this.offset = offset;
         this.limit = limit;
         this.user = user;

@@ -51,7 +51,8 @@ public class NonEmptyMapToBlobType extends SerializableToBlobType {
     }
 
     @Override
-    public void set(PreparedStatement st, Object value, int index, SessionImplementor session) throws SQLException {
+    public void set(PreparedStatement st, Object value, int index, SessionImplementor session)
+            throws SQLException {
         if (value instanceof Map && ((Map) value).isEmpty()) {
             st.setNull(index, sqlTypes(null)[0]);
         } else {

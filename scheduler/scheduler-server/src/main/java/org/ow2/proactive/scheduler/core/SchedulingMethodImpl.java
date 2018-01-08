@@ -180,6 +180,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private int startTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Map<JobId, JobDescriptor> toUnlock) {
         try {
+            logger.info("XXXXXXX START 8...");
+            long start8 = System.currentTimeMillis();
             List<JobDescriptor> descriptors = new ArrayList<>(jobMap.values());
 
             //get rmState and update it in scheduling policy
@@ -190,16 +192,26 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
 
             // ask the policy all the tasks to be schedule according to the jobs list.
+            logger.info("XXXXXXX START 9...");
+            long start9 = System.currentTimeMillis();
             LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy = currentPolicy.getOrderedTasks(descriptors);
+            logger.info("XXXXXXX END 9 :" + (System.currentTimeMillis() - start9));
 
             //if there is no task to scheduled, return without starting any task
             if (fullListOfTaskRetrievedFromPolicy == null || fullListOfTaskRetrievedFromPolicy.isEmpty()) {
                 return 0;
             }
-
+            logger.info("XXXXXXX START 10...");
+            long start10 = System.currentTimeMillis();
             toUnlock = unlockResources(toUnlock);
+            logger.info("XXXXXXX END 10 :" + (System.currentTimeMillis() - start10));
+            int totTasksStarted = getNumberOfTaskStarted(currentPolicy,
+                                                         jobMap,
+                                                         freeResources,
+                                                         fullListOfTaskRetrievedFromPolicy);
 
-            return getNumberOfTaskStarted(currentPolicy, jobMap, freeResources, fullListOfTaskRetrievedFromPolicy);
+            logger.info("XXXXXXX END 8 :" + (System.currentTimeMillis() - start8));
+            return totTasksStarted;
         } finally {
             if (toUnlock != null) {
                 schedulingService.unlockJobsToSchedule(toUnlock.values());

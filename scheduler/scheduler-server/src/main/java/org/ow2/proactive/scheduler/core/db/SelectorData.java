@@ -25,10 +25,28 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.Serializable;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.Cacheable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
@@ -40,12 +58,15 @@ import org.ow2.proactive.scheduler.core.db.types.PatternType;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteSelectorData", query = "delete from SelectorData where taskData.id.jobId = :jobId"),
-                @NamedQuery(name = "deleteSelectorDataInBulk", query = "delete from SelectorData where taskData.id.jobId in :jobIdList"),
-                @NamedQuery(name = "countSelectorData", query = "select count (*) from SelectorData") })
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@NamedQueries({
+        @NamedQuery(name = "deleteSelectorData", query = "delete from SelectorData where taskData.id.jobId = :jobId"),
+        @NamedQuery(name = "deleteSelectorDataInBulk", query = "delete from SelectorData where taskData.id.jobId in :jobIdList"),
+        @NamedQuery(name = "countSelectorData", query = "select count (*) from SelectorData") })
 @Table(name = "DS_SELECTOR_DATA", indexes = { @Index(name = "DS_SELECTOR_DATA_JOB_ID", columnList = "JOB_ID"),
-                                              @Index(name = "DS_SELECTOR_DATA_TASK_ID", columnList = "TASK_ID") })
-public class SelectorData {
+        @Index(name = "DS_SELECTOR_DATA_TASK_ID", columnList = "TASK_ID") })
+public class SelectorData implements Serializable {
 
     private static final String INPUT_TYPE = "input";
 
@@ -129,7 +150,7 @@ public class SelectorData {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns(value = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
-                           @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
+            @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") })
     public TaskData getTaskData() {
         return taskData;
     }
