@@ -129,8 +129,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
         try {
             nodesFile = writeNodesFile(taskContext);
             VariablesMap variables = new VariablesMap();
-            variables.setInheritedMap(taskContextVariableExtractor.extractVariables(taskContext, nodesFile, false));
-            variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(taskContext));
+            variables.setInheritedMap(taskContextVariableExtractor.getAllNonTaskVariablesInjectNodesFile(taskContext,
+                                                                                                         nodesFile));
+            variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(taskContext));
             Map<String, String> resultMetadata = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);

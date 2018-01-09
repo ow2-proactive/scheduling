@@ -289,8 +289,7 @@ public class TaskLauncher implements InitActive {
     private Map<String, byte[]> extractVariablesFromContext(TaskContext context) {
         if (context != null) {
             try {
-                return SerializationUtil.serializeVariableMap(taskContextVariableExtractor.extractVariables(context,
-                                                                                                            false));
+                return SerializationUtil.serializeVariableMap(taskContextVariableExtractor.getAllNonTaskVariables(context));
             } catch (Exception e) {
                 e.printStackTrace(taskLogger.getErrorSink());
             }
@@ -346,11 +345,11 @@ public class TaskLauncher implements InitActive {
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)
             throws Exception {
-        return taskContextVariableExtractor.extractVariables(taskContext, taskResult, true);
+        return taskContextVariableExtractor.getAllVariablesWithTaskResult(taskContext, taskResult);
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext) throws Exception {
-        return taskContextVariableExtractor.extractVariables(taskContext, true);
+        return taskContextVariableExtractor.getAllVariables(taskContext);
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
@@ -372,8 +371,7 @@ public class TaskLauncher implements InitActive {
             String workingDirPath = taskContext.getInitializer().getForkEnvironment().getWorkingDir();
             if (workingDirPath != null) {
                 workingDirPath = VariableSubstitutor.filterAndUpdate(workingDirPath,
-                                                                     taskContextVariableExtractor.extractVariables(taskContext,
-                                                                                                                   true));
+                                                                     taskContextVariableExtractor.getAllVariables(taskContext));
                 workingDir = new File(workingDirPath);
             }
         }

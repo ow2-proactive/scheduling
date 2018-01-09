@@ -76,7 +76,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         if (taskContext == null) {
             return new ArrayList<>(0);
         }
-        Map<String, Serializable> variables = taskContextVariableExtractor.extractVariables(taskContext, true);
+        Map<String, Serializable> variables = taskContextVariableExtractor.getAllVariables(taskContext);
         String javaHome = System.getProperty("java.home");
         ArrayList<String> jvmArguments = new ArrayList<>(1);
 

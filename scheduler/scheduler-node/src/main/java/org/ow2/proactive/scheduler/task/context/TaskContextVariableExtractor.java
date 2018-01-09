@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.task.context;
 
+import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -36,50 +38,243 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
-import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
 
 
+/**
+ * This class will help you to create a Map containing all variables you need. I will
+ * also manage to resolve values following some constraints of VariableSubstitutor class.
+ */
 public class TaskContextVariableExtractor implements Serializable {
 
     private static final Logger logger = Logger.getLogger(TaskContextVariableExtractor.class);
 
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
 
-    public Map<String, String> extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(
-            TaskContext taskContext) throws Exception {
+    /**
+     * Retrieve all third party credential variables in a map.
+     *
+     * @param taskContext all information to extract third party credentials is here.
+     *
+     * @return map containing thirdPartyCredentials
+     */
+    public Map<String, String>
+            extractVariablesThirdPartyCredentialsAndSystemEnvironmentVariables(TaskContext taskContext) {
         ForkEnvironment forkEnvironment = taskContext.getInitializer().getForkEnvironment();
-        Map<String, Serializable> variables = this.extractVariables(taskContext, true);
-        Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
+        Map<String, Serializable> variables = new HashMap<>();
+
+        try {
+            variables = extractAllVariables(taskContext, null, "");
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Error reading variables from task context!");
+        }
+
+        Map<String, String> thirdPartyCredentials = new HashMap<>();
+
+        try {
+            thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
+        } catch (Exception e) {
+            logger.error("Error decrypting third party credentials!");
+        }
+
         HashMap<String, Serializable> systemEnvironmentVariables = new HashMap<String, Serializable>(System.getenv());
         systemEnvironmentVariables.putAll(variables);
         systemEnvironmentVariables.putAll(thirdPartyCredentials);
 
-        return VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(), systemEnvironmentVariables);
+        return filterAndUpdate(forkEnvironment.getSystemEnvironment(), systemEnvironmentVariables);
     }
 
-    public Map<String, Serializable> extractVariables(TaskContext taskContext, boolean useTaskVariables)
-            throws IOException, ClassNotFoundException {
-        return extractVariables(taskContext, (TaskResult) null, useTaskVariables);
+    /**
+     * Return all variables in scope of a given taskContext.
+     *
+     * @param taskContext task context container.
+     * @return Map containing all variables resolved.
+     */
+    public Map<String, Serializable> getScopeVariables(TaskContext taskContext) {
+        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Serializable> inherited = new HashMap<>();
+        Map<String, Serializable> dictionary = new HashMap<>();
+
+        try {
+            inherited.putAll(extractJobVariables(taskContext));
+            inherited.putAll(extractInheritedVariables(taskContext));
+            inherited.putAll(extractSystemVariables(taskContext, ""));
+
+            for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
+                if (!taskVariable.isJobInherited()) {
+                    //add non inherited variables
+                    variables.put(taskVariable.getName(), taskVariable.getValue());
+                } else if (!inherited.containsKey(taskVariable.getName())) {
+                    //but if the variable is inherited
+                    //replace by the inherited value if exists
+                    variables.put(taskVariable.getName(), taskVariable.getValue());
+                }
+            }
+
+            dictionary = extractAllVariables(taskContext, null, "");
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Error reading variables from task context!");
+        }
+        return resolveVariables(variables, dictionary);
     }
 
-    private Map<String, Serializable> extractVariables(TaskContext container, TaskResult taskResult, String nodesFile,
-            boolean useTaskVariables) throws IOException, ClassNotFoundException {
-        Map<String, Serializable> variables = extractVariables(container, taskResult, useTaskVariables);
+    /**
+     * Method to retrieve all variables in scope. Note it ignores TaskResult variables and nodesFile.
+     *
+     * @param taskContext task context container.
+     *
+     * @return Map containing all variables extracted.
+     *
+     */
+    public Map<String, Serializable> getAllNonTaskVariables(TaskContext taskContext) {
+        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Serializable> dictionary = new HashMap<>();
 
-        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), container.getOtherNodesURLs().size() + 1);
-        variables.put(SchedulerVars.PA_NODESFILE.toString(), nodesFile);
+        try {
+            if (taskContext != null) {
+                variables.putAll(extractInheritedVariables(taskContext));
+                variables.putAll(extractJobVariables(taskContext));
+                variables.putAll(extractSystemVariables(taskContext, ""));
+            }
+            dictionary = extractAllVariables(taskContext, null, "");
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Error reading variables from task context!");
+        }
 
-        variables.put(SchedulerVars.PA_TASK_PROGRESS_FILE.toString(), container.getProgressFilePath());
+        return resolveVariables(variables, dictionary);
+    }
+
+    /**
+     * Method to retrieve all variables in scope. Note it ignores TaskResult variables and nodesFile.
+     *
+     * @param taskContext task context container.
+     *
+     * @return Map containing all variables extracted.
+     */
+    public Map<String, Serializable> getAllNonTaskVariablesInjectNodesFile(TaskContext taskContext, String nodesFile) {
+        Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Serializable> dictionary = new HashMap<>();
+
+        try {
+            if (taskContext != null) {
+                variables.putAll(extractInheritedVariables(taskContext));
+                variables.putAll(extractJobVariables(taskContext));
+                variables.putAll(extractSystemVariables(taskContext, nodesFile));
+            }
+            dictionary = extractAllVariables(taskContext, null, nodesFile);
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Error reading variables from task context!");
+        }
+
+        return resolveVariables(variables, dictionary);
+    }
+
+    /**
+     * Return all variables available.
+     *
+     * @param taskContext context containing all variables inside.
+     * @param taskResult used to retrieve the result task variables.
+     *
+     * @return Map containing variables.
+     */
+    public Map<String, Serializable> getAllVariablesWithTaskResult(TaskContext taskContext, TaskResult taskResult) {
+        Map<String, Serializable> variables = new HashMap<>();
+        try {
+            variables = extractAllVariables(taskContext, taskResult, "");
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Error reading variables from task context!");
+        }
+        return resolveVariables(variables, variables);
+    }
+
+    /**
+     * Method to retrieve all variables in scope. Note it ignores TaskResult variables and nodesFile.
+     *
+     * @param taskContext
+     *
+     * @return Map containing all variables extracted.
+     */
+    public Map<String, Serializable> getAllVariables(TaskContext taskContext) {
+        Map<String, Serializable> variables = new HashMap<>();
+        try {
+            variables = extractAllVariables(taskContext, null, "");
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("Error reading variables from task context!");
+        }
+        return resolveVariables(variables, variables);
+    }
+
+    /**
+     * Creates a HashMap with variablesDictionary where values are resolved.
+     *
+     * Solve variables value if bound to another variable, for instance "var log=${LOG_ENV_VAR}", we
+     * expect that LOG_ENV_VAR is replaced by its value. To do so we have a variables hash, that must have
+     * all references and then for each variable we do a filterAndUpdate that will recursively replace
+     * when needed, @see VariableSubstitutor.
+     *
+     * Some limitations to consider: recursive substitution limit is VariableSubstitutor.MAXIMUM_DEPTH,
+     * if the variable value is a complex data structure (array, List, Vector) we will not substitute it.
+     *
+     * @param variables input hash containing variables and their values may reference other variables
+     * @return dictionary with the same variables however with their values resolved
+     */
+    private static Map<String, Serializable> resolveVariables(Map<String, Serializable> variables,
+            Map<String, Serializable> dictionary) {
+        Map<String, Serializable> dictionaryVariables = new HashMap<>();
+        for (Map.Entry<String, Serializable> entry : variables.entrySet()) {
+            String resolvedValue;
+            if (entry.getValue() instanceof String) {
+                resolvedValue = filterAndUpdate(entry.getValue().toString(), variables);
+                dictionaryVariables.put(entry.getKey(), resolvedValue);
+            } else {
+                dictionaryVariables.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return dictionaryVariables;
+    }
+
+    /**
+     * Extract all variables including task, inherited, and also variables from taskResult, this method must
+     * be called only internally. The public methods depend on the usage context:
+     *
+     * @param taskContext includes job variables, inherited variables, and task variables itself.
+     * @param taskResult  used to get the variables from taskResult, might be needed.
+     *
+     * @return map containing variables and unresolved values.
+     *
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private Map<String, Serializable> extractAllVariables(TaskContext taskContext, TaskResult taskResult,
+            String nodesFile) throws IOException, ClassNotFoundException {
+
+        Map<String, Serializable> variables = new HashMap<>();
+
+        if (taskContext != null) {
+            variables.putAll(extractJobVariables(taskContext));
+            variables.putAll(extractInheritedVariables(taskContext));
+            variables.putAll(extractTaskVariables(taskContext));
+            variables.putAll(extractSystemVariables(taskContext, nodesFile));
+
+        }
+
+        if (taskResult != null) {
+            variables.putAll(extractTaskResultVariables(taskResult));
+        }
 
         return variables;
     }
 
-    @SuppressWarnings("squid:S134")
-    public Map<String, Serializable> extractVariables(TaskContext taskContext, TaskResult taskResult,
-            boolean useTaskVariables) throws IOException, ClassNotFoundException {
+    /**
+     * Variables declared on the xml scheme for the workflow.
+     *
+     * @param taskContext object that contains it all.
+     *
+     * @return Map with the variables declared in xml at workflow level.
+     */
+    private Map<String, Serializable> extractJobVariables(TaskContext taskContext) {
         Map<String, Serializable> variables = new HashMap<>();
 
         // job variables from workflow definition
@@ -88,95 +283,97 @@ public class TaskContextVariableExtractor implements Serializable {
                 variables.put(jobVariable.getName(), jobVariable.getValue());
             }
         }
-
-        try {
-            // variables from previous tasks
-            if (taskContext.getPreviousTasksResults() != null) {
-                variables.putAll(extractPreviousTaskResultVariablesFromTaskContext(taskContext));
-            }
-
-            // task variables from workflow definition
-            if (useTaskVariables && taskContext.getInitializer().getTaskVariables() != null) {
-                for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
-                    if (!taskVariable.isJobInherited()) {
-                        variables.put(taskVariable.getName(), taskVariable.getValue());
-                    }
-                }
-            }
-
-            // and from this task execution
-            if (taskResult != null && taskResult.getPropagatedVariables() != null) {
-                variables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            logger.error("Could not deserialize variables", e);
-            throw e;
-        }
-
-        // variables from current job/task context
-        variables.putAll(retrieveContextVariables(taskContext.getInitializer()));
-
-        variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), taskContext.getSchedulerHome());
         return variables;
     }
 
-    public Map<String, Serializable> extractScopeVariables(TaskContext taskContext)
+    /**
+     * Extract variables from the task result, useful for composing post script actions with variable values.
+     *
+     * @param taskResult object that contains it all.
+     *
+     * @return Map with variables or empty hash if taskResult is null or empty.
+     *
+     * @throws IOException might be triggered during deserialization
+     * @throws ClassNotFoundException might be triggered during deserialization
+     */
+    private Map<String, Serializable> extractTaskResultVariables(TaskResult taskResult)
             throws IOException, ClassNotFoundException {
-        Map<String, Serializable> variables = new HashMap<>();
-
-        // variables from task definition
-        if (taskContext.getInitializer() != null && taskContext.getInitializer().getTaskVariables() != null) {
-            variables = appendNonInheritedTaskVariables(taskContext);
+        HashMap<String, Serializable> variables = new HashMap<>();
+        if (taskResult != null && taskResult.getPropagatedVariables() != null) {
+            variables.putAll(SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables()));
         }
         return variables;
     }
 
-    public Map<String, Serializable> appendNonInheritedTaskVariables(TaskContext taskContext)
-            throws IOException, ClassNotFoundException {
-        Map<String, Serializable> variables = new HashMap<>();
-        Map<String, Serializable> previousVariables = new HashMap<>();
-        try {
-            previousVariables = extractVariables(taskContext, false);
-        } catch (IOException | ClassNotFoundException e) {
-            logger.error("Unable to extract variables", e);
-            throw e;
-        }
-        for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
-            if (!taskVariable.isJobInherited() ||
-                (taskVariable.isJobInherited() && !previousVariables.containsKey(taskVariable.getName()))) {
-                variables.put(taskVariable.getName(), taskVariable.getValue());
-            }
-        }
-        return variables;
-    }
+    /**
+     * Extract default scheduller context variables, for a complete list see the documentation.
+     * https://doc.activeeon.com/latest/user/ProActiveUserGuide.html#_proactive_system_variables
+     *
+     * @param taskContext object that contains job information to extract the desired variables.
+     * @return map containing variables with values set.
+     */
+    private Map<String, Serializable> extractSystemVariables(TaskContext taskContext, String nodesFile) {
+        TaskLauncherInitializer initializer = taskContext.getInitializer();
 
-    public Map<String, Serializable> extractVariables(TaskContext container, String nodesFile, boolean useTaskVariables)
-            throws Exception {
-        return extractVariables(container, null, nodesFile, useTaskVariables);
-    }
-
-    public Map<String, Serializable> retrieveContextVariables(TaskLauncherInitializer initializer) {
         Map<String, Serializable> variables = new HashMap<>();
+
         variables.put(SchedulerVars.PA_JOB_ID.toString(), initializer.getTaskId().getJobId().value());
         variables.put(SchedulerVars.PA_JOB_NAME.toString(), initializer.getTaskId().getJobId().getReadableName());
         variables.put(SchedulerVars.PA_TASK_ID.toString(), initializer.getTaskId().value());
         variables.put(SchedulerVars.PA_TASK_NAME.toString(), initializer.getTaskId().getReadableName());
         variables.put(SchedulerVars.PA_TASK_ITERATION.toString(), initializer.getIterationIndex());
         variables.put(SchedulerVars.PA_TASK_REPLICATION.toString(), initializer.getReplicationIndex());
+        variables.put(SchedulerVars.PA_TASK_PROGRESS_FILE.toString(), taskContext.getProgressFilePath());
+        variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), taskContext.getSchedulerHome());
         variables.put(SchedulerVars.PA_USER.toString(), initializer.getJobOwner());
+        variables.put(SchedulerVars.PA_NODESFILE.toString(), nodesFile);
+        variables.put(SchedulerVars.PA_NODESNUMBER.toString(), taskContext.getOtherNodesURLs().size() + 1);
         variables.put(SchedulerVars.PA_SCHEDULER_REST_URL.toString(), initializer.getSchedulerRestUrl());
         variables.put(SchedulerVars.PA_CATALOG_REST_URL.toString(), initializer.getCatalogRestUrl());
+
         return variables;
     }
 
-    private Map<String, Serializable> extractPreviousTaskResultVariablesFromTaskContext(TaskContext container)
+    /**
+     * Extract variables from the previous task result to be used now.
+     *
+     * @param taskContext contains the information needed to extract.
+     *
+     * @return a map containing extracted variables or an empty hash if there are no variables or previous tasks.
+     *
+     * @throws IOException might be triggered during deserialization
+     * @throws ClassNotFoundException might be triggered during deserialization
+     */
+    private Map<String, Serializable> extractInheritedVariables(TaskContext taskContext)
             throws IOException, ClassNotFoundException {
-        Map<String, Serializable> result = new HashMap<>();
-        for (TaskResult previousTaskResult : container.getPreviousTasksResults()) {
-            if (previousTaskResult.getPropagatedVariables() != null) {
-                result.putAll(SerializationUtil.deserializeVariableMap(previousTaskResult.getPropagatedVariables()));
+        Map<String, Serializable> variables = new HashMap<>();
+        if (taskContext.getPreviousTasksResults() != null) {
+            for (TaskResult previousTaskResult : taskContext.getPreviousTasksResults()) {
+                if (previousTaskResult.getPropagatedVariables() != null) {
+                    variables.putAll(SerializationUtil.deserializeVariableMap(previousTaskResult.getPropagatedVariables()));
+                }
             }
         }
-        return result;
+        return variables;
+    }
+
+    /**
+     * Extract variables from the previous task result to be used now.
+     *
+     * @param taskContext contains the information needed to extract.
+     *
+     * @return a map containing extracted variables or an empty hash if there are no variables.
+     */
+    private Map<String, Serializable> extractTaskVariables(TaskContext taskContext)
+            throws IOException, ClassNotFoundException {
+        Map<String, Serializable> variables = new HashMap<>();
+
+        for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
+            //ignore inherited variables
+            if (!taskVariable.isJobInherited()) {
+                variables.put(taskVariable.getName(), taskVariable.getValue());
+            }
+        }
+        return variables;
     }
 }
