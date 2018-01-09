@@ -863,6 +863,7 @@ public class TaskData {
 
     @Lob
     @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE, updatable = false)
+    @Type(type = "org.hibernate.type.TextType")
     public String getDescription() {
         return description;
     }
