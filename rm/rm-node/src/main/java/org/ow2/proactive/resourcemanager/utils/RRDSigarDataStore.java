@@ -25,8 +25,12 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -170,41 +174,23 @@ public class RRDSigarDataStore extends RRDDataStore {
             String attrName = names[0];
             String objectName = names[1];
 
-            try {
-                Object attrValue = mbs.getAttribute(new ObjectName(objectName), attrName);
+            // Redirect error stream to avoid sigar exceptions flooding
+            // @see https://github.com/ow2-proactive/scheduling/issues/3068
+            StdErrRedirectionHelper stdErrRedirectionHelper = new StdErrRedirectionHelper();
 
-                if (attrValue instanceof CompositeDataSupport && compositeTypes.get(fullName) != null) {
-                    Object val = ((CompositeDataSupport) attrValue).get(compositeTypes.get(fullName));
-                    if (val != null) {
-                        attrValue = val;
-                    }
-                }
-                sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
-                if (logger.isTraceEnabled()) {
-                    logger.trace(timeInMs / 1000 + " sampling: " + dataSource + " / " + fullName + " " +
-                                 Double.parseDouble(attrValue.toString()));
-                }
-            } catch (NumberFormatException ex) {
-                // do not save non-numeric values
-                String exceptionAsString = StackTraceUtil.getStackTrace(ex).replaceAll("For input string: \".*\"", "");
-                exceptionAsString = fullName + " / " + exceptionAsString;
+            stdErrRedirectionHelper.redirectStdErr();
 
-                if (!exceptionsThrown.contains(exceptionAsString)) {
-                    exceptionsThrown.add(exceptionAsString);
-                    logger.warn("Non numeric value for " + dataSource + " / " + fullName + ": " + ex.getMessage());
-                } else if (logger.isTraceEnabled()) {
-                    logger.trace("Non numeric value for " + dataSource + " / " + fullName + ": " + ex.getMessage());
-                }
-            } catch (Exception e) {
-                String exceptionAsString = StackTraceUtil.getStackTrace(e);
-                if (!exceptionsThrown.contains(exceptionAsString)) {
-                    exceptionsThrown.add(exceptionAsString);
-                    logger.warn("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
-                } else if (logger.isTraceEnabled()) {
-                    logger.trace("Error while reading attribute " + attrName + " for object " + objectName + ": ", e);
-                }
+            readAttribute(timeInMs, sample, dataSource, fullName, attrName, objectName);
+
+            String errorContent = stdErrRedirectionHelper.readAndReset();
+
+            if (errorContent.length() > 0) {
+                logErrorOnce(errorContent,
+                             "Error while reading attribute " + attrName + " for object " + objectName + ": " +
+                                           System.lineSeparator() + errorContent);
             }
         }
+
         try {
             sample.setTime(timeInMs / 1000);
             sample.update();
@@ -213,4 +199,86 @@ public class RRDSigarDataStore extends RRDDataStore {
         }
     }
 
+    private void readAttribute(long timeInMs, Sample sample, String dataSource, String fullName, String attrName,
+            String objectName) {
+        try {
+
+            Object attrValue = mbs.getAttribute(new ObjectName(objectName), attrName);
+            if (attrValue instanceof CompositeDataSupport && compositeTypes.get(fullName) != null) {
+                Object val = ((CompositeDataSupport) attrValue).get(compositeTypes.get(fullName));
+                if (val != null) {
+                    attrValue = val;
+                }
+            }
+            sample.setValue(dataSource, Double.parseDouble(attrValue.toString()));
+            if (logger.isTraceEnabled()) {
+                logger.trace(timeInMs / 1000 + " sampling: " + dataSource + " / " + fullName + " " +
+                             Double.parseDouble(attrValue.toString()));
+            }
+        } catch (NumberFormatException ex) {
+            // do not save non-numeric values
+            String exceptionAsString = StackTraceUtil.getStackTrace(ex).replaceAll("For input string: \".*\"", "");
+            exceptionAsString = fullName + " / " + exceptionAsString;
+
+            logErrorOnce(exceptionAsString,
+                         "Non numeric value for " + dataSource + " / " + fullName + ": " + ex.getMessage());
+        } catch (Exception e) {
+            String exceptionAsString = StackTraceUtil.getStackTrace(e);
+            logErrorOnce(exceptionAsString,
+                         "Error while reading attribute " + attrName + " for object " + objectName + ": ",
+                         e);
+        }
+    }
+
+    /**
+     * Logs a sigar error only once to avoid flooding
+     * @param exceptionAsString key used to memorize exceptions already handled
+     * @param message message to display
+     */
+    private void logErrorOnce(String exceptionAsString, String message) {
+        if (!exceptionsThrown.contains(exceptionAsString)) {
+            exceptionsThrown.add(exceptionAsString);
+            logger.warn(message);
+        } else if (logger.isTraceEnabled()) {
+            logger.trace(message);
+        }
+    }
+
+    /**
+     * Logs a sigar error only once to avoid flooding
+     * @param exceptionAsString key used to memorize exceptions already handled
+     * @param message message to display
+     * @param e real exception
+     */
+    private void logErrorOnce(String exceptionAsString, String message, Exception e) {
+        if (!exceptionsThrown.contains(exceptionAsString)) {
+            exceptionsThrown.add(exceptionAsString);
+            logger.warn(message, e);
+        } else if (logger.isTraceEnabled()) {
+            logger.trace(message, e);
+        }
+    }
+
+    private class StdErrRedirectionHelper {
+        private ByteArrayOutputStream storedErrors;
+
+        private PrintStream redirectedStream;
+
+        private PrintStream console;
+
+        public PrintStream redirectStdErr() throws UnsupportedEncodingException {
+            storedErrors = new ByteArrayOutputStream();
+            redirectedStream = new PrintStream(storedErrors, true, StandardCharsets.UTF_8.name());
+            console = System.err;
+            System.setErr(redirectedStream);
+            return redirectedStream;
+        }
+
+        public String readAndReset() {
+            System.setErr(console);
+            String errorContent = new String(storedErrors.toByteArray(), StandardCharsets.UTF_8);
+            redirectedStream.close();
+            return errorContent.trim();
+        }
+    }
 }
