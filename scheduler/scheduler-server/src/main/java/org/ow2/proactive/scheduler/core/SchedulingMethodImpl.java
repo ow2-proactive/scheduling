@@ -102,7 +102,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     protected static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
 
     /** Maximum blocking time for the do task action */
-    protected static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
+    protected static int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
 
     protected int activeObjectCreationRetryTimeNumber;
 
@@ -657,6 +657,16 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     task.getExecutableContainer().setNodes(nodes);
 
                     tlogger.debug(task.getId(), "deploying");
+
+                    // Dynamically adjust the start-task-timeout according to the number dependency tasks in a merge.
+                    // above 500 parent tasks, it is worth adjusting.
+                    if (taskDescriptor.getParents().size() > 500) {
+                        DOTASK_ACTION_TIMEOUT = (int) (taskDescriptor.getParents().size() / 500.0 *
+                                                       PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt());
+                    } else {
+                        // reset the DOTASK_ACTION_TIMEOUT to its default value otherwise.
+                        DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
+                    }
 
                     Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                                                                    taskDescriptor,

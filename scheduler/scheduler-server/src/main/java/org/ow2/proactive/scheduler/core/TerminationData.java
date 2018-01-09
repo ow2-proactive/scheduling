@@ -41,6 +41,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
@@ -48,6 +49,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
@@ -289,10 +291,14 @@ final class TerminationData {
                                                              .getFirstNotSkippedParentTaskIds(parentTask));
                 }
 
-                Map<TaskId, TaskResult> taskResults = service.getInfrastructure()
-                                                             .getDBManager()
-                                                             .loadTasksResults(taskData.getTask().getJobId(),
-                                                                               new ArrayList(parentIds));
+                // Batch fetching of parent tasks results
+                Map<TaskId, TaskResult> taskResults = new HashMap<>();
+                for (List<TaskId> parentsSublit : ListUtils.partition(new ArrayList<>(parentIds),
+                                                                      PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+                    taskResults.putAll(service.getInfrastructure()
+                                              .getDBManager()
+                                              .loadTasksResults(taskData.getTask().getJobId(), parentsSublit));
+                }
                 getResultsFromListOfTaskResults(variablesMap.getInheritedMap(), taskResults);
             } else {
                 if (internalJob != null) {
