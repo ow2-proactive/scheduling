@@ -26,11 +26,15 @@
 package functionaltests.rm;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
 import performancetests.helper.LogProcessor;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class PolicyWhichThrowsExceptions extends ExtendedSchedulerPolicy {
@@ -44,7 +48,7 @@ public class PolicyWhichThrowsExceptions extends ExtendedSchedulerPolicy {
         if (LogProcessor.linesThatMatch("job 1 started").size() == 1 &&
             LogProcessor.linesThatMatch("job 1 finished").size() == 0 && thrown == false) {
             thrown = true;
-            throw new Error("This error is thrown to perform reconnection to RM");
+            throw new Error("This error is thrown to perform reconnection to RM isTaskExecutable");
         } else {
             return super.isTaskExecutable(selectedNodes, task);
         }

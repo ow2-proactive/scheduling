@@ -48,17 +48,17 @@ import functionaltests.utils.*;
 import performancetests.helper.LogProcessor;
 
 
-public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
+public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
 
-    static final Logger logger = Logger.getLogger(TestRMReconnectioWhileRunning.class);
+    static final Logger logger = Logger.getLogger(TestRMReconnectionWhileRunning.class);
 
     private SchedulerTHelper schedulerHelper;
 
-    private static URL runningJob = TestRMReconnectioWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s.xml");
+    private static URL runningJob = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s.xml");
 
-    private static URL runningJob1 = TestRMReconnectioWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-1.xml");
+    private static URL runningJob1 = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-1.xml");
 
-    private static URL runningJob2 = TestRMReconnectioWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-2.xml");
+    private static URL runningJob2 = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-2.xml");
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -102,8 +102,13 @@ public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
 
         schedulerHelper.waitForEventTaskRunning(jobId, "running_task_for20s");
 
+        schedulerHelper.disconnect();
+        schedulerHelper.getSchedulerInterface().disconnect();
+        schedulerHelper.getResourceManager().disconnect();
+
         Thread.sleep(200000); // sleep enough that all jobs should be able to finish
 
+        assertJobFinished(jobId);
         assertJobFinished(jobId2);
         assertJobFinished(jobId3);
 
@@ -115,6 +120,7 @@ public class TestRMReconnectioWhileRunning extends MultipleRMTBase {
 
         assertEquals(0, actualNumberOfReconnections);
     }
+
 
     private void assertJobFinished(JobId jobId) throws Exception {
         final JobResult result0 = schedulerHelper.getJobResult(jobId);
