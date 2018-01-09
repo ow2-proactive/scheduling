@@ -65,7 +65,7 @@ task('performanceTest', type: Test).configure schedulingPerformanceTestConfigura
 
 task verifyPerformanceChange(type: Test){
     systemProperties << ['pathToStorage' : System.getProperty('pathToStorage')]
-    systemProperties << ['threshold': '0.3']
+    systemProperties << ['threshold': System.getProperty('threshold')]
 
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
