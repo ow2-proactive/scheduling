@@ -69,6 +69,10 @@ public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
         initConfigs();
     }
 
+    /**
+     * This case checks that even if exception was trown in main Scheduler loop it will not cause that jobId is running forever.
+     * @throws Exception
+     */
     @Test
     public void testTaskIsNotStuckRunning() throws Exception {
         ProActiveConfiguration.load();
@@ -81,14 +85,18 @@ public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
         JobId jobId3 = schedulerHelper.submitJob(new File(runningJob2.toURI()).getAbsolutePath());
 
         schedulerHelper.waitForEventTaskRunning(jobId, "running_task_for20s");
-
-        Thread.sleep(200000); // sleep enough that all jobs should be able to finish
+        schedulerHelper.waitForEventJobFinished(jobId2);
+        schedulerHelper.waitForEventJobFinished(jobId3);
 
         assertJobFinished(jobId2);
         assertJobFinished(jobId3);
         assertJobFinished(jobId);
     }
 
+    /**
+     * This case checks that even if exception was trown in main Scheduler loop it will not cause reconnection to RM.
+     * @throws Exception
+     */
     @Test
     public void testReconnectionIsNotHappen() throws Exception {
         ProActiveConfiguration.load();
@@ -101,14 +109,9 @@ public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
         JobId jobId3 = schedulerHelper.submitJob(new File(runningJob2.toURI()).getAbsolutePath());
 
         schedulerHelper.waitForEventTaskRunning(jobId, "running_task_for20s");
+        schedulerHelper.waitForEventJobFinished(jobId2);
+        schedulerHelper.waitForEventJobFinished(jobId3);
 
-        schedulerHelper.disconnect();
-        schedulerHelper.getSchedulerInterface().disconnect();
-        schedulerHelper.getResourceManager().disconnect();
-
-        Thread.sleep(200000); // sleep enough that all jobs should be able to finish
-
-        assertJobFinished(jobId);
         assertJobFinished(jobId2);
         assertJobFinished(jobId3);
 
