@@ -176,7 +176,7 @@ public abstract class InfrastructureManager implements Serializable {
         writeLock.lock();
         try {
             variable = t.handle();
-            persistInfraVariables();
+            persistInfrastructureVariables();
         } catch (RuntimeException e) {
             logger.error("Exception while setting runtime variable: " + e.getMessage());
             throw e;
@@ -611,34 +611,36 @@ public abstract class InfrastructureManager implements Serializable {
      * The node source data is never persisted if the current infrastructure is
      * the {@link NodeSource#DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME}.
      */
-    public void persistInfraVariables() {
+    public void persistInfrastructureVariables() {
         if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean()) {
             String nodeSourceName = nodeSource.getName();
             if (!nodeSourceName.equals(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
                 readLock.lock();
                 try {
-                    if (dbManager == null) {
-                        setRmDbManager(RMDBManager.getInstance());
-                    }
-                    if (nodeSourceData == null) {
-                        logger.debug("Node source data of node source " + nodeSourceName +
-                                     " needs to be retrieved from database");
-                        nodeSourceData = dbManager.getNodeSource(nodeSourceName);
-                    }
-                    if (nodeSourceData != null) {
-                        nodeSourceData.setInfrastructureVariables(persistedInfraVariables);
-                        dbManager.updateNodeSource(nodeSourceData);
-                    } else {
-                        logger.warn("Node source " + nodeSourceName +
-                                    " is unknown. Cannot persist infrastructure variables");
-                    }
+                    getAndPersistNodeSourceData(nodeSourceName);
                 } catch (RuntimeException e) {
-                    logger.error("Exception while persisting runtime variables: " + e.getMessage());
+                    logger.error("Exception while persisting infrastructure variables", e);
                     throw e;
                 } finally {
                     readLock.unlock();
                 }
             }
+        }
+    }
+
+    private void getAndPersistNodeSourceData(String nodeSourceName) {
+        if (dbManager == null) {
+            setRmDbManager(RMDBManager.getInstance());
+        }
+        if (nodeSourceData == null) {
+            logger.debug("Node source data of node source " + nodeSourceName + " needs to be retrieved from database");
+            nodeSourceData = dbManager.getNodeSource(nodeSourceName);
+        }
+        if (nodeSourceData != null) {
+            nodeSourceData.setInfrastructureVariables(persistedInfraVariables);
+            dbManager.updateNodeSource(nodeSourceData);
+        } else {
+            logger.warn("Node source " + nodeSourceName + " is unknown. Cannot persist infrastructure variables");
         }
     }
 
