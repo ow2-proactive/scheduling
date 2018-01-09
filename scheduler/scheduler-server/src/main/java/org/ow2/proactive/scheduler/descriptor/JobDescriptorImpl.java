@@ -240,6 +240,17 @@ public class JobDescriptorImpl implements JobDescriptor {
         eligibleTasks.put(taskId, (EligibleTaskDescriptor) runningTasks.remove(taskId));
     }
 
+    synchronized public void restartAllRunningTasls() {
+        final Iterator<Entry<TaskId, TaskDescriptor>> iterator = runningTasks.entrySet().iterator();
+        while (iterator.hasNext()) {
+            final Entry<TaskId, TaskDescriptor> entry = iterator.next();
+            logger.info("Move " + entry.getKey() + " from running to eligible tasls");
+            eligibleTasks.put(entry.getKey(), (EligibleTaskDescriptor) entry.getValue());
+        }
+        runningTasks.clear();
+        logger.info("Restarted all running tasks");
+    }
+
     /**
      * Complete LOOP action on JobDescriptor side
      *

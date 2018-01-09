@@ -321,6 +321,10 @@ public abstract class InternalJob extends JobState {
         }
     }
 
+    public void restartAllRunningTasks() {
+        getJobDescriptor().restartAllRunningTasls();
+    }
+
     /**
      * Terminate a task, change status, managing dependencies
      *

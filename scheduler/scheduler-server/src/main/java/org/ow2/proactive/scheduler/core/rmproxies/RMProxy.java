@@ -99,12 +99,12 @@ public class RMProxy {
         return proxyActiveObject.getState();
     }
 
-    public void rebind(URI rmURI) throws RMException, RMProxyCreationException {
+    public boolean rebind(URI rmURI) throws RMException, RMProxyCreationException {
 
         if (rmURI.equals(this.rmURL) && proxyActiveObject != null && proxyActiveObject.isActive().getBooleanValue()) {
             // nothing to do
             logger.info("Do not reconnect to the RM as connection is active for " + rmURL);
-            return;
+            return false;
         }
 
         if (!this.rmURL.equals(rmURI)) {
@@ -114,6 +114,8 @@ public class RMProxy {
         this.rmURL = rmURI;
         terminate();
         init();
+        return true;
+
     }
 
     public NodeSet getNodes(Criteria criteria) throws RMProxyCreationException {
