@@ -698,8 +698,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.eligibleNodes.add(rmNode);
         }
 
-        // persist the state change to the database
-        persistUpdatedRMNode(rmNode);
+        persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
 
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, client.getName()));
 
@@ -740,8 +739,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         final NodeState previousNodeState = rmNode.getState();
         rmNode.setToRemove();
 
-        // persist the state change to the database
-        persistUpdatedRMNode(rmNode);
+        persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
 
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
@@ -890,7 +888,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.allNodes.put(rmnode.getNodeURL(), rmnode);
 
         // save the information of this new node in DB, in particular its state
-        persistNewRMNode(rmnode);
+        persistNewRMNodeIfRecoveryEnabled(rmnode);
 
         // create the event
         this.registerAndEmitNodeEvent(rmnode.createNodeEvent(RMEventType.NODE_ADDED,
@@ -1756,8 +1754,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         rmNode.setBusy(owner);
         this.eligibleNodes.remove(rmNode);
 
-        // persist the state change to the database
-        persistUpdatedRMNode(rmNode);
+        persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
 
         // create the event
         this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, owner.getName()));
@@ -1784,8 +1781,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             rmNode.setDown();
 
-            // persist the state change to the database
-            persistUpdatedRMNode(rmNode);
+            persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
 
             // create the event
             this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
@@ -2404,17 +2400,23 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return busyNodesNotInGivenSet;
     }
 
+    private boolean nodeRecoveryEnabled() {
+        return PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
+    }
+
     /**
      * Add the information of the given node to the database.
      *
      * @param rmNode the node to add to the database
      */
-    private void persistNewRMNode(RMNode rmNode) {
-        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-        NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
-        rmNodeData.setNodeSource(nodeSourceData);
-        if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceData.getName())) {
-            dbManager.addNode(rmNodeData);
+    private void persistNewRMNodeIfRecoveryEnabled(RMNode rmNode) {
+        if (nodeRecoveryEnabled()) {
+            RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+            NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
+            rmNodeData.setNodeSource(nodeSourceData);
+            if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceData.getName())) {
+                dbManager.addNode(rmNodeData);
+            }
         }
     }
 
@@ -2423,10 +2425,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @param rmNode the node to update in database
      */
-    private void persistUpdatedRMNode(RMNode rmNode) {
-        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-        if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(rmNode.getNodeSourceName())) {
-            dbManager.updateNode(rmNodeData);
+    private void persistUpdatedRMNodeIfRecoveryEnabled(RMNode rmNode) {
+        if (nodeRecoveryEnabled()) {
+            RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+            if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(rmNode.getNodeSourceName())) {
+                dbManager.updateNode(rmNodeData);
+            }
         }
     }
 
