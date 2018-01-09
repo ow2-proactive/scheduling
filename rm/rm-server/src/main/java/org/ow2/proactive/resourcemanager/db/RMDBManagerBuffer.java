@@ -355,16 +355,16 @@ public class RMDBManagerBuffer {
                                 DatabaseOperation databaseOperation = nodeOperation.operation;
                                 switch (databaseOperation) {
                                     case CREATE:
-                                        session.save(rmNodeData);
                                         logger.info("Add node " + rmNodeData.getName() + " in database");
+                                        session.save(rmNodeData);
                                         break;
                                     case UPDATE:
                                         logger.debug("Update node " + rmNodeData.getName() + " in database");
                                         session.update(rmNodeData);
                                         break;
                                     case DELETE:
-                                        session.delete(rmNodeData);
                                         logger.info("Remove node " + rmNodeData.getName() + " in database");
+                                        session.delete(rmNodeData);
                                         break;
                                     case RETRIEVE:
                                         // currently retrieval are not enqueued

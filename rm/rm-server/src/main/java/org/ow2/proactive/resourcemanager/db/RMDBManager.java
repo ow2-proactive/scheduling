@@ -389,8 +389,8 @@ public class RMDBManager {
             return;
         }
 
-        logger.debug("Request " + RMDBManagerBuffer.class.getSimpleName() + " to create node " + rmNodeData.getName() +
-                     " in database");
+        logger.debug("Request " + rmdbManagerBuffer.getClass().getSimpleName() + " to create node " +
+                     rmNodeData.getName() + " in database");
         rmdbManagerBuffer.addCreateNodeToPendingDatabaseOperations(rmNodeData);
     }
 
@@ -413,7 +413,7 @@ public class RMDBManager {
                 throw new RuntimeException("Exception occurred while updating node " + rmNodeData.getName(), e);
             }
         } else {
-            logger.debug("Request " + RMDBManagerBuffer.class.getSimpleName() + " to update node " +
+            logger.debug("Request " + rmdbManagerBuffer.getClass().getSimpleName() + " to update node " +
                          rmNodeData.getName() + " in database");
             rmdbManagerBuffer.addUpdateNodeToPendingDatabaseOperations(rmNodeData);
         }
@@ -447,8 +447,8 @@ public class RMDBManager {
                 throw new RuntimeException("Exception occurred while removing node " + rmNodeData.getName(), e);
             }
         } else {
-            logger.info("Request " + RMDBManagerBuffer.class.getSimpleName() + " to remove node " +
-                        rmNodeData.getName() + " in database");
+            logger.debug("Request " + rmdbManagerBuffer.getClass().getSimpleName() + " to remove node " +
+                         rmNodeData.getName() + " in database");
             rmdbManagerBuffer.addRemoveNodeToPendingDatabaseOperations(rmNodeData);
         }
     }
@@ -459,8 +459,11 @@ public class RMDBManager {
         }
 
         if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNodes(nodes)) {
-            logger.info("Remove nodes " + Arrays.toString(nodes.toArray()) + " in database");
             try {
+                logger.info("Remove " + nodes.size() + " nodes in database");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Nodes removed: " + Arrays.toString(nodes.toArray()));
+                }
                 executeReadWriteTransaction(new SessionWork<Void>() {
                     @Override
                     public Void doInTransaction(Session session) {
@@ -474,8 +477,8 @@ public class RMDBManager {
                 throw new RuntimeException("Exception occurred while removing nodes", e);
             }
         } else {
-            logger.info("Request " + RMDBManagerBuffer.class.getSimpleName() + " to remove nodes " +
-                        Arrays.toString(nodes.toArray()) + " in database");
+            logger.debug("Request " + rmdbManagerBuffer.getClass().getSimpleName() + " to remove " + nodes.size() +
+                         " nodes in database");
             rmdbManagerBuffer.addRemoveNodesToPendingDatabaseOperations(nodes);
         }
     }
@@ -496,7 +499,7 @@ public class RMDBManager {
     }
 
     public RMNodeData getNodeByNameAndUrl(final String nodeName, final String nodeUrl) {
-        logger.debug("Request " + RMDBManagerBuffer.class.getSimpleName() + " to retrieve node with node name " +
+        logger.debug("Request " + rmdbManagerBuffer.getClass().getSimpleName() + " to retrieve node with node name " +
                      nodeName + " in database");
         rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
@@ -516,8 +519,8 @@ public class RMDBManager {
     }
 
     public Collection<RMNodeData> getNodesByNodeSource(final String nodeSourceName) {
-        logger.debug("Request " + RMDBManagerBuffer.class.getSimpleName() + " to retrieve node with node source name " +
-                     nodeSourceName + " in database");
+        logger.debug("Request " + rmdbManagerBuffer.getClass().getSimpleName() +
+                     " to retrieve node with node source name " + nodeSourceName + " in database");
         rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
             logger.debug("Retrieve nodes from node source " + nodeSourceName + " in database");
@@ -537,7 +540,7 @@ public class RMDBManager {
     }
 
     public Collection<RMNodeData> getAllNodes() {
-        logger.debug("Request " + RMDBManagerBuffer.class.getSimpleName() + " to retrieve all nodes in database.");
+        logger.debug("Request " + rmdbManagerBuffer.getClass().getSimpleName() + " to retrieve all nodes in database.");
         rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
             logger.debug("Retrieve all nodes in database");
