@@ -121,7 +121,6 @@ public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
         assertEquals(0, actualNumberOfReconnections);
     }
 
-
     private void assertJobFinished(JobId jobId) throws Exception {
         final JobResult result0 = schedulerHelper.getJobResult(jobId);
         assertNotNull(result0);

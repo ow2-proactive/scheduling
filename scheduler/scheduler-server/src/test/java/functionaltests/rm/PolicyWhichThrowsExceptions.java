@@ -25,6 +25,9 @@
  */
 package functionaltests.rm;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -32,9 +35,6 @@ import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
 import performancetests.helper.LogProcessor;
-
-import java.util.LinkedList;
-import java.util.List;
 
 
 public class PolicyWhichThrowsExceptions extends ExtendedSchedulerPolicy {
