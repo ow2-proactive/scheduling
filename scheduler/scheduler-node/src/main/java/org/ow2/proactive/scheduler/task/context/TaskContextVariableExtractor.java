@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.task.context;
 
+import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -57,7 +59,7 @@ public class TaskContextVariableExtractor implements Serializable {
         systemEnvironmentVariables.putAll(variables);
         systemEnvironmentVariables.putAll(thirdPartyCredentials);
 
-        return VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(), systemEnvironmentVariables);
+        return filterAndUpdate(forkEnvironment.getSystemEnvironment(), systemEnvironmentVariables);
     }
 
     public Map<String, Serializable> extractVariables(TaskContext taskContext, boolean useTaskVariables)
@@ -77,9 +79,35 @@ public class TaskContextVariableExtractor implements Serializable {
         return variables;
     }
 
+    /**
+     * Creates a HashMap with variablesDictionary where values are resolved.
+     *
+     * Solve variables value if bound to another variable, for instance "var log=${LOG_ENV_VAR}", we
+     * expect that LOG_ENV_VAR is replaced by its value. To do so we have a variables hash, that must have
+     * all references and then for each variable we do a filterAndUpdate that will recursively replace
+     * when needed, @see VariableSubstitutor.
+     *
+     * Some limitations to consider: recursive substitution limit is VariableSubstitutor.MAXIMUM_DEPTH,
+     * if the variable value is a complex data structure (array, List, Vector) we will not substitute it.
+     *
+     * @param variables input hash containing variables and their values may reference other variables
+     * @return dictionary with the same variables however with their values resolved
+     */
+    private Map<String, Serializable> resolveVariables(Map<String, Serializable> variables) {
+        Map<String, Serializable> dictionaryVariables = new HashMap<>();
+        for (Map.Entry<String, Serializable> entry : variables.entrySet()) {
+            if (entry.getValue() instanceof String)
+                dictionaryVariables.put(entry.getKey(), filterAndUpdate(entry.getValue().toString(), variables));
+            else
+                dictionaryVariables.put(entry.getKey(), entry.getValue());
+        }
+        return dictionaryVariables;
+    }
+
     @SuppressWarnings("squid:S134")
     public Map<String, Serializable> extractVariables(TaskContext taskContext, TaskResult taskResult,
             boolean useTaskVariables) throws IOException, ClassNotFoundException {
+
         Map<String, Serializable> variables = new HashMap<>();
 
         // job variables from workflow definition
@@ -117,6 +145,10 @@ public class TaskContextVariableExtractor implements Serializable {
         variables.putAll(retrieveContextVariables(taskContext.getInitializer()));
 
         variables.put(SchedulerVars.PA_SCHEDULER_HOME.toString(), taskContext.getSchedulerHome());
+
+        //resolve variable values
+        variables = resolveVariables(variables);
+
         return variables;
     }
 
