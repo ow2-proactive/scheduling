@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -47,6 +49,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -601,34 +604,40 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * First fetch the {@link NodeSourceData} associated to this infrastructure, then update the information related to
-     * the infrastructure, and then update in database the {@link NodeSourceData}.
+     * If nodes recovery is enabled, persist the current state of the node
+     * source.
+     * If the node source data of this infrastructure is not know, it is first
+     * fetched in database.
+     * The node source data is never persisted if the current infrastructure is
+     * the {@link NodeSource#DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME}.
      */
     public void persistInfraVariables() {
-        String nodeSourceName = nodeSource.getName();
-        if (!nodeSourceName.equals(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
-            readLock.lock();
-            try {
-                if (dbManager == null) {
-                    setRmDbManager(RMDBManager.getInstance());
+        if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean()) {
+            String nodeSourceName = nodeSource.getName();
+            if (!nodeSourceName.equals(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
+                readLock.lock();
+                try {
+                    if (dbManager == null) {
+                        setRmDbManager(RMDBManager.getInstance());
+                    }
+                    if (nodeSourceData == null) {
+                        logger.debug("Node source data of node source " + nodeSourceName +
+                                     " needs to be retrieved from database");
+                        nodeSourceData = dbManager.getNodeSource(nodeSourceName);
+                    }
+                    if (nodeSourceData != null) {
+                        nodeSourceData.setInfrastructureVariables(persistedInfraVariables);
+                        dbManager.updateNodeSource(nodeSourceData);
+                    } else {
+                        logger.warn("Node source " + nodeSourceName +
+                                    " is unknown. Cannot persist infrastructure variables");
+                    }
+                } catch (RuntimeException e) {
+                    logger.error("Exception while persisting runtime variables: " + e.getMessage());
+                    throw e;
+                } finally {
+                    readLock.unlock();
                 }
-                if (nodeSourceData == null) {
-                    logger.debug("Node source data of node source " + nodeSourceName +
-                                 " needs to be retrieved from database");
-                    nodeSourceData = dbManager.getNodeSource(nodeSourceName);
-                }
-                if (nodeSourceData != null) {
-                    nodeSourceData.setInfrastructureVariables(persistedInfraVariables);
-                    dbManager.updateNodeSource(nodeSourceData);
-                } else {
-                    logger.warn("Node source " + nodeSourceName +
-                                " is unknown. Cannot persist infrastructure variables");
-                }
-            } catch (RuntimeException e) {
-                logger.error("Exception while persisting runtime variables: " + e.getMessage());
-                throw e;
-            } finally {
-                readLock.unlock();
             }
         }
     }
@@ -727,16 +736,19 @@ public abstract class InfrastructureManager implements Serializable {
         final String deployingNodeUrl = deployingNode.getNodeURL();
         putDeployingNode(deployingNodeUrl, deployingNode);
 
-        nodeSource.setDeploying(deployingNode);
-        // The value for 'deployingNode' is retrieved before calling 'nodeSource.setDeploying'
-        // However, 'nodeSource.setDeploying' may lock the node that is currently handled
-        // (e.g. node lock restoration on RM startup) and thus update 'deployingNodes'.
-        // In such a case, the 'deployingNodes' collection is updated with a new deploying node instance which has the
-        // same URL as 'deployingNode' but different state information (e.g. lock status).
-        // This is due to deep copies made by ProActive Programming with method invocation on Active Objects.
-        // As a consequence, the 'deployingNode' variable must be updated with the last value available
-        // in the 'deployingNodes' collection
-        deployingNode = getDeployingNode(deployingNodeUrl);
+        if (RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
+            logger.debug("Checking lock status for node " + deployingNodeUrl);
+            nodeSource.setDeploying(deployingNode);
+            // The value for 'deployingNode' is retrieved before calling 'nodeSource.setDeploying'
+            // However, 'nodeSource.setDeploying' may lock the node that is currently handled
+            // (e.g. node lock restoration on RM startup) and thus update 'deployingNodes'.
+            // In such a case, the 'deployingNodes' collection is updated with a new deploying node instance which has the
+            // same URL as 'deployingNode' but different state information (e.g. lock status).
+            // This is due to deep copies made by ProActive Programming with method invocation on Active Objects.
+            // As a consequence, the 'deployingNode' variable must be updated with the last value available
+            // in the 'deployingNodes' collection
+            deployingNode = getDeployingNode(deployingNodeUrl);
+        }
 
         if (logger.isTraceEnabled()) {
             logger.trace("New DeployingNode " + name + " instantiated in IM");

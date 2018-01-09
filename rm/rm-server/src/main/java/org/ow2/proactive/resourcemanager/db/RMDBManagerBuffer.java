@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.db;
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_DB_OPERATIONS_DELAY;
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_DB_SYNCHRONOUS_UPDATES;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,7 +109,7 @@ public class RMDBManagerBuffer {
 
     private final Condition pendingNodeOperationsCondition = pendingNodeOperationsLock.newCondition();
 
-    protected RMDBManagerBuffer(RMDBManager rmdbManager) {
+    RMDBManagerBuffer(RMDBManager rmdbManager) {
         this.rmdbManager = rmdbManager;
         delayEqualsToZero = RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt() == 0;
         databaseTransactionExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -126,7 +127,7 @@ public class RMDBManagerBuffer {
 
     ////// Node Source Database Operations //////
 
-    protected void addKnownNodeSource(final String nodeSourceName) {
+    void addKnownNodeSource(final String nodeSourceName) {
         pendingNodeSourceUpdatesLock.lock();
         try {
             knownNodeSources.add(nodeSourceName);
@@ -135,7 +136,7 @@ public class RMDBManagerBuffer {
         }
     }
 
-    protected void removeKnownNodeSourceAndPendingUpdates(final String nodeSourceName) {
+    void removeKnownNodeSourceAndPendingUpdates(final String nodeSourceName) {
         pendingNodeSourceUpdatesLock.lock();
         try {
             knownNodeSources.remove(nodeSourceName);
@@ -145,7 +146,7 @@ public class RMDBManagerBuffer {
         }
     }
 
-    protected void addUpdateNodeSourceToPendingDatabaseOperations(final NodeSourceData nodeSource) {
+    void addUpdateNodeSourceToPendingDatabaseOperations(final NodeSourceData nodeSource) {
         pendingNodeSourceUpdatesLock.lock();
         try {
             String nodeSourceName = nodeSource.getName();
@@ -153,8 +154,10 @@ public class RMDBManagerBuffer {
                 cancelScheduledNodeSourceTransaction();
                 pendingNodeSourceUpdates.put(nodeSourceName, nodeSource);
                 if (delayEqualsToZero) {
+                    logger.debug("Apply update node source " + nodeSource.getName() + " in database with no delay");
                     buildNodeSourceTransactionAndCommit();
                 } else {
+                    logger.debug("Schedule update node source " + nodeSource.getName() + " in database");
                     scheduleNodeSourceTransaction();
                 }
             }
@@ -170,11 +173,13 @@ public class RMDBManagerBuffer {
     }
 
     private void buildNodeSourceTransactionAndCommit() {
+        logger.trace("Execute update node sources in database");
         rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
                 for (NodeSourceData nodeSource : pendingNodeSourceUpdates.values()) {
                     if (knownNodeSources.contains(nodeSource.getName())) {
+                        logger.debug("Update node source " + nodeSource.getName() + " in database");
                         session.update(nodeSource);
                     }
                 }
@@ -200,7 +205,7 @@ public class RMDBManagerBuffer {
 
     ////// Node Database Operations //////
 
-    protected boolean canOperateDatabaseSynchronouslyWithNode(RMNodeData rmNodeData) {
+    boolean canOperateDatabaseSynchronouslyWithNode(RMNodeData rmNodeData) {
         boolean canOperateNodeSynchronously = true;
         if (!delayEqualsToZero) {
             pendingNodeOperationsLock.lock();
@@ -213,7 +218,7 @@ public class RMDBManagerBuffer {
         return canOperateNodeSynchronously;
     }
 
-    protected boolean canOperateDatabaseSynchronouslyWithNodes(Collection<RMNodeData> nodes) {
+    boolean canOperateDatabaseSynchronouslyWithNodes(Collection<RMNodeData> nodes) {
         boolean canOperateAllNodesSynchronously = true;
         if (!delayEqualsToZero) {
             for (RMNodeData rmNodeData : nodes) {
@@ -230,57 +235,66 @@ public class RMDBManagerBuffer {
         return RM_NODES_DB_SYNCHRONOUS_UPDATES.getValueAsBoolean();
     }
 
-    protected void addCreateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    void addCreateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.CREATE, rmNodeData);
         if (delayEqualsToZero) {
+            logger.debug("Apply create node " + rmNodeData.getName() + " in database with no delay");
             buildNodesTransactionAndCommit();
         } else {
+            logger.debug("Schedule create node " + rmNodeData.getName() + " in database");
             scheduleNodeTransaction();
         }
     }
 
-    protected void addUpdateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    void addUpdateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.UPDATE, rmNodeData);
         if (delayEqualsToZero) {
+            logger.debug("Apply update node " + rmNodeData.getName() + " in database with no delay");
             buildNodesTransactionAndCommit();
         } else {
+            logger.debug("Schedule update node " + rmNodeData.getName() + " in database");
             scheduleNodeTransaction();
         }
     }
 
-    protected void addRemoveNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    void addRemoveNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData);
         if (delayEqualsToZero) {
+            logger.debug("Apply remove node " + rmNodeData.getName() + " in database with no delay");
             buildNodesTransactionAndCommit();
         } else {
+            logger.debug("Schedule remove node " + rmNodeData.getName() + " in database");
             scheduleNodeTransaction();
         }
     }
 
-    protected void addRemoveNodesToPendingDatabaseOperations(Collection<RMNodeData> nodes) {
+    void addRemoveNodesToPendingDatabaseOperations(Collection<RMNodeData> nodes) {
         cancelScheduledNodeTransaction();
         for (RMNodeData rmNodeData : nodes) {
             registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData);
         }
         if (delayEqualsToZero) {
+            logger.debug("Apply remove node " + Arrays.toString(nodes.toArray()) + " in database with no delay");
             buildNodesTransactionAndCommit();
         } else {
+            logger.debug("Schedule remove node " + Arrays.toString(nodes.toArray()) + " in database");
             scheduleNodeTransaction();
         }
     }
 
-    protected void debounceNodeUpdatesIfNeeded() {
+    void debounceNodeUpdatesIfNeeded() {
         if (!delayEqualsToZero) {
             pendingNodeOperationsLock.lock();
             try {
                 while (!pendingNodesOperations.isEmpty()) {
                     try {
+                        logger.debug("Wait for flush of database operations related to nodes");
                         pendingNodeOperationsCondition.await();
                     } catch (InterruptedException e) {
-                        logger.warn("Waiting of debouncing of database operations has been interrupted.");
+                        logger.warn("Waiting for flush of database operations has been interrupted.", e);
                     }
                 }
             } finally {
@@ -333,8 +347,8 @@ public class RMDBManagerBuffer {
                 rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
                     @Override
                     public Void doInTransaction(Session session) {
-                        logger.debug("Executing database transaction with " + currentNodesOperations.size() +
-                                     " operations");
+                        logger.debug("Execute database transaction with operations: " +
+                                     Arrays.toString(currentNodesOperations.toArray()));
                         try {
                             for (NodeOperation nodeOperation : currentNodesOperations) {
                                 RMNodeData rmNodeData = nodeOperation.node;
@@ -342,14 +356,15 @@ public class RMDBManagerBuffer {
                                 switch (databaseOperation) {
                                     case CREATE:
                                         session.save(rmNodeData);
-                                        logger.info("Adding a new node " + rmNodeData.getName() + " to the database");
+                                        logger.info("Add node " + rmNodeData.getName() + " in database");
                                         break;
                                     case UPDATE:
+                                        logger.debug("Update node " + rmNodeData.getName() + " in database");
                                         session.update(rmNodeData);
                                         break;
                                     case DELETE:
                                         session.delete(rmNodeData);
-                                        logger.info("Removing a node " + rmNodeData.getName() + " from the database");
+                                        logger.info("Remove node " + rmNodeData.getName() + " in database");
                                         break;
                                     case RETRIEVE:
                                         // currently retrieval are not enqueued
@@ -368,6 +383,7 @@ public class RMDBManagerBuffer {
                 effectiveNodesOperations = extractOperationsOfNextTransaction();
             }
             // Pending node operations are cleared, retrieval can be enabled
+            logger.debug("End of flush of database operations related to nodes");
             pendingNodeOperationsCondition.signalAll();
         } catch (RuntimeException e) {
             throw new RuntimeException("Exception occurred while adding new node ", e);
@@ -435,6 +451,11 @@ public class RMDBManagerBuffer {
         protected NodeOperation(RMNodeData node, DatabaseOperation operation) {
             this.node = node;
             this.operation = operation;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + node.getName() + "," + operation + ")";
         }
     }
 
