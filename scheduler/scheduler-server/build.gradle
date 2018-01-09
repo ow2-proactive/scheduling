@@ -64,8 +64,13 @@ task('functionalTest', type: Test).configure schedulingFunctionalTestConfigurati
 task('performanceTest', type: Test).configure schedulingPerformanceTestConfiguration
 
 task verifyPerformanceChange(type: Test){
-    systemProperty 'pathToStorage', System.getProperty('pathToStorage')
-    systemProperty 'threshold', '0.3'
+    systemProperties << ['pathToStorage' : System.getProperty('pathToStorage')]
+    systemProperties << ['threshold': '0.3']
+
+    systemProperties << ['pa.rm.home': rootDir.absolutePath]
+    systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
+    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['file.encoding': 'UTF-8']
 
     include 'performancetests/verification/**'
 
