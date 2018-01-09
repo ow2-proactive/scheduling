@@ -5,7 +5,13 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
 import org.ow2.proactive.utils.NodeSet;
 
-public class PolicyWhichThrowsExceptions extends ExtendedSchedulerPolicy{
+
+/**
+ * This class is used only in TestRMReconnectionWhileRunning.
+ * It reproduces throwing error in main SchedulingThread which causes reconnection to RM.
+ *
+ */
+public class PolicyWhichThrowsExceptions extends ExtendedSchedulerPolicy {
 
     static final Logger logger = Logger.getLogger(PolicyWhichThrowsExceptions.class);
 
