@@ -293,11 +293,11 @@ final class TerminationData {
 
                 // Batch fetching of parent tasks results
                 Map<TaskId, TaskResult> taskResults = new HashMap<>();
-                for (List<TaskId> parentsSublit : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                      PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
+                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
                     taskResults.putAll(service.getInfrastructure()
                                               .getDBManager()
-                                              .loadTasksResults(taskData.getTask().getJobId(), parentsSublit));
+                                              .loadTasksResults(taskData.getTask().getJobId(), parentsSubList));
                 }
                 getResultsFromListOfTaskResults(variablesMap.getInheritedMap(), taskResults);
             } else {

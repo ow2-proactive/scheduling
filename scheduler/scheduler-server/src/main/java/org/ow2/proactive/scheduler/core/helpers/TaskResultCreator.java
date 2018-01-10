@@ -145,9 +145,9 @@ public class TaskResultCreator {
 
         // Batch fetching of parent tasks results
         Map<TaskId, TaskResult> taskResults = new HashMap<>();
-        for (List<TaskId> parentsSublit : ListUtils.partition(new ArrayList<>(parentIds),
-                                                              PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
-            taskResults.putAll(dbManager.loadTasksResults(job.getId(), parentsSublit));
+        for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
+                                                               PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+            taskResults.putAll(dbManager.loadTasksResults(job.getId(), parentsSubList));
         }
 
         for (TaskResult taskResult : taskResults.values()) {

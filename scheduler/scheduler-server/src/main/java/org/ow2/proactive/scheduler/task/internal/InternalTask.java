@@ -1184,12 +1184,12 @@ public abstract class InternalTask extends TaskState {
 
                 // Batch fetching of parent tasks results
                 Map<TaskId, TaskResult> taskResults = new HashMap<>();
-                for (List<TaskId> parentsSublit : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                      PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
+                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
 
                     taskResults.putAll(schedulingService.getInfrastructure()
                                                         .getDBManager()
-                                                        .loadTasksResults(internalJob.getId(), parentsSublit));
+                                                        .loadTasksResults(internalJob.getId(), parentsSubList));
 
                 }
                 if (!parentIds.isEmpty()) {

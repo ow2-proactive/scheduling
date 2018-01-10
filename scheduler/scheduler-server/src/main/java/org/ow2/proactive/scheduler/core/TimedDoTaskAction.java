@@ -127,11 +127,11 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
                 Map<TaskId, TaskResult> taskResults = new HashMap<>();
                 // Batch fetching of parent tasks results
-                for (List<TaskId> parentsSublit : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                      PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
+                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
                     taskResults.putAll(schedulingService.getInfrastructure()
                                                         .getDBManager()
-                                                        .loadTasksResults(job.getId(), parentsSublit));
+                                                        .loadTasksResults(job.getId(), parentsSubList));
                 }
                 int i = 0;
                 for (TaskId taskId : parentIds) {
