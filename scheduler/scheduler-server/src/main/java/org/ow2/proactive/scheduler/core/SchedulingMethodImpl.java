@@ -274,7 +274,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
 
-                while (taskRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
+                while (!taskRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
                     neededResourcesNumber = getNextcompatibleTasks(jobMap,
                                                                    taskRetrievedFromPolicy,
