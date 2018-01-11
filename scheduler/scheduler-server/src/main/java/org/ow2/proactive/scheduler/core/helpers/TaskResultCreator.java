@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.collections4.ListUtils;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
@@ -39,6 +40,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -140,7 +142,14 @@ public class TaskResultCreator {
         for (int i = 0; i < numberOfParentTasks; i++) {
             parentIds.add(eligibleTaskDescriptor.getParents().get(i).getTaskId());
         }
-        Map<TaskId, TaskResult> taskResults = dbManager.loadTasksResults(job.getId(), parentIds);
+
+        // Batch fetching of parent tasks results
+        Map<TaskId, TaskResult> taskResults = new HashMap<>();
+        for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
+                                                               PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+            taskResults.putAll(dbManager.loadTasksResults(job.getId(), parentsSubList));
+        }
+
         for (TaskResult taskResult : taskResults.values()) {
             if (taskResult.getPropagatedVariables() != null) {
                 mergedVariables.putAll(taskResult.getPropagatedVariables());

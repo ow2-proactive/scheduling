@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.commons.collections4.ListUtils;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -1180,11 +1181,18 @@ public abstract class InternalTask extends TaskState {
                     parentIds.addAll(InternalTaskParentFinder.getInstance()
                                                              .getFirstNotSkippedParentTaskIds(parentTask));
                 }
+
+                // Batch fetching of parent tasks results
+                Map<TaskId, TaskResult> taskResults = new HashMap<>();
+                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
+                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+
+                    taskResults.putAll(schedulingService.getInfrastructure()
+                                                        .getDBManager()
+                                                        .loadTasksResults(internalJob.getId(), parentsSubList));
+
+                }
                 if (!parentIds.isEmpty()) {
-                    Map<TaskId, TaskResult> taskResults = schedulingService.getInfrastructure()
-                                                                           .getDBManager()
-                                                                           .loadTasksResults(internalJob.getId(),
-                                                                                             new ArrayList(parentIds));
                     updateVariablesWithTaskResults(taskResults);
                 }
             }
