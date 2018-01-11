@@ -113,7 +113,7 @@ public class VerifyChangeTest {
     }
 
     private List<File> getTwoLastFiles() {
-        File folder = new File(".");
+        File folder = new File(System.getProperty("pa.rm.home"));
         System.out.println(folder.getAbsolutePath());
         assertTrue("PathToStorage parameter does not lead to directory.", folder.isDirectory());
         final File[] files = folder.listFiles(new FilenameFilter() {
