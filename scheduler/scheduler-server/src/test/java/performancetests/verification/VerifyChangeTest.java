@@ -113,12 +113,15 @@ public class VerifyChangeTest {
     }
 
     private List<File> getTwoLastFiles() {
-        File folder = new File("./");
+        File folder = new File(".");
+        System.out.println(folder.getAbsolutePath());
         assertTrue("PathToStorage parameter does not lead to directory.", folder.isDirectory());
         final File[] files = folder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String s) {
-                return s.startsWith("performance") && s.endsWith("csv");
+                boolean result = s.startsWith("performance");
+                System.out.println("file: " + s + " found: " + result);
+                return result;
             }
         });
         assertNotEquals(0, files.length);
