@@ -72,7 +72,6 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
-import org.ow2.proactive.catalogclient.service.CatalogClientLib;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -133,6 +132,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+
+import io.swagger.client.api.CatalogObjectControllerApi;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -769,12 +770,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
         JobIdData jobIdData = null;
         try {
-            String workflow = CatalogClientLib.getCatalogObjectService()
-                                              .getResolvedCatalogObject(catalogRestURL,
-                                                                        bucketName,
-                                                                        workflowName,
-                                                                        false,
-                                                                        sid);
+            String workflow = new CatalogObjectControllerApi().getRawUsingGET(bucketName, workflowName, sid);
 
             InputStream stream = new ByteArrayInputStream(workflow.getBytes(StandardCharsets.UTF_8.name()));
             jobIdData = restApiClient().submitXml(sid, stream, variables);
