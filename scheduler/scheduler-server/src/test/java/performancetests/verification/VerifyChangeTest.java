@@ -67,7 +67,7 @@ public class VerifyChangeTest {
         String notifyReport = String.format("Two last performance reports were compared: \n\t\t'%s' \n\tand\n\t\t'%s'\n",
                                             previousFile.getName(),
                                             newFile.getName());
-        notifyReport += "Some performance metrics have become bigger than " + (THRESHOLD * 100) + "%:\n";
+        notifyReport += "Some performance metrics have become bigger than " + THRESHOLD + "%:\n";
         final Iterator<Map.Entry<String, Double>> iterator = compared.entrySet().iterator();
         while (iterator.hasNext()) {
             final Map.Entry<String, Double> entry = iterator.next();
@@ -114,14 +114,11 @@ public class VerifyChangeTest {
 
     private List<File> getTwoLastFiles() {
         File folder = new File(System.getProperty("pa.rm.home"));
-        System.out.println(folder.getAbsolutePath());
         assertTrue("PathToStorage parameter does not lead to directory.", folder.isDirectory());
         final File[] files = folder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String s) {
-                boolean result = s.startsWith("performance");
-                System.out.println("file: " + s + " found: " + result);
-                return result;
+                return s.startsWith("performance");
             }
         });
         assertNotEquals(0, files.length);
