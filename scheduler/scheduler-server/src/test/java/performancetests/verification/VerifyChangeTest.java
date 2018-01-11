@@ -113,14 +113,12 @@ public class VerifyChangeTest {
     }
 
     private List<File> getTwoLastFiles() {
-        final String pathToStorage = System.getProperty("pathToStorage");
-        File folder = new File(pathToStorage);
-        assertTrue("PathToStorage parameter does not lead to valid path.", folder.exists());
+        File folder = new File("./");
         assertTrue("PathToStorage parameter does not lead to directory.", folder.isDirectory());
         final File[] files = folder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String s) {
-                return s.startsWith("performance");
+                return s.startsWith("performance") && s.endsWith("csv");
             }
         });
         assertNotEquals(0, files.length);
