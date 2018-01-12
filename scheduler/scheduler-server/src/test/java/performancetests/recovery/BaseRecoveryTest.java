@@ -33,7 +33,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 
-
+@SuppressWarnings("squid:S2187")
 public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     @Rule
