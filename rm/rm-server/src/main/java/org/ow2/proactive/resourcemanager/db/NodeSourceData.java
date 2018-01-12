@@ -40,7 +40,6 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 
 
 @Entity
@@ -93,7 +92,8 @@ public class NodeSourceData implements Serializable {
         this.name = name;
     }
 
-    @Column(length = 64984)
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.TextType")
     public String getInfrastructureType() {
         return infrastructureType;
     }
