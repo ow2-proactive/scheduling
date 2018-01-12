@@ -52,6 +52,7 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyException;
 import java.util.AbstractMap;
@@ -65,7 +66,13 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.codec.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
@@ -132,8 +139,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
-
-import io.swagger.client.api.CatalogObjectControllerApi;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -769,11 +774,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
 
         JobIdData jobIdData = null;
-        try {
-            String workflow = new CatalogObjectControllerApi().getRawUsingGET(bucketName, workflowName, sid);
 
-            InputStream stream = new ByteArrayInputStream(workflow.getBytes(StandardCharsets.UTF_8.name()));
-            jobIdData = restApiClient().submitXml(sid, stream, variables);
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(catalogRestURL + "/buckets/" + bucketName + "/resources/" + workflowName +
+                                         "/raw");
+        httpPost.addHeader("sessionid", sid);
+
+        try (CloseableHttpResponse response = httpclient.execute(httpPost)) {
+
+            jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
