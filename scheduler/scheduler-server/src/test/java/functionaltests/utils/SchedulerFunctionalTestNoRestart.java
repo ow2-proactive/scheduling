@@ -31,6 +31,10 @@ import org.junit.BeforeClass;
 
 /**
  * Test which either reuses an existing scheduler or start a new one with the default configuration
+ *
+ * Every concrete subclass should be added to one of functionaltests.StandardTestSuite or functionaltests.RegressionTestSuite
+ * @see functionaltests.StandardTestSuite
+ * @see functionaltests.RegressionTestSuite
  */
 public class SchedulerFunctionalTestNoRestart extends SchedulerFunctionalTest {
 

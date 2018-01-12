@@ -55,8 +55,8 @@ public class FailTaskConditionally extends JavaExecutable {
             }
 
         } else {
-            getOut().println("I will sleep for 10 seconds");
-            Thread.sleep(10000);
+            getOut().println("I will sleep for 60 seconds");
+            Thread.sleep(60000);
             return "Nothing";
         }
     }

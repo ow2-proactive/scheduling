@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.examples.WaitAndPrint;
 
 import functionaltests.utils.RMTHelper;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.utils.TestUsers;
 
@@ -61,7 +62,7 @@ import functionaltests.utils.TestUsers;
  * 
  * @author ProActive team
  */
-public final class SchedulerJMXTest extends SchedulerFunctionalTestWithRestart {
+public final class SchedulerJMXTest extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void action() throws Exception {

@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
@@ -49,7 +50,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  * - before task was restarted job is killed
  *
  */
-public class TestTaskNotRestarted extends SchedulerFunctionalTestWithRestart {
+public class TestTaskNotRestarted extends SchedulerFunctionalTestNoRestart {
 
     public static class TestJavaTask extends JavaExecutable {
         @Override
