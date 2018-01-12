@@ -108,6 +108,13 @@ import org.rrd4j.core.RrdDb;
 @Path("/rm")
 public class RMRest implements RMRestInterface {
 
+    /**
+     * The createNodeSource endpoint will create a node source with
+     * recoverable nodes if the nodesRecoverable value is equal to the string
+     * "true", regardless of the case
+     */
+    private static final String CREATE_NODE_SOURCE_WITH_RECOVERABLE_NODES_VALUE = "true";
+
     protected static final String[] dataSources = { //
                                                     // "AverageInactivity", // redundant with AverageActivity
                                                     // "ToBeReleasedNodesCo", // useless info
@@ -383,7 +390,8 @@ public class RMRest implements RMRestInterface {
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
-            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException {
+            @FormParam("policyFileParameters") String[] policyFileParameters,
+            @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         Object[] infraParams = new Object[infrastructureParameters.length + infrastructureFileParameters.length];
         Object[] policyParams = new Object[policyParameters.length + policyFileParameters.length];
@@ -433,7 +441,8 @@ public class RMRest implements RMRestInterface {
                                                   infrastructureType,
                                                   infraParams,
                                                   policyType,
-                                                  policyParams)
+                                                  policyParams,
+                                                  nodesRecoverable.equalsIgnoreCase(CREATE_NODE_SOURCE_WITH_RECOVERABLE_NODES_VALUE))
                                 .getBooleanValue());
         } catch (RuntimeException ex) {
             nsState.setResult(false);

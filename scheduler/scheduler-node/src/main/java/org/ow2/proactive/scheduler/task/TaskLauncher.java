@@ -102,7 +102,7 @@ public class TaskLauncher implements InitActive {
 
     private Thread nodeShutdownHook;
 
-    private TaskLauncherRebinder taskLauncherRebinder = new TaskLauncherRebinder();
+    private TaskLauncherRebinder taskLauncherRebinder;
 
     /**
      * Needed for ProActive but should never be used manually to create an instance of the object.
@@ -145,11 +145,12 @@ public class TaskLauncher implements InitActive {
 
     void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
-        doTask(executableContainer, previousTasksResults, terminateNotification, null);
+        doTask(executableContainer, previousTasksResults, terminateNotification, null, false);
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
-            TaskTerminateNotification terminateNotification, String terminateNotificationNodeURL) {
+            TaskTerminateNotification terminateNotification, String terminateNotificationNodeURL,
+            boolean taskRecoverable) {
 
         TaskResultImpl taskResult;
         WallTimer wallTimer = null;
@@ -166,7 +167,7 @@ public class TaskLauncher implements InitActive {
 
             taskStopwatchForFailures = Stopwatch.createUnstarted();
 
-            taskLauncherRebinder.saveTerminateNotificationNodeURL(taskId, terminateNotificationNodeURL);
+            taskLauncherRebinder = new TaskLauncherRebinder(taskId, terminateNotificationNodeURL, taskRecoverable);
 
             addShutdownHook();
             // lock the cache space cleaning mechanism
@@ -402,7 +403,7 @@ public class TaskLauncher implements InitActive {
                 return;
             } catch (Throwable t) {
                 logger.warn("Cannot notify task termination, trying to rebind to the task termination handler", t);
-                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getReboundTaskTerminateNotificationHandler();
+                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getReboundTaskTerminateNotificationHandler(currentTerminateNotification);
                 if (rebindedTerminateNotification != null) {
                     currentTerminateNotification = rebindedTerminateNotification;
                     // we'll retry to call the terminate method

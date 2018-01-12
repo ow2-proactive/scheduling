@@ -114,10 +114,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     /**
-     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#createNodeSource(java.lang.String, java.lang.String, java.lang.Object[], java.lang.String, java.lang.Object[])
+     * @see ResourceManager#createNodeSource(String, String, Object[], String, Object[], boolean)
      */
-    public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4) {
-        return target.createNodeSource(arg0, arg1, arg2, arg3, arg4);
+    public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
+            boolean arg5) {
+        return target.createNodeSource(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
     /**
@@ -384,6 +385,16 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public void releaseBusyNodesNotInList(List<NodeSet> verifiedBusyNodes) {
         target.releaseBusyNodesNotInList(verifiedBusyNodes);
+    }
+
+    @Override
+    public boolean areNodesKnown(NodeSet nodes) {
+        return target.areNodesKnown(nodes);
+    }
+
+    @Override
+    public boolean areNodesRecoverable(NodeSet nodes) {
+        return target.areNodesRecoverable(nodes);
     }
 
 }

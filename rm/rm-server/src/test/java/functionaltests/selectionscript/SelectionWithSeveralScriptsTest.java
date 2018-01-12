@@ -85,7 +85,8 @@ public class SelectionWithSeveralScriptsTest extends RMFunctionalTest {
                                          DefaultInfrastructureManager.class.getName(),
                                          null,
                                          StaticPolicy.class.getName(),
-                                         new Object[] { "ALL", "ALL" })
+                                         new Object[] { "ALL", "ALL" },
+                                         NODES_NOT_RECOVERABLE)
                        .getBooleanValue();
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);
 

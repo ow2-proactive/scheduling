@@ -78,7 +78,8 @@ public class TestNodeSourcesActions extends RMFunctionalTest {
                                          LocalInfrastructure.class.getName(),
                                          new Object[] { creds, nodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                          StaticPolicy.class.getName(),
-                                         null);
+                                         null,
+                                         NODES_NOT_RECOVERABLE);
 
         //wait for creation of GCM Node Source event, and deployment of its nodes
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nodeSourceName);

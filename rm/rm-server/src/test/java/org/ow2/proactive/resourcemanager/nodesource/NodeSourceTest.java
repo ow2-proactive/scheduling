@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource;
 
 import static com.google.common.truth.Truth.assertThat;
+import static functionaltests.utils.RMFunctionalTest.NODES_NOT_RECOVERABLE;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -154,7 +155,8 @@ public class NodeSourceTest {
                               infrastructureManager,
                               nodeSourcePolicy,
                               mock(RMCore.class),
-                              mock(RMMonitoringImpl.class));
+                              mock(RMMonitoringImpl.class),
+                              NODES_NOT_RECOVERABLE);
     }
 
 }

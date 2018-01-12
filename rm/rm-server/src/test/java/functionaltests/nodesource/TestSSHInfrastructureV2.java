@@ -31,7 +31,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
@@ -97,7 +96,8 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                                          SSHInfrastructureV2.class.getName(),
                                          infraParams,
                                          StaticPolicy.class.getName(),
-                                         policyParameters);
+                                         policyParameters,
+                                         NODES_NOT_RECOVERABLE);
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, this.rmHelper.getMonitorsHandler());
 
         RMTHelper.log("Checking scheduler state after node source creation");

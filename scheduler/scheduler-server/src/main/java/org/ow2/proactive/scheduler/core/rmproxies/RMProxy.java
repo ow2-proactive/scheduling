@@ -153,4 +153,21 @@ public class RMProxy {
         }
     }
 
+    public boolean areNodesKnown(NodeSet nodes) {
+        if (proxyActiveObject != null) {
+            return proxyActiveObject.areNodesKnown(nodes);
+        } else {
+            logger.warn("Didn't find RM to check nodes URL");
+            return false;
+        }
+    }
+
+    public boolean areNodesRecoverable(NodeSet nodes) {
+        if (proxyActiveObject != null) {
+            return proxyActiveObject.areNodesRecoverable(nodes);
+        } else {
+            logger.warn("Didn't find RM to check whether nodes are recoverable");
+            return false;
+        }
+    }
 }

@@ -62,6 +62,8 @@ public class NodeSourceData implements Serializable {
 
     private Client provider;
 
+    private boolean nodesRecoverable;
+
     /**
      * name of the variable --> value of the variable
      */
@@ -71,7 +73,7 @@ public class NodeSourceData implements Serializable {
     }
 
     public NodeSourceData(String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
-            String policyType, Object[] policyParameters, Client provider) {
+            String policyType, Object[] policyParameters, Client provider, boolean nodesRecoverable) {
 
         this.name = nodeSourceName;
         this.infrastructureType = infrastructureType;
@@ -79,6 +81,7 @@ public class NodeSourceData implements Serializable {
         this.policyType = policyType;
         this.policyParameters = policyParameters;
         this.provider = provider;
+        this.nodesRecoverable = nodesRecoverable;
         this.infrastructureVariables = new HashMap<>();
     }
 
@@ -139,6 +142,15 @@ public class NodeSourceData implements Serializable {
 
     public void setProvider(Client provider) {
         this.provider = provider;
+    }
+
+    @Column
+    public boolean getNodesRecoverable() {
+        return nodesRecoverable;
+    }
+
+    public void setNodesRecoverable(boolean nodesRecoverable) {
+        this.nodesRecoverable = nodesRecoverable;
     }
 
     @Column(length = Integer.MAX_VALUE)

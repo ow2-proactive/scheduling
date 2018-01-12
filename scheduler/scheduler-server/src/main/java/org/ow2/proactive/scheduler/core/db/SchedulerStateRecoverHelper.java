@@ -30,10 +30,12 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.utils.NodeSet;
 
 
 public class SchedulerStateRecoverHelper {
@@ -49,6 +51,10 @@ public class SchedulerStateRecoverHelper {
     }
 
     public RecoveredSchedulerState recover(long loadJobPeriod) {
+        return recover(loadJobPeriod, null);
+    }
+
+    public RecoveredSchedulerState recover(long loadJobPeriod, RMProxy rmProxy) {
         List<InternalJob> notFinishedJobs = dbManager.loadNotFinishedJobs(true);
 
         Vector<InternalJob> pendingJobs = new Vector<>();
@@ -63,7 +69,7 @@ public class SchedulerStateRecoverHelper {
                 case RUNNING:
                 case IN_ERROR:
                     runningJobs.add(job);
-                    recoverRunningTasksOrResetToPending(job, job.getITasks());
+                    recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
                     break;
                 case PAUSED:
                     if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() +
@@ -71,7 +77,7 @@ public class SchedulerStateRecoverHelper {
                         pendingJobs.add(job);
                     } else {
                         runningJobs.add(job);
-                        recoverRunningTasksOrResetToPending(job, job.getITasks());
+                        recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
                     }
                     break;
                 default:
@@ -118,7 +124,7 @@ public class SchedulerStateRecoverHelper {
         return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
     }
 
-    private void recoverRunningTasksOrResetToPending(InternalJob job, List<InternalTask> tasks) {
+    private void recoverRunningTasksOrResetToPending(InternalJob job, List<InternalTask> tasks, RMProxy rmProxy) {
         int pendingTasksCount = 0;
         int runningTasksCount = 0;
         for (InternalTask task : tasks) {
@@ -129,15 +135,14 @@ public class SchedulerStateRecoverHelper {
             if ((task.getStatus() == TaskStatus.RUNNING || task.getStatus() == TaskStatus.PAUSED) &&
                 task.getExecuterInformation() != null) {
                 try {
-                    TaskLauncher launcher = task.getExecuterInformation().getLauncher();
-                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
-                                ") successfully. Launcher: " + launcher);
-                    runningTasksCount++;
+                    if (runningTaskMustBeResetToPending(task, rmProxy)) {
+                        pendingTasksCount = setStatusAndIncrementPendingTasks(pendingTasksCount, task);
+                    } else {
+                        runningTasksCount++;
+                    }
                 } catch (Throwable e) {
-                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
-                                ") failed. Moving back task from status RUNNING TO PENDING.", e);
-                    task.setStatus(TaskStatus.PENDING);
-                    pendingTasksCount++;
+                    logger.warn("Fail to recover running task " + task.getId() + " (" + task.getName() + ")", e);
+                    pendingTasksCount = setStatusAndIncrementPendingTasks(pendingTasksCount, task);
                 }
             } else {
                 // recount existing pending tasks. We base this number on the
@@ -163,6 +168,40 @@ public class SchedulerStateRecoverHelper {
         }
         job.setNumberOfPendingTasks(pendingTasksCount);
         job.setNumberOfRunningTasks(runningTasksCount);
+    }
+
+    private boolean runningTaskMustBeResetToPending(InternalTask task, RMProxy rmProxy) {
+        boolean resetToPending;
+        if (rmProxy != null) {
+
+            NodeSet nodes = task.getExecuterInformation().getNodes();
+            boolean taskNodesKnownByRM = rmProxy.areNodesKnown(nodes);
+
+            if (taskNodesKnownByRM) {
+                TaskLauncher launcher = task.getExecuterInformation().getLauncher();
+                logger.info("Recover running task " + task.getId() + " (" + task.getName() +
+                            ") successfully with task launcher " + launcher);
+                resetToPending = false;
+            } else {
+                logger.info("Fail to recover running task " + task.getId() + " (" + task.getName() +
+                            ") because the task's node is not known by the resource manager");
+                resetToPending = true;
+            }
+
+        } else {
+            logger.info("Fail to recover running task " + task.getId() + " (" + task.getName() +
+                        ") because the resource manager is not reachable");
+            resetToPending = true;
+        }
+
+        return resetToPending;
+    }
+
+    private int setStatusAndIncrementPendingTasks(int pendingTasksCount, InternalTask task) {
+        logger.info("Changing task status to " + TaskStatus.PENDING);
+        task.setStatus(TaskStatus.PENDING);
+        pendingTasksCount++;
+        return pendingTasksCount;
     }
 
     /**
