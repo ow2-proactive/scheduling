@@ -393,7 +393,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     protected NodeSet getRMNodes(Map<JobId, JobDescriptor> jobMap, int neededResourcesNumber,
             LinkedList<EligibleTaskDescriptor> tasksToSchedule, Set<String> freeResources) {
         NodeSet nodeSet = new NodeSet();
-
         if (neededResourcesNumber <= 0) {
             throw new IllegalArgumentException("'neededResourcesNumber' must be greater than 0");
         }
@@ -401,7 +400,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
         InternalJob currentJob = jobMap.get(etd.getJobId()).getInternal();
         InternalTask internalTask0 = currentJob.getIHMTasks().get(etd.getTaskId());
-
         try {
             updateVariablesForTasksToSchedule(jobMap, tasksToSchedule);
 
@@ -431,7 +429,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setBestEffort(bestEffort);
                 criteria.setAcceptableNodesUrls(freeResources);
                 criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0));
-
                 if (internalTask0.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask0.getRuntimeGenericInformation()
                                                              .get(SchedulerConstants.NODE_ACCESS_TOKEN));

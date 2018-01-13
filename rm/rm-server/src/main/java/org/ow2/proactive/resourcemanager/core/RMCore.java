@@ -1707,7 +1707,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // return false for non connected clients
         // it should be verified by checkPermissionsMethod but it returns true for
         // local active objects
-        return new BooleanWrapper(!toShutDown && clients.containsKey(caller.getId()));
+
+        // caller == localClient added, because otherwise whatever exception thrown from main scheduler loop
+        // will cause reconnection to RM.
+        return new BooleanWrapper(!toShutDown && (clients.containsKey(caller.getId()) || caller == localClient));
     }
 
     /**
