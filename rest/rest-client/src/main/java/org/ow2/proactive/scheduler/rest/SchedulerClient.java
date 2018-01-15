@@ -65,7 +65,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
@@ -770,12 +770,12 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
         JobIdData jobIdData = null;
 
-        HttpPost httpPost = new HttpPost(catalogRestURL + "/buckets/" + bucketName + "/resources/" + workflowName +
-                                         "/raw");
-        httpPost.addHeader("sessionid", sid);
+        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" + bucketName + "/resources/" + workflowName +
+                                      "/raw");
+        httpGet.addHeader("sessionid", sid);
 
         try (CloseableHttpClient httpclient = HttpClients.createDefault();
-                CloseableHttpResponse response = httpclient.execute(httpPost)) {
+                CloseableHttpResponse response = httpclient.execute(httpGet)) {
 
             jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables);
         } catch (Exception e) {
