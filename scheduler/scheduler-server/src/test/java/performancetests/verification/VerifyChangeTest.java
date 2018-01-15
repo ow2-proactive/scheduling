@@ -25,9 +25,7 @@
  */
 package performancetests.verification;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.*;
@@ -49,7 +47,7 @@ public class VerifyChangeTest {
      * When any performance metric changes more or less than
      * given threshold then this test fails
      */
-    private static final Double THRESHOLD = Double.parseDouble(System.getProperty("threshold"));
+    private static final Double THRESHOLD = Double.parseDouble(System.getProperty("performanceTestThreshold"));
 
     @Test
     public void changeShouldBeLessThanThreshold() throws IOException {
@@ -65,10 +63,11 @@ public class VerifyChangeTest {
         final Map<String, Double> compared = compareReports(prediousReport, newReport);
 
         boolean toNotify = false;
+        LOGGER.info(String.format("Going to compare %s and %s.", previousFile.getName(), newFile.getName()));
         String notifyReport = String.format("Two last performance reports were compared: \n\t\t'%s' \n\tand\n\t\t'%s'\n",
                                             previousFile.getName(),
                                             newFile.getName());
-        notifyReport += "Some performance metrics have become bigger than " + (THRESHOLD * 100) + "%:\n";
+        notifyReport += "Some performance metrics have become bigger than " + THRESHOLD + "%:\n";
         final Iterator<Map.Entry<String, Double>> iterator = compared.entrySet().iterator();
         while (iterator.hasNext()) {
             final Map.Entry<String, Double> entry = iterator.next();
@@ -83,6 +82,9 @@ public class VerifyChangeTest {
         }
         if (toNotify) {
             LOGGER.info(notifyReport);
+            LOGGER.info("Verification status: FAILURE.\n");
+        } else {
+            LOGGER.info("Verification status: SUCCESS.\n");
         }
 
         assertFalse(notifyReport, toNotify);
@@ -111,14 +113,15 @@ public class VerifyChangeTest {
     }
 
     private List<File> getTwoLastFiles() {
-        final String pathToStorage = System.getProperty("pathToStorage");
-        File folder = new File(pathToStorage);
+        File folder = new File(System.getProperty("pa.rm.home"));
+        assertTrue("PathToStorage parameter does not lead to directory.", folder.isDirectory());
         final File[] files = folder.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String s) {
                 return s.startsWith("performance");
             }
         });
+        assertNotEquals(0, files.length);
         Arrays.sort(files, new Comparator<File>() {
             @Override
             public int compare(File fileA, File fileB) {
