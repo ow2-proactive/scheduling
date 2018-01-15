@@ -86,14 +86,17 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private final InternalTaskParentFinder internalTaskParentFinder;
 
+    private Map<TaskId, TaskResult> taskResults;
+
     /**
      * Create a new instance of TimedDoTaskAction
      *
      * @param launcher the launcher of the task
+     * @param taskResults parent tasks results
      */
     public TimedDoTaskAction(InternalJob job, TaskDescriptor taskDescriptor, TaskLauncher launcher,
             SchedulingService schedulingService, TaskTerminateNotification terminateNotification,
-            PrivateKey corePrivateKey, String terminateNotificationNodeURL) {
+            PrivateKey corePrivateKey, String terminateNotificationNodeURL, Map<TaskId, TaskResult> taskResults) {
         this.job = job;
         this.taskDescriptor = taskDescriptor;
         this.task = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
@@ -103,6 +106,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         this.corePrivateKey = corePrivateKey;
         this.internalTaskParentFinder = InternalTaskParentFinder.getInstance();
         this.terminateNotificationNodeURL = terminateNotificationNodeURL;
+        this.taskResults = taskResults;
     }
 
     /**
@@ -125,14 +129,6 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
                 params = new TaskResult[parentIds.size()];
 
-                Map<TaskId, TaskResult> taskResults = new HashMap<>();
-                // Batch fetching of parent tasks results
-                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
-                    taskResults.putAll(schedulingService.getInfrastructure()
-                                                        .getDBManager()
-                                                        .loadTasksResults(job.getId(), parentsSubList));
-                }
                 int i = 0;
                 for (TaskId taskId : parentIds) {
                     params[i] = taskResults.get(taskId);

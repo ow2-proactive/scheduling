@@ -1167,9 +1167,14 @@ public abstract class InternalTask extends TaskState {
      * 3) propagated variables
      * 4) system variables
      *
+     * Since 7.35, this method returns the parent tasks results to avoid fetching them again elsewhere.
+     *
      * @param schedulingService
+     *
+     * @return the results of the task's parents to avoid fetching them another time later
      */
-    public synchronized void updateVariables(SchedulingService schedulingService) {
+    public synchronized Map<TaskId, TaskResult> updateVariables(SchedulingService schedulingService) {
+        Map<TaskId, TaskResult> taskResults = new HashMap<>();
         if (updatedVariables == null) {
             updatedVariables = new LinkedHashMap<>();
             updatedVariables.putAll(internalJob.getVariablesAsReplacementMap());
@@ -1183,7 +1188,6 @@ public abstract class InternalTask extends TaskState {
                 }
 
                 // Batch fetching of parent tasks results
-                Map<TaskId, TaskResult> taskResults = new HashMap<>();
                 for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
                                                                        PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
 
@@ -1199,6 +1203,7 @@ public abstract class InternalTask extends TaskState {
 
             updatedVariables.putAll(getSystemVariables());
         }
+        return taskResults;
     }
 
     private void updateVariablesWithTaskResults(Map<TaskId, TaskResult> taskResults) {
