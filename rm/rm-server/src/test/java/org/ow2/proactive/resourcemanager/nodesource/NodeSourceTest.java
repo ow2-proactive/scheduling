@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger;
@@ -149,14 +150,16 @@ public class NodeSourceTest {
 
     private NodeSource createNodeSource(InfrastructureManager infrastructureManager, NodeSourcePolicy nodeSourcePolicy,
             Client client) {
+        NodeSourceData nodeSourceData = new NodeSourceData();
+        nodeSourceData.setProvider(client);
+        nodeSourceData.setNodesRecoverable(NODES_NOT_RECOVERABLE);
         return new NodeSource("registrationURL",
                               "name",
-                              client,
                               infrastructureManager,
                               nodeSourcePolicy,
                               mock(RMCore.class),
                               mock(RMMonitoringImpl.class),
-                              NODES_NOT_RECOVERABLE);
+                              nodeSourceData);
     }
 
 }

@@ -59,6 +59,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -197,8 +198,9 @@ public class NodeSource implements InitActive, RunActive {
      * @param policy nodes acquisition policy
      * @param rmcore resource manager core
      */
-    public NodeSource(String registrationURL, String name, Client provider, InfrastructureManager im,
-            NodeSourcePolicy policy, RMCore rmcore, RMMonitoringImpl monitor, boolean nodesRecoverable) {
+    public NodeSource(String registrationURL, String name, InfrastructureManager im, NodeSourcePolicy policy,
+            RMCore rmcore, RMMonitoringImpl monitor, NodeSourceData nodeSourceData) {
+        Client provider = nodeSourceData.getProvider();
         this.registrationURL = registrationURL;
         this.name = name;
         this.administrator = provider;
@@ -222,7 +224,7 @@ public class NodeSource implements InitActive, RunActive {
                                                           nodeSourcePolicy.getProviderAccessType()
                                                                           .getIdentityPrincipals(provider));
         this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
-        this.nodesRecoverable = nodesRecoverable;
+        this.nodesRecoverable = nodeSourceData.getNodesRecoverable();
     }
 
     /**

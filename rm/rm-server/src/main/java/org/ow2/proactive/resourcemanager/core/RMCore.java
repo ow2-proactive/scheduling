@@ -462,11 +462,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         nodesRecoveryManager.initialize();
         if (RM_NODES_RECOVERY.getValueAsBoolean()) {
             logger.info("Starting Nodes Recovery");
-            recoverNodeSourcesAndNodes();
         } else {
             logger.info("Nodes Recovery is disabled. Removing all nodes from database");
             dbManager.removeAllNodes();
         }
+        recoverNodeSourcesAndNodes();
     }
 
     Function<RMCore, NodesRecoveryManager> getNodesRecoveryManagerBuilder() {
@@ -1361,17 +1361,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                  nodeSourceData.getPolicyParameters());
 
         NodeSource nodeSource;
-        Client provider = nodeSourceData.getProvider();
 
         try {
             nodeSource = new NodeSource(this.getUrl(),
                                         nodeSourceName,
-                                        provider,
                                         im,
                                         policy,
                                         (RMCore) PAActiveObject.getStubOnThis(),
                                         this.monitoring,
-                                        nodesRecoverable);
+                                        nodeSourceData);
             nodeSource = PAActiveObject.turnActive(nodeSource, nodeRM);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -1396,6 +1394,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (!result.getBooleanValue()) {
             logger.error("Node source " + nodeSourceName + " cannot be activated");
         }
+
+        Client provider = nodeSourceData.getProvider();
 
         Client nsService = new Client(provider.getSubject(), false);
         Client policyService = new Client(provider.getSubject(), false);
@@ -1431,7 +1431,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private boolean existNodesToRecover(String nodeSourceName, boolean nodesRecoverable) {
         boolean recoverNodes = false;
-        if (nodesRecoverable) {
+        if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() && nodesRecoverable) {
             Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSourceName);
             if (nodesData.isEmpty()) {
                 logger.info("No node found in database for node source: " + nodeSourceName);
@@ -2481,7 +2481,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param rmNode the node to add to the database
      */
     private void persistNewRMNodeIfRecoveryEnabled(RMNode rmNode) {
-        if (nodesRecoveryEnabled(rmNode)) {
+        if (nodesRecoveryEnabledForNode(rmNode)) {
             RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
             NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
             rmNodeData.setNodeSource(nodeSourceData);
@@ -2495,13 +2495,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param rmNode the node to update in database
      */
     private void persistUpdatedRMNodeIfRecoveryEnabled(RMNode rmNode) {
-        if (nodesRecoveryEnabled(rmNode)) {
+        if (nodesRecoveryEnabledForNode(rmNode)) {
             RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
             dbManager.updateNode(rmNodeData);
         }
     }
 
-    private boolean nodesRecoveryEnabled(RMNode rmNode) {
+    private boolean nodesRecoveryEnabledForNode(RMNode rmNode) {
         return PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() &&
                rmNode.getNodeSource().nodesRecoverable();
     }
