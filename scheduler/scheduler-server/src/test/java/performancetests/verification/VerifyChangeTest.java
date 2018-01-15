@@ -47,7 +47,7 @@ public class VerifyChangeTest {
      * When any performance metric changes more or less than
      * given threshold then this test fails
      */
-    private static final Double THRESHOLD = Double.parseDouble(System.getProperty("threshold"));
+    private static final Double THRESHOLD = Double.parseDouble(System.getProperty("performanceTestThreshold"));
 
     @Test
     public void changeShouldBeLessThanThreshold() throws IOException {

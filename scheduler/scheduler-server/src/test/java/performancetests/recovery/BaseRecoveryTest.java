@@ -33,7 +33,9 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 
-
+/**
+ * We need this class only to increase timeout rule for performance tests.
+ */
 @SuppressWarnings("squid:S2187")
 public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
