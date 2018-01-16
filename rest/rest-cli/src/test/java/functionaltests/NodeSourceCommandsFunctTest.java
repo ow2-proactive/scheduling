@@ -96,10 +96,10 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         int nbOccurrencesOfNodeSourceNameInNodeList = StringUtils.countMatches(out, nodeSourceName);
 
         // depending on the time it takes to add the nodes to the RM, the node
-        // source name can appear once per node or twice per node, whether the
+        // source name can appear once per node or more per node, whether the
         // node is deploying or registered (in which case the node source name
         // appears also in the URL of the node)
-        assertThat(nbOccurrencesOfNodeSourceNameInNodeList).isIn(Range.closed(nbNodes, nbNodes * 2));
+        assertThat(nbOccurrencesOfNodeSourceNameInNodeList).isAtLeast(nbNodes);
     }
 
 }
