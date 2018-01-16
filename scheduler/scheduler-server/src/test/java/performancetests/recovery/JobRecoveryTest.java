@@ -79,7 +79,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
      */
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 1000 }, { 100, 2000 }, { 500, 5000 } });
+        return Arrays.asList(new Object[][] { { 10, 2000 }, { 100, 5000 }, { 500, 30000 } });
     }
 
     // number of jobs
