@@ -61,8 +61,8 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
             throws Exception {
 
         VariablesMap variables = new VariablesMap();
-        variables.setInheritedMap(taskContextVariableExtractor.extractVariables(context, false));
-        variables.setScopeMap(taskContextVariableExtractor.extractScopeVariables(context));
+        variables.setInheritedMap(taskContextVariableExtractor.getAllNonTaskVariables(context));
+        variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(context));
         Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(context);
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         Script<?> script = context.getInitializer().getForkEnvironment().getEnvScript();

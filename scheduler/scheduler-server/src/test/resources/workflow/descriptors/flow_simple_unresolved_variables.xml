@@ -1,21 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job xmlns="urn:proactive:jobdescriptor:3.3"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="urn:proactive:jobdescriptor:3.3 ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
-     name="Job" priority="low" projectName="myProject" cancelJobOnError="true">
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.9"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.9 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.9/schedulerjob.xsd"
+        name="Test resolve reference to variables"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
     <variables>
         <variable name="TESTVAR" value="var_${PA_JOB_ID}"/>
     </variables>
     <taskFlow>
         <task name="Groovy_Task">
-            <description>
-                <![CDATA[ The simplest task, ran by a groovy engine. ]]>
-            </description>
+            <variables>
+                <variable name="VALUE_FROM_TASK" value="world" model="" />
+                <variable name="TO_RESOLVE_IN_TASK" value="hello_$VALUE_FROM_TASK" model="" />
+            </variables>
             <scriptExecutable>
                 <script>
                     <code language="groovy">
                         <![CDATA[
-println "TESTVAR=>"+variables.get("TESTVAR")
+println "TESTVAR="+variables.get("TESTVAR")
+println "TO_RESOLVE_IN_TASK="+variables.get("TO_RESOLVE_IN_TASK")
+println "ENTIREMAP="+variables
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+        </task>
+        <task name="Groovy_Task2">
+            <variables>
+                <variable name="TESTVAR_NEW" value="$TESTVAR" model="" />
+            </variables>
+            <depends>
+                <task ref="Groovy_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println "TESTVAR_NEW="+variables.get("TESTVAR_NEW")
 ]]>
                     </code>
                 </script>

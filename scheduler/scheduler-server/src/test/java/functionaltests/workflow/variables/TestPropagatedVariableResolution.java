@@ -41,7 +41,6 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
-import functionaltests.workflow.variables.TestModifyPropagatedVariables;
 
 
 public class TestPropagatedVariableResolution extends SchedulerFunctionalTestWithRestart {
@@ -50,25 +49,25 @@ public class TestPropagatedVariableResolution extends SchedulerFunctionalTestWit
                                                                      .getResource("workflow/descriptors/flow_simple_unresolved_variables.xml");
 
     @Test
-    public void TestPropagatedVariableResolution() throws Throwable {
+    public void testPropagatedVariableResolution() throws Throwable {
         TaskFlowJob job = (TaskFlowJob) StaxJobFactory.getFactory().createJob(absolutePath(job_desc));
         JobId id = schedulerHelper.submitJob(job);
 
-        TaskInfo taskInfo = schedulerHelper.waitForEventTaskFinished(id, "Groovy_Task");
+        TaskInfo taskInfo = schedulerHelper.waitForEventTaskFinished(id, "Groovy_Task2");
         //assert the task finished correctly
         assertEquals(TaskStatus.FINISHED, taskInfo.getStatus());
 
+        //for the first task:
         String jobLog = schedulerHelper.getTaskResult(id, "Groovy_Task").getOutput().getAllLogs();
+        //1- resolve reference to job variable
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TESTVAR=var_" + id.toString()));
+        //2- resolve reference to another task variable
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TO_RESOLVE_IN_TASK=hello_world"));
 
-        //verify if the first task get resolved
-        Assert.assertThat(jobLog, CoreMatchers.containsString("var_" + id.toString()));
-
-        //verify if variable from task get resolved
-        //Assert.assertThat(jobLog, CoreMatchers.containsString("var_" + id.toString()));
-
-        //verify if variable inhereted from other task get resolved
-        //Assert.assertThat(jobLog, CoreMatchers.containsString("var_" + id.toString()));
-
+        //for the second task:
+        jobLog = schedulerHelper.getTaskResult(id, "Groovy_Task2").getOutput().getAllLogs();
+        //3- resolve reference to previous task variable
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TESTVAR_NEW=var_" + id.toString()));
     }
 
     private String absolutePath(URL file) throws Exception {
