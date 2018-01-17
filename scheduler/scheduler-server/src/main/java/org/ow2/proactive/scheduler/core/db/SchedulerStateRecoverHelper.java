@@ -148,7 +148,7 @@ public class SchedulerStateRecoverHelper {
         // recount existing pending tasks. We base this number on the
         // definition provided in SchedulerDBManager#PENDING_TASKS
         if (task.getStatus().equals(TaskStatus.PENDING) || task.getStatus().equals(TaskStatus.SUBMITTED) ||
-            task.getStatus().equals(TaskStatus.NOT_STARTED) || task.getExecuterInformation() == null) {
+            task.getStatus().equals(TaskStatus.NOT_STARTED)) {
             counter.pendingTasks++;
         } else {
             // recount existing running tasks that are not recoverable
