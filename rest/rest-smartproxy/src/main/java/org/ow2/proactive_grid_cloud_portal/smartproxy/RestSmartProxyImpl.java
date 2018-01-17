@@ -135,6 +135,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public ConnectionInfo getConnectionInfo() {
+        return connectionInfo;
+    }
+
+    @Override
     public void disconnect() throws PermissionException {
         try {
             _getScheduler().disconnect();
