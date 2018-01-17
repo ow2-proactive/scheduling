@@ -77,7 +77,8 @@ public class RestFuncTHelper {
 
     public final static int DEFAULT_NUMBER_OF_NODES = 1;
 
-    public static final String RM_CRED_RELATIVE_PATH = "config/authentication/rm.cred";
+    public static final String RM_CRED_RELATIVE_PATH = "config" + File.separator + "authentication" + File.separator +
+                                                       "rm.cred";
 
     private static String restServerUrl;
 
