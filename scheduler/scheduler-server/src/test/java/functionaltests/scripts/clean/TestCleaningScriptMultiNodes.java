@@ -37,13 +37,14 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
  * Test checks that a cleaning script on a multi-node task terminates and does not keep nodes busy
  */
-public class TestCleaningScriptMultiNodes extends SchedulerFunctionalTestWithRestart {
+public class TestCleaningScriptMultiNodes extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestCleaningScriptMultiNodes.class.getResource("/functionaltests/descriptors/Job_CleaningScript_multinode.xml");
 
