@@ -37,6 +37,7 @@ import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 
 import functionaltests.executables.EmptyExecutable;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.utils.TestUsers;
 
@@ -45,13 +46,17 @@ import functionaltests.utils.TestUsers;
  * Sanity test against method 'Scheduler.getUsers' and 'Scheduler.getUsersWithJobs'.
  *
  */
-public class TestGetUsers extends SchedulerFunctionalTestWithRestart {
+public class TestGetUsers extends SchedulerFunctionalTestNoRestart {
 
     long testStartTime = System.currentTimeMillis();
 
     @Test
     public void test() throws Exception {
 
+        // login once with a different user to reset the connection time
+        schedulerHelper.getSchedulerInterface(TestUsers.USER);
+
+        // login with the demo user
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
         List<SchedulerUserInfo> users;
         List<SchedulerUserInfo> usersWithJobs;

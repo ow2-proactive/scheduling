@@ -32,6 +32,10 @@ import org.junit.BeforeClass;
 /**
  * Test which starts a new scheduler with a custom configuration, and kill it after the test.
  * The scheduler start is delegated to the subclass.
+ *
+ * Every concrete subclass should be added to one of functionaltests.StandardTestSuite or functionaltests.RegressionTestSuite
+ * @see functionaltests.StandardTestSuite
+ * @see functionaltests.RegressionTestSuite
  */
 public class SchedulerFunctionalTestWithCustomConfigAndRestart extends SchedulerFunctionalTest {
 

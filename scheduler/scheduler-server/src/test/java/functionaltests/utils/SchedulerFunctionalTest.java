@@ -101,6 +101,8 @@ public class SchedulerFunctionalTest extends ProActiveTest {
             SchedulerTHelper.log("Do not kill the scheduler after test, but clean extra nodes.");
             schedulerHelper.removeExtraNodeSource();
 
+            schedulerHelper.cleanJobs();
+
             ResourceManager resourceManager = schedulerHelper.getResourceManager();
             int numberOfNodesAfterTest = resourceManager.listAliveNodeUrls().size();
 

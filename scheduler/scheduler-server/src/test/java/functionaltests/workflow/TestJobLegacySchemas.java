@@ -38,6 +38,7 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
@@ -54,7 +55,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.4.0
  */
-public class TestJobLegacySchemas extends SchedulerFunctionalTestWithRestart {
+public class TestJobLegacySchemas extends SchedulerFunctionalTestNoRestart {
 
     private static String[] jobDescriptorsLoc = { "3_0/Job_Schemas.xml", "3_1/Job_Schemas.xml", "3_2/Job_Schemas.xml",
                                                   "3_3/Job_Schemas.xml", "3_4/Job_Schemas.xml", "3_5/Job_Schemas.xml" };

@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 import functionaltests.job.error.TestJobAborted;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
@@ -81,7 +82,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  * @author The ProActive Team
  * @since ProActive Scheduling 1.0
  */
-public class TestJobCoverage extends SchedulerFunctionalTestWithRestart {
+public class TestJobCoverage extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestJobAborted.class.getResource("/functionaltests/descriptors/Job_Coverage.xml");
 

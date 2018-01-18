@@ -102,7 +102,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     protected static final int ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER = 3;
 
     /** Maximum blocking time for the do task action */
-    protected static final int DOTASK_ACTION_TIMEOUT = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
+    protected int dotaskActionTimeout;
 
     protected int activeObjectCreationRetryTimeNumber;
 
@@ -274,7 +274,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
 
-                while (taskRetrievedFromPolicy.size() > 0 && neededResourcesNumber == 0) {
+                while (!taskRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
                     neededResourcesNumber = getNextcompatibleTasks(jobMap,
                                                                    taskRetrievedFromPolicy,
@@ -462,7 +462,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     protected NodeSet getRMNodes(Map<JobId, JobDescriptor> jobMap, int neededResourcesNumber,
             LinkedList<EligibleTaskDescriptor> tasksToSchedule, Set<String> freeResources) {
         NodeSet nodeSet = new NodeSet();
-
         if (neededResourcesNumber <= 0) {
             throw new IllegalArgumentException("'neededResourcesNumber' must be greater than 0");
         }
@@ -470,7 +469,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         EligibleTaskDescriptor etd = tasksToSchedule.getFirst();
         InternalJob currentJob = ((JobDescriptorImpl) jobMap.get(etd.getJobId())).getInternal();
         InternalTask internalTask0 = currentJob.getIHMTasks().get(etd.getTaskId());
-
         try {
 
             TopologyDescriptor descriptor = null;
@@ -499,7 +497,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setBestEffort(bestEffort);
                 criteria.setAcceptableNodesUrls(freeResources);
                 criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0));
-
                 if (internalTask0.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask0.getRuntimeGenericInformation()
                                                              .get(SchedulerConstants.NODE_ACCESS_TOKEN));
@@ -658,6 +655,16 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                     tlogger.debug(task.getId(), "deploying");
 
+                    // Dynamically adjust the start-task-timeout according to the number dependency tasks in a merge.
+                    // above 500 parent tasks, it is worth adjusting.
+                    if (taskDescriptor.getParents().size() > 500) {
+                        dotaskActionTimeout = (int) (taskDescriptor.getParents().size() / 500.0 *
+                                                     PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt());
+                    } else {
+                        // reset the dotaskActionTimeout to its default value otherwise.
+                        dotaskActionTimeout = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
+                    }
+
                     Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                                                                    taskDescriptor,
                                                                                                                    launcher,
@@ -665,7 +672,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                                                                    terminateNotification,
                                                                                                                    corePrivateKey,
                                                                                                                    terminateNotificationNodeURL),
-                                                                                             DOTASK_ACTION_TIMEOUT,
+                                                                                             dotaskActionTimeout,
                                                                                              TimeUnit.MILLISECONDS);
                     waitForTaskToBeStarted(taskExecutionSubmittedFuture);
 
@@ -698,7 +705,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             // before signaling that the task is started, we need
             // to make sure the task is correctly submitted to the
             // task launcher
-            taskExecutionSubmittedFuture.get(DOTASK_ACTION_TIMEOUT, TimeUnit.MILLISECONDS);
+            taskExecutionSubmittedFuture.get(dotaskActionTimeout, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             logger.warn("Error while waiting for the task to be started.", e);
         }

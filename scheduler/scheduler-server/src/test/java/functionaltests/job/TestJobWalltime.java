@@ -38,13 +38,14 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
 import functionaltests.executables.EndlessExecutable;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
  * Test checks that walltime parameter is correctly taken into account for various tasks
  */
-public class TestJobWalltime extends SchedulerFunctionalTestWithRestart {
+public class TestJobWalltime extends SchedulerFunctionalTestNoRestart {
 
     private static final long TIMEOUT = 30000;
 

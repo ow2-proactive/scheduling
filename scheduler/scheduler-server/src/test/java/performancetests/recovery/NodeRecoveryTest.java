@@ -56,7 +56,7 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class NodeRecoveryTest extends BaseRecoveryTest {
 
     private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
 
@@ -72,7 +72,7 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
      */
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 5000 }, { 100, 5000 }, { 500, 10000 }, { 1000, 20000 } });
+        return Arrays.asList(new Object[][] { { 10, 2000 }, { 100, 5000 }, { 500, 30000 } });
     }
 
     // number of nodes
@@ -93,7 +93,6 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
      *
      * @throws Exception
      */
-    @Before
     public void startKillStartRM() throws Exception {
         ProActiveConfiguration.load();
         rmHelper = new RMTHelper();
@@ -119,9 +118,13 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
         assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
     }
 
-    @Test
+    @Test(timeout = 1600000)
     public void test() {
         try {
+            // it should be inside Test case and not in Before case, because
+            // otherwise After will not be executed if Before lasts longer than timeout Rule
+            // however, if it is inside Test case then, escaping by timeout anyway will call After
+            startKillStartRM();
             long recovered = nodesRecovered();
             long timeSpent = timeSpentToRecoverNodes();
             LOGGER.info(makeCSVString("NodeRecoveryTest",
@@ -157,8 +160,9 @@ public class NodeRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
             rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
         } catch (Exception ignored) {
 
+        } finally {
+            rmHelper.shutdownRM();
         }
-        rmHelper.shutdownRM();
     }
 
     private long nodesRecovered() {
