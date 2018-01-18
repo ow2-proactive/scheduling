@@ -108,6 +108,9 @@ public abstract class InternalJob extends JobState {
     /** Initial waiting time for a task before restarting in millisecond */
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
 
+    /** Verbosity to apply for job submission logging */
+    private boolean jobSubmissionDetailedLogging = PASchedulerProperties.SCHEDULER_JOB_SUBMISSION_DETAILED_LOGGING.getValueAsBoolean();
+
     /**
      * used credentials to fork as user id. Can be null, or contain
      * user/pwd[/key]
@@ -1253,7 +1256,10 @@ public abstract class InternalJob extends JobState {
     public String display() {
         String nl = System.lineSeparator();
         String answer = super.display();
-        return answer + nl + "\tTasks = " + displayAllTasks();
+        if (jobSubmissionDetailedLogging) {
+            return answer + nl + "\tTasks = " + displayAllTasks();
+        }
+        return answer + nl + "\tTasks = " + tasks.size() + " tasks" + nl;
     }
 
     private String displayAllTasks() {

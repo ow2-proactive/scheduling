@@ -286,6 +286,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Defines the cron expression for the db sizes polling */
     SCHEDULER_MEM_MONITORING_FREQ("pa.scheduler.mem.monitoring.freq", PropertyType.STRING),
 
+    // Define verbosity of job description when submitted
+    SCHEDULER_JOB_SUBMISSION_DETAILED_LOGGING(
+            "pa.scheduler.job.submission.detailed.logging",
+            PropertyType.BOOLEAN,
+            "true"),
+
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */
     /* ***************************************************************** */
