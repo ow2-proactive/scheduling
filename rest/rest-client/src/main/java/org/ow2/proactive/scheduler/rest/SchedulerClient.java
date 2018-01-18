@@ -42,7 +42,6 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
-import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,7 +51,6 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -66,13 +64,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
-import org.ow2.proactive.catalogclient.service.CatalogClientLib;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -768,16 +769,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
 
         JobIdData jobIdData = null;
-        try {
-            String workflow = CatalogClientLib.getCatalogObjectService()
-                                              .getResolvedCatalogObject(catalogRestURL,
-                                                                        bucketName,
-                                                                        workflowName,
-                                                                        false,
-                                                                        sid);
 
-            InputStream stream = new ByteArrayInputStream(workflow.getBytes(StandardCharsets.UTF_8.name()));
-            jobIdData = restApiClient().submitXml(sid, stream, variables);
+        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" + bucketName + "/resources/" + workflowName +
+                                      "/raw");
+        httpGet.addHeader("sessionid", sid);
+
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
+                CloseableHttpResponse response = httpclient.execute(httpGet)) {
+
+            jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }

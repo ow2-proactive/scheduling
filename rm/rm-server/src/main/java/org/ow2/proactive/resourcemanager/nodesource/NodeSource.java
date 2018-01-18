@@ -228,7 +228,7 @@ public class NodeSource implements InitActive, RunActive {
         // Infrastructure has been configured and linked to the node source, so we can now persist the runtime
         // variables of the infrastructure for the first time (they have been initialized during the creation of the
         // infrastructure, in its configuration.
-        infrastructureManager.persistInfraVariables();
+        infrastructureManager.persistInfrastructureVariables();
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
         Thread.currentThread().setName("Node Source \"" + name + "\"");

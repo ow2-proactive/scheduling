@@ -33,14 +33,18 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -57,7 +61,7 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class JobRecoveryTest extends BaseRecoveryTest {
 
     private static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
                                                                                      .getPath();
@@ -75,7 +79,7 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
      */
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 1000 }, { 100, 2000 }, { 500, 5000 }, { 1000, 10000 } });
+        return Arrays.asList(new Object[][] { { 10, 2000 }, { 100, 5000 }, { 500, 30000 } });
     }
 
     // number of jobs
@@ -94,7 +98,6 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
      *
      * @throws Exception
      */
-    @Before
     public void startKillStartScheduler() throws Exception {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
@@ -122,9 +125,13 @@ public class JobRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndR
 
     }
 
-    @Test
+    @Test(timeout = 1600000)
     public void test() {
         try {
+            // it should be inside Test case and not in Before case, because
+            // otherwise After will not be executed if Before lasts longer than timeout Rule
+            // however, if it is inside Test case then, escaping by timeout anyway will call After
+            startKillStartScheduler();
             long recovered = numberOfJobsRecovered();
             long timeSpent = timeSpentToRecoverJobs();
             LOGGER.info(NodeRecoveryTest.makeCSVString("JobRecoveryTest",

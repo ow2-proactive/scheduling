@@ -217,7 +217,7 @@ public class InfrastructureManagerTest {
     @Test
     public void testPersistInfrastructureVariables() {
         infrastructureManager.setPersistedNodeSourceData(nodeSourceData);
-        infrastructureManager.persistInfraVariables();
+        infrastructureManager.persistInfrastructureVariables();
         verify(nodeSourceData, times(1)).setInfrastructureVariables(anyMap());
         verify(dbManager, times(1)).updateNodeSource(eq(nodeSourceData));
     }
@@ -225,7 +225,7 @@ public class InfrastructureManagerTest {
     @Test
     public void testDoNotPersistInfrastructureVariablesWhenCannotFindNodeSource() {
         when(dbManager.getNodeSource(anyString())).thenReturn(null);
-        infrastructureManager.persistInfraVariables();
+        infrastructureManager.persistInfrastructureVariables();
         verify(nodeSourceData, times(0)).setInfrastructureVariables(anyMap());
         verify(dbManager, times(0)).updateNodeSource(eq(nodeSourceData));
     }
