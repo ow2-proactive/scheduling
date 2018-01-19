@@ -570,13 +570,11 @@ class LiveJobs {
                                                                            TerminationData.TerminationStatus.NORMAL);
 
             boolean errorOccurred = result.hadException();
-            if (errorOccurred) {
-                tlogger.error(taskId, "error", result.getException());
-            }
 
             tlogger.info(taskId, "finished with" + (errorOccurred ? "" : "out") + " errors");
 
             if (errorOccurred) {
+                tlogger.error(taskId, "error", result.getException());
                 tlogger.info(taskId, "task has terminated with an error ");
                 task.decreaseNumberOfExecutionLeft();
 
@@ -637,6 +635,8 @@ class LiveJobs {
                         !onErrorPolicyInterpreter.requiresPauseJobOnError(task) &&
                         !onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                         jobData.job.increaseNumberOfFaultyTasks(taskId);
+                        // remove the parent tasks results if task fails and job is canceled
+                        task.removeParentTasksResults();
                     } else if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration());
                         tlogger.info(taskId,
@@ -653,6 +653,9 @@ class LiveJobs {
                         pauseJob(task.getJobId());
                     }
                 }
+            } else {
+                //remove the parent tasks results if task finished with no error
+                task.removeParentTasksResults();
             }
 
             terminateTask(jobData, task, errorOccurred, result, terminationData);

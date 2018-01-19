@@ -31,7 +31,6 @@ import java.net.URL;
 import org.junit.Test;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
 /**
