@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -289,13 +290,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private NodesRecoveryManager nodesRecoveryManager;
 
-    // the following boolean/lock/condition serve as a barrier to prevent the
-    // setNodesAvailable some immediate services to run before the initActivity of the RM is finished.
+    // the following boolean/CountDownLatch serve as a barrier to prevent the
+    // setNodesAvailable immediate service to run before the initActivity of
+    // the RM is finished.
     private boolean rmCoreInitialized = false;
 
-    private final Lock rmCoreInitializedLock = new ReentrantLock();
-
-    private final Condition rmCoreInitializedCondition = rmCoreInitializedLock.newCondition();
+    private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
     /**
      * ProActive Empty constructor
@@ -457,14 +457,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     protected void signalRMCoreIsInitialized() {
-        rmCoreInitializedLock.lock();
-        try {
-            rmCoreInitialized = true;
-            logger.info("Resource Manager is initialized");
-            rmCoreInitializedCondition.signalAll();
-        } finally {
-            rmCoreInitializedLock.unlock();
-        }
+        rmCoreInitialized = true;
+        logger.info("Resource Manager is initialized");
+        countDownLatch.countDown();
     }
 
     protected void initiateRecoveryIfRequired() {
@@ -1280,19 +1275,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void waitForRMCoreToBeInitialized() {
-        rmCoreInitializedLock.lock();
-
-        try {
-            while (!rmCoreInitialized) {
-                try {
-                    logger.info("Waiting for Resource Manager to be initialized");
-                    rmCoreInitializedCondition.await();
-                } catch (InterruptedException e) {
-                    logger.warn("Interrupted while waiting for Resource Manager to be initialized", e);
-                }
+        while (!rmCoreInitialized) {
+            try {
+                logger.info("Waiting for Resource Manager to be initialized");
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                logger.warn("Interrupted while waiting for Resource Manager to be initialized", e);
             }
-        } finally {
-            rmCoreInitializedLock.unlock();
         }
     }
 
