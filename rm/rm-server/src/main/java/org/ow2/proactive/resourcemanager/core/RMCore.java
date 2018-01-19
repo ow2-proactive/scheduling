@@ -44,9 +44,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -290,11 +287,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private NodesRecoveryManager nodesRecoveryManager;
 
-    // the following boolean/CountDownLatch serve as a barrier to prevent the
-    // setNodesAvailable immediate service to run before the initActivity of
-    // the RM is finished.
-    private boolean rmCoreInitialized = false;
-
+    /**
+     * A barrier to prevent the {@link RMCore#setNodesAvailable} immediate
+     * service to run before the initActivity of the RM is finished.
+     */
     private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
     /**
@@ -457,7 +453,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     protected void signalRMCoreIsInitialized() {
-        rmCoreInitialized = true;
         logger.info("Resource Manager is initialized");
         countDownLatch.countDown();
     }
@@ -1260,7 +1255,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             if (node == null) {
                 logger.warn("Cannot set node as available, the node is unknown: " + nodeUrl);
                 if (logger.isDebugEnabled()) {
-                    logger.warn("Known nodes are: " + Arrays.toString(allNodes.keySet().toArray()));
+                    logger.debug("Known nodes are: " + Arrays.toString(allNodes.keySet().toArray()));
                 }
                 nodeUrlsNotKnownByTheRM.add(nodeUrl);
             } else if (node.isDown()) {
@@ -1275,13 +1270,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void waitForRMCoreToBeInitialized() {
-        while (!rmCoreInitialized) {
-            try {
-                logger.info("Waiting for Resource Manager to be initialized");
-                countDownLatch.await();
-            } catch (InterruptedException e) {
-                logger.warn("Interrupted while waiting for Resource Manager to be initialized", e);
-            }
+        try {
+            logger.info("Waiting for Resource Manager to be initialized");
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while waiting for Resource Manager to be initialized", e);
         }
     }
 
