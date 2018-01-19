@@ -186,6 +186,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         renewSession();
     }
 
+    @Override
+    public ConnectionInfo getConnectionInfo() {
+        return connectionInfo;
+    }
+
     private void checkInitialized() {
         if (!initialized) {
             throw new IllegalStateException("SchedulerClient not initialized.");
@@ -1005,6 +1010,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try {
             removeEventListener();
             schedulerEventReceiver = (new SchedulerEventReceiver.Builder()).restServerUrl(connectionInfo.getUrl())
+                                                                           .insecure(connectionInfo.isInsecure())
                                                                            .sessionId(sid)
                                                                            .schedulerEventListener(listener)
                                                                            .myEventsOnly(myEventsOnly)
