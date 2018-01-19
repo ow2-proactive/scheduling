@@ -55,6 +55,8 @@ import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -256,8 +258,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             if (logger.isDebugEnabled()) {
                 loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
             }
-
-            updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
 
             for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
                 // load and Initialize the executable container
@@ -541,18 +541,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     }
 
     /**
-     * Update all variables for the given scheduled tasks
-     */
-    private void updateVariablesForTasksToSchedule(Map<JobId, JobDescriptor> jobMap,
-            LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
-        for (EligibleTaskDescriptor taskDescriptor : tasksToSchedule) {
-            InternalJob associatedJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
-            InternalTask internalTask = associatedJob.getIHMTasks().get(taskDescriptor.getTaskId());
-            internalTask.updateVariables(schedulingService);
-        }
-    }
-
-    /**
      * Create bindings which will be used by selection scripts for the given tasks
      */
     public static Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task)
@@ -610,6 +598,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     /**
      * Create launcher and try to start the task.
+     * Since 7.35, this method also updates all types of variables in order to improve merge tasks performances
      *
      * @param nodeSet the node set containing every available nodes that can be used for execution
      * @param node the node on which to start the task
@@ -623,6 +612,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         TaskLauncher launcher = null;
         LiveJobs.JobData jobData = null;
         try {
+
+            //Update variables for this task and fetch the results of the task's parents
+            Map<TaskId, TaskResult> taskResults = task.updateVariables(schedulingService);
+
             jobData = schedulingService.lockJob(job.getId());
             //enough nodes to be launched at same time for a communicating task
             // task is not paused
@@ -671,7 +664,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                                                                    schedulingService,
                                                                                                                    terminateNotification,
                                                                                                                    corePrivateKey,
-                                                                                                                   terminateNotificationNodeURL),
+                                                                                                                   terminateNotificationNodeURL,
+                                                                                                                   taskResults),
                                                                                              dotaskActionTimeout,
                                                                                              TimeUnit.MILLISECONDS);
                     waitForTaskToBeStarted(taskExecutionSubmittedFuture);
