@@ -94,14 +94,30 @@ public class TaskContextVariableExtractor implements Serializable {
      */
     public Map<String, Serializable> getScopeVariables(TaskContext taskContext) {
         Map<String, Serializable> variables = new HashMap<>();
+        Map<String, Serializable> inherited = new HashMap<>();
+        Map<String, Serializable> dictionary = new HashMap<>();
 
         try {
-            variables = extractAllVariables(taskContext, null, "");
+            inherited.putAll(extractJobVariables(taskContext));
+            inherited.putAll(extractInheritedVariables(taskContext));
+            inherited.putAll(extractSystemVariables(taskContext, ""));
+
+            for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
+                if (!taskVariable.isJobInherited()) {
+                    //add non inherited variables
+                    variables.put(taskVariable.getName(), taskVariable.getValue());
+                } else if (!inherited.containsKey(taskVariable.getName())) {
+                    //but if the variable is inherited
+                    //replace by the inherited value if exists
+                    variables.put(taskVariable.getName(), taskVariable.getValue());
+                }
+            }
+
+            dictionary = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
             logger.error("Error reading variables from task context!");
         }
-
-        return resolveVariables(variables, variables);
+        return resolveVariables(variables, dictionary);
     }
 
     /**
@@ -118,9 +134,9 @@ public class TaskContextVariableExtractor implements Serializable {
 
         try {
             if (taskContext != null) {
-                variables.putAll(extractWorkflowVariables(taskContext));
-                variables.putAll(extractInheretedVariables(taskContext));
-                variables.putAll(extractContextVariables(taskContext, ""));
+                variables.putAll(extractInheritedVariables(taskContext));
+                variables.putAll(extractJobVariables(taskContext));
+                variables.putAll(extractSystemVariables(taskContext, ""));
             }
             dictionary = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
@@ -143,11 +159,10 @@ public class TaskContextVariableExtractor implements Serializable {
 
         try {
             if (taskContext != null) {
-                variables.putAll(extractWorkflowVariables(taskContext));
-                variables.putAll(extractInheretedVariables(taskContext));
-                variables.putAll(extractContextVariables(taskContext, ""));
+                variables.putAll(extractInheritedVariables(taskContext));
+                variables.putAll(extractJobVariables(taskContext));
+                variables.putAll(extractSystemVariables(taskContext, nodesFile));
             }
-
             dictionary = extractAllVariables(taskContext, null, nodesFile);
         } catch (IOException | ClassNotFoundException e) {
             logger.error("Error reading variables from task context!");
@@ -164,7 +179,7 @@ public class TaskContextVariableExtractor implements Serializable {
      *
      * @return Map containing variables.
      */
-    public Map<String, Serializable> getVariablesWithTaskResult(TaskContext taskContext, TaskResult taskResult) {
+    public Map<String, Serializable> getAllVariablesWithTaskResult(TaskContext taskContext, TaskResult taskResult) {
         Map<String, Serializable> variables = new HashMap<>();
         try {
             variables = extractAllVariables(taskContext, taskResult, "");
@@ -205,7 +220,7 @@ public class TaskContextVariableExtractor implements Serializable {
      * @param variables input hash containing variables and their values may reference other variables
      * @return dictionary with the same variables however with their values resolved
      */
-    public static Map<String, Serializable> resolveVariables(Map<String, Serializable> variables,
+    private static Map<String, Serializable> resolveVariables(Map<String, Serializable> variables,
             Map<String, Serializable> dictionary) {
         Map<String, Serializable> dictionaryVariables = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : variables.entrySet()) {
@@ -238,11 +253,11 @@ public class TaskContextVariableExtractor implements Serializable {
         Map<String, Serializable> variables = new HashMap<>();
 
         if (taskContext != null) {
-            variables.putAll(extractWorkflowVariables(taskContext));
-            variables.putAll(extractTaskResultVariables(taskResult));
+            variables.putAll(extractJobVariables(taskContext));
+            variables.putAll(extractInheritedVariables(taskContext));
             variables.putAll(extractTaskVariables(taskContext));
-            variables.putAll(extractInheretedVariables(taskContext));
-            variables.putAll(extractContextVariables(taskContext, nodesFile));
+            variables.putAll(extractSystemVariables(taskContext, nodesFile));
+
         }
 
         if (taskResult != null) {
@@ -259,7 +274,7 @@ public class TaskContextVariableExtractor implements Serializable {
      *
      * @return Map with the variables declared in xml at workflow level.
      */
-    private Map<String, Serializable> extractWorkflowVariables(TaskContext taskContext) {
+    private Map<String, Serializable> extractJobVariables(TaskContext taskContext) {
         Map<String, Serializable> variables = new HashMap<>();
 
         // job variables from workflow definition
@@ -297,7 +312,7 @@ public class TaskContextVariableExtractor implements Serializable {
      * @param taskContext object that contains job information to extract the desired variables.
      * @return map containing variables with values set.
      */
-    private Map<String, Serializable> extractContextVariables(TaskContext taskContext, String nodesFile) {
+    private Map<String, Serializable> extractSystemVariables(TaskContext taskContext, String nodesFile) {
         TaskLauncherInitializer initializer = taskContext.getInitializer();
 
         Map<String, Serializable> variables = new HashMap<>();
@@ -324,17 +339,19 @@ public class TaskContextVariableExtractor implements Serializable {
      *
      * @param taskContext contains the information needed to extract.
      *
-     * @return a map containing extracted variables or an empty hash if there are no variables.
+     * @return a map containing extracted variables or an empty hash if there are no variables or previous tasks.
      *
      * @throws IOException might be triggered during deserialization
      * @throws ClassNotFoundException might be triggered during deserialization
      */
-    private Map<String, Serializable> extractInheretedVariables(TaskContext taskContext)
+    private Map<String, Serializable> extractInheritedVariables(TaskContext taskContext)
             throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables = new HashMap<>();
-        for (TaskResult previousTaskResult : taskContext.getPreviousTasksResults()) {
-            if (previousTaskResult.getPropagatedVariables() != null) {
-                variables.putAll(SerializationUtil.deserializeVariableMap(previousTaskResult.getPropagatedVariables()));
+        if (taskContext.getPreviousTasksResults() != null) {
+            for (TaskResult previousTaskResult : taskContext.getPreviousTasksResults()) {
+                if (previousTaskResult.getPropagatedVariables() != null) {
+                    variables.putAll(SerializationUtil.deserializeVariableMap(previousTaskResult.getPropagatedVariables()));
+                }
             }
         }
         return variables;
@@ -347,9 +364,12 @@ public class TaskContextVariableExtractor implements Serializable {
      *
      * @return a map containing extracted variables or an empty hash if there are no variables.
      */
-    private Map<String, Serializable> extractTaskVariables(TaskContext taskContext) {
+    private Map<String, Serializable> extractTaskVariables(TaskContext taskContext)
+            throws IOException, ClassNotFoundException {
         Map<String, Serializable> variables = new HashMap<>();
+
         for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
+            //ignore inherited variables
             if (!taskVariable.isJobInherited()) {
                 variables.put(taskVariable.getName(), taskVariable.getValue());
             }

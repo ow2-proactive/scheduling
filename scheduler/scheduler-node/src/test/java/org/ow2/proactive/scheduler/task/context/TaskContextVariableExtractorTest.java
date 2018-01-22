@@ -155,8 +155,8 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
         TaskResultImpl taskResult = new TaskResultImpl(taskContext.getTaskId(), new Exception("Exception"));
         taskResult.setPropagatedVariables(taskResultVariables);
 
-        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getVariablesWithTaskResult(taskContext,
-                                                                                                                   taskResult);
+        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllVariablesWithTaskResult(taskContext,
+                                                                                                                      taskResult);
 
         assertThat((String) contextVariables.get(taskResultPropagatedVariables1Key),
                    is(taskResultPropagatedVariables1Value));

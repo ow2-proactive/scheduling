@@ -345,7 +345,7 @@ public class TaskLauncher implements InitActive {
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)
             throws Exception {
-        return taskContextVariableExtractor.getVariablesWithTaskResult(taskContext, taskResult);
+        return taskContextVariableExtractor.getAllVariablesWithTaskResult(taskContext, taskResult);
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext) throws Exception {
