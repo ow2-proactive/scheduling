@@ -98,9 +98,9 @@ public class TaskContextVariableExtractor implements Serializable {
         Map<String, Serializable> dictionary = new HashMap<>();
 
         try {
+            inherited.putAll(extractSystemVariables(taskContext, ""));
             inherited.putAll(extractJobVariables(taskContext));
             inherited.putAll(extractInheritedVariables(taskContext));
-            inherited.putAll(extractSystemVariables(taskContext, ""));
 
             for (TaskVariable taskVariable : taskContext.getInitializer().getTaskVariables().values()) {
                 if (!taskVariable.isJobInherited()) {
@@ -134,9 +134,9 @@ public class TaskContextVariableExtractor implements Serializable {
 
         try {
             if (taskContext != null) {
-                variables.putAll(extractInheritedVariables(taskContext));
-                variables.putAll(extractJobVariables(taskContext));
                 variables.putAll(extractSystemVariables(taskContext, ""));
+                variables.putAll(extractJobVariables(taskContext));
+                variables.putAll(extractInheritedVariables(taskContext));
             }
             dictionary = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
@@ -159,9 +159,9 @@ public class TaskContextVariableExtractor implements Serializable {
 
         try {
             if (taskContext != null) {
-                variables.putAll(extractInheritedVariables(taskContext));
-                variables.putAll(extractJobVariables(taskContext));
                 variables.putAll(extractSystemVariables(taskContext, nodesFile));
+                variables.putAll(extractJobVariables(taskContext));
+                variables.putAll(extractInheritedVariables(taskContext));
             }
             dictionary = extractAllVariables(taskContext, null, nodesFile);
         } catch (IOException | ClassNotFoundException e) {
@@ -226,7 +226,7 @@ public class TaskContextVariableExtractor implements Serializable {
         for (Map.Entry<String, Serializable> entry : variables.entrySet()) {
             String resolvedValue;
             if (entry.getValue() instanceof String) {
-                resolvedValue = filterAndUpdate(entry.getValue().toString(), variables);
+                resolvedValue = filterAndUpdate(entry.getValue().toString(), dictionary);
                 dictionaryVariables.put(entry.getKey(), resolvedValue);
             } else {
                 dictionaryVariables.put(entry.getKey(), entry.getValue());
