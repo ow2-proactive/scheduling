@@ -186,11 +186,10 @@ task wrapper(type: Wrapper) {
 
 ext.schedulingFunctionalTestConfiguration = {
 
-    include 'functionaltests/**'
+    include 'functionaltests/StandardTestSuite*'
 
-    if(!project.hasProperty('regression')){
-        def regression_tests = new File(project.rootDir, "/regression_tests.txt")
-        regression_tests.readLines().each { exclude '**/'+it+'.class' }
+    if(project.hasProperty('regression')){
+        include 'functionaltests/RegressionTestSuite*'
     }
 
     systemProperties << ['pa.rm.home': rootDir.absolutePath]

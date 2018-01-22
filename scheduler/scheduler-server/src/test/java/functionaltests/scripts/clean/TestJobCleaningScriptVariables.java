@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.utils.SchedulerStartForFunctionalTest;
 
@@ -48,7 +49,7 @@ import functionaltests.utils.SchedulerStartForFunctionalTest;
  * This is also a test for the PA_TASK_SUCCESS variable which indicates if a task has ended
  * with errors or not
  */
-public class TestJobCleaningScriptVariables extends SchedulerFunctionalTestWithRestart {
+public class TestJobCleaningScriptVariables extends SchedulerFunctionalTestNoRestart {
 
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();

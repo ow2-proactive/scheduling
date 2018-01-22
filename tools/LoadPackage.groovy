@@ -90,7 +90,7 @@ class LoadPackage {
 
         if (this.sessionId == null) {
             def schedulerClient = SchedulerClient.createInstance()
-            def schedulerConnectionSettings = new ConnectionInfo(this.SCHEDULER_REST_URL, null, null, new File(this.SCHEDULER_HOME, this.PATH_TO_SCHEDULER_CREDENTIALS_FILE), false)
+            def schedulerConnectionSettings = new ConnectionInfo(this.SCHEDULER_REST_URL, null, null, new File(this.SCHEDULER_HOME, this.PATH_TO_SCHEDULER_CREDENTIALS_FILE), true)
             schedulerClient.init(schedulerConnectionSettings)
 
             this.sessionId = schedulerClient.getSession()

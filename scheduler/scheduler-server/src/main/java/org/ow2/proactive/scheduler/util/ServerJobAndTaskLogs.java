@@ -83,6 +83,16 @@ public class ServerJobAndTaskLogs {
             String logsLocation = getLogsLocation();
             File logFolder = new File(logsLocation, path);
             org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
+
+            while (logFolder.exists()) {
+                logger.warn("Could not remove logs folder " + logFolder + " , retrying...");
+                org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
 
     }
