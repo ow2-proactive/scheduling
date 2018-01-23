@@ -86,6 +86,8 @@ public class DataSpaceClient implements IDataSpaceClient {
 
     public void init(String restServerUrl, ISchedulerClient client) {
         this.httpEngine = new ApacheHttpClient4Engine(new HttpClientBuilder().disableContentCompression()
+                                                                             .insecure(client.getConnectionInfo()
+                                                                                             .isInsecure())
                                                                              .useSystemProperties()
                                                                              .build());
         this.restDataspaceUrl = restDataspaceUrl(restServerUrl);

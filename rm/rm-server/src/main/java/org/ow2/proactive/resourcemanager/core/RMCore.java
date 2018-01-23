@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -224,7 +226,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * HashMaps of nodes known by the RMCore
      */
-    private volatile Map<String, RMNode> allNodes;
+    private Map<String, RMNode> allNodes;
 
     /**
      * List of nodes that are eligible for Scheduling.
@@ -286,6 +288,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private NodesRecoveryManager nodesRecoveryManager;
 
     /**
+     * A barrier to prevent the {@link RMCore#setNodesAvailable} immediate
+     * service to run before the initActivity of the RM is finished.
+     */
+    private final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    /**
      * ProActive Empty constructor
      */
     public RMCore() {
@@ -306,7 +314,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         nodeSources = new HashMap<>();
         brokenNodeSources = new ArrayList<>();
-        allNodes = new HashMap<>();
+        allNodes = new ConcurrentHashMap<>();
         eligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
 
         this.accountsManager = new RMAccountsManager();
@@ -427,6 +435,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             initiateRecoveryIfRequired();
 
+            signalRMCoreIsInitialized();
+
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
         } catch (NodeException e) {
@@ -440,6 +450,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (logger.isDebugEnabled()) {
             logger.debug("RMCore end: initActivity");
         }
+    }
+
+    protected void signalRMCoreIsInitialized() {
+        logger.info("Resource Manager is initialized");
+        countDownLatch.countDown();
     }
 
     protected void initiateRecoveryIfRequired() {
@@ -550,7 +565,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (rmNodeData.equalsToNode(node)) {
             logger.info("Node to recover could successfully be looked up at URL: " + nodeUrl);
             rmNode = nodeSource.internalAddNodeAfterRecovery(node, rmNodeData);
-            this.allNodes.put(rmNode.getNodeURL(), rmNode);
+            registerAvailableNode(rmNode);
         } else {
             logger.error("The node that has been looked up does not have the same information as the node to recover: " +
                          node.getNodeInformation().getName() + " is not equal to " + rmNodeData.getName() + " or " +
@@ -801,8 +816,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return;
         }
         //was added during internalRegisterConfiguringNode
-        RMNode rmnode = this.allNodes.remove(nodeURL);
-        this.allNodes.put(nodeURL, configuredNode);
+        RMNode rmnode = this.allNodes.get(nodeURL);
+        registerAvailableNode(configuredNode);
 
         if (toShutDown) {
             logger.warn("Node " + rmnode.getNodeURL() +
@@ -867,6 +882,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
+     * Add the node in the list of all nodes to make it pingable.
+     *
+     * @param rmNode the node to make available
+     */
+    public BooleanWrapper registerAvailableNode(RMNode rmNode) {
+        this.allNodes.put(rmNode.getNodeURL(), rmNode);
+        return new BooleanWrapper(true);
+    }
+
+    /**
      * Internal operation of configuring a node. The node is not useable by a final user
      * ( not eligible thanks to getNode methods ) if it is in configuration state.
      * This method is called by {@link RMNodeConfigurator} to notify the core that the
@@ -885,7 +910,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         rmnode.setConfiguring(rmnode.getProvider());
 
         //we add the configuring node to the collection to be able to ping it
-        this.allNodes.put(rmnode.getNodeURL(), rmnode);
+        registerAvailableNode(rmnode);
 
         // save the information of this new node in DB, in particular its state
         persistNewRMNodeIfRecoveryEnabled(rmnode);
@@ -1200,8 +1225,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * or filtered while a timeout occurs when this method tries to send back a reply.
      * <p>
      * The {@code allNodes} data-structure is written by a single Thread only
-     * but read by multiple Threads. The data-structure is marked as volatile
-     * to ensure visibility.
+     * but read by multiple Threads.
      * <p>
      * Parallel executions of this method must involves different {@code nodeUrl}s.
      * <p>
@@ -1216,6 +1240,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @ImmediateService
     @Override
     public Set<String> setNodesAvailable(Set<String> nodeUrls) {
+
+        waitForRMCoreToBeInitialized();
+
         if (logger.isTraceEnabled()) {
             logger.trace("Received availability for the following workers: " + nodeUrls);
         }
@@ -1227,16 +1254,29 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             if (node == null) {
                 logger.warn("Cannot set node as available, the node is unknown: " + nodeUrl);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Known nodes are: " + Arrays.toString(allNodes.keySet().toArray()));
+                }
                 nodeUrlsNotKnownByTheRM.add(nodeUrl);
             } else if (node.isDown()) {
                 restoreNodeState(nodeUrl, node);
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("The node identified by " + nodeUrl + " is known but not DOWN, no action performed");
+                    logger.debug("The node identified by " + nodeUrl + " is known and not DOWN, no action performed");
                 }
             }
         }
         return nodeUrlsNotKnownByTheRM.build();
+    }
+
+    private void waitForRMCoreToBeInitialized() {
+        try {
+            logger.info("Waiting for Resource Manager to be initialized");
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while waiting for Resource Manager to be initialized", e);
+        }
     }
 
     @VisibleForTesting

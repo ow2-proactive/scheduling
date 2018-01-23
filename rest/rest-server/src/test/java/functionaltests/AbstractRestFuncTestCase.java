@@ -33,7 +33,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
@@ -43,6 +42,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -136,7 +136,7 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected HttpResponse executeUriRequest(HttpUriRequest request) throws Exception {
-        return HttpClientBuilder.create().build().execute(request);
+        return new HttpClientBuilder().insecure(true).useSystemProperties().build().execute(request);
     }
 
     protected void assertEquals(int expected, int actual) {
@@ -301,7 +301,7 @@ public abstract class AbstractRestFuncTestCase {
         StringEntity entity = new StringEntity(buffer.toString());
         entity.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpPost.setEntity(entity);
-        HttpResponse response = HttpClientBuilder.create().build().execute(httpPost);
+        HttpResponse response = new HttpClientBuilder().insecure(true).useSystemProperties().build().execute(httpPost);
         String responseContent = EntityUtils.toString(response.getEntity());
         if (STATUS_OK != getStatusCode(response)) {
             throw new RuntimeException(String.format("Authentication error: %n%s", responseContent));

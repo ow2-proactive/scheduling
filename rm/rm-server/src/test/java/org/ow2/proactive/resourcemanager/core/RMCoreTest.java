@@ -612,6 +612,8 @@ public class RMCoreTest {
                                    freeNodes,
                                    Mockito.mock(RMDBManager.class));
 
+        rmCore.signalRMCoreIsInitialized();
+
         BooleanWrapper lockResult = rmCore.lockNodes(ImmutableSet.of(rmNode.getNodeURL()));
 
         assertThat(lockResult.getBooleanValue()).isTrue();
@@ -778,7 +780,16 @@ public class RMCoreTest {
     }
 
     private RMCore createRmCore(ImmutableMap<String, RMNode> allNodes, List<RMNode> freeNodes) {
-        return new RMCore(null, null, allNodes, null, Mockito.mock(RMMonitoringImpl.class), null, freeNodes, dbManager);
+        RMCore rmCore = new RMCore(null,
+                                   null,
+                                   allNodes,
+                                   null,
+                                   Mockito.mock(RMMonitoringImpl.class),
+                                   null,
+                                   freeNodes,
+                                   dbManager);
+        rmCore.signalRMCoreIsInitialized();
+        return rmCore;
     }
 
     /**
@@ -859,6 +870,8 @@ public class RMCoreTest {
                             mockedSelectionManager,
                             freeNodes,
                             dbManager);
+
+        rmCore.signalRMCoreIsInitialized();
 
         rmCore = spy(rmCore);
 

@@ -35,6 +35,7 @@ import java.util.List;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.log4j.Logger;
 import org.atmosphere.wasync.Client;
 import org.atmosphere.wasync.ClientFactory;
@@ -59,6 +60,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotificat
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
 
 import com.google.common.collect.Lists;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 
 
 /**
@@ -74,6 +77,8 @@ public class SchedulerEventReceiver {
     private String restServerUrl;
 
     private SchedulerEventListener eventListener;
+
+    private boolean insecure = false;
 
     private boolean myEventsOnly;
 
@@ -94,7 +99,15 @@ public class SchedulerEventReceiver {
     private void openAndReceive(final SchedulerEventListener eventListener, boolean myEventsOnly,
             SchedulerEvent... events) throws IOException {
         Client client = ClientFactory.getDefault().newClient();
-        socket = client.create(client.newOptionsBuilder().reconnect(false).build());
+        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
+        if (insecure) {
+            builder = builder.setAcceptAnyCertificate(true)
+                             .setHostnameVerifier(SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        }
+        AsyncHttpClientConfig httpClientConfig = builder.build();
+        AsyncHttpClient httpClient = new AsyncHttpClient(httpClientConfig);
+
+        socket = client.create(client.newOptionsBuilder().runtime(httpClient).reconnect(false).build());
         EventNotificationHandler notificationHandler = new EventNotificationHandler(eventListener);
         socket.on(Event.MESSAGE, notificationHandler);
         socket.on(Event.CLOSE, new Function() {
@@ -123,7 +136,11 @@ public class SchedulerEventReceiver {
 
     public void stop() {
         if (socket != null) {
-            socket.close();
+            try {
+                socket.close();
+            } catch (Exception ignored) {
+
+            }
         }
     }
 
@@ -148,6 +165,11 @@ public class SchedulerEventReceiver {
 
         public Builder restServerUrl(String restServerUrl) {
             this.schedulerEventReceiver.restServerUrl = restServerUrl;
+            return this;
+        }
+
+        public Builder insecure(boolean insecure) {
+            this.schedulerEventReceiver.insecure = insecure;
             return this;
         }
 
