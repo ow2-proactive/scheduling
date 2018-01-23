@@ -435,8 +435,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             initiateRecoveryIfRequired();
 
-            signalRMCoreIsInitialized();
-
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
         } catch (NodeException e) {
@@ -445,6 +443,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.error("", e);
         } catch (ClassNotFoundException e) {
             logger.error("", e);
+        } finally {
+            signalRMCoreIsInitialized();
         }
 
         if (logger.isDebugEnabled()) {
@@ -1271,7 +1271,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private void waitForRMCoreToBeInitialized() {
         try {
-            logger.info("Waiting for Resource Manager to be initialized");
             countDownLatch.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
