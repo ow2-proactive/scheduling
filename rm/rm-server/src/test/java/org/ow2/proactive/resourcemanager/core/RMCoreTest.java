@@ -888,7 +888,7 @@ public class RMCoreTest {
             }
         }).when(rmCore).getNodesRecoveryManagerBuilder();
 
-        rmCore.initiateRecovery();
+        rmCore.initiateRecoveryIfRequired();
     }
 
     private void configureRMNode(MockedRMNodeParameters param) {

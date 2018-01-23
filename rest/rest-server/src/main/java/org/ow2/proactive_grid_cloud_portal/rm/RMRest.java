@@ -108,13 +108,6 @@ import org.rrd4j.core.RrdDb;
 @Path("/rm")
 public class RMRest implements RMRestInterface {
 
-    /**
-     * The createNodeSource endpoint will create a node source with
-     * recoverable nodes if the nodesRecoverable value is equal to the string
-     * "true", regardless of the case
-     */
-    private static final String CREATE_NODE_SOURCE_WITH_RECOVERABLE_NODES_VALUE = "true";
-
     protected static final String[] dataSources = { //
                                                     // "AverageInactivity", // redundant with AverageActivity
                                                     // "ToBeReleasedNodesCo", // useless info
@@ -442,8 +435,7 @@ public class RMRest implements RMRestInterface {
                                                   infraParams,
                                                   policyType,
                                                   policyParams,
-                                                  nodesRecoverable.equalsIgnoreCase(CREATE_NODE_SOURCE_WITH_RECOVERABLE_NODES_VALUE))
-                                .getBooleanValue());
+                                                  Boolean.parseBoolean(nodesRecoverable)).getBooleanValue());
         } catch (RuntimeException ex) {
             nsState.setResult(false);
             nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
