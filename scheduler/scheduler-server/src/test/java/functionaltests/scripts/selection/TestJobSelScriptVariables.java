@@ -30,6 +30,7 @@ import java.net.URL;
 
 import org.junit.Test;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
@@ -37,7 +38,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  * This test checks that variable bindings are available and correctly set in selection scripts
  * The test timeouts if they are not, debugging can be done by reading the scheduler logs
  */
-public class TestJobSelScriptVariables extends SchedulerFunctionalTestWithRestart {
+public class TestJobSelScriptVariables extends SchedulerFunctionalTestNoRestart {
 
     private static URL jobDescriptor = TestJobSelScriptVariables.class.getResource("/functionaltests/descriptors/Job_selection_script_variables.xml");
 

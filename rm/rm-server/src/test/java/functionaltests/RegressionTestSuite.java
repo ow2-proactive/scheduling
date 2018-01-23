@@ -23,32 +23,27 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.utils;
+package functionaltests;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
+import functionaltests.nodesource.TestSSHInfrastructureV2RestartDownNodesPolicy;
+import functionaltests.nodesrecovery.RecoverLocalInfrastructureTest;
+import functionaltests.nodesrecovery.RecoverSSHInfrastructureV2Test;
+import functionaltests.nonblockingcore.NonBlockingCoreTest;
+import functionaltests.permissions.TestNSNodesPermissions;
+import functionaltests.selectionscript.SelectionScriptTimeOutTest;
+
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses({ NonBlockingCoreTest.class, TestNSNodesPermissions.class, SelectionScriptTimeOutTest.class,
+                      RecoverLocalInfrastructureTest.class, RecoverSSHInfrastructureV2Test.class,
+                      TestSSHInfrastructureV2RestartDownNodesPolicy.class })
 
 /**
- * Test which starts a new scheduler with a custom configuration, and kill it after the test.
- * The scheduler start is delegated to the subclass.
- *
- * Every concrete subclass should be added to one of functionaltests.StandardTestSuite or functionaltests.RegressionTestSuite
- * @see functionaltests.StandardTestSuite
- * @see functionaltests.RegressionTestSuite
+ * @author ActiveEon Team
+ * @since 10/01/2018
  */
-public class SchedulerFunctionalTestWithCustomConfigAndRestart extends SchedulerFunctionalTest {
-
-    @BeforeClass
-    public static void letTheSubclassStartTheScheduler() throws Exception {
-        schedulerHelper.log("Scheduler has been started with a custom configuration.");
-    }
-
-    @AfterClass
-    public static void cleanupScheduler() throws Exception {
-        if (schedulerHelper != null) {
-            schedulerHelper.log("Kill Scheduler after test.");
-            schedulerHelper.killScheduler();
-        }
-    }
+public class RegressionTestSuite {
 }

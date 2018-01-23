@@ -38,6 +38,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 import functionaltests.workflow.JobWorkflowDataspace;
 import functionaltests.workflow.TWorkflowJobs;
@@ -49,7 +50,7 @@ import functionaltests.workflow.TWorkflowJobs;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestWorkflowDataspace extends SchedulerFunctionalTestWithRestart {
+public class TestWorkflowDataspace extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testWorkflowDataspace() throws Throwable {

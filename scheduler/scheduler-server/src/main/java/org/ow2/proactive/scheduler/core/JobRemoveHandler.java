@@ -97,11 +97,11 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
         dbManager.removeJob(jobId, jobs.get(0).getRemovedTime(), removeFromDb);
 
+        ServerJobAndTaskLogs.remove(jobId);
+
         if (logger.isInfoEnabled()) {
             logger.info("Job " + jobId + " removed in " + (System.currentTimeMillis() - start) + "ms");
         }
-
-        ServerJobAndTaskLogs.remove(jobId);
 
         // send event to front-end
         service.getListener()

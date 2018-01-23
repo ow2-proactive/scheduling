@@ -42,6 +42,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.SimpleScript;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
@@ -51,7 +52,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestDataspaceScripts extends SchedulerFunctionalTestWithRestart {
+public class TestDataspaceScripts extends SchedulerFunctionalTestNoRestart {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
