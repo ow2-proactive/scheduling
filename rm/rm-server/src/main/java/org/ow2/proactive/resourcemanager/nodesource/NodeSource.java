@@ -392,11 +392,16 @@ public class NodeSource implements InitActive, RunActive {
             ((AbstractRMNode) rmNode).copyLockStatusFrom(deployingNode);
         }
 
-        //we notify the configuration of the node to the rmcore
-        //it then will be seen as "configuring"
-        rmcore.internalRegisterConfiguringNode(rmNode);
+        boolean isNodeAdded = rmcore.registerAvailableNode(rmNode).getBooleanValue();
 
-        return new BooleanWrapper(true);
+        if (isNodeAdded) {
+            // if the node is successfully added we can let it configure
+            // asynchronously. It will then be seen as "configuring"
+            rmcore.internalRegisterConfiguringNode(rmNode);
+            return new BooleanWrapper(true);
+        } else {
+            return new BooleanWrapper(false);
+        }
     }
 
     /**

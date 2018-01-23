@@ -40,7 +40,6 @@ import org.ow2.proactive.scheduler.job.InternalJobFactory;
 import org.ow2.tests.ProActiveTest;
 
 
-// FIXME: This is not a unit test
 public class TestInMemorySchedulerDB extends ProActiveTest {
 
     @Test

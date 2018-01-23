@@ -33,6 +33,10 @@ import org.junit.BeforeClass;
 
 /**
  * Test which starts a new scheduler in non-fork mode, and kill it after the test
+ *
+ * Every concrete subclass should be added to one of functionaltests.StandardTestSuite or functionaltests.RegressionTestSuite
+ * @see functionaltests.StandardTestSuite
+ * @see functionaltests.RegressionTestSuite
  */
 public class SchedulerFunctionalTestNonForkModeWithRestart extends SchedulerFunctionalTest {
 

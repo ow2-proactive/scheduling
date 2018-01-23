@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
@@ -54,7 +55,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  * @date 2 jun 08
  * @since ProActive Scheduling 1.0
  */
-public class TestJobDataspaceSubmission extends SchedulerFunctionalTestWithRestart {
+public class TestJobDataspaceSubmission extends SchedulerFunctionalTestNoRestart {
 
     private static String IOSPACE = System.getProperty("java.io.tmpdir") + File.separator + "scheduler_test" +
                                     File.separator;

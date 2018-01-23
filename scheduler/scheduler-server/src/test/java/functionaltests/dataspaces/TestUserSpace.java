@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scripting.SimpleScript;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
@@ -70,7 +71,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  * @author The ProActive Team
  * @since ProActive Scheduling 2.2
  */
-public class TestUserSpace extends SchedulerFunctionalTestWithRestart {
+public class TestUserSpace extends SchedulerFunctionalTestNoRestart {
 
     private static final String[][] inFiles = { { "A", "Content of A" }, { "B", "not much" },
                                                 { "_1234", "!@#%$@%54vc54\b\t\\\\\nasd123!@#", "res1",
