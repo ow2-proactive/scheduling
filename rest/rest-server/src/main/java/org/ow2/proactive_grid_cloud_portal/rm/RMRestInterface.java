@@ -161,6 +161,17 @@ public interface RMRestInterface {
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException;
+
+    @POST
+    @Path("nodesource/create/recovery")
+    @Produces("application/json")
+    NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
             @FormParam("policyFileParameters") String[] policyFileParameters,
             @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException;
 
