@@ -125,7 +125,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
 
     }
 
-    @Test(timeout = 1600000)
+    @Test(timeout = 3600000)
     public void test() {
         try {
             // it should be inside Test case and not in Before case, because

@@ -41,7 +41,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     @Rule
-    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() * 2,
+    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() * 10,
                                              TimeUnit.MILLISECONDS);
 
 }
