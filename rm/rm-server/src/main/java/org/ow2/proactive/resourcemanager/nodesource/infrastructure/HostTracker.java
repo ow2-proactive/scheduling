@@ -219,13 +219,15 @@ public class HostTracker implements Serializable {
         return nodeUrlsWithStatus;
     }
 
-    private enum NodeStatus {
+    private enum NodeStatus implements Serializable {
 
         ALIVE,
 
         DOWN,
 
-        REMOVED
+        REMOVED;
+
+        private static final long serialVersionUID = 1L;
 
     }
 
