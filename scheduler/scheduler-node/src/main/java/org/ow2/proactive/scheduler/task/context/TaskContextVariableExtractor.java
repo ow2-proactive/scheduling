@@ -49,6 +49,8 @@ import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariables
  */
 public class TaskContextVariableExtractor implements Serializable {
 
+    private final String ERROR_READING_VARIABLES = "Error reading variables from task context!";
+
     private static final Logger logger = Logger.getLogger(TaskContextVariableExtractor.class);
 
     private final ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
@@ -68,7 +70,7 @@ public class TaskContextVariableExtractor implements Serializable {
         try {
             variables = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
-            logger.error("Error reading variables from task context!");
+            logger.error(ERROR_READING_VARIABLES);
         }
 
         Map<String, String> thirdPartyCredentials = new HashMap<>();
@@ -76,7 +78,7 @@ public class TaskContextVariableExtractor implements Serializable {
         try {
             thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
         } catch (Exception e) {
-            logger.error("Error decrypting third party credentials!");
+            logger.error(ERROR_READING_VARIABLES);
         }
 
         HashMap<String, Serializable> systemEnvironmentVariables = new HashMap<String, Serializable>(System.getenv());
@@ -115,7 +117,7 @@ public class TaskContextVariableExtractor implements Serializable {
 
             dictionary = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
-            logger.error("Error reading variables from task context!");
+            logger.error(ERROR_READING_VARIABLES);
         }
         return resolveVariables(variables, dictionary);
     }
@@ -140,7 +142,7 @@ public class TaskContextVariableExtractor implements Serializable {
             }
             dictionary = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
-            logger.error("Error reading variables from task context!");
+            logger.error(ERROR_READING_VARIABLES);
         }
 
         return resolveVariables(variables, dictionary);
@@ -165,7 +167,7 @@ public class TaskContextVariableExtractor implements Serializable {
             }
             dictionary = extractAllVariables(taskContext, null, nodesFile);
         } catch (IOException | ClassNotFoundException e) {
-            logger.error("Error reading variables from task context!");
+            logger.error(ERROR_READING_VARIABLES);
         }
 
         return resolveVariables(variables, dictionary);
@@ -184,7 +186,7 @@ public class TaskContextVariableExtractor implements Serializable {
         try {
             variables = extractAllVariables(taskContext, taskResult, "");
         } catch (IOException | ClassNotFoundException e) {
-            logger.error("Error reading variables from task context!");
+            logger.error(ERROR_READING_VARIABLES);
         }
         return resolveVariables(variables, variables);
     }
@@ -201,7 +203,7 @@ public class TaskContextVariableExtractor implements Serializable {
         try {
             variables = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
-            logger.error("Error reading variables from task context!");
+            logger.error(ERROR_READING_VARIABLES);
         }
         return resolveVariables(variables, variables);
     }
