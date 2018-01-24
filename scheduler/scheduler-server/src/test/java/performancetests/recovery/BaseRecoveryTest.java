@@ -25,6 +25,12 @@
  */
 package performancetests.recovery;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Rule;
@@ -44,6 +50,10 @@ public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     public static final String FAILURE = "FAILURE";
 
+    public static final String SEPARATOR = ",";
+
+    public static final String FILE_PREFIX = "performance";
+
     public static final String ERROR = "ERROR";
 
     @Rule
@@ -51,12 +61,52 @@ public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
                                              TimeUnit.MILLISECONDS);
 
     public static String makeCSVString(Object... strings) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(strings[0].toString());
-        for (int i = 1; i < strings.length; ++i) {
-            builder.append(',');
-            builder.append(strings[i].toString());
+        String result = new String();
+        for (Object object : strings) {
+            result += SEPARATOR + object.toString();
         }
-        return builder.toString();
+        return result.substring(1);
+    }
+
+    public static Map<String, Double> readReport(File file) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        Map<String, Double> result = new HashMap<>(8);
+
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            final String[] values = line.split(SEPARATOR);
+            String key = values[1] + "-" + values[2];
+            String value = values[5];
+            result.put(key, Double.parseDouble(value));
+        }
+
+        return result;
+    }
+
+    public static List<File> getTwoLastFiles() {
+        File folder = new File(System.getProperty("pa.rm.home"));
+        assertTrue("PathToStorage parameter does not lead to directory.", folder.isDirectory());
+        final File[] files = folder.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File file, String s) {
+                return s.startsWith(FILE_PREFIX);
+            }
+        });
+        assertNotEquals(0, files.length);
+        Arrays.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File fileA, File fileB) {
+                return Long.valueOf(fileA.lastModified()).compareTo(fileB.lastModified());
+            }
+        });
+
+        List<File> result = new ArrayList<>(2);
+
+        result.add(files[files.length - 1]);
+        result.add(files[files.length - 2]);
+
+        assertEquals(2, result.size());
+        return result;
     }
 }

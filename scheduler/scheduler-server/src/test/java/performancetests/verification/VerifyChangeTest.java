@@ -34,6 +34,8 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
 
+import performancetests.recovery.BaseRecoveryTest;
+
 
 public class VerifyChangeTest {
 
@@ -52,28 +54,30 @@ public class VerifyChangeTest {
     @Test
     public void changeShouldBeLessThanThreshold() throws IOException {
 
-        final List<File> twoLastFiles = getTwoLastFiles();
+        final List<File> twoLastFiles = BaseRecoveryTest.getTwoLastFiles();
 
         final File newFile = twoLastFiles.get(0);
         final File previousFile = twoLastFiles.get(1);
 
-        final Map<String, Long> prediousReport = readReport(previousFile);
-        final Map<String, Long> newReport = readReport(newFile);
+        final Map<String, Double> prediousReport = BaseRecoveryTest.readReport(previousFile);
+        final Map<String, Double> newReport = BaseRecoveryTest.readReport(newFile);
 
         final Map<String, Double> compared = compareReports(prediousReport, newReport);
 
         boolean toNotify = false;
+
         LOGGER.info(String.format("Going to compare %s and %s.", previousFile.getName(), newFile.getName()));
+
         String notifyReport = String.format("Two last performance reports were compared: \n\t\t'%s' \n\tand\n\t\t'%s'\n",
                                             previousFile.getName(),
                                             newFile.getName());
+
         notifyReport += "Some performance metrics have become bigger than " + THRESHOLD + "%:\n";
-        final Iterator<Map.Entry<String, Double>> iterator = compared.entrySet().iterator();
-        while (iterator.hasNext()) {
-            final Map.Entry<String, Double> entry = iterator.next();
+
+        for (Map.Entry<String, Double> entry : compared.entrySet()) {
             if (Math.abs(entry.getValue()) > THRESHOLD) {
                 toNotify = true;
-                notifyReport += String.format("%s has changed by %.2f%% from %dms to %dms;\n",
+                notifyReport += String.format("%s has changed by %.2f%% from %fms to %fms;\n",
                                               entry.getKey(),
                                               entry.getValue(),
                                               prediousReport.get(entry.getKey()),
@@ -90,65 +94,18 @@ public class VerifyChangeTest {
         assertFalse(notifyReport, toNotify);
     }
 
-    private Map<String, Double> compareReports(Map<String, Long> previousReport, Map<String, Long> newReport) {
-        assertEquals(previousReport.size(), newReport.size());
+    private Map<String, Double> compareReports(Map<String, Double> previousReport, Map<String, Double> newReport) {
         Map<String, Double> result = new HashMap<>(previousReport.size());
 
-        final Iterator<String> iterator = previousReport.keySet().iterator();
-        while (iterator.hasNext()) {
-            final String key = iterator.next();
-            assertTrue(previousReport.containsKey(key));
-            assertTrue(newReport.containsKey(key));
+        Set<String> intersectionOfKeys = new HashSet<>(previousReport.keySet());
+        intersectionOfKeys.removeAll(newReport.keySet());
 
-            final Long previousValue = previousReport.get(key);
-            final Long newValue = newReport.get(key);
+        for (String key : intersectionOfKeys) {
+            final double previousValue = previousReport.get(key);
+            final double newValue = newReport.get(key);
 
-            double change = (newValue.doubleValue() / previousValue.doubleValue() - 1) * 100;
+            double change = (newValue / previousValue - 1) * 100; // change in percentage
             result.put(key, change);
-
-        }
-
-        assertEquals(previousReport.size(), result.size());
-        return result;
-    }
-
-    private List<File> getTwoLastFiles() {
-        File folder = new File(System.getProperty("pa.rm.home"));
-        assertTrue("PathToStorage parameter does not lead to directory.", folder.isDirectory());
-        final File[] files = folder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File file, String s) {
-                return s.startsWith("performance");
-            }
-        });
-        assertNotEquals(0, files.length);
-        Arrays.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File fileA, File fileB) {
-                return Long.valueOf(fileA.lastModified()).compareTo(fileB.lastModified());
-            }
-        });
-
-        List<File> result = new ArrayList<>(2);
-
-        result.add(files[files.length - 1]);
-        result.add(files[files.length - 2]);
-
-        assertEquals(2, result.size());
-        return result;
-    }
-
-    private Map<String, Long> readReport(File file) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-
-        Map<String, Long> result = new HashMap<>(8);
-
-        String line = null;
-        while ((line = br.readLine()) != null) {
-            final String[] values = line.split(",");
-            String key = values[1] + "-" + values[2];
-            String value = values[5];
-            result.put(key, Long.parseLong(value));
         }
 
         return result;

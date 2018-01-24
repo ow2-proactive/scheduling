@@ -58,8 +58,8 @@ import performancetests.helper.LogProcessor;
 @RunWith(Parameterized.class)
 public class JobRecoveryTest extends BaseRecoveryTest {
 
-    private static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
-                                                                                     .getPath();
+    public static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
+                                                                                    .getPath();
 
     private static final String SCHEDULER_CONFIGURATION_RESTART = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-restart.ini")
                                                                                        .getPath();
@@ -131,7 +131,8 @@ public class JobRecoveryTest extends BaseRecoveryTest {
             startKillStartScheduler();
             long recovered = numberOfJobsRecovered();
             final long timeSpent = timeSpentToRecoverJobs();
-            LOGGER.info(BaseRecoveryTest.makeCSVString("JobRecoveryTest",
+
+            LOGGER.info(BaseRecoveryTest.makeCSVString(JobRecoveryTest.class.getSimpleName(),
                                                        jobsNumber,
                                                        timeLimit,
                                                        recovered,
@@ -140,7 +141,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
 
             final Integer numberOfJobsOfLastTestCase = (Integer) parameters[parameters.length - 1][0];
             if (jobsNumber == numberOfJobsOfLastTestCase) {
-                LOGGER.info(BaseRecoveryTest.makeCSVString("JobRecoveryTestWithNodes",
+                LOGGER.info(BaseRecoveryTest.makeCSVString(JobRecoveryTest.class.getSimpleName() + "WithNodes",
                                                            jobsNumber,
                                                            timeLimit,
                                                            jobsNumber,
@@ -152,7 +153,12 @@ public class JobRecoveryTest extends BaseRecoveryTest {
             assertThat("Jobs recovery time for " + jobsNumber + " jobs", (int) timeSpent, lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(BaseRecoveryTest.makeCSVString("JobRecoveryTest", jobsNumber, timeLimit, -1, -1, ERROR));
+            LOGGER.info(BaseRecoveryTest.makeCSVString(JobRecoveryTest.class.getSimpleName(),
+                                                       jobsNumber,
+                                                       timeLimit,
+                                                       -1,
+                                                       -1,
+                                                       ERROR));
         }
     }
 

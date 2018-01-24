@@ -59,15 +59,15 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
 
     private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
 
-    static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
-                                                                       .getPath();
+    public static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
+                                                                              .getPath();
 
     static final String RM_CONFIGURATION_RESTART = NodeRecoveryTest.class.getResource("/performancetests/config/rm-restart.ini")
                                                                          .getPath();
 
     /**
      * @return an array of parameters which is used by JUnit to create objects of NodeRecoveryTest,
-     *         where first value represents nodes number to recover, and second value sets time limit to recovery.
+     * where first value represents nodes number to recover, and second value sets time limit to recovery.
      */
     @Parameters
     public static Collection<Object[]> data() {
@@ -126,7 +126,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
             startKillStartRM();
             long recovered = nodesRecovered();
             long timeSpent = timeSpentToRecoverNodes();
-            LOGGER.info(makeCSVString("NodeRecoveryTest",
+            LOGGER.info(makeCSVString(NodeRecoveryTest.class.getSimpleName(),
                                       nodesNumber,
                                       timeLimit,
                                       recovered,
@@ -138,7 +138,12 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
                        lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(BaseRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, ERROR));
+            LOGGER.info(BaseRecoveryTest.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
+                                                       nodesNumber,
+                                                       timeLimit,
+                                                       -1,
+                                                       -1,
+                                                       ERROR));
         }
     }
 
