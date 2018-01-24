@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
-
 
 /**
  * A map managing variables for scripts use
