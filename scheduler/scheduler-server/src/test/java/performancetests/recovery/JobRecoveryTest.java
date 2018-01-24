@@ -135,7 +135,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
                                                        timeLimit,
                                                        recovered,
                                                        timeSpent,
-                                                       ((timeSpent < timeLimit) ? SUCCESS : "FAILURE")));
+                                                       ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
 
             final Integer numberOfJobsOfLastTestCase = (Integer) parameters[parameters.length - 1][0];
             if (jobsNumber == numberOfJobsOfLastTestCase) {
@@ -151,7 +151,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
             assertThat("Jobs recovery time for " + jobsNumber + " jobs", (int) timeSpent, lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(BaseRecoveryTest.makeCSVString("JobRecoveryTest", jobsNumber, timeLimit, -1, -1, "ERROR"));
+            LOGGER.info(BaseRecoveryTest.makeCSVString("JobRecoveryTest", jobsNumber, timeLimit, -1, -1, ERROR));
         }
     }
 

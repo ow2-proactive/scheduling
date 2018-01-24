@@ -44,6 +44,8 @@ public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAnd
 
     public static final String FAILURE = "FAILURE";
 
+    public static final String ERROR = "ERROR";
+
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() * 10,
                                              TimeUnit.MILLISECONDS);

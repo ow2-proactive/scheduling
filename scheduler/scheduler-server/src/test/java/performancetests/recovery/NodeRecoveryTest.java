@@ -138,7 +138,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
                        lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(BaseRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, "ERROR"));
+            LOGGER.info(BaseRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, ERROR));
         }
     }
 
