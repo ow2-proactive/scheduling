@@ -34,7 +34,6 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -132,25 +131,15 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
                                       timeLimit,
                                       recovered,
                                       timeSpent,
-                                      ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE")));
+                                      ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
             assertEquals(nodesNumber, recovered);
             assertThat("Nodes recovery time for " + nodesNumber + " nodes",
                        (int) timeSpentToRecoverNodes(),
                        lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(NodeRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, "ERROR"));
+            LOGGER.info(BaseRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, "ERROR"));
         }
-    }
-
-    public static String makeCSVString(Object... strings) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(strings[0].toString());
-        for (int i = 1; i < strings.length; ++i) {
-            builder.append(',');
-            builder.append(strings[i].toString());
-        }
-        return builder.toString();
     }
 
     @After
@@ -177,8 +166,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
     }
 
     private long timeSpentToRecoverNodes() {
-        long time = LogProcessor.millisecondsFromTo(RMCore.START_TO_RECOVER_NODES, RMCore.END_OF_NODES_RECOVERY);
-
+        final long time = endedToRecover() - startedToRecover();
         if (time < 0) {
             throw new RuntimeException("First occurence of " + RMCore.START_TO_RECOVER_NODES + " goes after " +
                                        RMCore.END_OF_NODES_RECOVERY);
@@ -187,4 +175,11 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
         return time;
     }
 
+    static long startedToRecover() {
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.START_TO_RECOVER_NODES)).getTime();
+    }
+
+    static long endedToRecover() {
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY)).getTime();
+    }
 }
