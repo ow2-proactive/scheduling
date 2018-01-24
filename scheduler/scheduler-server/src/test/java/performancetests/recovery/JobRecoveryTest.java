@@ -198,7 +198,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
      */
     private long timeSpentToRecoverNodesAndJobs() {
         final long started = Math.min(NodeRecoveryTest.startedToRecover(), JobRecoveryTest.startedToRecover());
-        final long ended = Math.min(NodeRecoveryTest.endedToRecover(), JobRecoveryTest.endedToRecover());
+        final long ended = Math.max(NodeRecoveryTest.endedToRecover(), JobRecoveryTest.endedToRecover());
         return ended - started;
     }
 
