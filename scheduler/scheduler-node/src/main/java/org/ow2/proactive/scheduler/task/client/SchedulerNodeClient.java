@@ -620,6 +620,11 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public ConnectionInfo getConnectionInfo() {
+        return client.getConnectionInfo();
+    }
+
+    @Override
     public void setSession(String sid) {
         if (client == null)
             client = SchedulerClient.createInstance();

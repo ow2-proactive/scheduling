@@ -1,7 +1,13 @@
 
 ext.functionalTestConfiguration = {
     forkEvery 1
-    include 'functionaltests/**'
+
+    include 'functionaltests/StandardTestSuite*'
+
+    if(project.hasProperty('regression')){
+        include 'functionaltests/RegressionTestSuite*'
+    }
+
     systemProperties << ['rest.deploy': 'false']
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['pa.rm.home': rootDir.absolutePath]

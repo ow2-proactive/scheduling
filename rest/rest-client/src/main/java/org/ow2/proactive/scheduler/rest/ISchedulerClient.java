@@ -66,6 +66,12 @@ public interface ISchedulerClient extends Scheduler {
     void init(ConnectionInfo connectionInfo) throws Exception;
 
     /**
+     * Returns the connection info, if initialized previously
+     * @return the connection info
+     */
+    ConnectionInfo getConnectionInfo();
+
+    /**
      * Sets the session identifier explicitly. This might run on an uninitialized
      * client.
      *

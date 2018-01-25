@@ -44,10 +44,14 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
+import org.ow2.proactive.db.SortOrder;
+import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
+import org.ow2.proactive.scheduler.common.JobFilterCriteria;
+import org.ow2.proactive.scheduler.common.JobSortParameter;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -58,6 +62,8 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+
+import com.google.common.collect.ImmutableList;
 
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.monitor.SchedulerMonitorsHandler;
@@ -1171,6 +1177,20 @@ public class SchedulerTHelper {
             PAFuture.waitFor(getResourceManager().removeNodeSource(nsName, true));
         } catch (Throwable t) {
             t.printStackTrace();
+        }
+    }
+
+    public void cleanJobs() throws Exception {
+        Scheduler userInt = getSchedulerInterface();
+        JobFilterCriteria criteria = new JobFilterCriteria(false, true, true, true);
+        List<JobInfo> jobs = userInt.getJobs(0,
+                                             1000,
+                                             criteria,
+                                             ImmutableList.of(new SortParameter<>(JobSortParameter.ID, SortOrder.ASC)))
+                                    .getList();
+
+        for (JobInfo job : jobs) {
+            userInt.removeJob(job.getJobId());
         }
     }
 

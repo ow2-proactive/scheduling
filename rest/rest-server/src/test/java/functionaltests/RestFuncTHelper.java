@@ -37,13 +37,14 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
@@ -55,6 +56,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
+import org.ow2.proactive.web.WebProperties;
 
 import com.google.common.collect.Sets;
 import com.jayway.awaitility.Duration;
@@ -113,6 +115,8 @@ public class RestFuncTHelper {
                 System.getProperty("scheduler.deploy.dropDB", "true"));
         cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(schedHibernateConfig));
 
+        cmd.add(WebProperties.WEB_HTTPS.getCmdLine() + "true");
+
         cmd.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
         cmd.add(PNPConfig.PA_PNP_PORT.getCmdLine() + "1200");
 
@@ -145,7 +149,7 @@ public class RestFuncTHelper {
         Credentials rmCredentials = getRmCredentials();
         rm = rmAuth.login(rmCredentials);
 
-        restServerUrl = "http://localhost:8080/rest/";
+        restServerUrl = "https://localhost:8443/rest/";
         restfulSchedulerUrl = restServerUrl + "scheduler";
 
         await().atMost(Duration.FIVE_MINUTES).until(restIsStarted());
@@ -196,7 +200,8 @@ public class RestFuncTHelper {
             public Boolean call() throws Exception {
                 try {
                     String resourceUrl = getResourceUrl("version");
-                    HttpResponse response = HttpClientBuilder.create().build().execute(new HttpGet(resourceUrl));
+                    HttpClient client = new HttpClientBuilder().insecure(true).useSystemProperties().build();
+                    HttpResponse response = client.execute(new HttpGet(resourceUrl));
                     int statusCode = response.getStatusLine().getStatusCode();
                     if (statusCode == HttpStatus.SC_OK) {
                         return true;

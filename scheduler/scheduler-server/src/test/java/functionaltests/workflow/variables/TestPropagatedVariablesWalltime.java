@@ -35,10 +35,11 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
 
 
-public class TestPropagatedVariablesWalltime extends SchedulerFunctionalTestWithRestart {
+public class TestPropagatedVariablesWalltime extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testPropagatedVariablesWalltime() throws Throwable {

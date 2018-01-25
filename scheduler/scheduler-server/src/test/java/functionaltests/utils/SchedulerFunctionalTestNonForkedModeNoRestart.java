@@ -33,6 +33,10 @@ import org.junit.BeforeClass;
 
 /**
  * Test which either reuses an existing scheduler with non-forked mode task configuration or starts a new one
+ *
+ * Every concrete subclass should be added to one of functionaltests.StandardTestSuite or functionaltests.RegressionTestSuite
+ * @see functionaltests.StandardTestSuite
+ * @see functionaltests.RegressionTestSuite
  */
 public class SchedulerFunctionalTestNonForkedModeNoRestart extends SchedulerFunctionalTest {
 
