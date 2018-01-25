@@ -366,4 +366,5 @@ public class TagCommandsFunctTest extends AbstractFunctCmdTest {
         System.out.println(out);
         assertTrue(out.contains("error"));
     }
+
 }

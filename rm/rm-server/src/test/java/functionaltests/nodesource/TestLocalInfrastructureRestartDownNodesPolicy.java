@@ -71,7 +71,8 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
                                   LocalInfrastructure.class.getName(),
                                   new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                   RestartDownNodesPolicy.class.getName(),
-                                  policyParameters);
+                                  policyParameters,
+                                  NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }

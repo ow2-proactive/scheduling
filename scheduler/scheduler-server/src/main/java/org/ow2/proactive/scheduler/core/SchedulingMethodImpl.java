@@ -71,6 +71,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.internal.TaskRecoveryData;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
@@ -665,13 +666,18 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         dotaskActionTimeout = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
                     }
 
+                    boolean taskRecoverable = getRMProxiesManager().getRmProxy().areNodesRecoverable(nodes);
+                    TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL,
+                                                                             taskRecoverable);
+
                     Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                                                                    taskDescriptor,
                                                                                                                    launcher,
                                                                                                                    schedulingService,
                                                                                                                    terminateNotification,
                                                                                                                    corePrivateKey,
-                                                                                                                   terminateNotificationNodeURL),
+                                                                                                                   taskRecoveryData),
+
                                                                                              dotaskActionTimeout,
                                                                                              TimeUnit.MILLISECONDS);
                     waitForTaskToBeStarted(taskExecutionSubmittedFuture);

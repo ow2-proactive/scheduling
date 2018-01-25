@@ -70,7 +70,8 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
                                        DefaultInfrastructureManager.class.getName(),
                                        null,
                                        StaticPolicy.class.getName(),
-                                       new Object[] { "ALL", "ME" });
+                                       new Object[] { "ALL", "ME" },
+                                       NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
@@ -102,7 +103,8 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
                                       DefaultInfrastructureManager.class.getName(),
                                       null,
                                       StaticPolicy.class.getName(),
-                                      new Object[] { "PROVIDER", "ALL" });
+                                      new Object[] { "PROVIDER", "ALL" },
+                                      NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);

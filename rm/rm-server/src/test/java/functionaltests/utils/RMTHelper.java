@@ -25,6 +25,9 @@
  */
 package functionaltests.utils;
 
+import static functionaltests.nodesrecovery.RecoverInfrastructureTestHelper.NODES_RECOVERABLE;
+import static functionaltests.utils.RMFunctionalTest.NODES_NOT_RECOVERABLE;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -59,6 +62,7 @@ import org.ow2.tests.ProActiveSetup;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.nodesrecovery.RecoverInfrastructureTestHelper;
 
 
 /**
@@ -138,12 +142,21 @@ public class RMTHelper {
         createNodeSource(name, nodeNumber, getResourceManager(), getMonitorsHandler());
     }
 
+    public void createNodeSourceWithNodesRecoverable(String name, int nodeNumber) throws Exception {
+        createNodeSourceWithNodesRecoverable(name, nodeNumber, getResourceManager(), getMonitorsHandler());
+    }
+
     public void createNodeSourceWithInfiniteTimeout(String name, int nodeNumber) throws Exception {
         createNodeSourceWithInfiniteTimeout(name, nodeNumber, getResourceManager(), getMonitorsHandler());
     }
 
     public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
             RMMonitorsHandler monitor) throws Exception {
+        createNodeSource(name, nodeNumber, vmOptions, rm, monitor, NODES_NOT_RECOVERABLE);
+    }
+
+    public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
+            RMMonitorsHandler monitor, boolean nodesRecoverable) throws Exception {
         RMFactory.setOsJavaProperty();
         log("Creating a node source " + name);
         //first emtpy im parameter is default rm url
@@ -154,7 +167,8 @@ public class RMTHelper {
                                            vmOptions != null ? setup.listToString(vmOptions)
                                                              : setup.getJvmParameters() },
                             StaticPolicy.class.getName(),
-                            null);
+                            null,
+                            nodesRecoverable);
         rm.setNodeSourcePingFrequency(5000, name);
 
         waitForNodeSourceCreation(name, nodeNumber, monitor);
@@ -172,7 +186,8 @@ public class RMTHelper {
                                            vmOptions != null ? setup.listToString(vmOptions)
                                                              : setup.getJvmParameters() },
                             StaticPolicy.class.getName(),
-                            null);
+                            null,
+                            NODES_RECOVERABLE);
         rm.setNodeSourcePingFrequency(5000, name);
 
         waitForNodeSourceCreation(name, nodeNumber, monitor);
@@ -183,7 +198,12 @@ public class RMTHelper {
      */
     public static void createNodeSource(String name, int nodeNumber, ResourceManager rm, RMMonitorsHandler monitor)
             throws Exception {
-        createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor);
+        createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor, NODES_NOT_RECOVERABLE);
+    }
+
+    public static void createNodeSourceWithNodesRecoverable(String name, int nodeNumber, ResourceManager rm,
+            RMMonitorsHandler monitor) throws Exception {
+        createNodeSource(name, nodeNumber, setup.getJvmParametersAsList(), rm, monitor, NODES_RECOVERABLE);
     }
 
     public static void createNodeSourceWithInfiniteTimeout(String name, int nodeNumber, ResourceManager rm,

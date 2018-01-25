@@ -26,6 +26,7 @@
 package functionaltests.nodesrecovery;
 
 import static com.google.common.truth.Truth.assertThat;
+import static functionaltests.nodesrecovery.RecoverInfrastructureTestHelper.NODES_RECOVERABLE;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -55,9 +56,9 @@ import functionaltests.utils.RMTHelper;
  */
 public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
-    private static final String START_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-clean-db.ini";
+    private static final String START_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-start-clean-db-nodes-recovery-enabled.ini";
 
-    private static final String RESTART_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db.ini";
+    private static final String RESTART_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db-nodes-recovery-enabled.ini";
 
     private static final String NODE_SOURCE_NAME = "testRecoverSSHInfra";
 
@@ -112,7 +113,8 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
                                          SSHInfrastructureV2.class.getName(),
                                          TestSSHInfrastructureV2.infraParams,
                                          StaticPolicy.class.getName(),
-                                         TestSSHInfrastructureV2.policyParameters);
+                                         TestSSHInfrastructureV2.policyParameters,
+                                         NODES_RECOVERABLE);
         RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME,
                                             TestSSHInfrastructureV2.NB_NODES,
                                             this.rmHelper.getMonitorsHandler());

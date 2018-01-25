@@ -315,7 +315,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             logger.debug("Booting jmx...");
             this.jmxHelper.boot(authentication);
 
-            RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(dbManager).recover(loadJobPeriod);
+            RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(dbManager).recover(loadJobPeriod,
+                                                                                                        rmProxy);
 
             this.frontendState = new SchedulerFrontendState(recoveredState.getSchedulerState(), jmxHelper);
 

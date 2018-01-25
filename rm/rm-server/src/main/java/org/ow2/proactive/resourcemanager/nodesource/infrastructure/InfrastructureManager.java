@@ -217,9 +217,11 @@ public abstract class InfrastructureManager implements Serializable {
     public void recoverPersistedInfraVariables(Map<String, Serializable> persistedInfrastructureVariables) {
         writeLock.lock();
         try {
-            logger.debug("Recovering persisted infrastructure variables");
-            for (Map.Entry<String, Serializable> entry : persistedInfrastructureVariables.entrySet()) {
-                logger.info("[" + entry.getKey() + " ; " + entry.getValue() + "]");
+            logger.info("Recover persisted infrastructure variables");
+            if (logger.isDebugEnabled()) {
+                for (Map.Entry<String, Serializable> entry : persistedInfrastructureVariables.entrySet()) {
+                    logger.debug("[" + entry.getKey() + " ; " + entry.getValue() + "]");
+                }
             }
             persistedInfraVariables.putAll(persistedInfrastructureVariables);
         } catch (RuntimeException e) {
@@ -612,20 +614,22 @@ public abstract class InfrastructureManager implements Serializable {
      * the {@link NodeSource#DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME}.
      */
     public void persistInfrastructureVariables() {
-        if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean()) {
+        if (recoveryActivated()) {
             String nodeSourceName = nodeSource.getName();
-            if (!nodeSourceName.equals(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
-                readLock.lock();
-                try {
-                    getAndPersistNodeSourceData(nodeSourceName);
-                } catch (RuntimeException e) {
-                    logger.error("Exception while persisting infrastructure variables", e);
-                    throw e;
-                } finally {
-                    readLock.unlock();
-                }
+            readLock.lock();
+            try {
+                getAndPersistNodeSourceData(nodeSourceName);
+            } catch (RuntimeException e) {
+                logger.error("Exception while persisting infrastructure variables", e);
+                throw e;
+            } finally {
+                readLock.unlock();
             }
         }
+    }
+
+    private boolean recoveryActivated() {
+        return PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() && nodeSource.nodesRecoverable();
     }
 
     private void getAndPersistNodeSourceData(String nodeSourceName) {

@@ -553,7 +553,8 @@ public class SchedulerStarter {
                               LocalInfrastructure.class.getName(),
                               new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
                               RestartDownNodesPolicy.class.getName(),
-                              new Object[] { "ALL", "ALL", "10000" });
+                              new Object[] { "ALL", "ALL", "10000" },
+                              NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE);
 
         credentials = creds;
     }
