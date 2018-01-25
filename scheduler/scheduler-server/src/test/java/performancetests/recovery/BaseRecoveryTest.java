@@ -40,8 +40,23 @@ import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 @SuppressWarnings("squid:S2187")
 public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
+    public static final String SUCCESS = "SUCCESS";
+
+    public static final String FAILURE = "FAILURE";
+
+    public static final String ERROR = "ERROR";
+
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() * 10,
                                              TimeUnit.MILLISECONDS);
 
+    public static String makeCSVString(Object... strings) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(strings[0].toString());
+        for (int i = 1; i < strings.length; ++i) {
+            builder.append(',');
+            builder.append(strings[i].toString());
+        }
+        return builder.toString();
+    }
 }
