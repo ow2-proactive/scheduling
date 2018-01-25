@@ -349,6 +349,31 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
+     * {@link RMRest#createNodeSource(String, String, String, String[], String[], String, String[], String[], String)}
+     */
+    @Override
+    @POST
+    @Path("nodesource/create")
+    @Produces("application/json")
+    public NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException {
+        return createNodeSource(sessionId,
+                                nodeSourceName,
+                                infrastructureType,
+                                infrastructureParameters,
+                                infrastructureFileParameters,
+                                policyType,
+                                policyParameters,
+                                policyFileParameters,
+                                Boolean.TRUE.toString());
+    }
+
+    /**
      * Create a NodeSource
      * <p>
      *
@@ -370,12 +395,14 @@ public class RMRest implements RMRestInterface {
      *            containing files or credentials
      * @param policyFileParameters
      *            File or credential parameters
+     * @param nodesRecoverable
+     *            Whether the nodes can be recovered after a crash of the RM
      * @return true if a node source has been created
      * @throws NotConnectedException 
      */
     @Override
     @POST
-    @Path("nodesource/create")
+    @Path("nodesource/create/recovery")
     @Produces("application/json")
     public NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
@@ -383,7 +410,8 @@ public class RMRest implements RMRestInterface {
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
-            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException {
+            @FormParam("policyFileParameters") String[] policyFileParameters,
+            @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         Object[] infraParams = new Object[infrastructureParameters.length + infrastructureFileParameters.length];
         Object[] policyParams = new Object[policyParameters.length + policyFileParameters.length];
@@ -433,7 +461,8 @@ public class RMRest implements RMRestInterface {
                                                   infrastructureType,
                                                   infraParams,
                                                   policyType,
-                                                  policyParams)
+                                                  policyParams,
+                                                  Boolean.parseBoolean(nodesRecoverable))
                                 .getBooleanValue());
         } catch (RuntimeException ex) {
             nsState.setResult(false);

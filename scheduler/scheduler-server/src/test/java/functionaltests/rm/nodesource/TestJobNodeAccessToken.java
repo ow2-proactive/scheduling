@@ -25,6 +25,7 @@
  */
 package functionaltests.rm.nodesource;
 
+import static functionaltests.nodesrecovery.RecoverInfrastructureTestHelper.NODES_RECOVERABLE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -90,7 +91,8 @@ public class TestJobNodeAccessToken extends SchedulerFunctionalTestNoRestart {
                                        LocalInfrastructure.class.getName(),
                                        new Object[] { creds, 1, RMTHelper.DEFAULT_NODES_TIMEOUT, nsProps },
                                        StaticPolicy.class.getName(),
-                                       null)
+                                       null,
+                                       NODES_RECOVERABLE)
                      .getBooleanValue());
 
         nsCreated = true;

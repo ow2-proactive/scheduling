@@ -27,7 +27,6 @@ package functionaltests.nodesrecovery;
 
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
-import functionaltests.utils.NodesRecoveryProcessHelper;
 import functionaltests.utils.RMStarterForFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
@@ -37,6 +36,8 @@ import functionaltests.utils.RMTHelper;
  * @since 20/07/17
  */
 public class RecoverInfrastructureTestHelper {
+
+    public static final boolean NODES_RECOVERABLE = true;
 
     public static void killNodesWithStrongSigKill() throws Exception {
         RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test -- expect exceptions)");

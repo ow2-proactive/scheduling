@@ -50,6 +50,8 @@ import functionaltests.monitor.RMMonitorEventReceiver;
 
 public class RMFunctionalTest extends ProActiveTest {
 
+    public static final boolean NODES_NOT_RECOVERABLE = false;
+
     static {
         configureLogging();
         ProActiveConfiguration.load();

@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 
+import functionaltests.nodesrecovery.NodesRecoveryProcessHelper;
 import functionaltests.utils.*;
 import performancetests.helper.LogProcessor;
 

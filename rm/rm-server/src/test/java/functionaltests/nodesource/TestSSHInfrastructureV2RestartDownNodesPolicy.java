@@ -73,7 +73,8 @@ public class TestSSHInfrastructureV2RestartDownNodesPolicy extends RMFunctionalT
                                          SSHInfrastructureV2.class.getName(),
                                          TestSSHInfrastructureV2.infraParams,
                                          RestartDownNodesPolicy.class.getName(),
-                                         TestSSHInfrastructureV2.policyParameters);
+                                         TestSSHInfrastructureV2.policyParameters,
+                                         NODES_NOT_RECOVERABLE);
         RMMonitorsHandler monitorsHandler = this.rmHelper.getMonitorsHandler();
 
         this.rmHelper.waitForNodeSourceCreation(nsname, NB_NODES, monitorsHandler);

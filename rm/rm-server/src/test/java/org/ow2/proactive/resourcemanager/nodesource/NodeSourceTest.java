@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource;
 
 import static com.google.common.truth.Truth.assertThat;
+import static functionaltests.utils.RMFunctionalTest.NODES_NOT_RECOVERABLE;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -44,6 +45,7 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger;
@@ -148,13 +150,16 @@ public class NodeSourceTest {
 
     private NodeSource createNodeSource(InfrastructureManager infrastructureManager, NodeSourcePolicy nodeSourcePolicy,
             Client client) {
+        NodeSourceData nodeSourceData = new NodeSourceData();
+        nodeSourceData.setProvider(client);
+        nodeSourceData.setNodesRecoverable(NODES_NOT_RECOVERABLE);
         return new NodeSource("registrationURL",
                               "name",
-                              client,
                               infrastructureManager,
                               nodeSourcePolicy,
                               mock(RMCore.class),
-                              mock(RMMonitoringImpl.class));
+                              mock(RMMonitoringImpl.class),
+                              nodeSourceData);
     }
 
 }

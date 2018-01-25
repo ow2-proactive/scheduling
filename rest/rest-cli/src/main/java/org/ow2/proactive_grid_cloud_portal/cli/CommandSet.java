@@ -686,8 +686,9 @@ public class CommandSet {
                                                                            .description("Create new node source")
                                                                            .hasArgs(true)
                                                                            .numOfArgs(1)
-                                                                           .argNames("node-source")
-                                                                           .jsCommand("createns(node-source)")
+                                                                           .hasOptionalArg(true)
+                                                                           .argNames("node-source [nodes-recoverable]")
+                                                                           .jsCommand("createns(node-source[,nodes-recoverable])")
                                                                            .commandClass(CreateNodeSourceCommand.class)
                                                                            .entry();
 

@@ -70,7 +70,8 @@ public class TestConcurrentUsers extends RMFunctionalTest {
                                          DefaultInfrastructureManager.class.getName(),
                                          null,
                                          StaticPolicy.class.getName(),
-                                         null);
+                                         null,
+                                         NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
         resourceManager.addNode(node1URL, nsName);
 

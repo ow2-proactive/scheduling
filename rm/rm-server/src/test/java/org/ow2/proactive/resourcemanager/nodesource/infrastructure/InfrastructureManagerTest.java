@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.truth.Truth.assertThat;
+import static functionaltests.nodesrecovery.RecoverInfrastructureTestHelper.NODES_RECOVERABLE;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -70,6 +71,7 @@ public class InfrastructureManagerTest {
         infrastructureManager.setRmDbManager(dbManager);
         infrastructureManager.setNodeSource(nodeSource);
         when(nodeSource.getName()).thenReturn("NodeSource#1");
+        when(nodeSource.nodesRecoverable()).thenReturn(NODES_RECOVERABLE);
         when(dbManager.getNodeSource(anyString())).thenReturn(nodeSourceData);
     }
 

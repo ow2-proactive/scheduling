@@ -107,7 +107,8 @@ public class TestNodeEncoding extends RMFunctionalTest {
                                   LocalInfrastructure.class.getName(),
                                   new Object[] { credentials, 1, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                   StaticPolicy.class.getName(),
-                                  null);
+                                  null,
+                                  NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceCreation("testEncoding");
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);

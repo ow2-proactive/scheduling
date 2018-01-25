@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -46,15 +45,15 @@ import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
 
-/**
- * @author ActiveEon Team
- * @since 22/06/17
- */
-public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
+public class NodesRecoveryPropertyTest extends RMFunctionalTest {
 
-    private static final String START_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-start-clean-db-nodes-recovery-enabled.ini";
+    private static final String START_CONFIG_NODES_RECOVERY_ENABLED = "/functionaltests/config/functionalTRMProperties-RM-start-clean-db-nodes-recovery-enabled.ini";
 
-    private static final String RESTART_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db-nodes-recovery-enabled.ini";
+    private static final String RESTART_CONFIG_NODES_RECOVERY_ENABLED = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db-nodes-recovery-enabled.ini";
+
+    private static final String START_CONFIG_NODES_RECOVERY_DISABLED = "/functionaltests/config/functionalTRMProperties-RM-start-clean-db-nodes-recovery-disabled.ini";
+
+    private static final String RESTART_CONFIG_NODES_RECOVERY_DISABLED = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db-nodes-recovery-disabled.ini";
 
     private static final String NODE_SOURCE_NAME = "LocalNodeSource" +
                                                    RecoverLocalInfrastructureTest.class.getSimpleName();
@@ -63,31 +62,57 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
     private ResourceManager resourceManager = null;
 
-    @Before
-    public void setup() throws Exception {
-        startRmAndCheckInitialState();
-    }
-
     @After
     public void tearDown() throws Exception {
         // kill the remaining nodes that were preserved for the test
-        RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
+        boolean nodeProcessFound = true;
+        while (nodeProcessFound) {
+            try {
+                RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
+            } catch (NodesRecoveryProcessHelper.ProcessNotFoundException e) {
+                nodeProcessFound = false;
+            }
+        }
     }
 
     @Test
-    public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
+    public void testRecoverLocalInfrastructureNodesRecoveryEnabledAndNodesRecoverable() throws Exception {
+        final boolean nodesRecoverable = true;
+        startRmAndCheckInitialState(START_CONFIG_NODES_RECOVERY_ENABLED, nodesRecoverable);
         // kill only the RM by sending a SIGKILL and leave node processes alive
         RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
         // nodes should be re-taken into account by the restarted RM
-        restartRmAndCheckFinalState(false);
+        restartRmAndCheckFinalState(RESTART_CONFIG_NODES_RECOVERY_ENABLED, false);
     }
 
     @Test
-    public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
-        // kill RM and nodes with SIGKILL
-        RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
-        // nodes should be re-deployed by the restarted RM
-        restartRmAndCheckFinalState(true);
+    public void testRecoverLocalInfrastructureNodesRecoveryEnabledAndNodesNotRecoverable() throws Exception {
+        final boolean nodesRecoverable = false;
+        startRmAndCheckInitialState(START_CONFIG_NODES_RECOVERY_ENABLED, nodesRecoverable);
+        // kill only the RM by sending a SIGKILL and leave node processes alive
+        RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
+        // nodes should be re-taken into account by the restarted RM
+        restartRmAndCheckFinalState(RESTART_CONFIG_NODES_RECOVERY_ENABLED, true);
+    }
+
+    @Test
+    public void testRecoverLocalInfrastructureNodesRecoveryDisabledAndNodesRecoverable() throws Exception {
+        final boolean nodesRecoverable = true;
+        startRmAndCheckInitialState(START_CONFIG_NODES_RECOVERY_DISABLED, nodesRecoverable);
+        // kill only the RM by sending a SIGKILL and leave node processes alive
+        RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
+        // nodes should be re-taken into account by the restarted RM
+        restartRmAndCheckFinalState(RESTART_CONFIG_NODES_RECOVERY_DISABLED, true);
+    }
+
+    @Test
+    public void testRecoverLocalInfrastructureNodesRecoveryDisabledAndNodesNotRecoverable() throws Exception {
+        final boolean nodesRecoverable = false;
+        startRmAndCheckInitialState(START_CONFIG_NODES_RECOVERY_DISABLED, nodesRecoverable);
+        // kill only the RM by sending a SIGKILL and leave node processes alive
+        RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
+        // nodes should be re-taken into account by the restarted RM
+        restartRmAndCheckFinalState(RESTART_CONFIG_NODES_RECOVERY_DISABLED, true);
     }
 
     private void startRmWithConfig(String configurationFilePath) throws Exception {
@@ -96,15 +121,19 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         resourceManager = rmHelper.getResourceManager();
     }
 
-    private void startRmAndCheckInitialState() throws Exception {
+    private void startRmAndCheckInitialState(String rmConfigPath, boolean nodesRecoverable) throws Exception {
         // start RM
-        startRmWithConfig(START_CONFIG);
+        startRmWithConfig(rmConfigPath);
         assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isTrue();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
         // check the initial state of the RM
         assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(0);
-        rmHelper.createNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME, NODE_NUMBER);
+        if (nodesRecoverable) {
+            rmHelper.createNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME, NODE_NUMBER);
+        } else {
+            rmHelper.createNodeSource(NODE_SOURCE_NAME, NODE_NUMBER);
+        }
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
         ArrayList<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState()
                                                                                           .getNodeSource();
@@ -113,10 +142,10 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(NODE_NUMBER);
     }
 
-    private void restartRmAndCheckFinalState(boolean nodesShouldBeRecreated) throws Exception {
+    private void restartRmAndCheckFinalState(String rmConfigPath, boolean nodesShouldBeRecreated) throws Exception {
         // restart RM
         rmHelper = new RMTHelper();
-        startRmWithConfig(RESTART_CONFIG);
+        startRmWithConfig(rmConfigPath);
         assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isFalse();
         assertThat(rmHelper.isRMStarted()).isTrue();
 
@@ -125,7 +154,9 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         ArrayList<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
 
         // the node source has been recovered on restart: we should have one node source with the same name
-        assertThat(nodeSourceEvent.size()).isEqualTo(1);
+        if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean()) {
+            assertThat(nodeSourceEvent.size()).isEqualTo(1);
+        }
         assertThat(nodeSourceEvent.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
 
         // wait for nodes to be recreated if needed

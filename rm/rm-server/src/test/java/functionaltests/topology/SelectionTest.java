@@ -109,7 +109,8 @@ public class SelectionTest extends RMFunctionalTest {
                                                                              (distantHost + " 2\n" +
                                                                               neighborHost).getBytes() },
                                                               StaticPolicy.class.getName(),
-                                                              null);
+                                                              null,
+                                                              NODES_NOT_RECOVERABLE);
 
             if (result.getBooleanValue()) {
                 rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
