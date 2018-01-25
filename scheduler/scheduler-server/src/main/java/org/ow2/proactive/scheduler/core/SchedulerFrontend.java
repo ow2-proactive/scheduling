@@ -232,7 +232,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     /**
      * Mainly there for testing purposes.
-     *
+     * <p>
      * It allows to create a SchedulerFrontend instance without breaking
      * encapsulation.
      *
@@ -246,11 +246,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * Scheduler Front-end constructor.
      *
-     * @param rmURL
-     *            a started Resource Manager URL which be able to managed the
-     *            resource used by scheduler.
-     * @param policyFullClassName
-     *            the full class name of the policy to use.
+     * @param rmURL               a started Resource Manager URL which be able to managed the
+     *                            resource used by scheduler.
+     * @param policyFullClassName the full class name of the policy to use.
      */
     public SchedulerFrontend(URI rmURL, String policyFullClassName) {
         this.dbManager = SchedulerDBManager.createUsingProperties();
@@ -400,14 +398,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * Connect a new user on the scheduler. This user can interact with the
      * scheduler according to his right.
      *
-     * @param sourceBodyID
-     *            the source ID of the connected object representing a user
-     * @param identification
-     *            the identification of the connected user
-     * @param cred
-     *            the credentials of the user
-     * @throws AlreadyConnectedException
-     *             if the user is already connected
+     * @param sourceBodyID   the source ID of the connected object representing a user
+     * @param identification the identification of the connected user
+     * @param cred           the credentials of the user
+     * @throws AlreadyConnectedException if the user is already connected
      */
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
@@ -433,14 +427,30 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 throw new SubmissionClosedException(msg);
             }
 
-            UserIdentificationImpl ident = frontendState.checkPermission("submit",
-                                                                         YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
+            final UserIdentificationImpl ident = frontendState.checkPermission("submit",
+                                                                               YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
 
-            InternalJob job = frontendState.createJob(userJob, ident);
+            final InternalJob job = frontendState.createJob(userJob, ident);
 
-            schedulingService.submitJob(job);
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    schedulingService.submitJob(job);
 
-            frontendState.jobSubmitted(job, ident);
+                    try {
+                        frontendState.jobSubmitted(job, ident);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+            while (job.getId().longValue() == 0) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                }
+            }
             return job.getId();
         } catch (Exception e) {
             logger.warn("Error when submitting job.", e);
@@ -968,9 +978,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             eligibleTasks = (List) taskRetrievedFromPolicy;
         } catch (Exception e) {
             logger.error("Error Loading Current Policy:", e);
-        }
-
-        finally {
+        } finally {
             schedulingService.unlockJobsToSchedule(jobMap.values());
         }
         return eligibleTasks;

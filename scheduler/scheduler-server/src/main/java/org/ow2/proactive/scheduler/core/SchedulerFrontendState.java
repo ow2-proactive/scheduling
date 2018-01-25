@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -467,6 +468,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UniqueID id = checkAccess();
 
         // get the internal job.
+
         InternalJob job = InternalJobFactory.createJob(userJob, this.credentials.get(id));
 
         // setting job informations

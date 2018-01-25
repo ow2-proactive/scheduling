@@ -957,7 +957,7 @@ public abstract class InternalJob extends JobState {
      * @param id
      *            the id to set
      */
-    public void setId(JobId id) {
+    public synchronized void setId(JobId id) {
         jobInfo.setJobId(id);
     }
 

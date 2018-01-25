@@ -175,7 +175,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @see org.ow2.proactive.scheduler.common.job.Job#getId()
      */
     @Override
-    public JobId getId() {
+    public synchronized JobId getId() {
         return getJobInfo().getJobId();
     }
 

@@ -452,7 +452,7 @@ public class SchedulingService {
 
     public void submitJob(InternalJob job) {
         try {
-            infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job));//.get();
+            infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job)).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
