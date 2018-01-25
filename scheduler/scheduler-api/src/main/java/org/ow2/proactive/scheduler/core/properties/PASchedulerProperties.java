@@ -418,6 +418,10 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** default value to use if the property is not defined **/
     private String defaultValue;
 
+    /**
+     * I do not dare delete this constructor because I might be used by reflection.
+     */
+    @SuppressWarnings("squid:UnusedPrivateMethod")
     PASchedulerProperties(String str, PropertyType type) {
         this(str, type, null);
     }
@@ -425,10 +429,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     /**
      * Create a new instance of PASchedulerProperties
      *
+     * (I do not dare delete this constructor because I might be used by reflection)
      * @param str the key of the instance.
      * @param type the real java type of this instance.
      * @param defaultValue value to use if the property is not defined
      */
+    @SuppressWarnings("squid:UnusedPrivateMethod")
     PASchedulerProperties(String str, PropertyType type, String defaultValue) {
         this.key = str;
         this.type = type;
