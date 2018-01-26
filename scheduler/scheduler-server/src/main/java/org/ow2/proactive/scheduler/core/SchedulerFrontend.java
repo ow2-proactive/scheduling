@@ -55,18 +55,9 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import java.net.URI;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.*;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -111,13 +102,7 @@ import org.ow2.proactive.scheduler.common.exception.TaskCouldNotStartException;
 import org.ow2.proactive.scheduler.common.exception.TaskSkippedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
-import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -208,6 +193,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private SchedulerPortalConfiguration schedulerPortalConfiguration = SchedulerPortalConfiguration.getConfiguration();
 
     private it.sauronsoftware.cron4j.Scheduler metricsMonitorScheduler;
+
+    private final Set<JobId> waitForJobsToBeSubmitted = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+    private final Set<JobId> alreadySumbittedJobs = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /*
      * #########################################################################
@@ -432,17 +421,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             final InternalJob job = frontendState.createJob(userJob, ident);
 
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    schedulingService.submitJob(job);
-
-                    try {
-                        frontendState.jobSubmitted(job, ident);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            Thread thread = new Thread(() -> {
+                schedulingService.submitJob(job);
+                try {
+                    frontendState.jobSubmitted(job, ident);
+                } catch (Exception e) {
+                    logger.error(String.format("Error while submiting a job[id:%s] ", job.getId().value()), e);
+                } finally {
+                    unregisterSumbittedJob(job.getId());
                 }
+
             });
             thread.start();
             while (job.getId().longValue() == 0) {
@@ -451,11 +439,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 } catch (InterruptedException e) {
                 }
             }
+            registerJobAsUnderSumbission(job.getId());
             return job.getId();
         } catch (Exception e) {
             logger.warn("Error when submitting job.", e);
             throw e;
         }
+
     }
 
     /**
@@ -484,6 +474,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public JobResult getJobResult(final JobId jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
+        blockUntilJobIsUnderSubmission(jobId);
 
         // checking permissions
         IdentifiedJob ij = frontendState.getIdentifiedJob(jobId);
@@ -1037,12 +1028,49 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         schedulingService.changeJobPriority(jobId, priority);
     }
 
+    private void blockUntilJobIsUnderSubmission(JobId jobId) {
+        while (waitForJobsToBeSubmitted.contains(jobId)) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                logger.warn("Something tried to interrupt our blocking", e);
+            }
+        }
+    }
+
+    private void registerJobAsUnderSumbission(JobId jobId) {
+        synchronized (waitForJobsToBeSubmitted) {
+            synchronized (alreadySumbittedJobs) {
+                if (alreadySumbittedJobs.contains(jobId)) {
+                    alreadySumbittedJobs.remove(jobId);
+                    waitForJobsToBeSubmitted.remove(jobId);
+                } else {
+                    waitForJobsToBeSubmitted.add(jobId);
+                }
+            }
+        }
+    }
+
+    private void unregisterSumbittedJob(JobId jobId) {
+        synchronized (waitForJobsToBeSubmitted) {
+            synchronized (alreadySumbittedJobs) {
+                if (waitForJobsToBeSubmitted.contains(jobId)) {
+                    alreadySumbittedJobs.remove(jobId);
+                    waitForJobsToBeSubmitted.remove(jobId);
+                } else {
+                    alreadySumbittedJobs.add(jobId);
+                }
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     @ImmediateService
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        blockUntilJobIsUnderSubmission(jobId);
         return frontendState.getJobState(jobId);
     }
 
@@ -1183,6 +1211,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public String getJobServerLogs(String jobId)
             throws UnknownJobException, NotConnectedException, PermissionException {
         JobId id = JobIdImpl.makeJobId(jobId);
+        blockUntilJobIsUnderSubmission(id);
         frontendState.checkPermissions("getJobServerLogs",
                                        frontendState.getIdentifiedJob(id),
                                        YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB);
