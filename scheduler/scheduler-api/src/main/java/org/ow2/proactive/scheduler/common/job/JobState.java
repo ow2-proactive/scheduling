@@ -53,6 +53,9 @@ import org.ow2.proactive.scheduler.task.SchedulerVars;
 @PublicAPI
 public abstract class JobState extends Job implements Comparable<JobState> {
 
+    /** if job has this id, it means that it was not yet submitted or exception occured */
+    public static final long UNINITIALIZED_JOB_ID = 0;
+
     /** Used to sort by id */
     public static final int SORT_BY_ID = 1;
 
