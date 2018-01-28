@@ -194,11 +194,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     private it.sauronsoftware.cron4j.Scheduler metricsMonitorScheduler;
 
-    private Set<JobId> waitForJobsToBeSubmitted;
+    private Set<JobId> waitForJobsToBeSubmitted = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    private Set<JobId> alreadySumbittedJobs;
+    private Set<JobId> alreadySumbittedJobs = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    private ExecutorService submitPool;
+    private ExecutorService submitPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt());
 
     /*
      * #########################################################################
@@ -280,12 +280,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             ExecutorService taskPingerThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_TASK_PINGER_POOL_NBTHREAD.getValueAsInt(),
                                                                                 new NamedThreadFactory("TaskPingerThreadPool"));
-
-            waitForJobsToBeSubmitted = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
-            alreadySumbittedJobs = Collections.newSetFromMap(new ConcurrentHashMap<>());
-
-            submitPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt());
 
             ScheduledExecutorService scheduledThreadPool = new ScheduledThreadPoolExecutor(PASchedulerProperties.SCHEDULER_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
                                                                                            new NamedThreadFactory("SchedulingServiceTimerThread"));
@@ -429,29 +423,32 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             final InternalJob job = frontendState.createJob(userJob, ident);
 
-            final Future<?> submitting = submitPool.submit(() -> {
-                try {
-                    schedulingService.submitJob(job);
-                    frontendState.jobSubmitted(job, ident);
-                } catch (Exception e) {
-                    if (job.getId().longValue() == InternalJob.UNINITIALIZED_JOB_ID) {
-                        logger.error(String.format("Error while submitting job %s. JobID wasn't available yet.",
-                                                   userJob.getName()),
-                                     e);
-                    } else {
-                        logger.error(String.format("Error while submiting a job[id:%s] ", job.getId().value()), e);
-                    }
-                    throw new RuntimeException(e);
-                } finally {
-                    unregisterSumbittedJob(job.getId());
-                    ;
-                }
-            });
+            final Future<?> submitting = submitJob(userJob, ident, job);
             return blockUntilJobIdInitialized(userJob, job, submitting);
         } catch (Exception e) {
             logger.warn("Error when submitting job.", e);
             throw e;
         }
+    }
+
+    private Future<?> submitJob(Job userJob, UserIdentificationImpl ident, InternalJob job) {
+        return submitPool.submit(() -> {
+            try {
+                schedulingService.submitJob(job);
+                frontendState.jobSubmitted(job, ident);
+            } catch (Exception e) {
+                if (job.getId().longValue() == InternalJob.UNINITIALIZED_JOB_ID) {
+                    logger.error(String.format("Error while submitting job %s. JobID wasn't available yet.",
+                                               userJob.getName()),
+                                 e);
+                } else {
+                    logger.error(String.format("Error while submiting a job[id:%s] ", job.getId().value()), e);
+                }
+                throw new RuntimeException(e);
+            } finally {
+                unregisterSumbittedJob(job.getId());
+            }
+        });
     }
 
     /**
@@ -1095,7 +1092,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private void blockIfJobIsStillUnderSubmission(JobId jobId) {
         while (waitForJobsToBeSubmitted.contains(jobId)) {
             try {
-                waitForJobsToBeSubmitted.wait();
+                synchronized (waitForJobsToBeSubmitted) {
+                    waitForJobsToBeSubmitted.wait();
+                }
             } catch (InterruptedException e) {
                 logger.warn("Something tried to interrupt our blocking", e);
             }
