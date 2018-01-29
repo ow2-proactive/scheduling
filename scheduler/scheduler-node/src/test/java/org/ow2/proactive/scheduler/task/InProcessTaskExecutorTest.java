@@ -307,7 +307,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                             taskOutput.outputStream,
                                             taskOutput.error);
 
-        assertEquals("parent1234", taskOutput.output());
+        assertEquals("parent42", taskOutput.output());
     }
 
     @Test
