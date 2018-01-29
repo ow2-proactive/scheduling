@@ -33,8 +33,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -101,10 +103,7 @@ public abstract class InfrastructureManager implements Serializable {
     /** key to retrieve the lost nodes list: Map<String, RMDeployingNode> */
     private static final String LOST_NODES_KEY = "infrastructureManagerLostNodes";
 
-    /**
-     * key to retrieve node list, miror of nodesource.getAliveNodes(), to implement random
-     * access
-     */
+    /** key to retrieve the acquired nodes set in the persisted infrastructure variables: */
     private static final String ACQUIRED_NODES_KEY = "infrastructureManagerAcquiredNodes";
 
     private static final String USING_DEPLOYING_NODES_KEY = "usingDeployingNodes";
@@ -413,7 +412,7 @@ public abstract class InfrastructureManager implements Serializable {
                 emitEvent(event);
                 this.notifyAcquiredNode(node);
                 // if everything went well with the new node, caching it
-                putAcquiredNode(node.getNodeInformation().getName(), node);
+                putAcquiredNode(node.getNodeInformation().getName());
             } else {
                 String url = node.getNodeInformation().getURL();
                 logger.warn("Not expected node registered, discarding it: " + url);
@@ -1042,7 +1041,7 @@ public abstract class InfrastructureManager implements Serializable {
     private void internalInitializePersistedInfraVariables() {
         persistedInfraVariables.put(DEPLOYING_NODES_KEY, new HashMap<String, RMDeployingNode>());
         persistedInfraVariables.put(LOST_NODES_KEY, new HashMap<String, RMDeployingNode>());
-        persistedInfraVariables.put(ACQUIRED_NODES_KEY, new HashMap<String, Node>());
+        persistedInfraVariables.put(ACQUIRED_NODES_KEY, new HashSet<String>());
         persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, false);
         persistedInfraVariables.put(RM_URL_KEY, "");
     }
@@ -1257,15 +1256,15 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private Map<String, Node> getAcquiredNodesMap() {
-        return (Map<String, Node>) persistedInfraVariables.get(ACQUIRED_NODES_KEY);
+    private Set<String> getAcquiredNodesMap() {
+        return (Set<String>) persistedInfraVariables.get(ACQUIRED_NODES_KEY);
     }
 
-    private void putAcquiredNode(final String nodeName, final Node deployingNode) {
+    private void putAcquiredNode(final String nodeName) {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                getAcquiredNodesMap().put(nodeName, deployingNode);
+                getAcquiredNodesMap().add(nodeName);
                 return null;
             }
         });
@@ -1275,7 +1274,7 @@ public abstract class InfrastructureManager implements Serializable {
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
-                return getAcquiredNodesMap().containsKey(nodeName);
+                return getAcquiredNodesMap().contains(nodeName);
             }
         });
     }
