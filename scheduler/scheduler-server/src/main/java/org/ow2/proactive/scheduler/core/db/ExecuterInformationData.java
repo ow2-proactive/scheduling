@@ -79,7 +79,7 @@ public class ExecuterInformationData implements Serializable {
      *                      running)
      */
     public ExecuterInformation toExecuterInformation(boolean loadFullState) {
-        TaskLauncher taskLauncher = new TaskLauncher();
+        TaskLauncher taskLauncher = null;
         if (taskLauncherNodeUrl != null) {
             try {
                 taskLauncher = PAActiveObject.lookupActive(TaskLauncher.class, taskLauncherNodeUrl);
@@ -87,22 +87,23 @@ public class ExecuterInformationData implements Serializable {
             } catch (Exception e) {
                 if (loadFullState) {
                     logger.warn("Task launcher " + taskLauncherNodeUrl + " of task " + taskId +
-                                " cannot be looked up. Trying to rebind it", e);
-                    taskLauncher = getRebindedTaskLauncher();
+                                " cannot be looked up, try to rebind it");
+                    taskLauncher = getReboundTaskLauncher(e);
                 }
             }
         }
         return new ExecuterInformation(taskLauncher, nodes, nodeName, hostName);
     }
 
-    private TaskLauncher getRebindedTaskLauncher() {
+    private TaskLauncher getReboundTaskLauncher(Exception e) {
         try {
             logger.debug("List AOs on " + taskLauncherNodeUrl + " (expect only one): " +
                          Arrays.toString(NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects()));
             Object[] aos = NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects();
             return (TaskLauncher) aos[0];
-        } catch (Throwable e) {
-            logger.error("Failed to rebind TaskLauncher " + taskLauncherNodeUrl + " of task " + taskId, e);
+        } catch (Throwable t) {
+            logger.error("Failed to rebind TaskLauncher " + taskLauncherNodeUrl + " of task " + taskId +
+                         " after exception " + e.getMessage(), t);
             return new TaskLauncher();
         }
     }
