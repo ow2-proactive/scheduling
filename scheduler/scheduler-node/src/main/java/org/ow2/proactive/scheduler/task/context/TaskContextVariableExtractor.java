@@ -169,7 +169,7 @@ public class TaskContextVariableExtractor implements Serializable {
             logger.error(ERROR_READING_VARIABLES, e);
         }
 
-       return resolveVariables(variables, dictionary);
+        return resolveVariables(variables, dictionary);
     }
 
     /**
