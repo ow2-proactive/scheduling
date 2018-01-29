@@ -160,17 +160,16 @@ public class TaskContextVariableExtractor implements Serializable {
         Map<String, Serializable> dictionary = new HashMap<>();
 
         try {
-            if (taskContext != null) {
-                variables.putAll(extractSystemVariables(taskContext, nodesFile));
-                variables.putAll(extractJobVariables(taskContext));
-                variables.putAll(extractInheritedVariables(taskContext));
-            }
+            variables.putAll(extractJobVariables(taskContext));
+            variables.putAll(extractInheritedVariables(taskContext));
+            variables.putAll(extractSystemVariables(taskContext, nodesFile));
+
             dictionary = extractAllVariables(taskContext, null, nodesFile);
         } catch (IOException | ClassNotFoundException e) {
             logger.error(ERROR_READING_VARIABLES, e);
         }
 
-        return resolveVariables(variables, dictionary);
+       return resolveVariables(variables, dictionary);
     }
 
     /**
