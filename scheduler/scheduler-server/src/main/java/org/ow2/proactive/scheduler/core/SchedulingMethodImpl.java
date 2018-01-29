@@ -236,7 +236,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
             logger.trace("No jobs selected to be scheduled");
         }
-        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
+        if (logger.isDebugEnabled() && jobMap != null && !jobMap.isEmpty()) {
             logger.debug("jobs selected to be scheduled : " + (jobMap.size() < 5 ? jobMap : jobMap.size()));
         }
     }
@@ -255,7 +255,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
             }
 
-            updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
+            updateVariablesForTasksToSchedule(taskRetrievedFromPolicy);
 
             for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
                 // load and Initialize the executable container
@@ -301,7 +301,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     while (nodeSet != null && !nodeSet.isEmpty()) {
                         EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
                         currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
-                        InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
+                        InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
 
                         if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
                             //create launcher and try to start the task
@@ -459,7 +459,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      */
     protected NodeSet getRMNodes(Map<JobId, JobDescriptor> jobMap, int neededResourcesNumber,
             LinkedList<EligibleTaskDescriptor> tasksToSchedule, Set<String> freeResources) {
-        NodeSet nodeSet = new NodeSet();
+        NodeSet nodeSet;
         if (neededResourcesNumber <= 0) {
             throw new IllegalArgumentException("'neededResourcesNumber' must be greater than 0");
         }
@@ -541,11 +541,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /**
      * Update all variables for the given scheduled tasks
      */
-    private void updateVariablesForTasksToSchedule(Map<JobId, JobDescriptor> jobMap,
-            LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
+    private void updateVariablesForTasksToSchedule(LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
         for (EligibleTaskDescriptor taskDescriptor : tasksToSchedule) {
-            InternalJob associatedJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
-            InternalTask internalTask = associatedJob.getIHMTasks().get(taskDescriptor.getTaskId());
+            InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
             internalTask.updateVariables(schedulingService);
         }
     }

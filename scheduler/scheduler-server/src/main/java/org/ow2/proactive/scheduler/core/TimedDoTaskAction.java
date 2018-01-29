@@ -29,14 +29,10 @@ import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -47,7 +43,6 @@ import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -127,17 +122,9 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
                 params = new TaskResult[parentIds.size()];
 
-                Map<TaskId, TaskResult> taskResults = new HashMap<>();
-                // Batch fetching of parent tasks results
-                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
-                    taskResults.putAll(schedulingService.getInfrastructure()
-                                                        .getDBManager()
-                                                        .loadTasksResults(job.getId(), parentsSubList));
-                }
                 int i = 0;
                 for (TaskId taskId : parentIds) {
-                    params[i] = taskResults.get(taskId);
+                    params[i] = task.getParentTasksResults().get(taskId);
                     i++;
                 }
 
