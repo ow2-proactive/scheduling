@@ -117,8 +117,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
-    private final String terminateNotificationNodeURL;
-
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
         this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
@@ -129,7 +127,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         terminateNotification = PAActiveObject.turnActive(terminateNotification,
                                                           TaskTerminateNotification.class.getName(),
                                                           terminateNotificationNode);
-        terminateNotificationNodeURL = terminateNotificationNode.getNodeInformation().getURL();
 
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
                                                                        new NamedThreadFactory("DoTask_Action"));
@@ -667,6 +664,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     }
 
                     boolean taskRecoverable = getRMProxiesManager().getRmProxy().areNodesRecoverable(nodes);
+                    String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
+                                                                        .getNodeInformation()
+                                                                        .getURL();
                     TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL,
                                                                              taskRecoverable);
 
