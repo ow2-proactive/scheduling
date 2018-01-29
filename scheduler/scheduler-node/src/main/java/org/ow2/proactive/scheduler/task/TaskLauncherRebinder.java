@@ -76,8 +76,8 @@ public class TaskLauncherRebinder {
                 return terminateNotification;
             } catch (Exception e) {
                 logger.warn("TaskTerminatedNotification handler of task " + taskId.getReadableName() +
-                            " is disconnected from the scheduler, try to rebind it", e);
-                return getReboundTaskTerminateNotificationHandler(terminateNotification);
+                            " is disconnected from the scheduler, try to rebind it");
+                return getReboundTaskTerminateNotificationHandler(e);
             }
         } else {
             return terminateNotification;
@@ -88,10 +88,11 @@ public class TaskLauncherRebinder {
      * Attempt to reaquire a correct reference to the TaskTerminateNotification
      * active object from a previously saved URL for this object.
      *
-     * @return a correct reference to a TaskTerminateNotification, or null if none can be retrieved
+     * @return a reference to a TaskTerminateNotification that is bounded to the
+     * terminateNotificationNodeURL, or null if it cannot be retrieved or if
+     * task is not recoverable
      */
-    TaskTerminateNotification
-            getReboundTaskTerminateNotificationHandler(TaskTerminateNotification taskTerminateNotification) {
+    TaskTerminateNotification getReboundTaskTerminateNotificationHandler(Throwable error) {
         if (taskRecoverable) {
             try {
                 logger.debug("List AOs on " + terminateNotificationNodeURL + " (expect only one): " +
@@ -102,14 +103,14 @@ public class TaskLauncherRebinder {
                 logger.info("On node " + node.getNodeInformation().getName() + " number of active objects found is " +
                             aos.length + " and the first one " + aos[0] + " will be used to send back the task result");
                 return (TaskTerminateNotification) aos[0];
-            } catch (Throwable e) {
+            } catch (Throwable t) {
                 // error when retrieving the termination handler after reconnection
                 logger.error("Failed to rebind TaskTerminatedNotification handler of task " + taskId.getReadableName() +
-                             " from URL " + terminateNotificationNodeURL, e);
-                return taskTerminateNotification;
+                             " from URL " + terminateNotificationNodeURL + " after exception " + error.getMessage(), t);
+                return null;
             }
         } else {
-            return taskTerminateNotification;
+            return null;
         }
     }
 
