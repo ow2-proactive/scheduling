@@ -431,9 +431,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             } catch (Exception e) {
                 String message;
                 if (jobIdInitialized(job)) {
-                    message = String.format("Error while submiting a job[id:%s] ", job.getId().value());
+                    message = String.format("Error while submitting job name: %s; id: %s.",
+                                            userJob.getName(),
+                                            job.getId().value());
                 } else {
-                    message = String.format("Error while submitting job %s. JobID wasn't available yet.",
+                    message = String.format("Error while submitting job name: %s. JobID wasn't available yet.",
                                             userJob.getName());
                 }
                 logger.error(message, e);
@@ -1107,14 +1109,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      *
      * @param jobId
      */
-    private void blockIfJobIsStillUnderSubmission(JobId jobId) {
-        while (waitForJobsToBeSubmitted.contains(jobId)) {
-            try {
-                synchronized (waitForJobsToBeSubmitted) {
+    private void blockIfJobIsStillUnderSubmission(JobId jobId) throws UnknownJobException {
+        synchronized (waitForJobsToBeSubmitted) {
+            while (waitForJobsToBeSubmitted.contains(jobId)) {
+                try {
                     waitForJobsToBeSubmitted.wait();
+                } catch (InterruptedException e) {
+                    String message = "Something tried to interrupt our blocking";
+                    logger.warn(message, e);
+                    throw new UnknownJobException(message, e);
                 }
-            } catch (InterruptedException e) {
-                logger.warn("Something tried to interrupt our blocking", e);
             }
         }
     }
@@ -1131,8 +1135,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         synchronized (waitForJobsToBeSubmitted) {
             synchronized (alreadySumbittedJobs) {
                 if (alreadySumbittedJobs.contains(jobId)) {
+
                     alreadySumbittedJobs.remove(jobId);
                     waitForJobsToBeSubmitted.remove(jobId);
+
                     waitForJobsToBeSubmitted.notifyAll();
                 } else {
                     waitForJobsToBeSubmitted.add(jobId);
@@ -1151,8 +1157,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         synchronized (waitForJobsToBeSubmitted) {
             synchronized (alreadySumbittedJobs) {
                 if (waitForJobsToBeSubmitted.contains(jobId)) {
+
                     alreadySumbittedJobs.remove(jobId);
                     waitForJobsToBeSubmitted.remove(jobId);
+
                     waitForJobsToBeSubmitted.notifyAll();
                 } else {
                     alreadySumbittedJobs.add(jobId);
@@ -1359,15 +1367,25 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public Page<JobInfo> getJobs(int offset, int limit, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
-        UserIdentificationImpl ident = frontendState.checkPermission("getJobs",
-                                                                     "You don't have permissions to load jobs");
-        return dbManager.getJobs(offset,
-                                 limit,
-                                 filterCriteria.isMyJobsOnly() ? ident.getUsername() : null,
-                                 filterCriteria.isPending(),
-                                 filterCriteria.isRunning(),
-                                 filterCriteria.isFinished(),
-                                 sortParameters);
+        synchronized (waitForJobsToBeSubmitted) {
+            while (!waitForJobsToBeSubmitted.isEmpty()) {
+                try {
+                    waitForJobsToBeSubmitted.wait();
+                } catch (InterruptedException e) {
+                    logger.warn("Thread was interrupted.", e);
+                }
+            }
+
+            UserIdentificationImpl ident = frontendState.checkPermission("getJobs",
+                                                                         "You don't have permissions to load jobs");
+            return dbManager.getJobs(offset,
+                                     limit,
+                                     filterCriteria.isMyJobsOnly() ? ident.getUsername() : null,
+                                     filterCriteria.isPending(),
+                                     filterCriteria.isRunning(),
+                                     filterCriteria.isFinished(),
+                                     sortParameters);
+        }
     }
 
     /**
@@ -1387,7 +1405,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public List<SchedulerUserInfo> getUsersWithJobs() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("getUsersWithJobs", "You don't have permissions to get users with jobs");
-        return dbManager.loadUsersWithJobs();
+        synchronized (waitForJobsToBeSubmitted) {
+            while (!waitForJobsToBeSubmitted.isEmpty()) {
+                try {
+                    waitForJobsToBeSubmitted.wait();
+                } catch (InterruptedException e) {
+                    logger.warn("Thread was interrupted.", e);
+                }
+            }
+
+            return dbManager.loadUsersWithJobs();
+        }
     }
 
     /**
