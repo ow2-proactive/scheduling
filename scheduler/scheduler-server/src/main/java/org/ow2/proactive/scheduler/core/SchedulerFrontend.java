@@ -590,6 +590,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public List<TaskResult> getTaskResultsByTag(JobId jobId, String taskTag)
             throws NotConnectedException, UnknownJobException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
+
         frontendState.checkPermission("getTaskResultByTag",
                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         List<TaskState> taskStates = getJobState(jobId).getTasksByTag(taskTag);
@@ -632,6 +634,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public TaskResult getTaskResultFromIncarnation(JobId jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
 
         // checking permissions
         frontendState.checkPermissions("getTaskResultFromIncarnation",
@@ -705,11 +708,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
+
         // checking permissions
         frontendState.checkPermissions("killTask",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK);
-        blockIfJobIsStillUnderSubmission(jobId);
         return schedulingService.killTask(jobId, taskName);
     }
 
@@ -730,6 +734,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public boolean restartTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
+
         // checking permissions
         frontendState.checkPermissions("restartTask",
                                        frontendState.getIdentifiedJob(jobId),
@@ -756,6 +762,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        blockIfJobIsStillUnderSubmission(jobIdObject);
         frontendState.checkPermissions("finishTaskInError",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
@@ -771,6 +778,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        blockIfJobIsStillUnderSubmission(jobIdObject);
         frontendState.checkPermissions("restartTaskOnError",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
@@ -784,6 +792,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public boolean preemptTask(JobId jobId, String taskName, int restartDelay)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
         // checking permissions
         frontendState.checkPermissions("preemptTask",
                                        frontendState.getIdentifiedJob(jobId),
@@ -806,11 +815,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
         // checking permissions
         frontendState.checkPermissions("removeJob",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
-        blockIfJobIsStillUnderSubmission(jobId);
 
         // asking the scheduler for the result
         return schedulingService.removeJob(jobId);
@@ -822,6 +831,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
+
         // checking permissions
         frontendState.checkPermissions("listenJobLogs",
                                        frontendState.getIdentifiedJob(jobId),
@@ -1043,6 +1054,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
+
         frontendState.checkPermissions("pauseJob",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_PAUSE_THIS_JOB);
@@ -1054,10 +1067,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
+
         frontendState.checkPermissions("resumeJob",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_RESUME_THIS_JOB);
-        blockIfJobIsStillUnderSubmission(jobId);
         return schedulingService.resumeJob(jobId);
     }
 
@@ -1066,10 +1080,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
+
         frontendState.checkPermissions("killJob",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB);
-        blockIfJobIsStillUnderSubmission(jobId);
         return schedulingService.killJob(jobId);
     }
 
@@ -1079,6 +1094,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public void changeJobPriority(JobId jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
+        blockIfJobIsStillUnderSubmission(jobId);
+
         frontendState.checkChangeJobPriority(jobId, priority);
 
         schedulingService.changeJobPriority(jobId, priority);
@@ -1181,6 +1198,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public boolean restartAllInErrorTasks(String jobId)
             throws NotConnectedException, UnknownJobException, PermissionException {
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
+        blockIfJobIsStillUnderSubmission(jobIdObject);
         frontendState.checkPermissions("restartAllInErrorTasks",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_IN_ERROR_TASKS_IN_THIS_JOB);
@@ -1516,6 +1534,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException {
+        blockIfJobIsStillUnderSubmission(jobId);
         return schedulingService.changeStartAt(jobId, startAt);
     }
 
@@ -1523,6 +1542,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
             throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
             JobCreationException {
+        blockIfJobIsStillUnderSubmission(jobId);
         TaskFlowJob job = (TaskFlowJob) dbManager.loadInitalJobContent(jobId);
         for (Entry<String, String> entry : generalInfo.entrySet()) {
             job.addGenericInformation(entry.getKey(), entry.getValue());
