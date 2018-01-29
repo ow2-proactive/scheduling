@@ -815,10 +815,10 @@ public abstract class InternalTask extends TaskState {
 
     /** Remove all the results of the parent tasks */
     public void removeParentTasksResults() {
-        if(parentTasksResults!=null) {
+        if (parentTasksResults != null) {
             parentTasksResults.clear();
             // reset to default
-            parentTasksResults=null;
+            parentTasksResults = null;
         }
     }
 
@@ -1200,7 +1200,7 @@ public abstract class InternalTask extends TaskState {
                                                              .getFirstNotSkippedParentTaskIds(parentTask));
                 }
 
-                parentTasksResults=new HashMap<>();
+                parentTasksResults = new HashMap<>();
 
                 // Batch fetching of parent tasks results
                 for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
