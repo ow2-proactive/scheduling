@@ -27,6 +27,7 @@ package performancetests.metrics;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -47,15 +48,14 @@ import org.ow2.proactive.scripting.TaskScript;
 import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.BaseRecoveryTest;
 import performancetests.recovery.JobRecoveryTest;
-import performancetests.recovery.NodeRecoveryTest;
 
 
 @RunWith(Parameterized.class)
-public class TaskCreationRateTest extends BaseRecoveryTest {
+public class SchedulerEfficiencyTime extends BaseRecoveryTest {
 
-    private static final URL SCHEDULER_CONFIGURATION_START = TaskCreationRateTest.class.getResource("/performancetests/config/scheduler-start-memory.ini");
+    private static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyTime.class.getResource("/performancetests/config/scheduler-start-memory.ini");
 
-    private static final URL RM_CONFIGURATION_START = TaskCreationRateTest.class.getResource("/performancetests/config/rm-start-memory.ini");
+    private static final URL RM_CONFIGURATION_START = SchedulerEfficiencyTime.class.getResource("/performancetests/config/rm-start-memory.ini");
 
     private static final Logger LOGGER = Logger.getLogger(JobRecoveryTest.class);
 
@@ -70,14 +70,14 @@ public class TaskCreationRateTest extends BaseRecoveryTest {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{10, 2}});
+        return Arrays.asList(new Object[][]{{10, 10}});
     }
 
     private final int taskNumber;
 
-    private final double rateLimit;
+    private final long rateLimit;
 
-    public TaskCreationRateTest(int taskNumber, double rateLimit) {
+    public SchedulerEfficiencyTime(int taskNumber, long rateLimit) {
         this.taskNumber = taskNumber;
         this.rateLimit = rateLimit;
     }
@@ -99,25 +99,24 @@ public class TaskCreationRateTest extends BaseRecoveryTest {
 
         final JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
 
-        final Double anActualRate = computeTaskCreationRate(jobState);
+        final Long anActualRate = computeSchedulerEfficiencyTime(jobState);
 
-        LOGGER.info(makeCSVString(TaskCreationRateTest.class.getSimpleName(),
+        LOGGER.info(makeCSVString(SchedulerEfficiencyTime.class.getSimpleName(),
                 taskNumber,
                 rateLimit,
                 anActualRate,
-                ((anActualRate > rateLimit) ? SUCCESS : FAILURE)));
+                ((anActualRate < rateLimit) ? SUCCESS : FAILURE)));
 
         assertThat(String.format("Task creation rate for job with %s tasks", taskNumber),
                 anActualRate,
-                greaterThan(rateLimit));
+                lessThan(rateLimit));
 
     }
 
-    private Double computeTaskCreationRate(JobState jobState) {
+    private long computeSchedulerEfficiencyTime(JobState jobState) {
         final long optimalJobDuration = Long.valueOf(jobState.getVariables().get(OPTIMAL_JOB_DURATION).getValue());
-        final long numberOfTasks = jobState.getTotalNumberOfTasks();
         final long actualJobDuration = jobState.getFinishedTime() - jobState.getStartTime();
-        return ((double) numberOfTasks / (actualJobDuration - optimalJobDuration)) * 1000.0; // because rate is jobs per second
+        return actualJobDuration - optimalJobDuration;
     }
 
     private TaskFlowJob createJob() throws Exception {
