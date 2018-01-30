@@ -53,20 +53,20 @@ import performancetests.recovery.JobRecoveryTest;
 @RunWith(Parameterized.class)
 public class SchedulerEfficiencyTime extends BaseRecoveryTest {
 
-    private static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyTime.class.getResource("/performancetests/config/scheduler-start-memory.ini");
+    public static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyTime.class.getResource("/performancetests/config/scheduler-start-memory.ini");
 
-    private static final URL RM_CONFIGURATION_START = SchedulerEfficiencyTime.class.getResource("/performancetests/config/rm-start-memory.ini");
+    public static final URL RM_CONFIGURATION_START = SchedulerEfficiencyTime.class.getResource("/performancetests/config/rm-start-memory.ini");
 
-    private static final Logger LOGGER = Logger.getLogger(JobRecoveryTest.class);
+    private static final Logger LOGGER = Logger.getLogger(SchedulerEfficiencyTime.class);
 
     private static final String OPTIMAL_JOB_DURATION = "OPTIMAL_JOB_DURATION";
 
     private static final int TASK_DURATION = 10; // in seconds
 
     /**
-     * @return an array of parameters which is used by JUnit to create objects of TaskCreationRateTest,
-     * where first value represents number of task in the job, and the second represents limit for TaskCreationRate (TCR).
-     * The bigget TCR the better.
+     * @return an array of parameters which is used by JUnit to create objects of SchedulerEfficiencyTime,
+     * where first value represents number of task in the job, and the second represents limit for SchedulerEfficiencyTime (SER).
+     * The biggest SER the better.
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
@@ -93,7 +93,7 @@ public class SchedulerEfficiencyTime extends BaseRecoveryTest {
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", taskNumber);
 
-        final JobId jobId = schedulerHelper.submitJob(createJob());
+        final JobId jobId = schedulerHelper.submitJob(createJob(taskNumber));
 
         schedulerHelper.waitForEventJobFinished(jobId);
 
@@ -119,7 +119,7 @@ public class SchedulerEfficiencyTime extends BaseRecoveryTest {
         return actualJobDuration - optimalJobDuration;
     }
 
-    private TaskFlowJob createJob() throws Exception {
+    public static TaskFlowJob createJob(int taskNumber) throws Exception {
         final TaskFlowJob job = new TaskFlowJob();
         job.setName(String.format("EP_%d_NO_MERGE_%dSEC", taskNumber, TASK_DURATION));
         job.setOnTaskError(OnTaskError.CANCEL_JOB);
