@@ -104,6 +104,10 @@ public abstract class InternalTask extends TaskState {
     @XmlTransient
     private transient List<InternalTask> internalTasksDependencies = null;
 
+    /** Results of the parent tasks. Null if no dependency*/
+    @XmlTransient
+    private transient Map<TaskId, TaskResult> parentTasksResults = null;
+
     /** Information about the launcher and node, mutable can change overtime, in case of restart for instance */
     // These information are not required during task process
     private transient ExecuterInformation executerInformation;
@@ -535,7 +539,7 @@ public abstract class InternalTask extends TaskState {
      * @return true if this task has dependencies, false otherwise.
      */
     public boolean hasDependences() {
-        return (internalTasksDependencies != null && internalTasksDependencies.size() > 0);
+        return (internalTasksDependencies != null && !internalTasksDependencies.isEmpty());
     }
 
     /**
@@ -713,7 +717,7 @@ public abstract class InternalTask extends TaskState {
      */
     public List<InternalTask> getIDependences() {
         //set to null if needed
-        if (internalTasksDependencies != null && internalTasksDependencies.size() == 0) {
+        if (internalTasksDependencies != null && internalTasksDependencies.isEmpty()) {
             internalTasksDependencies = null;
         }
         return internalTasksDependencies;
@@ -726,7 +730,7 @@ public abstract class InternalTask extends TaskState {
     @XmlTransient
     public List<TaskState> getDependences() {
         //set to null if needed
-        if (internalTasksDependencies == null || internalTasksDependencies.size() == 0) {
+        if (internalTasksDependencies == null || internalTasksDependencies.isEmpty()) {
             internalTasksDependencies = null;
             return null;
         }
@@ -802,6 +806,25 @@ public abstract class InternalTask extends TaskState {
     @Override
     public int getMaxNumberOfExecutionOnFailure() {
         return maxNumberOfExecutionOnFailure;
+    }
+
+    /** Get the results of the parent tasks */
+    public Map<TaskId, TaskResult> getParentTasksResults() {
+        return parentTasksResults;
+    }
+
+    /** Set the results of the parent tasks */
+    public void setParentTasksResults(Map<TaskId, TaskResult> parentTasksResults) {
+        this.parentTasksResults = parentTasksResults;
+    }
+
+    /** Remove all the results of the parent tasks */
+    public void removeParentTasksResults() {
+        if (parentTasksResults != null) {
+            parentTasksResults.clear();
+            // reset to default
+            parentTasksResults = null;
+        }
     }
 
     /**
@@ -1182,18 +1205,19 @@ public abstract class InternalTask extends TaskState {
                                                              .getFirstNotSkippedParentTaskIds(parentTask));
                 }
 
+                parentTasksResults = new HashMap<>();
+
                 // Batch fetching of parent tasks results
-                Map<TaskId, TaskResult> taskResults = new HashMap<>();
                 for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
                                                                        PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
 
-                    taskResults.putAll(schedulingService.getInfrastructure()
-                                                        .getDBManager()
-                                                        .loadTasksResults(internalJob.getId(), parentsSubList));
+                    parentTasksResults.putAll(schedulingService.getInfrastructure()
+                                                               .getDBManager()
+                                                               .loadTasksResults(internalJob.getId(), parentsSubList));
 
                 }
                 if (!parentIds.isEmpty()) {
-                    updateVariablesWithTaskResults(taskResults);
+                    updateVariablesWithTaskResults(parentTasksResults);
                 }
             }
 
@@ -1203,7 +1227,7 @@ public abstract class InternalTask extends TaskState {
 
     private void updateVariablesWithTaskResults(Map<TaskId, TaskResult> taskResults) {
         for (TaskResult taskResult : taskResults.values()) {
-            Map<String, Serializable> propagatedVariables = new HashMap<>();
+            Map<String, Serializable> propagatedVariables;
             if (taskResult.getPropagatedVariables() != null) {
                 try {
                     propagatedVariables = SerializationUtil.deserializeVariableMap(taskResult.getPropagatedVariables());

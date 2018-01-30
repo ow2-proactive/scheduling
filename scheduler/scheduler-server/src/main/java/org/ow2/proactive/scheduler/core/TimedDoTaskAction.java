@@ -127,17 +127,23 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
                 params = new TaskResult[parentIds.size()];
 
-                Map<TaskId, TaskResult> taskResults = new HashMap<>();
-                // Batch fetching of parent tasks results
-                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
-                    taskResults.putAll(schedulingService.getInfrastructure()
-                                                        .getDBManager()
-                                                        .loadTasksResults(job.getId(), parentsSubList));
+                // If parentTaskResults is null after a system failure (a very rare case)
+                if (task.getParentTasksResults() == null) {
+                    Map<TaskId, TaskResult> taskResults = new HashMap<>();
+                    // Batch fetching of parent tasks results
+                    for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
+                                                                           PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+                        taskResults.putAll(schedulingService.getInfrastructure()
+                                                            .getDBManager()
+                                                            .loadTasksResults(job.getId(), parentsSubList));
+                    }
+                    // store the parent tasks results in InternalTask for future executions.
+                    task.setParentTasksResults(taskResults);
                 }
+
                 int i = 0;
                 for (TaskId taskId : parentIds) {
-                    params[i] = taskResults.get(taskId);
+                    params[i] = task.getParentTasksResults().get(taskId);
                     i++;
                 }
 
