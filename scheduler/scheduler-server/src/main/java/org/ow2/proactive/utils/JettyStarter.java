@@ -350,6 +350,8 @@ public class JettyStarter {
     private WebAppContext createWebAppContext(String contextPath, String[] virtualHost) {
         WebAppContext webApp = new WebAppContext();
         webApp.setParentLoaderPriority(true);
+        // The following setting allows to avoid conflicts between server jackson jars and individual war jackson versions.
+        webApp.addServerClass("com.fasterxml.jackson.");
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);
         return webApp;
