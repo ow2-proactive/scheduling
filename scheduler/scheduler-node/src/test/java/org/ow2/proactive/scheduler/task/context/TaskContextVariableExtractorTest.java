@@ -32,6 +32,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -130,6 +132,42 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
 
         assertThat((String) contextVariables.get(taskResultPropagatedVariables1Key),
                    is(taskResultPropagatedVariables1Value));
+    }
+
+    @Test
+    public void testExtractTaskResultVariablesGetScopeVariables() throws Exception {
+        ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                  "javascript")));
+        TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariables();
+
+        TaskContext taskContext = new TaskContext(scriptContainer,
+                                                  taskLauncherInitializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs(null, null, null, null, null, null),
+                                                  null,
+                                                  null);
+
+        Map<String, Serializable> scopeVariables = new TaskContextVariableExtractor().getScopeVariables(taskContext);
+
+        Assert.assertThat(scopeVariables.toString(), CoreMatchers.containsString("{TestVariable2=valueForTest2}"));
+    }
+
+    @Test
+    public void testExtractTaskResultVariablesGetAllNonTaskVariables() throws Exception {
+        ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                  "javascript")));
+        TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariables();
+
+        TaskContext taskContext = new TaskContext(scriptContainer,
+                                                  taskLauncherInitializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs(null, null, null, null, null, null),
+                                                  null,
+                                                  null);
+
+        Map<String, Serializable> scopeVariables = new TaskContextVariableExtractor().getAllNonTaskVariables(taskContext);
+
+        Assert.assertThat(scopeVariables.toString(), CoreMatchers.containsString("PA_TASK_NAME=TestTaskName"));
     }
 
     @Test
