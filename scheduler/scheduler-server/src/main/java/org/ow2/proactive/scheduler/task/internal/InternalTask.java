@@ -813,6 +813,11 @@ public abstract class InternalTask extends TaskState {
         return parentTasksResults;
     }
 
+    /** Set the results of the parent tasks */
+    public void setParentTasksResults(Map<TaskId, TaskResult> parentTasksResults) {
+        this.parentTasksResults = parentTasksResults;
+    }
+
     /** Remove all the results of the parent tasks */
     public void removeParentTasksResults() {
         if (parentTasksResults != null) {
