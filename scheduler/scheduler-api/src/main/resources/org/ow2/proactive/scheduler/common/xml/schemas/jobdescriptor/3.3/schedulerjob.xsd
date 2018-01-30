@@ -1,0 +1,1176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="urn:proactive:jobdescriptor:3.3" xmlns:jd="urn:proactive:jobdescriptor:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <xs:import namespace="http://www.w3.org/2001/XMLSchema-instance" schemaLocation="xsi.xsd"/>
+  <xs:element name="job">
+    <xs:annotation>
+      <xs:documentation>Definition of a job for the scheduler </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:variables"/>
+        <xs:group minOccurs="0" ref="jd:jobDescription"/>
+        <xs:element minOccurs="0" ref="jd:genericInformation"/>
+        <xs:element minOccurs="0" ref="jd:inputSpace"/>
+        <xs:element minOccurs="0" ref="jd:outputSpace"/>
+        <xs:element minOccurs="0" ref="jd:globalSpace"/>
+        <xs:element minOccurs="0" ref="jd:userSpace"/>
+        <xs:element ref="jd:taskFlow"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="jd:jobName"/>
+      <xs:attribute name="priority">
+        <xs:annotation>
+          <xs:documentation>Priority of the job</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="jd:jobPriority jd:variableRefType"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="cancelJobOnError">
+        <xs:annotation>
+          <xs:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="restartTaskOnError">
+        <xs:annotation>
+          <xs:documentation>For each task, where does the task restart if an error occurred ? (default=anywhere)</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="jd:restartTaskType jd:variableRefType"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="maxNumberOfExecution">
+        <xs:annotation>
+          <xs:documentation>Maximum number of execution for each task (default=1)</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="projectName" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute ref="xsi:schemaLocation"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="jobName">
+    <xs:attribute name="name" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Identification of this job</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="variables">
+    <xs:annotation>
+      <xs:documentation>Definition of variables which can be reused throughout this descriptor</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:variable"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="variable">
+    <xs:sequence>
+      <xs:element name="variable">
+        <xs:annotation>
+          <xs:documentation>Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attributeGroup ref="jd:variableName"/>
+          <xs:attributeGroup ref="jd:variableValue"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="variableName">
+    <xs:attribute name="name" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of a variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="variableValue">
+    <xs:attribute name="value" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The patterns ${variable_name} will be replaced by this value</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="priority">
+    <xs:attribute name="priority" use="required">
+      <xs:annotation>
+        <xs:documentation>Priority of the job</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:jobPriority jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="cancelJobOnError_j">
+    <xs:attribute name="cancelJobOnError" use="required">
+      <xs:annotation>
+        <xs:documentation>For each task, does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...) (default=false)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="restartTaskOnError_j">
+    <xs:attribute name="restartTaskOnError" use="required">
+      <xs:annotation>
+        <xs:documentation>For each task, where does the task restart if an error occurred ? (default=anywhere)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:restartTaskType jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="numberOfExecution_j">
+    <xs:attribute name="maxNumberOfExecution" use="required">
+      <xs:annotation>
+        <xs:documentation>Maximum number of execution for each task (default=1)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="pathElement">
+    <xs:annotation>
+      <xs:documentation>Path element (one pathElement for each classpath entry)</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="path" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="genericInformation">
+    <xs:annotation>
+      <xs:documentation>Definition of any information you would like to get in the policy</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:info"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="info">
+    <xs:annotation>
+      <xs:documentation>Information that you can get in the policy through the job content</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:infoName"/>
+      <xs:attributeGroup ref="jd:infoValue"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="infoName">
+    <xs:attribute name="name" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of the information variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="infoValue">
+    <xs:attribute name="value" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Value of the information variable</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="projectName">
+    <xs:attribute name="projectName" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>Name of the project related to this job. It is also used in the policy to group some jobs together</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="jobDescription">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Textual description of this job </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="taskFlow">
+    <xs:annotation>
+      <xs:documentation>A job composed of a flow of tasks with or without dependencies </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:task"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- +++++++++++++ task -->
+  <xs:group name="task">
+    <xs:sequence>
+      <xs:element name="task">
+        <xs:annotation>
+          <xs:documentation>A task is the smallest computation unit for the scheduler </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:group minOccurs="0" ref="jd:taskDescription"/>
+            <xs:element minOccurs="0" ref="jd:genericInformation"/>
+            <xs:element minOccurs="0" ref="jd:depends"/>
+            <xs:element minOccurs="0" ref="jd:inputFiles"/>
+            <xs:element minOccurs="0" ref="jd:parallel"/>
+            <xs:element minOccurs="0" ref="jd:selection"/>
+            <xs:element minOccurs="0" ref="jd:forkEnvironment"/>
+            <xs:element minOccurs="0" ref="jd:pre"/>
+            <xs:element ref="jd:executable"/>
+            <xs:element minOccurs="0" ref="jd:controlFlow"/>
+            <xs:element minOccurs="0" ref="jd:post"/>
+            <xs:element minOccurs="0" ref="jd:cleaning"/>
+            <xs:element minOccurs="0" ref="jd:outputFiles"/>
+          </xs:sequence>
+          <xs:attributeGroup ref="jd:taskName"/>
+          <xs:attribute name="numberOfNodes">
+            <xs:annotation>
+              <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:positiveInteger jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="cancelJobOnError">
+            <xs:annotation>
+              <xs:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="restartTaskOnError" type="jd:restartTaskType">
+            <xs:annotation>
+              <xs:documentation>Where does the task restart if an error occurred ?</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attribute name="maxNumberOfExecution">
+            <xs:annotation>
+              <xs:documentation>Maximum number of execution for this task</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="runAsMe">
+            <xs:annotation>
+              <xs:documentation>Do we run this task under the job owner user identity</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="walltime">
+            <xs:annotation>
+              <xs:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="jd:walltimePattern jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="preciousResult">
+            <xs:annotation>
+              <xs:documentation>Do we keep the result among the job results  </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="preciousLogs">
+            <xs:annotation>
+              <xs:documentation>Do we keep the logs as file on USERSPACE</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+          <xs:attribute name="resultPreviewClass">
+            <xs:annotation>
+              <xs:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+              <xs:union memberTypes="jd:classPattern jd:variableRefType"/>
+            </xs:simpleType>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="taskName">
+    <xs:attribute name="name" use="required" type="xs:ID">
+      <xs:annotation>
+        <xs:documentation>Identification of this task (identifier) </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="nodesNumber_t">
+    <xs:attribute name="numberOfNodes" use="required">
+      <xs:annotation>
+        <xs:documentation>number of cores needed for the task (identifier)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:positiveInteger jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="taskDescription">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Textual description of this task</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="walltime">
+    <xs:attribute name="walltime" use="required">
+      <xs:annotation>
+        <xs:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:walltimePattern jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="cancelJobOnError_t">
+    <xs:attribute name="cancelJobOnError" use="required">
+      <xs:annotation>
+        <xs:documentation>Does the job cancel right away if a single task had an error (by opposition to a network failure, memory error, etc...)</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="restartTaskOnError_t">
+    <xs:attribute name="restartTaskOnError" use="required" type="jd:restartTaskType">
+      <xs:annotation>
+        <xs:documentation>Where does the task restart if an error occurred ?</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="numberOfExecution_t">
+    <xs:attribute name="maxNumberOfExecution" use="required">
+      <xs:annotation>
+        <xs:documentation>Maximum number of execution for this task</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="preciousResult">
+    <xs:attribute name="preciousResult" use="required">
+      <xs:annotation>
+        <xs:documentation>Do we keep the result among the job results  </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="preciousLogs">
+    <xs:attribute name="preciousLogs" use="required">
+      <xs:annotation>
+        <xs:documentation>Do we keep the logs as file on USERSPACE</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="resultPreviewClass">
+    <xs:attribute name="resultPreviewClass" use="required">
+      <xs:annotation>
+        <xs:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:classPattern jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="depends">
+    <xs:annotation>
+      <xs:documentation>A list of dependencies for this task </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:dependsTask"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="dependsTask">
+    <xs:sequence>
+      <xs:element name="task">
+        <xs:annotation>
+          <xs:documentation>A task from which this task depends </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="ref" use="required" type="xs:IDREF"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="parallel">
+    <xs:annotation>
+      <xs:documentation>An information related parallel task including nodes number and topology</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:topology"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="jd:nodesNumber_t"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="topology">
+    <xs:annotation>
+      <xs:documentation>A topology descriptor of the parallel task</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="jd:arbitrary"/>
+        <xs:element ref="jd:bestProximity"/>
+        <xs:element ref="jd:thresholdProximity"/>
+        <xs:element ref="jd:singleHost"/>
+        <xs:element ref="jd:singleHostExclusive"/>
+        <xs:element ref="jd:multipleHostsExclusive"/>
+        <xs:element ref="jd:differentHostsExclusive"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="selection">
+    <xs:annotation>
+      <xs:documentation>A script used to select resources that can handle the task </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:selectionScript"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="controlFlow">
+    <xs:annotation>
+      <xs:documentation>Flow control : block declaration, flow action</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0">
+        <xs:element ref="jd:if"/>
+        <xs:element ref="jd:replicate"/>
+        <xs:element ref="jd:loop"/>
+      </xs:choice>
+      <xs:attribute name="block" type="jd:blockAttr">
+        <xs:annotation>
+          <xs:documentation>block declaration</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="block">
+    <xs:attribute name="block" use="required" type="jd:blockAttr">
+      <xs:annotation>
+        <xs:documentation>block declaration</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="pre" type="jd:simpleScript">
+    <xs:annotation>
+      <xs:documentation>A script launched before the task execution in the task node</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="post" type="jd:simpleScript">
+    <xs:annotation>
+      <xs:documentation>A script launched after the task execution in the task node</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="cleaning" type="jd:simpleScript">
+    <xs:annotation>
+      <xs:documentation>A script launched by the Resource Manager after the task or post script</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:attributeGroup name="runAsMe">
+    <xs:attribute name="runAsMe" use="required">
+      <xs:annotation>
+        <xs:documentation>Do we run this task under the job owner user identity</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:boolean jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- +++++++++++++ scripts -->
+  <xs:complexType name="simpleScript">
+    <xs:sequence>
+      <xs:element name="script">
+        <xs:annotation>
+          <xs:documentation>Definition of a standard script</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:choice>
+            <xs:element ref="jd:code"/>
+            <xs:element ref="jd:file"/>
+          </xs:choice>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:group name="selectionScript">
+    <xs:sequence>
+      <xs:element name="script">
+        <xs:annotation>
+          <xs:documentation>Definition of a specific script which is used for resource selection </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:choice>
+            <xs:element ref="jd:code"/>
+            <xs:element ref="jd:file"/>
+          </xs:choice>
+          <xs:attribute name="type" type="jd:scriptTypeT">
+            <xs:annotation>
+              <xs:documentation>Type of script for the infrastructure manager (default to dynamic)  </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="scriptType">
+    <xs:attribute name="type" use="required" type="jd:scriptTypeT">
+      <xs:annotation>
+        <xs:documentation>Type of script for the infrastructure manager (default to dynamic)  </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="code">
+    <xs:annotation>
+      <xs:documentation>Definition of a script by writing directly the code inside the descriptor </xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="language" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="file">
+    <xs:annotation>
+      <xs:documentation>Definition of a script by loading a file </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group minOccurs="0" ref="jd:fileScriptArguments"/>
+      <xs:attribute name="path">
+        <xs:annotation>
+          <xs:documentation>File path to script definition  </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="url">
+        <xs:annotation>
+          <xs:documentation>Remote script definition, reachable at the given url </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="path">
+    <xs:attribute name="path" use="required">
+      <xs:annotation>
+        <xs:documentation>File path to script definition  </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="url">
+    <xs:attribute name="url" use="required">
+      <xs:annotation>
+        <xs:documentation>Remote script definition, reachable at the given url </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="fileScriptArguments">
+    <xs:sequence>
+      <xs:element name="arguments">
+        <xs:annotation>
+          <xs:documentation>A list of arguments of this script </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:group maxOccurs="unbounded" ref="jd:fileScriptArgument"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="fileScriptArgument">
+    <xs:sequence>
+      <xs:element name="argument">
+        <xs:annotation>
+          <xs:documentation>An argument of this script  </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="value" use="required" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <!-- +++++++++++++ Topology -->
+  <xs:element name="arbitrary">
+    <xs:annotation>
+      <xs:documentation>arbitrary topology</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="bestProximity">
+    <xs:annotation>
+      <xs:documentation>best nodes proximity</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="thresholdProximity">
+    <xs:annotation>
+      <xs:documentation>threshold nodes proximity</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:threshold"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="singleHost">
+    <xs:annotation>
+      <xs:documentation>nodes on single host</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="singleHostExclusive">
+    <xs:annotation>
+      <xs:documentation>nodes on single host exclusively</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="multipleHostsExclusive">
+    <xs:annotation>
+      <xs:documentation>nodes on multiple hosts exclusively</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="differentHostsExclusive">
+    <xs:annotation>
+      <xs:documentation>nodes on single host exclusively</xs:documentation>
+    </xs:annotation>
+    <xs:complexType/>
+  </xs:element>
+  <xs:attributeGroup name="threshold">
+    <xs:attribute name="threshold" use="required" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>threshold value</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- +++++++++++++ executables -->
+  <xs:element name="executable" abstract="true"/>
+  <xs:element name="nativeExecutable" substitutionGroup="jd:executable" type="jd:staticCommand">
+    <xs:annotation>
+      <xs:documentation>A native command call, it can be statically described or generated by a script </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="staticCommand">
+    <xs:sequence>
+      <xs:element ref="jd:staticCommand"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="staticCommand">
+    <xs:annotation>
+      <xs:documentation>A native command statically defined in the descriptor </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group minOccurs="0" ref="jd:commandArguments"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="workingDir_t">
+    <xs:attribute name="workingDir" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>working dir for native command to execute (ie launching dir, pwd...)</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="commandArguments">
+    <xs:sequence>
+      <xs:element name="arguments">
+        <xs:annotation>
+          <xs:documentation>List of arguments to the native command (they will be appended at the end of the command) </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:group maxOccurs="unbounded" ref="jd:commandArgument"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="commandArgument">
+    <xs:sequence>
+      <xs:element name="argument">
+        <xs:complexType>
+          <xs:attribute name="value" use="required" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="javaExecutable" substitutionGroup="jd:executable">
+    <xs:annotation>
+      <xs:documentation>A Java class implementing the Executable interface</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:parameters"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="jd:class"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="class">
+    <xs:attribute name="class" use="required">
+      <xs:annotation>
+        <xs:documentation>The fully qualified class name </xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="jd:classPattern jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="forkEnvironment">
+    <xs:annotation>
+      <xs:documentation>Fork environment if needed</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="jd:SystemEnvironment"/>
+        <xs:element minOccurs="0" ref="jd:jvmArgs"/>
+        <xs:element minOccurs="0" ref="jd:additionalClasspath"/>
+        <xs:element minOccurs="0" ref="jd:envScript"/>
+      </xs:sequence>
+      <xs:attribute name="workingDir" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>working dir for native command to execute (ie launching dir, pwd...)</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="javaHome">
+        <xs:annotation>
+          <xs:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="javaHome">
+    <xs:attribute name="javaHome" use="required">
+      <xs:annotation>
+        <xs:documentation>Path to installed java directory, to this path '/bin/java' will be added, if attribute does not exist only 'java' command will be called</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+        <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="SystemEnvironment">
+    <xs:annotation>
+      <xs:documentation>a list of sysProp</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:sysProp"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="sysProp">
+    <xs:sequence>
+      <xs:element name="variable">
+        <xs:annotation>
+          <xs:documentation>A parameter in the form of key/value pair</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attribute name="name" use="required" type="xs:string"/>
+          <xs:attribute name="value" use="required" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="jvmArgs">
+    <xs:annotation>
+      <xs:documentation>A list of java properties or options</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:jvmArg"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="jvmArg">
+    <xs:annotation>
+      <xs:documentation>A list of java properties or options</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="additionalClasspath">
+    <xs:annotation>
+      <xs:documentation>classpath entries to add to the new java process</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:pathElement"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="envScript" type="jd:simpleScript">
+    <xs:annotation>
+      <xs:documentation>environment script to execute for setting forked process environment</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:element name="parameters">
+    <xs:annotation>
+      <xs:documentation>A list of parameters that will be given to the Java task through the init method </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="jd:parameter"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parameter">
+    <xs:annotation>
+      <xs:documentation>A parameter in the form of key/value pair </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:string"/>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="scriptExecutable" substitutionGroup="jd:executable" type="jd:simpleScript">
+    <xs:annotation>
+      <xs:documentation>A script to be executed as a task</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <!-- +++++++++++++ DataSpaces -->
+  <xs:element name="inputSpace">
+    <xs:annotation>
+      <xs:documentation>INPUT space for the job, this setting overrides the default input space provided by the scheduler. It is typically used to store input files for a single job.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:url"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="outputSpace">
+    <xs:annotation>
+      <xs:documentation>OUTPUT space for the job, this setting overrides the default output space provided by the scheduler. It is typically used to store output files for a single job.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:url"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="globalSpace">
+    <xs:annotation>
+      <xs:documentation>GLOBAL space for the job, this setting overrides the default global space provided by the scheduler. It is typically used to store files shared by all users.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:url"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="userSpace">
+    <xs:annotation>
+      <xs:documentation>USER space for the job, this setting overrides the default user space provided by the scheduler. It is typically used to store files that a user needs across multiple jobs.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attributeGroup ref="jd:url"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="inputFiles">
+    <xs:annotation>
+      <xs:documentation>selection of input files that will be accessible for the application and copied from INPUT/OUTPUT to local system</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:infiles_"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="infiles_">
+    <xs:sequence>
+      <xs:element name="files">
+        <xs:annotation>
+          <xs:documentation>description of input files with include, exclude and an access mode</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attributeGroup ref="jd:includes_"/>
+          <xs:attribute name="excludes" type="jd:inexcludePattern">
+            <xs:annotation>
+              <xs:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attributeGroup ref="jd:inaccessMode_"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="inaccessMode_">
+    <xs:attribute name="accessMode" use="required" type="jd:inaccessModeType">
+      <xs:annotation>
+        <xs:documentation>type of access on the selected files</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="outputFiles">
+    <xs:annotation>
+      <xs:documentation>selection of output files that will be copied from LOCALSPACE to OUTPUT</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="jd:outfiles_"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="outfiles_">
+    <xs:sequence>
+      <xs:element name="files">
+        <xs:annotation>
+          <xs:documentation>description of output files with include, exclude and an access mode</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:attributeGroup ref="jd:includes_"/>
+          <xs:attribute name="excludes" type="jd:inexcludePattern">
+            <xs:annotation>
+              <xs:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+          <xs:attributeGroup ref="jd:outaccessMode_"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="outaccessMode_">
+    <xs:attribute name="accessMode" use="required" type="jd:outaccessModeType">
+      <xs:annotation>
+        <xs:documentation>type of access on the selected files</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="includes_">
+    <xs:attribute name="includes" use="required" type="jd:inexcludePattern">
+      <xs:annotation>
+        <xs:documentation>Pattern of the files to include, relative to INPUT or OUTPUT spaces</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="excludes_">
+    <xs:attribute name="excludes" use="required" type="jd:inexcludePattern">
+      <xs:annotation>
+        <xs:documentation>Pattern of the files to exclude among the included one, relative to INPUT or OUTPUT spaces</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- +++++++++++++ Control flow -->
+  <xs:element name="if">
+    <xs:annotation>
+      <xs:documentation>branching Control flow action</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="jd:simpleScript">
+          <xs:attributeGroup ref="jd:target"/>
+          <xs:attributeGroup ref="jd:targetElse"/>
+          <xs:attribute name="continuation" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>branching else target</xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="target">
+    <xs:attribute name="target" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>branching if target</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="targetElse">
+    <xs:attribute name="else" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>branching else target</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="targetContinuation">
+    <xs:attribute name="continuation" use="required" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>branching else target</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="loop">
+    <xs:annotation>
+      <xs:documentation>looping control flow action</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="jd:simpleScript">
+          <xs:attributeGroup ref="jd:target"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="replicate" type="jd:simpleScript">
+    <xs:annotation>
+      <xs:documentation>replicate control flow action</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <!-- +++++++++++++ User define types -->
+  <xs:simpleType name="jobPriority">
+    <xs:union memberTypes="jd:variableRefType">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="highest"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="high"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="low"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="lowest"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="restartTaskType">
+    <xs:union memberTypes="jd:variableRefType">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="anywhere"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="elsewhere"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="inaccessModeType">
+    <xs:union memberTypes="jd:variableRefType">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="transferFromInputSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="transferFromOutputSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="transferFromGlobalSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="transferFromUserSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="none"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="outaccessModeType">
+    <xs:union memberTypes="jd:variableRefType">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="transferToOutputSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="transferToGlobalSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="transferToUserSpace"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="none"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="classPattern">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="walltimePattern">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="variableRefType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="$\{[A-Za-z0-9._]+\}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="inexcludePattern">
+    <xs:restriction base="xs:string">
+      <xs:pattern value=".+(,.+)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="controlFlowAction">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="goto"/>
+      <xs:enumeration value="replicate"/>
+      <xs:enumeration value="continue"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="blockAttr">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="start"/>
+      <xs:enumeration value="end"/>
+      <xs:enumeration value="none"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="scriptTypeT">
+    <xs:union memberTypes="jd:variableRefType">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="dynamic"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="static"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType>
+  <xs:simpleType name="propertyAppendChar">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="."/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
