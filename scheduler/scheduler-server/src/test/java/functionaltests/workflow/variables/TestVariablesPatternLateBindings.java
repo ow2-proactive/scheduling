@@ -40,10 +40,10 @@ import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 
 
-public class TestPropagatedVariableResolution extends SchedulerFunctionalTestWithRestart {
+public class TestVariablesPatternLateBindings extends SchedulerFunctionalTestNoRestart {
 
     private static URL job_desc = TestModifyPropagatedVariables.class.getClassLoader()
                                                                      .getResource("workflow/descriptors/flow_simple_unresolved_variables.xml");
@@ -57,17 +57,23 @@ public class TestPropagatedVariableResolution extends SchedulerFunctionalTestWit
         //assert the task finished correctly
         assertEquals(TaskStatus.FINISHED, taskInfo.getStatus());
 
-        //for the first task:
-        String jobLog = schedulerHelper.getTaskResult(id, "Groovy_Task").getOutput().getAllLogs();
-        //1- resolve reference to job variable
-        Assert.assertThat(jobLog, CoreMatchers.containsString("TESTVAR=var_" + id.toString()));
-        //2- resolve reference to another task variable
-        Assert.assertThat(jobLog, CoreMatchers.containsString("TO_RESOLVE_IN_TASK=hello_world"));
-
         //for the second task:
-        jobLog = schedulerHelper.getTaskResult(id, "Groovy_Task2").getOutput().getAllLogs();
-        //3- resolve reference to previous task variable
-        Assert.assertThat(jobLog, CoreMatchers.containsString("TESTVAR_NEW=var_" + id.toString()));
+        String jobLog = schedulerHelper.getTaskResult(id, "Groovy_Task2").getOutput().getAllLogs();
+
+        Assert.assertThat(jobLog, CoreMatchers.containsString("WORKFLOW_VAR1=workflow_value"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("WORKFLOW_VAR2=var2_workflow_value"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("WORKFLOW_VAR3=workflow_value"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("WORKFLOW_VAR4=workflow_value_task_value"));
+
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR1=task_value"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR2=task_value_1"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR3=task_value_task_value"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR4=task_value_inherited_value"));
+
+        Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR1=inherited_value"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR2=inherited_value_1"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR3=inherited_value_task_value"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR4=inherited_value_inherited_value"));
     }
 
     private String absolutePath(URL file) throws Exception {

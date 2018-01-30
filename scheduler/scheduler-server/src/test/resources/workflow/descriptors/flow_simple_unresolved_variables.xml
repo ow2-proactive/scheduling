@@ -9,21 +9,21 @@
         maxNumberOfExecution="2"
 >
     <variables>
-        <variable name="TESTVAR" value="var_${PA_JOB_ID}"/>
+        <variable name="WORKFLOW_VAR1" value="workflow_value"/>
+        <variable name="WORKFLOW_VAR2" value="var2_$WORKFLOW_VAR1"/>
+        <variable name="WORKFLOW_VAR3" value="workflow_value_${PA_JOB_ID}"/>
+        <variable name="WORKFLOW_VAR4" value="workflow_value_${TASK_VAR1}"/>
     </variables>
     <taskFlow>
         <task name="Groovy_Task">
-            <variables>
-                <variable name="VALUE_FROM_TASK" value="world" model="" />
-                <variable name="TO_RESOLVE_IN_TASK" value="hello_$VALUE_FROM_TASK" model="" />
-            </variables>
             <scriptExecutable>
                 <script>
                     <code language="groovy">
                         <![CDATA[
-println "TESTVAR="+variables.get("TESTVAR")
-println "TO_RESOLVE_IN_TASK="+variables.get("TO_RESOLVE_IN_TASK")
-println "ENTIREMAP="+variables
+variables.put("INHERITED_VAR1", "inherited_value")
+variables.put("INHERITED_VAR2", "inherited_value_\${PA_JOB_ID}")
+variables.put("INHERITED_VAR3", "inherited_value_\${TASK_VAR1}")
+variables.put("INHERITED_VAR4", "inherited_value_\${INHERITED_VAR1}")
 ]]>
                     </code>
                 </script>
@@ -31,7 +31,10 @@ println "ENTIREMAP="+variables
         </task>
         <task name="Groovy_Task2">
             <variables>
-                <variable name="TESTVAR_NEW" value="$TESTVAR" model="" />
+                <variable name="TASK_VAR1" value="task_value" />
+                <variable name="TASK_VAR2" value="task_value_${PA_JOB_ID}"/>
+                <variable name="TASK_VAR3" value="task_value_$TASK_VAR1" />
+                <variable name="TASK_VAR4" value="task_value_${INHERITED_VAR1}"/>
             </variables>
             <depends>
                 <task ref="Groovy_Task"/>
@@ -40,7 +43,20 @@ println "ENTIREMAP="+variables
                 <script>
                     <code language="groovy">
                         <![CDATA[
-println "TESTVAR_NEW="+variables.get("TESTVAR_NEW")
+println "WORKFLOW_VAR1="+variables.get("WORKFLOW_VAR1")
+println "WORKFLOW_VAR2="+variables.get("WORKFLOW_VAR2")
+println "WORKFLOW_VAR3="+variables.get("WORKFLOW_VAR3")
+println "WORKFLOW_VAR4="+variables.get("WORKFLOW_VAR4")
+
+println "TASK_VAR1="+variables.get("TASK_VAR1")
+println "TASK_VAR2="+variables.get("TASK_VAR2")
+println "TASK_VAR3="+variables.get("TASK_VAR3")
+println "TASK_VAR4="+variables.get("TASK_VAR4")
+
+println "INHERITED_VAR1="+variables.get("INHERITED_VAR1")
+println "INHERITED_VAR2="+variables.get("INHERITED_VAR2")
+println "INHERITED_VAR3="+variables.get("INHERITED_VAR3")
+println "INHERITED_VAR4="+variables.get("INHERITED_VAR4")
 ]]>
                     </code>
                 </script>
