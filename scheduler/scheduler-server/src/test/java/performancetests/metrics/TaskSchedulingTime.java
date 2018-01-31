@@ -66,7 +66,7 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 3, 3000 } });
+        return Arrays.asList(new Object[][]{{8, 3000}});
     }
 
     private final int taskNumber;
@@ -83,9 +83,9 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                                               SchedulerEfficiencyTime.SCHEDULER_CONFIGURATION_START.getPath(),
-                                               SchedulerEfficiencyTime.RM_CONFIGURATION_START.getPath(),
-                                               null);
+                SchedulerEfficiencyTime.SCHEDULER_CONFIGURATION_START.getPath(),
+                SchedulerEfficiencyTime.RM_CONFIGURATION_START.getPath(),
+                null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", taskNumber);
 
@@ -108,16 +108,22 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
 
         for (JobTaskStatusListener.TimestampedData<TaskInfo> tData : listener.getTaskEvents()) {
             if (tData.getData().getJobId().equals(jobId) && (tData.getData().getStatus().equals(TaskStatus.ABORTED) ||
-                                                             tData.getData().getStatus().equals(TaskStatus.FAILED) ||
-                                                             tData.getData().getStatus().equals(TaskStatus.FAULTY) ||
-                                                             tData.getData().getStatus().equals(TaskStatus.FINISHED) ||
-                                                             tData.getData().getStatus().equals(TaskStatus.PAUSED))) {
+                    tData.getData().getStatus().equals(TaskStatus.FAILED) ||
+                    tData.getData().getStatus().equals(TaskStatus.FAULTY) ||
+                    tData.getData().getStatus().equals(TaskStatus.FINISHED) ||
+                    tData.getData().getStatus().equals(TaskStatus.PAUSED) ||
+                    tData.getData().getStatus().equals(TaskStatus.PENDING))) {
                 throw new RuntimeException("There should not be task with any of these statuses.");
             }
         }
 
         List<Long> longList = new ArrayList<>();
-        longList.addAll(ids);
+
+        for (JobTaskStatusListener.TimestampedData<TaskInfo> tData : listener.getTaskEvents()) {
+            if (tData.getData().getJobId().equals(jobId) && tData.getData().getStatus().equals(TaskStatus.RUNNING)) {
+                longList.add(tData.getTimestamp());
+            }
+        }
 
         Collections.sort(longList);
 
@@ -129,19 +135,19 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
         assertTrue(last > first);
 
         LOGGER.info(makeCSVString(TaskSchedulingTime.class.getSimpleName(),
-                                  taskNumber,
-                                  timeLimit,
-                                  anActualTime,
-                                  ((anActualTime < timeLimit) ? SUCCESS : FAILURE)));
+                taskNumber,
+                timeLimit,
+                anActualTime,
+                ((anActualTime < timeLimit) ? SUCCESS : FAILURE)));
 
         assertThat(String.format("Task creation rate for job with %s tasks", taskNumber),
-                   anActualTime,
-                   lessThan(timeLimit));
+                anActualTime,
+                lessThan(timeLimit));
 
     }
 
     private long waitUntilNumberOfTasksEvents(JobTaskStatusListener listener, JobId jobId, TaskStatus taskStatus,
-            int numberOfEvents) throws InterruptedException {
+                                              int numberOfEvents) throws InterruptedException {
         long result = 0;
 
         while (result < numberOfEvents) {
@@ -154,8 +160,8 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
 
             if (result > numberOfEvents) {
                 throw new RuntimeException(String.format("There are more %s tasks %d that we expected",
-                                                         taskStatus.toString(),
-                                                         result));
+                        taskStatus.toString(),
+                        result));
             }
             Thread.sleep(1000);
 

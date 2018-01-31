@@ -64,7 +64,7 @@ public class TaskCreationTime extends BaseRecoveryTest {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 1000, 3000 } });
+        return Arrays.asList(new Object[][] { { 20000, 15000 } });
     }
 
     private final int taskNumber;

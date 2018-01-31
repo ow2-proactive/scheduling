@@ -70,7 +70,7 @@ public class SchedulerEfficiencyTime extends BaseRecoveryTest {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 10000 } });
+        return Arrays.asList(new Object[][] { { 8, 10000 } });
     }
 
     private final int taskNumber;
