@@ -70,7 +70,7 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
         if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
             nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
         }
-        HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/create"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/create/recovery"));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
         queryStringBuilder.add("nodeSourceName", nodeSource)
                           .addAll(infrastructure)
