@@ -32,6 +32,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -99,13 +101,8 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   null);
 
-        new TaskContextVariableExtractor().extractVariables(taskContext, (TaskResult) null, true);
+        new TaskContextVariableExtractor().getAllVariables(taskContext);
 
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testExtractThrowsNullPointerExceptionIfTaskContextIsNull() throws Exception {
-        new TaskContextVariableExtractor().extractVariables(null, (TaskResult) null, true);
     }
 
     @Test
@@ -131,12 +128,46 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   null);
 
-        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().extractVariables(taskContext,
-                                                                                                         (TaskResult) null,
-                                                                                                         true);
+        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllVariables(taskContext);
 
         assertThat((String) contextVariables.get(taskResultPropagatedVariables1Key),
                    is(taskResultPropagatedVariables1Value));
+    }
+
+    @Test
+    public void testExtractTaskResultVariablesGetScopeVariables() throws Exception {
+        ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                  "javascript")));
+        TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariables();
+
+        TaskContext taskContext = new TaskContext(scriptContainer,
+                                                  taskLauncherInitializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs(null, null, null, null, null, null),
+                                                  null,
+                                                  null);
+
+        Map<String, Serializable> scopeVariables = new TaskContextVariableExtractor().getScopeVariables(taskContext);
+
+        Assert.assertThat(scopeVariables.toString(), CoreMatchers.containsString("{TestVariable2=valueForTest2}"));
+    }
+
+    @Test
+    public void testExtractTaskResultVariablesGetAllNonTaskVariables() throws Exception {
+        ScriptExecutableContainer scriptContainer = new ScriptExecutableContainer(new TaskScript(new SimpleScript("print('hello'); result='hello'",
+                                                                                                                  "javascript")));
+        TaskLauncherInitializer taskLauncherInitializer = getTaskLauncherInitializerWithWorkflowVariables();
+
+        TaskContext taskContext = new TaskContext(scriptContainer,
+                                                  taskLauncherInitializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs(null, null, null, null, null, null),
+                                                  null,
+                                                  null);
+
+        Map<String, Serializable> scopeVariables = new TaskContextVariableExtractor().getAllNonTaskVariables(taskContext);
+
+        Assert.assertThat(scopeVariables.toString(), CoreMatchers.containsString("PA_TASK_NAME=TestTaskName"));
     }
 
     @Test
@@ -162,9 +193,8 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
         TaskResultImpl taskResult = new TaskResultImpl(taskContext.getTaskId(), new Exception("Exception"));
         taskResult.setPropagatedVariables(taskResultVariables);
 
-        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().extractVariables(taskContext,
-                                                                                                         taskResult,
-                                                                                                         true);
+        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllVariablesWithTaskResult(taskContext,
+                                                                                                                      taskResult);
 
         assertThat((String) contextVariables.get(taskResultPropagatedVariables1Key),
                    is(taskResultPropagatedVariables1Value));
@@ -182,9 +212,8 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
                                                   null);
-        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().extractVariables(taskContext,
-                                                                                                         nodesfileContent,
-                                                                                                         false);
+        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllNonTaskVariablesInjectNodesFile(taskContext,
+                                                                                                                              nodesfileContent);
 
         assertThat("Nodes number must be equal to number of other nodes + 1 (for the own node).",
                    (int) contextVariables.get(SchedulerVars.PA_NODESNUMBER.toString()),
@@ -210,8 +239,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   null);
 
-        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().extractVariables(taskContext,
-                                                                                                         true);
+        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllVariables(taskContext);
 
         assertThat((String) contextVariables.get(testVariable1Key), is(testVariable1Value));
         assertThat((String) contextVariables.get(testVariable2Key), is(testVariable2Value));
@@ -240,19 +268,8 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   null);
 
-        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().extractVariables(taskContext,
-                                                                                                         true);
+        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllVariables(taskContext);
 
-        validateExtractedVariablesFromTaskLauncherInitializer(contextVariables);
-    }
-
-    @Test
-    public void testExtractTaskVariablesFromTaskLauncherInitializer() throws Exception {
-        TaskLauncherInitializer taskLauncherInitializer = createTaskLauncherInitializer();
-
-        Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().retrieveContextVariables(taskLauncherInitializer);
-
-        // assertThat
         validateExtractedVariablesFromTaskLauncherInitializer(contextVariables);
     }
 

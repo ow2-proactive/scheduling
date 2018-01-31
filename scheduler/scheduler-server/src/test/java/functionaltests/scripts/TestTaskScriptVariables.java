@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Test;
@@ -75,7 +76,7 @@ public class TestTaskScriptVariables extends SchedulerFunctionalTestNoRestart {
         //Selection files access
         assertTrue(logs.contains("testvartask0"));
 
-        //Fork environment, pre, scriptExecutable, post scripts 
+        //Fork environment, pre, scriptExecutable, post scripts
         assertEquals(5, outputVariablesLines.length);
         assertEquals("testvartask1", outputVariablesLines[0]);
         assertEquals("testvartask2", outputVariablesLines[1]);

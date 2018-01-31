@@ -119,7 +119,7 @@ public class VariablesMap implements Map<String, Serializable>, Serializable {
      * Getter of the merged variables map: scopeMap variables override inheritedMap variables and scriptMap variables override scopeMap variables
      * @return the merged variables map
      */
-    public Map<String, Serializable> getMergedMap() {
+    private Map<String, Serializable> getMergedMap() {
         Map<String, Serializable> variables = new HashMap<>(inheritedMap);
         variables.putAll(scopeMap);
         variables.putAll(scriptMap);

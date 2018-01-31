@@ -42,8 +42,6 @@ import functionaltests.dataspaces.TestCacheSpaceCleaning;
 import functionaltests.dataspaces.TestCleanTaskWorkingDir;
 import functionaltests.dataspaces.TestDataSpaceConfiguration;
 import functionaltests.dataspaces.TestDataSpaceServiceStarter;
-import functionaltests.dataspaces.TestDataspaceConcurrentKilling;
-import functionaltests.dataspaces.TestDataspaceConcurrentTransfer;
 import functionaltests.dataspaces.TestDataspaceScripts;
 import functionaltests.dataspaces.TestGlobalSpace;
 import functionaltests.dataspaces.TestJobDataspaceSubmission;
@@ -167,6 +165,7 @@ import functionaltests.workflow.variables.TestModifyPropagatedVariables;
 import functionaltests.workflow.variables.TestNonForkedScriptTaskVariablePropagation;
 import functionaltests.workflow.variables.TestPropagatedVariables;
 import functionaltests.workflow.variables.TestPropagatedVariablesWalltime;
+import functionaltests.workflow.variables.TestVariablesPatternLateBindings;
 import functionaltests.workflow.variables.Test_SCHEDULING_2034;
 
 
@@ -214,11 +213,11 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestJobSchedulerHome.class, TestJobSelScriptSubmission.class, TestJobSelScriptVariables.class,
                       TestJobServerLogs.class, TestJobWalltime.class, TestJobWithInvalidSelectionScript.class,
                       TestKilledJobResult.class, TestLoadJobs.class, TestLoggers.class,
-                      TestModifyPropagatedVariables.class, TestMultipleHostsRequest.class, TestNativeTaskPaths.class,
-                      TestPauseJob.class, TestPreciousLogs.class, TestPropagatedVariables.class,
-                      TestPropagatedVariablesWalltime.class, TestSchedulerMiscEvents.class, TestScriptEngines.class,
-                      TestScriptForkEnvironment.class, TestScriptTask.class,
-                      TestTaskIdOrderSameAsDeclarationOrder.class, TestTaskNotExecuted.class,
+                      TestVariablesPatternLateBindings.class, TestModifyPropagatedVariables.class,
+                      TestMultipleHostsRequest.class, TestNativeTaskPaths.class, TestPauseJob.class,
+                      TestPreciousLogs.class, TestPropagatedVariables.class, TestPropagatedVariablesWalltime.class,
+                      TestSchedulerMiscEvents.class, TestScriptEngines.class, TestScriptForkEnvironment.class,
+                      TestScriptTask.class, TestTaskIdOrderSameAsDeclarationOrder.class, TestTaskNotExecuted.class,
                       TestTaskNotRestarted.class, TestTaskNotStarted.class, TestTaskScriptVariables.class,
                       TestThirdPartyCredentialsDefined.class, TestUserSpace.class, TestWorkflowDataspace.class,
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
