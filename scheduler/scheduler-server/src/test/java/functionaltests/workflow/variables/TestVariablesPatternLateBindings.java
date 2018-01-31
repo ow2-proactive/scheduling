@@ -66,12 +66,12 @@ public class TestVariablesPatternLateBindings extends SchedulerFunctionalTestNoR
         Assert.assertThat(jobLog, CoreMatchers.containsString("WORKFLOW_VAR4=workflow_value_task_value"));
 
         Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR1=task_value"));
-        Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR2=task_value_1"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR2=task_value_" + id.toString()));
         Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR3=task_value_task_value"));
         Assert.assertThat(jobLog, CoreMatchers.containsString("TASK_VAR4=task_value_inherited_value"));
 
         Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR1=inherited_value"));
-        Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR2=inherited_value_1"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR2=inherited_value_" + id.toString()));
         Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR3=inherited_value_task_value"));
         Assert.assertThat(jobLog, CoreMatchers.containsString("INHERITED_VAR4=inherited_value_inherited_value"));
     }
