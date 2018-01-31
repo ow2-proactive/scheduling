@@ -25,7 +25,12 @@
  */
 package performancetests.metrics;
 
-import functionaltests.utils.SchedulerTHelper;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.lessThan;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,13 +45,9 @@ import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
+
+import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.BaseRecoveryTest;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
 
 
 @RunWith(Parameterized.class)
@@ -63,7 +64,7 @@ public class TaskCreationTime extends BaseRecoveryTest {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{1000, 3000}});
+        return Arrays.asList(new Object[][] { { 1000, 3000 } });
     }
 
     private final int taskNumber;
@@ -80,27 +81,27 @@ public class TaskCreationTime extends BaseRecoveryTest {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                SchedulerEfficiencyTime.SCHEDULER_CONFIGURATION_START.getPath(),
-                SchedulerEfficiencyTime.RM_CONFIGURATION_START.getPath(),
-                null);
+                                               SchedulerEfficiencyTime.SCHEDULER_CONFIGURATION_START.getPath(),
+                                               SchedulerEfficiencyTime.RM_CONFIGURATION_START.getPath(),
+                                               null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", 1);
 
         final long start = System.currentTimeMillis();
 
-        final JobId jobId = schedulerHelper.submitJob(SchedulerEfficiencyTime.createJob(taskNumber));
+        final JobId jobId = schedulerHelper.submitJob(SchedulerEfficiencyTime.createJob(taskNumber, TASK_DURATION));
 
         final long anActualTime = System.currentTimeMillis() - start;
 
         LOGGER.info(makeCSVString(TaskCreationTime.class.getSimpleName(),
-                taskNumber,
-                timeLimit,
-                anActualTime,
-                ((anActualTime < timeLimit) ? SUCCESS : FAILURE)));
+                                  taskNumber,
+                                  timeLimit,
+                                  anActualTime,
+                                  ((anActualTime < timeLimit) ? SUCCESS : FAILURE)));
 
         assertThat(String.format("Task creation rate for job with %s tasks", taskNumber),
-                anActualTime,
-                lessThan(timeLimit));
+                   anActualTime,
+                   lessThan(timeLimit));
 
     }
 

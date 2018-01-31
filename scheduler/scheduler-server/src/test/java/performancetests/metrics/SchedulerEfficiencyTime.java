@@ -70,7 +70,7 @@ public class SchedulerEfficiencyTime extends BaseRecoveryTest {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{10, 10}});
+        return Arrays.asList(new Object[][] { { 10, 10000 } });
     }
 
     private final int taskNumber;
@@ -87,29 +87,29 @@ public class SchedulerEfficiencyTime extends BaseRecoveryTest {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                SCHEDULER_CONFIGURATION_START.getPath(),
-                RM_CONFIGURATION_START.getPath(),
-                null);
+                                               SCHEDULER_CONFIGURATION_START.getPath(),
+                                               RM_CONFIGURATION_START.getPath(),
+                                               null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", taskNumber);
 
-        final JobId jobId = schedulerHelper.submitJob(createJob(taskNumber));
+        final JobId jobId = schedulerHelper.submitJob(createJob(taskNumber, TASK_DURATION));
 
         schedulerHelper.waitForEventJobFinished(jobId);
 
         final JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
 
-        final Long anActualRate = computeSchedulerEfficiencyTime(jobState);
+        final Long anActualTime = computeSchedulerEfficiencyTime(jobState);
 
         LOGGER.info(makeCSVString(SchedulerEfficiencyTime.class.getSimpleName(),
-                taskNumber,
-                rateLimit,
-                anActualRate,
-                ((anActualRate < rateLimit) ? SUCCESS : FAILURE)));
+                                  taskNumber,
+                                  rateLimit,
+                                  anActualTime,
+                                  ((anActualTime < rateLimit) ? SUCCESS : FAILURE)));
 
         assertThat(String.format("Task creation rate for job with %s tasks", taskNumber),
-                anActualRate,
-                lessThan(rateLimit));
+                   anActualTime,
+                   lessThan(rateLimit));
 
     }
 
@@ -119,17 +119,17 @@ public class SchedulerEfficiencyTime extends BaseRecoveryTest {
         return actualJobDuration - optimalJobDuration;
     }
 
-    public static TaskFlowJob createJob(int taskNumber) throws Exception {
+    public static TaskFlowJob createJob(int taskNumber, int taskDuration) throws Exception {
         final TaskFlowJob job = new TaskFlowJob();
-        job.setName(String.format("EP_%d_NO_MERGE_%dSEC", taskNumber, TASK_DURATION));
+        job.setName(String.format("EP_%d_NO_MERGE_%dSEC", taskNumber, taskDuration));
         job.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.getVariables().put(OPTIMAL_JOB_DURATION,
-                new JobVariable(OPTIMAL_JOB_DURATION, String.valueOf(TASK_DURATION * 1000)));
+                               new JobVariable(OPTIMAL_JOB_DURATION, String.valueOf(taskDuration * 1000)));
         for (int i = 0; i < taskNumber; i++) {
             ScriptTask task = new ScriptTask();
             task.setName("process_" + i);
-            task.setScript(new TaskScript(new SimpleScript(String.format("Thread.sleep(%s * 1000)", TASK_DURATION),
-                    "groovy")));
+            task.setScript(new TaskScript(new SimpleScript(String.format("Thread.sleep(%s * 1000)", taskDuration),
+                                                           "groovy")));
             job.addTask(task);
         }
         return job;
