@@ -26,7 +26,6 @@
 package performancetests.metrics;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 
 import java.net.URL;
@@ -47,17 +46,16 @@ import org.ow2.proactive.scripting.TaskScript;
 
 import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.BaseRecoveryTest;
-import performancetests.recovery.JobRecoveryTest;
 
 
 @RunWith(Parameterized.class)
-public class SchedulerEfficiencyTime extends BaseRecoveryTest {
+public class SchedulerEfficiencyTimeTest extends BaseRecoveryTest {
 
-    public static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyTime.class.getResource("/performancetests/config/scheduler-start-memory.ini");
+    public static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyTimeTest.class.getResource("/performancetests/config/scheduler-start-memory.ini");
 
-    public static final URL RM_CONFIGURATION_START = SchedulerEfficiencyTime.class.getResource("/performancetests/config/rm-start-memory.ini");
+    public static final URL RM_CONFIGURATION_START = SchedulerEfficiencyTimeTest.class.getResource("/performancetests/config/rm-start-memory.ini");
 
-    private static final Logger LOGGER = Logger.getLogger(SchedulerEfficiencyTime.class);
+    private static final Logger LOGGER = Logger.getLogger(SchedulerEfficiencyTimeTest.class);
 
     private static final String OPTIMAL_JOB_DURATION = "OPTIMAL_JOB_DURATION";
 
@@ -77,7 +75,7 @@ public class SchedulerEfficiencyTime extends BaseRecoveryTest {
 
     private final long rateLimit;
 
-    public SchedulerEfficiencyTime(int taskNumber, long rateLimit) {
+    public SchedulerEfficiencyTimeTest(int taskNumber, long rateLimit) {
         this.taskNumber = taskNumber;
         this.rateLimit = rateLimit;
     }
@@ -101,7 +99,7 @@ public class SchedulerEfficiencyTime extends BaseRecoveryTest {
 
         final Long anActualTime = computeSchedulerEfficiencyTime(jobState);
 
-        LOGGER.info(makeCSVString(SchedulerEfficiencyTime.class.getSimpleName(),
+        LOGGER.info(makeCSVString(SchedulerEfficiencyTimeTest.class.getSimpleName(),
                                   taskNumber,
                                   rateLimit,
                                   anActualTime,

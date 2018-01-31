@@ -27,14 +27,11 @@ package performancetests.metrics;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.theInstance;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -43,7 +40,6 @@ import org.junit.runners.Parameterized;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.listener.JobTaskStatusListener;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -53,9 +49,9 @@ import performancetests.recovery.BaseRecoveryTest;
 
 
 @RunWith(Parameterized.class)
-public class TaskSchedulingTime extends BaseRecoveryTest {
+public class TaskSchedulingTimeTest extends BaseRecoveryTest {
 
-    private static final Logger LOGGER = Logger.getLogger(TaskSchedulingTime.class);
+    private static final Logger LOGGER = Logger.getLogger(TaskSchedulingTimeTest.class);
 
     private static final int TASK_DURATION = 10; // in seconds
 
@@ -73,7 +69,7 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
 
     private final long timeLimit;
 
-    public TaskSchedulingTime(int taskNumber, long timeLimit) {
+    public TaskSchedulingTimeTest(int taskNumber, long timeLimit) {
         this.taskNumber = taskNumber;
         this.timeLimit = timeLimit;
     }
@@ -83,8 +79,8 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                SchedulerEfficiencyTime.SCHEDULER_CONFIGURATION_START.getPath(),
-                SchedulerEfficiencyTime.RM_CONFIGURATION_START.getPath(),
+                SchedulerEfficiencyTimeTest.SCHEDULER_CONFIGURATION_START.getPath(),
+                SchedulerEfficiencyTimeTest.RM_CONFIGURATION_START.getPath(),
                 null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", taskNumber);
@@ -93,7 +89,7 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
 
         final long start = System.currentTimeMillis();
 
-        final JobId jobId = schedulerHelper.submitJob(SchedulerEfficiencyTime.createJob(taskNumber, 10000000));
+        final JobId jobId = schedulerHelper.submitJob(SchedulerEfficiencyTimeTest.createJob(taskNumber, 10000000));
 
         waitUntilNumberOfTasksEvents(listener, jobId, TaskStatus.RUNNING, taskNumber);
 
@@ -134,7 +130,7 @@ public class TaskSchedulingTime extends BaseRecoveryTest {
 
         assertTrue(last > first);
 
-        LOGGER.info(makeCSVString(TaskSchedulingTime.class.getSimpleName(),
+        LOGGER.info(makeCSVString(TaskSchedulingTimeTest.class.getSimpleName(),
                 taskNumber,
                 timeLimit,
                 anActualTime,
