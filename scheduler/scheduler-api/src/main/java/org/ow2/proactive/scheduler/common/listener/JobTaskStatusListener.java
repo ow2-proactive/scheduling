@@ -26,9 +26,7 @@
 package org.ow2.proactive.scheduler.common.listener;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.objectweb.proactive.annotation.ImmediateService;
@@ -71,44 +69,44 @@ public class JobTaskStatusListener implements SchedulerEventListener, Serializab
     }
 
     @ImmediateService
-    public long blockToGetJobTimestamp(JobId jobId, JobStatus jobStatus) throws Exception {
+    public long blockToGetJobTimestamp(JobId jobId, JobStatus jobStatus) throws InterruptedException {
         return blockToGetJobTimestampInternal(jobId, jobStatus, 0);
     }
 
     @ImmediateService
-    public long blockToGetJobTimestamp(JobId jobId, JobStatus jobStatus, long filter) throws Exception {
+    public long blockToGetJobTimestamp(JobId jobId, JobStatus jobStatus, long filter) throws InterruptedException {
         return blockToGetJobTimestampInternal(jobId, jobStatus, filter);
     }
 
     @ImmediateService
-    public long blockToGetTaskTimestamp(JobId jobId, TaskStatus taskStatus) throws Exception {
+    public long blockToGetTaskTimestamp(JobId jobId, TaskStatus taskStatus) throws InterruptedException {
         return blockToGetTaskTimestampInternal(jobId, taskStatus, 0);
 
     }
 
     @ImmediateService
-    public long blockToGetTaskTimestamp(JobId jobId, TaskStatus taskStatus, long filter) throws Exception {
+    public long blockToGetTaskTimestamp(JobId jobId, TaskStatus taskStatus, long filter) throws InterruptedException {
         return blockToGetTaskTimestampInternal(jobId, taskStatus, filter);
     }
 
     @Override
     public void schedulerStateUpdatedEvent(SchedulerEvent eventType) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void jobSubmittedEvent(JobState job) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void jobUpdatedFullDataEvent(JobState job) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void usersUpdatedEvent(NotificationData<UserIdentification> notification) {
-
+        throw new UnsupportedOperationException();
     }
 
     @ImmediateService
@@ -121,45 +119,47 @@ public class JobTaskStatusListener implements SchedulerEventListener, Serializab
         return taskEvents;
     }
 
-    private long blockToGetTaskTimestampInternal(JobId jobId, TaskStatus taskStatus, long filter) throws Exception {
-        Optional<TimestampedData<TaskInfo>> found = searchData(jobId, taskStatus, filter);
-        while (!found.isPresent()) {
+    private long blockToGetTaskTimestampInternal(JobId jobId, TaskStatus taskStatus, long filter)
+            throws InterruptedException {
+        TimestampedData<TaskInfo> found = searchData(jobId, taskStatus, filter);
+        while (found == null) {
             Thread.sleep(WAIT_TIME);
             found = searchData(jobId, taskStatus, filter);
         }
-        return found.get().getTimestamp();
+        return found.getTimestamp();
     }
 
-    private long blockToGetJobTimestampInternal(JobId jobId, JobStatus jobStatus, long filter) throws Exception {
-        Optional<TimestampedData<JobInfo>> found = searchData(jobId, jobStatus, filter);
-        while (!found.isPresent()) {
+    private long blockToGetJobTimestampInternal(JobId jobId, JobStatus jobStatus, long filter)
+            throws InterruptedException {
+        TimestampedData<JobInfo> found = searchData(jobId, jobStatus, filter);
+        while (found == null) {
             Thread.sleep(WAIT_TIME);
             found = searchData(jobId, jobStatus, filter);
         }
-        return found.get().getTimestamp();
+        return found.getTimestamp();
     }
 
-    private Optional<TimestampedData<JobInfo>> searchData(JobId jobId, JobStatus jobStatus, long filterTimestamp) {
+    private TimestampedData<JobInfo> searchData(JobId jobId, JobStatus jobStatus, long filterTimestamp) {
         for (TimestampedData<JobInfo> event : jobEvents) {
             if (event.getData().getJobId().equals(jobId) && event.getData().getStatus().equals(jobStatus) &&
                 event.getTimestamp() > filterTimestamp) {
-                return Optional.of(event);
+                return event;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
-    private Optional<TimestampedData<TaskInfo>> searchData(JobId jobId, TaskStatus taskStatus, long filterTimestamp) {
+    private TimestampedData<TaskInfo> searchData(JobId jobId, TaskStatus taskStatus, long filterTimestamp) {
         for (TimestampedData<TaskInfo> event : taskEvents) {
             if (event.getData().getJobId().equals(jobId) && event.getData().getStatus().equals(taskStatus) &&
                 event.getTimestamp() > filterTimestamp) {
-                return Optional.of(event);
+                return event;
             }
         }
-        return Optional.empty();
+        return null;
     }
 
-    public static class TimestampedData<T> implements Serializable {
+    public static class TimestampedData<T extends Serializable> implements Serializable {
         private T data;
 
         private long timestamp;

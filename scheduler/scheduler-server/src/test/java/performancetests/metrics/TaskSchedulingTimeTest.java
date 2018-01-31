@@ -25,15 +25,22 @@
  */
 package performancetests.metrics;
 
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.awaitility.Awaitility.*;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -62,7 +69,7 @@ public class TaskSchedulingTimeTest extends BaseRecoveryTest {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{8, 3000}});
+        return Arrays.asList(new Object[][] { { 8, 3000 } });
     }
 
     private final int taskNumber;
@@ -79,9 +86,9 @@ public class TaskSchedulingTimeTest extends BaseRecoveryTest {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                SchedulerEfficiencyTimeTest.SCHEDULER_CONFIGURATION_START.getPath(),
-                SchedulerEfficiencyTimeTest.RM_CONFIGURATION_START.getPath(),
-                null);
+                                               SchedulerEfficiencyTimeTest.SCHEDULER_CONFIGURATION_START.getPath(),
+                                               SchedulerEfficiencyTimeTest.RM_CONFIGURATION_START.getPath(),
+                                               null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", taskNumber);
 
@@ -104,11 +111,11 @@ public class TaskSchedulingTimeTest extends BaseRecoveryTest {
 
         for (JobTaskStatusListener.TimestampedData<TaskInfo> tData : listener.getTaskEvents()) {
             if (tData.getData().getJobId().equals(jobId) && (tData.getData().getStatus().equals(TaskStatus.ABORTED) ||
-                    tData.getData().getStatus().equals(TaskStatus.FAILED) ||
-                    tData.getData().getStatus().equals(TaskStatus.FAULTY) ||
-                    tData.getData().getStatus().equals(TaskStatus.FINISHED) ||
-                    tData.getData().getStatus().equals(TaskStatus.PAUSED) ||
-                    tData.getData().getStatus().equals(TaskStatus.PENDING))) {
+                                                             tData.getData().getStatus().equals(TaskStatus.FAILED) ||
+                                                             tData.getData().getStatus().equals(TaskStatus.FAULTY) ||
+                                                             tData.getData().getStatus().equals(TaskStatus.FINISHED) ||
+                                                             tData.getData().getStatus().equals(TaskStatus.PAUSED) ||
+                                                             tData.getData().getStatus().equals(TaskStatus.PENDING))) {
                 throw new RuntimeException("There should not be task with any of these statuses.");
             }
         }
@@ -131,37 +138,39 @@ public class TaskSchedulingTimeTest extends BaseRecoveryTest {
         assertTrue(last > first);
 
         LOGGER.info(makeCSVString(TaskSchedulingTimeTest.class.getSimpleName(),
-                taskNumber,
-                timeLimit,
-                anActualTime,
-                ((anActualTime < timeLimit) ? SUCCESS : FAILURE)));
+                                  taskNumber,
+                                  timeLimit,
+                                  anActualTime,
+                                  ((anActualTime < timeLimit) ? SUCCESS : FAILURE)));
 
         assertThat(String.format("Task creation rate for job with %s tasks", taskNumber),
-                anActualTime,
-                lessThan(timeLimit));
+                   anActualTime,
+                   lessThan(timeLimit));
 
     }
 
-    private long waitUntilNumberOfTasksEvents(JobTaskStatusListener listener, JobId jobId, TaskStatus taskStatus,
-                                              int numberOfEvents) throws InterruptedException {
-        long result = 0;
+    private long waitUntilNumberOfTasksEvents(final JobTaskStatusListener listener, final JobId jobId,
+            final TaskStatus taskStatus, final int numberOfEvents) throws InterruptedException {
 
-        while (result < numberOfEvents) {
-            result = 0;
-            for (JobTaskStatusListener.TimestampedData<TaskInfo> tData : listener.getTaskEvents()) {
-                if (tData.getData().getJobId().equals(jobId) && tData.getData().getStatus().equals(taskStatus)) {
-                    ++result;
+        final int result = await().pollInterval(1, TimeUnit.SECONDS).until(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                int result = 0;
+                for (JobTaskStatusListener.TimestampedData<TaskInfo> tData : listener.getTaskEvents()) {
+                    if (tData.getData().getJobId().equals(jobId) && tData.getData().getStatus().equals(taskStatus)) {
+                        ++result;
+                    }
                 }
+                return result;
             }
+        }, greaterThanOrEqualTo(numberOfEvents));
 
-            if (result > numberOfEvents) {
-                throw new RuntimeException(String.format("There are more %s tasks %d that we expected",
-                        taskStatus.toString(),
-                        result));
-            }
-            Thread.sleep(1000);
-
+        if (result > numberOfEvents) {
+            throw new RuntimeException(String.format("There are more %s tasks %d that we expected",
+                                                     taskStatus.toString(),
+                                                     result));
         }
+
         return result;
     }
 
