@@ -290,4 +290,14 @@ public class RMProxyActiveObject {
         rm.releaseBusyNodesNotInList(verifiedBusyNodes);
     }
 
+    @ImmediateService
+    public boolean areNodesKnown(NodeSet nodes) {
+        return rm.areNodesKnown(nodes);
+    }
+
+    @ImmediateService
+    public boolean areNodesRecoverable(NodeSet nodes) {
+        return rm.areNodesRecoverable(nodes);
+    }
+
 }

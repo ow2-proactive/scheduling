@@ -71,6 +71,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.task.internal.TaskRecoveryData;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
@@ -116,8 +117,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
-    private final String terminateNotificationNodeURL;
-
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
         this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
@@ -128,7 +127,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         terminateNotification = PAActiveObject.turnActive(terminateNotification,
                                                           TaskTerminateNotification.class.getName(),
                                                           terminateNotificationNode);
-        terminateNotificationNodeURL = terminateNotificationNode.getNodeInformation().getURL();
 
         this.threadPool = TimeoutThreadPoolExecutor.newFixedThreadPool(PASchedulerProperties.SCHEDULER_STARTTASK_THREADNUMBER.getValueAsInt(),
                                                                        new NamedThreadFactory("DoTask_Action"));
@@ -238,7 +236,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         if (logger.isTraceEnabled() && jobMap == null || jobMap.isEmpty()) {
             logger.trace("No jobs selected to be scheduled");
         }
-        if (logger.isDebugEnabled() && !jobMap.isEmpty()) {
+        if (logger.isDebugEnabled() && jobMap != null && !jobMap.isEmpty()) {
             logger.debug("jobs selected to be scheduled : " + (jobMap.size() < 5 ? jobMap : jobMap.size()));
         }
     }
@@ -257,7 +255,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
             }
 
-            updateVariablesForTasksToSchedule(jobMap, taskRetrievedFromPolicy);
+            updateVariablesForTasksToSchedule(taskRetrievedFromPolicy);
 
             for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
                 // load and Initialize the executable container
@@ -303,7 +301,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     while (nodeSet != null && !nodeSet.isEmpty()) {
                         EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
                         currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
-                        InternalTask internalTask = currentJob.getIHMTasks().get(taskDescriptor.getTaskId());
+                        InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
 
                         if (currentPolicy.isTaskExecutable(nodeSet, taskDescriptor)) {
                             //create launcher and try to start the task
@@ -461,7 +459,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      */
     protected NodeSet getRMNodes(Map<JobId, JobDescriptor> jobMap, int neededResourcesNumber,
             LinkedList<EligibleTaskDescriptor> tasksToSchedule, Set<String> freeResources) {
-        NodeSet nodeSet = new NodeSet();
+        NodeSet nodeSet;
         if (neededResourcesNumber <= 0) {
             throw new IllegalArgumentException("'neededResourcesNumber' must be greater than 0");
         }
@@ -543,11 +541,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /**
      * Update all variables for the given scheduled tasks
      */
-    private void updateVariablesForTasksToSchedule(Map<JobId, JobDescriptor> jobMap,
-            LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
+    private void updateVariablesForTasksToSchedule(LinkedList<EligibleTaskDescriptor> tasksToSchedule) {
         for (EligibleTaskDescriptor taskDescriptor : tasksToSchedule) {
-            InternalJob associatedJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
-            InternalTask internalTask = associatedJob.getIHMTasks().get(taskDescriptor.getTaskId());
+            InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
             internalTask.updateVariables(schedulingService);
         }
     }
@@ -665,13 +661,21 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         dotaskActionTimeout = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
                     }
 
+                    boolean taskRecoverable = getRMProxiesManager().getRmProxy().areNodesRecoverable(nodes);
+                    String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
+                                                                        .getNodeInformation()
+                                                                        .getURL();
+                    TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL,
+                                                                             taskRecoverable);
+
                     Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                                                                    taskDescriptor,
                                                                                                                    launcher,
                                                                                                                    schedulingService,
                                                                                                                    terminateNotification,
                                                                                                                    corePrivateKey,
-                                                                                                                   terminateNotificationNodeURL),
+                                                                                                                   taskRecoveryData),
+
                                                                                              dotaskActionTimeout,
                                                                                              TimeUnit.MILLISECONDS);
                     waitForTaskToBeStarted(taskExecutionSubmittedFuture);

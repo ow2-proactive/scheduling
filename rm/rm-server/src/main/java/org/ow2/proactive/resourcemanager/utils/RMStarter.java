@@ -155,7 +155,8 @@ public class RMStarter {
                                                  LocalInfrastructure.class.getName(),
                                                  new Object[] { creds, defaultNodesNumber, nodeTimeout, "" },
                                                  RestartDownNodesPolicy.class.getName(),
-                                                 null);
+                                                 null,
+                                                 NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE);
                 resourceManager.disconnect();
                 logger.info("The resource manager with " + defaultNodesNumber + " local nodes created on " +
                             auth.getHostURL());

@@ -25,6 +25,7 @@
  */
 package functionaltests.rm.nodesource;
 
+import static functionaltests.utils.RMFunctionalTest.NODES_NOT_RECOVERABLE;
 import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,6 +45,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.SchedulerConnection;
@@ -76,7 +78,8 @@ public class TestBrokenNodeSourceRemoval extends SchedulerFunctionalTestWithCust
                                                               new Object[] { creds, defaultDescriptorNodesNb,
                                                                              RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                                               ReleaseResourcesWhenSchedulerIdle.class.getName(),
-                                                              getPolicyParams());
+                                                              getPolicyParams(),
+                                                              NODES_NOT_RECOVERABLE);
 
         schedulerHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
     }

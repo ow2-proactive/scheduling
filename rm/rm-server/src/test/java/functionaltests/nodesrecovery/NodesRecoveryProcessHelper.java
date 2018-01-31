@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.utils;
+package functionaltests.nodesrecovery;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -114,7 +114,7 @@ public class NodesRecoveryProcessHelper {
         throw new ProcessNotFoundException(processName, stringBuilder);
     }
 
-    static private class ProcessNotFoundException extends Exception {
+    static class ProcessNotFoundException extends Exception {
 
         ProcessNotFoundException(String processName, StringBuilder stringBuilder) {
             // build sentence in reverse manner

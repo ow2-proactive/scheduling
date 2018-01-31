@@ -286,6 +286,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Defines the cron expression for the db sizes polling */
     SCHEDULER_MEM_MONITORING_FREQ("pa.scheduler.mem.monitoring.freq", PropertyType.STRING),
 
+    // Define verbosity of job description when submitted
+    SCHEDULER_JOB_SUBMISSION_DETAILED_LOGGING(
+            "pa.scheduler.job.submission.detailed.logging",
+            PropertyType.BOOLEAN,
+            "true"),
+
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */
     /* ***************************************************************** */
@@ -412,6 +418,10 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** default value to use if the property is not defined **/
     private String defaultValue;
 
+    /**
+     * I do not dare to delete this constructor because it might be used by reflection.
+     */
+    @SuppressWarnings("squid:UnusedPrivateMethod")
     PASchedulerProperties(String str, PropertyType type) {
         this(str, type, null);
     }
@@ -419,10 +429,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     /**
      * Create a new instance of PASchedulerProperties
      *
+     * (I do not dare to delete this constructor because it might be used by reflection)
      * @param str the key of the instance.
      * @param type the real java type of this instance.
      * @param defaultValue value to use if the property is not defined
      */
+    @SuppressWarnings("squid:UnusedPrivateMethod")
     PASchedulerProperties(String str, PropertyType type, String defaultValue) {
         this.key = str;
         this.type = type;

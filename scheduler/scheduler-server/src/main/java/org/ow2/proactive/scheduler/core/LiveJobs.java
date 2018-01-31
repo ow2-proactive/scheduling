@@ -237,7 +237,7 @@ class LiveJobs {
             InternalJob job = jobData.job;
             Set<TaskId> updatedTasks = job.setUnPause();
 
-            if (updatedTasks.size() > 0) {
+            if (!updatedTasks.isEmpty()) {
                 jlogger.info(jobId, "has just been resumed.");
                 dbManager.updateJobAndTasksState(job);
                 updateTasksInSchedulerState(job, updatedTasks);
@@ -246,7 +246,7 @@ class LiveJobs {
             // update tasks events list and send it to front-end
             updateJobInSchedulerState(job, SchedulerEvent.JOB_RESUMED);
 
-            return updatedTasks.size() > 0;
+            return !updatedTasks.isEmpty();
         } finally {
             jobData.unlock();
         }
@@ -262,7 +262,7 @@ class LiveJobs {
 
             Set<TaskId> updatedTasks = job.setPaused();
 
-            if (updatedTasks.size() > 0) {
+            if (!updatedTasks.isEmpty()) {
                 jlogger.info(jobId, "has just been paused.");
                 dbManager.updateJobAndTasksState(job);
                 updateTasksInSchedulerState(job, updatedTasks);
@@ -271,7 +271,7 @@ class LiveJobs {
             // update tasks events list and send it to front-end
             updateJobInSchedulerState(job, SchedulerEvent.JOB_PAUSED);
 
-            return updatedTasks.size() > 0;
+            return !updatedTasks.isEmpty();
         } finally {
             jobData.unlock();
         }
@@ -570,14 +570,11 @@ class LiveJobs {
                                                                            TerminationData.TerminationStatus.NORMAL);
 
             boolean errorOccurred = result.hadException();
-            if (errorOccurred) {
-                tlogger.error(taskId, "error", result.getException());
-            }
 
             tlogger.info(taskId, "finished with" + (errorOccurred ? "" : "out") + " errors");
 
             if (errorOccurred) {
-                tlogger.info(taskId, "task has terminated with an error ");
+                tlogger.error(taskId, "task has terminated with an error", result.getException());
                 task.decreaseNumberOfExecutionLeft();
 
                 boolean requiresPauseJobOnError = onErrorPolicyInterpreter.requiresPauseJobOnError(task);
@@ -637,6 +634,8 @@ class LiveJobs {
                         !onErrorPolicyInterpreter.requiresPauseJobOnError(task) &&
                         !onErrorPolicyInterpreter.requiresCancelJobOnError(task)) {
                         jobData.job.increaseNumberOfFaultyTasks(taskId);
+                        // remove the parent tasks results if task fails and job is canceled
+                        task.removeParentTasksResults();
                     } else if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task)) {
                         suspendTaskOnError(jobData, task, result.getTaskDuration());
                         tlogger.info(taskId,
@@ -653,6 +652,9 @@ class LiveJobs {
                         pauseJob(task.getJobId());
                     }
                 }
+            } else {
+                //remove the parent tasks results if task finished with no error
+                task.removeParentTasksResults();
             }
 
             terminateTask(jobData, task, errorOccurred, result, terminationData);

@@ -114,4 +114,5 @@ public class LogProcessor {
         long finishedMilliseconds = LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(to)).getTime();
         return finishedMilliseconds - startedMilliseconds;
     }
+
 }

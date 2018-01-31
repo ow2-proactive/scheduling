@@ -114,6 +114,7 @@ import functionaltests.job.workingdir.TestForkedTaskWorkingDir;
 import functionaltests.job.workingdir.TestWorkingDirStaticCommand;
 import functionaltests.policy.license.TestLicensePolicy;
 import functionaltests.policy.ram.TestRamPolicy;
+import functionaltests.recover.TaskRecoveryWhenNodesAreReservedInBatchTest;
 import functionaltests.rm.TestNodeDiesAtSchedulerRestart;
 import functionaltests.rm.TestRMProxy;
 import functionaltests.rm.TestRMProxyRebind;
@@ -240,7 +241,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
                       TestSubmitJobWithUnaccessibleDataSpaces.class, TestTaskRestartOnNodeFailure.class,
                       TestTasksCompleteAfterSelectiontimeout.class, TestUnauthorizedScripts.class,
-                      TestVariablesPropagation.class })
+                      TestVariablesPropagation.class, TaskRecoveryWhenNodesAreReservedInBatchTest.class })
 
 /**
  * @author ActiveEon Team

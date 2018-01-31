@@ -80,10 +80,11 @@ public interface ResourceManager {
      * @param infrastructureParameters parameters for infrastructure creation
      * @param policyType name of the policy type. It passed as a string due to plug-able approach
      * @param policyParameters parameters for policy creation
+     * @param nodesRecoverable whether the nodes can be recovered in case of a scheduler crash
      * @return true if a new node source was created successfully, runtime exception otherwise
      */
     BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
-            String policyType, Object[] policyParameters);
+            String policyType, Object[] policyParameters, boolean nodesRecoverable);
 
     /**
      * Remove a node source from the RM.
@@ -446,5 +447,23 @@ public interface ResourceManager {
      * @param verifiedBusyNodes nodes that should not be released
      */
     void releaseBusyNodesNotInList(List<NodeSet> verifiedBusyNodes);
+
+    /**
+     * Check whether the nodes in the given node set are known by the resource
+     * manager
+     *
+     * @param nodes the node set to verify
+     * @return whether all nodes in the node set appear in the resource manager
+     */
+    boolean areNodesKnown(NodeSet nodes);
+
+    /**
+     * Check whether the nodes in the given node set can be recovered in case
+     * of a crash
+     *
+     * @param nodes the node set to verify
+     * @return whether all nodes in the node set are recoverable
+     */
+    boolean areNodesRecoverable(NodeSet nodes);
 
 }

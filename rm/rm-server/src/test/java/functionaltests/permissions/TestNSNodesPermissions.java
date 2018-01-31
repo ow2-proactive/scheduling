@@ -75,7 +75,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                  DefaultInfrastructureManager.class.getName(),
                                  null,
                                  StaticPolicy.class.getName(),
-                                 new Object[] { "ME", "ALL" })
+                                 new Object[] { "ME", "ALL" },
+                                 NODES_NOT_RECOVERABLE)
                .getBooleanValue();
 
         List<Node> nodePool = createNodes("node", 2);
@@ -126,7 +127,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "MY_GROUPS", "ALL" })
+                               new Object[] { "MY_GROUPS", "ALL" },
+                               NODES_NOT_RECOVERABLE)
              .getBooleanValue();
 
         nodePool = createNodes("node", 2);
@@ -172,7 +174,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                               DefaultInfrastructureManager.class.getName(),
                               null,
                               StaticPolicy.class.getName(),
-                              new Object[] { "PROVIDER", "ALL" })
+                              new Object[] { "PROVIDER", "ALL" },
+                              NODES_NOT_RECOVERABLE)
             .getBooleanValue();
 
         nodePool = createNodes("node", 2);
@@ -228,7 +231,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                               DefaultInfrastructureManager.class.getName(),
                               null,
                               StaticPolicy.class.getName(),
-                              new Object[] { "PROVIDER_GROUPS", "ALL" })
+                              new Object[] { "PROVIDER_GROUPS", "ALL" },
+                              NODES_NOT_RECOVERABLE)
             .getBooleanValue();
 
         nodePool = createNodes("node", 2);
@@ -289,7 +293,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                               DefaultInfrastructureManager.class.getName(),
                               null,
                               StaticPolicy.class.getName(),
-                              new Object[] { "ALL", "ALL" })
+                              new Object[] { "ALL", "ALL" },
+                              NODES_NOT_RECOVERABLE)
             .getBooleanValue();
 
         nodePool = createNodes("node", 2);
@@ -325,7 +330,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "users=nsadmin", "ALL" })
+                               new Object[] { "users=nsadmin", "ALL" },
+                               NODES_NOT_RECOVERABLE)
              .getBooleanValue();
 
         nodePool = createNodes("node", 2);
@@ -371,7 +377,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "groups=nsadmins", "ALL" })
+                               new Object[] { "groups=nsadmins", "ALL" },
+                               NODES_NOT_RECOVERABLE)
              .getBooleanValue();
 
         nodePool = createNodes("node", 2);
@@ -427,7 +434,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "tokens=token1,token2", "ALL" })
+                               new Object[] { "tokens=token1,token2", "ALL" },
+                               NODES_NOT_RECOVERABLE)
              .getBooleanValue();
 
         nodePool = createNodes("node", 2);
@@ -480,7 +488,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "users=radmin;groups=nsadmins", "ALL" })
+                               new Object[] { "users=radmin;groups=nsadmins", "ALL" },
+                               NODES_NOT_RECOVERABLE)
              .getBooleanValue();
 
         nodePool = createNodes("node", 2);
@@ -534,7 +543,8 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "users=radmin;tokens=token1", "ALL" })
+                               new Object[] { "users=radmin;tokens=token1", "ALL" },
+                               NODES_NOT_RECOVERABLE)
              .getBooleanValue();
 
         nodePool = createNodes("node", 2);

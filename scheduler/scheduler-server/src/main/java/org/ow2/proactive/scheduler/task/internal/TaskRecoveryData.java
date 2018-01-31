@@ -23,28 +23,29 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
-import functionaltests.nodesource.TestSSHInfrastructureV2RestartDownNodesPolicy;
-import functionaltests.nodesrecovery.NodesRecoveryPropertyTest;
-import functionaltests.nodesrecovery.RecoverLocalInfrastructureTest;
-import functionaltests.nodesrecovery.RecoverSSHInfrastructureV2Test;
-import functionaltests.nonblockingcore.NonBlockingCoreTest;
-import functionaltests.permissions.TestNSNodesPermissions;
-import functionaltests.selectionscript.SelectionScriptTimeOutTest;
-
-
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ NonBlockingCoreTest.class, TestNSNodesPermissions.class, SelectionScriptTimeOutTest.class,
-                      RecoverLocalInfrastructureTest.class, RecoverSSHInfrastructureV2Test.class,
-                      TestSSHInfrastructureV2RestartDownNodesPolicy.class, NodesRecoveryPropertyTest.class })
+package org.ow2.proactive.scheduler.task.internal;
 
 /**
- * @author ActiveEon Team
- * @since 10/01/2018
+ * Data structure to carry information for a task whether it runs on a
+ * recoverable node and what is the URL of the task terminate notification
+ * node.
  */
-public class RegressionTestSuite {
+public class TaskRecoveryData {
+
+    private final String terminateNotificationNodeURL;
+
+    private final boolean taskRecoverable;
+
+    public TaskRecoveryData(String terminateNotificationNodeURL, boolean taskRecoverable) {
+        this.terminateNotificationNodeURL = terminateNotificationNodeURL;
+        this.taskRecoverable = taskRecoverable;
+    }
+
+    public String getTerminateNotificationNodeURL() {
+        return terminateNotificationNodeURL;
+    }
+
+    public boolean isTaskRecoverable() {
+        return taskRecoverable;
+    }
 }

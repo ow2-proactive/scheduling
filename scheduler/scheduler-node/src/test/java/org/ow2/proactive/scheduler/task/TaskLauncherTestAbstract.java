@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.task;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -48,6 +49,9 @@ public class TaskLauncherTestAbstract extends ProActiveTestClean {
 
     @Mock
     protected TaskLauncherRebinder taskLauncherRebinder;
+
+    @Mock
+    protected TaskTerminateNotification taskTerminateNotification;
 
     protected TaskTerminateNotificationVerifier taskResult;
 
@@ -78,7 +82,7 @@ public class TaskLauncherTestAbstract extends ProActiveTestClean {
     private void injectTaskTerminateNotificationMock() {
         MockitoAnnotations.initMocks(this);
         when(taskLauncherRebinder.makeSureSchedulerIsConnected(taskResult)).thenReturn(taskResult);
-        when(taskLauncherRebinder.getReboundTaskTerminateNotificationHandler()).thenReturn(taskResult);
+        when(taskLauncherRebinder.getReboundTaskTerminateNotificationHandler(any(Exception.class))).thenReturn(taskResult);
     }
 
     protected static class TaskTerminateNotificationVerifier implements TaskTerminateNotification {

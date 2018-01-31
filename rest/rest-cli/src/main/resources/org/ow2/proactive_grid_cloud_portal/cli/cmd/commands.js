@@ -461,10 +461,15 @@ function removenode(nodeUrl, preempt) {
     execute(new RemoveNodeCommand('' + nodeUrl, preempt));
 }
 
-function createns(nodeSource, infrastructure, policy) {
+function createns(nodeSource, infrastructure, policy, nodesRecoverable) {
     execute(new SetInfrastructureCommand(infrastructure));
     execute(new SetPolicyCommand(policy));
-    execute(new CreateNodeSourceCommand('' + nodeSource));
+    if(typeof nodesRecoverable == 'undefined'){
+        execute(new CreateNodeSourceCommand('' + nodeSource));
+    }
+    else{
+        execute(new CreateNodeSourceCommand('' + nodeSource, '' + nodesRecoverable));
+    }
 }
 
 function removens(nodeSource, preempt) {
