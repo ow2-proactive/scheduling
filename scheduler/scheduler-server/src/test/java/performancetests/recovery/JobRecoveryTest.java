@@ -98,7 +98,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
                                                SCHEDULER_CONFIGURATION_START,
-                                               NodeRecoveryTest.RM_CONFIGURATION_START,
+                                               RMRecovererTest.RM_CONFIGURATION_START,
                                                null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", jobsNumber);
@@ -115,7 +115,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
 
         schedulerHelper = new SchedulerTHelper(false,
                                                SCHEDULER_CONFIGURATION_RESTART,
-                                               NodeRecoveryTest.RM_CONFIGURATION_RESTART,
+                                               RMRecovererTest.RM_CONFIGURATION_RESTART,
                                                null);
 
     }
@@ -198,8 +198,8 @@ public class JobRecoveryTest extends BaseRecoveryTest {
      * @return combined time to recover nodes and jobs
      */
     private long timeSpentToRecoverNodesAndJobs() {
-        final long started = Math.min(NodeRecoveryTest.startedToRecover(), JobRecoveryTest.startedToRecover());
-        final long ended = Math.max(NodeRecoveryTest.endedToRecover(), JobRecoveryTest.endedToRecover());
+        final long started = Math.min(RMRecovererTest.startedToRecover(), JobRecoveryTest.startedToRecover());
+        final long ended = Math.max(RMRecovererTest.endedToRecover(), JobRecoveryTest.endedToRecover());
         return ended - started;
     }
 

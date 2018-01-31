@@ -52,26 +52,24 @@ public class RMNodeDataTest {
 
     @Test
     public void testEqualNodeDataHaveSameHashcode() {
-        RMNodeData nodeData1 = new RMNodeData(NAME,
-                                              URL,
-                                              OWNER,
-                                              PROVIDER,
-                                              null,
-                                              NodeState.DEPLOYING,
-                                              1L,
-                                              HOSTNAME,
-                                              new String[] {},
-                                              JVM_NAME);
-        RMNodeData nodeData2 = new RMNodeData(NAME,
-                                              URL,
-                                              OWNER,
-                                              PROVIDER,
-                                              null,
-                                              NodeState.DEPLOYING,
-                                              1L,
-                                              HOSTNAME,
-                                              new String[] {},
-                                              JVM_NAME);
+        RMNodeData nodeData1 = new RMNodeData.Builder().name(NAME)
+                                                       .nodeUrl(URL)
+                                                       .owner(OWNER)
+                                                       .provider(PROVIDER)
+                                                       .state(NodeState.DEPLOYING)
+                                                       .stateChangeTime(1L)
+                                                       .hostname(HOSTNAME)
+                                                       .jvmName(JVM_NAME)
+                                                       .build();
+        RMNodeData nodeData2 = new RMNodeData.Builder().name(NAME)
+                                                       .nodeUrl(URL)
+                                                       .owner(OWNER)
+                                                       .provider(PROVIDER)
+                                                       .state(NodeState.DEPLOYING)
+                                                       .stateChangeTime(1L)
+                                                       .hostname(HOSTNAME)
+                                                       .jvmName(JVM_NAME)
+                                                       .build();
         assertThat(nodeData1).isEqualTo(nodeData2);
         assertThat(nodeData1.equals(nodeData2)).isTrue();
         assertThat(nodeData1.hashCode()).isEqualTo(nodeData2.hashCode());
@@ -79,26 +77,24 @@ public class RMNodeDataTest {
 
     @Test
     public void testIfHashCodeIsDifferentEqualsIsFalse() {
-        RMNodeData nodeData1 = new RMNodeData(NAME + "1",
-                                              URL + "1",
-                                              OWNER,
-                                              PROVIDER,
-                                              null,
-                                              NodeState.DEPLOYING,
-                                              1L,
-                                              HOSTNAME,
-                                              new String[] {},
-                                              JVM_NAME);
-        RMNodeData nodeData2 = new RMNodeData(NAME + "2",
-                                              URL + "2",
-                                              OWNER,
-                                              PROVIDER,
-                                              null,
-                                              NodeState.DEPLOYING,
-                                              1L,
-                                              HOSTNAME,
-                                              new String[] {},
-                                              JVM_NAME);
+        RMNodeData nodeData1 = new RMNodeData.Builder().name(NAME + "1")
+                                                       .nodeUrl(URL + "1")
+                                                       .owner(OWNER)
+                                                       .provider(PROVIDER)
+                                                       .state(NodeState.DEPLOYING)
+                                                       .stateChangeTime(1L)
+                                                       .hostname(HOSTNAME)
+                                                       .jvmName(JVM_NAME)
+                                                       .build();
+        RMNodeData nodeData2 = new RMNodeData.Builder().name(NAME + "2")
+                                                       .nodeUrl(URL + "2")
+                                                       .owner(OWNER)
+                                                       .provider(PROVIDER)
+                                                       .state(NodeState.DEPLOYING)
+                                                       .stateChangeTime(1L)
+                                                       .hostname(HOSTNAME)
+                                                       .jvmName(JVM_NAME)
+                                                       .build();
         assertThat(nodeData1).isNotEqualTo(nodeData2);
         assertThat(nodeData1.equals(nodeData2)).isFalse();
         assertThat(nodeData1.hashCode()).isNotEqualTo(nodeData2.hashCode());

@@ -30,6 +30,7 @@ import static org.mockito.Mockito.*;
 
 import java.security.Permission;
 import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.Before;
@@ -138,7 +139,8 @@ public class RMDBManagerBufferTest {
         checkPendingNodeOperationsNbOperations(2);
         long afterUpdate = System.currentTimeMillis();
 
-        assertThat(dbManager.getNodeByNameAndUrl(NODE_NAME_BASE, NODE_URL).getState()).isEqualTo(NodeState.BUSY);
+        checkNodeIsBusy();
+
         checkPendingNodeOperationsIsEmpty();
         long afterRetrieve = System.currentTimeMillis();
 
@@ -159,7 +161,8 @@ public class RMDBManagerBufferTest {
         updateRMNodeData(rmNodeData, NodeState.BUSY);
         checkPendingNodeOperationsIsEmpty();
 
-        assertThat(dbManager.getNodeByNameAndUrl(NODE_NAME_BASE, NODE_URL).getState()).isEqualTo(NodeState.BUSY);
+        checkNodeIsBusy();
+
         long afterRetrieve = System.currentTimeMillis();
 
         assertThat(afterRetrieve - beforeAdd).isLessThan(ACCEPTABLE_DATABASE_OPERATION_TIME_LESS_THAN_DELAY);
@@ -179,7 +182,8 @@ public class RMDBManagerBufferTest {
         updateRMNodeData(rmNodeData, NodeState.BUSY);
         checkPendingNodeOperationsIsEmpty();
 
-        assertThat(dbManager.getNodeByNameAndUrl(NODE_NAME_BASE, NODE_URL).getState()).isEqualTo(NodeState.BUSY);
+        checkNodeIsBusy();
+
         long afterRetrieve = System.currentTimeMillis();
 
         assertThat(afterRetrieve - beforeUpdate).isLessThan(ACCEPTABLE_DATABASE_OPERATION_TIME_LESS_THAN_DELAY);
@@ -200,11 +204,21 @@ public class RMDBManagerBufferTest {
         updateRMNodeData(rmNodeData, NodeState.BUSY);
         checkPendingNodeOperationsNbOperations(1);
 
-        assertThat(dbManager.getNodeByNameAndUrl(NODE_NAME_BASE, NODE_URL).getState()).isEqualTo(NodeState.BUSY);
+        checkNodeIsBusy();
+
         checkPendingNodeOperationsIsEmpty();
         long afterRetrieve = System.currentTimeMillis();
 
         assertThat(afterRetrieve - beforeUpdate).isGreaterThan(Long.valueOf(NODE_DB_OPERATION_DELAY));
+    }
+
+    private void checkNodeIsBusy() {
+        Collection<RMNodeData> nodes = dbManager.getNodesByNodeSource(NODE_SOURCE_NAME_BASE);
+        for (RMNodeData node : nodes) {
+            if (node.getNodeUrl().equals(NODE_URL)) {
+                assertThat(node.getState()).isEqualTo(NodeState.BUSY);
+            }
+        }
     }
 
     private void setPropertiesAndCreateDBManager(String nodeDbOperationDelay, String aFalse) {
@@ -224,19 +238,29 @@ public class RMDBManagerBufferTest {
     }
 
     private RMNodeData addRMNodeData(String nodeName, NodeState state) {
-        RMNodeData rmNodeData = new RMNodeData(nodeName,
-                                               NODE_URL,
-                                               owner,
-                                               provider,
-                                               permission,
-                                               state,
-                                               STATE_CHANGE_TIME_BASE,
-                                               HOSTNAME,
-                                               JMX_URLS,
-                                               JVM_NAME);
+        RMNodeData rmNodeData = new RMNodeData.Builder().name(nodeName)
+                                                        .nodeUrl(NODE_URL)
+                                                        .owner(owner)
+                                                        .provider(provider)
+                                                        .userPermission(permission)
+                                                        .state(state)
+                                                        .stateChangeTime(STATE_CHANGE_TIME_BASE)
+                                                        .hostname(HOSTNAME)
+                                                        .jmxUrls(JMX_URLS)
+                                                        .jvmName(JVM_NAME)
+                                                        .build();
+
         rmNodeData.setNodeSource(nodeSourceData);
         dbManager.addNode(rmNodeData);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }).start();
         return rmNodeData;
+
     }
 
     private void updateRMNodeData(RMNodeData rmNodeData, NodeState nodeState) {

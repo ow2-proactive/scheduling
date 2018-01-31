@@ -40,6 +40,7 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.Infrastructur
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
+import org.python.apache.commons.compress.archivers.sevenz.CLI;
 
 
 /**
@@ -68,7 +69,13 @@ public final class RMDeployingNode extends AbstractRMNode {
     }
 
     public RMDeployingNode(String name, NodeSource nodeSource, String command, Client provider) {
-        super(nodeSource, name, RMDeployingNode.PROTOCOL_ID + "://" + nodeSource.getName() + "/" + name, provider);
+        super(nodeSource,
+              name,
+              RMDeployingNode.PROTOCOL_ID + "://" + nodeSource.getName() + "/" + name,
+              provider,
+              false,
+              null,
+              AbstractRMNode.LOCK_TIME_INITIAL_VALUE);
 
         changeState(NodeState.DEPLOYING);
 
@@ -77,6 +84,13 @@ public final class RMDeployingNode extends AbstractRMNode {
 
     public RMDeployingNode(String name, NodeSource ns, String command, Client provider, String description) {
         this(name, ns, command, provider);
+        this.description = description;
+    }
+
+    public RMDeployingNode(String name, NodeSource ns, String command, String description, Client provider,
+            boolean isLocked, Client lockedBy, long lockTime) {
+        super(ns, name, command, provider, isLocked, lockedBy, lockTime);
+        this.commandLine = command;
         this.description = description;
     }
 
@@ -363,10 +377,6 @@ public final class RMDeployingNode extends AbstractRMNode {
     @Override
     public boolean isProtectedByToken() {
         return false;
-    }
-
-    public RMDeployingNode updateOnNodeSource() {
-        return nodeSource.update(this);
     }
 
 }

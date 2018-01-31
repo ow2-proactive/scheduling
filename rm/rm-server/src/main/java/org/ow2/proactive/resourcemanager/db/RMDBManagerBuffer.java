@@ -59,9 +59,7 @@ public class RMDBManagerBuffer {
 
     private static final Logger logger = ProActiveLogger.getLogger(RMDBManagerBuffer.class);
 
-    private static final String IN_DATABASE_STRING = " in database";
-
-    private static final String IN_DATABASE_WITH_NO_DELAY_STRING = IN_DATABASE_STRING + " with no delay";
+    private static final String IN_DATABASE_WITH_NO_DELAY_STRING = " with no delay";
 
     private RMDBManager rmdbManager;
 
@@ -161,7 +159,7 @@ public class RMDBManagerBuffer {
                     logger.debug("Apply update node source " + nodeSource.getName() + IN_DATABASE_WITH_NO_DELAY_STRING);
                     buildNodeSourceTransactionAndCommit();
                 } else {
-                    logger.debug("Schedule update node source " + nodeSource.getName() + IN_DATABASE_STRING);
+                    logger.debug("Schedule update node source " + nodeSource.getName());
                     scheduleNodeSourceTransaction();
                 }
             }
@@ -177,13 +175,13 @@ public class RMDBManagerBuffer {
     }
 
     private void buildNodeSourceTransactionAndCommit() {
-        logger.trace("Execute update node sources" + IN_DATABASE_STRING);
+        logger.trace("Execute update node sources");
         rmdbManager.executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
                 for (NodeSourceData nodeSource : pendingNodeSourceUpdates.values()) {
                     if (knownNodeSources.contains(nodeSource.getName())) {
-                        logger.debug("Update node source " + nodeSource.getName() + IN_DATABASE_STRING);
+                        logger.debug("Update node source " + nodeSource.getName());
                         session.update(nodeSource);
                     }
                 }
@@ -243,10 +241,10 @@ public class RMDBManagerBuffer {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.CREATE, rmNodeData);
         if (delayEqualsToZero) {
-            logger.debug("Apply create node " + rmNodeData.getName() + IN_DATABASE_WITH_NO_DELAY_STRING);
+            logger.debug("Apply create node " + rmNodeData.getNodeUrl() + IN_DATABASE_WITH_NO_DELAY_STRING);
             buildNodesTransactionAndCommit();
         } else {
-            logger.debug("Schedule create node " + rmNodeData.getName() + IN_DATABASE_STRING);
+            logger.debug("Schedule create node " + rmNodeData.getNodeUrl());
             scheduleNodeTransaction();
         }
     }
@@ -255,10 +253,10 @@ public class RMDBManagerBuffer {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.UPDATE, rmNodeData);
         if (delayEqualsToZero) {
-            logger.debug("Apply update node " + rmNodeData.getName() + IN_DATABASE_WITH_NO_DELAY_STRING);
+            logger.debug("Apply update node " + rmNodeData.getNodeUrl() + IN_DATABASE_WITH_NO_DELAY_STRING);
             buildNodesTransactionAndCommit();
         } else {
-            logger.debug("Schedule update node " + rmNodeData.getName() + IN_DATABASE_STRING);
+            logger.debug("Schedule update node " + rmNodeData.getNodeUrl());
             scheduleNodeTransaction();
         }
     }
@@ -267,10 +265,10 @@ public class RMDBManagerBuffer {
         cancelScheduledNodeTransaction();
         registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData);
         if (delayEqualsToZero) {
-            logger.debug("Apply remove node " + rmNodeData.getName() + IN_DATABASE_WITH_NO_DELAY_STRING);
+            logger.debug("Apply remove node " + rmNodeData.getNodeUrl() + IN_DATABASE_WITH_NO_DELAY_STRING);
             buildNodesTransactionAndCommit();
         } else {
-            logger.debug("Schedule remove node " + rmNodeData.getName() + IN_DATABASE_STRING);
+            logger.debug("Schedule remove node " + rmNodeData.getNodeUrl());
             scheduleNodeTransaction();
         }
     }
@@ -284,7 +282,7 @@ public class RMDBManagerBuffer {
             logger.debug("Apply " + nodes.size() + " remove node" + IN_DATABASE_WITH_NO_DELAY_STRING);
             buildNodesTransactionAndCommit();
         } else {
-            logger.debug("Schedule " + nodes.size() + " remove node" + IN_DATABASE_STRING);
+            logger.debug("Schedule " + nodes.size() + " remove node");
             scheduleNodeTransaction();
         }
     }
@@ -359,16 +357,18 @@ public class RMDBManagerBuffer {
                                 DatabaseOperation databaseOperation = nodeOperation.operation;
                                 switch (databaseOperation) {
                                     case CREATE:
-                                        logger.info("Add node " + rmNodeData.getName() + IN_DATABASE_STRING);
+                                        logger.info("Add node " + rmNodeData.getNodeUrl());
                                         session.save(rmNodeData);
                                         break;
                                     case UPDATE:
-                                        logger.debug("Update node " + rmNodeData.getName() + IN_DATABASE_STRING);
+                                        logger.debug("Update node " + rmNodeData.getNodeUrl());
                                         session.update(rmNodeData);
                                         break;
                                     case DELETE:
-                                        logger.info("Remove node " + rmNodeData.getName() + IN_DATABASE_STRING);
-                                        session.delete(rmNodeData);
+                                        logger.info("Remove node " + rmNodeData.getNodeUrl());
+                                        session.getNamedQuery("deleteRMNodeDataByUrl")
+                                               .setParameter("nodeUrl", rmNodeData.getNodeUrl())
+                                               .executeUpdate();
                                         break;
                                     case RETRIEVE:
                                         // currently retrieval are not enqueued
@@ -459,7 +459,7 @@ public class RMDBManagerBuffer {
 
         @Override
         public String toString() {
-            return "(" + node.getName() + "," + operation + ")";
+            return "(" + node.getNodeUrl() + "," + operation + ")";
         }
     }
 

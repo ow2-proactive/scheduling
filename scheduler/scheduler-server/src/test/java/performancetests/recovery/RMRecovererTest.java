@@ -41,7 +41,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.core.RMCore;
+import org.ow2.proactive.resourcemanager.core.RMRecoverer;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
@@ -55,18 +55,18 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class NodeRecoveryTest extends BaseRecoveryTest {
+public class RMRecovererTest extends BaseRecoveryTest {
 
-    private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
+    private static final Logger LOGGER = Logger.getLogger(RMRecovererTest.class);
 
-    static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
-                                                                       .getPath();
+    static final String RM_CONFIGURATION_START = RMRecovererTest.class.getResource("/performancetests/config/rm-start.ini")
+                                                                      .getPath();
 
-    static final String RM_CONFIGURATION_RESTART = NodeRecoveryTest.class.getResource("/performancetests/config/rm-restart.ini")
-                                                                         .getPath();
+    static final String RM_CONFIGURATION_RESTART = RMRecovererTest.class.getResource("/performancetests/config/rm-restart.ini")
+                                                                        .getPath();
 
     /**
-     * @return an array of parameters which is used by JUnit to create objects of NodeRecoveryTest,
+     * @return an array of parameters which is used by JUnit to create objects of RMRecovererTest,
      *         where first value represents nodes number to recover, and second value sets time limit to recovery.
      */
     @Parameters
@@ -80,7 +80,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
     // time limit in milliseconds for test to pass
     int timeLimit;
 
-    public NodeRecoveryTest(int nodesNumber, int timeLimit) {
+    public RMRecovererTest(int nodesNumber, int timeLimit) {
         this.nodesNumber = nodesNumber;
         this.timeLimit = timeLimit;
     }
@@ -126,7 +126,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
             startKillStartRM();
             long recovered = nodesRecovered();
             long timeSpent = timeSpentToRecoverNodes();
-            LOGGER.info(makeCSVString("NodeRecoveryTest",
+            LOGGER.info(makeCSVString("RMRecovererTest",
                                       nodesNumber,
                                       timeLimit,
                                       recovered,
@@ -138,7 +138,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
                        lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(BaseRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, ERROR));
+            LOGGER.info(BaseRecoveryTest.makeCSVString("RMRecovererTest", nodesNumber, timeLimit, -1, -1, ERROR));
         }
     }
 
@@ -155,7 +155,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
     }
 
     private long nodesRecovered() {
-        final String line = LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY);
+        final String line = LogProcessor.getFirstLineThatMatch(RMRecoverer.END_OF_NODES_RECOVERY);
         final List<Integer> numbersFromLine = LogProcessor.getNumbersFromLine(line);
 
         if (!numbersFromLine.isEmpty()) {
@@ -168,18 +168,20 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
     private long timeSpentToRecoverNodes() {
         final long time = endedToRecover() - startedToRecover();
         if (time < 0) {
-            throw new RuntimeException("First occurence of " + RMCore.START_TO_RECOVER_NODES + " goes after " +
-                                       RMCore.END_OF_NODES_RECOVERY);
+            throw new RuntimeException("First occurence of " + RMRecoverer.START_TO_RECOVER_NODES + " goes after " +
+                                       RMRecoverer.END_OF_NODES_RECOVERY);
         }
 
         return time;
     }
 
     static long startedToRecover() {
-        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.START_TO_RECOVER_NODES)).getTime();
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMRecoverer.START_TO_RECOVER_NODES))
+                           .getTime();
     }
 
     static long endedToRecover() {
-        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY)).getTime();
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMRecoverer.END_OF_NODES_RECOVERY))
+                           .getTime();
     }
 }

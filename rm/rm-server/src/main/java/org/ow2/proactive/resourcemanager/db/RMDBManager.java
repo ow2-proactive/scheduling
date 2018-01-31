@@ -31,9 +31,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,19 +41,15 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.objectweb.proactive.core.util.MutableInteger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.db.DatabaseManagerException;
 import org.ow2.proactive.db.SessionWork;
 import org.ow2.proactive.db.TransactionHelper;
 import org.ow2.proactive.resourcemanager.core.history.Alive;
-import org.ow2.proactive.resourcemanager.core.history.LockHistory;
 import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-
-import com.google.common.collect.Maps;
 
 import it.sauronsoftware.cron4j.Scheduler;
 
@@ -67,8 +61,6 @@ public class RMDBManager {
     private static final Logger logger = ProActiveLogger.getLogger(RMDBManager.class);
 
     private static final String REQUEST_BUFFER_STRING = "Request " + RMDBManagerBuffer.class.getSimpleName() + " to ";
-
-    private static final String IN_DATABASE_STRING = " in database";
 
     private final SessionFactory sessionFactory;
 
@@ -150,7 +142,6 @@ public class RMDBManager {
     public RMDBManager(Configuration configuration, boolean drop, boolean dropNS) {
         try {
             configuration.addAnnotatedClass(Alive.class);
-            configuration.addAnnotatedClass(LockHistory.class);
             configuration.addAnnotatedClass(NodeHistory.class);
             configuration.addAnnotatedClass(NodeSourceData.class);
             configuration.addAnnotatedClass(UserHistory.class);
@@ -288,11 +279,11 @@ public class RMDBManager {
         }
     }
 
-    //======================================================================================
+    // Below: node sources database operations
 
     public boolean addNodeSource(final NodeSourceData nodeSourceData) {
         try {
-            logger.info("Add node source " + nodeSourceData.getName() + IN_DATABASE_STRING);
+            logger.info("Add node source " + nodeSourceData.getName());
             boolean persisted = executeReadWriteTransaction(new SessionWork<Boolean>() {
                 @Override
                 public Boolean doInTransaction(Session session) {
@@ -324,7 +315,7 @@ public class RMDBManager {
 
     public NodeSourceData getNodeSource(final String sourceName) {
         try {
-            logger.debug("Retrieve node source " + sourceName + IN_DATABASE_STRING);
+            logger.debug("Retrieve node source " + sourceName);
             return executeReadTransaction(new SessionWork<NodeSourceData>() {
                 @Override
                 @SuppressWarnings("unchecked")
@@ -339,19 +330,19 @@ public class RMDBManager {
     }
 
     public void updateNodeSource(final NodeSourceData nodeSourceData) {
-        logger.debug(REQUEST_BUFFER_STRING + "update node source " + nodeSourceData.getName() + IN_DATABASE_STRING);
+        logger.debug(REQUEST_BUFFER_STRING + "update node source " + nodeSourceData.getName());
         rmdbManagerBuffer.addUpdateNodeSourceToPendingDatabaseOperations(nodeSourceData);
     }
 
     public void removeNodeSource(final String sourceName) {
         rmdbManagerBuffer.removeKnownNodeSourceAndPendingUpdates(sourceName);
         final Collection<RMNodeData> relatedNodes = getNodesByNodeSource(sourceName);
-        logger.info("Remove nodes linked to the node source " + sourceName + IN_DATABASE_STRING);
+        logger.info("Remove nodes linked to the node source " + sourceName);
         removeNodes(relatedNodes);
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
-                logger.info("Remove node source " + sourceName + IN_DATABASE_STRING);
+                logger.info("Remove node source " + sourceName);
                 session.getNamedQuery("deleteNodeSourceDataByName").setParameter("name", sourceName).executeUpdate();
                 return null;
             }
@@ -359,7 +350,7 @@ public class RMDBManager {
     }
 
     private void removeNodeSources() {
-        logger.info("Remove all node sources" + IN_DATABASE_STRING);
+        logger.info("Remove all node sources");
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -370,7 +361,7 @@ public class RMDBManager {
     }
 
     public Collection<NodeSourceData> getNodeSources() {
-        logger.debug("Retrieve all node sources" + IN_DATABASE_STRING);
+        logger.debug("Retrieve all node sources");
         return executeReadTransaction(new SessionWork<Collection<NodeSourceData>>() {
             @Override
             @SuppressWarnings("unchecked")
@@ -381,7 +372,7 @@ public class RMDBManager {
         });
     }
 
-    //======================================================================================
+    // Below: nodes database operation
 
     private boolean nodeRecoveryDisabled() {
         return !PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
@@ -392,7 +383,7 @@ public class RMDBManager {
             return;
         }
 
-        logger.debug(REQUEST_BUFFER_STRING + "create node " + rmNodeData.getName() + IN_DATABASE_STRING);
+        logger.debug(REQUEST_BUFFER_STRING + "create node with URL: " + rmNodeData.getNodeUrl());
         rmdbManagerBuffer.addCreateNodeToPendingDatabaseOperations(rmNodeData);
     }
 
@@ -403,7 +394,7 @@ public class RMDBManager {
 
         if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNode(rmNodeData)) {
             try {
-                logger.debug("Update node " + rmNodeData.getName() + IN_DATABASE_STRING);
+                logger.debug("Update node with URL: " + rmNodeData.getNodeUrl());
                 executeReadWriteTransaction(new SessionWork<Void>() {
                     @Override
                     public Void doInTransaction(Session session) {
@@ -412,21 +403,12 @@ public class RMDBManager {
                     }
                 });
             } catch (RuntimeException e) {
-                throw new RuntimeException("Exception occurred while updating node " + rmNodeData.getName(), e);
+                throw new RuntimeException("Exception occurred while updating node " + rmNodeData.getNodeUrl(), e);
             }
         } else {
-            logger.debug(REQUEST_BUFFER_STRING + "update node " + rmNodeData.getName() + IN_DATABASE_STRING);
+            logger.debug(REQUEST_BUFFER_STRING + "update node with URL: " + rmNodeData.getNodeUrl());
             rmdbManagerBuffer.addUpdateNodeToPendingDatabaseOperations(rmNodeData);
         }
-    }
-
-    public void removeNode(RMNode rmNode) {
-        if (nodeRecoveryDisabled()) {
-            return;
-        }
-
-        RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-        removeNode(rmNodeData);
     }
 
     public void removeNode(final RMNodeData rmNodeData) {
@@ -436,7 +418,7 @@ public class RMDBManager {
 
         if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNode(rmNodeData)) {
             try {
-                logger.info("Remove node " + rmNodeData.getName() + IN_DATABASE_STRING);
+                logger.info("Remove node with URL: " + rmNodeData.getNodeUrl());
                 executeReadWriteTransaction(new SessionWork<Void>() {
                     @Override
                     public Void doInTransaction(Session session) {
@@ -445,10 +427,10 @@ public class RMDBManager {
                     }
                 });
             } catch (RuntimeException e) {
-                throw new RuntimeException("Exception occurred while removing node " + rmNodeData.getName(), e);
+                throw new RuntimeException("Exception occurred while removing node " + rmNodeData.getNodeUrl(), e);
             }
         } else {
-            logger.debug(REQUEST_BUFFER_STRING + "remove node " + rmNodeData.getName() + IN_DATABASE_STRING);
+            logger.debug(REQUEST_BUFFER_STRING + "remove node " + rmNodeData.getNodeUrl());
             rmdbManagerBuffer.addRemoveNodeToPendingDatabaseOperations(rmNodeData);
         }
     }
@@ -460,7 +442,7 @@ public class RMDBManager {
 
         if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNodes(nodes)) {
             try {
-                logger.info("Remove " + nodes.size() + " nodes" + IN_DATABASE_STRING);
+                logger.info("Remove " + nodes.size() + " nodes");
                 if (logger.isDebugEnabled()) {
                     logger.debug("Nodes removed: " + Arrays.toString(nodes.toArray()));
                 }
@@ -477,14 +459,14 @@ public class RMDBManager {
                 throw new RuntimeException("Exception occurred while removing nodes", e);
             }
         } else {
-            logger.debug(REQUEST_BUFFER_STRING + "remove " + nodes.size() + " nodes" + IN_DATABASE_STRING);
+            logger.debug(REQUEST_BUFFER_STRING + "remove " + nodes.size() + " nodes");
             rmdbManagerBuffer.addRemoveNodesToPendingDatabaseOperations(nodes);
         }
     }
 
     public void removeAllNodes() {
         try {
-            logger.info("Remove all nodes" + IN_DATABASE_STRING);
+            logger.info("Remove all nodes");
             executeReadWriteTransaction(new SessionWork<Void>() {
                 @Override
                 public Void doInTransaction(Session session) {
@@ -497,31 +479,11 @@ public class RMDBManager {
         }
     }
 
-    public RMNodeData getNodeByNameAndUrl(final String nodeName, final String nodeUrl) {
-        logger.debug(REQUEST_BUFFER_STRING + "retrieve node with node name " + nodeName + IN_DATABASE_STRING);
-        rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
-        try {
-            return executeReadTransaction(new SessionWork<RMNodeData>() {
-                @Override
-                public RMNodeData doInTransaction(Session session) {
-                    logger.debug("Retrieve node " + nodeName + IN_DATABASE_STRING);
-                    Query query = session.getNamedQuery("getRMNodeDataByNameAndUrl")
-                                         .setParameter("name", nodeName)
-                                         .setParameter("url", nodeUrl);
-                    return (RMNodeData) query.uniqueResult();
-                }
-            });
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception occurred while retrieving node " + nodeName, e);
-        }
-    }
-
     public Collection<RMNodeData> getNodesByNodeSource(final String nodeSourceName) {
-        logger.debug(REQUEST_BUFFER_STRING + "retrieve node with node source name " + nodeSourceName +
-                     IN_DATABASE_STRING);
+        logger.debug(REQUEST_BUFFER_STRING + "retrieve node with node source name " + nodeSourceName);
         rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
-            logger.debug("Retrieve nodes from node source " + nodeSourceName + IN_DATABASE_STRING);
+            logger.debug("Retrieve nodes from node source " + nodeSourceName);
             return executeReadTransaction(new SessionWork<Collection<RMNodeData>>() {
                 @Override
                 @SuppressWarnings("unchecked")
@@ -538,10 +500,10 @@ public class RMDBManager {
     }
 
     public Collection<RMNodeData> getAllNodes() {
-        logger.debug(REQUEST_BUFFER_STRING + "retrieve all nodes" + IN_DATABASE_STRING);
+        logger.debug(REQUEST_BUFFER_STRING + "retrieve all nodes");
         rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
         try {
-            logger.debug("Retrieve all nodes" + IN_DATABASE_STRING);
+            logger.debug("Retrieve all nodes");
             return executeReadTransaction(new SessionWork<Collection<RMNodeData>>() {
                 @Override
                 @SuppressWarnings("unchecked")
@@ -634,60 +596,6 @@ public class RMDBManager {
         });
     }
 
-    /**
-     * Removes all entries from LockHistory table.
-     */
-    public void clearLockHistory() {
-        executeReadWriteTransaction(new SessionWork<Void>() {
-            @Override
-            public Void doInTransaction(Session session) {
-                int nbDeletes = session.createSQLQuery("delete from LockHistory").executeUpdate();
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug(nbDeletes + " delete(s) performed with success on LockHistory table.");
-                }
-
-                return null;
-            }
-        });
-    }
-
-    /**
-     * Returns information about the nodes which have been locked on previous RM run.
-     * <p>
-     * The purpose of this method is to fetch the number of nodes locked per node source
-     * on the previous RM run.
-     *
-     * @return the number of nodes locked, per node source, on the previous RM run.
-     */
-    public Map<String, MutableInteger> findNodesLockedOnPreviousRun() {
-        List<LockHistory> lockHistoryResult = getLockHistories();
-        return entityToMap(lockHistoryResult);
-    }
-
-    public List<LockHistory> getLockHistories() {
-        return (List<LockHistory>) executeSqlQuery("from LockHistory");
-    }
-
-    public Map<String, MutableInteger> entityToMap(List<LockHistory> lockHistoryResult) {
-        if (lockHistoryResult == null || lockHistoryResult.isEmpty()) {
-            return Maps.newHashMap();
-        }
-
-        Map<String, MutableInteger> result = new HashMap<>(lockHistoryResult.size(), 1f);
-
-        for (Object entry : lockHistoryResult) {
-            LockHistory lockHistory = (LockHistory) entry;
-
-            int lockCount = lockHistory.getLockCount();
-            if (lockCount > 0) {
-                result.put(lockHistory.getNodeSource(), new MutableInteger(lockCount));
-            }
-        }
-
-        return result;
-    }
-
     protected void updateRmAliveTime() {
         updateAliveTable("time", System.currentTimeMillis());
     }
@@ -702,53 +610,6 @@ public class RMDBManager {
                 return null;
             }
         });
-    }
-
-    public void createLockEntryOrUpdate(final String nodeSource, final NodeLockUpdateAction actionOnUpdate) {
-
-        if (!PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
-            return;
-        }
-
-        executeReadWriteTransaction(new SessionWork<Void>() {
-            @Override
-            public Void doInTransaction(Session session) {
-                LockHistory lockHistory = session.get(LockHistory.class, nodeSource);
-
-                if (lockHistory == null) {
-                    lockHistory = new LockHistory(nodeSource, 1);
-                    session.save(lockHistory);
-                } else {
-                    switch (actionOnUpdate) {
-                        case DECREMENT:
-                            lockHistory.decrementLockCount();
-                            break;
-                        case INCREMENT:
-                            lockHistory.incrementLockCount();
-                            break;
-                        default:
-                            break;
-                    }
-
-                    int nbUpdates = session.createSQLQuery("update LockHistory set lockCount = :lockCount where nodeSource = :nodeSource")
-                                           .setParameter("lockCount", lockHistory.getLockCount())
-                                           .setParameter("nodeSource", lockHistory.getNodeSource())
-                                           .executeUpdate();
-
-                    if (nbUpdates <= 0) {
-                        logger.warn("Lock history update has failed for a node that belongs to Node source " +
-                                    nodeSource);
-                    }
-                }
-
-                return null;
-            }
-        });
-    }
-
-    public enum NodeLockUpdateAction {
-        DECREMENT,
-        INCREMENT
     }
 
     private void createRmAliveEntry() {

@@ -28,10 +28,8 @@ package functionaltests.db;
 import static com.google.common.truth.Truth.assertThat;
 
 import java.security.Permission;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.AuthPermission;
@@ -40,16 +38,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.core.history.LockHistory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
-
-import com.google.common.collect.Sets;
 
 
 /**
@@ -110,82 +104,6 @@ public class RMDBManagerTest {
     @After
     public void tearDown() {
         dbManager.close();
-    }
-
-    @Test
-    public void testClearLockHistory() {
-        insertEntries(32);
-
-        assertThat(dbManager.getLockHistories()).hasSize(32);
-        dbManager.clearLockHistory();
-        assertThat(dbManager.getLockHistories()).hasSize(0);
-    }
-
-    @Test
-    public void testCreateLockEntryOrUpdateDisabled() {
-        PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.updateProperty("false");
-
-        insertEntries(10);
-
-        List<LockHistory> lockHistories = dbManager.getLockHistories();
-
-        assertThat(lockHistories).hasSize(0);
-    }
-
-    @Test
-    public void testCreateLockEntryOrUpdateEnabled() {
-        int nbEntries = 42;
-
-        Map<String, Integer> entries = insertEntries(nbEntries);
-
-        List<LockHistory> lockHistories = dbManager.getLockHistories();
-
-        assertThat(lockHistories).hasSize(nbEntries);
-
-        for (int i = 0; i < nbEntries; i++) {
-            Integer found = entries.remove("nodeSource" + i);
-
-            assertThat(found).isNotNull();
-            assertThat(found).isEqualTo(i);
-        }
-
-        assertThat(entries).hasSize(0);
-    }
-
-    @Test
-    public void testEntityToMapNullInput() {
-        assertThat(dbManager.entityToMap(null)).isEmpty();
-    }
-
-    @Test
-    public void testEntityToMapEmptyCollectionInput() {
-        assertThat(dbManager.entityToMap(new ArrayList<LockHistory>())).isEmpty();
-    }
-
-    @Test
-    public void testEntityToMap() {
-        Map<String, Integer> entries = insertEntries(10);
-
-        Map<String, MutableInteger> transformationResult = dbManager.entityToMap(dbManager.getLockHistories());
-
-        assertThat(transformationResult).hasSize(10);
-
-        assertThat(Sets.symmetricDifference(entries.keySet(), transformationResult.keySet())).isNotNull();
-    }
-
-    private Map<String, Integer> insertEntries(int nbEntries) {
-        Map<String, Integer> entries = new HashMap<>();
-
-        for (int i = 0; i < nbEntries; i++) {
-            String nodeSourceName = "nodeSource" + i;
-            dbManager.createLockEntryOrUpdate(nodeSourceName, RMDBManager.NodeLockUpdateAction.INCREMENT);
-            for (int j = 0; j < i; j++) {
-                dbManager.createLockEntryOrUpdate(nodeSourceName, RMDBManager.NodeLockUpdateAction.INCREMENT);
-            }
-
-            entries.put(nodeSourceName, i);
-        }
-        return entries;
     }
 
     @Test
@@ -277,16 +195,15 @@ public class RMDBManagerTest {
         RMNodeData rmNodeData1 = addRMNodeData(NODE_NAME_BASE + "1", NODE_STATE_BASE);
 
         // Add another RMNodeData with another NodeSourceData
-        RMNodeData rmNodeData2 = new RMNodeData(NODE_NAME_BASE + "2",
-                                                NODE_URL,
-                                                null,
-                                                null,
-                                                null,
-                                                NODE_STATE_BASE,
-                                                STATE_CHANGE_TIME_BASE,
-                                                HOSTNAME,
-                                                JMX_URLS,
-                                                JVM_NAME);
+        RMNodeData rmNodeData2 = new RMNodeData.Builder().name(NODE_NAME_BASE + "2")
+                                                         .nodeUrl(NODE_URL)
+                                                         .state(NODE_STATE_BASE)
+                                                         .stateChangeTime(STATE_CHANGE_TIME_BASE)
+                                                         .hostname(HOSTNAME)
+                                                         .jmxUrls(JMX_URLS)
+                                                         .jvmName(JVM_NAME)
+                                                         .build();
+
         NodeSourceData newNodeSourceData = new NodeSourceData();
         newNodeSourceData.setName("anotherNodeSourceName");
         newNodeSourceData.setPolicyType("aPolicyType");
@@ -309,16 +226,15 @@ public class RMDBManagerTest {
         RMNodeData rmNodeData1 = addRMNodeData(NODE_NAME_BASE + "1", NODE_STATE_BASE);
 
         // Add another RMNodeData with another NodeSourceData
-        RMNodeData rmNodeData2 = new RMNodeData(NODE_NAME_BASE + "2",
-                                                NODE_URL,
-                                                null,
-                                                null,
-                                                null,
-                                                NODE_STATE_BASE,
-                                                STATE_CHANGE_TIME_BASE,
-                                                HOSTNAME,
-                                                JMX_URLS,
-                                                JVM_NAME);
+        RMNodeData rmNodeData2 = new RMNodeData.Builder().name(NODE_NAME_BASE + "2")
+                                                         .nodeUrl(NODE_URL)
+                                                         .state(NODE_STATE_BASE)
+                                                         .stateChangeTime(STATE_CHANGE_TIME_BASE)
+                                                         .hostname(HOSTNAME)
+                                                         .jmxUrls(JMX_URLS)
+                                                         .jvmName(JVM_NAME)
+                                                         .build();
+
         NodeSourceData newNodeSourceData = new NodeSourceData();
         newNodeSourceData.setName("anotherNodeSourceName");
         newNodeSourceData.setPolicyType("aPolicyType");
@@ -396,16 +312,18 @@ public class RMDBManagerTest {
     }
 
     private RMNodeData addRMNodeData(String nodeName, NodeState state) {
-        RMNodeData rmNodeData = new RMNodeData(nodeName,
-                                               NODE_URL,
-                                               owner,
-                                               provider,
-                                               permission,
-                                               state,
-                                               STATE_CHANGE_TIME_BASE,
-                                               HOSTNAME,
-                                               JMX_URLS,
-                                               JVM_NAME);
+        RMNodeData rmNodeData = new RMNodeData.Builder().name(nodeName)
+                                                        .nodeUrl(NODE_URL)
+                                                        .owner(owner)
+                                                        .provider(provider)
+                                                        .userPermission(permission)
+                                                        .state(state)
+                                                        .stateChangeTime(STATE_CHANGE_TIME_BASE)
+                                                        .hostname(HOSTNAME)
+                                                        .jmxUrls(JMX_URLS)
+                                                        .jvmName(JVM_NAME)
+                                                        .build();
+
         rmNodeData.setNodeSource(nodeSourceData);
         dbManager.addNode(rmNodeData);
         return rmNodeData;

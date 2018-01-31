@@ -42,8 +42,12 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeDescriptor;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 
@@ -54,14 +58,14 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 @Entity
 @NamedQueries({ @NamedQuery(name = "deleteAllRMNodeData", query = "delete from RMNodeData"),
                 @NamedQuery(name = "getAllRMNodeData", query = "from RMNodeData"),
-                @NamedQuery(name = "getRMNodeDataByNameAndUrl", query = "from RMNodeData where name=:name and nodeUrl=:url"),
+                @NamedQuery(name = "deleteRMNodeDataByUrl", query = "delete from RMNodeData where nodeUrl=:url"),
                 @NamedQuery(name = "getRMNodeDataByNodeSource", query = "from RMNodeData where nodeSource.name=:name") })
 @Table(name = "RMNodeData")
 public class RMNodeData implements Serializable {
 
-    private String nodeUrl;
-
     private String name;
+
+    private String nodeUrl;
 
     /** client taken the node for computations */
     private Client owner;
@@ -91,31 +95,53 @@ public class RMNodeData implements Serializable {
       * e.g. following the pattern: pnp://192.168.1.104:59357/PA_JVM[0-9]* */
     private String jvmName;
 
+    private boolean locked;
+
+    private Client lockedBy;
+
+    private long lockTime;
+
+    /** Command line of deploying node. For RMDeployingNode only */
+    private String commandLine;
+
+    /** Description of a deploying or lost node. For RMDeployingNode only */
+    private String description;
+
     /**
      * Create an instance of {@link RMNodeData} and populate its fields with the content of a node.
      * @param rmNode the object to take the values from
      * @return a new instance of {@link RMNodeData} with the values of the given {@link RMNode}
      */
     public static RMNodeData createRMNodeData(RMNode rmNode) {
-        RMNodeData rmNodeData = new RMNodeData(rmNode.getNodeName(),
-                                               rmNode.getNodeURL(),
-                                               rmNode.getOwner(),
-                                               rmNode.getProvider(),
-                                               rmNode.getUserPermission(),
-                                               rmNode.getState(),
-                                               rmNode.getStateChangeTime(),
-                                               rmNode.getHostName(),
-                                               rmNode.getJmxUrls(),
-                                               rmNode.getDescriptorVMName());
-        return rmNodeData;
+        Builder builder = new Builder().name(rmNode.getNodeName())
+                                       .nodeUrl(rmNode.getNodeURL())
+                                       .provider(rmNode.getProvider())
+                                       .state(rmNode.getState())
+                                       .stateChangeTime(rmNode.getStateChangeTime())
+                                       .locked(rmNode.isLocked())
+                                       .lockedBy(rmNode.getLockedBy())
+                                       .lockTime(rmNode.getLockTime());
+        if (!rmNode.getState().equals(NodeState.DEPLOYING) && !rmNode.getState().equals(NodeState.LOST)) {
+            builder.owner(rmNode.getOwner())
+                   .userPermission(rmNode.getUserPermission())
+                   .hostname(rmNode.getHostName())
+                   .jmxUrls(rmNode.getJmxUrls())
+                   .jvmName(rmNode.getDescriptorVMName());
+        } else {
+            builder.commandLine(((RMDeployingNode) rmNode).getCommandLine())
+                   .description(((RMDeployingNode) rmNode).getDescription());
+        }
+
+        return builder.build();
     }
 
     public RMNodeData() {
         // Required empty constructor
     }
 
-    public RMNodeData(String name, String nodeUrl, Client owner, Client provider, Permission permission,
-            NodeState state, long stateChangeTime, String hostName, String[] jmxUrls, String jvmName) {
+    private RMNodeData(String name, String nodeUrl, Client owner, Client provider, Permission permission,
+            NodeState state, long stateChangeTime, String hostName, String[] jmxUrls, String jvmName, boolean locked,
+            Client lockedBy, long lockTime, String commandLine, String description) {
         this.name = name;
         this.nodeUrl = nodeUrl;
         this.owner = owner;
@@ -126,10 +152,13 @@ public class RMNodeData implements Serializable {
         this.hostname = hostName;
         this.jmxUrls = jmxUrls;
         this.jvmName = jvmName;
+        this.locked = locked;
+        this.lockedBy = lockedBy;
+        this.lockTime = lockTime;
+        this.commandLine = commandLine;
+        this.description = description;
     }
 
-    @Id
-    @Column(nullable = false)
     public String getName() {
         return name;
     }
@@ -232,6 +261,72 @@ public class RMNodeData implements Serializable {
         this.jvmName = jvmName;
     }
 
+    public boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Client getLockedBy() {
+        return lockedBy;
+    }
+
+    public void setLockedBy(Client lockedBy) {
+        this.lockedBy = lockedBy;
+    }
+
+    public long getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(long lockTime) {
+        this.lockTime = lockTime;
+    }
+
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "text")
+    public String getCommandLine() {
+        return commandLine;
+    }
+
+    public void setCommandLine(String commandLine) {
+        this.commandLine = commandLine;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setdescription(String description) {
+        this.description = description;
+    }
+
+    public RMNodeEvent createNodeEvent(String nodeSourceName) {
+
+        RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
+        rmNodeDescriptor.setNodeURL(nodeUrl);
+        rmNodeDescriptor.setDefaultJMXUrl(jmxUrls == null ? null : jmxUrls[JMXTransportProtocol.RMI.ordinal()]);
+        rmNodeDescriptor.setDescriptorVMName(jvmName);
+        rmNodeDescriptor.setHostName(hostname);
+        rmNodeDescriptor.setLocked(locked);
+        rmNodeDescriptor.setLockedBy(getLockedBy() == null ? null : getLockedBy().getName());
+        rmNodeDescriptor.setLockTime(getLockTime());
+        rmNodeDescriptor.setNodeSourceName(nodeSourceName);
+        rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
+        rmNodeDescriptor.setProactiveJMXUrl(jmxUrls == null ? null : jmxUrls[JMXTransportProtocol.RO.ordinal()]);
+        rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
+        rmNodeDescriptor.setState(getState());
+        rmNodeDescriptor.setStateChangeTime(getStateChangeTime());
+        rmNodeDescriptor.setVNodeName(jvmName);
+
+        RMNodeEvent rmNodeEvent = new RMNodeEvent(rmNodeDescriptor, null, null, null);
+        return rmNodeEvent;
+    }
+
     /**
      * Say whether the current node data structure reflects a particular
      * instance of {@link Node}.
@@ -242,12 +337,12 @@ public class RMNodeData implements Serializable {
         if (node == null) {
             return false;
         }
-        return node.getNodeInformation().getName().equals(name) && node.getNodeInformation().getURL().equals(nodeUrl);
+        return node.getNodeInformation().getURL().equals(nodeUrl);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode() + nodeUrl.hashCode();
+        return nodeUrl.hashCode();
     }
 
     @Override
@@ -263,10 +358,140 @@ public class RMNodeData implements Serializable {
         }
         if (obj instanceof RMNodeData) {
             RMNodeData other = (RMNodeData) obj;
-            return other.getName().equals(name) && other.getNodeUrl().equals(nodeUrl);
+            return other.getNodeUrl().equals(nodeUrl);
         } else {
             return false;
         }
+    }
+
+    public static class Builder {
+
+        private String name;
+
+        private String nodeUrl;
+
+        private Client owner;
+
+        private Client provider;
+
+        private Permission userPermission;
+
+        private NodeState state;
+
+        private long stateChangeTime;
+
+        private String hostname;
+
+        private String[] jmxUrls;
+
+        private String jvmName;
+
+        private boolean locked;
+
+        private Client lockedBy;
+
+        private long lockTime;
+
+        private String commandLine;
+
+        private String description;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder nodeUrl(String nodeUrl) {
+            this.nodeUrl = nodeUrl;
+            return this;
+        }
+
+        public Builder owner(Client owner) {
+            this.owner = owner;
+            return this;
+        }
+
+        public Builder provider(Client provider) {
+            this.provider = provider;
+            return this;
+        }
+
+        public Builder userPermission(Permission userPermission) {
+            this.userPermission = userPermission;
+            return this;
+
+        }
+
+        public Builder state(NodeState state) {
+            this.state = state;
+            return this;
+
+        }
+
+        public Builder stateChangeTime(long stateChangeTime) {
+            this.stateChangeTime = stateChangeTime;
+            return this;
+
+        }
+
+        public Builder hostname(String hostname) {
+            this.hostname = hostname;
+            return this;
+        }
+
+        public Builder jmxUrls(String[] jmxUrls) {
+            this.jmxUrls = jmxUrls;
+            return this;
+        }
+
+        public Builder jvmName(String jvmName) {
+            this.jvmName = jvmName;
+            return this;
+        }
+
+        public Builder locked(boolean locked) {
+            this.locked = locked;
+            return this;
+        }
+
+        public Builder lockedBy(Client lockedBy) {
+            this.lockedBy = lockedBy;
+            return this;
+        }
+
+        public Builder lockTime(long lockTime) {
+            this.lockTime = lockTime;
+            return this;
+        }
+
+        public Builder commandLine(String commandLine) {
+            this.commandLine = commandLine;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public RMNodeData build() {
+            return new RMNodeData(name,
+                                  nodeUrl,
+                                  owner,
+                                  provider,
+                                  userPermission,
+                                  state,
+                                  stateChangeTime,
+                                  hostname,
+                                  jmxUrls,
+                                  jvmName,
+                                  locked,
+                                  lockedBy,
+                                  lockTime,
+                                  commandLine,
+                                  description);
+        }
+
     }
 
 }

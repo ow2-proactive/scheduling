@@ -36,4 +36,9 @@ import org.ow2.proactive.policy.ClientsPolicy;
  * @see ClientsPolicy
  */
 public class AllPermission extends ClientPermission {
+
+    // This serial version uid is meant to prevent issues when restoring Resource Manager database from a previous version.
+    // any addition to this class (new method, field, etc) should imply to change this uid.
+    private static final long serialVersionUID = 1L;
+
 }
