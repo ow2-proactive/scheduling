@@ -288,7 +288,7 @@ public class RMNodeData implements Serializable {
     }
 
     @Column(length = Integer.MAX_VALUE)
-    @Type(type = "text")
+    @Type(type = "org.hibernate.type.TextType")
     public String getCommandLine() {
         return commandLine;
     }

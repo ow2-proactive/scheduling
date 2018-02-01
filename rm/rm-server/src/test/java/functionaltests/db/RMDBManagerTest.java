@@ -58,7 +58,7 @@ public class RMDBManagerTest {
 
     private static final String NODE_NAME_BASE = "RMNodeData";
 
-    private static final String NODE_URL = "pnp://XXX.XXX.X.XXX:ZZZZZ/";
+    private static final String NODE_URL_BASE = "pnp://XXX.XXX.X.XXX:ZZZZZ/";
 
     private static final NodeState NODE_STATE_BASE = NodeState.FREE;
 
@@ -88,7 +88,7 @@ public class RMDBManagerTest {
 
     @Before
     public void setUp() {
-        PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.updateProperty("true");
+        PAResourceManagerProperties.RM_NODES_DB_OPERATIONS_DELAY.updateProperty("0");
         PAResourceManagerProperties.RM_ALIVE_EVENT_FREQUENCY.updateProperty("10000");
 
         dbManager = RMDBManager.createInMemoryRMDBManager();
@@ -109,14 +109,14 @@ public class RMDBManagerTest {
     @Test
     public void testAddRMNodeData() {
 
-        RMNodeData d = addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
+        addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
 
         Collection<RMNodeData> allNodes = dbManager.getAllNodes();
         assertThat(allNodes).hasSize(1);
 
         for (RMNodeData node : allNodes) {
             assertThat(node.getName()).isEqualTo(NODE_NAME_BASE);
-            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL_BASE + NODE_NAME_BASE);
             assertThat(node.getState()).isEqualTo(NODE_STATE_BASE);
             assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
@@ -141,9 +141,8 @@ public class RMDBManagerTest {
         assertThat(allNodes).hasSize(1);
 
         for (RMNodeData node : allNodes) {
-            assertThat(node.getName()).startsWith(NODE_NAME_BASE);
             assertThat(node.getName()).isEqualTo(NODE_NAME_BASE);
-            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL_BASE + NODE_NAME_BASE);
             assertThat(node.getState()).isEqualTo(NodeState.BUSY);
             assertThat(node.getStateChangeTime()).isEqualTo(5678);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
@@ -159,14 +158,14 @@ public class RMDBManagerTest {
     @Test
     public void testAddAllRMNodeData() {
 
-        Map<String, RMNodeData> rmNodeDataEntries = addNRMNodeData(10);
+        addNRMNodeData(10);
 
         Collection<RMNodeData> allNodes = dbManager.getAllNodes();
         assertThat(allNodes).hasSize(10);
 
         for (RMNodeData node : allNodes) {
             assertThat(node.getName()).startsWith(NODE_NAME_BASE);
-            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getNodeUrl()).startsWith(NODE_URL_BASE + NODE_NAME_BASE);
             assertThat(node.getState()).isEqualTo(NODE_STATE_BASE);
             assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
@@ -196,7 +195,7 @@ public class RMDBManagerTest {
 
         // Add another RMNodeData with another NodeSourceData
         RMNodeData rmNodeData2 = new RMNodeData.Builder().name(NODE_NAME_BASE + "2")
-                                                         .nodeUrl(NODE_URL)
+                                                         .nodeUrl(NODE_URL_BASE)
                                                          .state(NODE_STATE_BASE)
                                                          .stateChangeTime(STATE_CHANGE_TIME_BASE)
                                                          .hostname(HOSTNAME)
@@ -227,7 +226,7 @@ public class RMDBManagerTest {
 
         // Add another RMNodeData with another NodeSourceData
         RMNodeData rmNodeData2 = new RMNodeData.Builder().name(NODE_NAME_BASE + "2")
-                                                         .nodeUrl(NODE_URL)
+                                                         .nodeUrl(NODE_URL_BASE)
                                                          .state(NODE_STATE_BASE)
                                                          .stateChangeTime(STATE_CHANGE_TIME_BASE)
                                                          .hostname(HOSTNAME)
@@ -263,7 +262,7 @@ public class RMDBManagerTest {
 
         for (RMNodeData node : allNodes) {
             assertThat(node.getName()).isEqualTo(NODE_NAME_BASE);
-            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getNodeUrl()).startsWith(NODE_URL_BASE + NODE_NAME_BASE);
             assertThat(node.getState()).isEqualTo(NodeState.DEPLOYING);
             assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
             assertThat(node.getOwner().getId()).isEqualTo(OWNER_ID);
@@ -290,7 +289,7 @@ public class RMDBManagerTest {
 
         for (RMNodeData node : allNodes) {
             assertThat(node.getName()).startsWith(NODE_NAME_BASE);
-            assertThat(node.getNodeUrl()).isEqualTo(NODE_URL);
+            assertThat(node.getNodeUrl()).startsWith(NODE_URL_BASE + NODE_NAME_BASE);
             // no more deploying nodes should be returned
             assertThat(node.getState()).isNotEqualTo(NodeState.DEPLOYING);
             assertThat(node.getStateChangeTime()).isEqualTo(STATE_CHANGE_TIME_BASE);
@@ -313,7 +312,7 @@ public class RMDBManagerTest {
 
     private RMNodeData addRMNodeData(String nodeName, NodeState state) {
         RMNodeData rmNodeData = new RMNodeData.Builder().name(nodeName)
-                                                        .nodeUrl(NODE_URL)
+                                                        .nodeUrl(NODE_URL_BASE + nodeName)
                                                         .owner(owner)
                                                         .provider(provider)
                                                         .userPermission(permission)

@@ -40,7 +40,7 @@ public class RMNodeDataTest {
 
     private static final Client OWNER = new Client();
 
-    private static final Client PROVIDER = OWNER;
+    private static final Client PROVIDER = new Client();
 
     private static final String JVM_NAME = "jvmName";
 
