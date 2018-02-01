@@ -71,7 +71,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.db.SortParameter;
@@ -150,7 +149,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     private SchedulerEventReceiver schedulerEventReceiver;
 
-    private static final Logger logger = ProActiveLogger.getLogger(SchedulerClient.class);
+    private static final Logger logger = Logger.getLogger(SchedulerClient.class);
 
     private SchedulerClient() {
     }
