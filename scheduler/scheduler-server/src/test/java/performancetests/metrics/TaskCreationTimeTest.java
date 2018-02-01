@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,6 +45,12 @@ import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.PeformanceTestBase;
 
 
+/**
+ * Performance test measures "Task Creation Time".
+ * It is basically time to execute scheduler::submit(job) method.
+ * This method just submit job, measure, and after kills it.
+ * This test does not require to have more than one core.
+ */
 @RunWith(Parameterized.class)
 public class TaskCreationTimeTest extends PeformanceTestBase {
 
@@ -65,6 +72,8 @@ public class TaskCreationTimeTest extends PeformanceTestBase {
 
     private final long timeLimit;
 
+    private JobId jobId;
+
     public TaskCreationTimeTest(int taskNumber, long timeLimit) {
         this.taskNumber = taskNumber;
         this.timeLimit = timeLimit;
@@ -85,7 +94,7 @@ public class TaskCreationTimeTest extends PeformanceTestBase {
 
         final long start = System.currentTimeMillis();
 
-        final JobId jobId = schedulerHelper.submitJob(job);
+        jobId = schedulerHelper.submitJob(job);
 
         final long anActualTime = System.currentTimeMillis() - start;
 
@@ -101,4 +110,15 @@ public class TaskCreationTimeTest extends PeformanceTestBase {
 
     }
 
+    @After
+    public void after() throws Exception {
+        if (schedulerHelper != null) {
+            if (!schedulerHelper.getSchedulerInterface().getJobState(jobId).isFinished()) {
+                schedulerHelper.getSchedulerInterface().killJob(jobId);
+            }
+            schedulerHelper.getSchedulerInterface().removeJob(jobId);
+            schedulerHelper.log("Kill Scheduler after test.");
+            schedulerHelper.killScheduler();
+        }
+    }
 }

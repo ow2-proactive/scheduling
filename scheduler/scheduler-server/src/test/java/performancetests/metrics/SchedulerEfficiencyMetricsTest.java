@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -52,6 +53,11 @@ import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.PeformanceTestBase;
 
 
+/**
+ * Performance test measures "Task Creation Time", "Task Scheduling Time", and "Task Termination Time".
+ * It is a time from submitting a job till it is finished.
+ * This test DOES require to have as many cores as there are tasks.
+ */
 @RunWith(Parameterized.class)
 public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
 
@@ -79,6 +85,8 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
 
     private final long timeLimit;
 
+    private JobId jobId;
+
     public SchedulerEfficiencyMetricsTest(int taskNumber, long timeLimit) {
         this.taskNumber = taskNumber;
         this.timeLimit = timeLimit;
@@ -97,7 +105,7 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
 
         final TaskFlowJob job = createJob(taskNumber, TASK_DURATION);
         long start = System.currentTimeMillis();
-        final JobId jobId = schedulerHelper.submitJob(job);
+        jobId = schedulerHelper.submitJob(job);
         long submited = System.currentTimeMillis();
         schedulerHelper.waitForEventJobFinished(jobId);
 
@@ -118,6 +126,18 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
         logAndAssert("TaskCreationTimeTest", TCT);
         logAndAssert("TaskSchedulingTimeTest", TST);
         logAndAssert("TaskTerminationTimeTest", TTT);
+    }
+
+    @After
+    public void after() throws Exception {
+        if (schedulerHelper != null) {
+            if (!schedulerHelper.getSchedulerInterface().getJobState(jobId).isFinished()) {
+                schedulerHelper.getSchedulerInterface().killJob(jobId);
+            }
+            schedulerHelper.getSchedulerInterface().removeJob(jobId);
+            schedulerHelper.log("Kill Scheduler after test.");
+            schedulerHelper.killScheduler();
+        }
     }
 
     private void logAndAssert(String name, long value) {

@@ -44,8 +44,6 @@ dependencies {
     testCompile 'org.jvnet.winp:winp:1.24'
     testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
-    testCompile 'org.awaitility:awaitility:3.0.0'
-
     testCompile project(':rm:rm-server').sourceSets.test.output // to get shared test classes
     testCompile project(':common:common-api').sourceSets.test.output
     testCompile project(':rm:rm-policy:rm-policy-scheduler')
