@@ -40,7 +40,6 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.Infrastructur
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SelectionScript;
-import org.python.apache.commons.compress.archivers.sevenz.CLI;
 
 
 /**

@@ -988,9 +988,9 @@ public abstract class InfrastructureManager implements Serializable {
         createDBManagerIfNull();
         if (nodeRecoveryEnabled()) {
             RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-            NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
-            rmNodeData.setNodeSource(nodeSourceData);
-            if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceData.getName())) {
+            NodeSourceData persistedNodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
+            rmNodeData.setNodeSource(persistedNodeSourceData);
+            if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(persistedNodeSourceData.getName())) {
                 dbManager.addNode(rmNodeData);
             }
         }

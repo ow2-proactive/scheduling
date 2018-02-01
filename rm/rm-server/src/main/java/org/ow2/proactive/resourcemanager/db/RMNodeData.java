@@ -323,8 +323,7 @@ public class RMNodeData implements Serializable {
         rmNodeDescriptor.setStateChangeTime(getStateChangeTime());
         rmNodeDescriptor.setVNodeName(jvmName);
 
-        RMNodeEvent rmNodeEvent = new RMNodeEvent(rmNodeDescriptor, null, null, null);
-        return rmNodeEvent;
+        return new RMNodeEvent(rmNodeDescriptor, null, null, null);
     }
 
     /**

@@ -285,10 +285,8 @@ public class RMRecoverer {
     }
 
     private boolean isEligible(RMNode node) {
-        if (node != null && node.isFree() && !node.isLocked()) {
-            return true;
-        }
-        return false;
+        // an eligible node should be in free state and should not be locked
+        return node != null && node.isFree() && !node.isLocked();
     }
 
 }

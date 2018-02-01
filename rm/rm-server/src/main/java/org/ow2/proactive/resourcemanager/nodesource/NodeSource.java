@@ -29,6 +29,7 @@ import java.security.Permission;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -73,7 +74,6 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 
 
 /**
@@ -733,7 +733,7 @@ public class NodeSource implements InitActive, RunActive {
      * @return the list of deploying nodes handled by the infrastructure manager
      */
     @ImmediateService
-    public LinkedList<RMNodeData> getDeployingNodes() {
+    public List<RMNodeData> getDeployingNodes() {
         LinkedList<RMNodeData> deployingAndLostNodes = new LinkedList<>();
         deployingAndLostNodes.addAll(this.infrastructureManager.getDeployingAndLostNodesData());
         return deployingAndLostNodes;
