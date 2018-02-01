@@ -430,7 +430,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             clientPinger.ping();
 
-            rmRecoverer.initiateRecoveryIfRequired();
+            rmRecoverer.startRecoveryOrRemoveAllNodes();
 
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
@@ -1164,13 +1164,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         logger.info("Creating a node source : " + nodeSourceName);
 
-        boolean recoverNodes = rmRecoverer.existNodesToRecover(nodeSourceName, nodesRecoverable);
+        Collection<RMNodeData> nodesToRecover = rmRecoverer.getNodesToRecover(nodeSourceName, nodesRecoverable);
+        boolean nodesMustBeRecovered = rmRecoverer.determineIfNodesMustBeRecovered(nodeSourceName, nodesToRecover);
 
         InfrastructureManager im;
 
         // we need to reload the infrastructure variables saved in database if
         // we recover the nodes
-        if (recoverNodes) {
+        if (nodesMustBeRecovered) {
             im = InfrastructureManagerFactory.recover(nodeSourceData);
         } else {
             im = InfrastructureManagerFactory.create(nodeSourceData);
@@ -1196,9 +1197,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
         }
 
-        // finally recover the nodes from a saved state if needed
-        if (recoverNodes) {
-            rmRecoverer.recoverNodes(nodeSource);
+        if (nodesMustBeRecovered) {
+            rmRecoverer.recoverNodes(nodeSource, nodesToRecover);
         }
 
         // Adding access to the core for node source and policy.

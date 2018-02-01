@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class RMRecoverer {
         this.dbManager = dbManager;
     }
 
-    protected void initiateRecoveryIfRequired() {
+    protected void startRecoveryOrRemoveAllNodes() {
         if (nodesRecoveryEnabled()) {
             logger.info("Starting Nodes Recovery");
         } else {
@@ -82,17 +83,19 @@ public class RMRecoverer {
      * it removes all its nodes. Thus if we restart and recover the RM
      * afterwards there will be no nodes in the database.
      */
-    public boolean existNodesToRecover(String nodeSourceName, boolean nodesRecoverable) {
-        boolean recoverNodes = false;
+    public Collection<RMNodeData> getNodesToRecover(String nodeSourceName, boolean nodesRecoverable) {
         if (nodesRecoveryEnabled() && nodesRecoverable) {
             Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSourceName);
             if (nodesData.isEmpty()) {
                 logger.info("No node found in database for node source: " + nodeSourceName);
             } else {
-                recoverNodes = true;
+                logger.info("Number of nodes found in database for node source " + nodeSourceName + ": " +
+                            nodesData.size());
             }
+            return nodesData;
+        } else {
+            return Collections.emptyList();
         }
-        return recoverNodes;
     }
 
     private void recoverNodeSourcesAndNodes() {
@@ -119,15 +122,21 @@ public class RMRecoverer {
         }
     }
 
-    public void recoverNodes(NodeSource nodeSource) {
+    /**
+     * Build the nodes of the given node source based on the information
+     * present in each node data.
+     * Populate the resource manager and the node source with the recovered
+     * nodes.
+     *
+     * @param nodeSource the node source for which the nodes are recovered
+     * @param nodesData the information about the nodes to recover
+     */
+    public void recoverNodes(NodeSource nodeSource, Collection<RMNodeData> nodesData) {
         logger.info(START_TO_RECOVER_NODES); // this log line is important for performance tests
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
         String nodeSourceName = nodeSource.getName();
 
         makeSureNodeSourceHasNoNode(nodeSource, nodeSourceName);
-
-        Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSourceName);
-        logger.info("Number of nodes found in database for node source " + nodeSourceName + ": " + nodesData.size());
 
         Map<NodeState, Integer> nodeStates = new HashMap<>();
         int totalEligibleRecoveredNodes = 0;
@@ -138,7 +147,7 @@ public class RMRecoverer {
             String nodeUrl = rmNodeData.getNodeUrl();
             RMNode rmnode = null;
 
-            if (rmNodeData.getState().equals(NodeState.DEPLOYING) || rmNodeData.getState().equals(NodeState.LOST)) {
+            if (isNotAcquired(rmNodeData)) {
                 rmnode = recoverDeployingNodeInternally(nodeSource, rmNodeData, nodeUrl);
             } else {
 
@@ -287,6 +296,28 @@ public class RMRecoverer {
     private boolean isEligible(RMNode node) {
         // an eligible node should be in free state and should not be locked
         return node != null && node.isFree() && !node.isLocked();
+    }
+
+    public boolean determineIfNodesMustBeRecovered(String nodeSourceName, Collection<RMNodeData> nodesToRecover) {
+        if (nodesToRecover.isEmpty()) {
+            logger.info("Nodes of node source " + nodeSourceName + " will be redeployed");
+            return false;
+        }
+
+        boolean allNodesToRecoverAreAcquired = true;
+        for (RMNodeData nodeToRecover : nodesToRecover) {
+            if (isNotAcquired(nodeToRecover)) {
+                logger.info("Some nodes of node source " + nodeSourceName +
+                            " are not acquired. All nodes will be redeployed");
+                allNodesToRecoverAreAcquired = false;
+                break;
+            }
+        }
+        return allNodesToRecoverAreAcquired;
+    }
+
+    private boolean isNotAcquired(RMNodeData node) {
+        return node.getState().equals(NodeState.DEPLOYING) || node.getState().equals(NodeState.LOST);
     }
 
 }

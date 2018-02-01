@@ -36,7 +36,6 @@
 
         <!-- Events -->
         <mapping class="org.ow2.proactive.resourcemanager.core.history.Alive"/>
-        <mapping class="org.ow2.proactive.resourcemanager.core.history.LockHistory"/>
         <mapping class="org.ow2.proactive.resourcemanager.core.history.NodeHistory"/>
         <mapping class="org.ow2.proactive.resourcemanager.core.history.UserHistory"/>
 
