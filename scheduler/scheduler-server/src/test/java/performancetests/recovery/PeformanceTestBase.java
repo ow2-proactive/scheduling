@@ -44,7 +44,7 @@ import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
  * We need this class only to increase timeout rule for performance tests.
  */
 @SuppressWarnings("squid:S2187")
-public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class PeformanceTestBase extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     public static final String SUCCESS = "SUCCESS";
 

@@ -40,11 +40,11 @@ import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 import functionaltests.utils.SchedulerTHelper;
-import performancetests.recovery.BaseRecoveryTest;
+import performancetests.recovery.PeformanceTestBase;
 
 
 @RunWith(Parameterized.class)
-public class TaskCreationTimeTest extends BaseRecoveryTest {
+public class TaskCreationTimeTest extends PeformanceTestBase {
 
     private static final Logger LOGGER = Logger.getLogger(TaskCreationTimeTest.class);
 

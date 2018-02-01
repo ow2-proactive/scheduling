@@ -45,11 +45,11 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
 import functionaltests.utils.SchedulerTHelper;
-import performancetests.recovery.BaseRecoveryTest;
+import performancetests.recovery.PeformanceTestBase;
 
 
 @RunWith(Parameterized.class)
-public class SchedulerEfficiencyTimeTest extends BaseRecoveryTest {
+public class SchedulerEfficiencyTimeTest extends PeformanceTestBase {
 
     public static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyTimeTest.class.getResource("/performancetests/config/scheduler-start-memory.ini");
 
@@ -63,8 +63,8 @@ public class SchedulerEfficiencyTimeTest extends BaseRecoveryTest {
 
     /**
      * @return an array of parameters which is used by JUnit to create objects of SchedulerEfficiencyTime,
-     * where first value represents number of task in the job, and the second represents limit for SchedulerEfficiencyTime (SER).
-     * The biggest SER the better.
+     * where first value represents number of task in the job, and the second represents limit for SchedulerEfficiencyTime (SET).
+     * The biggest SET the better.
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {

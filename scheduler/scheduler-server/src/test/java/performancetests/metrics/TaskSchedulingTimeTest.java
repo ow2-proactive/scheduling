@@ -26,7 +26,6 @@
 package performancetests.metrics;
 
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
@@ -39,8 +38,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.awaitility.Awaitility.*;
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -52,11 +49,11 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 import functionaltests.utils.SchedulerTHelper;
-import performancetests.recovery.BaseRecoveryTest;
+import performancetests.recovery.PeformanceTestBase;
 
 
 @RunWith(Parameterized.class)
-public class TaskSchedulingTimeTest extends BaseRecoveryTest {
+public class TaskSchedulingTimeTest extends PeformanceTestBase {
 
     private static final Logger LOGGER = Logger.getLogger(TaskSchedulingTimeTest.class);
 

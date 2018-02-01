@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
 
-import performancetests.recovery.BaseRecoveryTest;
+import performancetests.recovery.PeformanceTestBase;
 
 
 public class VerifyChangeTest {
@@ -54,13 +54,13 @@ public class VerifyChangeTest {
     @Test
     public void changeShouldBeLessThanThreshold() throws IOException {
 
-        final List<File> twoLastFiles = BaseRecoveryTest.getTwoLastFiles();
+        final List<File> twoLastFiles = PeformanceTestBase.getTwoLastFiles();
 
         final File newFile = twoLastFiles.get(0);
         final File previousFile = twoLastFiles.get(1);
 
-        final Map<String, Double> prediousReport = BaseRecoveryTest.readReport(previousFile);
-        final Map<String, Double> newReport = BaseRecoveryTest.readReport(newFile);
+        final Map<String, Double> prediousReport = PeformanceTestBase.readReport(previousFile);
+        final Map<String, Double> newReport = PeformanceTestBase.readReport(newFile);
 
         final Map<String, Double> compared = compareReports(prediousReport, newReport);
 

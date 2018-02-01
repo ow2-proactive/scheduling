@@ -55,7 +55,7 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class NodeRecoveryTest extends BaseRecoveryTest {
+public class NodeRecoveryTest extends PeformanceTestBase {
 
     private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
 
@@ -138,12 +138,12 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
                        lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(BaseRecoveryTest.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
-                                                       nodesNumber,
-                                                       timeLimit,
-                                                       -1,
-                                                       -1,
-                                                       ERROR));
+            LOGGER.info(PeformanceTestBase.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
+                                                         nodesNumber,
+                                                         timeLimit,
+                                                         -1,
+                                                         -1,
+                                                         ERROR));
         }
     }
 
