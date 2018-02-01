@@ -38,9 +38,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
-import org.ow2.proactive.scheduler.common.job.*;
+import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobVariable;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.task.ScriptTask;
+import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
@@ -49,39 +53,39 @@ import performancetests.recovery.PeformanceTestBase;
 
 
 @RunWith(Parameterized.class)
-public class SchedulerEfficiencyTimeTest extends PeformanceTestBase {
+public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
 
-    public static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyTimeTest.class.getResource("/performancetests/config/scheduler-start-memory.ini");
+    public static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyMetricsTest.class.getResource("/performancetests/config/scheduler-start-memory.ini");
 
-    public static final URL RM_CONFIGURATION_START = SchedulerEfficiencyTimeTest.class.getResource("/performancetests/config/rm-start-memory.ini");
+    public static final URL RM_CONFIGURATION_START = SchedulerEfficiencyMetricsTest.class.getResource("/performancetests/config/rm-start-memory.ini");
 
-    private static final Logger LOGGER = Logger.getLogger(SchedulerEfficiencyTimeTest.class);
+    private static final Logger LOGGER = Logger.getLogger(SchedulerEfficiencyMetricsTest.class);
 
     private static final String OPTIMAL_JOB_DURATION = "OPTIMAL_JOB_DURATION";
 
     private static final int TASK_DURATION = 10; // in seconds
 
     /**
-     * @return an array of parameters which is used by JUnit to create objects of SchedulerEfficiencyTime,
+     * @return an array of parameters which is used by JUnit to create objects of SchedulerEfficiencyMetricsTest,
      * where first value represents number of task in the job, and the second represents limit for SchedulerEfficiencyTime (SET).
      * The biggest SET the better.
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 8, 10000 } });
+        return Arrays.asList(new Object[][] { { 8, 20000 } });
     }
 
     private final int taskNumber;
 
-    private final long rateLimit;
+    private final long timeLimit;
 
-    public SchedulerEfficiencyTimeTest(int taskNumber, long rateLimit) {
+    public SchedulerEfficiencyMetricsTest(int taskNumber, long timeLimit) {
         this.taskNumber = taskNumber;
-        this.rateLimit = rateLimit;
+        this.timeLimit = timeLimit;
     }
 
     @Test(timeout = 3600000)
-    public void taskCreationRate() throws Exception {
+    public void test() throws Exception {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
@@ -91,30 +95,35 @@ public class SchedulerEfficiencyTimeTest extends PeformanceTestBase {
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", taskNumber);
 
-        final JobId jobId = schedulerHelper.submitJob(createJob(taskNumber, TASK_DURATION));
-
+        final TaskFlowJob job = createJob(taskNumber, TASK_DURATION);
+        long start = System.currentTimeMillis();
+        final JobId jobId = schedulerHelper.submitJob(job);
+        long submited = System.currentTimeMillis();
         schedulerHelper.waitForEventJobFinished(jobId);
 
         final JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
 
-        final Long anActualTime = computeSchedulerEfficiencyTime(jobState);
+        final long finished = jobState.getFinishedTime();
 
-        LOGGER.info(makeCSVString(SchedulerEfficiencyTimeTest.class.getSimpleName(),
-                                  taskNumber,
-                                  rateLimit,
-                                  anActualTime,
-                                  ((anActualTime < rateLimit) ? SUCCESS : FAILURE)));
+        long latestTaskStart = Long.MIN_VALUE;
+        for (TaskState taskState : jobState.getTasks()) {
+            if (taskState.getStartTime() > latestTaskStart) {
+                latestTaskStart = taskState.getStartTime();
+            }
+        }
+        long TCT = submited - start;
+        long TST = latestTaskStart - submited;
+        long TTT = finished - latestTaskStart - (TASK_DURATION * 1000);
 
-        assertThat(String.format("Task creation rate for job with %s tasks", taskNumber),
-                   anActualTime,
-                   lessThan(rateLimit));
-
+        logAndAssert("TaskCreationTimeTest", TCT);
+        logAndAssert("TaskSchedulingTimeTest", TST);
+        logAndAssert("TaskTerminationTimeTest", TTT);
     }
 
-    private long computeSchedulerEfficiencyTime(JobState jobState) {
-        final long optimalJobDuration = Long.valueOf(jobState.getVariables().get(OPTIMAL_JOB_DURATION).getValue());
-        final long actualJobDuration = jobState.getFinishedTime() - jobState.getStartTime();
-        return actualJobDuration - optimalJobDuration;
+    private void logAndAssert(String name, long value) {
+        LOGGER.info(makeCSVString(name, taskNumber, timeLimit, value, ((value < timeLimit) ? SUCCESS : FAILURE)));
+
+        assertThat(String.format("%s for job with %d tasks", name, taskNumber), value, lessThan(timeLimit));
     }
 
     public static TaskFlowJob createJob(int taskNumber, int taskDuration) throws Exception {

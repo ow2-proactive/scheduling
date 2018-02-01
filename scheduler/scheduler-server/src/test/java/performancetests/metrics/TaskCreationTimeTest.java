@@ -38,6 +38,7 @@ import org.junit.runners.Parameterized;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
 import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.PeformanceTestBase;
@@ -74,15 +75,17 @@ public class TaskCreationTimeTest extends PeformanceTestBase {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                                               SchedulerEfficiencyTimeTest.SCHEDULER_CONFIGURATION_START.getPath(),
-                                               SchedulerEfficiencyTimeTest.RM_CONFIGURATION_START.getPath(),
+                                               SchedulerEfficiencyMetricsTest.SCHEDULER_CONFIGURATION_START.getPath(),
+                                               SchedulerEfficiencyMetricsTest.RM_CONFIGURATION_START.getPath(),
                                                null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", 1);
 
+        final TaskFlowJob job = SchedulerEfficiencyMetricsTest.createJob(taskNumber, TASK_DURATION);
+
         final long start = System.currentTimeMillis();
 
-        final JobId jobId = schedulerHelper.submitJob(SchedulerEfficiencyTimeTest.createJob(taskNumber, TASK_DURATION));
+        final JobId jobId = schedulerHelper.submitJob(job);
 
         final long anActualTime = System.currentTimeMillis() - start;
 
