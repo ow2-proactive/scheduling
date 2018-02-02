@@ -31,6 +31,10 @@
 					<code language="javascript">
 						<![CDATA[
 print("ok");
+			variables.put("INHERITED_VAR1", "inherited_value")
+			variables.put("INHERITED_VAR2", "inherited_value_\${PA_JOB_ID}")
+			variables.put("INHERITED_VAR3", "inherited_value_\${TASK_VAR1}")
+			variables.put("INHERITED_VAR4", "inherited_value_\${INHERITED_VAR1}")
 ]]>
 					</code>
 				</script>
@@ -78,10 +82,6 @@ print("ok");
 			check_var_equals("test","initialValue",path2)
 			check_gi_equals("firstTaskGI","generic1",path2)
 
-			variables.put("INHERITED_VAR1", "inherited_value")
-			variables.put("INHERITED_VAR2", "inherited_value_\${PA_JOB_ID}")
-			variables.put("INHERITED_VAR3", "inherited_value_\${TASK_VAR1}")
-			variables.put("INHERITED_VAR4", "inherited_value_\${INHERITED_VAR1}")
                     	]]>
 					</code>
 				</script>
@@ -132,7 +132,7 @@ variables.put("var4", "propagatedVar4");
 										name, value, path ->
 											if (!value.equals(variables.get(name)))
 											{
-												writeFile(path,("Variables: " + name + " is not equal to " + variables.get(name)))
+												writeFile(path,("Variables: " + name + ", EXPECTED: '" + value + "' got '" + variables.get(name) + "'"))
 											}
 									}
 			def check_gi_equals = {
@@ -155,16 +155,16 @@ variables.put("var4", "propagatedVar4");
 
 			check_var_equals("WORKFLOW_VAR1", "workflow_value",path2)
 			check_var_equals("WORKFLOW_VAR2", "var2_workflow_value",path2)
-			check_var_equals("WORKFLOW_VAR3", "workflow_value",path2)
+			check_var_equals("WORKFLOW_VAR3", "workflow_value_" + variables.get("PA_JOB_ID"),path2)
 			check_var_equals("WORKFLOW_VAR4", "workflow_value_task_value",path2)
 
 			check_var_equals("TASK_VAR1", "task_value",path2)
-			check_var_equals("TASK_VAR2", "task_value_" + SchedulerVars.PA_JOB_ID.toString(),path2)
+			check_var_equals("TASK_VAR2", "task_value_" + variables.get("PA_JOB_ID"),path2)
 			check_var_equals("TASK_VAR3", "task_value_task_value",path2)
 			check_var_equals("TASK_VAR4", "task_value_inherited_value",path2)
 
 			check_var_equals("INHERITED_VAR1", "inherited_value",path2)
-			check_var_equals("INHERITED_VAR2", "inherited_value_" + SchedulerVars.PA_JOB_ID.toString(),path2)
+			check_var_equals("INHERITED_VAR2", "inherited_value_" + variables.get("PA_JOB_ID"),path2)
 			check_var_equals("INHERITED_VAR3", "inherited_value_task_value",path2)
 			check_var_equals("INHERITED_VAR4", "inherited_value_inherited_value",path2)
                     	]]>

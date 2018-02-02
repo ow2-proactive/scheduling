@@ -209,7 +209,10 @@ public class RMProxyActiveObject {
 
             //start handler for binding
             ScriptHandler handler = ScriptLoader.createHandler(nodes.get(0));
-            handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
+            VariablesMap resolvedMap = new VariablesMap();
+            resolvedMap.setInheritedMap(VariableSubstitutor.resolveVariables(variables.getInheritedMap(), dictionary));
+            resolvedMap.setScopeMap(VariableSubstitutor.resolveVariables(variables.getScopeMap(), dictionary));
+            handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) resolvedMap);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
 
             //retrieve scheduler URL to bind with schedulerapi, globalspaceapi, and userspaceapi
