@@ -13,6 +13,10 @@
 		<variable name="test" value="value_of_test"/>
 		<variable name="var1" value="jobVar1"/>
 		<variable name="var2" value="jobVar2"/>
+		<variable name="WORKFLOW_VAR1" value="workflow_value"/>
+		<variable name="WORKFLOW_VAR2" value="var2_$WORKFLOW_VAR1"/>
+		<variable name="WORKFLOW_VAR3" value="workflow_value_${PA_JOB_ID}"/>
+		<variable name="WORKFLOW_VAR4" value="workflow_value_${TASK_VAR1}"/>
 	</variables>
 	<taskFlow>
 		<task name="SuccessTask">
@@ -73,6 +77,11 @@ print("ok");
 			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
 			check_var_equals("test","initialValue",path2)
 			check_gi_equals("firstTaskGI","generic1",path2)
+
+			variables.put("INHERITED_VAR1", "inherited_value")
+			variables.put("INHERITED_VAR2", "inherited_value_\${PA_JOB_ID}")
+			variables.put("INHERITED_VAR3", "inherited_value_\${TASK_VAR1}")
+			variables.put("INHERITED_VAR4", "inherited_value_\${INHERITED_VAR1}")
                     	]]>
 					</code>
 				</script>
@@ -137,6 +146,21 @@ variables.put("var4", "propagatedVar4");
 			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
 			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
 			check_var_equals("test","newValue",path2)
+
+			check_var_equals("WORKFLOW_VAR1", "workflow_value")
+			check_var_equals("WORKFLOW_VAR2", "var2_workflow_value")
+			check_var_equals("WORKFLOW_VAR3", "workflow_value")
+			check_var_equals("WORKFLOW_VAR4", "workflow_value_task_value")
+
+			check_var_equals("TASK_VAR1", "task_value")
+			check_var_equals("TASK_VAR2", "task_value_" + SchedulerVars.PA_JOB_ID.toString())
+			check_var_equals("TASK_VAR3", "task_value_task_value")
+			check_var_equals("TASK_VAR4", "task_value_inherited_value")
+
+			check_var_equals("INHERITED_VAR1", "inherited_value")
+			check_var_equals("INHERITED_VAR2", "inherited_value_" + SchedulerVars.PA_JOB_ID.toString())
+			check_var_equals("INHERITED_VAR3", "inherited_value_task_value")
+			check_var_equals("INHERITED_VAR4", "inherited_value_inherited_value")
                     	]]>
 					</code>
 				</script>
