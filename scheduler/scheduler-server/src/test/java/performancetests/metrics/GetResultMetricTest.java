@@ -101,7 +101,7 @@ public class GetResultMetricTest extends PeformanceTestBase {
 
         long timeToGetResult = System.currentTimeMillis() - start - (taskDuration * 1000);
 
-        LOGGER.info(makeCSVString(TaskCreationTimeTest.class.getSimpleName(),
+        LOGGER.info(makeCSVString(GetResultMetricTest.class.getSimpleName(),
                                   taskNumber,
                                   timeLimit,
                                   timeToGetResult,
