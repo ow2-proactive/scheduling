@@ -109,4 +109,5 @@ public class PeformanceTestBase extends SchedulerFunctionalTestWithCustomConfigA
         assertEquals(2, result.size());
         return result;
     }
+
 }

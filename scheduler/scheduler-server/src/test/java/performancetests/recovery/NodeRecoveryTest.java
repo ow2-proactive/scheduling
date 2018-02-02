@@ -54,7 +54,7 @@ import performancetests.helper.LogProcessor;
  * @author ActiveEon Team
  * @since 01/12/17
  */
-@RunWith(Parameterized.class)
+//@RunWith(Parameterized.class)
 public class NodeRecoveryTest extends PeformanceTestBase {
 
     private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
@@ -69,7 +69,7 @@ public class NodeRecoveryTest extends PeformanceTestBase {
      * @return an array of parameters which is used by JUnit to create objects of NodeRecoveryTest,
      * where first value represents nodes number to recover, and second value sets time limit to recovery.
      */
-    @Parameters
+//    @Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] { { 10, 2000 }, { 100, 5000 }, { 500, 30000 } });
     }
@@ -117,7 +117,7 @@ public class NodeRecoveryTest extends PeformanceTestBase {
         assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
     }
 
-    @Test(timeout = 3600000)
+//    @Test(timeout = 3600000)
     public void test() {
         try {
             // it should be inside Test case and not in Before case, because
@@ -147,7 +147,7 @@ public class NodeRecoveryTest extends PeformanceTestBase {
         }
     }
 
-    @After
+//    @After
     public void shutdownRmHelper() throws Exception {
         try {
             rmHelper.removeNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME);

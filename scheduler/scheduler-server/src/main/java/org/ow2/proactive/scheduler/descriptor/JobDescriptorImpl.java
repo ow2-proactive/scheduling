@@ -690,7 +690,7 @@ public class JobDescriptorImpl implements JobDescriptor {
      * {@inheritDoc}
      */
     public void restoreRunningTasks() {
-        final String performanceTestOngoing = System.getProperty("performance.test.ongoing");
+        final String performanceTestOngoing = System.getProperty("performanceTestOngoing");
         if (performanceTestOngoing != null && performanceTestOngoing.equalsIgnoreCase("true")) {
             logger.info(STARTING_TASK_RECOVERY_FOR_JOB + jobId);
         }
