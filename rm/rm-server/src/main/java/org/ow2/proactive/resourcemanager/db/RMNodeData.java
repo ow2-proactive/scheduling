@@ -305,27 +305,6 @@ public class RMNodeData implements Serializable {
         this.description = description;
     }
 
-    public RMNodeEvent createNodeEvent(String nodeSourceName) {
-
-        RMNodeDescriptor rmNodeDescriptor = new RMNodeDescriptor();
-        rmNodeDescriptor.setNodeURL(nodeUrl);
-        rmNodeDescriptor.setDefaultJMXUrl(jmxUrls == null ? null : jmxUrls[JMXTransportProtocol.RMI.ordinal()]);
-        rmNodeDescriptor.setDescriptorVMName(jvmName);
-        rmNodeDescriptor.setHostName(hostname);
-        rmNodeDescriptor.setLocked(locked);
-        rmNodeDescriptor.setLockedBy(getLockedBy() == null ? null : getLockedBy().getName());
-        rmNodeDescriptor.setLockTime(getLockTime());
-        rmNodeDescriptor.setNodeSourceName(nodeSourceName);
-        rmNodeDescriptor.setOwnerName(getOwner() == null ? null : getOwner().getName());
-        rmNodeDescriptor.setProactiveJMXUrl(jmxUrls == null ? null : jmxUrls[JMXTransportProtocol.RO.ordinal()]);
-        rmNodeDescriptor.setProviderName(getProvider() == null ? null : getProvider().getName());
-        rmNodeDescriptor.setState(getState());
-        rmNodeDescriptor.setStateChangeTime(getStateChangeTime());
-        rmNodeDescriptor.setVNodeName(jvmName);
-
-        return new RMNodeEvent(rmNodeDescriptor, null, null, null);
-    }
-
     /**
      * Say whether the current node data structure reflects a particular
      * instance of {@link Node}.

@@ -36,6 +36,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 
 
 /**
@@ -88,11 +89,11 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
                     }
                 }
 
-                for (RMNodeData lostNode : nodeSource.getDeployingNodes()) {
+                for (RMDeployingNode lostNode : nodeSource.getDeployingAndLostNodes()) {
                     if (!lostNode.getState().equals(NodeState.LOST)) {
                         continue;
                     }
-                    String nodeUrl = lostNode.getNodeUrl();
+                    String nodeUrl = lostNode.getNodeURL();
 
                     logger.info("Removing lost node " + nodeUrl);
                     BooleanWrapper removed = nodeSource.getRMCore().removeNode(nodeUrl, true);

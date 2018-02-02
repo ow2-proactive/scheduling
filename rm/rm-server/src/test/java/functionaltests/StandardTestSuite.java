@@ -51,6 +51,8 @@ import functionaltests.nodesource.TestLocalInfrastructureTimeSlotPolicy;
 import functionaltests.nodesource.TestNodeSourceAfterRestart;
 import functionaltests.nodesource.TestSSHInfrastructureV2;
 import functionaltests.nodesource.TestSSHInfrastructureV2RestartDownNodesPolicy;
+import functionaltests.nodesrecovery.RecoverLocalInfrastructureTest;
+import functionaltests.nodesrecovery.RecoverSSHInfrastructureV2Test;
 import functionaltests.nodestate.TestAddRemoveAll;
 import functionaltests.nodestate.TestAdminAddingNodes;
 import functionaltests.nodestate.TestConcurrentUsers;
@@ -84,7 +86,7 @@ import functionaltests.topology.SelectionTest;
                       DynamicSelectionScriptTest.class, SelectionWithNodesExclusionTest.class,
                       SelectionWithSeveralScriptsTest.class, SelectionWithSeveralScriptsTest2.class,
                       StaticSelectionScriptTest.class, UnauthorizedSelectionScriptTest.class, LocalSelectionTest.class,
-                      SelectionTest.class })
+                      SelectionTest.class, RecoverLocalInfrastructureTest.class, RecoverSSHInfrastructureV2Test.class })
 
 /**
  * @author ActiveEon Team

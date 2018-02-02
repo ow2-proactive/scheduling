@@ -236,12 +236,12 @@ public abstract class InfrastructureManager implements Serializable {
      *
      * @return nodes whose registration status is deploying or lost.
      */
-    public List<RMNodeData> getDeployingAndLostNodesData() {
-        List<RMNodeData> deployingAndLostNodes = new LinkedList<>();
+    public List<RMDeployingNode> getDeployingAndLostNodes() {
+        List<RMDeployingNode> deployingAndLostNodes = new LinkedList<>();
         readLock.lock();
         try {
-            deployingAndLostNodes.addAll(getDeployingNodesDataWithLock());
-            deployingAndLostNodes.addAll(getLostNodesDataWithLock());
+            deployingAndLostNodes.addAll(getDeployingNodesWithLock());
+            deployingAndLostNodes.addAll(getLostNodesWithLock());
         } catch (RuntimeException e) {
             logger.error("Exception while getting deploying and lost nodes: " + e.getMessage());
             throw e;
@@ -483,8 +483,8 @@ public abstract class InfrastructureManager implements Serializable {
     public final void internalShutDown() {
         shutDown.set(true);
         // first removing deploying nodes
-        for (RMNodeData deployingNodesData : getDeployingNodesDataWithLock()) {
-            this.internalRemoveDeployingNode(deployingNodesData.getNodeUrl());
+        for (RMDeployingNode deployingNode : getDeployingNodesWithLock()) {
+            this.internalRemoveDeployingNode(deployingNode.getNodeURL());
         }
         // no need to remove lost nodes, implementation is notified
         // at the timeout of the deploying node
@@ -1170,16 +1170,14 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private List<RMNodeData> getDeployingNodesDataWithLock() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<List<RMNodeData>>() {
+    private List<RMDeployingNode> getDeployingNodesWithLock() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<List<RMDeployingNode>>() {
             @Override
-            public List<RMNodeData> handle() {
-                List<RMNodeData> deployingNodesData = new LinkedList<>();
+            public List<RMDeployingNode> handle() {
+                List<RMDeployingNode> deployingNodesCopy = new LinkedList<>();
                 Collection<RMDeployingNode> deployingNodes = deployingNodesMap.values();
-                for (RMDeployingNode deployingNode : deployingNodes) {
-                    deployingNodesData.add(RMNodeData.createRMNodeData(deployingNode));
-                }
-                return deployingNodesData;
+                deployingNodesCopy.addAll(deployingNodes);
+                return deployingNodesCopy;
             }
         });
     }
@@ -1234,16 +1232,14 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private List<RMNodeData> getLostNodesDataWithLock() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<List<RMNodeData>>() {
+    private List<RMDeployingNode> getLostNodesWithLock() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<List<RMDeployingNode>>() {
             @Override
-            public List<RMNodeData> handle() {
-                List<RMNodeData> lostNodesData = new LinkedList<>();
+            public List<RMDeployingNode> handle() {
+                List<RMDeployingNode> lostNodesCopy = new LinkedList<>();
                 Collection<RMDeployingNode> lostNodes = lostNodesMap.values();
-                for (RMDeployingNode lostNode : lostNodes) {
-                    lostNodesData.add(RMNodeData.createRMNodeData(lostNode));
-                }
-                return lostNodesData;
+                lostNodesCopy.addAll(lostNodes);
+                return lostNodesCopy;
             }
         });
     }

@@ -364,7 +364,7 @@ public class RMCoreTest {
                                                      null,
                                                      AbstractRMNode.LOCK_TIME_INITIAL_VALUE);
 
-        doReturn(rmNode).when(mockedNodeSource).getDeployingNode(rmNode.getNodeURL());
+        doReturn(rmNode).when(mockedNodeSource).getDeployingOrLostNode(rmNode.getNodeURL());
 
         RMNode rmNodeFound = rmCore.getNodeByUrlIncludingDeployingNodes(rmNode.getNodeURL());
         assertThat(rmNodeFound).isSameAs(rmNode);
