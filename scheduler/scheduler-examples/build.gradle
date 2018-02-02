@@ -1,6 +1,8 @@
 dependencies {
     compile(
             project(':scheduler:scheduler-api'),
+            "org.objectweb.proactive:programming-core:${programmingVersion}",
+            "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
     )
 }
 
