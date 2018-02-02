@@ -241,8 +241,8 @@ public abstract class InfrastructureManager implements Serializable {
      *
      * @return nodes whose registration status is deploying or lost.
      */
-    public ArrayList<RMDeployingNode> getDeployingAndLostNodes() {
-        ArrayList<RMDeployingNode> result;
+    public List<RMDeployingNode> getDeployingAndLostNodes() {
+        List<RMDeployingNode> result;
         readLock.lock();
         try {
             Collection<RMDeployingNode> rmDeployingNodes = getDeployingNodesWithLock();
@@ -1024,10 +1024,6 @@ public abstract class InfrastructureManager implements Serializable {
             previousDeployingNode = null;
         }
         return previousDeployingNode;
-    }
-
-    private boolean nodesRecoveryEnabled() {
-        return PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
     }
 
     private void internalInitializePersistedInfraVariables() {
