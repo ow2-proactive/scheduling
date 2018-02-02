@@ -528,11 +528,4 @@ public class SchedulerMonitorsHandler {
         }
     }
 
-    public HashMap<JobId, List<JobEventMonitor>> getJobsEvents() {
-        return jobsEvents;
-    }
-
-    public HashMap<TaskIdWrapper, List<TaskEventMonitor>> getTasksEvents() {
-        return tasksEvents;
-    }
 }

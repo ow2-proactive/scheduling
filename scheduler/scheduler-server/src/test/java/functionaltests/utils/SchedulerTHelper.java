@@ -1016,7 +1016,7 @@ public class SchedulerTHelper {
         SchedulerTestUser.getInstance().getMonitorsHandler().waitForFinishedJob(id, timeout);
     }
 
-    public SchedulerMonitorsHandler getSchedulerMonitorsHandler() {
+    private SchedulerMonitorsHandler getSchedulerMonitorsHandler() {
         return SchedulerTestUser.getInstance().getMonitorsHandler();
     }
 
