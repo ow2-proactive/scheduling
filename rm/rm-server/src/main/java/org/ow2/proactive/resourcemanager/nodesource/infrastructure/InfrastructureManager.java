@@ -25,8 +25,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
-import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +53,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
+import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
@@ -89,22 +89,21 @@ public abstract class InfrastructureManager implements Serializable {
     /** class' logger */
     protected static final Logger logger = Logger.getLogger(InfrastructureManager.class);
 
-    /** delay that is waited at startup of the scheduler to initialize the
-     * variables and persist them
-     */
-    private static final int PERSISTED_INFRA_VARIABLES_INIT_DELAY = 2000;
-
     /** manager's node source */
     protected NodeSource nodeSource;
 
-    /** key to retrieve the deploying nodes list: Map<String, RMDeployingNode> */
-    private static final String DEPLOYING_NODES_KEY = "infrastructureManagerDeployingNodes";
+    /** key to retrieve the deploying nodes URL set (Set<String>) */
+    private static final String DEPLOYING_NODES_URL_KEY = "infrastructureManagerDeployingNodes";
 
-    /** key to retrieve the lost nodes list: Map<String, RMDeployingNode> */
-    private static final String LOST_NODES_KEY = "infrastructureManagerLostNodes";
+    private final Map<String, RMDeployingNode> deployingNodesMap = new HashMap<>();
 
-    /** key to retrieve the acquired nodes set in the persisted infrastructure variables: */
-    private static final String ACQUIRED_NODES_KEY = "infrastructureManagerAcquiredNodes";
+    /** key to retrieve the lost nodes URL list: (Set<String>) */
+    private static final String LOST_NODES_URL_KEY = "infrastructureManagerLostNodes";
+
+    private final Map<String, RMDeployingNode> lostNodesMap = new HashMap<>();
+
+    /** key to retrieve the acquired nodes name set (Set<String>) */
+    private static final String ACQUIRED_NODES_NAME_KEY = "infrastructureManagerAcquiredNodesNameSetKey";
 
     private static final String USING_DEPLOYING_NODES_KEY = "usingDeployingNodes";
 
@@ -237,51 +236,46 @@ public abstract class InfrastructureManager implements Serializable {
      *
      * @return nodes whose registration status is deploying or lost.
      */
-    public ArrayList<RMDeployingNode> getDeployingNodes() {
-        ArrayList<RMDeployingNode> result;
+    public List<RMDeployingNode> getDeployingAndLostNodes() {
+        List<RMDeployingNode> deployingAndLostNodes = new LinkedList<>();
         readLock.lock();
         try {
-            Collection<RMDeployingNode> rmDeployingNodes = valuesDeployingNodes();
-            Collection<RMDeployingNode> rmLostNodes = valuesLostNodes();
-            result = new ArrayList<>(rmDeployingNodes.size() + rmLostNodes.size());
-            result.addAll(rmDeployingNodes);
-            result.addAll(rmLostNodes);
+            deployingAndLostNodes.addAll(getDeployingNodesWithLock());
+            deployingAndLostNodes.addAll(getLostNodesWithLock());
         } catch (RuntimeException e) {
             logger.error("Exception while getting deploying and lost nodes: " + e.getMessage());
             throw e;
         } finally {
             readLock.unlock();
         }
-        return result;
+        return deployingAndLostNodes;
     }
 
-    public RMDeployingNode getDeployingNode(String nodeUrl) {
-
-        RMDeployingNode deployingNode = getDeployingNodeFromPersistedInfraVariables(nodeUrl);
-
+    public RMDeployingNode getDeployingOrLostNode(String nodeUrl) {
+        RMDeployingNode deployingNode = getDeployingNodeWithLock(nodeUrl);
         if (deployingNode == null) {
-            return getLostNodeFromPersistedInfraVariables(nodeUrl);
+            return getLostNodeWithLock(nodeUrl);
+        } else {
+            return deployingNode;
         }
-
-        return deployingNode;
     }
 
     /**
      * To remove a deploying node given its url
      *
-     * @param pnUrl
+     * @param nodeUrl
      *            the url of the deploying node to remove.
      * @return true if successful, false otherwise
      */
-    public final boolean internalRemoveDeployingNode(String pnUrl) {
-        RMDeployingNode pn = null;
+    public final boolean internalRemoveDeployingNode(String nodeUrl) {
+        RMDeployingNode removedDeployingNode;
         boolean isLost = false;
 
         writeLock.lock();
         try {
-            pn = removeDeployingNode(pnUrl);
-            if (pn == null) {
-                pn = removeLostNode(pnUrl);
+            removedDeployingNode = removeDeployingNode(nodeUrl);
+            if (removedDeployingNode == null) {
+                removedDeployingNode = removeLostNode(nodeUrl);
                 isLost = true;
             }
         } catch (RuntimeException e) {
@@ -292,19 +286,20 @@ public abstract class InfrastructureManager implements Serializable {
         }
 
         // if such a deploying or lost node exists
-        if (pn != null) {
-            String url = pn.getNodeURL();
-            RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_REMOVED, pn.getState(), pn.getProvider().getName());
+        if (removedDeployingNode != null) {
+            RMNodeEvent event = removedDeployingNode.createNodeEvent(RMEventType.NODE_REMOVED,
+                                                                     removedDeployingNode.getState(),
+                                                                     removedDeployingNode.getProvider().getName());
             emitEvent(event);
-            logger.trace("DeployingNode " + url + " removed from IM");
+            logger.trace("DeployingNode " + nodeUrl + " removed from IM");
             // one notifies listeners about the deploying node removal
             // if the node is not lost
             if (!isLost) {
-                this.notifyDeployingNodeLost(pn.getNodeURL());
+                this.notifyDeployingNodeLost(nodeUrl);
             }
             return true;
         } else {
-            logger.trace("DeployingNode: " + pnUrl + " no more managed by IM, cannot remove it");
+            logger.trace("DeployingNode: " + nodeUrl + " no more managed by IM, cannot remove it");
             return false;
         }
     }
@@ -320,7 +315,7 @@ public abstract class InfrastructureManager implements Serializable {
     public final void internalRemoveNode(Node node) throws RMException {
         writeLock.lock();
         try {
-            getAcquiredNodesMap().remove(node.getNodeInformation().getName());
+            unregisterAcquiredNodeWithLockAndPersist(node.getNodeInformation().getName());
             this.removeNode(node);
         } catch (Exception e) {
             logger.warn("Exception occurred while removing node " + node);
@@ -359,7 +354,7 @@ public abstract class InfrastructureManager implements Serializable {
      * @param nodeName the node to remove
      */
     protected void removeDownNodePriorToNotify(String nodeName) {
-        removeAcquiredNode(nodeName);
+        unregisterAcquiredNodeWithLockAndPersist(nodeName);
     }
 
     /**
@@ -387,32 +382,30 @@ public abstract class InfrastructureManager implements Serializable {
      *            the newly added node
      * @throws RMException
      */
-    public final RMDeployingNode internalRegisterAcquiredNode(Node node) throws RMException {
-        // if implementation doesn't use deploying nodes, we just execute
-        // factory method and return
-
+    public final void internalRegisterAcquiredNode(Node node) throws RMException {
+        // if implementation doesn't have the notion of deploying nodes (and
+        // in this case, useDeployingNodes should be set to false), we just
+        // trigger the node acquisition and return
         if (!isUsingDeployingNode()) {
             this.notifyAcquiredNode(node);
-            return null;
+            return;
         }
-        // here we use deploying nodes and timeout
-        RMDeployingNode pn;
-        // we build the url of the associated deploying node
+
+        // otherwise, we use a timeout logic for deploying nodes
         String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
 
         writeLock.lock();
         try {
-            pn = removeDeployingNode(deployingNodeURL);
+            RMDeployingNode removedDeployingNode = removeDeployingNode(deployingNodeURL);
             // if a deploying node with this name exists, one runs the
             // implementation callback
-            if (pn != null) {
-                RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_REMOVED,
-                                                       pn.getState(),
-                                                       pn.getProvider().getName());
+            if (removedDeployingNode != null) {
+                RMNodeEvent event = removedDeployingNode.createNodeEvent(RMEventType.NODE_REMOVED,
+                                                                         removedDeployingNode.getState(),
+                                                                         removedDeployingNode.getProvider().getName());
                 emitEvent(event);
                 this.notifyAcquiredNode(node);
-                // if everything went well with the new node, caching it
-                putAcquiredNode(node.getNodeInformation().getName());
+                registerAcquiredNodeWithLockAndPersist(node.getNodeInformation().getName());
             } else {
                 String url = node.getNodeInformation().getURL();
                 logger.warn("Not expected node registered, discarding it: " + url);
@@ -424,8 +417,6 @@ public abstract class InfrastructureManager implements Serializable {
         } finally {
             writeLock.unlock();
         }
-
-        return pn;
     }
 
     /**
@@ -438,11 +429,6 @@ public abstract class InfrastructureManager implements Serializable {
      */
     protected List<String> addMultipleDeployingNodes(List<String> nodeNames, String obfuscatedCmd, String message,
             long nodeTimeout) {
-        try {
-            Thread.sleep(PERSISTED_INFRA_VARIABLES_INIT_DELAY);
-        } catch (InterruptedException e) {
-            logger.warn("Could not wait for persisted infrastructure variables init delay to end", e);
-        }
         List<String> answer = new ArrayList<>(nodeNames.size());
         for (String nodeName : nodeNames) {
             String depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, message, nodeTimeout);
@@ -497,12 +483,12 @@ public abstract class InfrastructureManager implements Serializable {
     public final void internalShutDown() {
         shutDown.set(true);
         // first removing deploying nodes
-        for (String dnUrl : keySetDeployingNodes()) {
-            this.internalRemoveDeployingNode(dnUrl);
+        for (RMDeployingNode deployingNode : getDeployingNodesWithLock()) {
+            this.internalRemoveDeployingNode(deployingNode.getNodeURL());
         }
         // no need to remove lost nodes, implementation is notified
         // at the timeout of the deploying node
-        clearDeployingNodes();
+        clearDeployingNodesWithLockAndPersist();
         // delegating the call to the implementation
         this.shutDown();
 
@@ -632,9 +618,7 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     private void getAndPersistNodeSourceData(String nodeSourceName) {
-        if (dbManager == null) {
-            setRmDbManager(RMDBManager.getInstance());
-        }
+        createDBManagerIfNull();
         if (nodeSourceData == null) {
             logger.debug("Node source data of node source " + nodeSourceName + " needs to be retrieved from database");
             nodeSourceData = dbManager.getNodeSource(nodeSourceName);
@@ -644,6 +628,12 @@ public abstract class InfrastructureManager implements Serializable {
             dbManager.updateNodeSource(nodeSourceData);
         } else {
             logger.warn("Node source " + nodeSourceName + " is unknown. Cannot persist infrastructure variables");
+        }
+    }
+
+    private void createDBManagerIfNull() {
+        if (dbManager == null) {
+            setRmDbManager(RMDBManager.getInstance());
         }
     }
 
@@ -731,7 +721,7 @@ public abstract class InfrastructureManager implements Serializable {
         }
         // if the user calls this method, we use the require nodes/timeout
         // mecanism
-        setUsingDeployingNodes(true);
+        setUsingDeployingNodesWithLockAndPersist();
         NodeSource nsStub = this.nodeSource.getStub();
         RMDeployingNode deployingNode = RMDeployingNodeAccessor.getDefault().newRMDeployingNode(name,
                                                                                                 nsStub,
@@ -739,25 +729,7 @@ public abstract class InfrastructureManager implements Serializable {
                                                                                                 nsStub.getAdministrator(),
                                                                                                 description);
         final String deployingNodeUrl = deployingNode.getNodeURL();
-        putDeployingNode(deployingNodeUrl, deployingNode);
-
-        if (RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
-            logger.debug("Checking lock status for node " + deployingNodeUrl);
-            nodeSource.setDeploying(deployingNode);
-            // The value for 'deployingNode' is retrieved before calling 'nodeSource.setDeploying'
-            // However, 'nodeSource.setDeploying' may lock the node that is currently handled
-            // (e.g. node lock restoration on RM startup) and thus update 'deployingNodes'.
-            // In such a case, the 'deployingNodes' collection is updated with a new deploying node instance which has the
-            // same URL as 'deployingNode' but different state information (e.g. lock status).
-            // This is due to deep copies made by ProActive Programming with method invocation on Active Objects.
-            // As a consequence, the 'deployingNode' variable must be updated with the last value available
-            // in the 'deployingNodes' collection
-            deployingNode = getDeployingNode(deployingNodeUrl);
-        }
-
-        if (logger.isTraceEnabled()) {
-            logger.trace("New DeployingNode " + name + " instantiated in IM");
-        }
+        addDeployingNode(deployingNode);
 
         RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_ADDED,
                                                           null,
@@ -773,34 +745,6 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * To update the description of a deploying node. If a timeout has occurred
-     * for this node, the update is discarded.
-     *
-     * @param toUpdateURL
-     *            The RMDeployingNode's URL whose description will be updated.
-     * @param newDescription
-     *            The new description
-     * @return true in case of success, false if the deploying node is not
-     *         managed by the IM anymore.
-     */
-    protected final boolean updateDeployingNodeDescription(String toUpdateURL, String newDescription) {
-        RMDeployingNode pn = getDeployingNodeFromPersistedInfraVariables(toUpdateURL);
-        if (pn != null) {
-            NodeState previousState = pn.getState();
-            RMDeployingNodeAccessor.getDefault().setDescription(pn, newDescription);
-            RMNodeEvent event = pn.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                                                   previousState,
-                                                   pn.getProvider().getName());
-            emitEvent(event);
-            logger.trace("DeployingNode " + toUpdateURL + " updated in IM");
-            return true;
-        } else {
-            logger.trace("DeployingNode " + toUpdateURL + " no more managed by the IM, cannot update it");
-            return false;
-        }
-    }
-
-    /**
      * Declares a deploying node lost. Future attempts to modify the deploying
      * node will be ignored.
      *
@@ -811,14 +755,14 @@ public abstract class InfrastructureManager implements Serializable {
      * @return true if the method ran successfully, false otherwise.
      */
     protected final boolean declareDeployingNodeLost(String toUpdateURL, String description) {
-        RMDeployingNode deployingNode;
+        RMDeployingNode removedDeployingNode;
         // we need to atomically move the node from the deploying collection to
         // the lost one.
         writeLock.lock();
         try {
-            deployingNode = removeDeployingNode(toUpdateURL);
-            if (deployingNode != null) {
-                putLostNode(toUpdateURL, deployingNode);
+            removedDeployingNode = removeDeployingNode(toUpdateURL);
+            if (removedDeployingNode != null) {
+                addLostNode(removedDeployingNode);
             }
         } catch (RuntimeException e) {
             logger.error("Exception while moving a node from deploying to lost: " + e.getMessage());
@@ -827,17 +771,19 @@ public abstract class InfrastructureManager implements Serializable {
             writeLock.unlock();
         }
 
-        if (deployingNode != null) {
+        if (removedDeployingNode != null) {
             logger.warn("Declaring node as lost: " + toUpdateURL + ", " + description);
-            NodeState previousState = deployingNode.getState();
-            RMDeployingNodeAccessor.getDefault().setLost(deployingNode);
+            NodeState previousState = removedDeployingNode.getState();
+            RMDeployingNodeAccessor.getDefault().setLost(removedDeployingNode);
             if (description != null) {
-                RMDeployingNodeAccessor.getDefault().setDescription(deployingNode, description);
+                RMDeployingNodeAccessor.getDefault().setDescription(removedDeployingNode, description);
             }
 
-            RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                                                              previousState,
-                                                              deployingNode.getProvider().getName());
+            persistUpdatedRMDeployingNodeIfRecoveryEnabled(removedDeployingNode);
+
+            RMNodeEvent event = removedDeployingNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                                     previousState,
+                                                                     removedDeployingNode.getProvider().getName());
             emitEvent(event);
 
             if (logger.isTraceEnabled()) {
@@ -877,7 +823,7 @@ public abstract class InfrastructureManager implements Serializable {
     protected final boolean checkNodeIsAcquiredAndDo(String nodeName, Runnable toRunWhenOK, Runnable toRunWhenKO) {
         writeLock.lock();
         try {
-            if (containsKeyAcquiredNode(nodeName)) {
+            if (containsAcquiredNodeWithLock(nodeName)) {
                 checkNodePostAction(toRunWhenOK,
                                     "An exception occurred while running implementation's code whereas the node " +
                                                  nodeName + " was found.");
@@ -954,7 +900,7 @@ public abstract class InfrastructureManager implements Serializable {
                                                "\" is forbidden");
         }
         String pnURL = this.buildDeployingNodeURL(name);
-        if (containsKeyDeployingNode(pnURL) || containsKeyLostNode(pnURL)) {
+        if (containsDeployingNodeUrlWithLock(pnURL) || containsLostNodeWithLock(pnURL)) {
             throw new IllegalArgumentException(RMDeployingNode.class.getSimpleName() + " with the same name (\"" +
                                                name + "\") has already been created");
         }
@@ -972,25 +918,6 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
-     * Look for a {@link RMNode} in data structures holding lost and deploying
-     * nodes. It does not look into the acquired nodes because this data
-     * structure holds instances of {@link Node} and thus has no information
-     * about the acquired {@link RMNode}.
-     *
-     * @param nodeUrl
-     * @return a lost or deploying {@link RMNode} that could be found using the given URL, or null
-     */
-    public RMNode searchForNotAcquiredRmNode(String nodeUrl) {
-        if (containsKeyLostNode(nodeUrl)) {
-            return getLostNodeFromPersistedInfraVariables(nodeUrl);
-        }
-        if (containsKeyDeployingNode(nodeUrl)) {
-            return getDeployingNodeFromPersistedInfraVariables(nodeUrl);
-        }
-        return null;
-    }
-
-    /**
      * Called by the system every time a node that is DOWN reconnects
      * and changes its status to FREE or BUSY.
      *
@@ -1000,50 +927,39 @@ public abstract class InfrastructureManager implements Serializable {
         // to be overridden by children
     }
 
-    /**
-     * Updates a deploying node.
-     * <p>
-     * The update is performed on deploying nodes first.
-     * If no node if found, lost nodes are considered.
-     *
-     * @param rmNode the new deploying node instance to use.
-     * @return the previous value or {@code null}.
-     */
-    public RMDeployingNode update(RMDeployingNode rmNode) {
-        String nodeUrl = rmNode.getNodeURL();
-        RMDeployingNode previousDeployingNode;
-        if (rmNode.isLost() && containsKeyLostNode(nodeUrl)) {
-            previousDeployingNode = putLostNode(nodeUrl, rmNode);
-        } else if (containsKeyDeployingNode(nodeUrl)) {
-            previousDeployingNode = putDeployingNode(nodeUrl, rmNode);
+    protected void addDeployingNode(RMDeployingNode deployingNode) {
+        RMDeployingNode previousDeployingNode = addDeployingNodeWithLockAndPersist(deployingNode.getNodeURL(),
+                                                                                   deployingNode);
+        if (previousDeployingNode == null) {
+            persistNewRMDeployingNodeIfRecoveryEnabled(deployingNode);
         } else {
-            previousDeployingNode = null;
+            persistUpdatedRMDeployingNodeIfRecoveryEnabled(deployingNode);
         }
-        return previousDeployingNode;
     }
 
-    void addDeployingNode(RMDeployingNode node) {
-        putDeployingNode(node.getNodeURL(), node);
+    protected RMDeployingNode removeDeployingNode(String nodeUrl) {
+        RMDeployingNode removedDeployingNode = removeDeployingNodeWithLockAndPersist(nodeUrl);
+        persistRemovedRMDeployingNodeIfRecoveryEnabled(nodeUrl);
+        return removedDeployingNode;
     }
 
-    void addLostNode(RMDeployingNode node) {
-        putLostNode(node.getNodeURL(), node);
+    protected void addLostNode(RMDeployingNode lostNode) {
+        RMDeployingNode previousLostNode = addLostNodeWithLockAndPersist(lostNode.getNodeURL(), lostNode);
+        if (previousLostNode == null) {
+            persistNewRMDeployingNodeIfRecoveryEnabled(lostNode);
+        } else {
+            persistUpdatedRMDeployingNodeIfRecoveryEnabled(lostNode);
+        }
     }
 
-    Map<String, RMDeployingNode> getDeployingNodesDeployingState() {
-        return getDeployingNodesMap();
+    protected RMDeployingNode removeLostNode(String nodeUrl) {
+        RMDeployingNode removedLostNode = removeLostNodeWithLockAndPersist(nodeUrl);
+        persistRemovedRMDeployingNodeIfRecoveryEnabled(nodeUrl);
+        return removedLostNode;
     }
 
-    Map<String, RMDeployingNode> getDeployingNodesLostState() {
-        return getLostNodesMap();
-    }
-
-    private void internalInitializePersistedInfraVariables() {
-        persistedInfraVariables.put(DEPLOYING_NODES_KEY, new HashMap<String, RMDeployingNode>());
-        persistedInfraVariables.put(LOST_NODES_KEY, new HashMap<String, RMDeployingNode>());
-        persistedInfraVariables.put(ACQUIRED_NODES_KEY, new HashSet<String>());
-        persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, false);
-        persistedInfraVariables.put(RM_URL_KEY, "");
+    public void setPersistedNodeSourceData(NodeSourceData nodeSourceData) {
+        this.nodeSourceData = nodeSourceData;
     }
 
     /**
@@ -1055,8 +971,61 @@ public abstract class InfrastructureManager implements Serializable {
      */
     protected abstract void initializePersistedInfraVariables();
 
-    public void setPersistedNodeSourceData(NodeSourceData nodeSourceData) {
-        this.nodeSourceData = nodeSourceData;
+    private void internalInitializePersistedInfraVariables() {
+        persistedInfraVariables.put(DEPLOYING_NODES_URL_KEY, new HashSet<>());
+        persistedInfraVariables.put(LOST_NODES_URL_KEY, new HashSet<>());
+        persistedInfraVariables.put(ACQUIRED_NODES_NAME_KEY, new HashSet<>());
+        persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, false);
+        persistedInfraVariables.put(RM_URL_KEY, "");
+    }
+
+    /**
+     * Add the information of the given deploying node to the database.
+     *
+     * @param rmNode the node to add to the database
+     */
+    private void persistNewRMDeployingNodeIfRecoveryEnabled(RMDeployingNode rmNode) {
+        createDBManagerIfNull();
+        if (nodeRecoveryEnabled()) {
+            RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+            NodeSourceData persistedNodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
+            rmNodeData.setNodeSource(persistedNodeSourceData);
+            if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(persistedNodeSourceData.getName())) {
+                dbManager.addNode(rmNodeData);
+            }
+        }
+    }
+
+    /**
+     * Update the information of the given deploying node in database.
+     *
+     * @param rmNode the node to update in database
+     */
+    private void persistUpdatedRMDeployingNodeIfRecoveryEnabled(RMNode rmNode) {
+        createDBManagerIfNull();
+        if (nodeRecoveryEnabled()) {
+            RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
+            if (!NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(rmNode.getNodeSourceName())) {
+                dbManager.updateNode(rmNodeData);
+            }
+        }
+    }
+
+    /**
+     * Update the information of the given deploying node in database.
+     *
+     * @param nodeUrl the URL of the node to remove in database
+     */
+    private void persistRemovedRMDeployingNodeIfRecoveryEnabled(String nodeUrl) {
+        createDBManagerIfNull();
+        if (nodeRecoveryEnabled()) {
+            RMNodeData rmNodeData = new RMNodeData.Builder().nodeUrl(nodeUrl).build();
+            dbManager.removeNode(rmNodeData);
+        }
+    }
+
+    private boolean nodeRecoveryEnabled() {
+        return PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
     }
 
     /**
@@ -1139,152 +1108,171 @@ public abstract class InfrastructureManager implements Serializable {
 
     // Below are wrapper methods around the runtime variables map
 
-    private Map<String, RMDeployingNode> getDeployingNodesMap() {
-        return (Map<String, RMDeployingNode>) persistedInfraVariables.get(DEPLOYING_NODES_KEY);
+    protected Set<String> getPersistedDeployingNodesUrl() {
+        return (Set<String>) persistedInfraVariables.get(DEPLOYING_NODES_URL_KEY);
     }
 
-    private RMDeployingNode getDeployingNodeFromPersistedInfraVariables(final String nodeUrl) {
+    /**
+     * @return The deploying node that was mapped by that URL before, or null.
+     */
+    public RMDeployingNode addDeployingNodeWithLockAndPersist(final String nodeUrl,
+            final RMDeployingNode deployingNode) {
+        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
+            @Override
+            public RMDeployingNode handle() {
+                RMDeployingNode previousDeployingNode = deployingNodesMap.put(nodeUrl, deployingNode);
+                getPersistedDeployingNodesUrl().add(nodeUrl);
+                return previousDeployingNode;
+            }
+        });
+    }
+
+    /**
+     * @return The deploying node that has been removed, or null
+     */
+    private RMDeployingNode removeDeployingNodeWithLockAndPersist(final String nodeUrl) {
+        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
+            @Override
+            public RMDeployingNode handle() {
+                RMDeployingNode removedDeployingNode = deployingNodesMap.remove(nodeUrl);
+                getPersistedDeployingNodesUrl().remove(nodeUrl);
+                return removedDeployingNode;
+            }
+        });
+    }
+
+    private void clearDeployingNodesWithLockAndPersist() {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+            @Override
+            public Void handle() {
+                deployingNodesMap.clear();
+                getPersistedDeployingNodesUrl().clear();
+                return null;
+            }
+        });
+    }
+
+    private boolean containsDeployingNodeUrlWithLock(final String nodeUrl) {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
+            @Override
+            public Boolean handle() {
+                return getPersistedDeployingNodesUrl().contains(nodeUrl);
+            }
+        });
+    }
+
+    private RMDeployingNode getDeployingNodeWithLock(final String nodeUrl) {
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
             @Override
             public RMDeployingNode handle() {
-                return getDeployingNodesMap().get(nodeUrl);
+                return deployingNodesMap.get(nodeUrl);
             }
         });
     }
 
-    private RMDeployingNode putDeployingNode(final String nodeUrl, final RMDeployingNode deployingNode) {
+    private List<RMDeployingNode> getDeployingNodesWithLock() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<List<RMDeployingNode>>() {
+            @Override
+            public List<RMDeployingNode> handle() {
+                List<RMDeployingNode> deployingNodesCopy = new LinkedList<>();
+                Collection<RMDeployingNode> deployingNodes = deployingNodesMap.values();
+                deployingNodesCopy.addAll(deployingNodes);
+                return deployingNodesCopy;
+            }
+        });
+    }
+
+    protected Set<String> getPersistedLostNodesUrl() {
+        return (Set<String>) persistedInfraVariables.get(LOST_NODES_URL_KEY);
+    }
+
+    /**
+     * @return The lost node that was mapped by that URL before, or null.
+     */
+    public RMDeployingNode addLostNodeWithLockAndPersist(final String nodeUrl, final RMDeployingNode lostNode) {
         return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
             @Override
             public RMDeployingNode handle() {
-                return getDeployingNodesMap().put(nodeUrl, deployingNode);
+                RMDeployingNode previousLostNode = lostNodesMap.put(nodeUrl, lostNode);
+                getPersistedLostNodesUrl().add(nodeUrl);
+                return previousLostNode;
             }
         });
     }
 
-    private RMDeployingNode removeDeployingNode(final String nodeUrl) {
+    /**
+     * @return The lost node that has been removed, or null
+     */
+    private RMDeployingNode removeLostNodeWithLockAndPersist(final String nodeUrl) {
         return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
             @Override
             public RMDeployingNode handle() {
-                return getDeployingNodesMap().remove(nodeUrl);
+                RMDeployingNode removedLostNode = lostNodesMap.remove(nodeUrl);
+                getPersistedLostNodesUrl().remove(nodeUrl);
+                return removedLostNode;
             }
         });
     }
 
-    private boolean containsKeyDeployingNode(final String nodeUrl) {
+    private boolean containsLostNodeWithLock(final String nodeUrl) {
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
             public Boolean handle() {
-                return getDeployingNodesMap().containsKey(nodeUrl);
+                return getPersistedLostNodesUrl().contains(nodeUrl);
             }
         });
     }
 
-    private Collection<String> keySetDeployingNodes() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Collection<String>>() {
-            @Override
-            public Collection<String> handle() {
-                return getDeployingNodesMap().keySet();
-            }
-        });
-    }
-
-    private void clearDeployingNodes() {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                getDeployingNodesMap().clear();
-                return null;
-            }
-        });
-    }
-
-    private Collection<RMDeployingNode> valuesDeployingNodes() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Collection<RMDeployingNode>>() {
-            @Override
-            public Collection<RMDeployingNode> handle() {
-                return getDeployingNodesMap().values();
-            }
-        });
-    }
-
-    private Map<String, RMDeployingNode> getLostNodesMap() {
-        return (Map<String, RMDeployingNode>) persistedInfraVariables.get(LOST_NODES_KEY);
-    }
-
-    private RMDeployingNode getLostNodeFromPersistedInfraVariables(final String nodeUrl) {
+    private RMDeployingNode getLostNodeWithLock(final String nodeUrl) {
         return getPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
             @Override
             public RMDeployingNode handle() {
-                return getLostNodesMap().get(nodeUrl);
+                return lostNodesMap.get(nodeUrl);
             }
         });
     }
 
-    private RMDeployingNode putLostNode(final String nodeUrl, final RMDeployingNode deployingNode) {
-        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
+    private List<RMDeployingNode> getLostNodesWithLock() {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<List<RMDeployingNode>>() {
             @Override
-            public RMDeployingNode handle() {
-                return getLostNodesMap().put(nodeUrl, deployingNode);
+            public List<RMDeployingNode> handle() {
+                List<RMDeployingNode> lostNodesCopy = new LinkedList<>();
+                Collection<RMDeployingNode> lostNodes = lostNodesMap.values();
+                lostNodesCopy.addAll(lostNodes);
+                return lostNodesCopy;
             }
         });
     }
 
-    private RMDeployingNode removeLostNode(final String nodeUrl) {
-        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
-            @Override
-            public RMDeployingNode handle() {
-                return getLostNodesMap().remove(nodeUrl);
-            }
-        });
+    private Set<String> getAcquiredNodesNameSet() {
+        return (Set<String>) persistedInfraVariables.get(ACQUIRED_NODES_NAME_KEY);
     }
 
-    private boolean containsKeyLostNode(final String nodeUrl) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return getLostNodesMap().containsKey(nodeUrl);
-            }
-        });
-    }
-
-    private Collection<RMDeployingNode> valuesLostNodes() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Collection<RMDeployingNode>>() {
-            @Override
-            public Collection<RMDeployingNode> handle() {
-                return getLostNodesMap().values();
-            }
-        });
-    }
-
-    private Set<String> getAcquiredNodesMap() {
-        return (Set<String>) persistedInfraVariables.get(ACQUIRED_NODES_KEY);
-    }
-
-    private void putAcquiredNode(final String nodeName) {
+    private void registerAcquiredNodeWithLockAndPersist(final String nodeName) {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                getAcquiredNodesMap().add(nodeName);
+                getAcquiredNodesNameSet().add(nodeName);
                 return null;
             }
         });
     }
 
-    private boolean containsKeyAcquiredNode(final String nodeName) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
+    private void unregisterAcquiredNodeWithLockAndPersist(final String nodeName) {
+        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
-            public Boolean handle() {
-                return getAcquiredNodesMap().contains(nodeName);
+            public Void handle() {
+                getAcquiredNodesNameSet().remove(nodeName);
+                return null;
             }
         });
     }
 
-    public void removeAcquiredNode(final String nodeName) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
+    private boolean containsAcquiredNodeWithLock(final String nodeName) {
+        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
             @Override
-            public Void handle() {
-                getAcquiredNodesMap().remove(nodeName);
-                return null;
+            public Boolean handle() {
+                return getAcquiredNodesNameSet().contains(nodeName);
             }
         });
     }
@@ -1298,11 +1286,11 @@ public abstract class InfrastructureManager implements Serializable {
         });
     }
 
-    private void setUsingDeployingNodes(final boolean isUsingDeployingNodes) {
+    private void setUsingDeployingNodesWithLockAndPersist() {
         setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
             @Override
             public Void handle() {
-                persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, isUsingDeployingNodes);
+                persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, true);
                 return null;
             }
         });

@@ -26,10 +26,12 @@
 package functionaltests.nodesrecovery;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.internal.progress.SequenceNumber.next;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.junit.After;
@@ -40,6 +42,8 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+
+import com.google.common.collect.ImmutableSet;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.utils.RMFunctionalTest;
@@ -62,6 +66,8 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     private static final int NODE_NUMBER = 3;
 
     private ResourceManager resourceManager = null;
+
+    private String lockedNodeUrl;
 
     @Before
     public void setup() throws Exception {
@@ -110,7 +116,13 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
                                                                                           .getNodeSource();
         assertThat(nodeSourceEventPerNodeSource.size()).isEqualTo(1);
         assertThat(nodeSourceEventPerNodeSource.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
-        assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(NODE_NUMBER);
+
+        Set<String> allNodesUrl = resourceManagerMonitor.getState().getAllNodes();
+        assertThat(allNodesUrl.size()).isEqualTo(NODE_NUMBER);
+
+        lockedNodeUrl = allNodesUrl.iterator().next();
+        resourceManager.lockNodes(ImmutableSet.of(lockedNodeUrl));
+        checkFreeNodes(resourceManagerMonitor);
     }
 
     private void restartRmAndCheckFinalState(boolean nodesShouldBeRecreated) throws Exception {
@@ -141,11 +153,33 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         Set<String> aliveNodeUrls = resourceManager.listAliveNodeUrls(nodeSourceNames);
         assertThat(aliveNodeUrls.size()).isEqualTo(NODE_NUMBER);
 
+        // check the node state, especially the lock status
+        checkFreeNodes(resourceManagerMonitor);
+
+        if (!nodesShouldBeRecreated) {
+            // finally unlock the recovered locked node
+            BooleanWrapper unlockSucceeded = resourceManager.unlockNodes(ImmutableSet.of(lockedNodeUrl));
+            assertThat(unlockSucceeded).isEqualTo(new BooleanWrapper(true));
+            assertThat(resourceManagerMonitor.getState().getFreeNodes()).contains(lockedNodeUrl);
+        }
+
         // the recovered nodes should be usable, try to lock/unlock them to see
         BooleanWrapper lockSucceeded = resourceManager.lockNodes(allNodes);
         assertThat(lockSucceeded).isEqualTo(new BooleanWrapper(true));
         BooleanWrapper unlockSucceeded = resourceManager.unlockNodes(allNodes);
         assertThat(unlockSucceeded).isEqualTo(new BooleanWrapper(true));
+    }
+
+    private void checkFreeNodes(RMMonitorEventReceiver resourceManagerMonitor) {
+        Set<String> freeNodes = resourceManagerMonitor.getState().getFreeNodes();
+        assertThat(freeNodes).doesNotContain(lockedNodeUrl);
+
+        // check the rest of the nodes
+        for (String nodeUrl : resourceManagerMonitor.getState().getAllNodes()) {
+            if (!nodeUrl.equals(lockedNodeUrl)) {
+                assertThat(freeNodes).contains(nodeUrl);
+            }
+        }
     }
 
 }

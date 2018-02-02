@@ -39,7 +39,6 @@ import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ NonBlockingCoreTest.class, TestNSNodesPermissions.class, SelectionScriptTimeOutTest.class,
-                      RecoverLocalInfrastructureTest.class, RecoverSSHInfrastructureV2Test.class,
                       TestSSHInfrastructureV2RestartDownNodesPolicy.class, NodesRecoveryPropertyTest.class })
 
 /**

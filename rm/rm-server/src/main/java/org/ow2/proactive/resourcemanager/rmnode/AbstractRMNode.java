@@ -48,6 +48,8 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
  */
 public abstract class AbstractRMNode implements RMNode, Serializable {
 
+    public static final long LOCK_TIME_INITIAL_VALUE = -1;
+
     /** The add event */
     protected RMNodeEvent addEvent;
 
@@ -71,7 +73,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
      * Defines the time at which the node has been locked.
      * This field has a meaning when {@code isLocked} is {@code true} only.
      */
-    protected long lockTime = -1;
+    protected long lockTime = LOCK_TIME_INITIAL_VALUE;
 
     /** Name of the node */
     protected final String nodeName;
@@ -111,6 +113,14 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         this.nodeName = nodeName;
         this.nodeURL = nodeURL;
         this.provider = provider;
+    }
+
+    public AbstractRMNode(NodeSource nodeSource, String nodeName, String nodeURL, Client provider, boolean isLocked,
+            Client lockedBy, long lockTime) {
+        this(nodeSource, nodeName, nodeURL, provider);
+        this.isLocked = isLocked;
+        this.lockedBy = lockedBy;
+        this.lockTime = lockTime;
     }
 
     public void copyLockStatusFrom(RMNode node) {
@@ -168,7 +178,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
     @Override
     public void unlock(Client client) {
         this.isLocked = false;
-        this.lockTime = -1;
+        this.lockTime = LOCK_TIME_INITIAL_VALUE;
         this.lockedBy = null;
     }
 

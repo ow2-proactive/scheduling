@@ -225,7 +225,7 @@ public class HostTracker implements Serializable {
 
         DOWN,
 
-        REMOVED
+        REMOVED;
 
     }
 

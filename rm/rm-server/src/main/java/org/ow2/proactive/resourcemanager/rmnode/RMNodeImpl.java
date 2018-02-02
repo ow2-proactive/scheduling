@@ -116,7 +116,13 @@ public class RMNodeImpl extends AbstractRMNode {
 
     public RMNodeImpl(Node node, NodeSource nodeSource, Client provider, Permission nodeAccessPermission,
             NodeState state) {
-        super(nodeSource, node.getNodeInformation().getName(), node.getNodeInformation().getURL(), provider);
+        super(nodeSource,
+              node.getNodeInformation().getName(),
+              node.getNodeInformation().getURL(),
+              provider,
+              false,
+              null,
+              AbstractRMNode.LOCK_TIME_INITIAL_VALUE);
 
         changeState(state);
 
@@ -133,8 +139,9 @@ public class RMNodeImpl extends AbstractRMNode {
      * configuration information.
      */
     public RMNodeImpl(Node node, NodeSource nodeSource, String nodeName, String nodeUrl, Client provider,
-            String hostName, String[] jmxUrls, String jvmName, Permission nodeAccessPermission, NodeState state) {
-        super(nodeSource, nodeName, nodeUrl, provider);
+            String hostName, String[] jmxUrls, String jvmName, Permission nodeAccessPermission, NodeState state,
+            boolean isLocked, Client lockedBy, long lockTime) {
+        super(nodeSource, nodeName, nodeUrl, provider, isLocked, lockedBy, lockTime);
 
         changeState(state);
 

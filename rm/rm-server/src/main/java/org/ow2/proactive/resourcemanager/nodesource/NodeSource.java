@@ -29,6 +29,7 @@ import java.security.Permission;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -67,7 +68,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
-import org.ow2.proactive.resourcemanager.rmnode.AbstractRMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
@@ -276,16 +276,15 @@ public class NodeSource implements InitActive, RunActive {
      * Updates internal node source structures.
      */
     @VisibleForTesting
-    RMDeployingNode internalAddNode(Node node) throws RMException {
+    void internalAddNode(Node node) throws RMException {
         String nodeUrl = node.getNodeInformation().getURL();
         if (this.nodes.containsKey(nodeUrl)) {
             throw new RMException("The node " + nodeUrl + " already added to the node source " + name);
         }
 
         logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
-        RMDeployingNode rmDeployingNode = infrastructureManager.internalRegisterAcquiredNode(node);
+        infrastructureManager.internalRegisterAcquiredNode(node);
         nodes.put(nodeUrl, node);
-        return rmDeployingNode;
     }
 
     /**
@@ -294,21 +293,23 @@ public class NodeSource implements InitActive, RunActive {
      * @return the {@link RMNode} that could be recovered.
      */
     public RMNode internalAddNodeAfterRecovery(Node node, RMNodeData rmNodeData) {
-        RMNode recoveredRmNode;
-        String nodeUrl = node.getNodeInformation().getURL();
-        // the infrastructure manager is up to date already because it was
-        // saved in database, contrarily to the node source internal data structures
-        RMNode rmNode = infrastructureManager.searchForNotAcquiredRmNode(nodeUrl);
-        if (rmNode != null) {
-            // Deploying or lost RMNodes can be directly found in the saved infrastructure.
-            recoveredRmNode = rmNode;
-        } else {
-            // the node is acquired in the infrastructure. We can recover the
-            // RMNode representation on top of it and save it in the node source
-            recoveredRmNode = buildRMNodeAfterRecovery(node, rmNodeData);
+        RMNode recoveredRmNode = buildRMNodeAfterRecovery(node, rmNodeData);
+        nodes.put(rmNodeData.getNodeUrl(), node);
+        return recoveredRmNode;
+    }
+
+    /**
+     * Recover the internal data structure of the infrastructure so that
+     * RMDeployingNode are back again.
+     */
+    public RMNode internalAddDeployingNodeAfterRecovery(RMNodeData rmNodeData) {
+        RMDeployingNode recoveredRmNode = buildRMDeployingNodeAfterRecovery(rmNodeData);
+        if (rmNodeData.getState().equals(NodeState.DEPLOYING)) {
+            infrastructureManager.addDeployingNodeWithLockAndPersist(rmNodeData.getNodeUrl(), recoveredRmNode);
         }
-        // we finally put back the node in the data structure of the node source
-        nodes.put(nodeUrl, node);
+        if (rmNodeData.getState().equals(NodeState.LOST)) {
+            infrastructureManager.addLostNodeWithLockAndPersist(rmNodeData.getNodeUrl(), recoveredRmNode);
+        }
         return recoveredRmNode;
     }
 
@@ -388,26 +389,16 @@ public class NodeSource implements InitActive, RunActive {
             }
         }
 
-        // if any exception occurs in internalAddNode(node) do not add the node to the core
-        RMDeployingNode deployingNode;
         try {
-            deployingNode = internalAddNode(nodeToAdd);
+            internalAddNode(nodeToAdd);
         } catch (RMException e) {
             throw new AddingNodesException(e);
         }
-        //we build the rmnode
         RMNode rmNode = buildRMNode(nodeToAdd, provider);
-
-        if (deployingNode != null) {
-            // inherit locking status from associated deploying node created before
-            ((AbstractRMNode) rmNode).copyLockStatusFrom(deployingNode);
-        }
 
         boolean isNodeAdded = rmcore.registerAvailableNode(rmNode).getBooleanValue();
 
         if (isNodeAdded) {
-            // if the node is successfully added we can let it configure
-            // asynchronously. It will then be seen as "configuring"
             rmcore.internalRegisterConfiguringNode(rmNode);
             return new BooleanWrapper(true);
         } else {
@@ -460,13 +451,6 @@ public class NodeSource implements InitActive, RunActive {
         return rmnode;
     }
 
-    /**
-     * Rebuild a RMNode from a node that could be looked up again after a
-     * recovery of the RM. This builder configures nothing for the node
-     * because it is configured already as it suppoesed to be recovered from
-     * the database.
-     * @return the expected RMNode
-     */
     private RMNode buildRMNodeAfterRecovery(Node node, RMNodeData rmNodeData) {
         RMNodeImpl rmNode = new RMNodeImpl(node,
                                            stub,
@@ -477,13 +461,27 @@ public class NodeSource implements InitActive, RunActive {
                                            rmNodeData.getJmxUrls(),
                                            rmNodeData.getJvmName(),
                                            rmNodeData.getUserPermission(),
-                                           rmNodeData.getState());
+                                           rmNodeData.getState(),
+                                           rmNodeData.getLocked(),
+                                           rmNodeData.getLockedBy(),
+                                           rmNodeData.getLockTime());
         if (rmNodeData.getState().equals(NodeState.BUSY)) {
             logger.info("Node " + rmNodeData.getName() + " was found busy after scheduler recovery with owner " +
                         rmNodeData.getOwner());
             rmNode.setBusy(rmNodeData.getOwner());
         }
         return rmNode;
+    }
+
+    private RMDeployingNode buildRMDeployingNodeAfterRecovery(RMNodeData rmNodeData) {
+        return new RMDeployingNode(rmNodeData.getName(),
+                                   stub,
+                                   rmNodeData.getCommandLine(),
+                                   rmNodeData.getDescription(),
+                                   rmNodeData.getProvider(),
+                                   rmNodeData.getLocked(),
+                                   rmNodeData.getLockedBy(),
+                                   rmNodeData.getLockTime());
     }
 
     public boolean setNodeAvailable(RMNode node) {
@@ -501,14 +499,6 @@ public class NodeSource implements InitActive, RunActive {
             logger.info("Node state not changed since it is unknown: " + proactiveProgrammingNodeUrl);
             return false;
         }
-    }
-
-    public RMDeployingNode update(RMDeployingNode rmNode) {
-        return infrastructureManager.update(rmNode);
-    }
-
-    public boolean setDeploying(RMDeployingNode deployingNode) {
-        return rmcore.setDeploying(deployingNode);
     }
 
     /**
@@ -743,10 +733,10 @@ public class NodeSource implements InitActive, RunActive {
      * @return the list of deploying nodes handled by the infrastructure manager
      */
     @ImmediateService
-    public LinkedList<RMDeployingNode> getDeployingNodes() {
-        LinkedList<RMDeployingNode> result = new LinkedList<>();
-        result.addAll(this.infrastructureManager.getDeployingNodes());
-        return result;
+    public List<RMDeployingNode> getDeployingAndLostNodes() {
+        LinkedList<RMDeployingNode> deployingAndLostNodes = new LinkedList<>();
+        deployingAndLostNodes.addAll(this.infrastructureManager.getDeployingAndLostNodes());
+        return deployingAndLostNodes;
     }
 
     /**
@@ -757,8 +747,8 @@ public class NodeSource implements InitActive, RunActive {
      * is an Active Object, the caller will receive a deep copy of the original object.
      */
     @ImmediateService
-    public RMDeployingNode getDeployingNode(String nodeUrl) {
-        return infrastructureManager.getDeployingNode(nodeUrl);
+    public RMDeployingNode getDeployingOrLostNode(String nodeUrl) {
+        return infrastructureManager.getDeployingOrLostNode(nodeUrl);
     }
 
     /**

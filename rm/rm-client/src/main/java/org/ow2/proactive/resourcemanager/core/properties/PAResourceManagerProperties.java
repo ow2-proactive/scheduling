@@ -239,17 +239,6 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     RM_SHUTDOWN_KILL_RUNTIME("pa.rm.shutdown.kill.rt", PropertyType.BOOLEAN, "true"),
 
     /**
-     * Defines if the lock restoration feature is enabled on RM startup.
-     * <p>
-     * When set to {@code true}, the RM will try to lock per Node Source
-     * as many Nodes as there were on the previous run.
-     * <p>
-     * The approach is best effort and Node hostname is not considered.
-     * As a result, Nodes are not necessarily locked on the same host.
-     */
-    RM_NODES_LOCK_RESTORATION("pa.rm.nodes.lock.restoration", PropertyType.BOOLEAN, "true"),
-
-    /**
      * Defines if the nodes should be kept when the resource manager exits.
      * This property is defaulted to false as shutting down the RM should
      * clean also its nodes.

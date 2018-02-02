@@ -66,16 +66,12 @@ import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeHelper;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
+import org.ow2.proactive.resourcemanager.rmnode.*;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -119,9 +115,8 @@ public class RMCoreTest {
     @Mock
     private RMNode mockedFreeButLockedNode;
 
-    private NodesLockRestorationManager nodesLockRestorationManager;
-
-    private NodesRecoveryManager nodesRecoveryManager;
+    @Mock
+    private RMRecoverer rmRecoverer;
 
     private HashMap<String, NodeSource> nodeSources;
 
@@ -160,7 +155,7 @@ public class RMCoreTest {
     @Test(expected = org.ow2.proactive.resourcemanager.exception.AddingNodesException.class)
     public void testThatExceptionIsThrownIfSetTo0() throws NoSuchFieldException, IllegalAccessException {
         setMaxNumberOfNodesTo(0L);
-        String nodeUrl = mockedRemovableNode.getNodeName();
+        String nodeUrl = mockedRemovableNode.getNodeURL();
         when(mockedRemovableNode.getNodeURL()).thenReturn(nodeUrl);
         when(mockedRemovableNode.getProvider()).thenReturn(new Client());
         rmCore.internalAddNodeToCore(mockedRemovableNode);
@@ -173,7 +168,7 @@ public class RMCoreTest {
     @Test(expected = org.ow2.proactive.resourcemanager.exception.AddingNodesException.class)
     public void testThatExceptionIsThrownIfSetTo1() throws NoSuchFieldException, IllegalAccessException {
         setMaxNumberOfNodesTo(1L);
-        String nodeUrl = mockedRemovableNode.getNodeName();
+        String nodeUrl = mockedRemovableNode.getNodeURL();
         when(mockedRemovableNode.getNodeURL()).thenReturn(nodeUrl);
         when(mockedRemovableNode.getProvider()).thenReturn(new Client());
         rmCore.internalAddNodeToCore(mockedRemovableNode);
@@ -187,7 +182,7 @@ public class RMCoreTest {
     @Test
     public void testThatNodeIsAddedIfSetTo3() throws NoSuchFieldException, IllegalAccessException {
         setMaxNumberOfNodesTo(3L);
-        String nodeUrl = mockedRemovableNode.getNodeName();
+        String nodeUrl = mockedRemovableNode.getNodeURL();
         when(mockedRemovableNode.getNodeURL()).thenReturn(nodeUrl);
         when(mockedRemovableNode.getProvider()).thenReturn(new Client());
         rmCore.internalAddNodeToCore(mockedRemovableNode);
@@ -202,7 +197,7 @@ public class RMCoreTest {
     @Test
     public void testThatAddedNodeIsSetAsFree() throws NoSuchFieldException, IllegalAccessException {
         setMaxNumberOfNodesTo(3L);
-        String nodeUrl = mockedUnremovableNodeInDeploy.getNodeName();
+        String nodeUrl = mockedUnremovableNodeInDeploy.getNodeURL();
         when(mockedUnremovableNodeInDeploy.getNodeURL()).thenReturn(nodeUrl);
         when(mockedUnremovableNodeInDeploy.getProvider()).thenReturn(new Client());
 
@@ -347,13 +342,6 @@ public class RMCoreTest {
     }
 
     @Test
-    public void testNodesRestorationManagerHandleInSetDeploying() {
-        verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class), Mockito.any(Client.class));
-        rmCore.setDeploying(mockedBusyNode);
-        verify(nodesRecoveryManager).restoreLocks(Mockito.any(RMNode.class), Mockito.any(Client.class));
-    }
-
-    @Test
     public void testGetNodeByUrlIncludingDeployingNodesKnownUrlDeployingNode() {
         RMNode rmNodeFound = rmCore.getNodeByUrlIncludingDeployingNodes(mockedBusyNode.getNodeURL());
         assertThat(rmNodeFound).isSameAs(mockedBusyNode);
@@ -367,9 +355,16 @@ public class RMCoreTest {
 
     @Test
     public void testGetNodeByUrlIncludingDeployingNodesUnknownNodeUrl() {
-        RMDeployingNode rmNode = new RMDeployingNode("node", mockedNodeSource, "command", new Client());
+        RMDeployingNode rmNode = new RMDeployingNode("node",
+                                                     mockedNodeSource,
+                                                     "command",
+                                                     "description",
+                                                     new Client(),
+                                                     false,
+                                                     null,
+                                                     AbstractRMNode.LOCK_TIME_INITIAL_VALUE);
 
-        doReturn(rmNode).when(mockedNodeSource).getDeployingNode(rmNode.getNodeURL());
+        doReturn(rmNode).when(mockedNodeSource).getDeployingOrLostNode(rmNode.getNodeURL());
 
         RMNode rmNodeFound = rmCore.getNodeByUrlIncludingDeployingNodes(rmNode.getNodeURL());
         assertThat(rmNodeFound).isSameAs(rmNode);
@@ -510,8 +505,7 @@ public class RMCoreTest {
      */
     @Test
     public void testAddNodeExistingNodeExistingNodeSource() {
-        boolean result = rmCore.addNode(mockedRemovableNode.getNodeName(), mockedNodeSource.getName())
-                               .getBooleanValue();
+        boolean result = rmCore.addNode(mockedRemovableNode.getNodeURL(), mockedNodeSource.getName()).getBooleanValue();
         assertEquals(true, result);
     }
 
@@ -520,7 +514,7 @@ public class RMCoreTest {
      */
     @Test(expected = AddingNodesException.class)
     public void testAddNodeExistingNodeNewNodeSource() {
-        rmCore.addNode(mockedRemovableNode.getNodeName(), "NEW-NODESOURCE-testAddNodeNewNodeNewNodeSource")
+        rmCore.addNode(mockedRemovableNode.getNodeURL(), "NEW-NODESOURCE-testAddNodeNewNodeNewNodeSource")
               .getBooleanValue();
     }
 
@@ -612,6 +606,8 @@ public class RMCoreTest {
                                    freeNodes,
                                    Mockito.mock(RMDBManager.class));
 
+        rmCore.setRMRecoverer(rmRecoverer);
+
         rmCore.signalRMCoreIsInitialized();
 
         BooleanWrapper lockResult = rmCore.lockNodes(ImmutableSet.of(rmNode.getNodeURL()));
@@ -620,69 +616,6 @@ public class RMCoreTest {
         assertThat(rmNode.getState()).isEqualTo(nodeState);
         assertThat(rmNode.isLocked()).isTrue();
         assertThat(freeNodes).isEmpty();
-    }
-
-    @Test
-    public void testInternalLockNodeWithNodeNotLocked() {
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-
-        rmCore.internalLockNode(mockedRemovableNode, mockedCaller);
-
-        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-    }
-
-    @Test
-    public void testInternalLockNodeWithNodeLocked() {
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-
-        rmCore.internalLockNode(mockedBusyNode, mockedCaller);
-
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-    }
-
-    @Test
-    public void testInternalUnlockNodeWithNodeNotLocked() {
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-
-        rmCore.internalUnlockNode(mockedRemovableNode);
-
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-    }
-
-    @Test
-    public void testInternalUnlockNodeWithNodeLocked() {
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-
-        rmCore.internalUnlockNode(mockedBusyNode);
-
-        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-    }
-
-    @Test
-    public void testInternalSetToRemoveNodeWithNodeNotSetToRemoveNotLockedNode() {
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-
-        rmCore.internalSetToRemove(mockedRemovableNode, new Client());
-
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-    }
-
-    @Test
-    public void testRemoveNodeCreateLockEntryLockedNonDeployingNode() {
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-
-        rmCore.removeNode(mockedBusyNode.getNodeURL(), false, false);
-
-        verify(dbManager).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-    }
-
-    @Test
-    public void testRemoveNodeDoCreateLockEntryLockedNonDeployingNode() {
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
-
-        rmCore.removeNode(mockedBusyNode.getNodeURL(), false, true);
-
-        verify(dbManager, never()).createLockEntryOrUpdate(anyString(), any(RMDBManager.NodeLockUpdateAction.class));
     }
 
     @Test
@@ -788,6 +721,7 @@ public class RMCoreTest {
                                    null,
                                    freeNodes,
                                    dbManager);
+        rmCore.setRMRecoverer(rmRecoverer);
         rmCore.signalRMCoreIsInitialized();
         return rmCore;
     }
@@ -850,12 +784,12 @@ public class RMCoreTest {
                                                    mockedFreeButLockedNode));
 
         HashMap<String, RMNode> nodes = new HashMap<>(6);
-        nodes.put(mockedRemovableNodeInDeploy.getNodeName(), mockedRemovableNodeInDeploy);
-        nodes.put(mockedUnremovableNodeInDeploy.getNodeName(), mockedUnremovableNodeInDeploy);
-        nodes.put(mockedRemovableNode.getNodeName(), mockedRemovableNode);
-        nodes.put(mockedUnremovableNode.getNodeName(), mockedUnremovableNode);
-        nodes.put(mockedBusyNode.getNodeName(), mockedBusyNode);
-        nodes.put(mockedFreeButLockedNode.getNodeName(), mockedFreeButLockedNode);
+        nodes.put(mockedRemovableNodeInDeploy.getNodeURL(), mockedRemovableNodeInDeploy);
+        nodes.put(mockedUnremovableNodeInDeploy.getNodeURL(), mockedUnremovableNodeInDeploy);
+        nodes.put(mockedRemovableNode.getNodeURL(), mockedRemovableNode);
+        nodes.put(mockedUnremovableNode.getNodeURL(), mockedUnremovableNode);
+        nodes.put(mockedBusyNode.getNodeURL(), mockedBusyNode);
+        nodes.put(mockedFreeButLockedNode.getNodeURL(), mockedFreeButLockedNode);
 
         ArrayList<RMNode> freeNodes = new ArrayList<>(3);
         freeNodes.add(mockedRemovableNodeInDeploy);
@@ -871,24 +805,12 @@ public class RMCoreTest {
                             freeNodes,
                             dbManager);
 
+        rmCore.setRMRecoverer(rmRecoverer);
+
         rmCore.signalRMCoreIsInitialized();
 
         rmCore = spy(rmCore);
 
-        nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
-        nodesLockRestorationManager = spy(nodesLockRestorationManager);
-
-        doReturn(new Function<RMCore, NodesRecoveryManager>() {
-            @Override
-            public NodesRecoveryManager apply(RMCore rmCore) {
-                nodesRecoveryManager = new NodesRecoveryManager(rmCore);
-                nodesRecoveryManager = spy(nodesRecoveryManager);
-
-                return nodesRecoveryManager;
-            }
-        }).when(rmCore).getNodesRecoveryManagerBuilder();
-
-        rmCore.initiateRecoveryIfRequired();
     }
 
     private void configureRMNode(MockedRMNodeParameters param) {
@@ -898,7 +820,6 @@ public class RMCoreTest {
 
         when(mockedNode.getNodeInformation()).thenReturn(mockedNodeInformation);
         when(rmNode.getNode()).thenReturn(mockedNode);
-        when(rmNode.getNodeName()).thenReturn(param.getUrl());
         when(rmNode.getNodeURL()).thenReturn(param.getUrl());
         when(rmNode.isDown()).thenReturn(param.isDown());
         when(rmNode.isFree()).thenReturn(param.isFree());
