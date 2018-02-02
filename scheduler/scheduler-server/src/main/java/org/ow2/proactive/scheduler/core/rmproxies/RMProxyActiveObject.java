@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core.rmproxies;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,6 +50,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
@@ -198,6 +200,13 @@ public class RMProxyActiveObject {
             Decrypter decrypter = new Decrypter(Credentials.getPrivateKey(privateKeyPath));
             decrypter.setCredentials(creds);
 
+            HashMap<String, Serializable> dictionary = new HashMap<>();
+
+            dictionary.putAll(variables.getScriptMap());
+            dictionary.putAll(variables.getInheritedMap());
+            dictionary.putAll(variables.getPropagatedVariables());
+            dictionary.putAll(variables.getScopeMap());
+
             //start handler for binding
             ScriptHandler handler = ScriptLoader.createHandler(nodes.get(0));
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
@@ -223,8 +232,10 @@ public class RMProxyActiveObject {
             handler.addBinding(SchedulerConstants.DS_USER_API_BINDING_NAME, (Serializable) userSpaceClient);
 
             logger.debug("Binding credentials...");
-            handler.addBinding(SchedulerConstants.CREDENTIALS_VARIABLE,
-                               (Serializable) decrypter.decrypt().getThirdPartyCredentials());
+            Map<String, String> resolvedThirdPartyCredentials = VariableSubstitutor.filterAndUpdate(decrypter.decrypt()
+                                                                                                             .getThirdPartyCredentials(),
+                                                                                                    dictionary);
+            handler.addBinding(SchedulerConstants.CREDENTIALS_VARIABLE, (Serializable) resolvedThirdPartyCredentials);
 
             ScriptResult<?> future = handler.handle(cleaningScript);
             try {
