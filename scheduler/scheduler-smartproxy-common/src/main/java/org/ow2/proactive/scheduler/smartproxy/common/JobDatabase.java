@@ -190,14 +190,15 @@ public class JobDatabase {
      * if a InvalidClassException occur, we clean the database
      */
     public void loadJobs() {
+        this.loadJobs(true);
+    }
+
+    // The following warning is disabled because in this case we must catch any throwable raised by data file parsing.
+    @SuppressWarnings("squid:3AS1181")
+    private void loadJobs(boolean firstAttempt) {
         try {
             writeLock.lock();
-            if (recMan != null) {
-                try {
-                    recMan.close();
-                } catch (Exception e) {
-                }
-            }
+            closeRecordManager();
             try {
                 recMan = RecordManagerFactory.createRecordManager(statusFile.getCanonicalPath());
                 awaitedJobs = recMan.hashMap(STATUS_RECORD_NAME);
@@ -205,26 +206,35 @@ public class JobDatabase {
                 for (Map.Entry<String, AwaitedJob> job : awaitedJobs.entrySet())
                     ;
                 recMan.commit();
-            } catch (IOError e) {
-                // we track invalid class exceptions
-                if (e.getCause() instanceof InvalidClassException) {
-                    try {
-                        recMan.close();
-                    } catch (IOException e1) {
-
-                    }
+                if (!firstAttempt) {
+                    log.info("Loading of job database successful after clean.");
+                }
+            } catch (Throwable e) {
+                if (firstAttempt) {
+                    log.error("Error occurred when loading job database " + statusFile.getAbsolutePath() +
+                              ", now cleaning it and retrying.", e);
+                    closeRecordManager();
                     recMan = null;
                     cleanDataBase();
-                    loadJobs();
+                    loadJobs(false);
                 } else {
-                    throw e;
+                    closeRecordManager();
+                    throw new IllegalStateException("Error when loading database (even after cleaning it): " +
+                                                    statusFile.getAbsolutePath(), e);
                 }
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
         } finally {
             writeLock.unlock();
+        }
+    }
+
+    private void closeRecordManager() {
+        if (recMan != null) {
+            try {
+                recMan.close();
+            } catch (IOException e1) {
+                log.trace("Error when closing record manager", e1);
+            }
         }
     }
 
