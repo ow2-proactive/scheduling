@@ -27,7 +27,13 @@ package org.ow2.proactive.resourcemanager.db;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.security.Permission;
+
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockSettings;
+import org.mockito.MockitoAnnotations;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 
@@ -38,37 +44,101 @@ import org.ow2.proactive.resourcemanager.common.NodeState;
  */
 public class RMNodeDataTest {
 
-    private static final Client OWNER = new Client();
+    private String name = "name";
 
-    private static final Client PROVIDER = new Client();
+    private String url = "url";
 
-    private static final String JVM_NAME = "jvmName";
+    @Mock
+    private Client owner;
 
-    private static final String NAME = "name";
+    @Mock
+    private Client provider;
 
-    private static final String URL = "url";
+    @Mock
+    private Permission permission;
 
-    private static final String HOSTNAME = "hostname";
+    private NodeState state = NodeState.TO_BE_REMOVED;
+
+    private long stateChangeTime = 1L;
+
+    private String hostname = "hostname";
+
+    private String[] jmxUrls = new String[] { "jmxUrl1", "jmxUrl2" };
+
+    private String jvmName = "jvmName";
+
+    private boolean locked = false;
+
+    @Mock
+    private Client lockedBy;
+
+    private long lockTime = 1L;
+
+    private String commandLine = "commandLine";
+
+    private String description = "description";
+
+    @Before
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void testBuilderSetsFields() {
+        RMNodeData nodeData = new RMNodeData.Builder().name(name)
+                                                      .nodeUrl(url)
+                                                      .owner(owner)
+                                                      .provider(provider)
+                                                      .userPermission(permission)
+                                                      .state(state)
+                                                      .stateChangeTime(stateChangeTime)
+                                                      .hostname(hostname)
+                                                      .jmxUrls(jmxUrls)
+                                                      .jvmName(jvmName)
+                                                      .locked(locked)
+                                                      .lockedBy(lockedBy)
+                                                      .lockTime(lockTime)
+                                                      .commandLine(commandLine)
+                                                      .description(description)
+                                                      .build();
+
+        assertThat(nodeData.getName()).isEqualTo(name);
+        assertThat(nodeData.getNodeUrl()).isEqualTo(url);
+        assertThat(nodeData.getOwner()).isEqualTo(owner);
+        assertThat(nodeData.getProvider()).isEqualTo(provider);
+        assertThat(nodeData.getUserPermission()).isEqualTo(permission);
+        assertThat(nodeData.getState()).isEqualTo(state);
+        assertThat(nodeData.getStateChangeTime()).isEqualTo(stateChangeTime);
+        assertThat(nodeData.getHostname()).isEqualTo(hostname);
+        assertThat(nodeData.getJmxUrls()).isEqualTo(jmxUrls);
+        assertThat(nodeData.getJvmName()).isEqualTo(jvmName);
+        assertThat(nodeData.getLocked()).isEqualTo(locked);
+        assertThat(nodeData.getLockedBy()).isEqualTo(lockedBy);
+        assertThat(nodeData.getLockTime()).isEqualTo(lockTime);
+        assertThat(nodeData.getCommandLine()).isEqualTo(commandLine);
+        assertThat(nodeData.getDescription()).isEqualTo(description);
+
+    }
 
     @Test
     public void testEqualNodeDataHaveSameHashcode() {
-        RMNodeData nodeData1 = new RMNodeData.Builder().name(NAME)
-                                                       .nodeUrl(URL)
-                                                       .owner(OWNER)
-                                                       .provider(PROVIDER)
+        RMNodeData nodeData1 = new RMNodeData.Builder().name(name)
+                                                       .nodeUrl(url)
+                                                       .owner(owner)
+                                                       .provider(provider)
                                                        .state(NodeState.DEPLOYING)
                                                        .stateChangeTime(1L)
-                                                       .hostname(HOSTNAME)
-                                                       .jvmName(JVM_NAME)
+                                                       .hostname(hostname)
+                                                       .jvmName(jvmName)
                                                        .build();
-        RMNodeData nodeData2 = new RMNodeData.Builder().name(NAME)
-                                                       .nodeUrl(URL)
-                                                       .owner(OWNER)
-                                                       .provider(PROVIDER)
+        RMNodeData nodeData2 = new RMNodeData.Builder().name(name)
+                                                       .nodeUrl(url)
+                                                       .owner(owner)
+                                                       .provider(provider)
                                                        .state(NodeState.DEPLOYING)
                                                        .stateChangeTime(1L)
-                                                       .hostname(HOSTNAME)
-                                                       .jvmName(JVM_NAME)
+                                                       .hostname(hostname)
+                                                       .jvmName(jvmName)
                                                        .build();
         assertThat(nodeData1).isEqualTo(nodeData2);
         assertThat(nodeData1.equals(nodeData2)).isTrue();
@@ -77,23 +147,23 @@ public class RMNodeDataTest {
 
     @Test
     public void testIfHashCodeIsDifferentEqualsIsFalse() {
-        RMNodeData nodeData1 = new RMNodeData.Builder().name(NAME + "1")
-                                                       .nodeUrl(URL + "1")
-                                                       .owner(OWNER)
-                                                       .provider(PROVIDER)
+        RMNodeData nodeData1 = new RMNodeData.Builder().name(name + "1")
+                                                       .nodeUrl(url + "1")
+                                                       .owner(owner)
+                                                       .provider(provider)
                                                        .state(NodeState.DEPLOYING)
                                                        .stateChangeTime(1L)
-                                                       .hostname(HOSTNAME)
-                                                       .jvmName(JVM_NAME)
+                                                       .hostname(hostname)
+                                                       .jvmName(jvmName)
                                                        .build();
-        RMNodeData nodeData2 = new RMNodeData.Builder().name(NAME + "2")
-                                                       .nodeUrl(URL + "2")
-                                                       .owner(OWNER)
-                                                       .provider(PROVIDER)
+        RMNodeData nodeData2 = new RMNodeData.Builder().name(name + "2")
+                                                       .nodeUrl(url + "2")
+                                                       .owner(owner)
+                                                       .provider(provider)
                                                        .state(NodeState.DEPLOYING)
                                                        .stateChangeTime(1L)
-                                                       .hostname(HOSTNAME)
-                                                       .jvmName(JVM_NAME)
+                                                       .hostname(hostname)
+                                                       .jvmName(jvmName)
                                                        .build();
         assertThat(nodeData1).isNotEqualTo(nodeData2);
         assertThat(nodeData1.equals(nodeData2)).isFalse();
