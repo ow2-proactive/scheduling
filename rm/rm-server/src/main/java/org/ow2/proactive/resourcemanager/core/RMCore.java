@@ -435,8 +435,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             initiateRecoveryIfRequired();
 
-            signalRMCoreIsInitialized();
-
         } catch (ActiveObjectCreationException e) {
             logger.error("", e);
         } catch (NodeException e) {
@@ -445,6 +443,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.error("", e);
         } catch (ClassNotFoundException e) {
             logger.error("", e);
+        } finally {
+            signalRMCoreIsInitialized();
         }
 
         if (logger.isDebugEnabled()) {
@@ -663,7 +663,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 NodeSource nodeSource = nodeSources.get(nodeSourceName);
 
                 if (nodeSource != null) {
-                    return nodeSource.getDeployingNode(url);
+                    return nodeSource.getNodeInDeployingOrLostNodes(url);
                 }
             }
         }
@@ -1125,7 +1125,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         removeAllNodes(nodeSourceName, "deploying nodes", new Function<NodeSource, Void>() {
             @Override
             public Void apply(NodeSource nodeSource) {
-                for (RMDeployingNode pn : nodeSource.getDeployingNodes()) {
+                for (RMDeployingNode pn : nodeSource.getDeployingAndLostNodes()) {
                     removeNode(pn.getNodeURL(), preemptive, isTriggeredFromShutdownHook);
                 }
                 return null;
@@ -1236,7 +1236,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public Set<String> setNodesAvailable(Set<String> nodeUrls) {
 
-        waitForRMCoreToBeInitialized();
+        waitForRMCoreToBeInitializedIfNeeded();
 
         if (logger.isTraceEnabled()) {
             logger.trace("Received availability for the following workers: " + nodeUrls);
@@ -1264,10 +1264,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return nodeUrlsNotKnownByTheRM.build();
     }
 
-    private void waitForRMCoreToBeInitialized() {
+    private void waitForRMCoreToBeInitializedIfNeeded() {
         try {
-            logger.info("Waiting for Resource Manager to be initialized");
-            countDownLatch.await();
+            if (countDownLatch.getCount() != 0) {
+                logger.info("Waiting for Resource Manager to be initialized");
+                countDownLatch.await();
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted while waiting for Resource Manager to be initialized", e);
@@ -1662,7 +1664,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<>(nodeSources.size());
         for (NodeSource s : nodeSources) {
             nodeSourcesList.add(new RMNodeSourceEvent(s.getName(), s.getDescription(), s.getAdministrator().getName()));
-            for (RMDeployingNode pn : s.getDeployingNodes()) {
+            for (RMDeployingNode pn : s.getDeployingAndLostNodes()) {
                 nodesList.add(pn.createNodeEvent());
             }
         }
