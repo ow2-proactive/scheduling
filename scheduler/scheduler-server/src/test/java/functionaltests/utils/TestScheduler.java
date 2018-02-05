@@ -127,6 +127,7 @@ public class TestScheduler {
         commandLine.add("-cp");
         commandLine.add(testClasspath());
         commandLine.add("-Djava.awt.headless=true"); // For Mac builds
+        commandLine.add("-DperformanceTestOngoing=true");
         commandLine.add("-Djava.library.path=" + System.getProperty("java.library.path"));
         commandLine.add(CentralPAPropertyRepository.PA_TEST.getCmdLine() + "true");
         commandLine.add(SchedulerStartForFunctionalTest.class.getName());
