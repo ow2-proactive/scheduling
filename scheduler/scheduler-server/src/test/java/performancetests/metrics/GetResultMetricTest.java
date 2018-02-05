@@ -60,7 +60,7 @@ public class GetResultMetricTest extends PeformanceTestBase {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 1, 3000 } });
+        return Arrays.asList(new Object[][] { { 1, 10000 } });
     }
 
     private final int taskNumber;
