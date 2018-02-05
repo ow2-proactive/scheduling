@@ -743,9 +743,9 @@ public class NodeSource implements InitActive, RunActive {
      * @return the list of deploying nodes handled by the infrastructure manager
      */
     @ImmediateService
-    public LinkedList<RMDeployingNode> getDeployingNodes() {
+    public LinkedList<RMDeployingNode> getDeployingAndLostNodes() {
         LinkedList<RMDeployingNode> result = new LinkedList<>();
-        result.addAll(this.infrastructureManager.getDeployingNodes());
+        result.addAll(this.infrastructureManager.getDeployingAndLostNodes());
         return result;
     }
 
@@ -757,8 +757,8 @@ public class NodeSource implements InitActive, RunActive {
      * is an Active Object, the caller will receive a deep copy of the original object.
      */
     @ImmediateService
-    public RMDeployingNode getDeployingNode(String nodeUrl) {
-        return infrastructureManager.getDeployingNode(nodeUrl);
+    public RMDeployingNode getNodeInDeployingOrLostNodes(String nodeUrl) {
+        return infrastructureManager.getDeployingOrLostNode(nodeUrl);
     }
 
     /**

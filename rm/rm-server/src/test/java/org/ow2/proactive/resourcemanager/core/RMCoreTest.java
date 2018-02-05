@@ -369,7 +369,7 @@ public class RMCoreTest {
     public void testGetNodeByUrlIncludingDeployingNodesUnknownNodeUrl() {
         RMDeployingNode rmNode = new RMDeployingNode("node", mockedNodeSource, "command", new Client());
 
-        doReturn(rmNode).when(mockedNodeSource).getDeployingNode(rmNode.getNodeURL());
+        doReturn(rmNode).when(mockedNodeSource).getNodeInDeployingOrLostNodes(rmNode.getNodeURL());
 
         RMNode rmNodeFound = rmCore.getNodeByUrlIncludingDeployingNodes(rmNode.getNodeURL());
         assertThat(rmNodeFound).isSameAs(rmNode);

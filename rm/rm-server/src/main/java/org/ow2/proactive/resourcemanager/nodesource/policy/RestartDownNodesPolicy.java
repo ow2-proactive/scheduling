@@ -33,7 +33,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 
@@ -88,7 +87,7 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
                     }
                 }
 
-                for (RMDeployingNode lostNode : nodeSource.getDeployingNodes()) {
+                for (RMDeployingNode lostNode : nodeSource.getDeployingAndLostNodes()) {
                     if (!lostNode.isLost()) {
                         continue;
                     }
