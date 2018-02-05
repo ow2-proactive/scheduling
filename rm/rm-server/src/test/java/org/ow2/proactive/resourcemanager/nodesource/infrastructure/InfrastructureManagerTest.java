@@ -79,10 +79,12 @@ public class InfrastructureManagerTest {
     public void testGetDeployingNodeUnknownNode() {
         RMDeployingNode rmNode = new RMDeployingNode("deploying", nodeSource, "command", null);
 
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(0);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(0);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(0);
 
-        RMDeployingNode rmNodeFound = infrastructureManager.getDeployingNode(rmNode.getNodeURL());
+        RMDeployingNode rmNodeFound = infrastructureManager.getDeployingOrLostNode(rmNode.getNodeURL());
 
         assertThat(rmNodeFound).isNull();
     }
@@ -90,12 +92,14 @@ public class InfrastructureManagerTest {
     @Test
     public void testGetDeployingNodeDeployingStateKnow() {
         RMDeployingNode rmNode = new RMDeployingNode("deploying", nodeSource, "command", null);
-        infrastructureManager.addDeployingNode(rmNode);
+        infrastructureManager.addDeployingNodeWithLockAndPersist(rmNode.getNodeURL(), rmNode);
 
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(0);
 
-        RMDeployingNode rmNodeFound = infrastructureManager.getDeployingNode(rmNode.getNodeURL());
+        RMDeployingNode rmNodeFound = infrastructureManager.getDeployingOrLostNode(rmNode.getNodeURL());
 
         assertThat(rmNodeFound).isSameAs(rmNode);
     }
@@ -103,19 +107,21 @@ public class InfrastructureManagerTest {
     @Test
     public void testGetDeployingNodeLostStateKnow() {
         RMDeployingNode deployingNode = new RMDeployingNode("deploying", nodeSource, "command", null);
-        infrastructureManager.addDeployingNode(deployingNode);
+        infrastructureManager.addDeployingNodeWithLockAndPersist(deployingNode.getNodeURL(), deployingNode);
         RMDeployingNode lostNode = new RMDeployingNode("lost", nodeSource, "command", null);
         lostNode.setLost();
-        infrastructureManager.addLostNode(lostNode);
+        infrastructureManager.addLostNodeWithLockAndPersist(lostNode.getNodeURL(), lostNode);
 
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(1);
 
-        RMDeployingNode rmNodeFound = infrastructureManager.getDeployingNode(lostNode.getNodeURL());
+        RMDeployingNode rmNodeFound = infrastructureManager.getDeployingOrLostNode(lostNode.getNodeURL());
         assertThat(rmNodeFound).isSameAs(lostNode);
         assertThat(rmNodeFound).isNotSameAs(deployingNode);
 
-        rmNodeFound = infrastructureManager.getDeployingNode(deployingNode.getNodeURL());
+        rmNodeFound = infrastructureManager.getDeployingOrLostNode(deployingNode.getNodeURL());
         assertThat(rmNodeFound).isSameAs(deployingNode);
         assertThat(rmNodeFound).isNotSameAs(lostNode);
     }
@@ -123,16 +129,18 @@ public class InfrastructureManagerTest {
     @Test
     public void testGetDeployingNodeConflictingUrls() {
         RMDeployingNode deployingNode = new RMDeployingNode("deploying", nodeSource, "command", null);
-        infrastructureManager.addDeployingNode(deployingNode);
+        infrastructureManager.addDeployingNodeWithLockAndPersist(deployingNode.getNodeURL(), deployingNode);
         RMDeployingNode lostNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         lostNode.setLost();
-        infrastructureManager.addLostNode(lostNode);
+        infrastructureManager.addLostNodeWithLockAndPersist(lostNode.getNodeURL(), lostNode);
 
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(1);
 
         // deploying nodes have priority over lost nodes
-        RMDeployingNode rmNodeFound = infrastructureManager.getDeployingNode(lostNode.getNodeURL());
+        RMDeployingNode rmNodeFound = infrastructureManager.getDeployingOrLostNode(lostNode.getNodeURL());
         assertThat(rmNodeFound).isSameAs(deployingNode);
         assertThat(rmNodeFound).isNotSameAs(lostNode);
     }
@@ -141,44 +149,55 @@ public class InfrastructureManagerTest {
     public void testUpdateUnknownNode() {
         RMDeployingNode rmNode = new RMDeployingNode("deploying", nodeSource, "command", null);
 
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(0);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(0);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(0);
 
         RMDeployingNode oldRmNode = infrastructureManager.update(rmNode);
 
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(0);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(0);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(0);
         assertThat(oldRmNode).isNull();
     }
 
     @Test
     public void testUpdateDeployingNodeKnown() {
         RMDeployingNode rmNode = new RMDeployingNode("deploying", nodeSource, "command", null);
-        infrastructureManager.addDeployingNode(rmNode);
+        infrastructureManager.addDeployingNodeWithLockAndPersist(rmNode.getNodeURL(), rmNode);
 
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(0);
 
         RMDeployingNode rmNode2 = new RMDeployingNode("deploying", nodeSource, "command2", null);
 
         RMDeployingNode oldRmNode = infrastructureManager.update(rmNode2);
 
         assertThat(oldRmNode).isSameAs(rmNode);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(0);
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesDeployingState().get(rmNode2.getNodeURL())).isSameAs(rmNode2);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(0);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(0);
+
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).contains(rmNode2);
     }
 
     @Test
     public void testUpdateLostNodeKnown() {
         RMDeployingNode deployingNode = new RMDeployingNode("deploying", nodeSource, "command", null);
-        infrastructureManager.addDeployingNode(deployingNode);
+        infrastructureManager.addDeployingNodeWithLockAndPersist(deployingNode.getNodeURL(), deployingNode);
         RMDeployingNode lostNode = new RMDeployingNode("lost", nodeSource, "command", null);
         lostNode.setLost();
-        infrastructureManager.addLostNode(lostNode);
+        infrastructureManager.addLostNodeWithLockAndPersist(lostNode.getNodeURL(), lostNode);
 
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(1);
 
         RMDeployingNode lostNode2 = new RMDeployingNode("lost", nodeSource, "command2", null);
         lostNode2.setLost();
@@ -186,22 +205,28 @@ public class InfrastructureManagerTest {
         RMDeployingNode oldRmNode = infrastructureManager.update(lostNode2);
 
         assertThat(oldRmNode).isSameAs(lostNode);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode.getNodeURL())).isSameAs(lostNode2);
-        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode2.getNodeURL())).isSameAs(lostNode2);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(1);
+
+        assertThat(infrastructureManager.getLostNodesWithLock()).contains(lostNode2);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).contains(lostNode.getNodeURL());
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).contains(lostNode2.getNodeURL());
     }
 
     @Test
     public void testUpdateLostNodeKnownConflictingUrls() {
         RMDeployingNode deployingNode = new RMDeployingNode("deploying", nodeSource, "command", null);
-        infrastructureManager.addDeployingNode(deployingNode);
+        infrastructureManager.addDeployingNodeWithLockAndPersist(deployingNode.getNodeURL(), deployingNode);
         RMDeployingNode lostNode = new RMDeployingNode("deploying", nodeSource, "command", null);
         lostNode.setLost();
-        infrastructureManager.addLostNode(lostNode);
+        infrastructureManager.addLostNodeWithLockAndPersist(lostNode.getNodeURL(), lostNode);
 
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(1);
 
         RMDeployingNode lostNode2 = new RMDeployingNode("deploying", nodeSource, "command2", null);
         lostNode2.setLost();
@@ -210,10 +235,14 @@ public class InfrastructureManagerTest {
 
         assertThat(oldRmNode).isSameAs(lostNode);
         assertThat(oldRmNode).isNotSameAs(deployingNode);
-        assertThat(infrastructureManager.getDeployingNodesLostState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesDeployingState()).hasSize(1);
-        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode.getNodeURL())).isSameAs(lostNode2);
-        assertThat(infrastructureManager.getDeployingNodesLostState().get(lostNode2.getNodeURL())).isSameAs(lostNode2);
+        assertThat(infrastructureManager.getDeployingNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedDeployingNodesUrl()).hasSize(1);
+        assertThat(infrastructureManager.getLostNodesWithLock()).hasSize(1);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).hasSize(1);
+
+        assertThat(infrastructureManager.getLostNodesWithLock()).contains(lostNode2);
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).contains(lostNode.getNodeURL());
+        assertThat(infrastructureManager.getPersistedLostNodesUrl()).contains(lostNode2.getNodeURL());
     }
 
     @Test

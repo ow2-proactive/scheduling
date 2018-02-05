@@ -23,33 +23,29 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.permissions;
+package performancetests;
 
-import java.security.BasicPermission;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-import org.ow2.proactive.policy.ClientsPolicy;
+import performancetests.metrics.GetResultMetricTest;
+import performancetests.metrics.SchedulerEfficiencyMetricsTest;
+import performancetests.metrics.TaskCreationTimeTest;
+import performancetests.recovery.JobRecoveryTest;
+import performancetests.recovery.NodeRecoveryTest;
 
+
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+                      // Performance tests
+                      NodeRecoveryTest.class, JobRecoveryTest.class,
+
+                      // Metrics
+                      TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class })
 
 /**
- * Base class of client specific permissions.
- * Allows to user wildcard in names and actions.
- * @see ClientsPolicy
+ * @author ActiveEon Team
+ * @since 05/02/2018
  */
-public class ClientPermission extends BasicPermission {
-
-    // This serial version uid is meant to prevent issues when restoring Resource Manager database from a previous version.
-    // any addition to this class (new method, field, etc) should imply to change this uid.
-    private static final long serialVersionUID = 1L;
-
-    public ClientPermission() {
-        super("*");
-    }
-
-    public ClientPermission(String name) {
-        super(name);
-    }
-
-    public ClientPermission(String name, String actions) {
-        super(name, actions);
-    }
+public class PerformanceTestSuite {
 }
