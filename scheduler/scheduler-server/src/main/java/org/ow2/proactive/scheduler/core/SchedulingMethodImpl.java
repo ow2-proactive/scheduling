@@ -254,25 +254,18 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             updateVariablesForTasksToSchedule(taskRetrievedFromPolicy);
 
-            for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
-                final InternalTask internalTask = ((EligibleTaskDescriptorImpl) etd).getInternal();
-                // load and Initialize the executable container
-                loadAndInit(internalTask);
-            }
+            loadAndInitTasks(taskRetrievedFromPolicy);
 
             while (!taskRetrievedFromPolicy.isEmpty() && !freeResources.isEmpty()) {
 
                 //get the next compatible tasks from the whole returned policy tasks
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
 
-                int neededResourcesNumber = 0;
-                while (!taskRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
-                    //the loop will search for next compatible task until it find something
-                    neededResourcesNumber = getNextCompatibleTasks(jobMap,
-                                                                   taskRetrievedFromPolicy,
-                                                                   freeResources.size(),
-                                                                   tasksToSchedule);
-                }
+                int neededResourcesNumber = getNeededResourcesNumber(jobMap,
+                                                                     freeResources.size(),
+                                                                     taskRetrievedFromPolicy,
+                                                                     tasksToSchedule);
+
                 if (logger.isDebugEnabled()) {
                     logger.debug("tasksToSchedule : " + tasksToSchedule);
                     logger.debug("required number of nodes : " + neededResourcesNumber);
@@ -293,7 +286,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //start selected tasks
                 InternalJob currentJob = null;
                 try {
-                    while (!nodeSet.isEmpty()) {
+                    while (!nodeSet.isEmpty() && !tasksToSchedule.isEmpty()) {
                         EligibleTaskDescriptor taskDescriptor = tasksToSchedule.removeFirst();
                         currentJob = ((JobDescriptorImpl) jobMap.get(taskDescriptor.getJobId())).getInternal();
                         InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
@@ -303,16 +296,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             createExecution(nodeSet, currentJob, internalTask, taskDescriptor)) {
                             numberOfTaskStarted++;
                         }
+                    }
 
-                        //if every task that should be launched have been removed
-                        if (tasksToSchedule.isEmpty()) {
-                            //get back unused nodes to the RManager
-                            if (!nodeSet.isEmpty()) {
-                                tryToGetBackRemainingNodesToTheRM(currentJob, nodeSet, freeResources);
-                            }
-                            //and leave the loop
-                            break; // while
-                        }
+                    //if every task that should be launched have been removed
+                    //get back unused nodes to the RManager
+                    if (tasksToSchedule.isEmpty() && !nodeSet.isEmpty()) {
+                        tryToGetBackRemainingNodesToTheRM(currentJob, nodeSet, freeResources);
                     }
                 } catch (ActiveObjectCreationException e1) {
                     //Something goes wrong with the active object creation (createLauncher)
@@ -336,6 +325,27 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
         }
         return numberOfTaskStarted;
+    }
+
+    private int getNeededResourcesNumber(Map<JobId, JobDescriptor> jobMap, int freeResourcesSize,
+            List<EligibleTaskDescriptor> taskRetrievedFromPolicy, List<EligibleTaskDescriptor> tasksToSchedule) {
+        int neededResourcesNumber = 0;
+        while (!taskRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
+            //the loop will search for next compatible task until it find something
+            neededResourcesNumber = getNextCompatibleTasks(jobMap,
+                                                           taskRetrievedFromPolicy,
+                                                           freeResourcesSize,
+                                                           tasksToSchedule);
+        }
+        return neededResourcesNumber;
+    }
+
+    private void loadAndInitTasks(List<EligibleTaskDescriptor> taskRetrievedFromPolicy) {
+        for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
+            final InternalTask internalTask = ((EligibleTaskDescriptorImpl) etd).getInternal();
+            // load and Initialize the executable container
+            loadAndInit(internalTask);
+        }
     }
 
     //so try to get back every remaining nodes to the resource manager
@@ -410,14 +420,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 } else {
                     firstLoop = false;
                 }
-                if (neededNodes > maxResource) {
-                    //no instruction is important :
-                    //in this case, a multi node task leads the search to be stopped and
-                    //the current task would be retried on the next step
-                    //we continue to start the maximum number of task in a single scheduling loop.
-                    //this case will focus on starting single node task first if lot of resources are busy.
-                    //(multi-nodes starvation may occurs)
-                } else {
+                if (neededNodes <= maxResource) {
                     //check if the task is compatible with the other previous one
                     if (referent.equals(new SchedulingTaskComparator(internalTask, currentJob))) {
                         tlogger.debug(internalTask.getId(), "scheduling");
@@ -428,6 +431,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         bagOfTasks.add(0, etd);
                         break;
                     }
+                } else {
+                    //no instruction is important :
+                    //in this case, a multi node task leads the search to be stopped and
+                    //the current task would be retried on the next step
+                    //we continue to start the maximum number of task in a single scheduling loop.
+                    //this case will focus on starting single node task first if lot of resources are busy.
+                    //(multi-nodes starvation may occurs)
                 }
             } while (maxResource > 0 && !bagOfTasks.isEmpty());
         }
