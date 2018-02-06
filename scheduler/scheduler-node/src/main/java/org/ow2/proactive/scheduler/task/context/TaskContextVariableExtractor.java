@@ -25,8 +25,6 @@
  */
 package org.ow2.proactive.scheduler.task.context;
 
-import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -38,6 +36,7 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedTaskVariablesManager;
@@ -85,7 +84,7 @@ public class TaskContextVariableExtractor implements Serializable {
         systemEnvironmentVariables.putAll(variables);
         systemEnvironmentVariables.putAll(thirdPartyCredentials);
 
-        return filterAndUpdate(forkEnvironment.getSystemEnvironment(), systemEnvironmentVariables);
+        return VariableSubstitutor.filterAndUpdate(forkEnvironment.getSystemEnvironment(), systemEnvironmentVariables);
     }
 
     /**
@@ -119,7 +118,7 @@ public class TaskContextVariableExtractor implements Serializable {
         } catch (IOException | ClassNotFoundException e) {
             logger.error(ERROR_READING_VARIABLES, e);
         }
-        return resolveVariables(variables, dictionary);
+        return VariableSubstitutor.resolveVariables(variables, dictionary);
     }
 
     /**
@@ -145,7 +144,7 @@ public class TaskContextVariableExtractor implements Serializable {
             logger.error(ERROR_READING_VARIABLES, e);
         }
 
-        return resolveVariables(variables, dictionary);
+        return VariableSubstitutor.resolveVariables(variables, dictionary);
     }
 
     /**
@@ -169,7 +168,7 @@ public class TaskContextVariableExtractor implements Serializable {
             logger.error(ERROR_READING_VARIABLES, e);
         }
 
-        return resolveVariables(variables, dictionary);
+        return VariableSubstitutor.resolveVariables(variables, dictionary);
     }
 
     /**
@@ -187,7 +186,7 @@ public class TaskContextVariableExtractor implements Serializable {
         } catch (IOException | ClassNotFoundException e) {
             logger.error(ERROR_READING_VARIABLES, e);
         }
-        return resolveVariables(variables, variables);
+        return VariableSubstitutor.resolveVariables(variables, variables);
     }
 
     /**
@@ -204,36 +203,7 @@ public class TaskContextVariableExtractor implements Serializable {
         } catch (IOException | ClassNotFoundException e) {
             logger.error(ERROR_READING_VARIABLES, e);
         }
-        return resolveVariables(variables, variables);
-    }
-
-    /**
-     * Creates a HashMap with variablesDictionary where values are resolved.
-     *
-     * Solve variables value if bound to another variable, for instance "var log=${LOG_ENV_VAR}", we
-     * expect that LOG_ENV_VAR is replaced by its value. To do so we have a variables hash, that must have
-     * all references and then for each variable we do a filterAndUpdate that will recursively replace
-     * when needed, @see VariableSubstitutor.
-     *
-     * Some limitations to consider: recursive substitution limit is VariableSubstitutor.MAXIMUM_DEPTH,
-     * if the variable value is a complex data structure (array, List, Vector) we will not substitute it.
-     *
-     * @param variables input hash containing variables and their values may reference other variables
-     * @return dictionary with the same variables however with their values resolved
-     */
-    private static Map<String, Serializable> resolveVariables(Map<String, Serializable> variables,
-            Map<String, Serializable> dictionary) {
-        Map<String, Serializable> dictionaryVariables = new HashMap<>();
-        for (Map.Entry<String, Serializable> entry : variables.entrySet()) {
-            String resolvedValue;
-            if (entry.getValue() instanceof String) {
-                resolvedValue = filterAndUpdate(entry.getValue().toString(), dictionary);
-                dictionaryVariables.put(entry.getKey(), resolvedValue);
-            } else {
-                dictionaryVariables.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return dictionaryVariables;
+        return VariableSubstitutor.resolveVariables(variables, variables);
     }
 
     /**

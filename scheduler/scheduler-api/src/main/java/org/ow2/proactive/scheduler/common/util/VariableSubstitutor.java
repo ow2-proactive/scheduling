@@ -67,6 +67,35 @@ public class VariableSubstitutor {
     }
 
     /**
+     * Creates a HashMap with variablesDictionary where values are resolved.
+     *
+     * Solve variables value if bound to another variable, for instance "var log=${LOG_ENV_VAR}", we
+     * expect that LOG_ENV_VAR is replaced by its value. To do so we have a variables hash, that must have
+     * all references and then for each variable we do a filterAndUpdate that will recursively replace
+     * when needed, @see VariableSubstitutor.
+     *
+     * Some limitations to consider: recursive substitution limit is VariableSubstitutor.MAXIMUM_DEPTH,
+     * if the variable value is a complex data structure (array, List, Vector) we will not substitute it.
+     *
+     * @param variables input hash containing variables and their values may reference other variables
+     * @return dictionary with the same variables however with their values resolved
+     */
+    public static Map<String, Serializable> resolveVariables(Map<String, Serializable> variables,
+            Map<String, Serializable> dictionary) {
+        Map<String, Serializable> resolvedVariables = new HashMap<>();
+        for (Map.Entry<String, Serializable> entry : variables.entrySet()) {
+            String resolvedValue;
+            if (entry.getValue() instanceof String) {
+                resolvedValue = filterAndUpdate(entry.getValue().toString(), dictionary);
+                resolvedVariables.put(entry.getKey(), resolvedValue);
+            } else {
+                resolvedVariables.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return resolvedVariables;
+    }
+
+    /**
      * Filters the specified string and replaces the variables with values
      * specified in the map.
      *

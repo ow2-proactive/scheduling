@@ -60,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -1222,6 +1223,8 @@ public abstract class InternalTask extends TaskState {
             }
 
             updatedVariables.putAll(getSystemVariables());
+
+            updatedVariables = VariableSubstitutor.resolveVariables(updatedVariables, updatedVariables);
         }
     }
 
