@@ -25,9 +25,6 @@
  */
 package performancetests.metrics;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
-
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -106,10 +103,6 @@ public class GetResultMetricTest extends PeformanceTestBase {
                                   timeLimit,
                                   timeToGetResult,
                                   ((timeToGetResult < timeLimit) ? SUCCESS : FAILURE)));
-
-        assertThat(String.format("Task creation rate for job with %s tasks", taskNumber),
-                   timeToGetResult,
-                   lessThan(timeLimit));
     }
 
     @After
