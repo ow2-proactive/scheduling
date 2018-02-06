@@ -6,6 +6,10 @@
 		<variable name="TESTVAR" value="testvar"/>
 		<variable name="TESTVAR1" value="jobVar1"/>
 		<variable name="TESTVAR2" value="jobVar2"/>
+		<variable name="WORKFLOW_VAR1" value="workflow_value"/>
+		<variable name="WORKFLOW_VAR2" value="var2_$WORKFLOW_VAR1"/>
+		<variable name="WORKFLOW_VAR3" value="workflow_value_${PA_JOB_ID}"/>
+		<variable name="WORKFLOW_VAR4" value="workflow_value_${TASK_VAR1}"/>
 	</variables>
 	<description>Job using variables in selection scripts, check the scheduler logs if the test fails to see the selection scripts output</description>
 	<genericInformation>
@@ -50,12 +54,22 @@
 						variables.put("TESTVAR", "newValue")
 						variables.put("TESTVAR3", "propagatedVar3")
 						variables.put("TESTVAR4", "propagatedVar4")
+						variables.put("INHERITED_VAR1", "inherited_value")
+						variables.put("INHERITED_VAR2", "inherited_value_\${PA_JOB_ID}")
+						variables.put("INHERITED_VAR3", "inherited_value_\${TASK_VAR1}")
+						variables.put("INHERITED_VAR4", "inherited_value_\${INHERITED_VAR1}")
 					</code>
 				</script>
 			</scriptExecutable>
 		</task>
 		<task name="taskSelectWithDep">
 			<description>Task with selection script which uses updated job variables</description>
+			<variables>
+				<variable name="TASK_VAR1" value="task_value" />
+				<variable name="TASK_VAR2" value="task_value_${PA_JOB_ID}"/>
+				<variable name="TASK_VAR3" value="task_value_$TASK_VAR1" />
+				<variable name="TASK_VAR4" value="task_value_${INHERITED_VAR1}"/>
+			</variables>
 			<genericInformation>
 				<info name="TESTGI" value="testgi"/>
 			</genericInformation>
@@ -79,6 +93,22 @@
 						ok = ok && (variables.get(SchedulerVars.PA_USER.toString()) != null)
 						ok = ok && ("newValue".equals(variables.get("TESTVAR")))
 						ok = ok && ("testgi".equals(genericInformation.get("TESTGI")))
+
+						ok = ok && ("workflow_value".equals(variables.get("WORKFLOW_VAR1")))
+						ok = ok && ("var2_workflow_value".equals(variables.get("WORKFLOW_VAR2")))
+						ok = ok && (("workflow_value_" + variables.get("PA_JOB_ID")).equals(variables.get("WORKFLOW_VAR3")))
+						ok = ok && ("workflow_value_task_value".equals(variables.get("WORKFLOW_VAR4")))
+
+						ok = ok && ("task_value".equals(variables.get("TASK_VAR1")))
+						ok = ok && (("task_value_" + variables.get("PA_JOB_ID")).equals(variables.get("TASK_VAR2")))
+						ok = ok && ("task_value_task_value".equals(variables.get("TASK_VAR3")))
+						ok = ok && ("task_value_inherited_value".equals(variables.get("TASK_VAR4")))
+
+						ok = ok && ("inherited_value".equals(variables.get("INHERITED_VAR1")))
+						ok = ok && (("inherited_value_" + variables.get("PA_JOB_ID")).equals(variables.get("INHERITED_VAR2")))
+						ok = ok && ("inherited_value_task_value".equals(variables.get("INHERITED_VAR3")))
+						ok = ok && ("inherited_value_inherited_value".equals(variables.get("INHERITED_VAR4")))
+
 						selected = ok
                      	]]>
 					</code>

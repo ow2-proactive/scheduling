@@ -252,7 +252,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testSchedulerNodeClientCleanScript() throws Throwable {
         ISchedulerClient client = clientInstance();
 
-        client.putThirdPartyCredential("TEST_CREDS", "mypassword");
+        client.putThirdPartyCredential("TEST_CREDS", "mypassword_${PA_JOB_ID}");
 
         Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
                                 "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
@@ -272,7 +272,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         //assert globalspaceapi.connect() worked
         Assert.assertThat(jobLog, CoreMatchers.containsString("GLOBALSPACE_FILE_LIST_NOT_NULL=true"));
         //assert globalspaceapi.connect() worked
-        Assert.assertThat(jobLog, CoreMatchers.containsString("TEST_CREDS=mypassword"));
+        Assert.assertThat(jobLog, CoreMatchers.containsString("TEST_CREDS=mypassword_" + jobId.toString()));
     }
 
     @Test(timeout = MAX_WAIT_TIME)
