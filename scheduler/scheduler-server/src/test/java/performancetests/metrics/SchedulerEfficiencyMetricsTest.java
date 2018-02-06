@@ -25,9 +25,6 @@
  */
 package performancetests.metrics;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
-
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -142,8 +139,6 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
 
     private void logAndAssert(String name, long value) {
         LOGGER.info(makeCSVString(name, taskNumber, timeLimit, value, ((value < timeLimit) ? SUCCESS : FAILURE)));
-
-        assertThat(String.format("%s for job with %d tasks", name, taskNumber), value, lessThan(timeLimit));
     }
 
     public static TaskFlowJob createJob(int taskNumber, int taskDuration) throws Exception {
