@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.common.job.factories;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,13 +43,15 @@ import javax.xml.transform.TransformerException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 
 
 public class Job2XMLTransformerTest {
@@ -84,6 +85,24 @@ public class Job2XMLTransformerTest {
         TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 
         assertNotNull(recreatedJob.getTask("forkedTask").getForkEnvironment());
+    }
+
+    @Test
+    public void argumentsInScript() throws Exception {
+        File xmlFile = tmpFolder.newFile();
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName("simpleJob");
+        String params[] = { "param1", "param2" };
+        SimpleScript script = new SimpleScript("\nprint('arguments[0]='+arguments[0])\n", "javascript", params);
+        ScriptTask task = new ScriptTask();
+        task.setName("testTask");
+        task.setScript(new TaskScript(script));
+        job.addTask(task);
+
+        new Job2XMLTransformer().job2xmlFile(job, xmlFile);
+        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
+
+        assertNotNull(((ScriptTask) recreatedJob.getTask("testTask")).getScript());
     }
 
     private String matchOnTaskErrorEquals(OnTaskError onTaskError) {
