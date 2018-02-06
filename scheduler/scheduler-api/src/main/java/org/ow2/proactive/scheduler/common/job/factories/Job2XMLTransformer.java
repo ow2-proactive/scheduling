@@ -770,17 +770,20 @@ public class Job2XMLTransformer {
         } else {
             Element codeE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.SCRIPT_CODE.getXMLName());
             setAttribute(codeE, XMLAttributes.LANGUAGE, script.getEngineName(), true);
-            String scriptText = script.getScript();
+            codeE.appendChild(doc.createCDATASection(script.getScript()));
+            scriptElement.appendChild(codeE);
             Serializable[] params = script.getParameters();
             if (params != null) {
-
-                scriptText = inlineScriptParametersInText(scriptText, params);
+                Element parametersE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                          XMLTags.SCRIPT_ARGUMENTS.getXMLName());
+                for (Serializable param : params) {
+                    Element parameterE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                             XMLTags.SCRIPT_ARGUMENT.getXMLName());
+                    setAttribute(parameterE, XMLAttributes.COMMON_VALUE, param.toString(), true);
+                    parametersE.appendChild(parameterE);
+                }
+                scriptElement.appendChild(parametersE);
             }
-
-            CDATASection scriptTextCDATA = doc.createCDATASection(scriptText);
-            codeE.appendChild(scriptTextCDATA);
-
-            scriptElement.appendChild(codeE);
         }
         return scriptElement;
     }
