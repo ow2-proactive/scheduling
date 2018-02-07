@@ -21,6 +21,12 @@
                     <code language="javascript">
                         print('${prescript_variable}')
                     </code>
+                    <arguments>
+                        <argument value="TESTARGUMENTS"/>
+                        <argument value="2"/>
+                        <argument value="3"/>
+                        <argument value="4"/>
+                    </arguments>
                 </script>
             </pre>
             <scriptExecutable>
