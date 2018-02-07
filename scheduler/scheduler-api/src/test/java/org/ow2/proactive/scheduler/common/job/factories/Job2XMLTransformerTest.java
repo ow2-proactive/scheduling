@@ -40,6 +40,7 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -102,7 +103,10 @@ public class Job2XMLTransformerTest {
         new Job2XMLTransformer().job2xmlFile(job, xmlFile);
         TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
 
-        assertNotNull(((ScriptTask) recreatedJob.getTask("testTask")).getScript());
+        Assert.assertEquals("param1",
+                            ((ScriptTask) recreatedJob.getTask("testTask")).getScript().getParameters()[0].toString());
+        Assert.assertEquals("param2",
+                            ((ScriptTask) recreatedJob.getTask("testTask")).getScript().getParameters()[1].toString());
     }
 
     private String matchOnTaskErrorEquals(OnTaskError onTaskError) {

@@ -741,6 +741,9 @@ public class StaxJobFactory extends JobFactory {
                         case PARAMETER_SWEEPING:
                             current = XMLTags.TASK;
                             throw new RuntimeException("Job parameter sweeping is not yet implemented!");
+                        default:
+                            //do nothing just cope with sonarqube rule switch must have default
+                            //https://sonarcloud.io/coding_rules?rule_key=squid%3ASwitchLastCaseIsDefaultCheck
                     }
                 }
             }
