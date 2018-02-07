@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -52,6 +53,9 @@ import org.ow2.proactive.scheduler.task.SchedulerVars;
  */
 @PublicAPI
 public abstract class JobState extends Job implements Comparable<JobState> {
+
+    /** if job has this id, it means that it was not yet submitted or exception occured */
+    public static final long UNINITIALIZED_JOB_ID = 0;
 
     /** Used to sort by id */
     public static final int SORT_BY_ID = 1;
@@ -175,7 +179,7 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @see org.ow2.proactive.scheduler.common.job.Job#getId()
      */
     @Override
-    public JobId getId() {
+    public synchronized JobId getId() {
         return getJobInfo().getJobId();
     }
 
@@ -207,14 +211,12 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return the set of filtered task states.
      */
     public List<TaskState> getTasksByTag(final String tag) {
-        List<TaskState> tasks = this.getTasks();
-        return (List<TaskState>) CollectionUtils.select(tasks, new Predicate() {
-            @Override
-            public boolean evaluate(Object object) {
-                String taskTag = ((TaskState) object).getTag();
-                return (taskTag != null) && (taskTag.equals(tag));
-            }
-        });
+        return this.getTasks().stream()
+                .filter(taskState -> {
+                    String taskTag = ((TaskState) taskState).getTag();
+                    return (taskTag != null) && (taskTag.equals(tag));
+                })
+                .collect(Collectors.toList());
     }
 
     /**
@@ -265,15 +267,11 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return the list of tags.
      */
     public List<String> getTags() {
-        Set<String> result = new HashSet<>();
-        String tag = null;
-        for (TaskState task : this.getTasks()) {
-            tag = task.getTag();
-            if (tag != null) {
-                result.add(task.getTag());
-            }
-        }
-        return new ArrayList<>(result);
+        return this.getTasks().stream()
+                .map(TaskState::getTag)
+                .filter(s -> s != null)
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     /**
@@ -282,15 +280,9 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @return the list of tags.
      */
     public List<String> getTags(String prefix) {
-        Set<String> result = new HashSet<>();
-        String tag = null;
-        for (TaskState task : this.getTasks()) {
-            tag = task.getTag();
-            if (tag != null && tag.startsWith(prefix)) {
-                result.add(task.getTag());
-            }
-        }
-        return new ArrayList<>(result);
+        return getTags().stream()
+                .filter(s -> s.startsWith(prefix))
+                .collect(Collectors.toList());
     }
 
     /**

@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -467,6 +466,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UniqueID id = checkAccess();
 
         // get the internal job.
+
         InternalJob job = InternalJobFactory.createJob(userJob, this.credentials.get(id));
 
         // setting job informations

@@ -118,6 +118,9 @@ public abstract class InternalJob extends JobState {
      */
     private long restartWaitingTimer = PASchedulerProperties.REEXECUTION_INITIAL_WAITING_TIME.getValueAsInt();
 
+    /** Verbosity to apply for job submission logging */
+    private boolean jobSubmissionDetailedLogging = PASchedulerProperties.SCHEDULER_JOB_SUBMISSION_DETAILED_LOGGING.getValueAsBoolean();
+
     /**
      * Verbosity to apply for job submission logging
      */
@@ -950,7 +953,7 @@ public abstract class InternalJob extends JobState {
      *
      * @param id the id to set
      */
-    public void setId(JobId id) {
+    public synchronized void setId(JobId id) {
         jobInfo.setJobId(id);
     }
 
