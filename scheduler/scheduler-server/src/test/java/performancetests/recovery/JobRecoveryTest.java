@@ -25,8 +25,6 @@
  */
 package performancetests.recovery;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -132,6 +130,7 @@ public class JobRecoveryTest extends PeformanceTestBase {
             long recovered = numberOfJobsRecovered();
             final long timeSpent = timeSpentToRecoverJobs();
 
+            assertEquals(jobsNumber, recovered);
             LOGGER.info(PeformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName(),
                                                          jobsNumber,
                                                          timeLimit,
@@ -148,9 +147,6 @@ public class JobRecoveryTest extends PeformanceTestBase {
                                                              timeSpentToRecoverNodesAndJobs(),
                                                              SUCCESS));
             }
-
-            assertEquals(jobsNumber, recovered);
-            assertThat("Jobs recovery time for " + jobsNumber + " jobs", (int) timeSpent, lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.info(PeformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName(),

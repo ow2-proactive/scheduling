@@ -25,8 +25,6 @@
  */
 package performancetests.recovery;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -126,16 +124,13 @@ public class NodeRecoveryTest extends PeformanceTestBase {
             startKillStartRM();
             long recovered = nodesRecovered();
             long timeSpent = timeSpentToRecoverNodes();
+            assertEquals(nodesNumber, recovered);
             LOGGER.info(makeCSVString(NodeRecoveryTest.class.getSimpleName(),
                                       nodesNumber,
                                       timeLimit,
                                       recovered,
                                       timeSpent,
                                       ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
-            assertEquals(nodesNumber, recovered);
-            assertThat("Nodes recovery time for " + nodesNumber + " nodes",
-                       (int) timeSpentToRecoverNodes(),
-                       lessThan(timeLimit));
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.info(PeformanceTestBase.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
