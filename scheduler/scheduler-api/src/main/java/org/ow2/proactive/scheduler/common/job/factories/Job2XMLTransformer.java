@@ -788,24 +788,6 @@ public class Job2XMLTransformer {
     }
 
     /**
-     * Inserts a line, at the beginning of the script code with the text: var
-     * args = ["argument_1",...,"argument_n"];
-     *
-     * where "argument_1",...,"argument_n" are the elements of the input array
-     * "params"
-     *
-     */
-    public static String inlineScriptParametersInText(String scriptText, Serializable[] params) {
-        String paramsLine = "var args=[";
-        for (Serializable param : params) {
-            paramsLine += "\"" + param + "\",";
-        }
-        paramsLine = paramsLine.substring(0, paramsLine.length() - 1) + "];";
-
-        return paramsLine + "\n" + scriptText;
-    }
-
-    /**
      * Corresponds to <element name="javaExecutable">
      *
      */
