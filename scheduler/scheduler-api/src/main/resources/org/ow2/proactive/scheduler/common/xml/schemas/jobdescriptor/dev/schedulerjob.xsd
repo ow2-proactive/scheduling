@@ -587,7 +587,7 @@
         </xs:annotation>
         <xs:complexType>
           <xs:choice>
-            <xs:element ref="jd:code"/>
+            <xs:group ref="jd:codeScript"/>
             <xs:element ref="jd:file"/>
           </xs:choice>
         </xs:complexType>
@@ -602,7 +602,7 @@
         </xs:annotation>
         <xs:complexType>
           <xs:choice>
-            <xs:element ref="jd:code"/>
+            <xs:group ref="jd:codeScript"/>
             <xs:element ref="jd:file"/>
           </xs:choice>
           <xs:attribute name="type" type="jd:scriptTypeT">
@@ -621,18 +621,18 @@
       </xs:annotation>
     </xs:attribute>
   </xs:attributeGroup>
+  <xs:group name="codeScript">
+    <xs:sequence>
+      <xs:element ref="jd:code"/>
+      <xs:group minOccurs="0" ref="jd:fileScriptArguments"/>
+    </xs:sequence>
+  </xs:group>
   <xs:element name="code">
     <xs:annotation>
       <xs:documentation>Definition of a script by writing directly the code inside the descriptor </xs:documentation>
     </xs:annotation>
     <xs:complexType mixed="true">
-      <xs:attribute name="language" use="required">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:minLength value="1"/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:attribute>
+      <xs:attributeGroup ref="jd:language"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="file">
@@ -657,8 +657,24 @@
           <xs:union memberTypes="xs:anyURI jd:variableRefType"/>
         </xs:simpleType>
       </xs:attribute>
+      <xs:attribute name="language">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
     </xs:complexType>
   </xs:element>
+  <xs:attributeGroup name="language">
+    <xs:attribute name="language" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
   <xs:attributeGroup name="path">
     <xs:attribute name="path" use="required">
       <xs:annotation>

@@ -51,7 +51,8 @@ public class TestNodeSourceAfterRestart extends RMFunctionalTest {
                                                        new Object[] { creds, 1, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                                        //first parameter is empty rmHelper url
                                                        StaticPolicy.class.getName(),
-                                                       new Object[] { "ME", "ALL" });
+                                                       new Object[] { "ME", "ALL" },
+                                                       NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceCreation(sourceName, 1);
     }
 

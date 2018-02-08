@@ -52,9 +52,9 @@ import functionaltests.utils.RMTHelper;
  */
 public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
-    private static final String START_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-clean-db.ini";
+    private static final String START_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-start-clean-db-nodes-recovery-enabled.ini";
 
-    private static final String RESTART_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db.ini";
+    private static final String RESTART_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-restart-keep-db-nodes-recovery-enabled.ini";
 
     private static final String NODE_SOURCE_NAME = "LocalNodeSource" +
                                                    RecoverLocalInfrastructureTest.class.getSimpleName();
@@ -104,7 +104,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
         // check the initial state of the RM
         assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(0);
-        rmHelper.createNodeSource(NODE_SOURCE_NAME, NODE_NUMBER);
+        rmHelper.createNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME, NODE_NUMBER);
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
         ArrayList<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState()
                                                                                           .getNodeSource();

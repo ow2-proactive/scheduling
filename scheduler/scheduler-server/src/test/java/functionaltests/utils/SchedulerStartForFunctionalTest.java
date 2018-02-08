@@ -25,6 +25,8 @@
  */
 package functionaltests.utils;
 
+import static functionaltests.utils.RMFunctionalTest.NODES_NOT_RECOVERABLE;
+
 import java.io.Serializable;
 import java.net.URI;
 
@@ -36,6 +38,7 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
@@ -114,7 +117,8 @@ public class SchedulerStartForFunctionalTest implements Serializable {
                                                  new Object[] { credentials.getBase64(), RM_NODE_NUMBER,
                                                                 RM_NODE_DEPLOYMENT_TIMEOUT, getJavaPropertiesLine() },
                                                  StaticPolicy.class.getName(),
-                                                 new Object[] { "ALL", "ALL" });
+                                                 new Object[] { "ALL", "ALL" },
+                                                 NODES_NOT_RECOVERABLE);
                         rmAdmin.disconnect();
                     }
                 } catch (Exception e) {

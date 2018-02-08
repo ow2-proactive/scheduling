@@ -67,7 +67,8 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
                                                        LocalInfrastructure.class.getName(),
                                                        new Object[] { creds, 0, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                                        TimeSlotPolicy.class.getName(),
-                                                       getPolicyParams());
+                                                       getPolicyParams(),
+                                                       NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceCreation(sourceName);
     }
@@ -81,7 +82,8 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
                                   new Object[] { creds, descriptorNodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                   //first parameter is empty rmHelper url
                                   TimeSlotPolicy.class.getName(),
-                                  getPolicyParams());
+                                  getPolicyParams(),
+                                  NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
 

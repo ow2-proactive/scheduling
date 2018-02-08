@@ -62,7 +62,8 @@ public class TestLocalInfrastructureStaticPolicy extends RMFunctionalTest {
                                                        LocalInfrastructure.class.getName(),
                                                        new Object[] { creds, 0, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                                        StaticPolicy.class.getName(),
-                                                       null);
+                                                       null,
+                                                       NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceCreation(sourceName);
     }
@@ -76,7 +77,8 @@ public class TestLocalInfrastructureStaticPolicy extends RMFunctionalTest {
                                   LocalInfrastructure.class.getName(),
                                   new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
                                   StaticPolicy.class.getName(),
-                                  null);
+                                  null,
+                                  NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }

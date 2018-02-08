@@ -741,6 +741,9 @@ public class StaxJobFactory extends JobFactory {
                         case PARAMETER_SWEEPING:
                             current = XMLTags.TASK;
                             throw new RuntimeException("Job parameter sweeping is not yet implemented!");
+                        default:
+                            //do nothing just cope with sonarqube rule switch must have default
+                            //https://sonarcloud.io/coding_rules?rule_key=squid%3ASwitchLastCaseIsDefaultCheck
                     }
                 }
             }
@@ -1245,6 +1248,13 @@ public class StaxJobFactory extends JobFactory {
                                 content = cursorScript.getText();
                             }
                             toReturn = new SimpleScript(content, language);
+                            //fast forward to the end of tag
+                            while (true) {
+                                int ev = cursorScript.next();
+                                if (XMLTags.SCRIPT_CODE.matches(current) && ev == XMLEvent.END_ELEMENT) {
+                                    break;
+                                }
+                            }
                         } else if (XMLTags.SCRIPT_FILE.matches(current)) {
                             String path = null;
                             String url = null;
@@ -1285,6 +1295,10 @@ public class StaxJobFactory extends JobFactory {
                                 attrtmp = null;
                                 throw new JobCreationException("Invalid script file definition, one of path/url attributes must be declared");
                             }
+                        } else if (XMLTags.SCRIPT_ARGUMENTS.matches(current)) {
+                            toReturn = new SimpleScript(toReturn.getScript(),
+                                                        toReturn.getEngineName(),
+                                                        getArguments(cursorScript));
                         } else if (XMLTags.SCRIPT_SCRIPT.matches(current)) {
                             if (cursorScript.getAttributeCount() > 0) {
                                 isDynamic = !"static".equals(cursorScript.getAttributeValue(0));

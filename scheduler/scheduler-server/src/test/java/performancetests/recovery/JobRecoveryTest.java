@@ -25,26 +25,18 @@
  */
 package performancetests.recovery;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -52,6 +44,7 @@ import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 
+import functionaltests.nodesrecovery.NodesRecoveryProcessHelper;
 import functionaltests.utils.*;
 import performancetests.helper.LogProcessor;
 
@@ -61,10 +54,10 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class JobRecoveryTest extends BaseRecoveryTest {
+public class JobRecoveryTest extends PeformanceTestBase {
 
-    private static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
-                                                                                     .getPath();
+    public static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
+                                                                                    .getPath();
 
     private static final String SCHEDULER_CONFIGURATION_RESTART = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-restart.ini")
                                                                                        .getPath();
@@ -75,7 +68,7 @@ public class JobRecoveryTest extends BaseRecoveryTest {
 
     /**
      * @return an array of parameters which is used by JUnit to create objects of JobRecoveryTest,
-     *         where first value represents jobs number to recover, and second value sets time limit to recovery.
+     * where first value represents jobs number to recover, and second value sets time limit to recovery.
      */
     @Parameters
     public static Collection<Object[]> data() {
@@ -125,26 +118,43 @@ public class JobRecoveryTest extends BaseRecoveryTest {
 
     }
 
-    @Test(timeout = 1600000)
+    @Test(timeout = 3600000)
     public void test() {
+        final Object[][] parameters = (Object[][]) data().toArray();
+
         try {
             // it should be inside Test case and not in Before case, because
             // otherwise After will not be executed if Before lasts longer than timeout Rule
             // however, if it is inside Test case then, escaping by timeout anyway will call After
             startKillStartScheduler();
             long recovered = numberOfJobsRecovered();
-            long timeSpent = timeSpentToRecoverJobs();
-            LOGGER.info(NodeRecoveryTest.makeCSVString("JobRecoveryTest",
-                                                       jobsNumber,
-                                                       timeLimit,
-                                                       recovered,
-                                                       timeSpent,
-                                                       ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE")));
+            final long timeSpent = timeSpentToRecoverJobs();
+
             assertEquals(jobsNumber, recovered);
-            assertThat("Jobs recovery time for " + jobsNumber + " jobs", (int) timeSpent, lessThan(timeLimit));
+            LOGGER.info(PeformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName(),
+                                                         jobsNumber,
+                                                         timeLimit,
+                                                         recovered,
+                                                         timeSpent,
+                                                         ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
+
+            final Integer numberOfJobsOfLastTestCase = (Integer) parameters[parameters.length - 1][0];
+            if (jobsNumber == numberOfJobsOfLastTestCase) {
+                LOGGER.info(PeformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName() + "WithNodes",
+                                                             jobsNumber,
+                                                             timeLimit,
+                                                             jobsNumber,
+                                                             timeSpentToRecoverNodesAndJobs(),
+                                                             SUCCESS));
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(NodeRecoveryTest.makeCSVString("JobRecoveryTest", jobsNumber, timeLimit, -1, -1, "ERROR"));
+            LOGGER.info(PeformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName(),
+                                                         jobsNumber,
+                                                         timeLimit,
+                                                         -1,
+                                                         -1,
+                                                         ERROR));
         }
     }
 
@@ -161,19 +171,38 @@ public class JobRecoveryTest extends BaseRecoveryTest {
     }
 
     private long timeSpentToRecoverJobs() {
-        final long startedToRecover = LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(SchedulerDBManager.ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED))
-                                                  .getTime();
-        final long recoveryEnded = LogProcessor.getDateOfLine(LogProcessor.getLastLineThatMatch(SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED))
-                                               .getTime();
-
-        long time = recoveryEnded - startedToRecover;
+        final long time = endedToRecover() - startedToRecover();
         if (time < 0) {
-            throw new RuntimeException("First occurence of " + " goes after " +
-                                       SchedulerDBManager.ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED +
-                                       SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED);
+            throw new RuntimeException(String.format("First occurence of %s goes after %s",
+                                                     SchedulerDBManager.ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED,
+                                                     SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED));
+        } else {
+            return time;
         }
+    }
 
-        return time;
+    static long startedToRecover() {
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(SchedulerDBManager.ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED))
+                           .getTime();
+    }
+
+    static long endedToRecover() {
+        return LogProcessor.getDateOfLine(LogProcessor.getLastLineThatMatch(SchedulingService.SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED))
+                           .getTime();
+    }
+
+    /**
+     * Scheduler performs jobs recovery and RM performs node recovery. This two process are independent.
+     * However, this method return combined time spent to recover both nodes and jobs.
+     * It counts time from time when jobs or node recovery started (depends who is first) till
+     * the time both of these process are finished.
+     *
+     * @return combined time to recover nodes and jobs
+     */
+    private long timeSpentToRecoverNodesAndJobs() {
+        final long started = Math.min(NodeRecoveryTest.startedToRecover(), JobRecoveryTest.startedToRecover());
+        final long ended = Math.max(NodeRecoveryTest.endedToRecover(), JobRecoveryTest.endedToRecover());
+        return ended - started;
     }
 
 }

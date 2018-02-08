@@ -23,25 +23,29 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package performancetests.recovery;
+package performancetests;
 
-import java.util.concurrent.TimeUnit;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-import org.junit.Rule;
-import org.junit.rules.Timeout;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import performancetests.metrics.GetResultMetricTest;
+import performancetests.metrics.SchedulerEfficiencyMetricsTest;
+import performancetests.metrics.TaskCreationTimeTest;
+import performancetests.recovery.JobRecoveryTest;
+import performancetests.recovery.NodeRecoveryTest;
 
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+                      // Performance tests
+                      NodeRecoveryTest.class, JobRecoveryTest.class,
+
+                      // Metrics
+                      TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class })
 
 /**
- * We need this class only to increase timeout rule for performance tests.
+ * @author ActiveEon Team
+ * @since 05/02/2018
  */
-@SuppressWarnings("squid:S2187")
-public class BaseRecoveryTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
-
-    @Rule
-    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() * 2,
-                                             TimeUnit.MILLISECONDS);
-
+public class PerformanceTestSuite {
 }

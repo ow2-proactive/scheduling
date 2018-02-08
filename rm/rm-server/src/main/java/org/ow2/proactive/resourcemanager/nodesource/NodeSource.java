@@ -59,6 +59,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -99,7 +100,12 @@ public class NodeSource implements InitActive, RunActive {
     /** Default name for NS with local nodes started with the Scheduler by default */
     public static final String DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME = "LocalNodes";
 
+    /** Default name for NS with local nodes started with the Scheduler by default */
+    public static final boolean DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE = false;
+
     public static final String DEFAULT = "Default";
+
+    public static final boolean DEFAULT_RECOVERABLE = true;
 
     public static final int INTERNAL_POOL = 0;
 
@@ -149,6 +155,8 @@ public class NodeSource implements InitActive, RunActive {
     // level is configured by ns admin at the moment of ns creation
     private AccessType nodeUserAccessType;
 
+    private final boolean nodesRecoverable;
+
     static {
         try {
             int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
@@ -178,6 +186,7 @@ public class NodeSource implements InitActive, RunActive {
         adminPermission = null;
         providerPermission = null;
         monitoring = null;
+        nodesRecoverable = PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
     }
 
     /**
@@ -189,8 +198,9 @@ public class NodeSource implements InitActive, RunActive {
      * @param policy nodes acquisition policy
      * @param rmcore resource manager core
      */
-    public NodeSource(String registrationURL, String name, Client provider, InfrastructureManager im,
-            NodeSourcePolicy policy, RMCore rmcore, RMMonitoringImpl monitor) {
+    public NodeSource(String registrationURL, String name, InfrastructureManager im, NodeSourcePolicy policy,
+            RMCore rmcore, RMMonitoringImpl monitor, NodeSourceData nodeSourceData) {
+        Client provider = nodeSourceData.getProvider();
         this.registrationURL = registrationURL;
         this.name = name;
         this.administrator = provider;
@@ -214,6 +224,7 @@ public class NodeSource implements InitActive, RunActive {
                                                           nodeSourcePolicy.getProviderAccessType()
                                                                           .getIdentityPrincipals(provider));
         this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
+        this.nodesRecoverable = nodeSourceData.getNodesRecoverable();
     }
 
     /**
@@ -665,6 +676,14 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
+     * @return whether nodes recovery is activated for this node source
+     */
+    @ImmediateService
+    public boolean nodesRecoverable() {
+        return nodesRecoverable;
+    }
+
+    /**
      * Activates a node source policy.
      */
     public BooleanWrapper activate() {
@@ -724,9 +743,9 @@ public class NodeSource implements InitActive, RunActive {
      * @return the list of deploying nodes handled by the infrastructure manager
      */
     @ImmediateService
-    public LinkedList<RMDeployingNode> getDeployingNodes() {
+    public LinkedList<RMDeployingNode> getDeployingAndLostNodes() {
         LinkedList<RMDeployingNode> result = new LinkedList<>();
-        result.addAll(this.infrastructureManager.getDeployingNodes());
+        result.addAll(this.infrastructureManager.getDeployingAndLostNodes());
         return result;
     }
 
@@ -738,8 +757,8 @@ public class NodeSource implements InitActive, RunActive {
      * is an Active Object, the caller will receive a deep copy of the original object.
      */
     @ImmediateService
-    public RMDeployingNode getDeployingNode(String nodeUrl) {
-        return infrastructureManager.getDeployingNode(nodeUrl);
+    public RMDeployingNode getNodeInDeployingOrLostNodes(String nodeUrl) {
+        return infrastructureManager.getDeployingOrLostNode(nodeUrl);
     }
 
     /**

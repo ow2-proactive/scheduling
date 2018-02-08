@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+        <property name="hibernate.connection.driver_class">org.hsqldb.jdbc.JDBCDriver</property>
+        <property name="hibernate.connection.url">jdbc:hsqldb:mem:scheduler;hsqldb.tx=mvcc;hsqldb.lob_file_scale=1</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
+
+        <!-- Username and password -->
+        <property name="hibernate.connection.username">scheduler</property>
+        <property name="hibernate.connection.password"></property>
+
+        <!-- JDBC connection pool -->
+        <property name="hibernate.connection.provider_class">org.hibernate.hikaricp.internal.HikariCPConnectionProvider</property>
+        <property name="hibernate.hikari.transactionIsolation">TRANSACTION_READ_COMMITTED</property>
+
+        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <property name="hibernate.hbm2ddl.auto">create</property>
+    </session-factory>
+
+</hibernate-configuration>

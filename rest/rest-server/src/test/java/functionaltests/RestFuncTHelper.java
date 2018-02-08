@@ -77,6 +77,9 @@ public class RestFuncTHelper {
 
     public final static int DEFAULT_NUMBER_OF_NODES = 1;
 
+    public static final String RM_CRED_RELATIVE_PATH = "config" + File.separator + "authentication" + File.separator +
+                                                       "rm.cred";
+
     private static String restServerUrl;
 
     private static String restfulSchedulerUrl;
@@ -229,6 +232,10 @@ public class RestFuncTHelper {
         return new File(defaultJobXml.toURI());
     }
 
+    public static String getRmCredentialsPath() throws Exception {
+        return getRmHome() + File.separator + RM_CRED_RELATIVE_PATH;
+    }
+
     private static String toPath(URL url) throws Exception {
         return (new File(url.toURI())).getCanonicalPath();
     }
@@ -242,7 +249,7 @@ public class RestFuncTHelper {
     }
 
     private static Credentials getRmCredentials() throws Exception {
-        File rmCredentails = new File(getRmHome(), "config/authentication/rm.cred");
+        File rmCredentails = new File(getRmHome(), RM_CRED_RELATIVE_PATH);
         return Credentials.getCredentials(new FileInputStream(rmCredentails));
     }
 

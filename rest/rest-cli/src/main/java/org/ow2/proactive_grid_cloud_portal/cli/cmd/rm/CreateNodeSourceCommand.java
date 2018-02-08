@@ -45,8 +45,16 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 public class CreateNodeSourceCommand extends AbstractCommand implements Command {
     private String nodeSource;
 
+    private String nodesRecoverable;
+
     public CreateNodeSourceCommand(String nodeSource) {
         this.nodeSource = nodeSource;
+        this.nodesRecoverable = "true";
+    }
+
+    public CreateNodeSourceCommand(String nodeSource, String nodesRecoverable) {
+        this.nodeSource = nodeSource;
+        this.nodesRecoverable = nodesRecoverable;
     }
 
     @Override
@@ -62,9 +70,12 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
         if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
             nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
         }
-        HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/create"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/create/recovery"));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("nodeSourceName", nodeSource).addAll(infrastructure).addAll(policy);
+        queryStringBuilder.add("nodeSourceName", nodeSource)
+                          .addAll(infrastructure)
+                          .addAll(policy)
+                          .add("nodesRecoverable", nodesRecoverable);
         request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {

@@ -102,7 +102,7 @@ public class TaskLauncher implements InitActive {
 
     private Thread nodeShutdownHook;
 
-    private TaskLauncherRebinder taskLauncherRebinder = new TaskLauncherRebinder();
+    private TaskLauncherRebinder taskLauncherRebinder;
 
     /**
      * Needed for ProActive but should never be used manually to create an instance of the object.
@@ -145,11 +145,12 @@ public class TaskLauncher implements InitActive {
 
     void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
-        doTask(executableContainer, previousTasksResults, terminateNotification, null);
+        doTask(executableContainer, previousTasksResults, terminateNotification, null, false);
     }
 
     public void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
-            TaskTerminateNotification terminateNotification, String terminateNotificationNodeURL) {
+            TaskTerminateNotification terminateNotification, String terminateNotificationNodeURL,
+            boolean taskRecoverable) {
 
         TaskResultImpl taskResult;
         WallTimer wallTimer = null;
@@ -166,7 +167,7 @@ public class TaskLauncher implements InitActive {
 
             taskStopwatchForFailures = Stopwatch.createUnstarted();
 
-            taskLauncherRebinder.saveTerminateNotificationNodeURL(taskId, terminateNotificationNodeURL);
+            taskLauncherRebinder = new TaskLauncherRebinder(taskId, terminateNotificationNodeURL, taskRecoverable);
 
             addShutdownHook();
             // lock the cache space cleaning mechanism
@@ -289,8 +290,7 @@ public class TaskLauncher implements InitActive {
     private Map<String, byte[]> extractVariablesFromContext(TaskContext context) {
         if (context != null) {
             try {
-                return SerializationUtil.serializeVariableMap(taskContextVariableExtractor.extractVariables(context,
-                                                                                                            false));
+                return SerializationUtil.serializeVariableMap(taskContextVariableExtractor.getAllNonTaskVariables(context));
             } catch (Exception e) {
                 e.printStackTrace(taskLogger.getErrorSink());
             }
@@ -346,11 +346,11 @@ public class TaskLauncher implements InitActive {
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext, TaskResult taskResult)
             throws Exception {
-        return taskContextVariableExtractor.extractVariables(taskContext, taskResult, true);
+        return taskContextVariableExtractor.getAllVariablesWithTaskResult(taskContext, taskResult);
     }
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext) throws Exception {
-        return taskContextVariableExtractor.extractVariables(taskContext, true);
+        return taskContextVariableExtractor.getAllVariables(taskContext);
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
@@ -372,8 +372,7 @@ public class TaskLauncher implements InitActive {
             String workingDirPath = taskContext.getInitializer().getForkEnvironment().getWorkingDir();
             if (workingDirPath != null) {
                 workingDirPath = VariableSubstitutor.filterAndUpdate(workingDirPath,
-                                                                     taskContextVariableExtractor.extractVariables(taskContext,
-                                                                                                                   true));
+                                                                     taskContextVariableExtractor.getAllVariables(taskContext));
                 workingDir = new File(workingDirPath);
             }
         }
@@ -401,14 +400,13 @@ public class TaskLauncher implements InitActive {
                 // termination has succeeded, exit the method
                 return;
             } catch (Throwable t) {
-                logger.warn("Cannot notify task termination, trying to rebind to the task termination handler", t);
-                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getReboundTaskTerminateNotificationHandler();
+                logger.warn("Cannot notify task termination, trying to rebind to the task termination handler");
+                TaskTerminateNotification rebindedTerminateNotification = taskLauncherRebinder.getReboundTaskTerminateNotificationHandler(t);
                 if (rebindedTerminateNotification != null) {
                     currentTerminateNotification = rebindedTerminateNotification;
-                    // we'll retry to call the terminate method
-                    continue;
+                } else {
+                    decreasePingAttemptsAndWait(pingAttempts, pingPeriodMs, i, t);
                 }
-                decreasePingAttemptsAndWait(pingAttempts, pingPeriodMs, i, t);
             }
         }
 

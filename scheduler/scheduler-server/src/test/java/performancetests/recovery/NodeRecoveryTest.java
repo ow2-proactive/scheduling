@@ -25,8 +25,6 @@
  */
 package performancetests.recovery;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -34,7 +32,6 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -56,19 +53,19 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class NodeRecoveryTest extends BaseRecoveryTest {
+public class NodeRecoveryTest extends PeformanceTestBase {
 
     private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
 
-    static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
-                                                                       .getPath();
+    public static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
+                                                                              .getPath();
 
     static final String RM_CONFIGURATION_RESTART = NodeRecoveryTest.class.getResource("/performancetests/config/rm-restart.ini")
                                                                          .getPath();
 
     /**
      * @return an array of parameters which is used by JUnit to create objects of NodeRecoveryTest,
-     *         where first value represents nodes number to recover, and second value sets time limit to recovery.
+     * where first value represents nodes number to recover, and second value sets time limit to recovery.
      */
     @Parameters
     public static Collection<Object[]> data() {
@@ -118,7 +115,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
         assertEquals(nodesNumber, resourceManager.getState().getAllNodes().size());
     }
 
-    @Test(timeout = 1600000)
+    @Test(timeout = 3600000)
     public void test() {
         try {
             // it should be inside Test case and not in Before case, because
@@ -127,30 +124,22 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
             startKillStartRM();
             long recovered = nodesRecovered();
             long timeSpent = timeSpentToRecoverNodes();
-            LOGGER.info(makeCSVString("NodeRecoveryTest",
+            assertEquals(nodesNumber, recovered);
+            LOGGER.info(makeCSVString(NodeRecoveryTest.class.getSimpleName(),
                                       nodesNumber,
                                       timeLimit,
                                       recovered,
                                       timeSpent,
-                                      ((timeSpent < timeLimit) ? "SUCCES" : "FAILURE")));
-            assertEquals(nodesNumber, recovered);
-            assertThat("Nodes recovery time for " + nodesNumber + " nodes",
-                       (int) timeSpentToRecoverNodes(),
-                       lessThan(timeLimit));
+                                      ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(NodeRecoveryTest.makeCSVString("NodeRecoveryTest", nodesNumber, timeLimit, -1, -1, "ERROR"));
+            LOGGER.info(PeformanceTestBase.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
+                                                         nodesNumber,
+                                                         timeLimit,
+                                                         -1,
+                                                         -1,
+                                                         ERROR));
         }
-    }
-
-    public static String makeCSVString(Object... strings) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(strings[0].toString());
-        for (int i = 1; i < strings.length; ++i) {
-            builder.append(',');
-            builder.append(strings[i].toString());
-        }
-        return builder.toString();
     }
 
     @After
@@ -177,8 +166,7 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
     }
 
     private long timeSpentToRecoverNodes() {
-        long time = LogProcessor.millisecondsFromTo(RMCore.START_TO_RECOVER_NODES, RMCore.END_OF_NODES_RECOVERY);
-
+        final long time = endedToRecover() - startedToRecover();
         if (time < 0) {
             throw new RuntimeException("First occurence of " + RMCore.START_TO_RECOVER_NODES + " goes after " +
                                        RMCore.END_OF_NODES_RECOVERY);
@@ -187,4 +175,11 @@ public class NodeRecoveryTest extends BaseRecoveryTest {
         return time;
     }
 
+    static long startedToRecover() {
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.START_TO_RECOVER_NODES)).getTime();
+    }
+
+    static long endedToRecover() {
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY)).getTime();
+    }
 }

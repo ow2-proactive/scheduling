@@ -82,7 +82,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
                                  DefaultInfrastructureManager.class.getName(),
                                  null,
                                  StaticPolicy.class.getName(),
-                                 new Object[] { "ALL", "ME" });
+                                 new Object[] { "ALL", "ME" },
+                                 NODES_NOT_RECOVERABLE);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 2);
 
@@ -135,7 +136,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "ALL", "MY_GROUPS" });
+                               new Object[] { "ALL", "MY_GROUPS" },
+                               NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);
@@ -198,7 +200,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
                                  DefaultInfrastructureManager.class.getName(),
                                  null,
                                  StaticPolicy.class.getName(),
-                                 new Object[] { "ALL", "ALL" });
+                                 new Object[] { "ALL", "ALL" },
+                                 NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);
@@ -246,7 +249,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
                                  DefaultInfrastructureManager.class.getName(),
                                  null,
                                  StaticPolicy.class.getName(),
-                                 new Object[] { "ALL", "ALL" });
+                                 new Object[] { "ALL", "ALL" },
+                                 NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 2);
@@ -274,7 +278,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "ALL", "users=nsadmin" });
+                               new Object[] { "ALL", "users=nsadmin" },
+                               NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);
@@ -330,7 +335,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "ALL", "groups=nsadmins" })
+                               new Object[] { "ALL", "groups=nsadmins" },
+                               NODES_NOT_RECOVERABLE)
              .getBooleanValue();
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
@@ -382,7 +388,8 @@ public class TestNSProviderPermissions extends RMFunctionalTest {
                                DefaultInfrastructureManager.class.getName(),
                                null,
                                StaticPolicy.class.getName(),
-                               new Object[] { "ALL", "users=radmin;groups=nsadmins" });
+                               new Object[] { "ALL", "users=radmin;groups=nsadmins" },
+                               NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
         List<TestNode> nodePool = rmHelper.createNodes("node", 3);

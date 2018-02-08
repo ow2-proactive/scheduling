@@ -166,7 +166,8 @@ public class NodeSourcesTest extends ProActiveTest {
                                   new String[] { "infrastructure" },
                                   StaticPolicy.class.getName(),
                                   new String[] { "policy" },
-                                  new Client(null, false));
+                                  new Client(null, false),
+                                  false);
     }
 
 }

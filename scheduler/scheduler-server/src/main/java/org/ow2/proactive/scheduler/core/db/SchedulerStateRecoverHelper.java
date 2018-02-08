@@ -30,10 +30,12 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.utils.NodeSet;
 
 
 public class SchedulerStateRecoverHelper {
@@ -42,6 +44,8 @@ public class SchedulerStateRecoverHelper {
 
     private static final JobLogger jobLogger = JobLogger.getInstance();
 
+    public static final String FAIL_TO_RECOVER_RUNNING_TASK_STRING = "Fail to recover running task ";
+
     private final SchedulerDBManager dbManager;
 
     public SchedulerStateRecoverHelper(SchedulerDBManager dbManager) {
@@ -49,6 +53,10 @@ public class SchedulerStateRecoverHelper {
     }
 
     public RecoveredSchedulerState recover(long loadJobPeriod) {
+        return recover(loadJobPeriod, null);
+    }
+
+    public RecoveredSchedulerState recover(long loadJobPeriod, RMProxy rmProxy) {
         List<InternalJob> notFinishedJobs = dbManager.loadNotFinishedJobs(true);
 
         Vector<InternalJob> pendingJobs = new Vector<>();
@@ -63,7 +71,7 @@ public class SchedulerStateRecoverHelper {
                 case RUNNING:
                 case IN_ERROR:
                     runningJobs.add(job);
-                    recoverRunningTasksOrResetToPending(job, job.getITasks());
+                    recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
                     break;
                 case PAUSED:
                     if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() +
@@ -71,7 +79,7 @@ public class SchedulerStateRecoverHelper {
                         pendingJobs.add(job);
                     } else {
                         runningJobs.add(job);
-                        recoverRunningTasksOrResetToPending(job, job.getITasks());
+                        recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
                     }
                     break;
                 default:
@@ -118,9 +126,8 @@ public class SchedulerStateRecoverHelper {
         return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
     }
 
-    private void recoverRunningTasksOrResetToPending(InternalJob job, List<InternalTask> tasks) {
-        int pendingTasksCount = 0;
-        int runningTasksCount = 0;
+    private void recoverRunningTasksOrResetToPending(InternalJob job, List<InternalTask> tasks, RMProxy rmProxy) {
+        TaskStatusCounter counter = new TaskStatusCounter();
         for (InternalTask task : tasks) {
             // we only need to take into account the tasks that were running
             // and recount the number of pending tasks, because if we do not
@@ -128,41 +135,85 @@ public class SchedulerStateRecoverHelper {
             // pending task
             if ((task.getStatus() == TaskStatus.RUNNING || task.getStatus() == TaskStatus.PAUSED) &&
                 task.getExecuterInformation() != null) {
-                try {
-                    TaskLauncher launcher = task.getExecuterInformation().getLauncher();
-                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
-                                ") successfully. Launcher: " + launcher);
-                    runningTasksCount++;
-                } catch (Throwable e) {
-                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
-                                ") failed. Moving back task from status RUNNING TO PENDING.", e);
-                    task.setStatus(TaskStatus.PENDING);
-                    pendingTasksCount++;
-                }
+                handleRunningTask(rmProxy, counter, task);
             } else {
-                // recount existing pending tasks. We base this number on the
-                // definition provided in SchedulerDBManager#PENDING_TASKS
-                if (task.getStatus().equals(TaskStatus.PENDING) || task.getStatus().equals(TaskStatus.SUBMITTED) ||
-                    task.getStatus().equals(TaskStatus.NOT_STARTED)) {
-                    pendingTasksCount++;
-                } else {
-                    // recount existing running tasks that are not recoverable
-                    // These tasks are "running" by the definition provided in
-                    // SchedulerDBManager#RUNNING_TASKS
-                    if (task.getStatus() == TaskStatus.IN_ERROR || task.getStatus() == TaskStatus.WAITING_ON_ERROR ||
-                        task.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
-                        runningTasksCount++;
-                    }
-                }
+                handleTaskOtherThanRunning(counter, task);
             }
             logger.debug("Task " + task.getId() + " status is " + task.getStatus().name());
         }
+        updateJobWithCounters(job, counter);
+    }
+
+    private void handleTaskOtherThanRunning(TaskStatusCounter counter, InternalTask task) {
+        // recount existing pending tasks. We base this number on the
+        // definition provided in SchedulerDBManager#PENDING_TASKS
+        if (task.getStatus().equals(TaskStatus.PENDING) || task.getStatus().equals(TaskStatus.SUBMITTED) ||
+            task.getStatus().equals(TaskStatus.NOT_STARTED)) {
+            counter.pendingTasks++;
+        } else {
+            // recount existing running tasks that are not recoverable
+            // These tasks are "running" by the definition provided in
+            // SchedulerDBManager#RUNNING_TASKS
+            if (task.getStatus() == TaskStatus.IN_ERROR || task.getStatus() == TaskStatus.WAITING_ON_ERROR ||
+                task.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
+                counter.runningTasks++;
+            }
+        }
+    }
+
+    private void handleRunningTask(RMProxy rmProxy, TaskStatusCounter counter, InternalTask task) {
+        try {
+            if (runningTaskMustBeResetToPending(task, rmProxy)) {
+                setTaskStatusAndIncrementPendingCounter(counter, task);
+            } else {
+                counter.runningTasks++;
+            }
+        } catch (Throwable e) {
+            logger.warn(FAIL_TO_RECOVER_RUNNING_TASK_STRING + task.getId() + " (" + task.getName() + ")", e);
+            setTaskStatusAndIncrementPendingCounter(counter, task);
+        }
+    }
+
+    private void updateJobWithCounters(InternalJob job, TaskStatusCounter counter) {
         // reapply definition of stalled job
-        if (runningTasksCount == 0 && job.getStatus().equals(JobStatus.RUNNING)) {
+        if (counter.runningTasks == 0 && job.getStatus().equals(JobStatus.RUNNING)) {
             job.setStatus(JobStatus.STALLED);
         }
-        job.setNumberOfPendingTasks(pendingTasksCount);
-        job.setNumberOfRunningTasks(runningTasksCount);
+        job.setNumberOfPendingTasks(counter.pendingTasks);
+        job.setNumberOfRunningTasks(counter.runningTasks);
+    }
+
+    private boolean runningTaskMustBeResetToPending(InternalTask task, RMProxy rmProxy) {
+        boolean resetToPending;
+        if (rmProxy != null) {
+
+            NodeSet nodes = task.getExecuterInformation().getNodes();
+            boolean taskNodesKnownByRM = rmProxy.areNodesKnown(nodes);
+
+            if (taskNodesKnownByRM) {
+                TaskLauncher launcher = task.getExecuterInformation().getLauncher();
+                logger.info("Recover running task " + task.getId() + " (" + task.getName() +
+                            ") successfully with task launcher " + launcher);
+                resetToPending = false;
+            } else {
+                logger.info(FAIL_TO_RECOVER_RUNNING_TASK_STRING + task.getId() + " (" + task.getName() +
+                            ") because the task's node is not known by the resource manager");
+                resetToPending = true;
+            }
+
+        } else {
+            logger.info(FAIL_TO_RECOVER_RUNNING_TASK_STRING + task.getId() + " (" + task.getName() +
+                        ") because the resource manager is not reachable");
+            resetToPending = true;
+        }
+
+        return resetToPending;
+    }
+
+    private void setTaskStatusAndIncrementPendingCounter(TaskStatusCounter counter, InternalTask task) {
+        logger.info("Changing task status to " + TaskStatus.PENDING);
+        task.setStatus(TaskStatus.PENDING);
+        counter.pendingTasks++;
     }
 
     /**
@@ -190,6 +241,13 @@ public class SchedulerStateRecoverHelper {
 
         //sort parents before children
         return TopologicalTaskSorter.sortInternalTasks(tasksList);
+    }
+
+    private class TaskStatusCounter {
+
+        private int pendingTasks = 0;
+
+        private int runningTasks = 0;
     }
 
 }

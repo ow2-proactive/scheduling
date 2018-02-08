@@ -510,13 +510,12 @@
   <define name="codeScript">
     <element name="code">
       <doc:documentation>Definition of a script by writing directly the code inside the descriptor </doc:documentation>
-      <attribute name="language">
-        <data type="string">
-          <param name="minLength">1</param>
-        </data>
-      </attribute>
+      <ref name="language"/>
       <text/>
     </element>
+    <optional>
+      <ref name="fileScriptArguments"/>
+    </optional>
   </define>
   <define name="fileScript">
     <element name="file">
@@ -526,9 +525,20 @@
         <ref name="url"/>
       </choice>
       <optional>
+        <ref name="language"/>
+      </optional>
+      <optional>
         <ref name="fileScriptArguments"/>
       </optional>
     </element>
+  </define>
+  <define name="language">
+    <!-- script engine language -->
+    <attribute name="language">
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
+    </attribute>
   </define>
   <define name="path">
     <attribute name="path">
