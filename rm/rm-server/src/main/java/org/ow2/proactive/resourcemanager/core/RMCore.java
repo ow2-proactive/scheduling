@@ -1638,7 +1638,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
-    public boolean isNodeSourceAlreadyExist(String nodeSourceName) {
+    public boolean isNodeSourceAlreadyExisting(String nodeSourceName) {
         return this.nodeSources.containsKey(nodeSourceName.trim());
     }
 

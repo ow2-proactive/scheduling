@@ -549,7 +549,8 @@ public class SchedulerStarter {
         ResourceManager rman = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        if (!rman.isNodeSourceAlreadyExist(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
+        // check if 'LocalNodes' nodesource already exists. It can exist if it was retrieved from db during initializing.
+        if (!rman.isNodeSourceAlreadyExisting(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME)) {
             rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME,
                                   LocalInfrastructure.class.getName(),
                                   new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },

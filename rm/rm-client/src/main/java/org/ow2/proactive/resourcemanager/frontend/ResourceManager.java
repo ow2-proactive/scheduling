@@ -355,7 +355,7 @@ public interface ResourceManager {
      * @param nodeSourceName
      * @return true if RM already has node source with given name
      */
-    boolean isNodeSourceAlreadyExist(String nodeSourceName);
+    boolean isNodeSourceAlreadyExisting(String nodeSourceName);
 
     /**
      * Releases the node after computations. The specified node is marked as free and become

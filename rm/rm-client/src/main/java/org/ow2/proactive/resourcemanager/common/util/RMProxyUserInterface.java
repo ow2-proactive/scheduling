@@ -367,8 +367,8 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
-    public boolean isNodeSourceAlreadyExist(String nodeSourceName) {
-        return this.target.isNodeSourceAlreadyExist(nodeSourceName);
+    public boolean isNodeSourceAlreadyExisting(String nodeSourceName) {
+        return this.target.isNodeSourceAlreadyExisting(nodeSourceName);
     }
 
     @Override
