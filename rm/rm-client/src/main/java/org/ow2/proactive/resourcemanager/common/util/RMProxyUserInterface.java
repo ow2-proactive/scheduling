@@ -367,6 +367,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
+    public boolean isNodeSourceAlreadyExist(String nodeSourceName) {
+        return this.target.isNodeSourceAlreadyExist(nodeSourceName);
+    }
+
+    @Override
     public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets) {
         return this.target.executeScript(script, scriptEngine, targetType, targets);
