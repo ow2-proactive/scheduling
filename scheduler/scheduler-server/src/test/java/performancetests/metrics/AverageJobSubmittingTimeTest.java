@@ -25,6 +25,8 @@
  */
 package performancetests.metrics;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +38,7 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -77,6 +80,16 @@ public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
         this.numberOfThreads = numberOfThreads;
         this.numberOfJobSubmittedByThread = numberOfJobSubmittedByThread;
         this.timeLimit = timeLimit;
+    }
+
+    @Before
+    public void before(){
+        PrintStream dummyStream = new PrintStream(new OutputStream(){
+            public void write(int b) {
+                // NO-OP
+            }
+        });
+        System.setOut(dummyStream);
     }
 
     @Test(timeout = 3600000)
