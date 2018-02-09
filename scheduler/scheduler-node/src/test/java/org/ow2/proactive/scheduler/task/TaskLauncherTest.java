@@ -151,9 +151,9 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
         // PAActiveObject.getNode, which is not stubbed in this test case.
         doReturn("1").when(spyTaskLauncher).nodeUrl();
 
-        Credentials thirdPartyCredentials = Credentials.createCredentials(credData, spyTaskLauncher.generatePublicKey());
+        Credentials thirdPartyCredentials = Credentials.createCredentials(credData,
+                                                                          spyTaskLauncher.generatePublicKey());
         executableContainer.setCredentials(thirdPartyCredentials);
-
 
         TaskResult taskResult = runTaskLauncher(spyTaskLauncher, executableContainer);
 
