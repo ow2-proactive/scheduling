@@ -25,7 +25,12 @@
  */
 package performancetests.metrics;
 
-import functionaltests.utils.SchedulerTHelper;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Test;
@@ -35,21 +40,19 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.OnTaskError;
-import org.ow2.proactive.scheduler.common.task.ScriptTask;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scripting.SimpleScript;
-import org.ow2.proactive.scripting.TaskScript;
+
+import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.PeformanceTestBase;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 
+/**
+ * The performance test calculates average time to scheduler (to dispatch) task, i.e. time to move
+ * task from pending till running state.
+ * Test repeats same experiment given number of times. In each experiment it submits job with a single task,
+ * waits until job is finished, and then computes scheduling time, as difference between timestamp when job was submitted,
+ * and timestamp when task was started.
+ */
 @RunWith(Parameterized.class)
 public class TaskSchedulingTimeTest extends PeformanceTestBase {
 
@@ -59,19 +62,25 @@ public class TaskSchedulingTimeTest extends PeformanceTestBase {
 
     private static final Logger LOGGER = Logger.getLogger(SchedulerEfficiencyMetricsTest.class);
 
+    /**
+     * initialize test with static parameters, where first argument is a number of experiments, and second
+     * is a limit which average scheduling time should not cross.
+     * @return
+     */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 2000 } });
+        return Arrays.asList(new Object[][] { { 1000, 2000 } });
     }
 
-    private final int taskNumber;
+    private final int numberOfExperiments;
 
+    // limit for average scheduling itme
     private final long timeLimit;
 
     private List<JobId> jobIds = new ArrayList<>();
 
     public TaskSchedulingTimeTest(int taskNumber, long timeLimit) {
-        this.taskNumber = taskNumber;
+        this.numberOfExperiments = taskNumber;
         this.timeLimit = timeLimit;
     }
 
@@ -80,18 +89,18 @@ public class TaskSchedulingTimeTest extends PeformanceTestBase {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                SCHEDULER_CONFIGURATION_START.getPath(),
-                RM_CONFIGURATION_START.getPath(),
-                null);
+                                               SCHEDULER_CONFIGURATION_START.getPath(),
+                                               RM_CONFIGURATION_START.getPath(),
+                                               null);
 
-        schedulerHelper.createNodeSourceWithInfiniteTimeout("local", taskNumber);
+        schedulerHelper.createNodeSourceWithInfiniteTimeout("local", numberOfExperiments);
 
         final TaskFlowJob job = SchedulerEfficiencyMetricsTest.createJob(1, 10);
 
         long totalTime = 0;
-        for(int i = 0; i < taskNumber; ++i){
+        for (int i = 0; i < numberOfExperiments; ++i) {
             JobId jobId = schedulerHelper.submitJob(job);
-            jobIds.add(jobId );
+            jobIds.add(jobId);
             schedulerHelper.waitForEventJobFinished(jobId);
             final JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
             final long submittedTime = jobState.getSubmittedTime();
@@ -99,12 +108,12 @@ public class TaskSchedulingTimeTest extends PeformanceTestBase {
             final long timeToScheduleTask = taskStartTime - submittedTime;
             totalTime += timeToScheduleTask;
         }
-        long averageTime = totalTime / taskNumber;
+        long averageTime = totalTime / numberOfExperiments;
         LOGGER.info(makeCSVString("AverageTaskSchedulingTime",
-                taskNumber,
-                timeLimit,
-                averageTime,
-                ((averageTime < timeLimit) ? SUCCESS : FAILURE)));
+                                  numberOfExperiments,
+                                  timeLimit,
+                                  averageTime,
+                                  ((averageTime < timeLimit) ? SUCCESS : FAILURE)));
     }
 
     @After

@@ -150,8 +150,7 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
         for (int i = 0; i < taskNumber; i++) {
             ScriptTask task = new ScriptTask();
             task.setName("process_" + i);
-            task.setScript(new TaskScript(new SimpleScript(String.format("Thread.sleep(%s)", taskDuration),
-                                                           "groovy")));
+            task.setScript(new TaskScript(new SimpleScript(String.format("Thread.sleep(%s)", taskDuration), "groovy")));
             job.addTask(task);
         }
         return job;
