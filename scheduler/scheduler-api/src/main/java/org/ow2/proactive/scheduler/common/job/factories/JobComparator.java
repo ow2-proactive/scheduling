@@ -500,15 +500,14 @@ public class JobComparator {
             return false;
         }
 
-        String text1 = s1.getScript().trim();
+        String text1 = "";
         if (s1.getParameters() != null) {
-            text1 = Job2XMLTransformer.inlineScriptParametersInText(text1, s1.getParameters());
+            text1 = Arrays.toString(s1.getParameters());
         }
-        String text2 = s2.getScript().trim();
+        String text2 = "";
         if (s2.getParameters() != null) {
-            text2 = Job2XMLTransformer.inlineScriptParametersInText(text2, s2.getParameters());
+            text2 = Arrays.toString(s2.getParameters());
         }
-
         return text1.equals(text2);
     }
 
