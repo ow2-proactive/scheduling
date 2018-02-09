@@ -74,7 +74,7 @@ public class GetResultMetricTest extends PeformanceTestBase {
     @Test(timeout = 3600000)
     public void test() throws Exception {
 
-        final int taskDuration = 1;
+        final int taskDuration = 1000; // in milliseconds
         final int nodeNumber = 1;
 
         ProActiveConfiguration.load();

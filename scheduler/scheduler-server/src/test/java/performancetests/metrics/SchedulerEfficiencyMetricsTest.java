@@ -66,7 +66,7 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
 
     private static final String OPTIMAL_JOB_DURATION = "OPTIMAL_JOB_DURATION";
 
-    private static final int TASK_DURATION = 10; // in seconds
+    private static final int TASK_DURATION = 10000; // in milliseconds
 
     /**
      * @return an array of parameters which is used by JUnit to create objects of SchedulerEfficiencyMetricsTest,
@@ -146,11 +146,11 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
         job.setName(String.format("EP_%d_NO_MERGE_%dSEC", taskNumber, taskDuration));
         job.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.getVariables().put(OPTIMAL_JOB_DURATION,
-                               new JobVariable(OPTIMAL_JOB_DURATION, String.valueOf(taskDuration * 1000)));
+                               new JobVariable(OPTIMAL_JOB_DURATION, String.valueOf(taskDuration)));
         for (int i = 0; i < taskNumber; i++) {
             ScriptTask task = new ScriptTask();
             task.setName("process_" + i);
-            task.setScript(new TaskScript(new SimpleScript(String.format("Thread.sleep(%s * 1000)", taskDuration),
+            task.setScript(new TaskScript(new SimpleScript(String.format("Thread.sleep(%s)", taskDuration),
                                                            "groovy")));
             job.addTask(task);
         }
