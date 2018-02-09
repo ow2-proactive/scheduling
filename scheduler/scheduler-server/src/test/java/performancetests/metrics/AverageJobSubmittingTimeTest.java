@@ -62,7 +62,7 @@ public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 4, 100, 40000 } });
+        return Arrays.asList(new Object[][] { { 10, 1000, 40000 } });
     }
 
     private final int numberOfThreads;

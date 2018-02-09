@@ -419,6 +419,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     @Override
     public JobId submit(Job userJob)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
