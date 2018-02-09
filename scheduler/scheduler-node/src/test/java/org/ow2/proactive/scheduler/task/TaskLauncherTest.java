@@ -32,10 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.InputStreamReader;
 import java.io.Serializable;
@@ -46,6 +43,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -146,10 +144,18 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
 
         CredData credData = new CredData("john", "pwd");
         credData.addThirdPartyCredential("password", "r00t");
-        Credentials thirdPartyCredentials = Credentials.createCredentials(credData, taskLauncher.generatePublicKey());
+
+        final TaskLauncher spyTaskLauncher = spy(taskLauncher);
+
+        // make nodeUrl return whatever value. Otherwise, nodeUrl method accesses static method of
+        // PAActiveObject.getNode, which is not stubbed in this test case.
+        doReturn("1").when(spyTaskLauncher).nodeUrl();
+
+        Credentials thirdPartyCredentials = Credentials.createCredentials(credData, spyTaskLauncher.generatePublicKey());
         executableContainer.setCredentials(thirdPartyCredentials);
 
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+
+        TaskResult taskResult = runTaskLauncher(spyTaskLauncher, executableContainer);
 
         assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("r00t%n")), is(true));
     }

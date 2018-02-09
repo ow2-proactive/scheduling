@@ -453,8 +453,18 @@ public class TaskLauncher implements InitActive {
         taskLogger.getStoredLogs(logSink);
     }
 
-    private static KeyPair getKeyPair() throws NodeException, NoSuchAlgorithmException {
-        final String nodeUrl = PAActiveObject.getNode().getNodeInformation().getURL();
+    /**
+     * this method exist as a separate method only for test purpose
+     * because in some test (e.g. TaskLauncherTest) we do not mock PAActiveObject
+     * so it is easy to mock this method.
+     * @return
+     * @throws NodeException
+     */
+    public String nodeUrl() throws NodeException {
+        return PAActiveObject.getNode().getNodeInformation().getURL();
+    }
+
+    private static KeyPair getKeyPair(String nodeUrl) throws NodeException, NoSuchAlgorithmException {
         if (!KEY_PAIR_MAP.containsKey(nodeUrl)) {
             synchronized (KEY_PAIR_MAP) {
                 if (!KEY_PAIR_MAP.containsKey(nodeUrl)) {
@@ -469,7 +479,7 @@ public class TaskLauncher implements InitActive {
     }
 
     public PublicKey generatePublicKey() throws NoSuchAlgorithmException, NodeException {
-        KeyPair keyPair = TaskLauncher.getKeyPair();
+        KeyPair keyPair = TaskLauncher.getKeyPair(nodeUrl());
         decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }
