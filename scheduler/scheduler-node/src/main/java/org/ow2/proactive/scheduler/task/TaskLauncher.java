@@ -34,6 +34,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
@@ -83,6 +85,8 @@ import com.google.common.base.Stopwatch;
 public class TaskLauncher implements InitActive {
 
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
+
+    private static final Map<String, KeyPair> KEY_PAIR_MAP = new ConcurrentHashMap<>();
 
     final private TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
@@ -449,11 +453,33 @@ public class TaskLauncher implements InitActive {
         taskLogger.getStoredLogs(logSink);
     }
 
-    public PublicKey generatePublicKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyGen;
-        keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(1024, new SecureRandom());
-        KeyPair keyPair = keyGen.generateKeyPair();
+    /**
+     * this method exist as a separate method only for test purpose
+     * because in some test (e.g. TaskLauncherTest) we do not mock PAActiveObject
+     * so it is easy to mock this method.
+     * @return
+     * @throws NodeException
+     */
+    public String nodeUrl() throws NodeException {
+        return PAActiveObject.getNode().getNodeInformation().getURL();
+    }
+
+    private static KeyPair getKeyPair(String nodeUrl) throws NodeException, NoSuchAlgorithmException {
+        if (!KEY_PAIR_MAP.containsKey(nodeUrl)) {
+            synchronized (KEY_PAIR_MAP) {
+                if (!KEY_PAIR_MAP.containsKey(nodeUrl)) {
+                    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+                    keyGen.initialize(1024, new SecureRandom());
+                    KeyPair keyPair = keyGen.generateKeyPair();
+                    KEY_PAIR_MAP.put(nodeUrl, keyPair);
+                }
+            }
+        }
+        return KEY_PAIR_MAP.get(nodeUrl);
+    }
+
+    public PublicKey generatePublicKey() throws NoSuchAlgorithmException, NodeException {
+        KeyPair keyPair = TaskLauncher.getKeyPair(nodeUrl());
         decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }

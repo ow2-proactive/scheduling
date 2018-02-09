@@ -38,6 +38,7 @@ import java.util.Set;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
@@ -167,7 +168,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         return null;
     }
 
-    protected void fillContainer() throws KeyException, NoSuchAlgorithmException {
+    protected void fillContainer() throws KeyException, NoSuchAlgorithmException, NodeException {
         boolean isRunAsMeEnabled = task.isRunAsMe();
 
         task.getExecutableContainer().setRunAsUser(isRunAsMeEnabled);
@@ -175,7 +176,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
         createAndSetCredentials();
     }
 
-    private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException {
+    private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException, NodeException {
         CredData decryptedUserCredentials = job.getCredentials().decrypt(corePrivateKey);
 
         enrichWithThirdPartyCredentials(decryptedUserCredentials);
