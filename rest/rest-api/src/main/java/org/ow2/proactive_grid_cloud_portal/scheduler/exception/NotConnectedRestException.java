@@ -33,4 +33,8 @@ public class NotConnectedRestException extends RestException {
     public NotConnectedRestException(String message) {
         super(message);
     }
+
+    public NotConnectedRestException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

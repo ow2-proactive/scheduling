@@ -198,6 +198,7 @@ public class Session {
     }
 
     public void renewSession() throws NotConnectedException {
+        updateLastAccessedTime();
         if (scheduler != null) {
             scheduler.renewSession();
         }
