@@ -549,12 +549,15 @@ public class SchedulerStarter {
         ResourceManager rman = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME,
-                              LocalInfrastructure.class.getName(),
-                              new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
-                              RestartDownNodesPolicy.class.getName(),
-                              new Object[] { "ALL", "ALL", "10000" },
-                              NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE);
+        // check if 'LocalNodes' nodesource already exists. It can exist if it was retrieved from db during initializing.
+        if (!rman.isNodeSourceAlreadyExisting(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME).getBooleanValue()) {
+            rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME,
+                                  LocalInfrastructure.class.getName(),
+                                  new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
+                                  RestartDownNodesPolicy.class.getName(),
+                                  new Object[] { "ALL", "ALL", "10000" },
+                                  NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE);
+        }
 
         credentials = creds;
     }
