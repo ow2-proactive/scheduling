@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 
 
 public class SessionStore {
@@ -114,6 +115,8 @@ public class SessionStore {
 
         if (session != null) {
             session.renewSession();
+        } else {
+            throw new NotConnectedException(SchedulerStateRest.YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
         }
     }
 

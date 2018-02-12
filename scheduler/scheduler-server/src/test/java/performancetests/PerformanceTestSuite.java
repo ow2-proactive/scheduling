@@ -31,6 +31,7 @@ import org.junit.runners.Suite;
 import performancetests.metrics.GetResultMetricTest;
 import performancetests.metrics.SchedulerEfficiencyMetricsTest;
 import performancetests.metrics.TaskCreationTimeTest;
+import performancetests.metrics.TaskSchedulingTimeTest;
 import performancetests.recovery.JobRecoveryTest;
 import performancetests.recovery.NodeRecoveryTest;
 
@@ -41,7 +42,10 @@ import performancetests.recovery.NodeRecoveryTest;
                       NodeRecoveryTest.class, JobRecoveryTest.class,
 
                       // Metrics
-                      TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class })
+                      TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class,
+
+                      // Test which computes average metrics
+                      TaskSchedulingTimeTest.class })
 
 /**
  * @author ActiveEon Team

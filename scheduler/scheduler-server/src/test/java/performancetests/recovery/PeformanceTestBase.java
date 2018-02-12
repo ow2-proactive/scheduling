@@ -77,7 +77,7 @@ public class PeformanceTestBase extends SchedulerFunctionalTestWithCustomConfigA
         while ((line = br.readLine()) != null) {
             final String[] values = line.split(SEPARATOR);
             String key = values[1] + "-" + values[2];
-            String value = values[5];
+            String value = values[values.length - 2];
             result.put(key, Double.parseDouble(value));
         }
 

@@ -75,7 +75,6 @@ import org.ow2.proactive.topology.descriptor.SingleHostDescriptor;
 import org.ow2.proactive.topology.descriptor.SingleHostExclusiveDescriptor;
 import org.ow2.proactive.topology.descriptor.ThresholdProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
-import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -444,16 +443,16 @@ public class Job2XMLTransformer {
 
         // *** elements ****
 
-        // <ref name="variables"/>
-        if (task.getVariables() != null && !task.getVariables().isEmpty()) {
-            Element variablesE = createTaskVariablesElement(doc, task.getVariables());
-            taskE.appendChild(variablesE);
-        }
-
         // <ref name="taskDescription"/>
         if (task.getDescription() != null) {
             Element descrNode = createElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), task.getDescription());
             taskE.appendChild(descrNode);
+        }
+
+        // <ref name="variables"/>
+        if (task.getVariables() != null && !task.getVariables().isEmpty()) {
+            Element variablesE = createTaskVariablesElement(doc, task.getVariables());
+            taskE.appendChild(variablesE);
         }
 
         // <ref name="genericInformation"/>
@@ -770,37 +769,22 @@ public class Job2XMLTransformer {
         } else {
             Element codeE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), XMLTags.SCRIPT_CODE.getXMLName());
             setAttribute(codeE, XMLAttributes.LANGUAGE, script.getEngineName(), true);
-            String scriptText = script.getScript();
+            codeE.appendChild(doc.createCDATASection(script.getScript()));
+            scriptElement.appendChild(codeE);
             Serializable[] params = script.getParameters();
             if (params != null) {
-
-                scriptText = inlineScriptParametersInText(scriptText, params);
+                Element parametersE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                          XMLTags.SCRIPT_ARGUMENTS.getXMLName());
+                for (Serializable param : params) {
+                    Element parameterE = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(),
+                                                             XMLTags.SCRIPT_ARGUMENT.getXMLName());
+                    setAttribute(parameterE, XMLAttributes.COMMON_VALUE, param.toString(), true);
+                    parametersE.appendChild(parameterE);
+                }
+                scriptElement.appendChild(parametersE);
             }
-
-            CDATASection scriptTextCDATA = doc.createCDATASection(scriptText);
-            codeE.appendChild(scriptTextCDATA);
-
-            scriptElement.appendChild(codeE);
         }
         return scriptElement;
-    }
-
-    /**
-     * Inserts a line, at the beginning of the script code with the text: var
-     * args = ["argument_1",...,"argument_n"];
-     *
-     * where "argument_1",...,"argument_n" are the elements of the input array
-     * "params"
-     *
-     */
-    public static String inlineScriptParametersInText(String scriptText, Serializable[] params) {
-        String paramsLine = "var args=[";
-        for (Serializable param : params) {
-            paramsLine += "\"" + param + "\",";
-        }
-        paramsLine = paramsLine.substring(0, paramsLine.length() - 1) + "];";
-
-        return paramsLine + "\n" + scriptText;
     }
 
     /**

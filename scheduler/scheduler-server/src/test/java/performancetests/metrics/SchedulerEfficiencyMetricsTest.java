@@ -25,9 +25,6 @@
  */
 package performancetests.metrics;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
-
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -69,7 +66,7 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
 
     private static final String OPTIMAL_JOB_DURATION = "OPTIMAL_JOB_DURATION";
 
-    private static final int TASK_DURATION = 10; // in seconds
+    private static final int TASK_DURATION = 10000; // in milliseconds
 
     /**
      * @return an array of parameters which is used by JUnit to create objects of SchedulerEfficiencyMetricsTest,
@@ -142,8 +139,6 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
 
     private void logAndAssert(String name, long value) {
         LOGGER.info(makeCSVString(name, taskNumber, timeLimit, value, ((value < timeLimit) ? SUCCESS : FAILURE)));
-
-        assertThat(String.format("%s for job with %d tasks", name, taskNumber), value, lessThan(timeLimit));
     }
 
     public static TaskFlowJob createJob(int taskNumber, int taskDuration) throws Exception {
@@ -151,12 +146,11 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
         job.setName(String.format("EP_%d_NO_MERGE_%dSEC", taskNumber, taskDuration));
         job.setOnTaskError(OnTaskError.CANCEL_JOB);
         job.getVariables().put(OPTIMAL_JOB_DURATION,
-                               new JobVariable(OPTIMAL_JOB_DURATION, String.valueOf(taskDuration * 1000)));
+                               new JobVariable(OPTIMAL_JOB_DURATION, String.valueOf(taskDuration)));
         for (int i = 0; i < taskNumber; i++) {
             ScriptTask task = new ScriptTask();
             task.setName("process_" + i);
-            task.setScript(new TaskScript(new SimpleScript(String.format("Thread.sleep(%s * 1000)", taskDuration),
-                                                           "groovy")));
+            task.setScript(new TaskScript(new SimpleScript(String.format("Thread.sleep(%s)", taskDuration), "groovy")));
             job.addTask(task);
         }
         return job;
