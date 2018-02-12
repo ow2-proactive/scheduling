@@ -198,6 +198,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private static final String ATM_RESOURCE_ID = "atmosphere.resource.id";
 
+    public static final String YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the scheduler, you should log on first";
+
     private final SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static RestDataspaceImpl dataspaceRestApi = new RestDataspaceImpl();
@@ -261,20 +263,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
-        }
-    }
-
-    /**
-     * Call a method on the scheduler's frontend in order to renew the lease the
-     * user has on this frontend. see PORTAL-70
-     *
-     * @throws NotConnectedRestException
-     */
-    protected void renewLeaseForClient(Scheduler scheduler) throws NotConnectedRestException {
-        try {
-            scheduler.renewSession();
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
         }
     }
 
@@ -2043,18 +2031,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Session session = sessionStore.get(sessionId);
 
         if (session == null) {
-            throw new NotConnectedRestException("You are not connected to the scheduler, you should log on first");
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
         }
 
         SchedulerProxyUserInterface schedulerProxy = session.getScheduler();
 
         if (schedulerProxy == null) {
-            throw new NotConnectedRestException("You are not connected to the scheduler, you should log on first");
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
         }
 
-        renewLeaseForClient(schedulerProxy);
+        renewSession(sessionId);
 
         return schedulerProxy;
+    }
+
+    /**
+     * Call a method on the scheduler's frontend in order to renew the lease the
+     * user has on this frontend. see PORTAL-70
+     *
+     * @throws NotConnectedRestException
+     */
+    protected void renewSession(String sessionId) throws NotConnectedRestException {
+        try {
+            sessionStore.renewSession(sessionId);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST, e);
+        }
     }
 
     private SchedulerProxyUserInterface checkAccess(String sessionId) throws NotConnectedRestException {
@@ -2932,12 +2934,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             return login(username, password);
         }
 
-        try {
-            sessionStore.renewSession(sessionId);
-            return sessionId;
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
-        }
+        renewSession(sessionId);
+        return sessionId;
     }
 
     /**
@@ -2954,12 +2952,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             return loginWithCredential(multipart);
         }
 
-        try {
-            sessionStore.renewSession(sessionId);
-            return sessionId;
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
-        }
+        renewSession(sessionId);
+        return sessionId;
     }
 
     /**
@@ -2971,7 +2965,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     public String getLoginFromSessionId(@PathParam("sessionId") String sessionId) {
         if (sessionId != null && sessionStore.exists(sessionId)) {
-            return sessionStore.get(sessionId).getUserName();
+            try {
+                renewSession(sessionId);
+                return sessionStore.get(sessionId).getUserName();
+            } catch (NotConnectedRestException e) {
+                logger.trace(e);
+            } catch (Exception e) {
+                logger.warn(e);
+            }
         }
         return "";
     }
@@ -2986,15 +2987,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId) {
         if (sessionId != null && sessionStore.exists(sessionId)) {
             try {
+                renewSession(sessionId);
                 Scheduler scheduler = sessionStore.get(sessionId).getScheduler();
                 UserData userData = scheduler.getCurrentUserData();
                 return userData;
-            } catch (NotConnectedException e) {
-                return null;
+            } catch (NotConnectedRestException | NotConnectedException e) {
+                logger.trace(e);
+            } catch (Exception e) {
+                logger.warn(e);
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

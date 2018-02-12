@@ -63,7 +63,7 @@ import com.google.common.collect.ImmutableSet;
 @RunWith(Parameterized.class)
 public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
 
-    private static final String METHOD_NAME_THAT_MUST_BE_INVOKED = "renewLeaseForClient";
+    private static final String METHOD_NAME_THAT_MUST_BE_INVOKED = "renewSession";
 
     private final Map<Class<?>, Object> defaultParameterValues;
 
@@ -73,6 +73,8 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
 
     private Method methodToTest;
 
+    private String sessionId;
+
     public SchedulerStateRestRenewLeaseForClientTest(String testName, Method methodToTest) {
         this.defaultParameterValues = new HashMap<>();
         this.methodToTest = methodToTest;
@@ -81,10 +83,7 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> data() throws NoSuchMethodException, IllegalAccessException {
         Set<String> methodsToIgnore = ImmutableSet.of("getCreateCredential",
-                                                      "getLoginFromSessionId",
-                                                      "getUserDataFromSessionId",
                                                       "login",
-                                                      "loginOrRenewSession",
                                                       "loginWithCredential",
                                                       "validate");
 
@@ -117,7 +116,7 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
         schedulerStateRest = spy(new SchedulerStateRest());
         scheduler = mock(SchedulerProxyUserInterface.class);
 
-        String sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
+        sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
 
         defaultParameterValues.put(Character.class, '\0');
         defaultParameterValues.put(Integer.class, 0);
@@ -133,7 +132,7 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
     @Test
     public void test() throws Throwable {
         Method methodThatMustBeInvoked = SchedulerStateRest.class.getDeclaredMethod(METHOD_NAME_THAT_MUST_BE_INVOKED,
-                                                                                    Scheduler.class);
+                                                                                    String.class);
 
         try {
             methodToTest.invoke(schedulerStateRest, createMethodParameters(methodToTest));
@@ -143,7 +142,7 @@ public class SchedulerStateRestRenewLeaseForClientTest extends RestTestServer {
             // However, renewLeaseForClient should have been invoked.
         }
 
-        methodThatMustBeInvoked.invoke(verify(schedulerStateRest, times(1)), scheduler);
+        methodThatMustBeInvoked.invoke(verify(schedulerStateRest, times(1)), sessionId);
     }
 
     private Object[] createMethodParameters(Method method) throws IllegalAccessException {
