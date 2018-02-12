@@ -46,6 +46,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -450,10 +451,7 @@ public class TaskLauncher implements InitActive {
     }
 
     public PublicKey generatePublicKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyGen;
-        keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(1024, new SecureRandom());
-        KeyPair keyPair = keyGen.generateKeyPair();
+        KeyPair keyPair = RMNodeStarter.getKeyPair();
         decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }
