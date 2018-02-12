@@ -1334,9 +1334,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         try {
             return createNodeSource(nodeSourceData, nodesRecoverable);
+        } catch (NodeSourceNameAlreadyExistException e) {
+            logger.error(e.getMessage(), e);
+            throw e;
         } catch (RuntimeException ex) {
             logger.error(ex.getMessage(), ex);
-            if (added && !(ex instanceof NodeSourceNameAlreadyExistException)) {
+            if (added) {
                 dbManager.removeNodeSource(nodeSourceName);
             }
             throw ex;
