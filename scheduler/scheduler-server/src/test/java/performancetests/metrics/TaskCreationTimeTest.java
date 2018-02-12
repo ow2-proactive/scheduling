@@ -53,7 +53,7 @@ public class TaskCreationTimeTest extends PeformanceTestBase {
 
     private static final Logger LOGGER = Logger.getLogger(TaskCreationTimeTest.class);
 
-    private static final int TASK_DURATION = 10; // in seconds
+    private static final int TASK_DURATION = 10000; // in milliseconds
 
     /**
      * @return an array of parameters which is used by JUnit to create objects of TaskCreationTime,
