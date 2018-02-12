@@ -1336,7 +1336,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return createNodeSource(nodeSourceData, nodesRecoverable);
         } catch (RuntimeException ex) {
             logger.error(ex.getMessage(), ex);
-            if (added) {
+            if (added && !(ex instanceof NodeSourceNameAlreadyExistException)) {
                 dbManager.removeNodeSource(nodeSourceName);
             }
             throw ex;
@@ -1351,14 +1351,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         logger.info("Creating a node source : " + nodeSourceName);
 
-        boolean recoverNodes = existNodesToRecover(nodeSourceName, nodesRecoverable);
+        boolean existPersistedNodes = existPersistedNodes(nodeSourceName, nodesRecoverable);
 
         InfrastructureManager im;
 
         // we need to reload the infrastructure variables saved in database if
         // we recover the nodes
-        if (recoverNodes) {
+        if (existPersistedNodes) {
             im = InfrastructureManagerFactory.recover(nodeSourceData);
+            if (!im.getDeployingAndLostNodes().isEmpty()) {
+                dbManager.removeAllNodesFromNodeSource(nodeSourceName);
+                im = InfrastructureManagerFactory.create(nodeSourceData);
+                existPersistedNodes = false;
+            }
         } else {
             im = InfrastructureManagerFactory.create(nodeSourceData);
         }
@@ -1383,8 +1388,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
         }
 
-        // finally recover the nodes from a saved state if needed
-        if (recoverNodes) {
+        if (existPersistedNodes) {
             recoverNodes(nodeSource);
         }
 
@@ -1436,7 +1440,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * it removes all its nodes. Thus if we restart and recover the RM
      * afterwards there will be no nodes in the database.
      */
-    private boolean existNodesToRecover(String nodeSourceName, boolean nodesRecoverable) {
+    private boolean existPersistedNodes(String nodeSourceName, boolean nodesRecoverable) {
         boolean recoverNodes = false;
         if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() && nodesRecoverable) {
             Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSourceName);
@@ -2112,7 +2116,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Node Source Name cannot be empty");
         }
         if (this.nodeSources.containsKey(nodeSourceName)) {
-            throw new IllegalArgumentException("Node Source name " + nodeSourceName + " already exist");
+            throw new NodeSourceNameAlreadyExistException("Node Source name " + nodeSourceName + " already exist");
         }
         Pattern pattern = Pattern.compile("[^-\\w]");//letters,digits,_and-
         Matcher matcher = pattern.matcher(nodeSourceName);

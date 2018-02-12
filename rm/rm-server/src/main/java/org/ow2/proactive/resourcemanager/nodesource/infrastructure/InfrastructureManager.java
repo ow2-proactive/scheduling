@@ -89,11 +89,6 @@ public abstract class InfrastructureManager implements Serializable {
     /** class' logger */
     protected static final Logger logger = Logger.getLogger(InfrastructureManager.class);
 
-    /** delay that is waited at startup of the scheduler to initialize the
-     * variables and persist them
-     */
-    private static final int PERSISTED_INFRA_VARIABLES_INIT_DELAY = 2000;
-
     /** manager's node source */
     protected NodeSource nodeSource;
 
@@ -442,11 +437,6 @@ public abstract class InfrastructureManager implements Serializable {
      */
     protected List<String> addMultipleDeployingNodes(List<String> nodeNames, String obfuscatedCmd, String message,
             long nodeTimeout) {
-        try {
-            Thread.sleep(PERSISTED_INFRA_VARIABLES_INIT_DELAY);
-        } catch (InterruptedException e) {
-            logger.warn("Could not wait for persisted infrastructure variables init delay to end", e);
-        }
         List<String> answer = new ArrayList<>(nodeNames.size());
         for (String nodeName : nodeNames) {
             String depNodeURL = this.addDeployingNode(nodeName, obfuscatedCmd, message, nodeTimeout);
