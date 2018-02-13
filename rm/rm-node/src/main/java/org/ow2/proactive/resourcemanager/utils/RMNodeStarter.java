@@ -267,6 +267,8 @@ public class RMNodeStarter {
 
     private static final String OPTION_DISABLE_MONITORING = "dm";
 
+    private static KeyPairProducer keyPairProducer = null;
+
     public RMNodeStarter() {
 
     }
@@ -422,7 +424,7 @@ public class RMNodeStarter {
             RMNodeStarter passiveStarter = new RMNodeStarter();
             String baseNodeName = passiveStarter.configure(args);
 
-            launchBackgorundKeyPairMaker(passiveStarter.workers);
+            keyPairProducer = new KeyPairProducer(passiveStarter.workers);
             passiveStarter.createNodesAndConnect(baseNodeName);
         } catch (Throwable t) {
             System.err.println("A major problem occurred when trying to start a node and register it into the Resource Manager, see the stacktrace below");
@@ -435,61 +437,8 @@ public class RMNodeStarter {
         }
     }
 
-    private static BlockingQueue<KeyPair> keyPairs = new LinkedBlockingQueue<>();
-
-    private static void launchBackgorundKeyPairMaker(final int numberOfWorkers) {
-        final Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!Thread.interrupted()) {
-                    try {
-                        // if we obeserve less than 'numberOfWorkers' elements than we goint to
-                        // add 'numberOfWorkers' more
-                        if (keyPairs.size() < numberOfWorkers) {
-                            RMNodeStarter.generateAndAddKeyPairs(numberOfWorkers);
-                        }
-
-                        // sleep 1 second, ot until notification (from getKeyPair method)
-                        synchronized (keyPairs) {
-                            keyPairs.wait(1000);
-                        }
-                    } catch (InterruptedException | NoSuchAlgorithmException e) {
-                        logger.warn("Something went terribly wrong.", e);
-                        Thread.currentThread().interrupt();
-                    }
-                }
-            }
-        });
-        thread.start();
-    }
-
-    private static void generateAndAddKeyPairs(int numberOfWorkers)
-            throws NoSuchAlgorithmException, InterruptedException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(1024, new SecureRandom());
-        KeyPair keyPair = keyGen.generateKeyPair();
-        keyPairs.put(keyPair);
-    }
-
-    /**
-     *
-     * @return keyPair from head of the keyPairs queue
-     */
-    public static KeyPair getKeyPair() {
-        // if by change queue is empty then we notify background thread which apparently sleeps
-        // background thread make sure that there are at least 'workers' key pairs.
-        if (keyPairs.isEmpty()) {
-            synchronized (keyPairs) {
-                keyPairs.notify();
-            }
-        }
-        try {
-            // block until there is something in the queue
-            return keyPairs.take();
-        } catch (InterruptedException e) {
-            logger.error("Thead was interrupted", e);
-            return null;
-        }
+    public static KeyPair getKeyPair() throws NoSuchAlgorithmException {
+        return keyPairProducer.getKeyPair();
     }
 
     protected String configure(final String args[]) {
