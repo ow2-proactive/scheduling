@@ -78,7 +78,7 @@ public class RMNodeUpdater {
      * Java Property prefix used to enter extra java command line options
      * For example -Xmn256m can be configured by using -DXtraOption1=Xmn256m
      */
-    private static final String XTRA_OPTION = "XtraOption";
+    public static final String XTRA_OPTION = "XtraOption";
 
     private static boolean isLocalJarUpToDate(String url, String filePath) {
 
@@ -168,6 +168,11 @@ public class RMNodeUpdater {
         }
     }
 
+    /**
+     * Clean the directory used by One-Jar to expand libraries. After a node.jar update, we clean this directory to prevent jar conflicts
+     * @param jarFile name of the node jar file
+     * @throws IOException
+     */
     private static void cleanExpandDirectory(String jarFile) throws IOException {
         File directoryToClean;
         String oneJarExpandDir = System.getProperty(ONEJAR_EXPAND_DIR_PROPERTY);
@@ -209,6 +214,12 @@ public class RMNodeUpdater {
         p.waitFor();
     }
 
+    /**
+     * Build the java subprocess which will be spawned from this JVM.
+     * @param args current JVM arguments
+     * @param jarFile up-to-date node jar file
+     * @return
+     */
     private static ProcessBuilder generateSubProcess(String[] args, String jarFile) {
         ProcessBuilder pb;
         List<String> command = new ArrayList<>();
@@ -217,7 +228,7 @@ public class RMNodeUpdater {
         } else {
             command.add((new File(StandardSystemProperty.JAVA_HOME.value(), "bin/java")).getAbsolutePath());
         }
-        command.addAll(extractUserSystemPropertiesFromCurrentJVM());
+        command.addAll(buildJVMOptions());
         command.add("-jar");
         command.add(jarFile);
         command.addAll(Lists.newArrayList(args));
@@ -229,7 +240,11 @@ public class RMNodeUpdater {
         return pb;
     }
 
-    private static List<String> extractUserSystemPropertiesFromCurrentJVM() {
+    /**
+     * Builds the list of JVM options to use on the forked process.
+     * @return list of command line options
+     */
+    private static List<String> buildJVMOptions() {
         ArrayList<String> commandLineProperties = new ArrayList<>();
 
         Set<String> standardPropertySet = Sets.union(allSystemProperties(), allInternalProperties());
@@ -243,6 +258,11 @@ public class RMNodeUpdater {
         return commandLineProperties;
     }
 
+    /**
+     * Returns a set containing all standard java system properties, which will not be forwarded to the new JVM
+     * Only java.io.tmpdir and java.library.path will be forwarded.
+     * @return set of property names
+     */
     private static Set<String> allSystemProperties() {
         Set<String> standardPropertySet = new HashSet<>();
         for (StandardSystemProperty stdProperty : StandardSystemProperty.values()) {
@@ -255,6 +275,10 @@ public class RMNodeUpdater {
         return standardPropertySet;
     }
 
+    /**
+     * Returns a set containing all internal or sun-proprietary java system properties, which will not be forwarded to the new JVM
+     * @return set of property names
+     */
     private static Set<String> allInternalProperties() {
         Set<String> internalPropertySet = new HashSet<>();
         for (String propertyName : System.getProperties().stringPropertyNames()) {
@@ -287,6 +311,11 @@ public class RMNodeUpdater {
         return internalPropertySet;
     }
 
+    /**
+     * Builds a list of options which converts java properties starting with XTRA_OPTION prefix to java command line arguments
+     * @return a list of command line options
+     * @link RMNodeUpdater.XTRA_OPTION
+     */
     private static List<String> allNonStandardXOptionsConvertedToProperties() {
         List<String> xOptions = new ArrayList<>();
         for (String propertyName : System.getProperties().stringPropertyNames()) {
