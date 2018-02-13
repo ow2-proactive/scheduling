@@ -43,7 +43,7 @@ public class KeyPairProducer {
 
     // for test purpose, e.g TaskLauncherTest
     public KeyPairProducer() {
-        keyPairs = new LinkedBlockingQueue<>();
+        keyPairs = new LinkedBlockingQueue<>(0);
     }
 
     public KeyPairProducer(int numberOfworkers) {
