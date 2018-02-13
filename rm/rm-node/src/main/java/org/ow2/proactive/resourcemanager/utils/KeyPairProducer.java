@@ -49,13 +49,15 @@ public class KeyPairProducer {
     public KeyPairProducer(int numberOfworkers) {
         this.keyPairs = new LinkedBlockingQueue(numberOfworkers);
         final Thread thread = new Thread(new Runnable() {
-            @SuppressWarnings("squid:S2189") // to allow infinite loop, in our case it is infinit because it is deamon thread
             @Override
             public void run() {
                 try {
-                    while (true) {
+                    while (!Thread.currentThread().isInterrupted()) {
                         keyPairs.put(generateAndAddKeyPairs());
                     }
+                } catch (InterruptedException e) {
+                    LOGGER.error(e);
+                    Thread.currentThread().interrupt();
                 } catch (Exception e) {
                     LOGGER.error(e);
                 }
