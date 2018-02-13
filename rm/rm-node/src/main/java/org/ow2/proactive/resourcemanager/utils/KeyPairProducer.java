@@ -31,7 +31,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
@@ -40,45 +39,25 @@ public class KeyPairProducer {
 
     private static final Logger LOGGER = Logger.getLogger(KeyPairProducer.class);
 
-    private AtomicInteger numberOfWorkers;
-
-    private BlockingQueue<KeyPair> keyPairs = new LinkedBlockingQueue<>();
-
-    private long loopTimeout = 1000; // in milliseconds
+    private BlockingQueue<KeyPair> keyPairs;
 
     // for test purpose, e.g TaskLauncherTest
     public KeyPairProducer() {
-
+        keyPairs = new LinkedBlockingQueue<>();
     }
 
     public KeyPairProducer(int numberOfworkers) {
-        // let say we generate 3 times more keys than nodes there are
-        this.numberOfWorkers = new AtomicInteger(numberOfworkers * 3);
+        this.keyPairs = new LinkedBlockingQueue(numberOfworkers);
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!Thread.currentThread().isInterrupted()) {
-                    try {
-                        // if we obeserve less than 'numberOfWorkers' elements than we going to
-                        // add 'numberOfWorkers' more
-                        int numberOfKeysToAdd = numberOfWorkers.get() - keyPairs.size();
-                        if (numberOfKeysToAdd > 0) {
-                            for (int i = 0; i < numberOfKeysToAdd; ++i) {
-                                keyPairs.put(generateAndAddKeyPairs());
-                            }
-                        }
-
-                        // sleep 1 second
-                        synchronized (keyPairs) {
-                            keyPairs.wait(loopTimeout);
-                        }
-                    } catch (InterruptedException e) {
-                        LOGGER.error("Deamon thread was interrupted.", e);
-                        Thread.currentThread().interrupt();
-                    } catch (Throwable e) {
-                        // ignore all exception except InterruptedException
-                        LOGGER.error(e);
+                try {
+                    while (true) {
+                        keyPairs.put(generateAndAddKeyPairs());
                     }
+                } catch (Throwable e) {
+                    // ignore all exception except InterruptedException
+                    LOGGER.error(e);
                 }
             }
         });
@@ -93,6 +72,7 @@ public class KeyPairProducer {
         KeyPair keyPair = keyPairs.poll();
         if (keyPair == null) {
             // if by change queue is empty then we generate key pair synchronously
+            LOGGER.warn("Key pair queue is empty");
             keyPair = generateAndAddKeyPairs();
         }
         return keyPair;
