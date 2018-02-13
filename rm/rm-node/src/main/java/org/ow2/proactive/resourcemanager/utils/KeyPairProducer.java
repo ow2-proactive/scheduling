@@ -73,7 +73,7 @@ public class KeyPairProducer {
         KeyPair keyPair = keyPairs.poll();
         if (keyPair == null) {
             // if by change queue is empty then we generate key pair synchronously
-            LOGGER.warn("Key pair queue is empty");
+            LOGGER.warn("Key pair queue is empty, generating a key pair now");
             keyPair = generateAndAddKeyPairs();
         }
         return keyPair;

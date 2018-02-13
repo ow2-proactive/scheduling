@@ -414,7 +414,7 @@ public class RMNodeStarter {
     }
 
     /**
-     * Creates a new instance of trhis class and calls registersInRm method.
+     * Creates a new instance of this class and calls registersInRm method.
      * @param args The arguments needed to join the Resource Manager
      */
     public static void main(String[] args) {
