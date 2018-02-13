@@ -484,12 +484,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         for (NodeSourceData nodeSourceData : nodeSources) {
             String nodeSourceDataName = nodeSourceData.getName();
-            try {
-                logger.info("Recovering node source " + nodeSourceDataName);
-                createNodeSource(nodeSourceData, nodeSourceData.getNodesRecoverable());
-            } catch (Throwable t) {
-                logger.error(t.getMessage(), t);
-                brokenNodeSources.add(nodeSourceDataName);
+            if (NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceDataName)) {
+                // will be recreated by SchedulerStarter
+                dbManager.removeNodeSource(nodeSourceDataName);
+            } else {
+                try {
+                    logger.info("Recovering node source " + nodeSourceDataName);
+                    createNodeSource(nodeSourceData, nodeSourceData.getNodesRecoverable());
+                } catch (Throwable t) {
+                    logger.error(t.getMessage(), t);
+                    brokenNodeSources.add(nodeSourceDataName);
+                }
             }
         }
     }
