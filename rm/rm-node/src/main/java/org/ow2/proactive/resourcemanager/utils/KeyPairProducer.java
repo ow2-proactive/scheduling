@@ -49,11 +49,15 @@ public class KeyPairProducer {
 
     private AtomicInteger numberOfWorkers;
 
-    private final Future<?> future;
+    private Future<?> future;
 
     private BlockingQueue<KeyPair> keyPairs = new LinkedBlockingQueue<>();
 
     private long loopTimeout = 1000;
+
+    public KeyPairProducer() {
+        future = null;
+    }
 
     public KeyPairProducer(int numberOfworkers) {
         this.numberOfWorkers = new AtomicInteger(numberOfworkers);
@@ -102,14 +106,14 @@ public class KeyPairProducer {
         try {
             // block until there is something in the queue but do not block more than 3 timeouts
             KeyPair keyPair = null;
-            if (!future.isDone()) {
+            if (future != null && !future.isDone()) {
                 keyPair = keyPairs.poll(loopTimeout * 3, timeUnit);
                 if (keyPair == null) {
-                    LOGGER.warn("Background thread is still working but there is nothing in the queue.");
+                    LOGGER.warn("Background thread is still working but there is nothing in the queue, so we generate key synchronously.");
                     keyPair = generateAndAddKeyPairs();
                 }
             } else {
-                LOGGER.error("Background thread is dead so we generate key by ourselves.");
+                //LOGGER.error("Background thread is dead, so we generate key synchronously.");
                 keyPair = generateAndAddKeyPairs();
             }
             return keyPair;
@@ -123,11 +127,7 @@ public class KeyPairProducer {
         return numberOfWorkers.get();
     }
 
-    public void setNumberOfWorkers(int numberOfWorkers) {
-        this.numberOfWorkers.set(numberOfWorkers);
-    }
-
-    private KeyPair generateAndAddKeyPairs() throws NoSuchAlgorithmException {
+    public KeyPair generateAndAddKeyPairs() throws NoSuchAlgorithmException {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(1024, new SecureRandom());
         return keyGen.generateKeyPair();

@@ -28,8 +28,10 @@ package org.ow2.proactive.scheduler.task;
 import java.io.File;
 import java.io.Serializable;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -448,8 +450,12 @@ public class TaskLauncher implements InitActive {
         taskLogger.getStoredLogs(logSink);
     }
 
+    public KeyPair getKeyPair() throws NoSuchAlgorithmException {
+        return RMNodeStarter.getKeyPair();
+    }
+
     public PublicKey generatePublicKey() throws NoSuchAlgorithmException {
-        KeyPair keyPair = RMNodeStarter.getKeyPair();
+        final KeyPair keyPair = getKeyPair();
         decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }
