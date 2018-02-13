@@ -441,10 +441,6 @@ public class RMNodeStarter {
         return keyPairProducer.getKeyPair();
     }
 
-    public static void setKeyPairProducer(KeyPairProducer keyPairProducer) {
-        RMNodeStarter.keyPairProducer = keyPairProducer;
-    }
-
     protected String configure(final String args[]) {
         configureSecurityManager();
         configureRMAndProActiveHomes();
