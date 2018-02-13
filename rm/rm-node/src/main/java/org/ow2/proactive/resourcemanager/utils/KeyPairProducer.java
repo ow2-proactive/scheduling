@@ -79,7 +79,7 @@ public class KeyPairProducer {
         return keyPair;
     }
 
-    public KeyPair generateAndAddKeyPairs() throws NoSuchAlgorithmException {
+    private KeyPair generateAndAddKeyPairs() throws NoSuchAlgorithmException {
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(1024, new SecureRandom());
         return keyGen.generateKeyPair();
