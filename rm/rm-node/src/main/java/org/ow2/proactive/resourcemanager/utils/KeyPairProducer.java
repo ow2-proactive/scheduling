@@ -55,7 +55,7 @@ public class KeyPairProducer {
                     while (true) {
                         keyPairs.put(generateAndAddKeyPairs());
                     }
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     // ignore all exception except InterruptedException
                     LOGGER.error(e);
                 }
