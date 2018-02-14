@@ -267,7 +267,7 @@ public class RMNodeStarter {
 
     private static final String OPTION_DISABLE_MONITORING = "dm";
 
-    private static KeyPairProducer keyPairProducer = null;
+    private static KeyPairProducer keyPairProducer = new KeyPairProducer();
 
     public RMNodeStarter() {
 
