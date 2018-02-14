@@ -859,7 +859,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @return total number of alive nodes
      */
-    private int getTotalAliveNodesNumber() {
+    public int getTotalAliveNodesNumber() {
         int count = 0;
         for (RMNode node : allNodes.values()) {
             if (!node.isDown())
