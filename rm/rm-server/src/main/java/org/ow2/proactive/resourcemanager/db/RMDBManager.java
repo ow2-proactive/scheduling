@@ -497,6 +497,24 @@ public class RMDBManager {
         }
     }
 
+    public void removeAllNodesFromNodeSource(final String nodeSourceName) {
+        try {
+            logger.info("Remove all nodes from node source " + nodeSourceName + IN_DATABASE_STRING);
+            executeReadWriteTransaction(new SessionWork<Void>() {
+                @Override
+                public Void doInTransaction(Session session) {
+                    session.getNamedQuery("deleteAllRMNodeDataFromNodeSource")
+                           .setParameter("name", nodeSourceName)
+                           .executeUpdate();
+                    return null;
+                }
+            });
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception occurred while removing all nodes from node source " +
+                                       nodeSourceName + " in the database", e);
+        }
+    }
+
     public RMNodeData getNodeByNameAndUrl(final String nodeName, final String nodeUrl) {
         logger.debug(REQUEST_BUFFER_STRING + "retrieve node with node name " + nodeName + IN_DATABASE_STRING);
         rmdbManagerBuffer.debounceNodeUpdatesIfNeeded();
