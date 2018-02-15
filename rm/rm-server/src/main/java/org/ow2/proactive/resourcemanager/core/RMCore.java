@@ -2457,7 +2457,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private void persistNewRMNodeIfRecoveryEnabled(RMNode rmNode) {
         if (nodesRecoveryEnabledForNode(rmNode)) {
             RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-            NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
+            NodeSourceData nodeSourceData = new NodeSourceData(rmNode.getNodeSourceName());
             rmNodeData.setNodeSource(nodeSourceData);
             dbManager.addNode(rmNodeData);
         }
