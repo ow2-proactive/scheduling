@@ -351,7 +351,7 @@ public class RMCoreTest {
     public void testNodesRestorationManagerHandleInSetDeploying() {
         verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class), Mockito.any(Client.class));
         rmCore.setDeploying(mockedBusyNode);
-        verify(nodesRecoveryManager).restoreLocks(Mockito.any(RMNode.class), Mockito.any(Client.class));
+        verify(nodesRecoveryManager).restoreLock(Mockito.any(RMNode.class), Mockito.any(Client.class));
     }
 
     @Test
