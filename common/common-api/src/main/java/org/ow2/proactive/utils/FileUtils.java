@@ -26,15 +26,17 @@
 package org.ow2.proactive.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -46,6 +48,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public class FileUtils {
+
+    private static final Logger logger = Logger.getLogger(FileUtils.class);
 
     /**
      * Remove directories and files recursively
@@ -167,6 +171,17 @@ public class FileUtils {
             return filename + "." + extension;
         }
         return filename;
+    }
+
+    public static Properties resolvePropertiesFile(String fileNamePath) {
+        Properties properties = new Properties();
+        logger.debug("Loading properties from file " + fileNamePath);
+        try (FileInputStream stream = new FileInputStream(fileNamePath)) {
+            properties.load(stream);
+        } catch (Exception e) {
+            logger.warn("Properties file not found : '" + fileNamePath + "'", e);
+        }
+        return properties;
     }
 
 }

@@ -25,14 +25,11 @@
  */
 package org.ow2.proactive.scheduler.policy.license;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.utils.FileUtils;
 
 
 public class LicenseConfiguration extends ArrayList<Object> {
@@ -40,8 +37,6 @@ public class LicenseConfiguration extends ArrayList<Object> {
     private String path;
 
     private static LicenseConfiguration configuration;
-
-    private static Logger logger = Logger.getLogger(LicenseConfiguration.class);
 
     private LicenseConfiguration() {
         path = PASchedulerProperties.LICENSE_SCHEDULING_POLICY_CONFIGURATION.getValueAsString();
@@ -62,13 +57,6 @@ public class LicenseConfiguration extends ArrayList<Object> {
     }
 
     public Properties getProperties() {
-        Properties props = new Properties();
-        try {
-            InputStream fis = new FileInputStream(getPath());
-            props.load(fis);
-        } catch (IOException e) {
-            logger.warn("License Configuration file: " + getPath() + " not found!", e);
-        }
-        return props;
+        return FileUtils.resolvePropertiesFile(getPath());
     }
 }
