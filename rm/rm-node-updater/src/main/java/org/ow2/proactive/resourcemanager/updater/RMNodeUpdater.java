@@ -32,13 +32,35 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.X509TrustManager;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 import com.google.common.base.StandardSystemProperty;
 import com.google.common.collect.Lists;
@@ -52,22 +74,38 @@ import com.google.common.collect.Sets;
  * When an agent detects it and restart the node it just proxies the request to RMNodeStarer.
  *
  */
-public class RMNodeUpdater {
+public class RMNodeUpdater extends RMNodeStarter {
 
     /**
      * Url used to download node.jar
      */
     private static final String NODE_URL_PROPERTY = "node.jar.url";
 
+    static final String OPTION_NODE_URL = "nju";
+
+    public static final String OPTION_NODE_JAR_URL_NAME = "nodeJarUrl";
+
+    public static final String OPTION_NODE_JAR_SAVE_AS_NAME = "nodeJarSaveAs";
+
+    protected String nodeJarUrl;
+
     /**
      * Local path where the node jar should be stored
      */
     private static final String NODE_JAR_SAVEAS_PROPERTY = "node.jar.saveas";
 
+    static final String OPTION_NODE_SAVEAS = "njs";
+
+    protected String nodeJarSaveAs;
+
     /**
-     * Default name of the local node jar
+     * If true, then the updater never terminates, it will
      */
-    private static final String DEFAULT_SCHEDULER_NODE_JAR = "node.jar";
+    private static final String NODE_UPDATER_AUTOMATIC_RELAUNCH = "node.updater.automatic.relaunch";
+
+    static final String OPTION_NODE_AUTOMATIC = "nja";
+
+    protected boolean automaticRelaunch = false;
 
     /**
      * optional One-Jar property, path used to expand librairies
@@ -80,105 +118,143 @@ public class RMNodeUpdater {
      */
     public static final String XTRA_OPTION = "XtraOption";
 
-    private static boolean isLocalJarUpToDate(String url, String filePath) {
+    public static final String LAST_DOT_AND_AFTER = "\\.[^\\.]*$";
+
+    private static final Logger logger = initLogger();
+
+    public static final int NUMBER_OF_ATTEMPTS = 10;
+
+    public RMNodeUpdater() {
+
+    }
+
+    private static Logger initLogger() {
+        if (System.getProperty("log4j.configuration") == null) {
+            // While logger is not configured and it not set with sys properties, use Console logger
+            Logger.getRootLogger().getLoggerRepository().resetConfiguration();
+            BasicConfigurator.configure(new ConsoleAppender(new PatternLayout("%m%n")));
+            Logger.getRootLogger().setLevel(Level.INFO);
+        }
+        return Logger.getLogger(RMNodeUpdater.class);
+    }
+
+    private boolean isLocalJarUpToDate(String url, String filePath) {
 
         try {
             URLConnection urlConnection = new URL(url).openConnection();
             File file = new File(filePath);
 
-            System.out.println("Url date=" + new Date(urlConnection.getLastModified()));
-            System.out.println("File date=" + new Date(file.lastModified()));
+            logger.info("Url date=" + new Date(urlConnection.getLastModified()));
+            logger.info("File date=" + new Date(file.lastModified()));
 
             if (!file.exists() || file.lastModified() < urlConnection.getLastModified()) {
-                System.out.println("Local jar " + file + " is obsolete or not present");
+                logger.info("Local jar " + file + " is obsolete or not present");
             } else {
-                System.out.println("Local jar " + file + " is up to date");
+                logger.info("Local jar " + file + " is up to date");
                 return true;
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logError("Error when contacting the remote url " + url, e);
         }
 
         return false;
     }
 
-    private static boolean makeNodeUpToDate() {
-        if (System.getProperty(NODE_URL_PROPERTY) != null) {
+    private static void logError(String message, Exception e) {
+        if (logger.isDebugEnabled()) {
+            logger.error(message, e);
+        } else {
+            logger.error(message + " : " + e.getMessage());
+        }
+    }
 
-            String jarUrl = System.getProperty(NODE_URL_PROPERTY);
-            String jarFile = DEFAULT_SCHEDULER_NODE_JAR;
+    private long getRemoteLastModifiedMillis(String url) {
+        try {
+            URLConnection urlConnection = new URL(url).openConnection();
+            return urlConnection.getLastModified();
+        } catch (IOException e) {
+            logError("Error when contacting the remote url " + url, e);
+            return 0;
+        }
+    }
 
-            if (System.getProperty(NODE_JAR_SAVEAS_PROPERTY) != null) {
-                jarFile = System.getProperty(NODE_JAR_SAVEAS_PROPERTY);
-            }
+    private boolean makeNodeUpToDate() {
+        if (!isLocalJarUpToDate(nodeJarUrl, nodeJarSaveAs)) {
+            logger.info("Downloading node.jar from " + nodeJarUrl + " to " + nodeJarSaveAs);
 
-            if (!isLocalJarUpToDate(jarUrl, jarFile)) {
-                System.out.println("Downloading node.jar from " + jarUrl + " to " + jarFile);
+            try {
+                File destination = new File(nodeJarSaveAs);
+                File lockFile = null;
+                FileLock lock = null;
 
-                try {
-                    File destination = new File(jarFile);
-                    File lockFile = null;
-                    FileLock lock = null;
+                if (destination.exists()) {
 
-                    if (destination.exists()) {
-
-                        lockFile = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value(), "lock");
-                        if (!lockFile.exists()) {
-                            lockFile.createNewFile();
-                        }
-
-                        System.out.println("Getting the lock on " + lockFile.getAbsoluteFile());
-                        FileChannel channel = new RandomAccessFile(lockFile, "rw").getChannel();
-                        lock = channel.lock();
-
-                        if (isLocalJarUpToDate(jarUrl, jarFile)) {
-                            System.out.println("Another process downloaded node.jar - don't do it anymore");
-                            System.out.println("Releasing the lock on " + lockFile.getAbsoluteFile());
-                            lock.release();
-                            channel.close();
-
-                            return false;
-                        }
+                    lockFile = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value(), "lock");
+                    if (!lockFile.exists()) {
+                        lockFile.createNewFile();
                     }
 
-                    FileUtils.copyURLToFile(new URL(jarUrl), destination);
-                    System.out.println("Download finished");
+                    logger.info("Getting the lock on " + lockFile.getAbsoluteFile());
+                    FileChannel channel = new RandomAccessFile(lockFile, "rw").getChannel();
+                    lock = channel.lock();
 
-                    cleanExpandDirectory(jarFile);
-
-                    if (lock != null && lockFile != null) {
-                        System.out.println("Releasing the lock on " + lockFile.getAbsoluteFile());
+                    if (isLocalJarUpToDate(nodeJarUrl, nodeJarSaveAs)) {
+                        logger.warn("Another process downloaded node.jar - don't do it anymore");
+                        logger.info("Releasing the lock on " + lockFile.getAbsoluteFile());
                         lock.release();
-                    }
-                    return true;
+                        channel.close();
 
-                } catch (Exception e) {
-                    System.err.println("Cannot download node.jar from " + jarUrl);
-                    e.printStackTrace();
-                    return false;
+                        return false;
+                    }
                 }
-            } else {
+                fetchUrl(nodeJarUrl, destination);
+                // Align the local file modification time with the remote url.
+                destination.setLastModified(getRemoteLastModifiedMillis(nodeJarUrl));
+                logger.info("Download finished");
+
+                cleanExpandDirectory(nodeJarSaveAs);
+
+                if (lock != null && lockFile != null) {
+                    logger.info("Releasing the lock on " + lockFile.getAbsoluteFile());
+                    lock.release();
+                }
                 return true;
+
+            } catch (Exception e) {
+                logError("Cannot download node.jar from " + nodeJarUrl, e);
+                return false;
             }
         } else {
-            throw new IllegalArgumentException("No java property " + NODE_URL_PROPERTY +
-                                               " specified. This property must be set when using " +
-                                               RMNodeUpdater.class.getSimpleName());
+            return true;
         }
+    }
+
+    /**
+     * Fetch the node.jar at the given url and store it to a file
+     * Disable ssl handshake if https
+     * @param jarUrl url to fetch
+     * @param destination local file
+     * @throws IOException
+     */
+    private static void fetchUrl(String jarUrl, File destination) throws IOException {
+        if (jarUrl.startsWith("https")) {
+            trustEveryone();
+
+        }
+        FileUtils.copyURLToFile(new URL(jarUrl), destination);
     }
 
     /**
      * Clean the directory used by One-Jar to expand libraries. After a node.jar update, we clean this directory to prevent jar conflicts
      * @param jarFile name of the node jar file
-     * @throws IOException
      */
-    private static void cleanExpandDirectory(String jarFile) throws IOException {
+    private void cleanExpandDirectory(String jarFile) {
         File directoryToClean;
         String oneJarExpandDir = System.getProperty(ONEJAR_EXPAND_DIR_PROPERTY);
         if (oneJarExpandDir == null) {
             // Default scheme used by one-jar
-            String jar = new File(jarFile).getName().replaceFirst("\\.[^\\.]*$", "");
+            String jar = new File(jarFile).getName().replaceFirst(LAST_DOT_AND_AFTER, "");
             directoryToClean = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value(), jar);
         } else {
             directoryToClean = new File(oneJarExpandDir);
@@ -187,21 +263,143 @@ public class RMNodeUpdater {
         FileUtils.deleteQuietly(directoryToClean);
     }
 
-    public static void main(String[] args) throws Exception {
-        while (!makeNodeUpToDate()) {
-            Thread.sleep(5000);
+    @Override
+    protected void fillOptions(final Options options) {
+        super.fillOptions(options);
+
+        // The url used to download node.jar
+        final Option nodeJarUrlOption = new Option(OPTION_NODE_URL,
+                                                   OPTION_NODE_JAR_URL_NAME,
+                                                   true,
+                                                   "url used to download the node.jar, e.g. http://localhost:8080/rest/node.jar");
+        nodeJarUrlOption.setRequired(false);
+        nodeJarUrlOption.setArgName("url");
+        options.addOption(nodeJarUrlOption);
+
+        // The location where to store the local node.jar
+        final Option nodeJarSaveAsOption = new Option(OPTION_NODE_SAVEAS,
+                                                      OPTION_NODE_JAR_SAVE_AS_NAME,
+                                                      true,
+                                                      "local path where to store the downloaded node.jar");
+        nodeJarSaveAsOption.setRequired(false);
+        nodeJarSaveAsOption.setArgName("path");
+        options.addOption(nodeJarSaveAsOption);
+
+        // Node updater in automatic relaunch mode
+        final Option nodeUpdaterAutomaticRelaunchOption = new Option(OPTION_NODE_AUTOMATIC,
+                                                                     "nodeUpdaterAutomaticRelaunch",
+                                                                     false,
+                                                                     "If set, the Node Updater will automatically relaunch when the subprocess terminates (always available)");
+        nodeUpdaterAutomaticRelaunchOption.setRequired(false);
+        options.addOption(nodeUpdaterAutomaticRelaunchOption);
+
+    }
+
+    @Override
+    protected String fillParameters(final CommandLine cl, final Options options) {
+        String parentResult = super.fillParameters(cl, options);
+
+        if (cl.hasOption(OPTION_NODE_URL)) {
+            nodeJarUrl = cl.getOptionValue(OPTION_NODE_URL);
+        } else if (System.getProperty(NODE_URL_PROPERTY) != null) {
+            nodeJarUrl = System.getProperty(NODE_URL_PROPERTY);
+        } else {
+            logger.error("Option " + OPTION_NODE_JAR_URL_NAME + " must be specified or java property " +
+                         NODE_URL_PROPERTY + " must be set");
+            System.exit(ExitStatus.RMNODE_PARSE_ERROR.exitCode);
         }
-        String jarFile = DEFAULT_SCHEDULER_NODE_JAR;
 
-        if (System.getProperty(NODE_JAR_SAVEAS_PROPERTY) != null) {
-            jarFile = System.getProperty(NODE_JAR_SAVEAS_PROPERTY);
+        if (cl.hasOption(OPTION_NODE_SAVEAS)) {
+            nodeJarSaveAs = cl.getOptionValue(OPTION_NODE_SAVEAS);
+        } else if (System.getProperty(NODE_JAR_SAVEAS_PROPERTY) != null) {
+            nodeJarSaveAs = System.getProperty(NODE_JAR_SAVEAS_PROPERTY);
+        } else {
+            logger.error("Option " + OPTION_NODE_JAR_SAVE_AS_NAME + " must be specified or java property " +
+                         NODE_JAR_SAVEAS_PROPERTY + " must be set");
+            System.exit(ExitStatus.RMNODE_PARSE_ERROR.exitCode);
         }
 
-        System.out.println("Launching a computing node");
-        ProcessBuilder pb = generateSubProcess(args, jarFile);
+        if (cl.hasOption(OPTION_NODE_AUTOMATIC)) {
+            automaticRelaunch = true;
+        } else if (System.getProperty(NODE_UPDATER_AUTOMATIC_RELAUNCH) != null) {
+            automaticRelaunch = "true".equals(System.getProperty(NODE_UPDATER_AUTOMATIC_RELAUNCH));
+        }
+        return parentResult;
+    }
 
-        final Process p = pb.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+    @Override
+    protected String parseCommandLine(String[] args) {
+        final Options options = new Options();
+
+        fillOptions(options);
+
+        final CommandLineParser parser = new DefaultParser();
+
+        CommandLine cl;
+        try {
+            cl = parser.parse(options, args);
+            //now we update this object's fields given the options.
+            String nodeName = fillParameters(cl, options);
+            //check the user supplied values
+            //performed after fillParameters to be able to override fillParameters in subclasses
+            checkUserSuppliedParameters();
+            return nodeName;
+        } catch (ParseException pe) {
+            pe.printStackTrace();
+            System.exit(ExitStatus.RMNODE_PARSE_ERROR.exitCode);
+        }
+
+        return null;
+    }
+
+    public static void main(String[] args) {
+
+        RMNodeUpdater rmNodeUpdater = new RMNodeUpdater();
+
+        rmNodeUpdater.parseCommandLine(args);
+
+        rmNodeUpdater.updateNodeAndLaunchJVM(args);
+    }
+
+    private void updateNodeAndLaunchJVM(String[] args) {
+        do {
+            try {
+                int attempts = 0;
+                while (!makeNodeUpToDate() && attempts < NUMBER_OF_ATTEMPTS) {
+                    Thread.sleep(5000);
+                    attempts++;
+                }
+                if (attempts >= NUMBER_OF_ATTEMPTS) {
+                    if (!automaticRelaunch) {
+                        throw new IllegalStateException("Could not make node up to date after " + NUMBER_OF_ATTEMPTS +
+                                                        "attempts, aborting");
+                    } else {
+                        // in case of auto relaunch, we will keep trying
+                        continue;
+                    }
+                }
+
+                logger.info("Launching a computing node");
+                ProcessBuilder pb = generateSubProcess(args, nodeJarSaveAs);
+
+                final Process p = pb.start();
+                Thread shutdownHook = createShutDownHook(p);
+                Runtime.getRuntime().addShutdownHook(shutdownHook);
+                p.waitFor();
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            } catch (InterruptedException e) {
+                logger.warn("", e);
+                Thread.currentThread().interrupt();
+            } catch (IOException e) {
+                logger.error("Error when starting sub process", e);
+                Thread.currentThread().interrupt();
+            }
+
+        } while (automaticRelaunch && !Thread.currentThread().isInterrupted());
+    }
+
+    private static Thread createShutDownHook(final Process p) {
+        return new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -210,8 +408,7 @@ public class RMNodeUpdater {
                     // ignore
                 }
             }
-        }));
-        p.waitFor();
+        });
     }
 
     /**
@@ -220,7 +417,7 @@ public class RMNodeUpdater {
      * @param jarFile up-to-date node jar file
      * @return
      */
-    private static ProcessBuilder generateSubProcess(String[] args, String jarFile) {
+    private ProcessBuilder generateSubProcess(String[] args, String jarFile) {
         ProcessBuilder pb;
         List<String> command = new ArrayList<>();
         if (StandardSystemProperty.OS_NAME.value().toLowerCase().contains("windows")) {
@@ -231,7 +428,8 @@ public class RMNodeUpdater {
         command.addAll(buildJVMOptions());
         command.add("-jar");
         command.add(jarFile);
-        command.addAll(Lists.newArrayList(args));
+        command.addAll(removeOptionsUnrecognizedByRMNodeStarter(args));
+        logger.info("Starting Java command: " + command);
         pb = new ProcessBuilder(command);
         pb.inheritIO();
         if (pb.environment().containsKey("CLASSPATH")) {
@@ -240,11 +438,28 @@ public class RMNodeUpdater {
         return pb;
     }
 
+    private List<String> removeOptionsUnrecognizedByRMNodeStarter(String[] args) {
+        List<String> argList = Lists.newArrayList(args);
+        for (Iterator<String> iterator = argList.iterator(); iterator.hasNext();) {
+            String arg = iterator.next();
+            if (arg.equals("-" + OPTION_NODE_URL) || arg.equals("-" + OPTION_NODE_SAVEAS)) {
+                // remove this option + parameter
+                iterator.remove();
+                iterator.next();
+                iterator.remove();
+            } else if (arg.equals("-" + OPTION_NODE_AUTOMATIC)) {
+                // remove this option
+                iterator.remove();
+            }
+        }
+        return argList;
+    }
+
     /**
      * Builds the list of JVM options to use on the forked process.
      * @return list of command line options
      */
-    private static List<String> buildJVMOptions() {
+    private List<String> buildJVMOptions() {
         ArrayList<String> commandLineProperties = new ArrayList<>();
 
         Set<String> standardPropertySet = Sets.union(allSystemProperties(), allInternalProperties());
@@ -263,7 +478,7 @@ public class RMNodeUpdater {
      * Only java.io.tmpdir and java.library.path will be forwarded.
      * @return set of property names
      */
-    private static Set<String> allSystemProperties() {
+    private Set<String> allSystemProperties() {
         Set<String> standardPropertySet = new HashSet<>();
         for (StandardSystemProperty stdProperty : StandardSystemProperty.values()) {
             if (stdProperty != StandardSystemProperty.JAVA_IO_TMPDIR &&
@@ -279,7 +494,7 @@ public class RMNodeUpdater {
      * Returns a set containing all internal or sun-proprietary java system properties, which will not be forwarded to the new JVM
      * @return set of property names
      */
-    private static Set<String> allInternalProperties() {
+    private Set<String> allInternalProperties() {
         Set<String> internalPropertySet = new HashSet<>();
         for (String propertyName : System.getProperties().stringPropertyNames()) {
             if (propertyName.startsWith("sun.") || (propertyName.startsWith(XTRA_OPTION))) {
@@ -316,7 +531,7 @@ public class RMNodeUpdater {
      * @return a list of command line options
      * @link RMNodeUpdater.XTRA_OPTION
      */
-    private static List<String> allNonStandardXOptionsConvertedToProperties() {
+    private List<String> allNonStandardXOptionsConvertedToProperties() {
         List<String> xOptions = new ArrayList<>();
         for (String propertyName : System.getProperties().stringPropertyNames()) {
             if (propertyName.startsWith(XTRA_OPTION)) {
@@ -324,6 +539,31 @@ public class RMNodeUpdater {
             }
         }
         return xOptions;
+    }
+
+    private static void trustEveryone() {
+        try {
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, new X509TrustManager[] { new X509TrustManager() {
+                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+            } }, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+        } catch (Exception e) { // should never happen
+            logger.error("Error occurred when modifying the ssl strategy", e);
+        }
     }
 
 }

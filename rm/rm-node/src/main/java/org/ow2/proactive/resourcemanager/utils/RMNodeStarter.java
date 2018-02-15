@@ -1041,7 +1041,7 @@ public class RMNodeStarter {
     /**
      * Checks that user has supplied parameters or override them with java properties values...
      */
-    private void checkUserSuppliedParameters() {
+    protected void checkUserSuppliedParameters() {
         //need an exhaustive list...
         //first, the number of add attempts
         if (!NB_OF_ADD_NODE_ATTEMPTS_USER_SUPPLIED) {
@@ -1392,7 +1392,7 @@ public class RMNodeStarter {
         return new File(tmpDir, URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank).getAbsolutePath();
     }
 
-    private enum ExitStatus {
+    protected enum ExitStatus {
         OK(0, "Exit success."),
         //mustn't be changed, return value set in the JVM itself
         JVM_ERROR(1, "Problem with the Java process itself ( classpath, main method... )."),
