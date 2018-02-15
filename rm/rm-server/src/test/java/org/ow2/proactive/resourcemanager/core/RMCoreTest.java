@@ -66,6 +66,7 @@ import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeHelper;
@@ -604,7 +605,7 @@ public class RMCoreTest {
         ArrayList<RMNode> freeNodes = Lists.newArrayList((RMNode) rmNode);
 
         RMCore rmCore = new RMCore(new HashMap<String, NodeSource>(),
-                                   new ArrayList<String>(),
+                                   new HashMap<String, NodeSourceDescriptor>(),
                                    allNodes,
                                    Mockito.mock(Client.class),
                                    Mockito.mock(RMMonitoringImpl.class),
@@ -863,7 +864,7 @@ public class RMCoreTest {
         freeNodes.add(mockedFreeButLockedNode);
 
         rmCore = new RMCore(nodeSources,
-                            new ArrayList<String>(),
+                            new HashMap<String, NodeSourceDescriptor>(),
                             nodes,
                             mockedCaller,
                             mockedMonitoring,

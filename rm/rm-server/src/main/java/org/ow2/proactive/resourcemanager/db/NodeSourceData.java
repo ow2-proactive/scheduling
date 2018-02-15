@@ -35,11 +35,14 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.xml.soap.Node;
 
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 
 
 @Entity
@@ -64,6 +67,10 @@ public class NodeSourceData implements Serializable {
 
     private boolean nodesRecoverable;
 
+    private NodeSourceStatus status;
+
+    private String description;
+
     /**
      * name of the variable --> value of the variable
      */
@@ -73,7 +80,8 @@ public class NodeSourceData implements Serializable {
     }
 
     public NodeSourceData(String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
-            String policyType, Object[] policyParameters, Client provider, boolean nodesRecoverable) {
+            String policyType, Object[] policyParameters, Client provider, boolean nodesRecoverable,
+            NodeSourceStatus status, String description) {
 
         this.name = nodeSourceName;
         this.infrastructureType = infrastructureType;
@@ -82,7 +90,21 @@ public class NodeSourceData implements Serializable {
         this.policyParameters = policyParameters;
         this.provider = provider;
         this.nodesRecoverable = nodesRecoverable;
+        this.status = status;
+        this.description = description;
         this.infrastructureVariables = new HashMap<>();
+    }
+
+    public static NodeSourceData fromNodeSourceDescriptor(NodeSourceDescriptor descriptor) {
+        return new NodeSourceData(descriptor.getName(),
+                                  descriptor.getInfrastructureType(),
+                                  descriptor.getInfrastructureParameters(),
+                                  descriptor.getPolicyType(),
+                                  descriptor.getPolicyParameters(),
+                                  descriptor.getProvider(),
+                                  descriptor.isNodesRecoverable(),
+                                  descriptor.getStatus(),
+                                  descriptor.getDescription());
     }
 
     @Id
@@ -153,6 +175,25 @@ public class NodeSourceData implements Serializable {
         this.nodesRecoverable = nodesRecoverable;
     }
 
+    @Column
+    public NodeSourceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(NodeSourceStatus status) {
+        this.status = status;
+    }
+
+    @Column(length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.TextType")
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, Serializable> getInfrastructureVariables() {
@@ -161,6 +202,19 @@ public class NodeSourceData implements Serializable {
 
     public void setInfrastructureVariables(Map<String, Serializable> infrastructureVariables) {
         this.infrastructureVariables = infrastructureVariables;
+    }
+
+    public NodeSourceDescriptor toNodeSourceDescriptor() {
+        return new NodeSourceDescriptor(name,
+                                        infrastructureType,
+                                        infrastructureParameters,
+                                        policyType,
+                                        policyParameters,
+                                        provider,
+                                        description,
+                                        nodesRecoverable,
+                                        status,
+                                        infrastructureVariables);
     }
 
     @Override

@@ -42,6 +42,7 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -167,7 +168,9 @@ public class NodeSourcesTest extends ProActiveTest {
                                   StaticPolicy.class.getName(),
                                   new String[] { "policy" },
                                   new Client(null, false),
-                                  false);
+                                  false,
+                                  NodeSourceStatus.DEPLOYED,
+                                  "description");
     }
 
 }

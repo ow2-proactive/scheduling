@@ -46,6 +46,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -153,6 +154,19 @@ public interface RMRestInterface {
             throws NotConnectedException;
 
     @POST
+    @Path("nodesource")
+    @Produces("application/json")
+    NSState defineNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters,
+            @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException;
+
+    @Deprecated
+    @POST
     @Path("nodesource/create")
     @Produces("application/json")
     NSState createNodeSource(@HeaderParam("sessionid") String sessionId,
@@ -163,6 +177,7 @@ public interface RMRestInterface {
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
             @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException;
 
+    @Deprecated
     @POST
     @Path("nodesource/create/recovery")
     @Produces("application/json")
@@ -174,6 +189,12 @@ public interface RMRestInterface {
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
             @FormParam("policyFileParameters") String[] policyFileParameters,
             @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException;
+
+    @PUT
+    @Path("nodesource/deploy")
+    @Produces("application/json")
+    NSState deployNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException;
 
     @POST
     @Path("nodesource/pingfrequency")

@@ -68,6 +68,23 @@ import org.ow2.proactive.utils.NodeSet;
 public interface ResourceManager {
 
     /**
+     * Defines a new node source in the resource manager.
+     *
+     * @param nodeSourceName the name of the node source
+     * @param infrastructureType type of the underlying infrastructure
+     * @param infraParams parameters for infrastructure creation
+     * @param policyType name of the policy type. It passed as a string due to plug-able approach
+     * @param policyParams parameters for policy creation
+     * @param nodesRecoverable whether the nodes can be recovered in case of a scheduler crash
+     * @return true if a new node source was created successfully, runtime exception otherwise
+     */
+    BooleanWrapper defineNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
+            String policyType, Object[] policyParams, boolean nodesRecoverable);
+
+    /**
+     * @deprecated  As of release 7.37, replaced by {@link #defineNodeSource(String, String, Object[], String, Object[],
+     * boolean)} and {@link #deployNodeSource(String)}
+     *
      * The node source is the set of nodes acquired from specific infrastructure and characterized
      * by particular acquisition policy.
      * <p>
@@ -83,8 +100,20 @@ public interface ResourceManager {
      * @param nodesRecoverable whether the nodes can be recovered in case of a scheduler crash
      * @return true if a new node source was created successfully, runtime exception otherwise
      */
+    @Deprecated
     BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
             String policyType, Object[] policyParameters, boolean nodesRecoverable);
+
+    /**
+     * Start acquiring the nodes of a node source that has been defined before.
+     * If the node source is already deployed, then this method does nothing.
+     *
+     * @param nodeSourceName the name of the node source to deploy
+     * @return true if the node source was deployed successfully, false if the
+     * node source is already deployed or if it is deployed already, runtime
+     * exception otherwise
+     */
+    BooleanWrapper deployNodeSource(String nodeSourceName);
 
     /**
      * Remove a node source from the RM.

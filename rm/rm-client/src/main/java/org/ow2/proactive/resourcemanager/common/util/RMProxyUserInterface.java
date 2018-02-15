@@ -113,12 +113,25 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return target.getExistingNodeSourcesList();
     }
 
+    @Override
+    public BooleanWrapper defineNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
+            boolean arg5) {
+        return target.defineNodeSource(arg0, arg1, arg2, arg3, arg4, arg5);
+    }
+
     /**
      * @see ResourceManager#createNodeSource(String, String, Object[], String, Object[], boolean)
      */
     public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
             boolean arg5) {
         return target.createNodeSource(arg0, arg1, arg2, arg3, arg4, arg5);
+    }
+
+    /**
+     * @see ResourceManager#deployNodeSource(String)
+     */
+    public BooleanWrapper deployNodeSource(String arg0) {
+        return target.deployNodeSource(arg0);
     }
 
     /**
