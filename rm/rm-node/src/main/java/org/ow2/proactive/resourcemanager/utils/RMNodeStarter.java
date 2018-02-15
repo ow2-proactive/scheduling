@@ -38,6 +38,8 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.Policy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -265,6 +267,8 @@ public class RMNodeStarter {
 
     private static final String OPTION_DISABLE_MONITORING = "dm";
 
+    private static KeyPairProducer keyPairProducer = new KeyPairProducer();
+
     public RMNodeStarter() {
 
     }
@@ -420,6 +424,7 @@ public class RMNodeStarter {
             RMNodeStarter passiveStarter = new RMNodeStarter();
             String baseNodeName = passiveStarter.configure(args);
 
+            keyPairProducer = new KeyPairProducer(passiveStarter.workers);
             passiveStarter.createNodesAndConnect(baseNodeName);
         } catch (Throwable t) {
             System.err.println("A major problem occurred when trying to start a node and register it into the Resource Manager, see the stacktrace below");
@@ -430,6 +435,10 @@ public class RMNodeStarter {
             t.printStackTrace(System.err);
             System.exit(-2);
         }
+    }
+
+    public static KeyPair getKeyPair() throws NoSuchAlgorithmException {
+        return keyPairProducer.getKeyPair();
     }
 
     protected String configure(final String args[]) {
