@@ -40,7 +40,6 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
@@ -99,23 +98,22 @@ public class NodesRecoveryManager {
     public void recoverNodeSourcesAndNodes() {
         Collection<NodeSourceData> nodeSources = rmCore.getDbManager().getNodeSources();
         logPersistedNodeSourceInfo(nodeSources);
-        recoverDefinedNodeSources(nodeSources);
 
-        for (NodeSourceDescriptor nodeSourceDescriptor : rmCore.getDefinedNodeSourceDescriptors()) {
-            String nodeSourceName = nodeSourceDescriptor.getName();
+        for (NodeSourceData nodeSourceData : nodeSources) {
+            String nodeSourceName = nodeSourceData.getName();
             if (NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceName)) {
                 // will be recreated by SchedulerStarter
-                rmCore.removeDefinedNodeSource(nodeSourceName);
                 rmCore.getDbManager().removeNodeSource(nodeSourceName);
             } else {
-                recoverDeployedNodeSourceIfNeeded(nodeSourceDescriptor, nodeSourceName);
+                recoverDeployedNodeSourceIfNeeded(nodeSourceData, nodeSourceName);
             }
         }
     }
 
-    private void recoverDeployedNodeSourceIfNeeded(NodeSourceDescriptor nodeSourceDescriptor, String nodeSourceName) {
+    private void recoverDeployedNodeSourceIfNeeded(NodeSourceData nodeSourceDescriptor, String nodeSourceName) {
         try {
             logger.info("Recover node source " + nodeSourceName);
+            rmCore.createNotActiveNodeSource(nodeSourceDescriptor);
             if (nodeSourceDescriptor.getStatus().equals(NodeSourceStatus.DEPLOYED)) {
                 rmCore.deployNodeSource(nodeSourceName);
             }
@@ -123,12 +121,6 @@ public class NodesRecoveryManager {
             logger.error("Failed to recover node source " + nodeSourceName, t);
             rmCore.removeDefinedNodeSource(nodeSourceName);
             rmCore.getDbManager().removeNodeSource(nodeSourceName);
-        }
-    }
-
-    private void recoverDefinedNodeSources(Collection<NodeSourceData> persistedNodeSources) {
-        for (NodeSourceData persistedNodeSource : persistedNodeSources) {
-            rmCore.addDefinedNodeSource(persistedNodeSource.toNodeSourceDescriptor());
         }
     }
 

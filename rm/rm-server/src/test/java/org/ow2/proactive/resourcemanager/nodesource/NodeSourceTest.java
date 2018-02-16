@@ -159,7 +159,7 @@ public class NodeSourceTest {
                               nodeSourcePolicy,
                               mock(RMCore.class),
                               mock(RMMonitoringImpl.class),
-                              nodeSourceData);
+                              nodeSourceData.toNodeSourceDescriptor());
     }
 
 }

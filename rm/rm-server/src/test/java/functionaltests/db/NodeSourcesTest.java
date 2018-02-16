@@ -169,8 +169,7 @@ public class NodeSourcesTest extends ProActiveTest {
                                   new String[] { "policy" },
                                   new Client(null, false),
                                   false,
-                                  NodeSourceStatus.DEPLOYED,
-                                  "description");
+                                  NodeSourceStatus.DEPLOYED);
     }
 
 }

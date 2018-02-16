@@ -59,7 +59,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -116,7 +115,11 @@ public class NodeSource implements InitActive, RunActive {
 
     private final InfrastructureManager infrastructureManager;
 
-    private final NodeSourcePolicy nodeSourcePolicy;
+    // The policy is not final: when the node source is defined, the policy is
+    // not an activity. When the node source is deployed, the policy is turned
+    // active, so we need to update the nodeSourcePolicy reference with the
+    // policy stub
+    private NodeSourcePolicy nodeSourcePolicy;
 
     private final String description;
 
@@ -155,7 +158,7 @@ public class NodeSource implements InitActive, RunActive {
     // level is configured by ns admin at the moment of ns creation
     private AccessType nodeUserAccessType;
 
-    private final boolean nodesRecoverable;
+    private NodeSourceDescriptor descriptor;
 
     static {
         try {
@@ -186,7 +189,7 @@ public class NodeSource implements InitActive, RunActive {
         adminPermission = null;
         providerPermission = null;
         monitoring = null;
-        nodesRecoverable = PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
+        descriptor = null;
     }
 
     /**
@@ -199,8 +202,8 @@ public class NodeSource implements InitActive, RunActive {
      * @param rmcore resource manager core
      */
     public NodeSource(String registrationURL, String name, InfrastructureManager im, NodeSourcePolicy policy,
-            RMCore rmcore, RMMonitoringImpl monitor, NodeSourceData nodeSourceData) {
-        Client provider = nodeSourceData.getProvider();
+            RMCore rmcore, RMMonitoringImpl monitor, NodeSourceDescriptor nodeSourceDescriptor) {
+        Client provider = nodeSourceDescriptor.getProvider();
         this.registrationURL = registrationURL;
         this.name = name;
         this.administrator = provider;
@@ -224,7 +227,7 @@ public class NodeSource implements InitActive, RunActive {
                                                           nodeSourcePolicy.getProviderAccessType()
                                                                           .getIdentityPrincipals(provider));
         this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
-        this.nodesRecoverable = nodeSourceData.getNodesRecoverable();
+        this.descriptor = nodeSourceDescriptor;
     }
 
     /**
@@ -511,6 +514,22 @@ public class NodeSource implements InitActive, RunActive {
         return rmcore.setDeploying(deployingNode);
     }
 
+    public InfrastructureManager getInfrastructureManager() {
+        return infrastructureManager;
+    }
+
+    public NodeSourcePolicy getPolicy() {
+        return nodeSourcePolicy;
+    }
+
+    public void setPolicy(NodeSourcePolicy policy) {
+        nodeSourcePolicy = policy;
+    }
+
+    public void setStatus(NodeSourceStatus status) {
+        this.descriptor.setStatus(status);
+    }
+
     /**
      * Looks up the node
      */
@@ -676,11 +695,21 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
+     * Get the information that describe the node source and that are needed
+     * to instantiate it
+     * @return the node source descriptor
+     */
+    @ImmediateService
+    public NodeSourceDescriptor getDescriptor() {
+        return descriptor;
+    }
+
+    /**
      * @return whether nodes recovery is activated for this node source
      */
     @ImmediateService
     public boolean nodesRecoverable() {
-        return nodesRecoverable;
+        return descriptor.nodesRecoverable();
     }
 
     /**

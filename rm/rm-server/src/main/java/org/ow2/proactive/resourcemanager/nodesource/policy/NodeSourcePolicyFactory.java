@@ -61,7 +61,11 @@ public class NodeSourcePolicyFactory {
      */
     public static NodeSourcePolicy create(String policyClassName, String infrastructureType,
             Object[] policyParameters) {
+        NodeSourcePolicy policy = createNotActive(policyClassName);
+        return turnActivePolicy(policy, policyParameters);
+    }
 
+    public static NodeSourcePolicy createNotActive(String policyClassName) {
         NodeSourcePolicy policy;
         try {
             boolean supported = false;
@@ -80,7 +84,10 @@ public class NodeSourcePolicyFactory {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return policy;
+    }
 
+    public static NodeSourcePolicy turnActivePolicy(NodeSourcePolicy policy, Object[] policyParameters) {
         // turning policy into an active object
         NodeSourcePolicy stub;
         try {
@@ -92,7 +99,7 @@ public class NodeSourcePolicyFactory {
         // initializing parameters
         BooleanWrapper result = stub.configure(policyParameters);
         if (!result.getBooleanValue()) {
-            throw new RuntimeException("Cannot configure the policy " + policyClassName);
+            throw new RuntimeException("Cannot configure the policy " + policy.getClass().getSimpleName());
         }
 
         return stub;

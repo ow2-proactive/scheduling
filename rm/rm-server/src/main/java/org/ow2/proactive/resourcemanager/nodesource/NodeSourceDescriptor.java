@@ -34,7 +34,9 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 /**
  *
  */
-public class NodeSourceDescriptor {
+public class NodeSourceDescriptor implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String name;
 
@@ -48,8 +50,6 @@ public class NodeSourceDescriptor {
 
     private Client provider;
 
-    private String description;
-
     private boolean nodesRecoverable;
 
     private NodeSourceStatus status;
@@ -57,7 +57,7 @@ public class NodeSourceDescriptor {
     private Map<String, Serializable> lastRecoveredInfrastructureVariables;
 
     public NodeSourceDescriptor(String name, String infrastructureType, Object[] infrastructureParameters,
-            String policyType, Object[] policyParameters, Client provider, String description, boolean nodesRecoverable,
+            String policyType, Object[] policyParameters, Client provider, boolean nodesRecoverable,
             NodeSourceStatus status, Map<String, Serializable> lastRecoveredInfrastructureVariables) {
         this.name = name;
         this.infrastructureType = infrastructureType;
@@ -65,7 +65,6 @@ public class NodeSourceDescriptor {
         this.policyType = policyType;
         this.policyParameters = policyParameters;
         this.provider = provider;
-        this.description = description;
         this.nodesRecoverable = nodesRecoverable;
         this.status = status;
         this.lastRecoveredInfrastructureVariables = lastRecoveredInfrastructureVariables;
@@ -95,11 +94,7 @@ public class NodeSourceDescriptor {
         return provider;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isNodesRecoverable() {
+    public boolean nodesRecoverable() {
         return nodesRecoverable;
     }
 

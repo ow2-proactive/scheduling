@@ -232,6 +232,23 @@ public abstract class InfrastructureManager implements Serializable {
     }
 
     /**
+     * Empty the infrastructure variables map.
+     */
+    public void resetPersistedInfraVariables() {
+        writeLock.lock();
+        try {
+            logger.info("Reset infrastructure variables");
+            persistedInfraVariables.clear();
+        } catch (RuntimeException e) {
+            logger.error("Exception while recovering infrastructure variables", e);
+            throw e;
+        } finally {
+            writeLock.unlock();
+        }
+
+    }
+
+    /**
      * To retrieve nodes whose registration status is deploying or lost.
      *
      * @return nodes whose registration status is deploying or lost.
