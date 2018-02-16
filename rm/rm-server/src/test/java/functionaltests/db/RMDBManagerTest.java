@@ -292,7 +292,7 @@ public class RMDBManagerTest {
         newNodeSourceData.setPolicyType("aPolicyType");
         dbManager.addNodeSource(newNodeSourceData);
         rmNodeData2.setNodeSource(newNodeSourceData);
-        dbManager.addNode(rmNodeData2, NODE_SOURCE_NAME_BASE);
+        dbManager.addNode(rmNodeData2, newNodeSourceData.getName());
 
         Collection<RMNodeData> nodes = dbManager.getNodesByNodeSource(nodeSourceData.getName());
 
@@ -324,7 +324,7 @@ public class RMDBManagerTest {
         newNodeSourceData.setPolicyType("aPolicyType");
         dbManager.addNodeSource(newNodeSourceData);
         rmNodeData2.setNodeSource(newNodeSourceData);
-        dbManager.addNode(rmNodeData2, NODE_SOURCE_NAME_BASE);
+        dbManager.addNode(rmNodeData2, newNodeSourceData.getName());
 
         RMNodeData rmNodeData3 = addRMNodeData(NODE_NAME_BASE + "3", NODE_STATE_BASE);
 
