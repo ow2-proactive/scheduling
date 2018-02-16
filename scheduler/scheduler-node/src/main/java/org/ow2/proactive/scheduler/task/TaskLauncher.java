@@ -28,10 +28,8 @@ package org.ow2.proactive.scheduler.task;
 import java.io.File;
 import java.io.Serializable;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +44,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -449,11 +448,12 @@ public class TaskLauncher implements InitActive {
         taskLogger.getStoredLogs(logSink);
     }
 
+    public KeyPair getKeyPair() throws NoSuchAlgorithmException {
+        return RMNodeStarter.getKeyPair();
+    }
+
     public PublicKey generatePublicKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyGen;
-        keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(1024, new SecureRandom());
-        KeyPair keyPair = keyGen.generateKeyPair();
+        final KeyPair keyPair = getKeyPair();
         decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }

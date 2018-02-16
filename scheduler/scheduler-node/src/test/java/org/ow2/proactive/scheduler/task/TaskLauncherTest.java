@@ -32,7 +32,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,6 +51,7 @@ import org.mockito.Matchers;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.utils.KeyPairProducer;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -146,12 +149,19 @@ public class TaskLauncherTest extends TaskLauncherTestAbstract {
 
         CredData credData = new CredData("john", "pwd");
         credData.addThirdPartyCredential("password", "r00t");
-        Credentials thirdPartyCredentials = Credentials.createCredentials(credData, taskLauncher.generatePublicKey());
+
+        final KeyPairProducer keyPairProducer = new KeyPairProducer();
+
+        final TaskLauncher spy = spy(taskLauncher);
+        doReturn(keyPairProducer.getKeyPair()).when(spy).getKeyPair();
+
+        Credentials thirdPartyCredentials = Credentials.createCredentials(credData, spy.generatePublicKey());
         executableContainer.setCredentials(thirdPartyCredentials);
 
-        TaskResult taskResult = runTaskLauncher(taskLauncher, executableContainer);
+        TaskResult taskResult = runTaskLauncher(spy, executableContainer);
 
-        assertThat(taskResult.getOutput().getAllLogs(false).contains(String.format("r00t%n")), is(true));
+        final String allLogs = taskResult.getOutput().getAllLogs(false);
+        assertThat(allLogs.contains(String.format("r00t%n")), is(true));
     }
 
     @Test

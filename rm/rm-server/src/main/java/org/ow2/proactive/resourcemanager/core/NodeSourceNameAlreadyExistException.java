@@ -23,40 +23,12 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.policy.license;
+package org.ow2.proactive.resourcemanager.core;
 
-import java.util.ArrayList;
-import java.util.Properties;
+public class NodeSourceNameAlreadyExistException extends RuntimeException {
 
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.proactive.utils.FileUtils;
-
-
-public class LicenseConfiguration extends ArrayList<Object> {
-
-    private String path;
-
-    private static LicenseConfiguration configuration;
-
-    private LicenseConfiguration() {
-        path = PASchedulerProperties.LICENSE_SCHEDULING_POLICY_CONFIGURATION.getValueAsString();
+    public NodeSourceNameAlreadyExistException(String message) {
+        super(message);
     }
 
-    public static synchronized LicenseConfiguration getConfiguration() {
-        if (configuration == null) {
-            configuration = new LicenseConfiguration();
-        }
-        return configuration;
-    }
-
-    public String getPath() {
-        if (path != null && path.length() > 0) {
-            path = PASchedulerProperties.getAbsolutePath(path);
-        }
-        return path;
-    }
-
-    public Properties getProperties() {
-        return FileUtils.resolvePropertiesFile(getPath());
-    }
 }

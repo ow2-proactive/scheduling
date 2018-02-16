@@ -424,11 +424,13 @@ else
 fi
 
 for file in $( find $PA_ROOT/default/dist/war -name 'application.properties' ); do
-    sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/$file"
+    sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$file"
     if $SELF_SIGNED; then
-        sed -e "s/web\.https\.allow_any_certificate=.*/web.https.allow_any_certificate=true/g" -i "$PA_ROOT/default/$file"
+        sed -e "s/web\.https\.allow_any_certificate=.*/web.https.allow_any_certificate=true/g" -i "$file"
     fi
 done
+
+sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/config/web/settings.ini"
 
 sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/dist/war/rm/rm.conf"
 sed -e "s/$(escape_lhs_sed http://localhost:8080)/$(escape_rhs_sed ${PROTOCOL}://localhost:${PORT})/g" -i "$PA_ROOT/default/dist/war/scheduler/scheduler.conf"

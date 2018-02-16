@@ -39,6 +39,7 @@ import functionaltests.job.taskkill.TestJobKilled;
 import functionaltests.job.taskkill.TestProcessTreeKiller;
 import functionaltests.recover.TaskReconnectionWithForkedTaskExecutorTest;
 import functionaltests.recover.TaskReconnectionWithInProcessTaskExecutorTest;
+import functionaltests.recover.TaskRecoveryWhenNodesAreReservedInBatchTest;
 import functionaltests.rm.TestOperationsWhenUnlinked;
 import functionaltests.workflow.TestJobLegacySchemas;
 import functionaltests.workflow.TestWorkflowSubmission;
@@ -82,7 +83,8 @@ import functionaltests.workflow.complex.TestWorkflowReplicateJobs3;
 
                       TestDataspaceConcurrentTransfer.class, TestDataspaceConcurrentKilling.class,
                       TaskReconnectionWithForkedTaskExecutorTest.class,
-                      TaskReconnectionWithInProcessTaskExecutorTest.class })
+                      TaskReconnectionWithInProcessTaskExecutorTest.class,
+                      TaskRecoveryWhenNodesAreReservedInBatchTest.class })
 
 /**
  * @author ActiveEon Team
