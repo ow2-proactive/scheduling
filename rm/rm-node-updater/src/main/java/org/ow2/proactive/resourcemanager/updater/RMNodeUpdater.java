@@ -125,7 +125,7 @@ public class RMNodeUpdater extends RMNodeStarter {
     public static final int NUMBER_OF_ATTEMPTS = 10;
 
     public RMNodeUpdater() {
-
+        // empty constructor
     }
 
     private static Logger initLogger() {
@@ -345,7 +345,7 @@ public class RMNodeUpdater extends RMNodeStarter {
             checkUserSuppliedParameters();
             return nodeName;
         } catch (ParseException pe) {
-            pe.printStackTrace();
+            logger.error("Error when parsing arguments", pe);
             System.exit(ExitStatus.RMNODE_PARSE_ERROR.exitCode);
         }
 
@@ -551,9 +551,11 @@ public class RMNodeUpdater extends RMNodeStarter {
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, new X509TrustManager[] { new X509TrustManager() {
                 public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    // always trusted
                 }
 
                 public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    // always trusted
                 }
 
                 public X509Certificate[] getAcceptedIssuers() {
