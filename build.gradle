@@ -340,11 +340,38 @@ task dist(type: Sync) {
     into file("$rootDir/dist/lib")
 }
 
+//add or update the scheduling version in config/scheduler/settings.ini
+task setSchedulingVersion{
+    String versionProperty="pa.scheduler.version"
+    String newVersion=versionProperty+"="+schedulingVersion+"\n"
+    String versionLine=null
+    File settings = new File('config/scheduler/settings.ini')
+
+    for(String line : settings.text.readLines()){
+        if (line.contains(versionProperty)) {
+            versionLine = line
+            break
+        }
+    }
+
+    //add the version at the end of the file if the property is missing
+    if(versionLine==null){
+        settings << "\n# Scheduler version \n"
+        settings << newVersion
+    }
+    else{
+        //update the version
+        settings.text.replace(versionLine,newVersion)
+    }
+}
+
 defaultTasks 'dist'
 build.dependsOn 'dist'
 
 task scripts
 dist.dependsOn scripts
+
+scripts.dependsOn setSchedulingVersion
 
 task cleanScripts
 clean.dependsOn cleanScripts
