@@ -347,7 +347,7 @@ public class RMDBManager {
         rmdbManagerBuffer.removeKnownNodeSourceAndPendingUpdates(sourceName);
         final Collection<RMNodeData> relatedNodes = getNodesByNodeSource(sourceName);
         logger.info("Remove nodes linked to the node source " + sourceName + IN_DATABASE_STRING);
-        removeNodes(relatedNodes);
+        removeNodes(relatedNodes, sourceName);
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
             public Void doInTransaction(Session session) {
@@ -387,16 +387,16 @@ public class RMDBManager {
         return !PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
     }
 
-    public void addNode(RMNodeData rmNodeData) {
+    public void addNode(RMNodeData rmNodeData, String nodeSourceName) {
         if (nodeRecoveryDisabled()) {
             return;
         }
 
         logger.debug(REQUEST_BUFFER_STRING + "create node " + rmNodeData.getName() + IN_DATABASE_STRING);
-        rmdbManagerBuffer.addCreateNodeToPendingDatabaseOperations(rmNodeData);
+        rmdbManagerBuffer.addCreateNodeToPendingDatabaseOperations(rmNodeData, nodeSourceName);
     }
 
-    public void updateNode(final RMNodeData rmNodeData) {
+    public void updateNode(final RMNodeData rmNodeData, final String nodeSourceName) {
         if (nodeRecoveryDisabled()) {
             return;
         }
@@ -407,6 +407,8 @@ public class RMDBManager {
                 executeReadWriteTransaction(new SessionWork<Void>() {
                     @Override
                     public Void doInTransaction(Session session) {
+                        NodeSourceData nodeSourceData = session.load(NodeSourceData.class, nodeSourceName);
+                        rmNodeData.setNodeSource(nodeSourceData);
                         session.update(rmNodeData);
                         return null;
                     }
@@ -416,7 +418,7 @@ public class RMDBManager {
             }
         } else {
             logger.debug(REQUEST_BUFFER_STRING + "update node " + rmNodeData.getName() + IN_DATABASE_STRING);
-            rmdbManagerBuffer.addUpdateNodeToPendingDatabaseOperations(rmNodeData);
+            rmdbManagerBuffer.addUpdateNodeToPendingDatabaseOperations(rmNodeData, nodeSourceName);
         }
     }
 
@@ -426,10 +428,10 @@ public class RMDBManager {
         }
 
         RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-        removeNode(rmNodeData);
+        removeNode(rmNodeData, rmNode.getNodeSourceName());
     }
 
-    public void removeNode(final RMNodeData rmNodeData) {
+    public void removeNode(final RMNodeData rmNodeData, final String nodeSourceName) {
         if (nodeRecoveryDisabled()) {
             return;
         }
@@ -440,6 +442,8 @@ public class RMDBManager {
                 executeReadWriteTransaction(new SessionWork<Void>() {
                     @Override
                     public Void doInTransaction(Session session) {
+                        NodeSourceData nodeSourceData = session.load(NodeSourceData.class, nodeSourceName);
+                        rmNodeData.setNodeSource(nodeSourceData);
                         session.delete(rmNodeData);
                         return null;
                     }
@@ -449,11 +453,11 @@ public class RMDBManager {
             }
         } else {
             logger.debug(REQUEST_BUFFER_STRING + "remove node " + rmNodeData.getName() + IN_DATABASE_STRING);
-            rmdbManagerBuffer.addRemoveNodeToPendingDatabaseOperations(rmNodeData);
+            rmdbManagerBuffer.addRemoveNodeToPendingDatabaseOperations(rmNodeData, nodeSourceName);
         }
     }
 
-    private void removeNodes(final Collection<RMNodeData> nodes) {
+    private void removeNodes(final Collection<RMNodeData> nodes, final String nodeSourceName) {
         if (nodeRecoveryDisabled()) {
             return;
         }
@@ -468,6 +472,8 @@ public class RMDBManager {
                     @Override
                     public Void doInTransaction(Session session) {
                         for (RMNodeData rmNodeData : nodes) {
+                            NodeSourceData nodeSourceData = session.load(NodeSourceData.class, nodeSourceName);
+                            rmNodeData.setNodeSource(nodeSourceData);
                             session.delete(rmNodeData);
                         }
                         return null;
@@ -478,7 +484,7 @@ public class RMDBManager {
             }
         } else {
             logger.debug(REQUEST_BUFFER_STRING + "remove " + nodes.size() + " nodes" + IN_DATABASE_STRING);
-            rmdbManagerBuffer.addRemoveNodesToPendingDatabaseOperations(nodes);
+            rmdbManagerBuffer.addRemoveNodesToPendingDatabaseOperations(nodes, nodeSourceName);
         }
     }
 
