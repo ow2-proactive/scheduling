@@ -47,6 +47,7 @@ public class OneJar {
         if (isRunningWithOneJar()) {
             String expandedDir = System.getProperty("one-jar.expand.dir", "");
             return asList(expandedDir + File.separatorChar + "lib" + File.separatorChar + "*",
+                          expandedDir + File.separatorChar + "binlib" + File.separatorChar + "*",
                           expandedDir + File.separatorChar + "main" + File.separatorChar + "*");
         } else {
             return emptyList();
