@@ -63,6 +63,8 @@ public class RMDBManagerBuffer {
 
     private static final String IN_DATABASE_WITH_NO_DELAY_STRING = IN_DATABASE_STRING + " with no delay";
 
+    private static final int MAXIMUM_BUFFERIZED_NODE_OPERATIONS = 1000;
+
     private RMDBManager rmdbManager;
 
     /**
@@ -247,7 +249,7 @@ public class RMDBManagerBuffer {
             buildNodesTransactionAndCommit();
         } else {
             logger.debug("Schedule create node " + rmNodeData.getName() + IN_DATABASE_STRING);
-            scheduleNodeTransaction();
+            scheduleNodeTransactionOrFlush();
         }
     }
 
@@ -259,7 +261,7 @@ public class RMDBManagerBuffer {
             buildNodesTransactionAndCommit();
         } else {
             logger.debug("Schedule update node " + rmNodeData.getName() + IN_DATABASE_STRING);
-            scheduleNodeTransaction();
+            scheduleNodeTransactionOrFlush();
         }
     }
 
@@ -271,7 +273,7 @@ public class RMDBManagerBuffer {
             buildNodesTransactionAndCommit();
         } else {
             logger.debug("Schedule remove node " + rmNodeData.getName() + IN_DATABASE_STRING);
-            scheduleNodeTransaction();
+            scheduleNodeTransactionOrFlush();
         }
     }
 
@@ -285,7 +287,7 @@ public class RMDBManagerBuffer {
             buildNodesTransactionAndCommit();
         } else {
             logger.debug("Schedule " + nodes.size() + " remove node" + IN_DATABASE_STRING);
-            scheduleNodeTransaction();
+            scheduleNodeTransactionOrFlush();
         }
     }
 
@@ -333,13 +335,17 @@ public class RMDBManagerBuffer {
         }
     }
 
-    private void scheduleNodeTransaction() {
-        scheduledNodeTransaction = databaseTransactionExecutor.schedule(new Runnable() {
-            @Override
-            public void run() {
-                buildNodesTransactionAndCommit();
-            }
-        }, RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt(), TimeUnit.MILLISECONDS);
+    private void scheduleNodeTransactionOrFlush() {
+        if (pendingNodesOperations.size() < MAXIMUM_BUFFERIZED_NODE_OPERATIONS) {
+            scheduledNodeTransaction = databaseTransactionExecutor.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    buildNodesTransactionAndCommit();
+                }
+            }, RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt(), TimeUnit.MILLISECONDS);
+        } else {
+            buildNodesTransactionAndCommit();
+        }
     }
 
     private void buildNodesTransactionAndCommit() {
