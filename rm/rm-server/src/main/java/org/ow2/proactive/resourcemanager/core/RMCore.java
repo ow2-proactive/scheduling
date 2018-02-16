@@ -859,13 +859,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @return total number of alive nodes
      */
-    private int getTotalAliveNodesNumber() {
-        int count = 0;
-        for (RMNode node : allNodes.values()) {
-            if (!node.isDown())
-                count++;
-        }
-        return count;
+    public int getTotalAliveNodesNumber() {
+        return listAliveNodeUrls().size();
     }
 
     /**
@@ -1700,10 +1695,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public Set<String> listAliveNodeUrls() {
         HashSet<String> aliveNodes = new HashSet<>();
-        for (String nodeurl : allNodes.keySet()) {
-            RMNode node = allNodes.get(nodeurl);
+        for (RMNode node : allNodes.values()) {
             if (!node.isDown()) {
-                aliveNodes.add(nodeurl);
+                aliveNodes.add(node.getNodeURL());
             }
         }
         return aliveNodes;
