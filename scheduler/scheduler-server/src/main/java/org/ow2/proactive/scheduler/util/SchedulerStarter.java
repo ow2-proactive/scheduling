@@ -81,7 +81,6 @@ import org.ow2.proactive.scripting.ScriptLoader;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.proactive.utils.FileUtils;
 import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.PAMRRouterStarter;
 import org.ow2.proactive.utils.SecurityPolicyLoader;
@@ -102,10 +101,6 @@ import org.ow2.proactive.web.WebProperties;
 public class SchedulerStarter {
 
     private static final Logger LOGGER = Logger.getLogger(SchedulerStarter.class);
-
-    public static final String GRADLE_PROPERTIES_PATH = "gradle.properties";
-
-    public static final String VERSION_ATTRIBUTE_NAME = "schedulingVersion";
 
     private static final String OPTION_HELP = "help";
 
@@ -278,7 +273,7 @@ public class SchedulerStarter {
             throws URISyntaxException, InternalSchedulerException, ParseException, SocketException,
             UnknownHostException, IllegalArgumentException {
         String policyFullName = getPolicyFullName(commandLine);
-        LOGGER.info("Scheduler version " + getSchedulerVersion());
+        LOGGER.info("Scheduler version " + PASchedulerProperties.SCHEDULER_VERSION.getValueAsString());
         LOGGER.info("Starting the scheduler...");
         SchedulerAuthenticationInterface sai = null;
         try {
@@ -290,10 +285,6 @@ public class SchedulerStarter {
         }
 
         return sai;
-    }
-
-    private static String getSchedulerVersion() {
-        return FileUtils.resolvePropertiesFile(GRADLE_PROPERTIES_PATH).getProperty(VERSION_ATTRIBUTE_NAME, "not found");
     }
 
     private static void startDiscovery(CommandLine commandLine, String urlToDiscover)

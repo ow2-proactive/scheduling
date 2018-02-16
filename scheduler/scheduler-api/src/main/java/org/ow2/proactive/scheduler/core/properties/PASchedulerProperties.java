@@ -54,6 +54,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /* ********************** SCHEDULER PROPERTIES ********************* */
     /* ***************************************************************** */
 
+    /** Scheduler version. */
+    SCHEDULER_VERSION("pa.scheduler.version", PropertyType.STRING),
+
     /** Scheduler default policy full name. */
     SCHEDULER_DEFAULT_POLICY("pa.scheduler.policy", PropertyType.STRING, "org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy"),
 
