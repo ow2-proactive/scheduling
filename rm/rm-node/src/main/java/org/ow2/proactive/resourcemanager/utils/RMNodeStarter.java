@@ -94,6 +94,7 @@ import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Tools;
+import org.ow2.proactive.utils.Version;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
@@ -450,6 +451,8 @@ public class RMNodeStarter {
         String nodeName = parseCommandLine(args);
 
         configureLogging(nodeName);
+
+        logger.info("ProActive Node version is " + Version.PA_VERSION);
 
         logger.info("Using ProActive configuration file : " +
                     System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()));
