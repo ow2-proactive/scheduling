@@ -11,6 +11,21 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+//add or update the scheduling version in config/scheduler/settings.ini
+task setProjectVersion(dependsOn: classes)<< {
+    logger.lifecycle("Adding version " + schedulingVersion)
+    String versionPattern='$!VERSION!$'
+    File settings = file("$buildDir/resources/main/org/ow2/proactive/utils/version.ini")
+
+    if(settings.text.contains(versionPattern)) {
+        settings.text = settings.text.replace(versionPattern, schedulingVersion)
+    }
+}
+
+jar.dependsOn setProjectVersion
+
+//stub.dependsOn setProjectVersion
+
 task stub(type: StubTask) {
     classes = ['org.ow2.proactive.scripting.ScriptResult']
 }
