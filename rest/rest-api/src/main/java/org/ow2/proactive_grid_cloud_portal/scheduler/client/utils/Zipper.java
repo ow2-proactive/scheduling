@@ -55,7 +55,9 @@ public class Zipper {
         public static void zip(File file, OutputStream os) throws IOException {
             checkNotNull(file);
             checkNotNull(os);
-            GZIP.zip(new FileInputStream(file), os);
+            try (InputStream inputStream = new FileInputStream(file)) {
+                GZIP.zip(inputStream, os);
+            }
         }
 
         public static void zip(InputStream is, OutputStream os) throws IOException {
@@ -73,7 +75,11 @@ public class Zipper {
         }
 
         public static void unzip(InputStream is, File file) throws IOException {
-            GZIP.unzip(is, new FileOutputStream(file));
+            checkNotNull(is);
+            checkNotNull(file);
+            try (OutputStream outputStream = new FileOutputStream(file)) {
+                GZIP.unzip(is, outputStream);
+            }
         }
 
         public static void unzip(InputStream is, OutputStream os) throws IOException {
@@ -119,10 +125,14 @@ public class Zipper {
                 closer.register(zos);
                 if (files.size() == 1) {
                     File file = files.get(0);
-                    writeZipEntry(new ZipEntry(file.getName()), new FileInputStream(file), zos);
+                    FileInputStream inputStream = new FileInputStream(file);
+                    closer.register(inputStream);
+                    writeZipEntry(new ZipEntry(file.getName()), inputStream, zos);
                 } else {
                     for (File file : files) {
-                        writeZipEntry(zipEntry(basepath, file), new FileInputStream(file), zos);
+                        FileInputStream inputStream = new FileInputStream(file);
+                        closer.register(inputStream);
+                        writeZipEntry(zipEntry(basepath, file), inputStream, zos);
                     }
                 }
             } catch (IOException ioe) {
@@ -160,7 +170,9 @@ public class Zipper {
                         entryContainer.mkdirs();
                     }
                     if (!entryFile.isDirectory()) {
-                        Zipper.ZIP.unzipEntry(zis, new FileOutputStream(entryFile));
+                        FileOutputStream outputStream = new FileOutputStream(entryFile);
+                        closer.register(outputStream);
+                        Zipper.ZIP.unzipEntry(zis, outputStream);
                     }
                     zipEntry = zis.getNextEntry();
                 }
@@ -193,7 +205,11 @@ public class Zipper {
     }
 
     public static boolean isZipFile(File file) throws FileNotFoundException {
-        return isZipFile(new FileInputStream(file));
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return isZipFile(inputStream);
+        } catch (IOException e) {
+            throw new FileNotFoundException("Error when reading file " + file + " " + e.getMessage());
+        }
     }
 
     public static boolean isZipFile(InputStream is) {

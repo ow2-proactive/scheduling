@@ -54,8 +54,7 @@ public class SchedulerPortalConfiguration {
 
     public Properties getProperties() {
         Properties props = new Properties();
-        try {
-            InputStream fis = new FileInputStream(path);
+        try (InputStream fis = new FileInputStream(path)) {
             props.load(fis);
         } catch (IOException e) {
             logger.warn("Scheduler Portal Configuration file: " + path + " not found!", e);

@@ -86,9 +86,10 @@ public class ScriptLoader {
             System.exit(-2);
         }
 
-        Reader reader = new FileReader(args[0]);
-        ScriptEngineManager sem = new ScriptEngineManager();
-        ScriptEngine engine = sem.getEngineByExtension(split[split.length - 1]);
-        engine.eval(reader);
+        try (Reader reader = new FileReader(args[0])) {
+            ScriptEngineManager sem = new ScriptEngineManager();
+            ScriptEngine engine = sem.getEngineByExtension(split[split.length - 1]);
+            engine.eval(reader);
+        }
     }
 }

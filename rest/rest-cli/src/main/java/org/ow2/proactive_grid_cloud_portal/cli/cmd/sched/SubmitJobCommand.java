@@ -78,14 +78,16 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
             File jobFile = new File(pathname);
             String contentType = URLConnection.getFileNameMap().getContentTypeFor(pathname);
             JobIdData jobId;
-            if (APPLICATION_XML.getMimeType().equals(contentType)) {
-                jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
-                                                                 new FileInputStream(jobFile),
-                                                                 map(this.variables));
-            } else {
-                jobId = currentContext.getRestClient().submitJobArchive(currentContext.getSessionId(),
-                                                                        new FileInputStream(jobFile),
-                                                                        map(this.variables));
+            try (FileInputStream inputStream = new FileInputStream(jobFile)) {
+                if (APPLICATION_XML.getMimeType().equals(contentType)) {
+                    jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
+                                                                     inputStream,
+                                                                     map(this.variables));
+                } else {
+                    jobId = currentContext.getRestClient().submitJobArchive(currentContext.getSessionId(),
+                                                                            inputStream,
+                                                                            map(this.variables));
+                }
             }
             writeLine(currentContext, "Job('%s') successfully submitted: job('%d')", pathname, jobId.getId());
             resultStack(currentContext).push(jobId);
@@ -122,8 +124,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
     }
 
     private Boolean isFileEmpty(String pathname) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(pathname));
+        try (BufferedReader reader = new BufferedReader(new FileReader(pathname))) {
             if (isFileExisting(pathname)) {
                 if (reader.readLine() == null) {
                     return true;

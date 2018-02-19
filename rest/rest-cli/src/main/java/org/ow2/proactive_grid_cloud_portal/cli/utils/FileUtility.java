@@ -44,8 +44,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 public class FileUtility {
 
     public static String md5Checksum(File file) {
-        try {
-            return DigestUtils.md5Hex(new FileInputStream(file));
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            return DigestUtils.md5Hex(inputStream);
         } catch (IOException ioe) {
             throw new CLIException(REASON_IO_ERROR, ioe);
         }

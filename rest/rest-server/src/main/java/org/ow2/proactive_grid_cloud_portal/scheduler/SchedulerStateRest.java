@@ -34,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.SequenceInputStream;
 import java.io.Serializable;
@@ -1085,8 +1086,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (!jobHtml.exists()) {
             throw new IOException("the file " + jobHtml.getAbsolutePath() + " was not found on the server");
         }
-        InputStream ips = new BufferedInputStream(new FileInputStream(jobHtml));
-        return new String(IOUtils.toByteArray(ips));
+        try (InputStream ips = new BufferedInputStream(new FileInputStream(jobHtml))) {
+            return new String(IOUtils.toByteArray(ips));
+        }
     }
 
     /**
@@ -2189,15 +2191,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if (selectionScriptContent != null && selectionScriptContent.trim().length() > 0) {
                 selection = File.createTempFile("flatsubmit_selection_", "." + selectionScriptExtension);
                 selection.deleteOnExit();
-                PrintWriter pw = new PrintWriter(new FileOutputStream(selection));
-                pw.print(selectionScriptContent);
-                pw.close();
+                try (PrintWriter pw = new PrintWriter(new FileOutputStream(selection))) {
+                    pw.print(selectionScriptContent);
+                }
                 selectionPath = selection.getAbsolutePath();
             }
 
-            PrintWriter pw = new PrintWriter(new FileOutputStream(command));
-            pw.print(commandFileContent);
-            pw.close();
+            try (PrintWriter pw = new PrintWriter(new FileOutputStream(command))) {
+                pw.print(commandFileContent);
+            }
 
             Job j = FlatJobFactory.getFactory().createNativeJobFromCommandsFile(command.getAbsolutePath(),
                                                                                 jobName,
@@ -2254,11 +2256,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             String jobXml = downloadWorkflowContent(sessionId, url);
             tmpWorkflowFile = File.createTempFile("job", "d");
-            IOUtils.write(jobXml, new FileOutputStream(tmpWorkflowFile));
+            JobId jobId;
+            try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
+                IOUtils.write(jobXml, outputStream);
 
-            WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
-            JobId jobId = workflowSubmitter.submit(tmpWorkflowFile,
-                                                   workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment));
+                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
+                jobId = workflowSubmitter.submit(tmpWorkflowFile,
+                                                 workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment));
+            }
 
             return mapper.map(jobId, JobIdData.class);
         } catch (IOException e) {
@@ -2307,20 +2312,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 });
                 tmpJobFile = File.createTempFile("job", "d");
 
-                IOUtils.copy(is, new FileOutputStream(tmpJobFile));
+                JobId jobId;
 
-                Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+                try (OutputStream outputStream = new FileOutputStream(tmpJobFile)) {
+                    IOUtils.copy(is, outputStream);
 
-                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
+                    Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-                JobId jobId = workflowSubmitter.submit(tmpJobFile, jobVariables);
+                    WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
+
+                    jobId = workflowSubmitter.submit(tmpJobFile, jobVariables);
+                }
 
                 return mapper.map(jobId, JobIdData.class);
 
             } finally {
                 if (tmpJobFile != null) {
                     // clean the temporary file
-                    tmpJobFile.delete();
+                    FileUtils.deleteQuietly(tmpJobFile);
                 }
             }
         } catch (IOException e) {
@@ -3279,9 +3288,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             });
 
             tmpFile = File.createTempFile("valid-job", "d");
-            IOUtils.copy(is, new FileOutputStream(tmpFile));
+            Map<String, String> jobVariables;
+            try (OutputStream outputStream = new FileOutputStream(tmpFile)) {
+                IOUtils.copy(is, outputStream);
 
-            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+                jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+            }
 
             return jobValidator.validateJobDescriptor(tmpFile, jobVariables);
         } catch (IOException e) {
@@ -3291,7 +3303,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             return validation;
         } finally {
             if (tmpFile != null) {
-                tmpFile.delete();
+                FileUtils.deleteQuietly(tmpFile);
             }
         }
     }
@@ -3305,9 +3317,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             checkAccess(sessionId);
             String jobXml = downloadWorkflowContent(sessionId, url);
             tmpWorkflowFile = File.createTempFile("job", "d");
-            IOUtils.write(jobXml, new FileOutputStream(tmpWorkflowFile));
+            Map<String, String> jobVariables;
+            try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
+                IOUtils.write(jobXml, outputStream);
 
-            Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+                jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
+            }
 
             return jobValidator.validateJobDescriptor(tmpWorkflowFile, jobVariables);
 

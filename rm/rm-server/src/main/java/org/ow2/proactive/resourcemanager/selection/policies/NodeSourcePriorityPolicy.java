@@ -83,14 +83,12 @@ public class NodeSourcePriorityPolicy implements SelectionPolicy {
                 logger.debug("Reading the NodeSourcePriorityPolicy config file");
                 nodeSources = new LinkedList<>();
 
-                try {
-                    BufferedReader br = new BufferedReader(new FileReader(config));
+                try (BufferedReader br = new BufferedReader(new FileReader(config))) {
                     String strLine;
                     while ((strLine = br.readLine()) != null) {
                         logger.debug("Node source name found: " + strLine);
                         nodeSources.add(strLine);
                     }
-                    br.close();
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }

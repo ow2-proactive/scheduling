@@ -53,9 +53,7 @@ public class UploadFileCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        FileInputStream fileStream = null;
-        try {
-            fileStream = new FileInputStream(localFile);
+        try (FileInputStream fileStream = new FileInputStream(localFile)) {
             boolean uploaded = currentContext.getRestClient().pushFile(currentContext.getSessionId(),
                                                                        spaceName,
                                                                        filePath,
@@ -68,9 +66,6 @@ public class UploadFileCommand extends AbstractCommand implements Command {
                 writeLine(currentContext, "Cannot upload the file: %s.", localFile);
             }
         } catch (Exception error) {
-            if (fileStream != null) {
-                closeQuietly(fileStream);
-            }
             handleError(String.format("An error occurred when uploading the file %s. ", localFile),
                         error,
                         currentContext);

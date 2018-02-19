@@ -912,9 +912,9 @@ public class RMRest implements RMRestInterface {
         File rrd4jDb = File.createTempFile("database", "rr4dj");
         rrd4jDb.deleteOnExit();
 
-        OutputStream out = new FileOutputStream(rrd4jDb);
-        out.write(rrd4j);
-        out.close();
+        try (OutputStream out = new FileOutputStream(rrd4jDb)) {
+            out.write(rrd4j);
+        }
 
         // create RRD4J DB, should be identical to the one held by the RM
         RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);

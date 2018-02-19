@@ -145,9 +145,9 @@ public class JarUtils extends ZipUtils {
                                                mainClass,
                                                jarInternalClasspath,
                                                crc);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
-        bos.write(jarred);
-        bos.close();
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest))) {
+            bos.write(jarred);
+        }
     }
 
     /**
