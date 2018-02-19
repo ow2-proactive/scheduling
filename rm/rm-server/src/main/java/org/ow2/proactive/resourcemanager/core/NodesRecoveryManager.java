@@ -114,7 +114,7 @@ public class NodesRecoveryManager {
         try {
             logger.info("Recover node source " + nodeSourceName);
             rmCore.createNotActiveNodeSource(nodeSourceDescriptor);
-            if (nodeSourceDescriptor.getStatus().equals(NodeSourceStatus.DEPLOYED)) {
+            if (nodeSourceDescriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
                 rmCore.deployNodeSource(nodeSourceName);
             }
         } catch (Throwable t) {

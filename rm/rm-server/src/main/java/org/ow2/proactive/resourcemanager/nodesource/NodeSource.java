@@ -526,6 +526,10 @@ public class NodeSource implements InitActive, RunActive {
         nodeSourcePolicy = policy;
     }
 
+    public NodeSourceStatus getStatus() {
+        return this.descriptor.getStatus();
+    }
+
     public void setStatus(NodeSourceStatus status) {
         this.descriptor.setStatus(status);
     }
@@ -740,7 +744,8 @@ public class NodeSource implements InitActive, RunActive {
                                                                            initiator.getName(),
                                                                            this.getName(),
                                                                            this.getDescription(),
-                                                                           this.getAdministrator().getName())));
+                                                                           this.getAdministrator().getName(),
+                                                                           this.getStatus().toString())));
 
         PAActiveObject.terminateActiveObject(false);
     }

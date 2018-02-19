@@ -1184,7 +1184,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                 policyParams,
                                                                 caller,
                                                                 nodesRecoverable,
-                                                                NodeSourceStatus.UNDEPLOYED);
+                                                                NodeSourceStatus.NODES_UNDEPLOYED);
 
         boolean added = dbManager.addNodeSource(persistedNodeSource);
 
@@ -1199,7 +1199,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                   caller.getName(),
                                                                   nodeSourceName,
                                                                   nodeSource.getDescription(),
-                                                                  caller.getName()));
+                                                                  caller.getName(),
+                                                                  nodeSource.getStatus().toString()));
 
             logger.info("Node source " + nodeSourceName + " has been successfully defined by " + caller.getName());
 
@@ -1256,7 +1257,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceDescriptor descriptor = nodeSourceToDeploy.getDescriptor();
 
-        if (descriptor.getStatus().equals(NodeSourceStatus.DEPLOYED)) {
+        if (descriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
             logger.warn("Cannot deploy a node source that is already deployed");
             return new BooleanWrapper(false);
         }
@@ -1280,8 +1281,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         NodeSourcePolicy policy = NodeSourcePolicyFactory.turnActivePolicy(nodeSourceToDeploy.getPolicy(),
                                                                            descriptor.getPolicyParameters());
         nodeSourceToDeploy.setPolicy(policy);
-
-        nodeSourceToDeploy.setStatus(NodeSourceStatus.DEPLOYED);
 
         try {
             nodeSourceToDeploy = PAActiveObject.turnActive(nodeSourceToDeploy, nodeRM);
@@ -1325,7 +1324,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               provider.getName(),
                                                               nodeSourceToDeploy.getName(),
                                                               nodeSourceToDeploy.getDescription(),
-                                                              nodeSourceToDeploy.getAdministrator().getName()));
+                                                              nodeSourceToDeploy.getAdministrator().getName(),
+                                                              nodeSourceToDeploy.getStatus().toString()));
 
         logger.info("Node source " + nodeSourceName + " has been successfully deployed by " + provider);
 
@@ -1334,6 +1334,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private void updateNodeSourceInfo(NodeSource nodeSource) {
         nodeSources.put(nodeSource.getName(), nodeSource);
+        nodeSource.setStatus(NodeSourceStatus.NODES_DEPLOYED);
         NodeSourceData nodeSourceData = NodeSourceData.fromNodeSourceDescriptor(nodeSource.getDescriptor());
         dbManager.updateNodeSource(nodeSourceData);
     }
@@ -1589,7 +1590,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         Collection<NodeSource> nodeSources = this.nodeSources.values();
         ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<>(nodeSources.size());
         for (NodeSource s : nodeSources) {
-            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(), s.getDescription(), s.getAdministrator().getName()));
+            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(),
+                                                      s.getDescription(),
+                                                      s.getAdministrator().getName(),
+                                                      s.getStatus().toString()));
             for (RMDeployingNode pn : s.getDeployingAndLostNodes()) {
                 nodesList.add(pn.createNodeEvent());
             }
@@ -1828,7 +1832,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (nodeSources.containsKey(sourceName)) {
             NodeSource nodeSource = nodeSources.get(sourceName);
 
-            if (nodeSource.getDescriptor().getStatus().equals(NodeSourceStatus.DEPLOYED)) {
+            if (nodeSource.getDescriptor().getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
                 caller.checkPermission(nodeSource.getAdminPermission(),
                                        caller + " is not authorized to remove " + sourceName);
 
@@ -1851,7 +1855,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                       caller.getName(),
                                                                       removedNodeSource.getName(),
                                                                       removedNodeSource.getDescription(),
-                                                                      removedNodeSource.getAdministrator().getName()));
+                                                                      removedNodeSource.getAdministrator().getName(),
+                                                                      removedNodeSource.getStatus().toString()));
 
                 return new BooleanWrapper(true);
             }

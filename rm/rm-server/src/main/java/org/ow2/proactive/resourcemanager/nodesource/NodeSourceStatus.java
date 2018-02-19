@@ -34,12 +34,23 @@ public enum NodeSourceStatus {
      * A deployed node source means that the nodes acquisition of this node
      * source has been triggered.
      */
-    DEPLOYED,
+    NODES_DEPLOYED("deployed"),
 
     /**
      * An undeployed node source means that no node of the node source is
      * acquired, and that the node source activity does not exist,
      */
-    UNDEPLOYED
+    NODES_UNDEPLOYED("undeployed");
+
+    private String stringValue;
+
+    NodeSourceStatus(String stringValue) {
+        this.stringValue = stringValue;
+    }
+
+    @Override
+    public String toString() {
+        return stringValue;
+    }
 
 }

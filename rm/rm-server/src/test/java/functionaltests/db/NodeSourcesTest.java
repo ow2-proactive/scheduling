@@ -45,7 +45,6 @@ import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.tests.ProActiveTest;
 
 
@@ -169,7 +168,7 @@ public class NodeSourcesTest extends ProActiveTest {
                                   new String[] { "policy" },
                                   new Client(null, false),
                                   false,
-                                  NodeSourceStatus.DEPLOYED);
+                                  NodeSourceStatus.NODES_DEPLOYED);
     }
 
 }
