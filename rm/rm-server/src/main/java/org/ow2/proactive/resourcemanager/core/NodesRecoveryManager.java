@@ -113,13 +113,21 @@ public class NodesRecoveryManager {
     private void recoverDeployedNodeSourceIfNeeded(NodeSourceData nodeSourceDescriptor, String nodeSourceName) {
         try {
             logger.info("Recover node source " + nodeSourceName);
-            rmCore.createNotActiveNodeSource(nodeSourceDescriptor);
+            // retrieve node source status
+            boolean deployNodeSource = false;
             if (nodeSourceDescriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
+                deployNodeSource = true;
+            }
+            // reset node source status
+            nodeSourceDescriptor.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
+            rmCore.createNotActiveNodeSource(nodeSourceDescriptor);
+            // repeat node source status
+            if (deployNodeSource) {
                 rmCore.deployNodeSource(nodeSourceName);
             }
         } catch (Throwable t) {
             logger.error("Failed to recover node source " + nodeSourceName, t);
-            rmCore.removeDefinedNodeSource(nodeSourceName);
+            rmCore.removeNodeSource(nodeSourceName);
             rmCore.getDbManager().removeNodeSource(nodeSourceName);
         }
     }

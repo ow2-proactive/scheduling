@@ -215,9 +215,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private RMAuthenticationImpl authentication;
 
     /**
-     * HashMap of node sources by name (including deployed and undeployed node sources)
+     * HashMap of undeployed node sources by name (undeployed node sources
+     * are standard Java objects -- not activated)
      */
-    private Map<String, NodeSource> nodeSources;
+    private Map<String, NodeSource> undeployedNodeSources;
+
+    /**
+     * HashMap of deployed node sources by name (deployed node sources have
+     * their activity running, and acquire nodes)
+     */
+    private Map<String, NodeSource> deployedNodeSources;
 
     /**
      * HashMaps of nodes known by the RMCore
@@ -307,7 +314,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public RMCore(String id, Node nodeRM) throws ActiveObjectCreationException, NodeException {
         this.id = id;
         this.nodeRM = nodeRM;
-        nodeSources = new HashMap<>();
+        deployedNodeSources = new HashMap<>();
+        undeployedNodeSources = new HashMap<>();
         allNodes = new ConcurrentHashMap<>();
         eligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
 
@@ -315,10 +323,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.jmxHelper = new RMJMXHelper(this.accountsManager);
     }
 
-    public RMCore(Map<String, NodeSource> nodeSources, Map<String, RMNode> allNodes, Client caller,
-            RMMonitoringImpl monitoring, SelectionManager manager, List<RMNode> freeNodesList,
-            RMDBManager newDataBaseManager) {
-        this.nodeSources = nodeSources;
+    public RMCore(Map<String, NodeSource> deployedNodeSources, Map<String, NodeSource> undeployedNodeSources,
+            Map<String, RMNode> allNodes, Client caller, RMMonitoringImpl monitoring, SelectionManager manager,
+            List<RMNode> freeNodesList, RMDBManager newDataBaseManager) {
+        this.deployedNodeSources = deployedNodeSources;
+        this.undeployedNodeSources = undeployedNodeSources;
         this.allNodes = allNodes;
         this.caller = caller;
         this.monitoring = monitoring;
@@ -523,7 +532,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             if (chunks.length >= 3) {
                 String nodeSourceName = chunks[2];
-                NodeSource nodeSource = nodeSources.get(nodeSourceName);
+                NodeSource nodeSource = deployedNodeSources.get(nodeSourceName);
 
                 if (nodeSource != null) {
                     return nodeSource.getNodeInDeployingOrLostNodes(url);
@@ -830,7 +839,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new AddingNodesException("The resource manager is shutting down");
         }
 
-        boolean existingNodeSource = nodeSources.containsKey(sourceName);
+        boolean existingNodeSource = deployedNodeSources.containsKey(sourceName);
 
         if (!existingNodeSource && sourceName.equals(NodeSource.DEFAULT)) {
             // creating the default node source
@@ -842,8 +851,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                              NodeSource.DEFAULT_RECOVERABLE).getBooleanValue();
         }
 
-        if (nodeSources.containsKey(sourceName)) {
-            NodeSource nodeSource = this.nodeSources.get(sourceName);
+        if (deployedNodeSources.containsKey(sourceName)) {
+            NodeSource nodeSource = this.deployedNodeSources.get(sourceName);
 
             // Known URL, so do some cleanup before replacing it
             if (allNodes.containsKey(nodeUrl)) {
@@ -1010,8 +1019,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         eligibleNodes.add(rmnode);
     }
 
-    public void removeDefinedNodeSource(String nodeSourceName) {
-        nodeSources.remove(nodeSourceName);
+    /**
+     * Remove a node source regardless of whether it is deployed.
+     * @param nodeSourceName name of the node source to remove
+     */
+    public void removeNodeSource(String nodeSourceName) {
+        deployedNodeSources.remove(nodeSourceName);
+        undeployedNodeSources.remove(nodeSourceName);
     }
 
     private final class RemoveAllNodes implements Function<NodeSource, Void> {
@@ -1052,7 +1066,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param function       a function that extracts the collection to iterate from the node source.
      */
     private void removeAllNodes(String nodeSourceName, String collectionName, Function<NodeSource, Void> function) {
-        NodeSource nodeSource = nodeSources.get(nodeSourceName);
+        NodeSource nodeSource = deployedNodeSources.get(nodeSourceName);
 
         if (nodeSource != null) {
             function.apply(nodeSource);
@@ -1191,18 +1205,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             validateNodeSourceNameOrFail(nodeSourceName);
 
-            NodeSource nodeSource = createNotActiveNodeSource(persistedNodeSource);
-
-            nodeSources.put(nodeSourceName, nodeSource);
-
-            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_DEFINED,
-                                                                  caller.getName(),
-                                                                  nodeSourceName,
-                                                                  nodeSource.getDescription(),
-                                                                  caller.getName(),
-                                                                  nodeSource.getStatus().toString()));
-
-            logger.info("Node source " + nodeSourceName + " has been successfully defined by " + caller.getName());
+            createNotActiveNodeSource(persistedNodeSource);
 
             return new BooleanWrapper(true);
         } catch (NodeSourceNameAlreadyExistException e) {
@@ -1217,18 +1220,32 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    public NodeSource createNotActiveNodeSource(NodeSourceData persistedNodeSource) {
+    public void createNotActiveNodeSource(NodeSourceData persistedNodeSource) {
         InfrastructureManager infrastructureManager = InfrastructureManagerFactory.create(persistedNodeSource);
 
         NodeSourcePolicy notActivePolicy = NodeSourcePolicyFactory.createNotActive(persistedNodeSource.getPolicyType());
 
-        return new NodeSource(this.getUrl(),
-                              persistedNodeSource.getName(),
-                              infrastructureManager,
-                              notActivePolicy,
-                              (RMCore) PAActiveObject.getStubOnThis(),
-                              this.monitoring,
-                              persistedNodeSource.toNodeSourceDescriptor());
+        NodeSource nodeSource = new NodeSource(this.getUrl(),
+                                               persistedNodeSource.getName(),
+                                               infrastructureManager,
+                                               notActivePolicy,
+                                               (RMCore) PAActiveObject.getStubOnThis(),
+                                               this.monitoring,
+                                               persistedNodeSource.toNodeSourceDescriptor());
+
+        String nodeSourceName = nodeSource.getName();
+
+        undeployedNodeSources.put(nodeSourceName, nodeSource);
+
+        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_DEFINED,
+                                                              persistedNodeSource.getProvider().getName(),
+                                                              nodeSourceName,
+                                                              nodeSource.getDescription(),
+                                                              persistedNodeSource.getProvider().getName(),
+                                                              nodeSource.getDescriptor().getStatus().toString()));
+
+        logger.info("Node source " + nodeSourceName + " has been successfully defined by " +
+                    persistedNodeSource.getProvider().getName());
     }
 
     /**
@@ -1257,11 +1274,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceDescriptor descriptor = nodeSourceToDeploy.getDescriptor();
 
-        if (descriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
-            logger.warn("Cannot deploy a node source that is already deployed");
-            return new BooleanWrapper(false);
-        }
-
         logger.info("Deploy node source : " + nodeSourceName);
 
         boolean existPersistedNodes = existPersistedNodes(nodeSourceName, nodeSourceToDeploy.nodesRecoverable());
@@ -1281,6 +1293,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         NodeSourcePolicy policy = NodeSourcePolicyFactory.turnActivePolicy(nodeSourceToDeploy.getPolicy(),
                                                                            descriptor.getPolicyParameters());
         nodeSourceToDeploy.setPolicy(policy);
+
+        nodeSourceToDeploy.setStatus(NodeSourceStatus.NODES_DEPLOYED);
+        undeployedNodeSources.remove(nodeSourceToDeploy.getName());
 
         try {
             nodeSourceToDeploy = PAActiveObject.turnActive(nodeSourceToDeploy, nodeRM);
@@ -1325,7 +1340,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               nodeSourceToDeploy.getName(),
                                                               nodeSourceToDeploy.getDescription(),
                                                               nodeSourceToDeploy.getAdministrator().getName(),
-                                                              nodeSourceToDeploy.getStatus().toString()));
+                                                              nodeSourceToDeploy.getDescriptor()
+                                                                                .getStatus()
+                                                                                .toString()));
 
         logger.info("Node source " + nodeSourceName + " has been successfully deployed by " + provider);
 
@@ -1333,17 +1350,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void updateNodeSourceInfo(NodeSource nodeSource) {
-        nodeSources.put(nodeSource.getName(), nodeSource);
-        nodeSource.setStatus(NodeSourceStatus.NODES_DEPLOYED);
+        deployedNodeSources.put(nodeSource.getName(), nodeSource);
         NodeSourceData nodeSourceData = NodeSourceData.fromNodeSourceDescriptor(nodeSource.getDescriptor());
         dbManager.updateNodeSource(nodeSourceData);
     }
 
     private NodeSource retrieveNodeSourceOrFail(String nodeSourceName) {
-        NodeSource nodeSourceData = nodeSources.get(nodeSourceName);
+        NodeSource nodeSourceData = undeployedNodeSources.get(nodeSourceName);
 
         if (nodeSourceData == null) {
-            throw new IllegalStateException("Node source " + nodeSourceName + " is not defined");
+            throw new IllegalStateException("Undeployed node source " + nodeSourceName + " is unknown");
         }
 
         return nodeSourceData;
@@ -1383,10 +1399,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
-        if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean() || nodeSources.size() == 0) {
+        if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean() ||
+            deployedNodeSources.size() == 0) {
             finalizeShutdown();
         } else {
-            for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
+            for (Entry<String, NodeSource> entry : deployedNodeSources.entrySet()) {
                 removeAllNodes(entry.getKey(), preempt, true);
                 entry.getValue().shutdown(caller);
             }
@@ -1587,16 +1604,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             nodesList.add(rmnode.createNodeEvent());
         }
 
-        Collection<NodeSource> nodeSources = this.nodeSources.values();
-        ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<>(nodeSources.size());
-        for (NodeSource s : nodeSources) {
+        ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<>(deployedNodeSources.size() +
+                                                                       undeployedNodeSources.size());
+
+        for (NodeSource s : deployedNodeSources.values()) {
             nodeSourcesList.add(new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
-                                                      s.getStatus().toString()));
+                                                      s.getDescriptor().getStatus().toString()));
             for (RMDeployingNode pn : s.getDeployingAndLostNodes()) {
                 nodesList.add(pn.createNodeEvent());
             }
+        }
+
+        for (NodeSource s : undeployedNodeSources.values()) {
+            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(),
+                                                      s.getDescription(),
+                                                      s.getAdministrator().getName(),
+                                                      s.getDescriptor().getStatus().toString()));
         }
 
         return new RMInitialState(nodesList, nodeSourcesList);
@@ -1630,7 +1655,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames) {
         HashSet<String> aliveNodes = new HashSet<>();
         for (String nodeSource : nodeSourceNames) {
-            for (Node node : nodeSources.get(nodeSource).getAliveNodes()) {
+            for (Node node : deployedNodeSources.get(nodeSource).getAliveNodes()) {
                 aliveNodes.add(node.getNodeInformation().getURL());
             }
         }
@@ -1641,7 +1666,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Unregisters node source from the resource manager core.
      */
     public BooleanWrapper nodeSourceUnregister(String sourceName, RMNodeSourceEvent evt) {
-        NodeSource nodeSource = this.nodeSources.remove(sourceName);
+        NodeSource nodeSource = deployedNodeSources.remove(sourceName);
 
         if (nodeSource == null) {
             logger.warn("Attempt to remove non-existing node source " + sourceName);
@@ -1660,7 +1685,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // create the event
         this.monitoring.nodeSourceEvent(evt);
 
-        if ((this.nodeSources.size() == 0) && this.toShutDown) {
+        if ((deployedNodeSources.size() == 0) && this.toShutDown) {
             finalizeShutdown();
         }
 
@@ -1789,8 +1814,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public IntWrapper getNodeSourcePingFrequency(String sourceName) {
-        if (this.nodeSources.containsKey(sourceName)) {
-            return this.nodeSources.get(sourceName).getPingFrequency();
+        if (deployedNodeSources.containsKey(sourceName)) {
+            return deployedNodeSources.get(sourceName).getPingFrequency();
         } else {
             throw new IllegalArgumentException("Unknown node source " + sourceName);
         }
@@ -1800,8 +1825,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public BooleanWrapper setNodeSourcePingFrequency(int frequency, String sourceName) {
-        if (this.nodeSources.containsKey(sourceName)) {
-            this.nodeSources.get(sourceName).setPingFrequency(frequency);
+        if (deployedNodeSources.containsKey(sourceName)) {
+            deployedNodeSources.get(sourceName).setPingFrequency(frequency);
         } else {
             throw new IllegalArgumentException("Unknown node source " + sourceName);
         }
@@ -1829,37 +1854,37 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public BooleanWrapper removeNodeSource(String sourceName, boolean preempt) {
-        if (nodeSources.containsKey(sourceName)) {
-            NodeSource nodeSource = nodeSources.get(sourceName);
+        if (deployedNodeSources.containsKey(sourceName)) {
+            NodeSource nodeSource = deployedNodeSources.get(sourceName);
 
-            if (nodeSource.getDescriptor().getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
-                caller.checkPermission(nodeSource.getAdminPermission(),
-                                       caller + " is not authorized to remove " + sourceName);
+            caller.checkPermission(nodeSource.getAdminPermission(),
+                                   caller + " is not authorized to remove " + sourceName);
 
-                logger.info(caller + " requested removal of node source " + sourceName);
+            logger.info(caller + " requested removal of node source " + sourceName);
 
-                //remove down nodes handled by the source
-                //because node source doesn't know anymore its down nodes
-                removeAllNodes(sourceName, preempt);
-                nodeSource.shutdown(caller);
-                dbManager.removeNodeSource(sourceName);
+            //remove down nodes handled by the source
+            //because node source doesn't know anymore its down nodes
+            removeAllNodes(sourceName, preempt);
+            nodeSource.shutdown(caller);
+            dbManager.removeNodeSource(sourceName);
 
-                return new BooleanWrapper(true);
-            } else {
-                NodeSource removedNodeSource = nodeSources.remove(sourceName);
-                logger.info(caller + " requested removal of undeployed node source " + sourceName);
+            return new BooleanWrapper(true);
+        } else if (undeployedNodeSources.containsKey(sourceName)) {
+            NodeSource removedNodeSource = undeployedNodeSources.remove(sourceName);
+            logger.info(caller + " requested removal of undeployed node source " + sourceName);
 
-                dbManager.removeNodeSource(sourceName);
+            dbManager.removeNodeSource(sourceName);
 
-                this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_REMOVED,
-                                                                      caller.getName(),
-                                                                      removedNodeSource.getName(),
-                                                                      removedNodeSource.getDescription(),
-                                                                      removedNodeSource.getAdministrator().getName(),
-                                                                      removedNodeSource.getStatus().toString()));
+            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_REMOVED,
+                                                                  caller.getName(),
+                                                                  removedNodeSource.getName(),
+                                                                  removedNodeSource.getDescription(),
+                                                                  removedNodeSource.getAdministrator().getName(),
+                                                                  removedNodeSource.getDescriptor()
+                                                                                   .getStatus()
+                                                                                   .toString()));
 
-                return new BooleanWrapper(true);
-            }
+            return new BooleanWrapper(true);
         } else {
             throw new IllegalArgumentException("Unknown node source " + sourceName);
         }
@@ -2026,7 +2051,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 }
             }
         }
-        NodeSource ns = nodeSources.get(nsName);
+        NodeSource ns = deployedNodeSources.get(nsName);
         if (ns == null) {
             logger.warn("No such nodesource: " + nsName + ", cannot remove the deploying node with url: " + url);
             return false;
@@ -2045,7 +2070,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         if (nodeSourceName.length() == 0) {
             throw new IllegalArgumentException("Node Source Name cannot be empty");
         }
-        if (nodeSources.containsKey(nodeSourceName)) {
+        if (undeployedNodeSources.containsKey(nodeSourceName) || deployedNodeSources.containsKey(nodeSourceName)) {
             throw new NodeSourceNameAlreadyExistException("Node Source name " + nodeSourceName + " already exist");
         }
         Pattern pattern = Pattern.compile("[^-\\w]");//letters,digits,_and-
@@ -2271,7 +2296,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             case NODESOURCE_NAME:
                 // If target is a nodesource name select all its nodes
                 for (String target : targets) {
-                    NodeSource nodeSource = nodeSources.get(target);
+                    NodeSource nodeSource = deployedNodeSources.get(target);
                     if (nodeSource != null) {
                         for (RMNode candidateNode : this.allNodes.values()) {
                             if (candidateNode.getNodeSource().equals(nodeSource)) {

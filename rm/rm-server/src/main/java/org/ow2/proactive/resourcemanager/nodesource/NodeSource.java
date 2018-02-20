@@ -59,6 +59,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -526,12 +527,9 @@ public class NodeSource implements InitActive, RunActive {
         nodeSourcePolicy = policy;
     }
 
-    public NodeSourceStatus getStatus() {
-        return this.descriptor.getStatus();
-    }
-
     public void setStatus(NodeSourceStatus status) {
         this.descriptor.setStatus(status);
+        this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(descriptor));
     }
 
     /**
@@ -731,8 +729,10 @@ public class NodeSource implements InitActive, RunActive {
     protected void shutdownNodeSourceServices(Client initiator) {
         logger.info("[" + name + "] Shutdown finalization");
 
-        nodeSourcePolicy.shutdown(initiator);
-        infrastructureManager.internalShutDown();
+        if (descriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
+            nodeSourcePolicy.shutdown(initiator);
+            infrastructureManager.internalShutDown();
+        }
     }
 
     /**
@@ -745,7 +745,7 @@ public class NodeSource implements InitActive, RunActive {
                                                                            this.getName(),
                                                                            this.getDescription(),
                                                                            this.getAdministrator().getName(),
-                                                                           this.getStatus().toString())));
+                                                                           descriptor.getStatus().toString())));
 
         PAActiveObject.terminateActiveObject(false);
     }
