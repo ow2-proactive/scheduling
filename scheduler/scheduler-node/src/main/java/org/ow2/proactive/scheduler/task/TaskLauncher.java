@@ -33,6 +33,7 @@ import java.security.PublicKey;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -103,6 +104,8 @@ public class TaskLauncher implements InitActive {
 
     private TaskLauncherRebinder taskLauncherRebinder;
 
+    private AtomicBoolean doTaskInvoked = new AtomicBoolean(false);
+
     /**
      * Needed for ProActive but should never be used manually to create an instance of the object.
      */
@@ -142,6 +145,11 @@ public class TaskLauncher implements InitActive {
         return true;
     }
 
+    @ImmediateService
+    public boolean getDoTaskInvoked() {
+        return doTaskInvoked.get();
+    }
+
     void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
         doTask(executableContainer, previousTasksResults, terminateNotification, null, false);
@@ -158,6 +166,8 @@ public class TaskLauncher implements InitActive {
         TaskDataspaces dataspaces = null;
 
         try {
+            doTaskInvoked.set(true);
+
             logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
 
             this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
