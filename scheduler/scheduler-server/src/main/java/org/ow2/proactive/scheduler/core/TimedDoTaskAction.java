@@ -111,7 +111,10 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
      * {@inheritDoc}
      */
     public Void call() throws Exception {
+        LiveJobs.JobData jobData = null;
         try {
+            jobData = schedulingService.lockJob(job.getId());
+
             // Set to empty array to emulate varargs behavior (i.e. not defined is
             // equivalent to empty array, not null.
             TaskResult[] params = new TaskResult[0];
@@ -160,9 +163,15 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
                             terminateNotification,
                             taskRecoveryData.getTerminateNotificationNodeURL(),
                             taskRecoveryData.isTaskRecoverable());
+
+            schedulingService.taskStarted(job, task, launcher);
         } catch (Throwable e) {
             logger.warn("Failed to start task: " + e.getMessage(), e);
             restartTask();
+        } finally {
+            if (jobData != null) {
+                jobData.unlock();
+            }
         }
         return null;
     }
