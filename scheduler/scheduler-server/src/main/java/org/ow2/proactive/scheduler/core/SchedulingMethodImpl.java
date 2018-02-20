@@ -668,19 +668,22 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL,
                                                                              taskRecoverable);
 
-                    Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
-                                                                                                                   taskDescriptor,
-                                                                                                                   launcher,
-                                                                                                                   schedulingService,
-                                                                                                                   terminateNotification,
-                                                                                                                   corePrivateKey,
-                                                                                                                   taskRecoveryData),
+                    // we release the lock in order to let TimedDoTaskAction
+                    // take it
+                    jobData.unlock();
 
-                                                                                             dotaskActionTimeout,
-                                                                                             TimeUnit.MILLISECONDS);
-                    waitForTaskToBeStarted(taskExecutionSubmittedFuture);
+                    threadPool.submitWithTimeout(new TimedDoTaskAction(job,
+                                                                       taskDescriptor,
+                                                                       launcher,
+                                                                       schedulingService,
+                                                                       terminateNotification,
+                                                                       corePrivateKey,
+                                                                       taskRecoveryData),
 
-                    finalizeStarting(job, task, node, launcher);
+                                                 dotaskActionTimeout,
+                                                 TimeUnit.MILLISECONDS);
+
+                    jobData = null;
                     return true;
                 } catch (Exception t) {
                     try {
@@ -702,33 +705,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
         }
 
-    }
-
-    private void waitForTaskToBeStarted(Future<Void> taskExecutionSubmittedFuture) {
-        try {
-            // before signaling that the task is started, we need
-            // to make sure the task is correctly submitted to the
-            // task launcher
-            taskExecutionSubmittedFuture.get(dotaskActionTimeout, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            logger.warn("Error while waiting for the task to be started.", e);
-        }
-    }
-
-    /**
-     * Finalize the start of the task by mark it as started. Also mark the job if it is not already started.
-     *
-     * @param job the job that owns the task to be started
-     * @param task the task to be started
-     * @param node the node on which the task will be started
-     * @param launcher the taskLauncher that has just been launched
-     */
-    void finalizeStarting(InternalJob job, InternalTask task, Node node, TaskLauncher launcher) {
-        tlogger.info(task.getId(),
-                     "started on " + node.getNodeInformation().getVMInformation().getHostName() + "(node: " +
-                                   node.getNodeInformation().getName() + ")");
-
-        schedulingService.taskStarted(job, task, launcher);
     }
 
     private SchedulerDBManager getDBManager() {
