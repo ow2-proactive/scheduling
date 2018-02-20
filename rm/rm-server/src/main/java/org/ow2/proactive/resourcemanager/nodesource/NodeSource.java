@@ -147,13 +147,13 @@ public class NodeSource implements InitActive, RunActive {
 
     // admin can remove node source, add nodes to the node source, remove any node
     // it is a PrincipalPermission of the user who created this node source
-    private final Permission adminPermission;
+    private Permission adminPermission;
 
     // provider can add nodes to the node source, remove only its nodes
     // level is configured by ns admin at the moment of ns creation
     // NOTE: the administrator is always the provider because each provider is one of those:
     // ns creator, ns creator groups, all
-    private final Permission providerPermission;
+    private Permission providerPermission;
 
     // user can get nodes for running computations
     // level is configured by ns admin at the moment of ns creation
@@ -217,17 +217,6 @@ public class NodeSource implements InitActive, RunActive {
         this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
         this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
 
-        // node source admin permission
-        // it's the PrincipalPermission of the user who created the node source
-        this.adminPermission = new PrincipalPermission(provider.getName(),
-                                                       provider.getSubject().getPrincipals(UserNamePrincipal.class));
-        // creating node source provider permission
-        // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
-        // or PrincipalPermission (anyone)
-        this.providerPermission = new PrincipalPermission(provider.getName(),
-                                                          nodeSourcePolicy.getProviderAccessType()
-                                                                          .getIdentityPrincipals(provider));
-        this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
         this.descriptor = nodeSourceDescriptor;
     }
 
@@ -245,6 +234,18 @@ public class NodeSource implements InitActive, RunActive {
         // infrastructure, in its configuration.
         infrastructureManager.persistInfrastructureVariables();
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
+
+        // node source admin permission
+        // it's the PrincipalPermission of the user who created the node source
+        this.adminPermission = new PrincipalPermission(administrator.getName(),
+                administrator.getSubject().getPrincipals(UserNamePrincipal.class));
+        // creating node source provider permission
+        // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
+        // or PrincipalPermission (anyone)
+        this.providerPermission = new PrincipalPermission(administrator.getName(),
+                nodeSourcePolicy.getProviderAccessType()
+                        .getIdentityPrincipals(administrator));
+        this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
 
         Thread.currentThread().setName("Node Source \"" + name + "\"");
     }
