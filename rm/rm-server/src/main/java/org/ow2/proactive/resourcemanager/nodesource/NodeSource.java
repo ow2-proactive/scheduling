@@ -217,6 +217,19 @@ public class NodeSource implements InitActive, RunActive {
         this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
         this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
 
+        // node source admin permission
+        // it's the PrincipalPermission of the user who created the node source
+        this.adminPermission = new PrincipalPermission(administrator.getName(),
+                                                       administrator.getSubject()
+                                                                    .getPrincipals(UserNamePrincipal.class));
+        // creating node source provider permission
+        // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
+        // or PrincipalPermission (anyone)
+        this.providerPermission = new PrincipalPermission(administrator.getName(),
+                                                          nodeSourcePolicy.getProviderAccessType()
+                                                                          .getIdentityPrincipals(administrator));
+        this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
+
         this.descriptor = nodeSourceDescriptor;
     }
 
@@ -235,16 +248,19 @@ public class NodeSource implements InitActive, RunActive {
         infrastructureManager.persistInfrastructureVariables();
         nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
+        // Set permissions again according to the activated node source policy
+
         // node source admin permission
         // it's the PrincipalPermission of the user who created the node source
         this.adminPermission = new PrincipalPermission(administrator.getName(),
-                administrator.getSubject().getPrincipals(UserNamePrincipal.class));
+                                                       administrator.getSubject()
+                                                                    .getPrincipals(UserNamePrincipal.class));
         // creating node source provider permission
         // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
         // or PrincipalPermission (anyone)
         this.providerPermission = new PrincipalPermission(administrator.getName(),
-                nodeSourcePolicy.getProviderAccessType()
-                        .getIdentityPrincipals(administrator));
+                                                          nodeSourcePolicy.getProviderAccessType()
+                                                                          .getIdentityPrincipals(administrator));
         this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
 
         Thread.currentThread().setName("Node Source \"" + name + "\"");

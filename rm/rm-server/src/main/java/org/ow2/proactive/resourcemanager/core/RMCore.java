@@ -1854,10 +1854,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public BooleanWrapper removeNodeSource(String sourceName, boolean preempt) {
+        NodeSource removedNodeSource;
         if (deployedNodeSources.containsKey(sourceName)) {
-            NodeSource nodeSource = deployedNodeSources.get(sourceName);
+            removedNodeSource = deployedNodeSources.get(sourceName);
 
-            caller.checkPermission(nodeSource.getAdminPermission(),
+            caller.checkPermission(removedNodeSource.getAdminPermission(),
                                    caller + " is not authorized to remove " + sourceName);
 
             logger.info(caller + " requested removal of node source " + sourceName);
@@ -1865,12 +1866,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             //remove down nodes handled by the source
             //because node source doesn't know anymore its down nodes
             removeAllNodes(sourceName, preempt);
-            nodeSource.shutdown(caller);
+            removedNodeSource.shutdown(caller);
             dbManager.removeNodeSource(sourceName);
 
             return new BooleanWrapper(true);
         } else if (undeployedNodeSources.containsKey(sourceName)) {
-            NodeSource removedNodeSource = undeployedNodeSources.remove(sourceName);
+            removedNodeSource = undeployedNodeSources.remove(sourceName);
+
+            caller.checkPermission(removedNodeSource.getAdminPermission(),
+                                   caller + " is not authorized to remove " + sourceName);
+
             logger.info(caller + " requested removal of undeployed node source " + sourceName);
 
             dbManager.removeNodeSource(sourceName);
