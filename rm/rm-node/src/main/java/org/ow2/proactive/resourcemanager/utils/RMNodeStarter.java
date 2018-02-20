@@ -1365,10 +1365,10 @@ public class RMNodeStarter {
                 logger.warn("NodeURL file already exists ; delete it.");
                 FileUtils.forceDelete(f);
             }
-            BufferedWriter out = new BufferedWriter(new FileWriter(f));
-            out.write(nodeURL);
-            out.write(System.lineSeparator());
-            out.close();
+            try (BufferedWriter out = new BufferedWriter(new FileWriter(f))) {
+                out.write(nodeURL);
+                out.write(System.lineSeparator());
+            }
         } catch (IOException e) {
             logger.warn("NodeURL cannot be created.", e);
         }
@@ -1384,11 +1384,11 @@ public class RMNodeStarter {
         try {
             File f = new File(getNodeURLFilename(nodeName, rank));
             if (f.exists()) {
-                BufferedReader in = new BufferedReader(new FileReader(f));
-                String read = in.readLine();
-                in.close();
-                FileUtils.deleteQuietly(f);
-                return read;
+                try (BufferedReader in = new BufferedReader(new FileReader(f))) {
+                    return in.readLine();
+                } finally {
+                    FileUtils.deleteQuietly(f);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

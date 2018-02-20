@@ -40,11 +40,8 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileType;
-import org.ow2.proactive_grid_cloud_portal.dataspace.FileSystem;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
 
-import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 
@@ -56,11 +53,11 @@ public class VFSZipper {
 
     public static class GZIP {
 
-        public static void zip(FileObject fo, OutputStream os) throws FileSystemException, IOException {
+        public static void zip(FileObject fo, OutputStream os) throws IOException {
             Zipper.GZIP.zip(fo.getContent().getInputStream(), os);
         }
 
-        public static void unzip(InputStream is, FileObject outputFile) throws FileSystemException, IOException {
+        public static void unzip(InputStream is, FileObject outputFile) throws IOException {
             Zipper.GZIP.unzip(is, outputFile.getContent().getOutputStream());
         }
     }
@@ -98,7 +95,7 @@ public class VFSZipper {
             return new ZipEntry(name);
         }
 
-        public static void unzip(InputStream is, FileObject outfileObj) throws FileSystemException, IOException {
+        public static void unzip(InputStream is, FileObject outfileObj) throws IOException {
             Closer closer = Closer.create();
             try {
                 ZipInputStream zis = new ZipInputStream(is);

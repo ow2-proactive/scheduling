@@ -502,18 +502,12 @@ public class SchedulerAuthenticationGUIHelper {
             if (!"".equals((String) jComboBox_url.getSelectedItem())) {
                 URLs.add((String) jComboBox_url.getSelectedItem());
             }
-            PrintWriter pw = null;
-            try {
-                pw = new PrintWriter(new FileOutputStream(TMP_AUTH_FILE));
+            try (PrintWriter pw = new PrintWriter(new FileOutputStream(TMP_AUTH_FILE))) {
                 for (String url : URLs) {
                     pw.println(url);
                 }
             } catch (Exception e) {
                 //not a big deal
-            } finally {
-                if (pw != null) {
-                    pw.close();
-                }
             }
         }
 
@@ -521,9 +515,7 @@ public class SchedulerAuthenticationGUIHelper {
             if (!"".equals(defaultURL)) {
                 URLs.add(defaultURL);
             }
-            BufferedReader br = null;
-            try {
-                br = new BufferedReader(new FileReader(TMP_AUTH_FILE));
+            try (BufferedReader br = new BufferedReader(new FileReader(TMP_AUTH_FILE))) {
                 String url;
                 while ((url = br.readLine()) != null) {
                     if (!"".equals(url)) {
@@ -533,13 +525,6 @@ public class SchedulerAuthenticationGUIHelper {
             } catch (Exception e) {
                 //If file not found, it will be created after
                 //if other, we cannot read historic -> not a big deal
-            } finally {
-                if (br != null) {
-                    try {
-                        br.close();
-                    } catch (IOException e) {
-                    }
-                }
             }
         }
 

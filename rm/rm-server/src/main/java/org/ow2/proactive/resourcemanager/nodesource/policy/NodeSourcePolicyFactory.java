@@ -113,9 +113,9 @@ public class NodeSourcePolicyFactory {
                 propFileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + propFileName;
             }
 
-            FileInputStream stream = new FileInputStream(propFileName);
-            properties.load(stream);
-            stream.close();
+            try (FileInputStream stream = new FileInputStream(propFileName)) {
+                properties.load(stream);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

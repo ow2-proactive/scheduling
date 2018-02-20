@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -97,8 +98,8 @@ public class CredentialsCreator {
     }
 
     private boolean sameCredentialsBytes(byte[] credentialBytes, File credentialsfile) {
-        try {
-            return Arrays.equals(credentialBytes, IOUtils.toByteArray(new FileInputStream(credentialsfile)));
+        try (InputStream inputStream = new FileInputStream(credentialsfile)) {
+            return Arrays.equals(credentialBytes, IOUtils.toByteArray(inputStream));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

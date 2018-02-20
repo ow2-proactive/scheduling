@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.stax;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.stream.XMLInputFactory;
@@ -82,20 +83,24 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
 
     private String findSchemaByNamespaceUsed(File file)
             throws FileNotFoundException, XMLStreamException, JobValidationException {
-        XMLStreamReader cursorRoot = xmlInputFactory.createXMLStreamReader(new FileInputStream(file));
-        try {
-            while (cursorRoot.hasNext()) {
-                String namespace = advanceCursorAndFindSchema(cursorRoot);
-                if (namespace != null)
-                    return namespace;
+        try (InputStream inputStream = new FileInputStream(file)) {
+            XMLStreamReader cursorRoot = xmlInputFactory.createXMLStreamReader(inputStream);
+            try {
+                while (cursorRoot.hasNext()) {
+                    String namespace = advanceCursorAndFindSchema(cursorRoot);
+                    if (namespace != null)
+                        return namespace;
+                }
+                return Schemas.SCHEMA_LATEST.getLocation();
+            } catch (Exception e) {
+                throw new JobValidationException(e.getMessage(), e);
+            } finally {
+                if (cursorRoot != null) {
+                    cursorRoot.close();
+                }
             }
-            return Schemas.SCHEMA_LATEST.getLocation();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new JobValidationException(e.getMessage(), e);
-        } finally {
-            if (cursorRoot != null) {
-                cursorRoot.close();
-            }
         }
     }
 

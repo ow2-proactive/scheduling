@@ -134,6 +134,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 
+import com.google.common.io.Closer;
+
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
@@ -705,8 +707,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public JobId submit(File job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
-        try {
-            InputStream is = new FileInputStream(job);
+        try (InputStream is = new FileInputStream(job)) {
             jobIdData = restApiClient().submitXml(sid, is);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
@@ -752,8 +753,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
-        try {
-            InputStream is = new FileInputStream(job);
+        try (InputStream is = new FileInputStream(job)) {
             jobIdData = restApiClient().submitXml(sid, is, variables);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
@@ -926,14 +926,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public boolean pushFile(String spacename, String pathname, String filename, String file)
             throws NotConnectedException, PermissionException {
         boolean uploaded = false;
-        FileInputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(file);
+        try (FileInputStream inputStream = new FileInputStream(file)) {
             uploaded = restApiClient().pushFile(sid, spacename, pathname, filename, inputStream);
         } catch (Exception e) {
             throwNCEOrPE(e);
-        } finally {
-            closeIfPossible(inputStream);
         }
         return uploaded;
     }
@@ -979,17 +975,26 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public void renewSession() throws NotConnectedException {
+        Closer closer = Closer.create();
         try {
             LoginForm loginForm = new LoginForm();
             loginForm.setUsername(connectionInfo.getLogin());
             loginForm.setPassword(connectionInfo.getPassword());
             if (connectionInfo.getCredentialFile() != null) {
-                loginForm.setCredential(new FileInputStream(connectionInfo.getCredentialFile()));
+                FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile());
+                closer.register(inputStream);
+                loginForm.setCredential(inputStream);
             }
             sid = restApi().loginOrRenewSession(sid, loginForm);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                closer.close();
+            } catch (IOException e) {
+                // ignore
+            }
         }
     }
 
@@ -1033,16 +1038,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             Thread.sleep(millis);
         } catch (InterruptedException ie) {
             // ignore
-        }
-    }
-
-    private void closeIfPossible(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException ioe) {
-                // ignore
-            }
         }
     }
 

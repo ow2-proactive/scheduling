@@ -55,7 +55,10 @@ public class SchedulerClientExample {
 
         // JOB SUBMISSION
         File xmlJobFile = new File("/home/ybonnaffe/src/cloud_service_provider_conectors/cloudstack/vminfo_job.xml");
-        JobIdData xmlJob = client.submitXml(sessionId, new FileInputStream(xmlJobFile));
+        JobIdData xmlJob;
+        try (FileInputStream inputStream = new FileInputStream(xmlJobFile)) {
+            xmlJob = client.submitXml(sessionId, inputStream);
+        }
         System.out.println(xmlJob.getReadableName() + " " + xmlJob.getId());
 
         // FLAT JOB SUBMISSION
