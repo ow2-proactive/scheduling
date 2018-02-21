@@ -192,9 +192,17 @@ public class SchedulerStateRecoverHelper {
 
             if (taskNodesKnownByRM) {
                 TaskLauncher launcher = task.getExecuterInformation().getLauncher();
-                logger.info("Recover running task " + task.getId() + " (" + task.getName() +
-                            ") successfully with task launcher " + launcher);
-                resetToPending = false;
+                logger.debug("Checking whether task launcher has called its doTask method: " +
+                             launcher.isTaskStarted());
+                if (launcher.isTaskStarted()) {
+                    logger.info("Recover running task " + task.getId() + " (" + task.getName() +
+                                ") successfully with task launcher " + launcher);
+                    resetToPending = false;
+                } else {
+                    logger.info(FAIL_TO_RECOVER_RUNNING_TASK_STRING + task.getId() + " (" + task.getName() +
+                                ") because its task launcher has not started to execute the task");
+                    resetToPending = true;
+                }
             } else {
                 logger.info(FAIL_TO_RECOVER_RUNNING_TASK_STRING + task.getId() + " (" + task.getName() +
                             ") because the task's node is not known by the resource manager");
