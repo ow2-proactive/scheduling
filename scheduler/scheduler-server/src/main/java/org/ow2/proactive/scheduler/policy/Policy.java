@@ -157,10 +157,8 @@ public abstract class Policy implements Serializable {
      */
     public boolean reloadConfig() {
         configProperties = new Properties();
-        try {
-            FileInputStream fis = new FileInputStream(getConfigFile());
+        try (FileInputStream fis = new FileInputStream(getConfigFile())) {
             configProperties.load(fis);
-            fis.close();
             return true;
         } catch (IOException ioe) {
             logger.warn("Cannot read policy configuration file", ioe);

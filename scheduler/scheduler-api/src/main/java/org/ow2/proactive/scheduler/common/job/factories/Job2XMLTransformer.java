@@ -165,9 +165,9 @@ public class Job2XMLTransformer {
     public void job2xmlFile(TaskFlowJob job, File f)
             throws ParserConfigurationException, TransformerException, IOException {
         String xmlString = jobToxmlString(job);
-        FileWriter fw = new FileWriter(f);
-        fw.write(xmlString);
-        fw.close();
+        try (FileWriter fw = new FileWriter(f)) {
+            fw.write(xmlString);
+        }
     }
 
     /**

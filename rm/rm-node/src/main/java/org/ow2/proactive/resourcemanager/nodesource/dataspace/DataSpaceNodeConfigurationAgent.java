@@ -297,11 +297,16 @@ public class DataSpaceNodeConfigurationAgent implements Serializable {
                 if (cacheCleaningRWLock.writeLock().tryLock()) {
                     try {
                         FileObject rootFO = fileSystemManager.resolveFile(rootCacheUri);
+                        if (!rootFO.exists()) {
+                            rootFO.createFolder();
+                        }
                         FileObject[] files = rootFO.findFiles(Selectors.EXCLUDE_SELF);
-                        for (FileObject file : files) {
-                            if (currentTime - file.getContent().getLastModifiedTime() > invalidationPeriod) {
-                                logger.info("[Cache Space cleaner] deleting " + file);
-                                file.delete();
+                        if (files != null) {
+                            for (FileObject file : files) {
+                                if (currentTime - file.getContent().getLastModifiedTime() > invalidationPeriod) {
+                                    logger.info("[Cache Space cleaner] deleting " + file);
+                                    file.delete();
+                                }
                             }
                         }
                     } finally {

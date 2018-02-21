@@ -114,10 +114,8 @@ public class LDAPProperties {
      * @param propertiesFileName properties file name
      */
     public LDAPProperties(String propertiesFileName) {
-        try {
-            FileInputStream stream = new FileInputStream(new File(propertiesFileName));
+        try (FileInputStream stream = new FileInputStream(new File(propertiesFileName))) {
             prop.load(stream);
-            stream.close();
             setUserJavaProperties();
         } catch (IOException e) {
             throw new RuntimeException(e);

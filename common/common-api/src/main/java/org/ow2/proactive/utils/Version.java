@@ -23,42 +23,46 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.util;
+package org.ow2.proactive.utils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
-public class SchedulerPortalConfiguration {
-    private final String path;
+public class Version {
 
-    private static SchedulerPortalConfiguration configuration;
+    public static final String UNDEFINED = "Undefined";
 
-    private static final Logger logger = Logger.getLogger(SchedulerPortalConfiguration.class);
+    public static final String VERSION_FILE = "version.ini";
 
-    private SchedulerPortalConfiguration() {
-        path = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_PORTAL_CONFIGURATION.getValueAsString());
-    }
+    public static final String VERSION_PROPERTY_NAME = "pa.version";
 
-    public static synchronized SchedulerPortalConfiguration getConfiguration() {
-        if (configuration == null) {
-            configuration = new SchedulerPortalConfiguration();
+    private static Logger logger = Logger.getLogger(Version.class);
+
+    public static final String PA_VERSION = initVersion();
+
+    private static String initVersion() {
+        URL versionFile = Version.class.getResource(VERSION_FILE);
+        if (versionFile == null) {
+            return UNDEFINED;
+        } else {
+            Properties properties = new Properties();
+            try (InputStream in = versionFile.openStream()) {
+                properties.load(in);
+                String version = properties.getProperty(VERSION_PROPERTY_NAME);
+                if (version == null) {
+                    return UNDEFINED;
+                } else {
+                    return version;
+                }
+            } catch (IOException e) {
+                logger.error("Error when loading version file", e);
+                return UNDEFINED;
+            }
         }
-        return configuration;
-    }
-
-    public Properties getProperties() {
-        Properties props = new Properties();
-        try (InputStream fis = new FileInputStream(path)) {
-            props.load(fis);
-        } catch (IOException e) {
-            logger.warn("Scheduler Portal Configuration file: " + path + " not found!", e);
-        }
-        return props;
     }
 }

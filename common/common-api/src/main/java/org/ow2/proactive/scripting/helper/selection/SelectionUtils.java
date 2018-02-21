@@ -87,10 +87,8 @@ public class SelectionUtils {
     public static boolean checkProperties(String configFilePath, Conditions conditions) {
         //open properties file
         Properties properties = new Properties();
-        try {
-            FileInputStream fis = new FileInputStream(configFilePath);
+        try (FileInputStream fis = new FileInputStream(configFilePath);) {
             properties.load(fis);
-            fis.close();
             //Check properties for each condition
             for (Condition condition : conditions) {
                 if (!checkProperty(properties, condition)) {
@@ -147,10 +145,8 @@ public class SelectionUtils {
     public static boolean checkProperty(String configFilePath, Condition condition) {
         // Opening of the property file
         Properties props = new Properties();
-        try {
-            FileInputStream stream = new FileInputStream(configFilePath);
+        try (FileInputStream stream = new FileInputStream(configFilePath)) {
             props.load(stream);
-            stream.close();
         } catch (IOException e) {
             e.printStackTrace();
             return false;

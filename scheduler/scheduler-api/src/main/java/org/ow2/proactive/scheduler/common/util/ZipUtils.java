@@ -71,9 +71,9 @@ public class ZipUtils extends FileUtils {
      */
     public static void zip(String[] directoriesAndFiles, File dest, CRC32 crc) throws IOException {
         byte[] zipped = ZipUtils.zipDirectoriesAndFiles(directoriesAndFiles, crc);
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));
-        bos.write(zipped);
-        bos.close();
+        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest))) {
+            bos.write(zipped);
+        }
     }
 
     /**
@@ -167,9 +167,7 @@ public class ZipUtils extends FileUtils {
      */
     protected static void zipFile(String filePath, int iBaseFolderLength, ZipOutputStream jos, CRC32 crc)
             throws IOException {
-        try {
-            FileInputStream fis = new FileInputStream(filePath);
-            BufferedInputStream bis = new BufferedInputStream(fis);
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(filePath))) {
             String fileNameEntry = filePath.substring(iBaseFolderLength).replace(File.separatorChar, '/');
             ZipEntry fileEntry = new ZipEntry(fileNameEntry);
             jos.putNextEntry(fileEntry);
@@ -182,7 +180,6 @@ public class ZipUtils extends FileUtils {
                 jos.write(data, 0, byteCount);
             }
             jos.closeEntry();
-            fis.close();
         } catch (ZipException e) {
             // TODO Other exceptions ?
             // Duplicate entry : ignore it.
@@ -204,16 +201,16 @@ public class ZipUtils extends FileUtils {
                     File destFile = new File(dest, entry.getName());
                     createFileWithPath(destFile);
                     InputStream in = new BufferedInputStream(zipFile.getInputStream(entry));
-                    OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
-                    byte[] buffer = new byte[2048];
-                    for (;;) {
-                        int nBytes = in.read(buffer);
-                        if (nBytes <= 0)
-                            break;
-                        out.write(buffer, 0, nBytes);
+                    try (OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile))) {
+                        byte[] buffer = new byte[2048];
+                        for (;;) {
+                            int nBytes = in.read(buffer);
+                            if (nBytes <= 0)
+                                break;
+                            out.write(buffer, 0, nBytes);
+                        }
+                        out.flush();
                     }
-                    out.flush();
-                    out.close();
                     in.close();
                 }
             }

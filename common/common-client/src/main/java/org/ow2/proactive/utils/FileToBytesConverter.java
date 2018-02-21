@@ -50,20 +50,12 @@ public class FileToBytesConverter {
      * @throws IOException
      */
     public static byte[] convertFileToByteArray(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        try {
+        try (FileInputStream fis = new FileInputStream(file)) {
             long length = file.length();
             if (length > 0) {
                 return fastConversion(fis, length);
             } else {
                 return slowConversion(fis);
-            }
-        } finally {
-            try {
-                fis.close();
-            } catch (IOException e) {
-                // We want to throw the exception thrown by the outer try block
-                // not by the close()
             }
         }
     }
@@ -121,8 +113,8 @@ public class FileToBytesConverter {
      * @throws IOException
      */
     public static void convertByteArrayToFile(byte[] array, File file) throws IOException {
-        FileOutputStream outStream = new FileOutputStream(file);
-        outStream.write(array);
-        outStream.close();
+        try (FileOutputStream outStream = new FileOutputStream(file)) {
+            outStream.write(array);
+        }
     }
 }

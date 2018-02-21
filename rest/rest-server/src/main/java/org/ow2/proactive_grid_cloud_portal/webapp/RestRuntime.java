@@ -96,11 +96,9 @@ public class RestRuntime {
     private void configureLogger(File log4jConfig) {
         if (loggerNotConfigured()) {
             if (log4jConfig != null) {
-                try {
-                    InputStream in = new FileInputStream(log4jConfig);
+                try (InputStream in = new FileInputStream(log4jConfig)) {
                     Properties p = new Properties();
                     p.load(in);
-                    in.close();
                     System.setProperty("log4j.configuration", log4jConfig.getAbsolutePath()); // avoid reset by ProActiveLogger
                     PropertyConfigurator.configure(p);
                 } catch (Exception e1) {

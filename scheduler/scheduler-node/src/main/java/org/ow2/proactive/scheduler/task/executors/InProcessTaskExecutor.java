@@ -100,12 +100,12 @@ public class InProcessTaskExecutor implements TaskExecutor {
             }
             File nodesFile = new File(directory, NODES_FILE_DIRECTORY_NAME + "_" + taskContext.getTaskId());
 
-            Writer outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(nodesFile),
-                                                                            PAProperties.getFileEncoding()));
-            for (String nodeHost : nodesHosts) {
-                outputWriter.append(nodeHost).append(System.lineSeparator());
+            try (Writer outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(nodesFile),
+                                                                                 PAProperties.getFileEncoding()))) {
+                for (String nodeHost : nodesHosts) {
+                    outputWriter.append(nodeHost).append(System.lineSeparator());
+                }
             }
-            outputWriter.close();
 
             return nodesFile.getAbsolutePath();
         }

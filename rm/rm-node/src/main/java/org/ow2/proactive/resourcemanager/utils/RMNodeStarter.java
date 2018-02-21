@@ -38,6 +38,8 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.Policy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,6 +94,7 @@ import org.ow2.proactive.resourcemanager.node.jmx.SigarExposer;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.Tools;
+import org.ow2.proactive.utils.Version;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSet;
@@ -265,6 +268,8 @@ public class RMNodeStarter {
 
     private static final String OPTION_DISABLE_MONITORING = "dm";
 
+    private static KeyPairProducer keyPairProducer = new KeyPairProducer();
+
     public RMNodeStarter() {
 
     }
@@ -420,6 +425,7 @@ public class RMNodeStarter {
             RMNodeStarter passiveStarter = new RMNodeStarter();
             String baseNodeName = passiveStarter.configure(args);
 
+            keyPairProducer = new KeyPairProducer(passiveStarter.workers);
             passiveStarter.createNodesAndConnect(baseNodeName);
         } catch (Throwable t) {
             System.err.println("A major problem occurred when trying to start a node and register it into the Resource Manager, see the stacktrace below");
@@ -432,6 +438,10 @@ public class RMNodeStarter {
         }
     }
 
+    public static KeyPair getKeyPair() throws NoSuchAlgorithmException {
+        return keyPairProducer.getKeyPair();
+    }
+
     protected String configure(final String args[]) {
         configureSecurityManager();
         configureRMAndProActiveHomes();
@@ -441,6 +451,8 @@ public class RMNodeStarter {
         String nodeName = parseCommandLine(args);
 
         configureLogging(nodeName);
+
+        logger.info("ProActive Node version is " + Version.PA_VERSION);
 
         logger.info("Using ProActive configuration file : " +
                     System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()));
@@ -1041,7 +1053,7 @@ public class RMNodeStarter {
     /**
      * Checks that user has supplied parameters or override them with java properties values...
      */
-    private void checkUserSuppliedParameters() {
+    protected void checkUserSuppliedParameters() {
         //need an exhaustive list...
         //first, the number of add attempts
         if (!NB_OF_ADD_NODE_ATTEMPTS_USER_SUPPLIED) {
@@ -1353,10 +1365,10 @@ public class RMNodeStarter {
                 logger.warn("NodeURL file already exists ; delete it.");
                 FileUtils.forceDelete(f);
             }
-            BufferedWriter out = new BufferedWriter(new FileWriter(f));
-            out.write(nodeURL);
-            out.write(System.lineSeparator());
-            out.close();
+            try (BufferedWriter out = new BufferedWriter(new FileWriter(f))) {
+                out.write(nodeURL);
+                out.write(System.lineSeparator());
+            }
         } catch (IOException e) {
             logger.warn("NodeURL cannot be created.", e);
         }
@@ -1372,11 +1384,11 @@ public class RMNodeStarter {
         try {
             File f = new File(getNodeURLFilename(nodeName, rank));
             if (f.exists()) {
-                BufferedReader in = new BufferedReader(new FileReader(f));
-                String read = in.readLine();
-                in.close();
-                FileUtils.deleteQuietly(f);
-                return read;
+                try (BufferedReader in = new BufferedReader(new FileReader(f))) {
+                    return in.readLine();
+                } finally {
+                    FileUtils.deleteQuietly(f);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -1392,7 +1404,7 @@ public class RMNodeStarter {
         return new File(tmpDir, URL_TMPFILE_PREFIX + "_" + nodeName + "-" + rank).getAbsolutePath();
     }
 
-    private enum ExitStatus {
+    protected enum ExitStatus {
         OK(0, "Exit success."),
         //mustn't be changed, return value set in the JVM itself
         JVM_ERROR(1, "Problem with the Java process itself ( classpath, main method... )."),

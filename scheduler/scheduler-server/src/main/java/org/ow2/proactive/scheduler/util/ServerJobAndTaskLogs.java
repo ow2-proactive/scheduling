@@ -76,6 +76,7 @@ public class ServerJobAndTaskLogs {
 
     public static void remove(JobId jobId) {
         removeFolderLog(jobId.value());
+        removeVisualizationFile(jobId.value());
     }
 
     private static void removeFolderLog(String path) {
@@ -95,6 +96,16 @@ public class ServerJobAndTaskLogs {
             }
         }
 
+    }
+
+    /**
+     * Remove visualization file created by rest server (if present)
+     * see org.ow2.proactive_grid_cloud_portal.studio.StudioRest.updateVisualization
+     */
+    private static void removeVisualizationFile(String jobId) {
+        File visualizationFile = new File(System.getProperty("java.io.tmpdir") + File.separator + "job_" + jobId +
+                                          ".zip.html");
+        org.apache.commons.io.FileUtils.deleteQuietly(visualizationFile);
     }
 
     private static boolean logsLocationIsSet() {
