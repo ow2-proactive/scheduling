@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.common.util;
 
 import java.io.IOException;
 import java.security.KeyException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -206,6 +207,31 @@ public class RMListenerProxy extends RMGroupEventListener {
      */
     public RMInitialState getRMInitialState() {
         return rmInitialState;
+    }
+
+    public RMInitialState getRMInitialState(long filter){
+        long maxCounter = Long.MIN_VALUE;
+        List<RMNodeEvent> rmNodeEvents = new ArrayList<>();
+        for (RMNodeEvent rmNodeEvent : rmInitialState.getNodesEvents()) {
+            if(rmNodeEvent.getCounter() > filter){
+                rmNodeEvents.add(rmNodeEvent);
+                if(maxCounter < rmNodeEvent.getCounter()){
+                    maxCounter = rmNodeEvent.getCounter();
+                }
+            }
+        }
+
+        List<RMNodeSourceEvent> rmNodeSourceEvents = new ArrayList<>();
+        for (RMNodeSourceEvent rmNodeSourceEvent : rmInitialState.getNodeSource()) {
+            if(rmNodeSourceEvent.getCounter() > filter){
+                rmNodeSourceEvents.add(rmNodeSourceEvent);
+                if(maxCounter < rmNodeSourceEvent.getCounter()){
+                    maxCounter = rmNodeSourceEvent.getCounter();
+                }
+            }
+        }
+
+        return new RMInitialState(rmNodeEvents, rmNodeSourceEvents, maxCounter);
     }
 
     /**

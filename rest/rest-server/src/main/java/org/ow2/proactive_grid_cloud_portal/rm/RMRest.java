@@ -264,9 +264,10 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId, @HeaderParam("latestCounter") @DefaultValue("0") String latestCounterClientAware) throws NotConnectedException {
         checkAccess(sessionId);
-        return RMStateCaching.getRMInitialState();
+        long counter = Integer.valueOf(latestCounterClientAware);
+        return RMStateCaching.getRMInitialState(counter);
     }
 
     /**

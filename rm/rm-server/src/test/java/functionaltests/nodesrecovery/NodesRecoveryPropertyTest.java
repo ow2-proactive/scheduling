@@ -28,8 +28,8 @@ package functionaltests.nodesrecovery;
 import static com.google.common.truth.Truth.assertThat;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -135,7 +135,7 @@ public class NodesRecoveryPropertyTest extends RMFunctionalTest {
             rmHelper.createNodeSource(NODE_SOURCE_NAME, NODE_NUMBER);
         }
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
-        ArrayList<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState()
+        List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState()
                                                                                           .getNodeSource();
         assertThat(nodeSourceEventPerNodeSource.size()).isEqualTo(1);
         assertThat(nodeSourceEventPerNodeSource.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
@@ -151,7 +151,7 @@ public class NodesRecoveryPropertyTest extends RMFunctionalTest {
 
         // re-snapshot the RM state
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
-        ArrayList<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
+        List<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
 
         // the node source has been recovered on restart: we should have one node source with the same name
         if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean()) {

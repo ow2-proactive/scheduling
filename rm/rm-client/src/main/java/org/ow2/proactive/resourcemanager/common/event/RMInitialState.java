@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.common.event;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -56,15 +57,22 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 public class RMInitialState implements Serializable {
 
     /** Nodes events */
-    private ArrayList<RMNodeEvent> nodesList = new ArrayList<>();
+    private List<RMNodeEvent> nodesList = new ArrayList<>();
 
     /** Nodes sources AO living in RM */
-    private ArrayList<RMNodeSourceEvent> nodeSources = new ArrayList<>();
+    private List<RMNodeSourceEvent> nodeSources = new ArrayList<>();
+
+    private final long latestCounter;
+
+    public long getLatestCounter() {
+        return latestCounter;
+    }
 
     /**
      * ProActive empty constructor
      */
     public RMInitialState() {
+        latestCounter = 0;
     }
 
     /**
@@ -73,16 +81,24 @@ public class RMInitialState implements Serializable {
      * @param nodesEventList RM's node events.
      * @param nodeSourcesList RM's node sources list.
      */
-    public RMInitialState(ArrayList<RMNodeEvent> nodesEventList, ArrayList<RMNodeSourceEvent> nodeSourcesList) {
+    public RMInitialState(List<RMNodeEvent> nodesEventList, List<RMNodeSourceEvent> nodeSourcesList) {
         this.nodesList = nodesEventList;
         this.nodeSources = nodeSourcesList;
+        this.latestCounter = 0;
     }
+
+    public RMInitialState(List<RMNodeEvent> nodesEventList, List<RMNodeSourceEvent> nodeSourcesList, long latestCounter) {
+        this.nodesList = nodesEventList;
+        this.nodeSources = nodeSourcesList;
+        this.latestCounter = latestCounter;
+    }
+
 
     /**
      * Returns the 'to release' Nodes list.
      * @return the 'to release' Nodes list.
      */
-    public ArrayList<RMNodeEvent> getNodesEvents() {
+    public List<RMNodeEvent> getNodesEvents() {
         return this.nodesList;
     }
 
@@ -90,7 +106,7 @@ public class RMInitialState implements Serializable {
      * Returns the NodeSources list.
      * @return the NodeSources list.
      */
-    public ArrayList<RMNodeSourceEvent> getNodeSource() {
+    public List<RMNodeSourceEvent> getNodeSource() {
         return this.nodeSources;
     }
 
