@@ -193,8 +193,8 @@ public class SchedulerStateRecoverHelper {
             if (taskNodesKnownByRM) {
                 TaskLauncher launcher = task.getExecuterInformation().getLauncher();
                 logger.debug("Checking whether task launcher has called its doTask method: " +
-                             launcher.getDoTaskInvoked());
-                if (launcher.getDoTaskInvoked()) {
+                             launcher.isTaskStarted());
+                if (launcher.isTaskStarted()) {
                     logger.info("Recover running task " + task.getId() + " (" + task.getName() +
                                 ") successfully with task launcher " + launcher);
                     resetToPending = false;

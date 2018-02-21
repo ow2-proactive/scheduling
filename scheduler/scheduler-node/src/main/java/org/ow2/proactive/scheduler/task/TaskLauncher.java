@@ -104,7 +104,7 @@ public class TaskLauncher implements InitActive {
 
     private TaskLauncherRebinder taskLauncherRebinder;
 
-    private AtomicBoolean doTaskInvoked = new AtomicBoolean(false);
+    private AtomicBoolean taskStarted = new AtomicBoolean(false);
 
     /**
      * Needed for ProActive but should never be used manually to create an instance of the object.
@@ -146,8 +146,8 @@ public class TaskLauncher implements InitActive {
     }
 
     @ImmediateService
-    public boolean getDoTaskInvoked() {
-        return doTaskInvoked.get();
+    public boolean isTaskStarted() {
+        return taskStarted.get();
     }
 
     void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
@@ -166,7 +166,7 @@ public class TaskLauncher implements InitActive {
         TaskDataspaces dataspaces = null;
 
         try {
-            doTaskInvoked.set(true);
+            taskStarted.set(true);
 
             logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
 
