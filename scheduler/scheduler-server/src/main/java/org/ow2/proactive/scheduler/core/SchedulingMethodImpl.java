@@ -36,7 +36,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -665,17 +664,31 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         dotaskActionTimeout = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
                     }
 
-                    Future<Void> taskExecutionSubmittedFuture = threadPool.submitWithTimeout(new TimedDoTaskAction(job,
-                                                                                                                   taskDescriptor,
-                                                                                                                   launcher,
-                                                                                                                   schedulingService,
-                                                                                                                   terminateNotification,
-                                                                                                                   corePrivateKey,
-                                                                                                                   terminateNotificationNodeURL),
-                                                                                             dotaskActionTimeout,
-                                                                                             TimeUnit.MILLISECONDS);
-                    waitForTaskToBeStarted(taskExecutionSubmittedFuture);
+                    threadPool.submitWithTimeout(new TimedDoTaskAction(job,
+                                                                       taskDescriptor,
+                                                                       launcher,
+                                                                       schedulingService,
+                                                                       terminateNotification,
+                                                                       corePrivateKey,
+                                                                       terminateNotificationNodeURL),
 
+                                                 dotaskActionTimeout,
+                                                 TimeUnit.MILLISECONDS);
+
+                    // we advertise here that the task is started, however
+                    // this is not entirely true: the only thing we are sure
+                    // about at this point is that we submitted to the thread
+                    // pool the action that will call the "doTask" of the task
+                    // launcher. There is thus a small gap here where the task
+                    // is seen as started whereas it is not yet started. We
+                    // cannot easily move the task started notification because
+                    // 1) it makes the job lock acquisition less predictable
+                    // (because the TimeDoTaskAction will have to compete with
+                    // the SchedulingMethodImpl)
+                    // and more importantly 2) the
+                    // SchedulingMethodImpl#createExecution may happen to be
+                    // called a second time for the task that is currently being
+                    // started by the TimedDoTaskAction.
                     finalizeStarting(job, task, node, launcher);
                     return true;
                 } catch (Exception t) {
@@ -698,17 +711,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
         }
 
-    }
-
-    private void waitForTaskToBeStarted(Future<Void> taskExecutionSubmittedFuture) {
-        try {
-            // before signaling that the task is started, we need
-            // to make sure the task is correctly submitted to the
-            // task launcher
-            taskExecutionSubmittedFuture.get(dotaskActionTimeout, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            logger.warn("Error while waiting for the task to be started.", e);
-        }
     }
 
     /**
