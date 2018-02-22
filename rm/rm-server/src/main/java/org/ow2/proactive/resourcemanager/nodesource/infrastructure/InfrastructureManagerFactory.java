@@ -81,6 +81,19 @@ public class InfrastructureManagerFactory {
     }
 
     /**
+      * Creates a new infrastructure manager and recovers its state thanks to
+      * the variables contained in {@param infrastructureVariables}.
+      *
+      * @param nodeSourceData the persisted information about the node source
+      * @return recovered infrastructure manager
+      */
+    public static InfrastructureManager recover(NodeSourceData nodeSourceData) {
+        InfrastructureManager infrastructure = create(nodeSourceData);
+        infrastructure.recoverPersistedInfraVariables(nodeSourceData.getInfrastructureVariables());
+        return infrastructure;
+    }
+
+    /**
      * Loads a list of supported infrastructures from a configuration file
      * @return list of supported infrastructures
      */

@@ -1276,19 +1276,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         logger.info("Deploy node source : " + nodeSourceName);
 
-        boolean existPersistedNodes = existPersistedNodes(nodeSourceName, nodeSourceToDeploy.nodesRecoverable());
-
-        // we need to reload the infrastructure variables saved in database if
-        // we recover the nodes
-        if (existPersistedNodes) {
-            InfrastructureManager infrastructureManager = nodeSourceToDeploy.getInfrastructureManager();
-            infrastructureManager.recoverPersistedInfraVariables(descriptor.getLastRecoveredInfrastructureVariables());
-            if (!infrastructureManager.getDeployingAndLostNodes().isEmpty()) {
-                dbManager.removeAllNodesFromNodeSource(nodeSourceName);
-                infrastructureManager.resetPersistedInfraVariables();
-                existPersistedNodes = false;
-            }
-        }
+        boolean existPersistedNodes = nodesRecoveryManager.recoverInfrastructureVariablesIfNeeded(nodeSourceName,
+                                                                                                  nodeSourceToDeploy,
+                                                                                                  descriptor);
 
         NodeSourcePolicy policy = NodeSourcePolicyFactory.turnActivePolicy(nodeSourceToDeploy.getPolicy(),
                                                                            descriptor.getPolicyParameters());
@@ -1363,28 +1353,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         return nodeSourceData;
-    }
-
-    /**
-     * @return whether there are nodes in database for the given node source
-     *
-     * In case of a recovery, we need to check whether there are nodes in
-     * database for this node source, otherwise, we will do a redeployment
-     * from scratch. The reason is that when the RM shuts down correctly,
-     * it removes all its nodes. Thus if we restart and recover the RM
-     * afterwards there will be no nodes in the database.
-     */
-    private boolean existPersistedNodes(String nodeSourceName, boolean nodesRecoverable) {
-        boolean recoverNodes = false;
-        if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() && nodesRecoverable) {
-            Collection<RMNodeData> nodesData = dbManager.getNodesByNodeSource(nodeSourceName);
-            if (nodesData.isEmpty()) {
-                logger.info("No node found in database for node source: " + nodeSourceName);
-            } else {
-                recoverNodes = true;
-            }
-        }
-        return recoverNodes;
     }
 
     /**

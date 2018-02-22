@@ -114,7 +114,7 @@ public class NodeSource implements InitActive, RunActive {
     /** unique name of the source */
     private final String name;
 
-    private final InfrastructureManager infrastructureManager;
+    private InfrastructureManager infrastructureManager;
 
     // The policy is not final: when the node source is defined, the policy is
     // not an activity. When the node source is deployed, the policy is turned
@@ -532,8 +532,8 @@ public class NodeSource implements InitActive, RunActive {
         return rmcore.setDeploying(deployingNode);
     }
 
-    public InfrastructureManager getInfrastructureManager() {
-        return infrastructureManager;
+    public void setInfrastructureManager(InfrastructureManager infrastructureManager) {
+        this.infrastructureManager = infrastructureManager;
     }
 
     public NodeSourcePolicy getPolicy() {

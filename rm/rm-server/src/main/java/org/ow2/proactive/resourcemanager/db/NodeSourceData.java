@@ -92,14 +92,16 @@ public class NodeSourceData implements Serializable {
     }
 
     public static NodeSourceData fromNodeSourceDescriptor(NodeSourceDescriptor descriptor) {
-        return new NodeSourceData(descriptor.getName(),
-                                  descriptor.getInfrastructureType(),
-                                  descriptor.getInfrastructureParameters(),
-                                  descriptor.getPolicyType(),
-                                  descriptor.getPolicyParameters(),
-                                  descriptor.getProvider(),
-                                  descriptor.nodesRecoverable(),
-                                  descriptor.getStatus());
+        NodeSourceData nodeSourceData = new NodeSourceData(descriptor.getName(),
+                                                           descriptor.getInfrastructureType(),
+                                                           descriptor.getInfrastructureParameters(),
+                                                           descriptor.getPolicyType(),
+                                                           descriptor.getPolicyParameters(),
+                                                           descriptor.getProvider(),
+                                                           descriptor.nodesRecoverable(),
+                                                           descriptor.getStatus());
+        nodeSourceData.setInfrastructureVariables(descriptor.getLastRecoveredInfrastructureVariables());
+        return nodeSourceData;
     }
 
     @Id

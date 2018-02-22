@@ -40,7 +40,10 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManagerFactory;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 import com.google.common.base.Function;
@@ -108,6 +111,37 @@ public class NodesRecoveryManager {
                 recoverDeployedNodeSourceIfNeeded(nodeSourceData, nodeSourceName);
             }
         }
+    }
+
+    public boolean recoverInfrastructureVariablesIfNeeded(String nodeSourceName, NodeSource nodeSourceToDeploy,
+            NodeSourceDescriptor descriptor) {
+        boolean existPersistedNodes = existPersistedNodes(nodeSourceName, nodeSourceToDeploy.nodesRecoverable());
+        boolean recoverNodes = existPersistedNodes;
+
+        if (existPersistedNodes) {
+            InfrastructureManager im = InfrastructureManagerFactory.recover(NodeSourceData.fromNodeSourceDescriptor(descriptor));
+            if (!im.getDeployingAndLostNodes().isEmpty()) {
+                // if there are deploying nodes, we will not recover
+                rmCore.getDbManager().removeAllNodesFromNodeSource(nodeSourceName);
+                recoverNodes = false;
+            } else {
+                nodeSourceToDeploy.setInfrastructureManager(im);
+            }
+        }
+        return recoverNodes;
+    }
+
+    private boolean existPersistedNodes(String nodeSourceName, boolean nodesRecoverable) {
+        boolean recoverNodes = false;
+        if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() && nodesRecoverable) {
+            Collection<RMNodeData> nodesData = rmCore.getDbManager().getNodesByNodeSource(nodeSourceName);
+            if (nodesData.isEmpty()) {
+                logger.info("No node found in database for node source: " + nodeSourceName);
+            } else {
+                recoverNodes = true;
+            }
+        }
+        return recoverNodes;
     }
 
     private void recoverDeployedNodeSourceIfNeeded(NodeSourceData nodeSourceDescriptor, String nodeSourceName) {
