@@ -81,6 +81,7 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.NSState;
+import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
@@ -247,7 +248,7 @@ public class RMRest implements RMRestInterface {
     @GET
     @Path("state")
     @Produces("application/json")
-    public org.ow2.proactive.resourcemanager.common.RMState getState(@HeaderParam("sessionid") String sessionId)
+    public RMState getState(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getState());

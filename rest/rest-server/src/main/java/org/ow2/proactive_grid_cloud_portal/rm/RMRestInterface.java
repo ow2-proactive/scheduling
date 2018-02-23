@@ -59,6 +59,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.NSState;
+import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -120,7 +121,7 @@ public interface RMRestInterface {
     @GET
     @Path("state")
     @Produces("application/json")
-    org.ow2.proactive.resourcemanager.common.RMState getState(@HeaderParam("sessionid") String sessionId)
+    RMState getState(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException;
 
     @GET

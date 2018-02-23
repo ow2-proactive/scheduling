@@ -47,10 +47,11 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
  * and get an initial state which is the snapshot of Resource Manager state, with its
  * nodes and NodeSources.
  *
- * @author The ProActive Team
  * @see RMNodeEvent
  * @see RMNodeSourceEvent
  * @see RMMonitoring
+ *
+ * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
