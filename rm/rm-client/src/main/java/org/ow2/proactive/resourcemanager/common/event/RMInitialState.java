@@ -111,34 +111,43 @@ public class RMInitialState implements Serializable {
     }
 
     public void nodeAdded(RMNodeEvent event) {
+        updateCounter(event);
         nodeEvents.put(event.getNodeUrl(), event);
+
     }
 
     public void nodeStateChanged(RMNodeEvent event) {
+        updateCounter(event);
         nodeEvents.put(event.getNodeUrl(), event);
     }
 
     public void nodeRemoved(RMNodeEvent event) {
+        updateCounter(event);
         nodeEvents.put(event.getNodeUrl(), event);
     }
 
     public void nodeSourceAdded(RMNodeSourceEvent event) {
+        updateCounter(event);
         nodeSourceEvents.put(event.getSourceName(), event);
     }
 
     public void nodeSourceRemoved(RMNodeSourceEvent event) {
+        updateCounter(event);
         nodeSourceEvents.remove(event.getSourceName());
     }
 
-
+    private void updateCounter(RMEvent event) {
+        latestCounter = Math.max(latestCounter, event.getCounter());
+    }
 
     public RMInitialState cloneAndFilter(long filter) {
+        long actualFilter = Math.min(filter, latestCounter);
         RMInitialState clone = new RMInitialState();
 
-        clone.nodeEvents = newFilteredEvents(this.nodeEvents, filter);
-        clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, filter);
+        clone.nodeEvents = newFilteredEvents(this.nodeEvents, actualFilter);
+        clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, actualFilter);
 
-        clone.latestCounter = Math.max(filter,
+        clone.latestCounter = Math.max(actualFilter,
                                        Math.max(findLargestCounter(clone.nodeEvents.values()),
                                                 findLargestCounter(clone.nodeSourceEvents.values())));
         return clone;
