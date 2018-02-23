@@ -248,8 +248,7 @@ public class RMRest implements RMRestInterface {
     @GET
     @Path("state")
     @Produces("application/json")
-    public RMState getState(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException {
+    public RMState getState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getState());
     }

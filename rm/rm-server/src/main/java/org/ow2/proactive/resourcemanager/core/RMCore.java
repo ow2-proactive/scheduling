@@ -1903,8 +1903,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         RMStateNodeUrls rmStateNodeUrls = new RMStateNodeUrls(nodesListToUrlsSet(eligibleNodes),
                                                               listAliveNodeUrls(),
                                                               nodesListToUrlsSet(allNodes.values()));
-        RMState state = new RMState(rmStateNodeUrls,
-                                                                                                                      maximumNumberOfNodes);
+        RMState state = new RMState(rmStateNodeUrls, maximumNumberOfNodes);
         return state;
     }
 

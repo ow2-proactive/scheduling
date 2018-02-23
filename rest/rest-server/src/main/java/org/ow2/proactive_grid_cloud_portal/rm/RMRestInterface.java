@@ -121,8 +121,7 @@ public interface RMRestInterface {
     @GET
     @Path("state")
     @Produces("application/json")
-    RMState getState(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException;
+    RMState getState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @GET
     @GZIP
