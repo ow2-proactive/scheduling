@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import static org.apache.http.entity.ContentType.*;
+import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand.SET_INFRASTRUCTURE;
@@ -33,6 +33,7 @@ import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceComman
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand.SET_POLICY;
 
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
@@ -42,45 +43,21 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
-/**
- * @deprecated  As of release 7.37, replaced by
- * {@link DefineNodeSourceCommand)} and {@link DeployNodeSourceCommand}
- */
-@Deprecated
-public class CreateNodeSourceCommand extends AbstractCommand implements Command {
-    private String nodeSource;
+public class DeployNodeSourceCommand extends AbstractCommand implements Command {
 
-    private String nodesRecoverable;
+    private static final String RM_REST_ENDPOINT = "nodesource/deploy";
 
-    public CreateNodeSourceCommand(String nodeSource) {
-        this.nodeSource = nodeSource;
-        this.nodesRecoverable = "true";
-    }
+    private String nodeSourceName;
 
-    public CreateNodeSourceCommand(String nodeSource, String nodesRecoverable) {
-        this.nodeSource = nodeSource;
-        this.nodesRecoverable = nodesRecoverable;
+    public DeployNodeSourceCommand(String nodeSourceName) {
+        this.nodeSourceName = nodeSourceName;
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        QueryStringBuilder infrastructure = currentContext.getProperty(SET_INFRASTRUCTURE, QueryStringBuilder.class);
-        QueryStringBuilder policy = currentContext.getProperty(SET_POLICY, QueryStringBuilder.class);
-        if (infrastructure == null) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, "Infrastructure not specified");
-        }
-        if (policy == null) {
-            throw new CLIException(REASON_INVALID_ARGUMENTS, "Policy not specified");
-        }
-        if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
-            nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
-        }
-        HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/create/recovery"));
+        HttpPut request = new HttpPut(currentContext.getResourceUrl(RM_REST_ENDPOINT));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("nodeSourceName", nodeSource)
-                          .addAll(infrastructure)
-                          .addAll(policy)
-                          .add("nodesRecoverable", nodesRecoverable);
+        queryStringBuilder.add("nodeSourceName", nodeSourceName);
         request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
@@ -88,12 +65,12 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
             boolean success = nsState.isResult();
             resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext, "Node source successfully created.");
+                writeLine(currentContext, "Node source successfully deployed.");
             } else {
-                writeLine(currentContext, "%s %s", "Cannot create node source:", nodeSource);
+                writeLine(currentContext, "%s %s", "Cannot deploy node source:", nodeSourceName);
             }
         } else {
-            handleError("An error occurred while creating node source:", response, currentContext);
+            handleError("An error occurred while deploying node source:", response, currentContext);
 
         }
     }

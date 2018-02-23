@@ -88,6 +88,12 @@ public class AbstractFunctCmdTest extends AbstractRestFuncTestCase {
         userInput.append("\n");
     }
 
+    protected void clearAndTypeLine(String line) {
+        userInput = new StringBuffer();
+        userInput.append(line);
+        userInput.append("\n");
+    }
+
     protected void cleanScheduler() throws NotConnectedException, PermissionException, UnknownJobException {
         scheduler = RestFuncTHelper.getScheduler();
         SchedulerState state = scheduler.getState();

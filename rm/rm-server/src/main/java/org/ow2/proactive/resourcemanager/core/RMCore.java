@@ -1014,7 +1014,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, preemptive, isTriggeredFromShutdownHook));
     }
 
-    public void recoverEligibleNodes(List<RMNode> eligibleNodes) {
+    protected void recoverEligibleNodes(List<RMNode> eligibleNodes) {
         this.eligibleNodes = eligibleNodes;
     }
 
@@ -1219,7 +1219,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    public void createNotActiveNodeSource(NodeSourceData persistedNodeSource) {
+    protected void createNotActiveNodeSource(NodeSourceData persistedNodeSource) {
         InfrastructureManager infrastructureManager = InfrastructureManagerFactory.create(persistedNodeSource);
 
         NodeSourcePolicy notActivePolicy = NodeSourcePolicyFactory.createNotActive(persistedNodeSource.getPolicyType());

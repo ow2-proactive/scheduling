@@ -30,7 +30,7 @@ import org.junit.runners.Suite;
 
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TagCommandsFunctTest.class })
+@Suite.SuiteClasses({ TagCommandsFunctTest.class, NodeSourceCommandsFunctTest.class })
 
 /**
  * @author ActiveEon Team
