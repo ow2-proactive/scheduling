@@ -165,20 +165,13 @@ public class RMListenerProxy extends RMGroupEventListener {
         switch (event.getEventType()) {
             case NODESOURCE_DEFINED:
                 rmInitialState.getNodeSource().add(event);
-                break;
             case NODESOURCE_CREATED:
                 rmInitialState.nodeSourceStateChanged(event);
                 break;
             case NODESOURCE_REMOVED:
-                for (int i = 0; i < rmInitialState.getNodeSource().size(); i++) {
-                    if (rmInitialState.getNodeSource().get(i).getSourceName().equals(event.getSourceName())) {
-                        rmInitialState.getNodeSource().remove(i);
-                        break;
-                    }
-                }
+                rmInitialState.nodeSourceRemoved(event);
                 break;
         }
-
         checkCounter(event);
     }
 
@@ -206,32 +199,11 @@ public class RMListenerProxy extends RMGroupEventListener {
      * @return the local version of the initial state
      */
     public RMInitialState getRMInitialState() {
-        return rmInitialState;
+        return getRMInitialState(-1);
     }
 
     public RMInitialState getRMInitialState(long filter){
-        long maxCounter = Long.MIN_VALUE;
-        List<RMNodeEvent> rmNodeEvents = new ArrayList<>();
-        for (RMNodeEvent rmNodeEvent : rmInitialState.getNodesEvents()) {
-            if(rmNodeEvent.getCounter() > filter){
-                rmNodeEvents.add(rmNodeEvent);
-                if(maxCounter < rmNodeEvent.getCounter()){
-                    maxCounter = rmNodeEvent.getCounter();
-                }
-            }
-        }
-
-        List<RMNodeSourceEvent> rmNodeSourceEvents = new ArrayList<>();
-        for (RMNodeSourceEvent rmNodeSourceEvent : rmInitialState.getNodeSource()) {
-            if(rmNodeSourceEvent.getCounter() > filter){
-                rmNodeSourceEvents.add(rmNodeSourceEvent);
-                if(maxCounter < rmNodeSourceEvent.getCounter()){
-                    maxCounter = rmNodeSourceEvent.getCounter();
-                }
-            }
-        }
-
-        return new RMInitialState(rmNodeEvents, rmNodeSourceEvents, maxCounter);
+        return rmInitialState.cloneAndFilter(filter);
     }
 
     /**

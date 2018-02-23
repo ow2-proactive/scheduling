@@ -135,7 +135,12 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
     @Override
     public RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator) {
 
-        RMNodeEvent rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState, initiator);
+        RMNodeEvent rmNodeEvent = null;
+        if(eventType == RMEventType.NODE_REMOVED){
+            rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState, initiator, NodeState.REMOVED);
+        }else{
+            rmNodeEvent = new RMNodeEvent(toNodeDescriptor(), eventType, previousNodeState, initiator);
+        }
 
         // The rm node always keeps track on its last event, this is needed for rm node events logic
         if (eventType != null) {

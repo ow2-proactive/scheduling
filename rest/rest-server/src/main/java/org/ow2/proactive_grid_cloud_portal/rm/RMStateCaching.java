@@ -26,10 +26,6 @@
 package org.ow2.proactive_grid_cloud_portal.rm;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -39,8 +35,6 @@ import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
@@ -72,8 +66,7 @@ public class RMStateCaching {
 
             try {
                 if (rm == null) {
-                    RMProxyUserInterface
-                            rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[]{});
+                    rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[]{});
 
                     if (cred_path != null && !(new File(cred_path)).exists()) {
                         logger.error("Credentials path set in " + PortalConfiguration.RM_CACHE_CREDENTIALS.getKey() +

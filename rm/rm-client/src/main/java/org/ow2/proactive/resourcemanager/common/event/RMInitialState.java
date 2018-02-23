@@ -27,8 +27,10 @@ package org.ow2.proactive.resourcemanager.common.event;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -45,108 +47,151 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
  * and get an initial state which is the snapshot of Resource Manager state, with its
  * nodes and NodeSources.
  *
+ * @author The ProActive Team
  * @see RMNodeEvent
  * @see RMNodeSourceEvent
  * @see RMMonitoring
- *
- * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
 @XmlRootElement
 public class RMInitialState implements Serializable {
 
-    /** Nodes events */
-    private List<RMNodeEvent> nodesList = new ArrayList<>();
+    /**
+     * Nodes events
+     */
+    private Map<String, RMNodeEvent> nodeEvents = new ConcurrentHashMap<>();
 
-    /** Nodes sources AO living in RM */
-    private List<RMNodeSourceEvent> nodeSources = new ArrayList<>();
+    /**
+     * Nodes sources AO living in RM
+     */
+    private Map<String, RMNodeSourceEvent> nodeSourceEvents = new ConcurrentHashMap<>();
 
-    private final long latestCounter;
+    private Map<String, RMNodeSourceEvent> removeNodeSourceEvents = new ConcurrentHashMap<>();
 
-    public long getLatestCounter() {
-        return latestCounter;
-    }
+    private long latestCounter = -1;
 
     /**
      * ProActive empty constructor
      */
     public RMInitialState() {
-        latestCounter = 0;
+
     }
 
     /**
      * Creates an InitialState object.
      *
-     * @param nodesEventList RM's node events.
+     * @param nodesEventList  RM's node events.
      * @param nodeSourcesList RM's node sources list.
      */
-    public RMInitialState(List<RMNodeEvent> nodesEventList, List<RMNodeSourceEvent> nodeSourcesList) {
-        this.nodesList = nodesEventList;
-        this.nodeSources = nodeSourcesList;
-        this.latestCounter = 0;
-    }
-
-    public RMInitialState(List<RMNodeEvent> nodesEventList, List<RMNodeSourceEvent> nodeSourcesList, long latestCounter) {
-        this.nodesList = nodesEventList;
-        this.nodeSources = nodeSourcesList;
-        this.latestCounter = latestCounter;
+    public RMInitialState(Map<String, RMNodeEvent> nodesEventList, Map<String, RMNodeSourceEvent> nodeSourcesList) {
+        this.nodeEvents = nodesEventList;
+        this.nodeSourceEvents = nodeSourcesList;
     }
 
 
     /**
-     * Returns the 'to release' Nodes list.
-     * @return the 'to release' Nodes list.
+     * Current version of RM portal and maybe other clients expects "nodesEvents" inside JSON
+     *
+     * @return
      */
     public List<RMNodeEvent> getNodesEvents() {
-        return this.nodesList;
+        return new ArrayList(this.nodeEvents.values());
     }
+
 
     /**
-     * Returns the NodeSources list.
-     * @return the NodeSources list.
+     * Current version of RM portal and maybe other clients expects "nodeSource" inside JSON
+     *
+     * @return
      */
     public List<RMNodeSourceEvent> getNodeSource() {
-        return this.nodeSources;
+        return new ArrayList<>(this.nodeSourceEvents.values());
     }
 
-    public void nodeStateChanged(RMNodeEvent stateChangedEvent) {
-        int size = nodesList.size();
-        for (int i = 0; i < size; i++) {
-            if (stateChangedEvent.getNodeUrl().equals(nodesList.get(i).getNodeUrl())) {
-                nodesList.set(i, stateChangedEvent);
-                break;
-            }
-        }
+
+    public long getLatestCounter() {
+        return latestCounter;
     }
 
-    public void nodeRemoved(RMNodeEvent removedEvent) {
-        Iterator<RMNodeEvent> events = nodesList.iterator();
-        while (events.hasNext()) {
-            RMNodeEvent nodeEvent = events.next();
-            if (removedEvent.getNodeUrl().equals(nodeEvent.getNodeUrl())) {
-                events.remove();
-                break;
-            }
-        }
+
+    public Collection<RMNodeSourceEvent> getRemoveNodeSourceEvents() {
+        return removeNodeSourceEvents.values();
     }
 
     public void nodeAdded(RMNodeEvent event) {
-        nodesList.add(event);
+        nodeEvents.put(event.getNodeUrl(), event);
+    }
+
+    public void nodeStateChanged(RMNodeEvent event) {
+        nodeEvents.put(event.getNodeUrl(), event);
+    }
+
+    public void nodeRemoved(RMNodeEvent event) {
+        nodeEvents.put(event.getNodeUrl(), event);
+    }
+
+    public void nodeSourceAdded(RMNodeSourceEvent event) {
+        nodeSourceEvents.put(event.getSourceName(), event);
+    }
+
+    public void nodeSourceRemoved(RMNodeSourceEvent event) {
+        nodeSourceEvents.remove(event.getSourceName());
+        removeNodeSourceEvents.put(event.getSourceName(), event);
+    }
+
+
+
+    public RMInitialState cloneAndFilter(long filter) {
+        RMInitialState clone = new RMInitialState();
+
+        clone.nodeEvents = newFilteredEvents(this.nodeEvents, filter);
+        clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, filter);
+        clone.removeNodeSourceEvents = newFilteredEvents(this.removeNodeSourceEvents, filter);
+
+        clone.latestCounter = Math.max(
+                Math.max(
+                        findLargestCounter(clone.nodeEvents.values()),
+                        findLargestCounter(clone.nodeSourceEvents.values())),
+                Math.max(
+                        filter,
+                        findLargestCounter(clone.removeNodeSourceEvents.values())));
+
+        return clone;
+    }
+
+    private <T extends RMEvent> Map<String, T> newFilteredEvents(Map<String, T> events, long filter) {
+        Map<String, T> result = new ConcurrentHashMap<>();
+        for (Map.Entry<String, T> entry : events.entrySet()) {
+            if(entry.getValue().getCounter() > filter){
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
+    }
+
+    private <T extends RMEvent> long findLargestCounter(Collection<T> events) {
+        long result = 0;
+        for (T event : events) {
+            if (result < event.getCounter()) {
+                result = event.getCounter();
+            }
+        }
+        return result;
     }
 
     public void nodeSourceStateChanged(RMNodeSourceEvent stateChangedEvent) {
         boolean existNodeSource = false;
-        int size = nodeSources.size();
+        int size = nodeSourceEvents.size();
         for (int i = 0; i < size; i++) {
-            if (stateChangedEvent.getSourceName().equals(nodeSources.get(i).getSourceName())) {
+            if (stateChangedEvent.getSourceName().equals(nodeSourceEvents.get(i).getSourceName())) {
                 existNodeSource = true;
-                nodeSources.set(i, stateChangedEvent);
+                nodeSourceEvents.put(stateChangedEvent.getSourceName(), stateChangedEvent);
                 break;
             }
         }
         if (!existNodeSource) {
-            nodeSources.add(stateChangedEvent);
+            nodeSourceEvents.put(stateChangedEvent.getSourceName(), stateChangedEvent);
         }
     }
 }

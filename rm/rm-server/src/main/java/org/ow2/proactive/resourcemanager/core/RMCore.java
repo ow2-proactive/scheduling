@@ -78,7 +78,6 @@ import org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl;
 import org.ow2.proactive.resourcemanager.cleaning.NodesCleaner;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
-import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.RMStateNodeUrls;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -1602,15 +1601,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         Collection<RMNode> nodes = this.allNodes.values();
         ArrayList<RMNodeEvent> nodesList = new ArrayList<>(nodes.size());
 
-        for (RMNode rmnode : nodes) {
-            nodesList.add(rmnode.createNodeEvent());
+        Map<String, RMNodeEvent> nodeEvents = new HashMap<>();
+        for (RMNode rmnode : this.allNodes.values()) {
+            final RMNodeEvent nodeEvent = rmnode.createNodeEvent();
+            nodeEvents.put(nodeEvent.getNodeUrl(), nodeEvent);
         }
 
-        ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<>(this.deployedNodeSources.size() +
+        Map<String, RMNodeSourceEvent> nodeSourcesList = new HashMap<>(this.deployedNodeSources.size() +
                                                                        this.undeployedNodeSources.size());
 
         for (NodeSource s : this.deployedNodeSources.values()) {
-            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(),
+            nodeSourcesList.put(s.getName(), new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
                                                       s.getDescriptor().getStatus().toString()));
@@ -1620,13 +1621,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         for (NodeSource s : this.undeployedNodeSources.values()) {
-            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(),
+            nodeSourcesList.put(s.getName(), new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
                                                       s.getDescriptor().getStatus().toString()));
         }
 
-        return new RMInitialState(nodesList, nodeSourcesList);
+        return new RMInitialState(nodeEvents, nodeSourcesList);
     }
 
     /**
@@ -1897,11 +1898,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    public RMState getState() {
+    public org.ow2.proactive.resourcemanager.common.RMState getState() {
         RMStateNodeUrls rmStateNodeUrls = new RMStateNodeUrls(nodesListToUrlsSet(eligibleNodes),
                                                               listAliveNodeUrls(),
                                                               nodesListToUrlsSet(allNodes.values()));
-        RMState state = new RMState(rmStateNodeUrls, maximumNumberOfNodes);
+        org.ow2.proactive.resourcemanager.common.RMState state = new org.ow2.proactive.resourcemanager.common.RMState(rmStateNodeUrls, maximumNumberOfNodes);
         return state;
     }
 
