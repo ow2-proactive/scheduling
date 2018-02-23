@@ -67,8 +67,6 @@ public class RMInitialState implements Serializable {
      */
     private Map<String, RMNodeSourceEvent> nodeSourceEvents = new ConcurrentHashMap<>();
 
-    private Map<String, RMNodeSourceEvent> removeNodeSourceEvents = new ConcurrentHashMap<>();
-
     private long latestCounter = -1;
 
     /**
@@ -114,11 +112,6 @@ public class RMInitialState implements Serializable {
         return latestCounter;
     }
 
-
-    public Collection<RMNodeSourceEvent> getRemoveNodeSourceEvents() {
-        return removeNodeSourceEvents.values();
-    }
-
     public void nodeAdded(RMNodeEvent event) {
         nodeEvents.put(event.getNodeUrl(), event);
     }
@@ -135,9 +128,8 @@ public class RMInitialState implements Serializable {
         nodeSourceEvents.put(event.getSourceName(), event);
     }
 
-    public void nodeSourceRemoved(RMNodeSourceEvent event) {
-        nodeSourceEvents.remove(event.getSourceName());
-        removeNodeSourceEvents.put(event.getSourceName(), event);
+    public void nodeSourceRemoved(RMNodeSourceEvent event)  {
+        nodeSourceEvents.put(event.getSourceName(), event);
     }
 
 
@@ -147,23 +139,18 @@ public class RMInitialState implements Serializable {
 
         clone.nodeEvents = newFilteredEvents(this.nodeEvents, filter);
         clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, filter);
-        clone.removeNodeSourceEvents = newFilteredEvents(this.removeNodeSourceEvents, filter);
 
-        clone.latestCounter = Math.max(
-                Math.max(
-                        findLargestCounter(clone.nodeEvents.values()),
-                        findLargestCounter(clone.nodeSourceEvents.values())),
-                Math.max(
-                        filter,
-                        findLargestCounter(clone.removeNodeSourceEvents.values())));
-
+        clone.latestCounter = Math.max( filter,
+                                        Math.max(
+                                            findLargestCounter(clone.nodeEvents.values()),
+                                            findLargestCounter(clone.nodeSourceEvents.values())));
         return clone;
     }
 
     private <T extends RMEvent> Map<String, T> newFilteredEvents(Map<String, T> events, long filter) {
         Map<String, T> result = new ConcurrentHashMap<>();
         for (Map.Entry<String, T> entry : events.entrySet()) {
-            if(entry.getValue().getCounter() > filter){
+            if (entry.getValue().getCounter() > filter) {
                 result.put(entry.getKey(), entry.getValue());
             }
         }
