@@ -27,10 +27,7 @@ package org.ow2.proactive.resourcemanager.core;
 
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
@@ -108,54 +105,53 @@ public class NodesRecoveryManager {
                 // will be recreated by SchedulerStarter
                 rmCore.getDbManager().removeNodeSource(nodeSourceName);
             } else {
-                recoverDeployedNodeSourceIfNeeded(nodeSourceData, nodeSourceName);
+                recoverNodeSourceSuccessfullyOrRemove(nodeSourceData, nodeSourceName);
             }
         }
     }
 
-    public boolean recoverInfrastructureVariablesIfNeeded(String nodeSourceName, NodeSource nodeSourceToDeploy,
+    public boolean recoverFullyDeployedInfrastructureOrReset(String nodeSourceName, NodeSource nodeSourceToDeploy,
             NodeSourceDescriptor descriptor) {
-        boolean existPersistedNodes = existPersistedNodes(nodeSourceName, nodeSourceToDeploy.nodesRecoverable());
-        boolean recoverNodes = existPersistedNodes;
+        boolean recoverNodes = false;
+        boolean existPersistedNodes = existPersistedNodes(nodeSourceName);
 
         if (existPersistedNodes) {
             InfrastructureManager im = InfrastructureManagerFactory.recover(NodeSourceData.fromNodeSourceDescriptor(descriptor));
             if (!im.getDeployingAndLostNodes().isEmpty()) {
                 // if there are deploying nodes, we will not recover
                 rmCore.getDbManager().removeAllNodesFromNodeSource(nodeSourceName);
-                recoverNodes = false;
             } else {
+                recoverNodes = true;
                 nodeSourceToDeploy.setInfrastructureManager(im);
             }
         }
         return recoverNodes;
     }
 
-    private boolean existPersistedNodes(String nodeSourceName, boolean nodesRecoverable) {
-        boolean recoverNodes = false;
-        if (PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() && nodesRecoverable) {
-            Collection<RMNodeData> nodesData = rmCore.getDbManager().getNodesByNodeSource(nodeSourceName);
-            if (nodesData.isEmpty()) {
-                logger.info("No node found in database for node source: " + nodeSourceName);
-            } else {
-                recoverNodes = true;
-            }
+    private boolean existPersistedNodes(String nodeSourceName) {
+        boolean existPersistedNodes = false;
+
+        Collection<RMNodeData> nodesData = rmCore.getDbManager().getNodesByNodeSource(nodeSourceName);
+        if (nodesData.isEmpty()) {
+            logger.info("No node found in database for node source: " + nodeSourceName);
+        } else {
+            existPersistedNodes = true;
         }
-        return recoverNodes;
+
+        return existPersistedNodes;
     }
 
-    private void recoverDeployedNodeSourceIfNeeded(NodeSourceData nodeSourceDescriptor, String nodeSourceName) {
+    private void recoverNodeSourceSuccessfullyOrRemove(NodeSourceData nodeSourceData, String nodeSourceName) {
         try {
             logger.info("Recover node source " + nodeSourceName);
             // retrieve node source status
             boolean deployNodeSource = false;
-            if (nodeSourceDescriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
+            if (nodeSourceData.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
+                // reset node source status to be able to deploy again
+                nodeSourceData.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
                 deployNodeSource = true;
             }
-            // reset node source status
-            nodeSourceDescriptor.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
-            rmCore.createNotActiveNodeSource(nodeSourceDescriptor);
-            // repeat node source status
+            rmCore.createNotActiveNodeSource(nodeSourceData);
             if (deployNodeSource) {
                 rmCore.deployNodeSource(nodeSourceName);
             }
@@ -182,46 +178,58 @@ public class NodesRecoveryManager {
         logger.info(START_TO_RECOVER_NODES); // this log line is important for performance tests
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();
         String nodeSourceName = nodeSource.getName();
-
-        makeSureNodeSourceHasNoNode(nodeSource, nodeSourceName);
+        logWarnIfNodeSourceHasNoNode(nodeSource, nodeSourceName);
 
         Collection<RMNodeData> nodesData = rmCore.getDbManager().getNodesByNodeSource(nodeSourceName);
         logger.info("Number of nodes found in database for node source " + nodeSourceName + ": " + nodesData.size());
 
-        Map<NodeState, Integer> nodeStates = new HashMap<>();
-        int totalEligibleRecoveredNodes = 0;
+        List<RMNode> recoveredEligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
+        Map<NodeState, Integer> recoveredNodeStatesCounter = new HashMap<>();
 
         // for each node found in database, try to lookup node or recover it
         // as down node
         for (RMNodeData rmNodeData : nodesData) {
             String nodeUrl = rmNodeData.getNodeUrl();
-            RMNode rmnode = null;
 
             Node node = tryToLookupNode(nodeSource, lookUpTimeout, nodeUrl);
+            RMNode rmnode = recoverRMNode(nodeSource, recoveredNodeStatesCounter, rmNodeData, nodeUrl, node);
 
-            if (node != null) {
-                rmnode = recoverNodeInternally(nodeSource, rmNodeData, nodeUrl, node);
-                nodesLockRestorationManager.handle(rmnode, rmNodeData.getProvider());
-                Integer nbNodesInState = nodeStates.get(rmnode.getState());
-                int newNbNodesInState = nbNodesInState == null ? 1 : nbNodesInState + 1;
-                nodeStates.put(rmnode.getState(), newNbNodesInState);
-            } else {
-                // the node is not recoverable and does not appear in any data
-                // structures: we can remove it safely from database
-                rmCore.getDbManager().removeNode(rmNodeData);
-                triggerDownNodeHandling(nodeSource, rmNodeData, nodeUrl);
-            }
-            // we must add the recreated node to the eligible data
-            // structure if we want it to be usable by a task
             if (isEligible(rmnode)) {
-                rmCore.addEligibleNode(rmnode);
-                totalEligibleRecoveredNodes++;
+                recoveredEligibleNodes.add(rmnode);
             }
         }
 
-        int totalRecoveredNodes = 0;
+        rmCore.recoverEligibleNodes(recoveredEligibleNodes);
 
-        logNodeRecoverySummary(nodeSourceName, nodeStates, totalRecoveredNodes, totalEligibleRecoveredNodes);
+        logNodeRecoverySummary(nodeSourceName, recoveredNodeStatesCounter, recoveredEligibleNodes.size());
+    }
+
+    private RMNode recoverRMNode(NodeSource nodeSource, Map<NodeState, Integer> nodeStates, RMNodeData rmNodeData,
+            String nodeUrl, Node node) {
+        RMNode rmnode = null;
+        if (node != null) {
+            rmnode = recoverNodeInternally(nodeSource, rmNodeData, nodeUrl, node);
+            nodesLockRestorationManager.handle(rmnode, rmNodeData.getProvider());
+            updateRecoveredNodeStateCounter(nodeStates, rmnode.getState());
+        } else {
+            // the node is not recoverable and does not appear in any data
+            // structures: we can remove it safely from database
+            rmCore.getDbManager().removeNode(rmNodeData);
+            markNodesNotInDeployingStateAsDown(nodeSource, rmNodeData, nodeUrl);
+            updateRecoveredNodeStateCounter(nodeStates, NodeState.DOWN);
+        }
+        return rmnode;
+    }
+
+    private void updateRecoveredNodeStateCounter(Map<NodeState, Integer> nodeStates, NodeState nodeState) {
+        Integer previousCounter = nodeStates.get(nodeState);
+        int updatedCounter;
+        if (previousCounter == null) {
+            updatedCounter = 1;
+        } else {
+            updatedCounter = previousCounter + 1;
+        }
+        nodeStates.put(nodeState, updatedCounter);
     }
 
     private RMNode recoverNodeInternally(NodeSource nodeSource, RMNodeData rmNodeData, String nodeUrl, Node node) {
@@ -240,7 +248,7 @@ public class NodesRecoveryManager {
         return rmNode;
     }
 
-    private void triggerDownNodeHandling(NodeSource nodeSource, RMNodeData rmNodeData, String nodeUrl) {
+    private void markNodesNotInDeployingStateAsDown(NodeSource nodeSource, RMNodeData rmNodeData, String nodeUrl) {
         // if the node to recover was in deploying state then we have
         // nothing to do as it is going to be redeployed
         if (!rmNodeData.getState().equals(NodeState.DEPLOYING)) {
@@ -262,7 +270,7 @@ public class NodesRecoveryManager {
         return node;
     }
 
-    private void makeSureNodeSourceHasNoNode(NodeSource nodeSource, String nodeSourceName) {
+    private void logWarnIfNodeSourceHasNoNode(NodeSource nodeSource, String nodeSourceName) {
         int nodesCount = nodeSource.getNodesCount();
         if (nodesCount != 0) {
             logger.warn("Recovered node source " + nodeSourceName + " unexpectedly already manages nodes");
@@ -270,7 +278,8 @@ public class NodesRecoveryManager {
     }
 
     private void logNodeRecoverySummary(String nodeSourceName, Map<NodeState, Integer> nodeStates,
-            int totalRecoveredNodes, int totalEligibleRecoveredNodes) {
+            int totalEligibleRecoveredNodes) {
+        int totalRecoveredNodes = 0;
         logger.info("Recovered nodes summary for node source " + nodeSourceName + ":");
         for (Map.Entry<NodeState, Integer> nodeStateIntEntry : nodeStates.entrySet()) {
             logger.info("- Nodes in " + nodeStateIntEntry.getKey() + " state: " + nodeStateIntEntry.getValue());

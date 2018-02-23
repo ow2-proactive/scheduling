@@ -26,7 +26,6 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import static org.ow2.proactive.resourcemanager.common.event.RMEventType.NODE_STATE_CHANGED;
-import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_RECOVERY;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -462,7 +461,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     protected void initiateRecoveryIfRequired() {
         nodesRecoveryManager = getNodesRecoveryManagerBuilder().apply(this);
         nodesRecoveryManager.initialize();
-        if (RM_NODES_RECOVERY.getValueAsBoolean()) {
+        if (isNodesRecoveryEnabled()) {
             logger.info("Starting Nodes Recovery");
         } else {
             logger.info("Nodes Recovery is disabled. Removing all nodes from database");
@@ -1015,8 +1014,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, preemptive, isTriggeredFromShutdownHook));
     }
 
-    public void addEligibleNode(RMNode rmnode) {
-        eligibleNodes.add(rmnode);
+    public void recoverEligibleNodes(List<RMNode> eligibleNodes) {
+        this.eligibleNodes = eligibleNodes;
     }
 
     /**
@@ -1244,7 +1243,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               persistedNodeSource.getProvider().getName(),
                                                               nodeSource.getDescriptor().getStatus().toString()));
 
-        logger.info("Node source " + nodeSourceName + " has been successfully defined by " +
+        logger.info("The node source " + nodeSourceName + " has been successfully defined by " +
                     persistedNodeSource.getProvider().getName());
     }
 
@@ -1276,9 +1275,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         logger.info("Deploy node source : " + nodeSourceName);
 
-        boolean existPersistedNodes = nodesRecoveryManager.recoverInfrastructureVariablesIfNeeded(nodeSourceName,
-                                                                                                  nodeSourceToDeploy,
-                                                                                                  descriptor);
+        boolean recoverNodes = false;
+
+        if (isNodeRecoveryEnabledForNodeSource(nodeSourceToDeploy)) {
+            recoverNodes = nodesRecoveryManager.recoverFullyDeployedInfrastructureOrReset(nodeSourceName,
+                                                                                          nodeSourceToDeploy,
+                                                                                          descriptor);
+        }
 
         NodeSourcePolicy policy = NodeSourcePolicyFactory.turnActivePolicy(nodeSourceToDeploy.getPolicy(),
                                                                            descriptor.getPolicyParameters());
@@ -1294,7 +1297,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
         }
 
-        if (existPersistedNodes) {
+        if (recoverNodes) {
             nodesRecoveryManager.recoverNodes(nodeSourceToDeploy);
         }
 
@@ -1334,7 +1337,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                                 .getStatus()
                                                                                 .toString()));
 
-        logger.info("Node source " + nodeSourceName + " has been successfully deployed by " + provider);
+        logger.info("The node source " + nodeSourceName + " has been successfully deployed by " + provider);
 
         return new BooleanWrapper(true);
     }
@@ -2440,9 +2443,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    private boolean isNodesRecoveryEnabled() {
+        return PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean();
+    }
+
+    private boolean isNodeRecoveryEnabledForNodeSource(NodeSource nodeSource) {
+        return isNodesRecoveryEnabled() && nodeSource.nodesRecoverable();
+    }
+
     private boolean nodesRecoveryEnabledForNode(RMNode rmNode) {
-        return PAResourceManagerProperties.RM_NODES_RECOVERY.getValueAsBoolean() &&
-               rmNode.getNodeSource().nodesRecoverable();
+        return isNodesRecoveryEnabled() && rmNode.getNodeSource().nodesRecoverable();
     }
 
 }

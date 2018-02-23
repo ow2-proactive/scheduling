@@ -367,7 +367,6 @@ public class RMRest implements RMRestInterface {
         NSState nsState = new NSState();
 
         prepareInfraParams(infrastructureType, infrastructureParameters, infrastructureFileParameters, rm, infraParams);
-
         preparePolicyParams(policyType, policyParameters, policyFileParameters, rm, policyParams);
 
         try {
@@ -382,10 +381,9 @@ public class RMRest implements RMRestInterface {
             nsState.setResult(false);
             nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
             nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
-
-        } finally {
-            return nsState;
         }
+
+        return nsState;
     }
 
     /**
@@ -518,9 +516,8 @@ public class RMRest implements RMRestInterface {
             nsState.setResult(false);
             nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
             nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
-        } finally {
-            return nsState;
         }
+        return nsState;
     }
 
     /**
@@ -1111,25 +1108,38 @@ public class RMRest implements RMRestInterface {
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters, ResourceManager rm,
             Object[] infraParams) {
         /*
-         * we need to merge both infrastructureParameters and infrastructureFileParameters into one
-         * to do so we need the infrastructure parameter order from the RM
+         * we need to merge both infrastructureParameters and
+         * infrastructureFileParameters into one to do so we need the
+         * infrastructure parameter order from the RM
          */
         for (PluginDescriptor infra : rm.getSupportedNodeSourceInfrastructures()) {
             if (infra.getPluginName().equals(infrastructureType)) {
-                int i = 0, j = 0, k = 0;
-                for (ConfigurableField field : infra.getConfigurableFields()) {
-                    if (field.getMeta().credential() || field.getMeta().fileBrowser()) {
-                        // file parameter : insert from the other array, convert
-                        // to byte[]
-                        infraParams[i] = infrastructureFileParameters[k].getBytes();
-                        k++;
-                    } else {
-                        infraParams[i] = infrastructureParameters[j];
-                        j++;
-                    }
-                    i++;
-                }
+                assignInfraFieldToNormalParamOrToFileParam(infrastructureParameters,
+                                                           infrastructureFileParameters,
+                                                           infraParams,
+                                                           infra);
             }
+        }
+    }
+
+    private void assignInfraFieldToNormalParamOrToFileParam(
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters, Object[] infraParams,
+            PluginDescriptor infra) {
+        int i = 0, j = 0, k = 0;
+        for (ConfigurableField field : infra.getConfigurableFields()) {
+            if (field.getMeta().credential() || field.getMeta().fileBrowser()) {
+                /*
+                 * file parameter : insert from the other array, convert
+                 * to byte[]
+                 */
+                infraParams[i] = infrastructureFileParameters[k].getBytes();
+                k++;
+            } else {
+                infraParams[i] = infrastructureParameters[j];
+                j++;
+            }
+            i++;
         }
     }
 
@@ -1139,22 +1149,26 @@ public class RMRest implements RMRestInterface {
             Object[] policyParams) {
         for (PluginDescriptor pol : rm.getSupportedNodeSourcePolicies()) {
             if (pol.getPluginName().equals(policyType)) {
-                int i = 0, j = 0, k = 0;
-                for (ConfigurableField
-
-                field : pol.getConfigurableFields()) {
-                    if (field.getMeta().credential() || field.getMeta().password()) {
-                        // file parameter : insert from the other array, convert
-                        // to byte[]
-                        policyParams[i] = policyFileParameters[k].getBytes();
-                        k++;
-                    } else {
-                        policyParams[i] = policyParameters[j];
-                        j++;
-                    }
-                    i++;
-                }
+                assignPolicyFieldToNormalParamOrToFileParam(policyParameters, policyFileParameters, policyParams, pol);
             }
+        }
+    }
+
+    private void assignPolicyFieldToNormalParamOrToFileParam(@FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters, Object[] policyParams,
+            PluginDescriptor pol) {
+        int i = 0, j = 0, k = 0;
+        for (ConfigurableField field : pol.getConfigurableFields()) {
+            if (field.getMeta().credential() || field.getMeta().password()) {
+                // file parameter : insert from the other array, convert
+                // to byte[]
+                policyParams[i] = policyFileParameters[k].getBytes();
+                k++;
+            } else {
+                policyParams[i] = policyParameters[j];
+                j++;
+            }
+            i++;
         }
     }
 
