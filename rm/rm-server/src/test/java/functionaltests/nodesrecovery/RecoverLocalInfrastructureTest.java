@@ -106,8 +106,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(0);
         rmHelper.createNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME, NODE_NUMBER);
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
-        List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState()
-                                                                                          .getNodeSource();
+        List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState().getNodeSource();
         assertThat(nodeSourceEventPerNodeSource.size()).isEqualTo(1);
         assertThat(nodeSourceEventPerNodeSource.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
         assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(NODE_NUMBER);

@@ -63,6 +63,7 @@ public class RMNodeSourceEvent extends RMEvent {
     private String nodeSourceStatus;
 
     private Type type = Type.ADDED;
+
     /**
      * ProActive Empty constructor.
      */

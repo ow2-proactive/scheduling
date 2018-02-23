@@ -87,7 +87,6 @@ public class RMInitialState implements Serializable {
         this.nodeSourceEvents = nodeSourcesList;
     }
 
-
     /**
      * Current version of RM portal and maybe other clients expects "nodesEvents" inside JSON
      *
@@ -97,7 +96,6 @@ public class RMInitialState implements Serializable {
         return new ArrayList(this.nodeEvents.values());
     }
 
-
     /**
      * Current version of RM portal and maybe other clients expects "nodeSource" inside JSON
      *
@@ -106,7 +104,6 @@ public class RMInitialState implements Serializable {
     public List<RMNodeSourceEvent> getNodeSource() {
         return new ArrayList<>(this.nodeSourceEvents.values());
     }
-
 
     public long getLatestCounter() {
         return latestCounter;
@@ -128,8 +125,8 @@ public class RMInitialState implements Serializable {
         nodeSourceEvents.put(event.getSourceName(), event);
     }
 
-    public void nodeSourceRemoved(RMNodeSourceEvent event)  {
-        nodeSourceEvents.put(event.getSourceName(), event);
+    public void nodeSourceRemoved(RMNodeSourceEvent event) {
+        nodeSourceEvents.remove(event.getSourceName());
     }
 
 
@@ -140,10 +137,9 @@ public class RMInitialState implements Serializable {
         clone.nodeEvents = newFilteredEvents(this.nodeEvents, filter);
         clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, filter);
 
-        clone.latestCounter = Math.max( filter,
-                                        Math.max(
-                                            findLargestCounter(clone.nodeEvents.values()),
-                                            findLargestCounter(clone.nodeSourceEvents.values())));
+        clone.latestCounter = Math.max(filter,
+                                       Math.max(findLargestCounter(clone.nodeEvents.values()),
+                                                findLargestCounter(clone.nodeSourceEvents.values())));
         return clone;
     }
 

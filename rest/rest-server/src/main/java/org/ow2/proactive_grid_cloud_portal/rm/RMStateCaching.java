@@ -48,6 +48,8 @@ public class RMStateCaching {
 
     private static RMProxyUserInterface rm;
 
+    private static RMProxyUserInterface aorm;
+
     /**
      * Start a thread that will periodically fetch {@link RMProxyUserInterface#getMonitoring()}.
      * <p>
@@ -60,33 +62,35 @@ public class RMStateCaching {
     }
 
     private static void init_() {
-        while (rm == null) {
+        while (aorm == null) {
             String url = PortalConfiguration.RM_URL.getValueAsString();
             String cred_path = PortalConfiguration.RM_CACHE_CREDENTIALS.getValueAsStringOrNull();
 
             try {
-                if (rm == null) {
-                    rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[]{});
+                if (aorm == null) {
+
+                    rm = new RMProxyUserInterface();
+                    aorm = PAActiveObject.turnActive(rm);
 
                     if (cred_path != null && !(new File(cred_path)).exists()) {
                         logger.error("Credentials path set in " + PortalConfiguration.RM_CACHE_CREDENTIALS.getKey() +
-                                " but file " + cred_path + " does not exist");
+                                     " but file " + cred_path + " does not exist");
                     }
 
                     if (cred_path != null && new File(cred_path).exists()) {
                         Credentials cred = Credentials.getCredentials(cred_path);
-                        rm.init(url, cred);
+                        aorm.init(url, cred);
                     } else {
                         String login = PortalConfiguration.RM_CACHE_LOGIN.getValueAsString();
                         String password = PortalConfiguration.RM_CACHE_PASSWORD.getValueAsString();
-                        rm.init(url, new CredData(login, password));
+                        aorm.init(url, new CredData(login, password));
                     }
                 }
             } catch (Exception e) {
                 logger.warn("Could not connect to resource manager at " + url + " retrying in 8 seconds", e);
-                if (rm != null) {
-                    PAActiveObject.terminateActiveObject(rm, true);
-                    rm = null;
+                if (aorm != null) {
+                    PAActiveObject.terminateActiveObject(aorm, true);
+                    aorm = null;
                 }
                 new Sleeper(8 * 1000, logger).sleep();
                 continue;
@@ -101,7 +105,7 @@ public class RMStateCaching {
         try {
             long startTime = System.currentTimeMillis();
 
-            final RMInitialState state = PAFuture.getFutureValue(rm.getRMInitialState(counter));
+            final RMInitialState state = rm.getRMInitialState(counter);
 
             long time = System.currentTimeMillis() - startTime;
 

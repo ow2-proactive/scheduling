@@ -120,13 +120,16 @@ public interface RMRestInterface {
     @GET
     @Path("state")
     @Produces("application/json")
-    org.ow2.proactive.resourcemanager.common.RMState getState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+    org.ow2.proactive.resourcemanager.common.RMState getState(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException;
 
     @GET
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId, @HeaderParam("latestCounter") @DefaultValue("0") String latestCounterClientAware) throws NotConnectedException;
+    RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("latestCounter") @DefaultValue("0") String latestCounterClientAware)
+            throws NotConnectedException;
 
     @GET
     @Path("isactive")

@@ -1902,7 +1902,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         RMStateNodeUrls rmStateNodeUrls = new RMStateNodeUrls(nodesListToUrlsSet(eligibleNodes),
                                                               listAliveNodeUrls(),
                                                               nodesListToUrlsSet(allNodes.values()));
-        org.ow2.proactive.resourcemanager.common.RMState state = new org.ow2.proactive.resourcemanager.common.RMState(rmStateNodeUrls, maximumNumberOfNodes);
+        org.ow2.proactive.resourcemanager.common.RMState state = new org.ow2.proactive.resourcemanager.common.RMState(rmStateNodeUrls,
+                                                                                                                      maximumNumberOfNodes);
         return state;
     }
 

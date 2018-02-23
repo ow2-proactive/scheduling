@@ -170,7 +170,7 @@ public final class RMNodeEvent extends RMEvent {
     }
 
     public RMNodeEvent(final RMNodeDescriptor rmNode, final RMEventType eventType, final NodeState previousNodeState,
-                       final String initiator, NodeState nodeState) {
+            final String initiator, NodeState nodeState) {
         super(eventType);
 
         this.initiator = initiator;

@@ -247,15 +247,21 @@ public class RMRest implements RMRestInterface {
     @GET
     @Path("state")
     @Produces("application/json")
-    public org.ow2.proactive.resourcemanager.common.RMState getState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+    public org.ow2.proactive.resourcemanager.common.RMState getState(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return PAFuture.getFutureValue(rm.getState());
     }
 
     /**
-     * Returns the initial state of the resource manager
+     * Returns difference between current state of the resource manager
+     * and state that the client is aware of. Each event that changes state fo the RM
+     * has counter assosiacted to it. Thus client has to provide 'latestCounter',
+     * i.e. latest event he is aware of.
      * @param sessionId a valid session id
-     * @return the initial state of the resource manager 
+     * @param clientCounter (optional) is the latest counter client has, if parameter is not provided then
+     *                                 method returns all events
+     * @return the difference between current state and state that client knows
      * @throws NotConnectedException 
      */
     @Override
@@ -263,9 +269,15 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId, @HeaderParam("latestCounter") @DefaultValue("0") String latestCounterClientAware) throws NotConnectedException {
+    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("latestCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
         checkAccess(sessionId);
-        long counter = Integer.valueOf(latestCounterClientAware);
+        long counter;
+        try {
+            counter = Integer.valueOf(clientCounter);
+        } catch (NumberFormatException e) {
+            counter = -1; // default value
+        }
         return RMStateCaching.getRMInitialState(counter);
     }
 
