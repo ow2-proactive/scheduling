@@ -29,7 +29,6 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.CredData;
@@ -46,9 +45,9 @@ public class RMStateCaching {
 
     private static Logger logger = ProActiveLogger.getLogger(RMStateCaching.class);
 
-    private static RMProxyUserInterface rm;
+    private static RMProxyUserInterface rmProxy;
 
-    private static RMProxyUserInterface aorm;
+    private static RMProxyUserInterface rmProxyActiveObject;
 
     /**
      * Start a thread that will periodically fetch {@link RMProxyUserInterface#getMonitoring()}.
@@ -62,15 +61,15 @@ public class RMStateCaching {
     }
 
     private static void init_() {
-        while (aorm == null) {
+        while (rmProxyActiveObject == null) {
             String url = PortalConfiguration.RM_URL.getValueAsString();
             String cred_path = PortalConfiguration.RM_CACHE_CREDENTIALS.getValueAsStringOrNull();
 
             try {
-                if (aorm == null) {
+                if (rmProxyActiveObject == null) {
 
-                    rm = new RMProxyUserInterface();
-                    aorm = PAActiveObject.turnActive(rm);
+                    rmProxy = new RMProxyUserInterface();
+                    rmProxyActiveObject = PAActiveObject.turnActive(rmProxy);
 
                     if (cred_path != null && !(new File(cred_path)).exists()) {
                         logger.error("Credentials path set in " + PortalConfiguration.RM_CACHE_CREDENTIALS.getKey() +
@@ -79,18 +78,18 @@ public class RMStateCaching {
 
                     if (cred_path != null && new File(cred_path).exists()) {
                         Credentials cred = Credentials.getCredentials(cred_path);
-                        aorm.init(url, cred);
+                        rmProxyActiveObject.init(url, cred);
                     } else {
                         String login = PortalConfiguration.RM_CACHE_LOGIN.getValueAsString();
                         String password = PortalConfiguration.RM_CACHE_PASSWORD.getValueAsString();
-                        aorm.init(url, new CredData(login, password));
+                        rmProxyActiveObject.init(url, new CredData(login, password));
                     }
                 }
             } catch (Exception e) {
                 logger.warn("Could not connect to resource manager at " + url + " retrying in 8 seconds", e);
-                if (aorm != null) {
-                    PAActiveObject.terminateActiveObject(aorm, true);
-                    aorm = null;
+                if (rmProxyActiveObject != null) {
+                    PAActiveObject.terminateActiveObject(rmProxyActiveObject, true);
+                    rmProxyActiveObject = null;
                 }
                 new Sleeper(8 * 1000, logger).sleep();
                 continue;
@@ -105,7 +104,9 @@ public class RMStateCaching {
         try {
             long startTime = System.currentTimeMillis();
 
-            final RMInitialState state = rm.getRMInitialState(counter);
+            // we request the state of the RM directly via rmProxy object
+            // and not via ActiveObject wrap of it.
+            final RMInitialState state = rmProxy.getRMInitialState(counter);
 
             long time = System.currentTimeMillis() - startTime;
 

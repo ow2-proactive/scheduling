@@ -128,7 +128,7 @@ public interface RMRestInterface {
     @Path("monitoring")
     @Produces("application/json")
     RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId,
-            @HeaderParam("latestCounter") @DefaultValue("0") String latestCounterClientAware)
+            @HeaderParam("latestCounter") @DefaultValue("-1") String latestCounterClientAware)
             throws NotConnectedException;
 
     @GET

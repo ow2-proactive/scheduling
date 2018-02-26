@@ -31,9 +31,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -58,6 +60,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 @XmlRootElement
 public class RMInitialState implements Serializable {
 
+    private static final Logger LOGGER = Logger.getLogger(RMInitialState.class);
+
     /**
      * Nodes events
      */
@@ -68,7 +72,7 @@ public class RMInitialState implements Serializable {
      */
     private Map<String, RMNodeSourceEvent> nodeSourceEvents = new ConcurrentHashMap<>();
 
-    private long latestCounter = -1;
+    private AtomicLong latestCounter = new AtomicLong(0);
 
     /**
      * ProActive empty constructor
@@ -107,7 +111,7 @@ public class RMInitialState implements Serializable {
     }
 
     public long getLatestCounter() {
-        return latestCounter;
+        return latestCounter.get();
     }
 
     public void nodeAdded(RMNodeEvent event) {
@@ -137,19 +141,26 @@ public class RMInitialState implements Serializable {
     }
 
     private void updateCounter(RMEvent event) {
-        latestCounter = Math.max(latestCounter, event.getCounter());
+        latestCounter.set(Math.max(latestCounter.get(), event.getCounter()));
     }
 
     public RMInitialState cloneAndFilter(long filter) {
-        long actualFilter = Math.min(filter, latestCounter);
+        long actualFilter;
+        if(filter <= latestCounter.get()){
+            actualFilter = filter;
+        }else{
+            LOGGER.info(String.format("Client is aware of %d but server knows only about %d counter. " +
+                    "Probably because there was network server restart.", filter, latestCounter.get()));
+            actualFilter = -1;
+        }
         RMInitialState clone = new RMInitialState();
 
         clone.nodeEvents = newFilteredEvents(this.nodeEvents, actualFilter);
         clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, actualFilter);
 
-        clone.latestCounter = Math.max(actualFilter,
+        clone.latestCounter.set(Math.max(actualFilter,
                                        Math.max(findLargestCounter(clone.nodeEvents.values()),
-                                                findLargestCounter(clone.nodeSourceEvents.values())));
+                                                findLargestCounter(clone.nodeSourceEvents.values()))));
         return clone;
     }
 
