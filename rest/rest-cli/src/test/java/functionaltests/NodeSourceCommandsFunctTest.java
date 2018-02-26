@@ -75,12 +75,12 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         if (nodesRecoverableParameter) {
             clearAndTypeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                     nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'tRuE')");
+                             RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
+                             nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'tRuE')");
         } else {
             clearAndTypeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                     nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
+                             RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
+                             nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
         }
 
         runCli();
@@ -117,12 +117,12 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         if (nodesRecoverableParameter) {
             clearAndTypeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                     nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'TrUe')");
+                             RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
+                             nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'TrUe')");
         } else {
             clearAndTypeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                     nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
+                             RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
+                             nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
         }
 
         runCli();
