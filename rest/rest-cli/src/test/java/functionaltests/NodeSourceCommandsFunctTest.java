@@ -84,12 +84,11 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         }
 
         runCli();
+        waitForNodeSourceToBeDeployed();
 
         String out = this.capturedOutput.toString();
         System.setOut(stdOut);
         System.out.println(out);
-
-        waitForNodeSourceToBeDeployed();
 
         assertThat(out).contains("Node source successfully created.");
 
@@ -126,6 +125,7 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         }
 
         runCli();
+        waitForNodeSourceToBeDeployed();
 
         String out = this.capturedOutput.toString();
         System.setOut(stdOut);
@@ -137,12 +137,11 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         clearAndTypeLine("deployns( '" + nodeSourceName + "')");
         runCli();
+        waitForNodeSourceToBeDeployed();
 
         out = this.capturedOutput.toString();
         System.setOut(stdOut);
         System.out.println(out);
-
-        waitForNodeSourceToBeDeployed();
 
         assertThat(out).contains("Node source successfully deployed.");
 
