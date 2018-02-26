@@ -74,13 +74,13 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         System.out.println(testLogString + "Test createns command");
 
         if (nodesRecoverableParameter) {
-            clearAndTypeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                             RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                             nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'tRuE')");
+            typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
+                     nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'tRuE')");
         } else {
-            clearAndTypeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                             RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                             nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
+            typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
+                     nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
         }
 
         runCli();
@@ -116,13 +116,13 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         System.out.println(testLogString + "Test definens command");
 
         if (nodesRecoverableParameter) {
-            clearAndTypeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                             RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                             nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'TrUe')");
+            typeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
+                     nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'TrUe')");
         } else {
-            clearAndTypeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                             RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                             nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
+            typeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
+                     nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
         }
 
         runCli();
