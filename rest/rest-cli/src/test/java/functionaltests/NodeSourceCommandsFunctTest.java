@@ -89,9 +89,9 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         System.setOut(stdOut);
         System.out.println(out);
 
-        assertThat(out).contains("Node source successfully created.");
-
         waitForNodeSourceToBeDeployed();
+
+        assertThat(out).contains("Node source successfully created.");
 
         checkOccurrencesOfNodeSourceNameInNodeSourceList(testLogString, nodeSourceName);
     }
@@ -142,9 +142,9 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         System.setOut(stdOut);
         System.out.println(out);
 
-        assertThat(out).contains("Node source successfully deployed.");
-
         waitForNodeSourceToBeDeployed();
+
+        assertThat(out).contains("Node source successfully deployed.");
 
         checkOccurrencesOfNodeSourceNameInNodeSourceList(testLogString, nodeSourceName);
 
