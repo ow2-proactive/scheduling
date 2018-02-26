@@ -74,11 +74,11 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         System.out.println(testLogString + "Test createns command");
 
         if (nodesRecoverableParameter) {
-            typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+            clearAndTypeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
                      RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
                      nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'tRuE')");
         } else {
-            typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+            clearAndTypeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
                      RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
                      nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
         }
@@ -116,11 +116,11 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         System.out.println(testLogString + "Test definens command");
 
         if (nodesRecoverableParameter) {
-            typeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+            clearAndTypeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
                      RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
                      nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'TrUe')");
         } else {
-            typeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+            clearAndTypeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
                      RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
                      nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
         }
