@@ -146,11 +146,13 @@ public class RMInitialState implements Serializable {
 
     public RMInitialState cloneAndFilter(long filter) {
         long actualFilter;
-        if(filter <= latestCounter.get()){
+        if (filter <= latestCounter.get()) {
             actualFilter = filter;
-        }else{
+        } else {
             LOGGER.info(String.format("Client is aware of %d but server knows only about %d counter. " +
-                    "Probably because there was network server restart.", filter, latestCounter.get()));
+                                      "Probably because there was network server restart.",
+                                      filter,
+                                      latestCounter.get()));
             actualFilter = -1;
         }
         RMInitialState clone = new RMInitialState();
@@ -159,8 +161,8 @@ public class RMInitialState implements Serializable {
         clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, actualFilter);
 
         clone.latestCounter.set(Math.max(actualFilter,
-                                       Math.max(findLargestCounter(clone.nodeEvents.values()),
-                                                findLargestCounter(clone.nodeSourceEvents.values()))));
+                                         Math.max(findLargestCounter(clone.nodeEvents.values()),
+                                                  findLargestCounter(clone.nodeSourceEvents.values()))));
         return clone;
     }
 

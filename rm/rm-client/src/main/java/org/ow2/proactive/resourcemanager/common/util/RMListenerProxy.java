@@ -135,7 +135,6 @@ public class RMListenerProxy extends RMGroupEventListener {
 
     private void checkCounter(RMEvent event) {
 
-
         if (counter.get() > 0 && counter.get() != event.getCounter() - 1) {
             logger.warn("Missing events detected - resetting the rm state");
             logger.warn("Local event counter is " + counter + " vs. rm event counter " + event.getCounter());
@@ -226,7 +225,7 @@ public class RMListenerProxy extends RMGroupEventListener {
         try {
             return rmInitialState.cloneAndFilter(filter);
         } finally {
-             readWriteLock.writeLock().unlock();
+            readWriteLock.writeLock().unlock();
         }
     }
 
