@@ -96,7 +96,9 @@ public class GetResultMetricTest extends PeformanceTestBase {
 
         final JobResult jobResult = schedulerHelper.getSchedulerInterface().getJobResult(jobId);
 
-        long timeToGetResult = System.currentTimeMillis() - start - (taskDuration * 1000);
+        long wholeTime = System.currentTimeMillis() - start;
+
+        long timeToGetResult = wholeTime - taskDuration;
 
         LOGGER.info(makeCSVString(GetResultMetricTest.class.getSimpleName(),
                                   taskNumber,
