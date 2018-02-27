@@ -42,10 +42,14 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
     private static final int NODE_SOURCE_DEPLOYED_WAIT_TIME_MILLIS = 5000;
 
+    private static String rmCredentialPath;
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         System.out.println("Init class: " + NodeSourceCommandsFunctTest.class);
         init();
+        rmCredentialPath = RestFuncTHelper.getRmCredentialsPath();
+        rmCredentialPath = rmCredentialPath.replace("\\", "\\\\");
         System.out.println("Finished init class: " + NodeSourceCommandsFunctTest.class);
     }
 
@@ -75,12 +79,12 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         if (nodesRecoverableParameter) {
             typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                     nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'tRuE')");
+                     rmCredentialPath + "', " + NB_NODES + ", 60000, ''], ['" + nodeSourcePolicyClass +
+                     "', 'ALL', 'ALL'], 'tRuE')");
         } else {
             typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                     nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
+                     rmCredentialPath + "', " + NB_NODES + ", 60000, ''], ['" + nodeSourcePolicyClass +
+                     "', 'ALL', 'ALL'])");
         }
 
         runCli();
@@ -116,12 +120,12 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         if (nodesRecoverableParameter) {
             typeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                     nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'TrUe')");
+                     rmCredentialPath + "', " + NB_NODES + ", 60000, ''], ['" + nodeSourcePolicyClass +
+                     "', 'ALL', 'ALL'], 'TrUe')");
         } else {
             typeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                     RestFuncTHelper.getRmCredentialsPath() + "', " + NB_NODES + ", 60000, ''], ['" +
-                     nodeSourcePolicyClass + "', 'ALL', 'ALL'])");
+                     rmCredentialPath + "', " + NB_NODES + ", 60000, ''], ['" + nodeSourcePolicyClass +
+                     "', 'ALL', 'ALL'])");
         }
 
         runCli();
