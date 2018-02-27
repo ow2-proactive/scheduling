@@ -130,7 +130,6 @@ public class ScriptExecutor implements Callable<Node> {
                             exception = new ScriptException(scriptResult.getException());
                             logger.warn(rmnode.getNodeURL() + " : exception during the script execution",
                                         scriptResult.getException());
-                            break;
                         }
 
                         // processing script result and updating knowledge base of
