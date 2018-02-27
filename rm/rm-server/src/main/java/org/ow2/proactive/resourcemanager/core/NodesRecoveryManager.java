@@ -25,9 +25,13 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
@@ -47,7 +51,7 @@ import com.google.common.base.Function;
 
 
 /**
- * This classe handles the recovery of node sources and of nodes when the RM is restarted.
+ * This class handles the recovery of node sources and of nodes when the RM is restarted.
  *
  * @author ActiveEon Team
  * @since 26/06/17
@@ -75,7 +79,7 @@ public class NodesRecoveryManager {
     void initNodesRestorationManager() {
         nodesLockRestorationManager = getNodesLockRestorationManagerBuilder().apply(rmCore);
 
-        if (RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
+        if (PAResourceManagerProperties.RM_NODES_LOCK_RESTORATION.getValueAsBoolean()) {
             nodesLockRestorationManager.initialize();
         } else {
             logger.info("Nodes lock restoration is disabled");
@@ -151,7 +155,7 @@ public class NodesRecoveryManager {
                 nodeSourceData.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
                 deployNodeSource = true;
             }
-            rmCore.createNotActiveNodeSource(nodeSourceData);
+            rmCore.prepareNodeSource(nodeSourceData);
             if (deployNodeSource) {
                 rmCore.deployNodeSource(nodeSourceName);
             }

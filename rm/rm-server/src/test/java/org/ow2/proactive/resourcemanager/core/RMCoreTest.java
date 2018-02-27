@@ -611,7 +611,6 @@ public class RMCoreTest {
         ArrayList<RMNode> freeNodes = Lists.newArrayList((RMNode) rmNode);
 
         RMCore rmCore = new RMCore(new HashMap<String, NodeSource>(),
-                                   new HashMap<String, NodeSource>(),
                                    allNodes,
                                    Mockito.mock(Client.class),
                                    Mockito.mock(RMMonitoringImpl.class),
@@ -788,7 +787,6 @@ public class RMCoreTest {
 
     private RMCore createRmCore(ImmutableMap<String, RMNode> allNodes, List<RMNode> freeNodes) {
         RMCore rmCore = new RMCore(null,
-                                   null,
                                    allNodes,
                                    null,
                                    Mockito.mock(RMMonitoringImpl.class),
@@ -870,7 +868,6 @@ public class RMCoreTest {
         freeNodes.add(mockedFreeButLockedNode);
 
         rmCore = new RMCore(nodeSources,
-                            new HashMap<String, NodeSource>(),
                             nodes,
                             mockedCaller,
                             mockedMonitoring,

@@ -165,6 +165,10 @@ public interface RMRestInterface {
             @FormParam("policyFileParameters") String[] policyFileParameters,
             @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException;
 
+    /**
+     * @deprecated  As of release 7.37, replaced by {@link #defineNodeSource(String, String, String, String[], String[],
+     * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
+     */
     @Deprecated
     @POST
     @Path("nodesource/create")
@@ -177,6 +181,10 @@ public interface RMRestInterface {
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
             @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException;
 
+    /**
+     * @deprecated  As of release 7.37, replaced by {@link #defineNodeSource(String, String, String, String[], String[],
+     * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
+     */
     @Deprecated
     @POST
     @Path("nodesource/create/recovery")
