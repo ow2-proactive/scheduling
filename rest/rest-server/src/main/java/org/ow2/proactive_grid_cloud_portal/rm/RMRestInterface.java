@@ -156,7 +156,7 @@ public interface RMRestInterface {
     @POST
     @Path("nodesource")
     @Produces("application/json")
-    NSState defineNodeSource(@HeaderParam("sessionid") String sessionId,
+    NSState defineNodeSource(@HeaderParam("sessionid") String sessionId, //NOSONAR
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
             @FormParam("infrastructureParameters") String[] infrastructureParameters,

@@ -192,15 +192,16 @@ public class NodeSourceData implements Serializable {
     }
 
     public NodeSourceDescriptor toNodeSourceDescriptor() {
-        return new NodeSourceDescriptor(name,
-                                        infrastructureType,
-                                        infrastructureParameters,
-                                        policyType,
-                                        policyParameters,
-                                        provider,
-                                        nodesRecoverable,
-                                        status,
-                                        infrastructureVariables);
+        return new NodeSourceDescriptor.Builder().name(this.name)
+                                                 .infrastructureType(this.infrastructureType)
+                                                 .infrastructureParameters(this.infrastructureParameters)
+                                                 .policyType(this.policyType)
+                                                 .policyParameters(this.policyParameters)
+                                                 .provider(this.provider)
+                                                 .nodesRecoverable(this.nodesRecoverable)
+                                                 .status(this.status)
+                                                 .lastRecoveredInfrastructureVariables(this.infrastructureVariables)
+                                                 .build();
     }
 
     @Override

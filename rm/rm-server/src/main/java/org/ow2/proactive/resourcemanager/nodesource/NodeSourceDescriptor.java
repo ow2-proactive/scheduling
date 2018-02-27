@@ -56,9 +56,9 @@ public class NodeSourceDescriptor implements Serializable {
 
     private Map<String, Serializable> lastRecoveredInfrastructureVariables;
 
-    public NodeSourceDescriptor(String name, String infrastructureType, Object[] infrastructureParameters,
+    private NodeSourceDescriptor(String name, String infrastructureType, Object[] infrastructureParameters,
             String policyType, Object[] policyParameters, Client provider, boolean nodesRecoverable,
-            NodeSourceStatus status, Map<String, Serializable> lastRecoveredInfrastructureVariables) {
+            NodeSourceStatus status) {
         this.name = name;
         this.infrastructureType = infrastructureType;
         this.infrastructureParameters = infrastructureParameters;
@@ -67,47 +67,132 @@ public class NodeSourceDescriptor implements Serializable {
         this.provider = provider;
         this.nodesRecoverable = nodesRecoverable;
         this.status = status;
-        this.lastRecoveredInfrastructureVariables = lastRecoveredInfrastructureVariables;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public String getInfrastructureType() {
-        return infrastructureType;
+        return this.infrastructureType;
     }
 
     public Object[] getInfrastructureParameters() {
-        return infrastructureParameters;
+        return this.infrastructureParameters;
     }
 
     public String getPolicyType() {
-        return policyType;
+        return this.policyType;
     }
 
     public Object[] getPolicyParameters() {
-        return policyParameters;
+        return this.policyParameters;
     }
 
     public Client getProvider() {
-        return provider;
+        return this.provider;
     }
 
     public boolean nodesRecoverable() {
-        return nodesRecoverable;
+        return this.nodesRecoverable;
     }
 
     public NodeSourceStatus getStatus() {
-        return status;
+        return this.status;
+    }
+
+    public Map<String, Serializable> getLastRecoveredInfrastructureVariables() {
+        return this.lastRecoveredInfrastructureVariables;
     }
 
     public void setStatus(NodeSourceStatus status) {
         this.status = status;
     }
 
-    public Map<String, Serializable> getLastRecoveredInfrastructureVariables() {
-        return lastRecoveredInfrastructureVariables;
+    private void
+            setLastRecoveredInfrastructureVariables(Map<String, Serializable> lastRecoveredInfrastructureVariables) {
+        this.lastRecoveredInfrastructureVariables = lastRecoveredInfrastructureVariables;
+    }
+
+    public static class Builder {
+
+        private String name;
+
+        private String infrastructureType;
+
+        private Object[] infrastructureParameters;
+
+        private String policyType;
+
+        private Object[] policyParameters;
+
+        private Client provider;
+
+        private boolean nodesRecoverable;
+
+        private NodeSourceStatus status;
+
+        private Map<String, Serializable> lastRecoveredInfrastructureVariables;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder infrastructureType(String infrastructureType) {
+            this.infrastructureType = infrastructureType;
+            return this;
+        }
+
+        public Builder infrastructureParameters(Object[] infrastructureParameters) {
+            this.infrastructureParameters = infrastructureParameters;
+            return this;
+        }
+
+        public Builder policyType(String policyType) {
+            this.policyType = policyType;
+            return this;
+        }
+
+        public Builder policyParameters(Object[] policyParameters) {
+            this.policyParameters = policyParameters;
+            return this;
+        }
+
+        public Builder provider(Client provider) {
+            this.provider = provider;
+            return this;
+        }
+
+        public Builder nodesRecoverable(boolean nodesRecoverable) {
+            this.nodesRecoverable = nodesRecoverable;
+            return this;
+        }
+
+        public Builder status(NodeSourceStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder
+                lastRecoveredInfrastructureVariables(Map<String, Serializable> lastRecoveredInfrastructureVariables) {
+            this.lastRecoveredInfrastructureVariables = lastRecoveredInfrastructureVariables;
+            return this;
+        }
+
+        public NodeSourceDescriptor build() {
+            NodeSourceDescriptor built = new NodeSourceDescriptor(this.name,
+                                                                  this.infrastructureType,
+                                                                  this.infrastructureParameters,
+                                                                  this.policyType,
+                                                                  this.policyParameters,
+                                                                  this.provider,
+                                                                  this.nodesRecoverable,
+                                                                  this.status);
+            built.setLastRecoveredInfrastructureVariables(this.lastRecoveredInfrastructureVariables);
+            return built;
+        }
+
     }
 
 }
