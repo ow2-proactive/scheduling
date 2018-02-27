@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.common.event;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -98,7 +99,7 @@ public class RMInitialState implements Serializable {
      * @return
      */
     public List<RMNodeEvent> getNodesEvents() {
-        return new ArrayList(this.nodeEvents.values());
+        return Collections.unmodifiableList(new ArrayList<>(this.nodeEvents.values()));
     }
 
     /**
@@ -107,7 +108,7 @@ public class RMInitialState implements Serializable {
      * @return
      */
     public List<RMNodeSourceEvent> getNodeSource() {
-        return new ArrayList<>(this.nodeSourceEvents.values());
+        return Collections.unmodifiableList(new ArrayList<>(this.nodeSourceEvents.values()));
     }
 
     public long getLatestCounter() {

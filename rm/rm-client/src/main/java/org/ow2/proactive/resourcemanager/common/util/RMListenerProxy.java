@@ -225,7 +225,7 @@ public class RMListenerProxy extends RMGroupEventListener {
         try {
             return rmInitialState.cloneAndFilter(filter);
         } finally {
-            readWriteLock.writeLock().unlock();
+            readWriteLock.readLock().unlock();
         }
     }
 
