@@ -73,7 +73,6 @@ public class RMInitialState implements Serializable {
      */
     private Map<String, RMNodeSourceEvent> nodeSourceEvents = new ConcurrentHashMap<>();
 
-
     /**
      * keeps track of the latest (biggest) counter among the 'nodeEvents' and 'nodeSourceEvents'
      */

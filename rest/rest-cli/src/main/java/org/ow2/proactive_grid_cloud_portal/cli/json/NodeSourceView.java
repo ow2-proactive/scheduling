@@ -39,7 +39,7 @@ public class NodeSourceView {
      *
      * String constant should be aligned with {@link RMEventType} from rm-client
      */
-    public boolean isRemoved(){
+    public boolean isRemoved() {
         return "NODESOURCE_REMOVED".equalsIgnoreCase(this.eventType);
     }
 
