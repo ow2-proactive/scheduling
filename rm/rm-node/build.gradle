@@ -22,6 +22,9 @@ dependencies {
     // script engines
     runtime 'org.jruby:jruby-complete:9.0.5.0'
     runtime 'org.python:jython-standalone:2.7.0'
+    runtime 'org.scala-lang:scala-library:2.11.7'
+    runtime 'org.scala-lang:scala-compiler:2.11.7'
+    runtime 'org.scala-lang:scala-reflect:2.11.7'
 
     runtime 'org.codehaus.groovy:groovy-all:2.4.12'
     runtime 'jsr223:jsr223-nativeshell:0.4.3'
