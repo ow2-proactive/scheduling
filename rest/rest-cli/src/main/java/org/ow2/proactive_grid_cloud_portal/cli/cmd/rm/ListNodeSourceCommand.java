@@ -54,14 +54,17 @@ public class ListNodeSourceCommand extends AbstractCommand implements Command {
             NodeSourceView[] nodeSources = state.getNodeSource();
             List<NodeSourceView> filtered = new ArrayList<>(nodeSources.length);
             for (NodeSourceView nodeSourceEvent : nodeSources) {
-                if (!"NODE_REMOVED".equalsIgnoreCase(nodeSourceEvent.getEventType())) {
+                if (!"NODESOURCE_REMOVED".equalsIgnoreCase(nodeSourceEvent.getEventType())) {
                     filtered.add(nodeSourceEvent);
+                } else {
                 }
             }
 
-            resultStack(currentContext).push(filtered.toArray());
+            NodeSourceView[] result = new NodeSourceView[filtered.size()];
+            result = filtered.toArray(result);
+            resultStack(currentContext).push(result);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s", StringUtility.string(nodeSources));
+                writeLine(currentContext, "%s", StringUtility.string(result));
             }
         } else {
             handleError("An error occurred while retrieving node sources:", response, currentContext);

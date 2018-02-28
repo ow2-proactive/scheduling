@@ -29,15 +29,13 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
@@ -48,9 +46,7 @@ public class RMStateCaching {
 
     private static Logger logger = ProActiveLogger.getLogger(RMStateCaching.class);
 
-    private static RMProxyUserInterface rmProxy;
-
-    private static RMProxyUserInterface rmProxyActiveObject;
+    private static RMProxyUserInterface rm;
 
     /**
      * Start a thread that will periodically fetch {@link RMProxyUserInterface#getMonitoring()}.
@@ -64,15 +60,13 @@ public class RMStateCaching {
     }
 
     private static void init_() {
-        while (rmProxyActiveObject == null) {
+        while (rm == null) {
             String url = PortalConfiguration.RM_URL.getValueAsString();
             String cred_path = PortalConfiguration.RM_CACHE_CREDENTIALS.getValueAsStringOrNull();
 
             try {
-                if (rmProxyActiveObject == null) {
-
-                    rmProxy = new RMProxyUserInterface();
-                    rmProxyActiveObject = PAActiveObject.turnActive(rmProxy);
+                if (rm == null) {
+                    rm = PAActiveObject.newActive(RMProxyUserInterface.class, new Object[] {});
 
                     if (cred_path != null && !(new File(cred_path)).exists()) {
                         logger.error("Credentials path set in " + PortalConfiguration.RM_CACHE_CREDENTIALS.getKey() +
@@ -81,18 +75,18 @@ public class RMStateCaching {
 
                     if (cred_path != null && new File(cred_path).exists()) {
                         Credentials cred = Credentials.getCredentials(cred_path);
-                        rmProxyActiveObject.init(url, cred);
+                        rm.init(url, cred);
                     } else {
                         String login = PortalConfiguration.RM_CACHE_LOGIN.getValueAsString();
                         String password = PortalConfiguration.RM_CACHE_PASSWORD.getValueAsString();
-                        rmProxyActiveObject.init(url, new CredData(login, password));
+                        rm.init(url, new CredData(login, password));
                     }
                 }
             } catch (Exception e) {
                 logger.warn("Could not connect to resource manager at " + url + " retrying in 8 seconds", e);
-                if (rmProxyActiveObject != null) {
-                    PAActiveObject.terminateActiveObject(rmProxyActiveObject, true);
-                    rmProxyActiveObject = null;
+                if (rm != null) {
+                    PAActiveObject.terminateActiveObject(rm, true);
+                    rm = null;
                 }
                 new Sleeper(8 * 1000, logger).sleep();
                 continue;
@@ -109,18 +103,7 @@ public class RMStateCaching {
 
             // we request the state of the RM directly via rmProxy object
             // and not via ActiveObject wrap of it.
-            final RMInitialState state = rmProxy.getRMInitialState(counter);
-
-            logger.info("---------------------");
-            logger.info("state returned");
-            logger.info("node sources");
-            for (RMNodeSourceEvent nodeSourceEvent : state.getNodeSource()) {
-                logger.info(nodeSourceEvent.getSourceName() + " " + nodeSourceEvent.getEventType());
-            }
-            logger.info("nodes");
-            for (RMNodeEvent nodeEvent : state.getNodesEvents()) {
-                logger.info(nodeEvent.getNodeUrl() + " " + nodeEvent.getEventType() + " " + nodeEvent.getNodeState());
-            }
+            final RMInitialState state = PAFuture.getFutureValue(rm.getRMInitialState(counter));
 
             long time = System.currentTimeMillis() - startTime;
 

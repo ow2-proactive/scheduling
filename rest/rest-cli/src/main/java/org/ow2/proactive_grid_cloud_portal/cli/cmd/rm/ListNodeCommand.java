@@ -80,11 +80,14 @@ public class ListNodeCommand extends AbstractCommand implements Command {
             for (NodeEventView nodeEvent : selectedNodeEvents) {
                 if (!"NODE_REMOVED".equalsIgnoreCase(nodeEvent.getEventType())) {
                     filtered.add(nodeEvent);
+                } else {
                 }
             }
 
-            resultStack(currentContext).push(filtered.toArray());
-            writeLine(currentContext, "%s", StringUtility.string(selectedNodeEvents));
+            NodeEventView[] result = new NodeEventView[filtered.size()];
+            result = filtered.toArray(result);
+            resultStack(currentContext).push(result);
+            writeLine(currentContext, "%s", StringUtility.string(result));
 
         } else {
             handleError("An error occurred while retrieving nodes:", response, currentContext);

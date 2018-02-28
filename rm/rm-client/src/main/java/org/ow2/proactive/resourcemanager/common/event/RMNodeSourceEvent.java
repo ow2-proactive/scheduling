@@ -108,6 +108,12 @@ public class RMNodeSourceEvent extends RMEvent {
         this.type = type;
     }
 
+    // for testing purpose RMinitialStateTest
+    public RMNodeSourceEvent(String nodeSourceName, long counter) {
+        this.nodeSourceName = nodeSourceName;
+        this.counter = counter;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
