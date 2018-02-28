@@ -39,8 +39,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.junit.Test;
@@ -191,31 +195,50 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
     private void checkFile(boolean shouldExist, File jobLogFile) {
         String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist" : "not exist");
         final boolean actualExistings = jobLogFile.exists();
-        if (actualExistings != shouldExist) {
-            System.out.println("This test is going to fail, but before we print diagnostic message." +
-                               simpleDateFormat.format(new Date()));
-            // iterate over all files in the 'logsLocation'
-            for (File file : FileUtils.listFiles(new File(logsLocation),
-                                                 TrueFileFilter.INSTANCE,
-                                                 TrueFileFilter.INSTANCE)) {
-                try {
-                    BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                    System.out.println(String.format("Name: %s, Size: %d, Created: %s, Modified: %s",
-                                                     file.getAbsolutePath(),
-                                                     attr.size(),
-                                                     attr.creationTime(),
-                                                     attr.lastModifiedTime()));
-                    BufferedReader br = new BufferedReader(new FileReader(file));
-                    String line;
-                    for (int i = 0; i < 5 && (line = br.readLine()) != null; ++i) {
-                        System.out.println(line);
-                    }
-                    System.out.println("............");
-                } catch (IOException e) {
-                    System.out.println("Exception ocurred during accessing file attributes " + e);
+        //        if (actualExistings != shouldExist) {
+        int LIMIT = 5;
+        System.out.println("This test is going to fail, but before we print diagnostic message." +
+                           simpleDateFormat.format(new Date()));
+        // iterate over all files in the 'logsLocation'
+        for (File file : FileUtils.listFiles(new File(logsLocation),
+                                             TrueFileFilter.INSTANCE,
+                                             TrueFileFilter.INSTANCE)) {
+            try {
+                BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                System.out.println(String.format("Name: %s, Size: %d, Created: %s, Modified: %s",
+                                                 file.getAbsolutePath(),
+                                                 attr.size(),
+                                                 attr.creationTime(),
+                                                 attr.lastModifiedTime()));
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String line;
+                int i;
+                // print up to LIMIT first lines
+                for (i = 0; i < LIMIT && (line = br.readLine()) != null; ++i) {
+                    System.out.println(line);
                 }
+                Queue<String> queue = new CircularFifoQueue<>(LIMIT);
+
+                // gather up to LIMIT last lines
+                for (i = 0; i < LIMIT && (line = br.readLine()) != null; ++i) {
+                    queue.add(line);
+                }
+                if (br.readLine() != null) { // if there is more line than 2*LIMIT
+                    System.out.println(".......");
+                    System.out.println("....... (skipped content)");
+                    System.out.println(".......");
+                }
+                for (String l : queue) { // print rest of the file
+                    System.out.println(l);
+                }
+
+                System.out.println("------------------------------------");
+                System.out.println();
+            } catch (IOException e) {
+                System.out.println("Exception ocurred during accessing file attributes " + e);
             }
         }
+        //        }
         assertEquals(message, shouldExist, actualExistings);
     }
 
