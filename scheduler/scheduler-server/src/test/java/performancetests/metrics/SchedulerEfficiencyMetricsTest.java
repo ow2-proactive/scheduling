@@ -118,7 +118,7 @@ public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
         }
         long TCT = submited - start;
         long TST = latestTaskStart - submited;
-        long TTT = finished - latestTaskStart - (TASK_DURATION * 1000);
+        long TTT = finished - latestTaskStart - TASK_DURATION;
 
         logAndAssert("TaskCreationTimeTest", TCT);
         logAndAssert("TaskSchedulingTimeTest", TST);
