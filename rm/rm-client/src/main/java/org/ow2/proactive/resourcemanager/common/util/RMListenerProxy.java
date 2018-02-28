@@ -89,9 +89,9 @@ public class RMListenerProxy extends RMGroupEventListener {
     protected AtomicLong counter = new AtomicLong(0);
 
     /**
-     * this locks are needed to synchronize access to rmInitialState
-     * RMest via RMStateCaching will read state of rmInitialState
-     * AO will change the state of rmInitialState
+     * This locks are needed to synchronize access to rmInitialState.
+     * RMRest via RMStateCaching will read state of rmInitialState.
+     * AO will change the state of rmInitialState.
      * */
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 

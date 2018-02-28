@@ -101,8 +101,6 @@ public class RMStateCaching {
         try {
             long startTime = System.currentTimeMillis();
 
-            // we request the state of the RM directly via rmProxy object
-            // and not via ActiveObject wrap of it.
             final RMInitialState state = PAFuture.getFutureValue(rm.getRMInitialState(counter));
 
             long time = System.currentTimeMillis() - startTime;

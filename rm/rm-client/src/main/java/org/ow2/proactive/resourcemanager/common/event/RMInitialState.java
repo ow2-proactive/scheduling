@@ -73,6 +73,10 @@ public class RMInitialState implements Serializable {
      */
     private Map<String, RMNodeSourceEvent> nodeSourceEvents = new ConcurrentHashMap<>();
 
+
+    /**
+     * keeps track of the latest (biggest) counter among the 'nodeEvents' and 'nodeSourceEvents'
+     */
     private AtomicLong latestCounter = new AtomicLong(0);
 
     /**
@@ -145,6 +149,13 @@ public class RMInitialState implements Serializable {
         latestCounter.set(Math.max(latestCounter.get(), event.getCounter()));
     }
 
+    /**
+     * Clones current state events, but keep only those events which has counter bigger than provided 'filter'
+     * Event counter can take values [0, +).
+     * So if filter is '-1' then all events will returned.
+     * @param filter
+     * @return rmInitialState where all the events bigger than 'filter'
+     */
     public RMInitialState cloneAndFilter(long filter) {
         long actualFilter;
         if (filter <= latestCounter.get()) {
@@ -154,7 +165,7 @@ public class RMInitialState implements Serializable {
                                       "Probably because there was network server restart.",
                                       filter,
                                       latestCounter.get()));
-            actualFilter = -1;
+            actualFilter = -1; // reset filter to default  value
         }
         RMInitialState clone = new RMInitialState();
 
