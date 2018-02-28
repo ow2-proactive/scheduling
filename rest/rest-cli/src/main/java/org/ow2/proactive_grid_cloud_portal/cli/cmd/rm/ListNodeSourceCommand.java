@@ -50,11 +50,13 @@ public class ListNodeSourceCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             RmStateView state = readValue(response, RmStateView.class, currentContext);
             NodeSourceView[] nodeSources = state.getNodeSource();
+
+            // filter out all node source events that was removed
+            // so rm client does not display them
             List<NodeSourceView> filtered = new ArrayList<>(nodeSources.length);
             for (NodeSourceView nodeSourceEvent : nodeSources) {
-                if (!"NODESOURCE_REMOVED".equalsIgnoreCase(nodeSourceEvent.getEventType())) {
+                if (!nodeSourceEvent.isRemoved()) {
                     filtered.add(nodeSourceEvent);
-                } else {
                 }
             }
 

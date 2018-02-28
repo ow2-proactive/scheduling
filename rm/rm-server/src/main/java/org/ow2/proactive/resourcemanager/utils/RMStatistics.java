@@ -211,7 +211,7 @@ public final class RMStatistics {
                 break;
             case NODE_REMOVED:
                 // Get the state of the node before it was removed
-                final NodeState nodeState = event.getPreviousNodeState();
+                final NodeState nodeState = event.getNodeState();
                 switch (nodeState) {
                     case FREE:
                         this.decrementFreeNodesCount();

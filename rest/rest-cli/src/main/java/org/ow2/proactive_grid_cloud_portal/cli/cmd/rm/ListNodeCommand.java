@@ -75,11 +75,13 @@ public class ListNodeCommand extends AbstractCommand implements Command {
                     selectedNodeEvents = selectedList.toArray(new NodeEventView[selectedList.size()]);
                 }
             }
-            List<NodeEventView> filtered = new ArrayList<>(selectedNodeEvents.length);
+
+            // filter out all node events that was removed
+            // so rm client does not display them
+            List<NodeEventView> filtered = new ArrayList<>();
             for (NodeEventView nodeEvent : selectedNodeEvents) {
-                if (!"NODE_REMOVED".equalsIgnoreCase(nodeEvent.getEventType())) {
+                if (!nodeEvent.isRemoved()) {
                     filtered.add(nodeEvent);
-                } else {
                 }
             }
 

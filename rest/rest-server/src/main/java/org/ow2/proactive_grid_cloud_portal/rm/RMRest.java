@@ -270,7 +270,7 @@ public class RMRest implements RMRestInterface {
     @Path("monitoring")
     @Produces("application/json")
     public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId,
-            @HeaderParam("latestCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
+            @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
         checkAccess(sessionId);
         long counter = Integer.valueOf(clientCounter);
         return RMStateCaching.getRMInitialState(counter);
