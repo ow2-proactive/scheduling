@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -38,26 +39,26 @@ public class NodeSourceDescriptor implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
+    private final String name;
 
-    private String infrastructureType;
+    private final String infrastructureType;
 
-    private Object[] infrastructureParameters;
+    private final List<Serializable> infrastructureParameters;
 
-    private String policyType;
+    private final String policyType;
 
-    private Object[] policyParameters;
+    private final List<Serializable> policyParameters;
 
-    private Client provider;
+    private final Client provider;
 
-    private boolean nodesRecoverable;
+    private final boolean nodesRecoverable;
 
     private NodeSourceStatus status;
 
     private Map<String, Serializable> lastRecoveredInfrastructureVariables;
 
-    private NodeSourceDescriptor(String name, String infrastructureType, Object[] infrastructureParameters,
-            String policyType, Object[] policyParameters, Client provider, boolean nodesRecoverable,
+    private NodeSourceDescriptor(String name, String infrastructureType, List<Serializable> infrastructureParameters,
+            String policyType, List<Serializable> policyParameters, Client provider, boolean nodesRecoverable,
             NodeSourceStatus status) {
         this.name = name;
         this.infrastructureType = infrastructureType;
@@ -77,16 +78,32 @@ public class NodeSourceDescriptor implements Serializable {
         return this.infrastructureType;
     }
 
-    public Object[] getInfrastructureParameters() {
+    public List<Serializable> getSerializableInfrastructureParameters() {
         return this.infrastructureParameters;
+    }
+
+    public Object[] getInfrastructureParameters() {
+        if (this.infrastructureParameters != null) {
+            return this.infrastructureParameters.toArray();
+        } else {
+            return null;
+        }
     }
 
     public String getPolicyType() {
         return this.policyType;
     }
 
-    public Object[] getPolicyParameters() {
+    public List<Serializable> getSerializablePolicyParameters() {
         return this.policyParameters;
+    }
+
+    public Object[] getPolicyParameters() {
+        if (this.policyParameters != null) {
+            return this.policyParameters.toArray();
+        } else {
+            return null;
+        }
     }
 
     public Client getProvider() {
@@ -120,11 +137,11 @@ public class NodeSourceDescriptor implements Serializable {
 
         private String infrastructureType;
 
-        private Object[] infrastructureParameters;
+        private List<Serializable> infrastructureParameters;
 
         private String policyType;
 
-        private Object[] policyParameters;
+        private List<Serializable> policyParameters;
 
         private Client provider;
 
@@ -144,7 +161,7 @@ public class NodeSourceDescriptor implements Serializable {
             return this;
         }
 
-        public Builder infrastructureParameters(Object[] infrastructureParameters) {
+        public Builder infrastructureParameters(List<Serializable> infrastructureParameters) {
             this.infrastructureParameters = infrastructureParameters;
             return this;
         }
@@ -154,7 +171,7 @@ public class NodeSourceDescriptor implements Serializable {
             return this;
         }
 
-        public Builder policyParameters(Object[] policyParameters) {
+        public Builder policyParameters(List<Serializable> policyParameters) {
             this.policyParameters = policyParameters;
             return this;
         }

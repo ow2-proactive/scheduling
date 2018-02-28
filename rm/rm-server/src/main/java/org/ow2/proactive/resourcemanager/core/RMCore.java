@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.core;
 
 import static org.ow2.proactive.resourcemanager.common.event.RMEventType.NODE_STATE_CHANGED;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Permission;
@@ -1185,15 +1186,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Node Source name cannot be null");
         }
 
+        List<Serializable> serializableInfraParams = getSerializableParamsOrFail(nodeSourceName, infraParams);
+        List<Serializable> serializablePolicyParams = getSerializableParamsOrFail(nodeSourceName, policyParams);
+
         logger.info("Define a node source : " + nodeSourceName);
 
         nodeSourceName = nodeSourceName.trim();
 
         NodeSourceData persistedNodeSource = new NodeSourceData(nodeSourceName,
                                                                 infrastructureType,
-                                                                infraParams,
+                                                                serializableInfraParams,
                                                                 policyType,
-                                                                policyParams,
+                                                                serializablePolicyParams,
                                                                 caller,
                                                                 nodesRecoverable,
                                                                 NodeSourceStatus.NODES_UNDEPLOYED);
@@ -1205,6 +1209,25 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         } else {
             return validateAndPrepareNodeSource(nodeSourceName, persistedNodeSource, added);
         }
+
+    }
+
+    private List<Serializable> getSerializableParamsOrFail(String nodeSourceName, Object[] params) {
+        List<Serializable> serializableParams = null;
+        if (params != null) {
+            Object currentParam = null;
+            try {
+                serializableParams = new ArrayList<>(params.length);
+                for (int i = 0; i < params.length; i++) {
+                    currentParam = params[i];
+                    serializableParams.add(i, (Serializable) currentParam);
+                }
+            } catch (ClassCastException e) {
+                throw new IllegalArgumentException("Parameter " + currentParam + " of defined node source " +
+                                                   nodeSourceName + " is not Serializable");
+            }
+        }
+        return serializableParams;
     }
 
     private BooleanWrapper validateAndPrepareNodeSource(String nodeSourceName, NodeSourceData persistedNodeSource,
@@ -1228,7 +1251,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     protected void prepareNodeSource(NodeSourceData persistedNodeSource) {
-        InfrastructureManager infrastructureManager = InfrastructureManagerFactory.create(persistedNodeSource);
+        InfrastructureManager infrastructureManager = InfrastructureManagerFactory.create(persistedNodeSource.toNodeSourceDescriptor());
 
         NodeSourcePolicy notActivePolicy = NodeSourcePolicyFactory.createNotActive(persistedNodeSource.getPolicyType());
 
@@ -1357,13 +1380,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private NodeSource retrieveNodeSourceOrFail(String nodeSourceName) {
-        NodeSource nodeSourceData = this.undeployedNodeSources.get(nodeSourceName);
+        NodeSource nodeSource = this.undeployedNodeSources.get(nodeSourceName);
 
-        if (nodeSourceData == null) {
+        if (nodeSource == null) {
             throw new IllegalStateException("Undeployed node source " + nodeSourceName + " is unknown");
         }
 
-        return nodeSourceData;
+        return nodeSource;
     }
 
     /**

@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.db;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -56,11 +57,11 @@ public class NodeSourceData implements Serializable {
 
     private String infrastructureType;
 
-    private Object[] infrastructureParameters;
+    private List<Serializable> infrastructureParameters;
 
     private String policyType;
 
-    private Object[] policyParameters;
+    private List<Serializable> policyParameters;
 
     private Client provider;
 
@@ -76,8 +77,8 @@ public class NodeSourceData implements Serializable {
     public NodeSourceData() {
     }
 
-    public NodeSourceData(String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
-            String policyType, Object[] policyParameters, Client provider, boolean nodesRecoverable,
+    public NodeSourceData(String nodeSourceName, String infrastructureType, List<Serializable> infrastructureParameters,
+            String policyType, List<Serializable> policyParameters, Client provider, boolean nodesRecoverable,
             NodeSourceStatus status) {
 
         this.name = nodeSourceName;
@@ -94,9 +95,9 @@ public class NodeSourceData implements Serializable {
     public static NodeSourceData fromNodeSourceDescriptor(NodeSourceDescriptor descriptor) {
         NodeSourceData nodeSourceData = new NodeSourceData(descriptor.getName(),
                                                            descriptor.getInfrastructureType(),
-                                                           descriptor.getInfrastructureParameters(),
+                                                           descriptor.getSerializableInfrastructureParameters(),
                                                            descriptor.getPolicyType(),
-                                                           descriptor.getPolicyParameters(),
+                                                           descriptor.getSerializablePolicyParameters(),
                                                            descriptor.getProvider(),
                                                            descriptor.nodesRecoverable(),
                                                            descriptor.getStatus());
@@ -126,11 +127,11 @@ public class NodeSourceData implements Serializable {
 
     @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Object[] getInfrastructureParameters() {
+    public List<Serializable> getInfrastructureParameters() {
         return infrastructureParameters;
     }
 
-    public void setInfrastructureParameters(Object[] infrastructureParameters) {
+    public void setInfrastructureParameters(List<Serializable> infrastructureParameters) {
         this.infrastructureParameters = infrastructureParameters;
     }
 
@@ -145,11 +146,11 @@ public class NodeSourceData implements Serializable {
 
     @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Object[] getPolicyParameters() {
+    public List<Serializable> getPolicyParameters() {
         return policyParameters;
     }
 
-    public void setPolicyParameters(Object[] policyParameters) {
+    public void setPolicyParameters(List<Serializable> policyParameters) {
         this.policyParameters = policyParameters;
     }
 

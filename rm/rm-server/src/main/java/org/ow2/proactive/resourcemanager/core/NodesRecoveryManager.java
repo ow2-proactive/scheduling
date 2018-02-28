@@ -120,7 +120,7 @@ public class NodesRecoveryManager {
         boolean existPersistedNodes = this.existPersistedNodes(nodeSourceName);
 
         if (existPersistedNodes) {
-            InfrastructureManager im = InfrastructureManagerFactory.recover(NodeSourceData.fromNodeSourceDescriptor(descriptor));
+            InfrastructureManager im = InfrastructureManagerFactory.recover(descriptor);
             if (!im.getDeployingAndLostNodes().isEmpty()) {
                 // if there are deploying nodes, we will not recover
                 this.rmCore.getDbManager().removeAllNodesFromNodeSource(nodeSourceName);
