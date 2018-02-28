@@ -81,6 +81,8 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
     private String logsLocation = ServerJobAndTaskLogs.getLogsLocation();
 
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("kk:mm:ss:SSS");
+
     private Job createPendingJob() throws Exception {
         final TaskFlowJob job = new TaskFlowJob();
         JavaTask task = new JavaTask();
@@ -157,7 +159,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
         schedulerHelper.removeJob(jobId);
         schedulerHelper.waitForEventJobRemoved(jobId);
 
-        System.out.println("Suppose to remove all logs at " + new SimpleDateFormat("kk:mm:ss:SSS").format(new Date()));
+        System.out.println("Suppose to remove all logs at " + simpleDateFormat.format(new Date()));
 
         checkNoLogsFromAPI(jobId, tasks);
         checkJobAndTaskLogFiles(jobId, tasks, false);
@@ -191,7 +193,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
         final boolean actualExistings = jobLogFile.exists();
         if (actualExistings != shouldExist) {
             System.out.println("This test is going to fail, but before we print diagnostic message." +
-                               new SimpleDateFormat("kk:mm:ss:SSS").format(new Date()));
+                    simpleDateFormat.format(new Date()));
             // iterate over all files in the 'logsLocation'
             for (File file : FileUtils.listFiles(new File(logsLocation),
                                                  TrueFileFilter.INSTANCE,
