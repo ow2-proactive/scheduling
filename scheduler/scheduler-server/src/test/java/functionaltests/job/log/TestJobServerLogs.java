@@ -193,7 +193,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
         final boolean actualExistings = jobLogFile.exists();
         if (actualExistings != shouldExist) {
             System.out.println("This test is going to fail, but before we print diagnostic message." +
-                    simpleDateFormat.format(new Date()));
+                               simpleDateFormat.format(new Date()));
             // iterate over all files in the 'logsLocation'
             for (File file : FileUtils.listFiles(new File(logsLocation),
                                                  TrueFileFilter.INSTANCE,
