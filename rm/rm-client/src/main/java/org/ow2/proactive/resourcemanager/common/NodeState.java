@@ -77,12 +77,7 @@ public enum NodeState {
     /**
      * a node cannot be provided to a RM user, it is under configuration
      */
-    CONFIGURING("Configuring"),
-
-    /**
-     * a node that was removed completely
-     */
-    REMOVED("Removed");
+    CONFIGURING("Configuring");
 
     private String desc;
 

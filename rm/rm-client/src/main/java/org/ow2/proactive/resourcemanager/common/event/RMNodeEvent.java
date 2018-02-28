@@ -169,37 +169,6 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeLocker = rmNode.getLockedBy();
     }
 
-    public RMNodeEvent(final RMNodeDescriptor rmNode, final RMEventType eventType, final NodeState previousNodeState,
-            final String initiator, NodeState nodeState) {
-        super(eventType);
-
-        this.initiator = initiator;
-        this.nodeUrl = rmNode.getNodeURL();
-        this.nodeSource = rmNode.getNodeSourceName();
-        this.PADName = "";
-        this.VnName = rmNode.getVNodeName();
-        this.hostName = rmNode.getHostName();
-        this.VMName = rmNode.getDescriptorVMName();
-        this.nodeState = nodeState;
-        this.description = rmNode.getNodeInfo();
-        this.defaultJMXUrl = rmNode.getDefaultJMXUrl();
-        this.proactiveJMXUrl = rmNode.getProactiveJMXUrl();
-
-        // when node is requested to be removed
-        // there is no state change in the node itself
-        // so the time stamp of the event has to be used
-        if (eventType != RMEventType.NODE_REMOVED) {
-            this.timeStamp = rmNode.getStateChangeTime();
-        }
-        this.previousNodeState = previousNodeState;
-        this.nodeProvider = rmNode.getProviderName();
-        this.nodeOwner = rmNode.getOwnerName();
-
-        this.isLocked = rmNode.isLocked();
-        this.lockTime = rmNode.getLockTime();
-        this.nodeLocker = rmNode.getLockedBy();
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;

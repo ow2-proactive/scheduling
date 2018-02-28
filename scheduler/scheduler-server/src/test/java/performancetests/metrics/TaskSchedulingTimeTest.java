@@ -85,7 +85,7 @@ public class TaskSchedulingTimeTest extends PerformanceTestBase {
                                                RM_CONFIGURATION_START.getPath(),
                                                null);
 
-        schedulerHelper.createNodeSourceWithInfiniteTimeout("local", numberOfExperiments);
+        schedulerHelper.createNodeSourceWithInfiniteTimeout("local", 1);
 
         final TaskFlowJob job = SchedulerEfficiencyMetricsTest.createJob(1, 10);
 

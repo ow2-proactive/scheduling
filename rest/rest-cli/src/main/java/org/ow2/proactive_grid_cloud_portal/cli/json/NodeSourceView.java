@@ -32,6 +32,8 @@ public class NodeSourceView {
 
     private String nodeSourceAdmin;
 
+    private String eventType;
+
     public String getSourceName() {
         return sourceName;
     }
@@ -54,5 +56,13 @@ public class NodeSourceView {
 
     public void setNodeSourceAdmin(String nodeSourceAdmin) {
         this.nodeSourceAdmin = nodeSourceAdmin;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 }

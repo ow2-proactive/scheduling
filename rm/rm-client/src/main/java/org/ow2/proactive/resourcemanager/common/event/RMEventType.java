@@ -83,6 +83,6 @@ public enum RMEventType {
     /**
      * A node has been removed from Resource manager
      */
-    NODE_REMOVED,
+    NODE_REMOVED;
 
 }

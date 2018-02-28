@@ -76,7 +76,14 @@ public class ListNodeCommand extends AbstractCommand implements Command {
                     selectedNodeEvents = selectedList.toArray(new NodeEventView[selectedList.size()]);
                 }
             }
-            resultStack(currentContext).push(selectedNodeEvents);
+            List<NodeEventView> filtered = new ArrayList<>(selectedNodeEvents.length);
+            for (NodeEventView nodeEvent : selectedNodeEvents) {
+                if (!"NODE_REMOVED".equalsIgnoreCase(nodeEvent.getEventType())) {
+                    filtered.add(nodeEvent);
+                }
+            }
+
+            resultStack(currentContext).push(filtered.toArray());
             writeLine(currentContext, "%s", StringUtility.string(selectedNodeEvents));
 
         } else {

@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
@@ -138,7 +139,7 @@ public class RMInitialState implements Serializable {
 
     public void nodeSourceRemoved(RMNodeSourceEvent event) {
         updateCounter(event);
-        nodeSourceEvents.remove(event.getSourceName());
+        nodeSourceEvents.put(event.getSourceName(), event);
     }
 
     private void updateCounter(RMEvent event) {

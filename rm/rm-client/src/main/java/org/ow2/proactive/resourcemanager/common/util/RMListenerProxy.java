@@ -212,14 +212,6 @@ public class RMListenerProxy extends RMGroupEventListener {
         }
     }
 
-    /**
-     * give access to the cached initial state
-     * @return the local version of the initial state
-     */
-    public RMInitialState getRMInitialState() {
-        return getRMInitialState(-1);
-    }
-
     public RMInitialState getRMInitialState(long filter) {
         readWriteLock.readLock().lock();
         try {

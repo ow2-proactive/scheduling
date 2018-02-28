@@ -27,12 +27,16 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.cli.json.NodeEventView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NodeSourceView;
 import org.ow2.proactive_grid_cloud_portal.cli.json.RmStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
@@ -48,7 +52,14 @@ public class ListNodeSourceCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             RmStateView state = readValue(response, RmStateView.class, currentContext);
             NodeSourceView[] nodeSources = state.getNodeSource();
-            resultStack(currentContext).push(nodeSources);
+            List<NodeSourceView> filtered = new ArrayList<>(nodeSources.length);
+            for (NodeSourceView nodeSourceEvent : nodeSources) {
+                if (!"NODE_REMOVED".equalsIgnoreCase(nodeSourceEvent.getEventType())) {
+                    filtered.add(nodeSourceEvent);
+                }
+            }
+
+            resultStack(currentContext).push(filtered.toArray());
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "%s", StringUtility.string(nodeSources));
             }

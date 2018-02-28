@@ -34,7 +34,10 @@ import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
@@ -107,6 +110,17 @@ public class RMStateCaching {
             // we request the state of the RM directly via rmProxy object
             // and not via ActiveObject wrap of it.
             final RMInitialState state = rmProxy.getRMInitialState(counter);
+
+            logger.info("---------------------");
+            logger.info("state returned");
+            logger.info("node sources");
+            for (RMNodeSourceEvent nodeSourceEvent : state.getNodeSource()) {
+                logger.info(nodeSourceEvent.getSourceName() + " " + nodeSourceEvent.getEventType());
+            }
+            logger.info("nodes");
+            for (RMNodeEvent nodeEvent : state.getNodesEvents()) {
+                logger.info(nodeEvent.getNodeUrl() + " " + nodeEvent.getEventType() + " " + nodeEvent.getNodeState());
+            }
 
             long time = System.currentTimeMillis() - startTime;
 

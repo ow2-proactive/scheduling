@@ -55,6 +55,8 @@ public class NodeEventView {
 
     private String nodeLocker;
 
+    private String eventType;
+
     public String getHostName() {
         return hostName;
     }
@@ -167,4 +169,11 @@ public class NodeEventView {
         this.nodeLocker = nodeLocker;
     }
 
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
 }
