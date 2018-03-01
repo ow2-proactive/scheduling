@@ -131,11 +131,11 @@ public class NodeRecoveryTest extends PerformanceTestBase {
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.info(PerformanceTestBase.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
-                                                         nodesNumber,
-                                                         timeLimit,
-                                                         -1,
-                                                         -1,
-                                                         ERROR));
+                                                          nodesNumber,
+                                                          timeLimit,
+                                                          -1,
+                                                          -1,
+                                                          ERROR));
         }
     }
 

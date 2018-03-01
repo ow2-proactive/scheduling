@@ -39,7 +39,8 @@ import performancetests.recovery.NodeRecoveryTest;
                       NodeRecoveryTest.class, JobRecoveryTest.class,
 
                       // Metrics
-                      TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class, ParallelTaskSchedulingTest.class,
+                      TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class,
+                      ParallelTaskSchedulingTest.class,
 
                       // Test which computes average metrics
                       TaskSchedulingTimeTest.class })

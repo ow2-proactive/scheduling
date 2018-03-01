@@ -25,18 +25,23 @@
  */
 package performancetests.metrics;
 
-import functionaltests.utils.SchedulerTHelper;
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
+import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.examples.EmptyTask;
+
+import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.PerformanceTestBase;
 
-import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * Performance test measure paraller task scheduling.
@@ -59,7 +64,7 @@ public class ParallelTaskSchedulingTest extends PerformanceTestBase {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{{1000, 50, 10000}});
+        return Arrays.asList(new Object[][] { { 1000, 50, 100000 } });
     }
 
     // number of tasks (all task are empty) inside single job
@@ -81,9 +86,9 @@ public class ParallelTaskSchedulingTest extends PerformanceTestBase {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                SCHEDULER_CONFIGURATION_START.getPath(),
-                RM_CONFIGURATION_START.getPath(),
-                null);
+                                               SCHEDULER_CONFIGURATION_START.getPath(),
+                                               RM_CONFIGURATION_START.getPath(),
+                                               null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", numberOfNodes);
 
@@ -94,14 +99,21 @@ public class ParallelTaskSchedulingTest extends PerformanceTestBase {
 
         final long timeToMeasure = jobState.getFinishedTime() - jobState.getStartTime();
 
-        LOGGER.info(makeCSVString(TaskCreationTimeTest.class.getSimpleName(),
-                numberOfTasks,
-                timeLimit,
-                timeToMeasure,
-                ((timeToMeasure < timeLimit) ? SUCCESS : FAILURE)));
+        LOGGER.info(makeCSVString(ParallelTaskSchedulingTest.class.getSimpleName(),
+                                  numberOfTasks,
+                                  timeLimit,
+                                  timeToMeasure,
+                                  ((timeToMeasure < timeLimit) ? SUCCESS : FAILURE)));
     }
 
-    private TaskFlowJob createJob(int numberOfTasks) {
-        return null;
+    private TaskFlowJob createJob(int numberOfTasks) throws UserException {
+        TaskFlowJob job = new TaskFlowJob();
+        for (int i = 0; i < numberOfTasks; i++) {
+            JavaTask task = new JavaTask();
+            task.setName("JavaTask_" + i);
+            task.setExecutableClassName(EmptyTask.class.getName());
+            job.addTask(task);
+        }
+        return job;
     }
 }

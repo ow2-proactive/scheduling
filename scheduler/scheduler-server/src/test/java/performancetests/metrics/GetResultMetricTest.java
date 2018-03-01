@@ -59,7 +59,6 @@ public class GetResultMetricTest extends PerformanceTestBase {
 
     private final long timeLimit;
 
-
     public GetResultMetricTest(int taskNumber, int timeLimit) {
         this.taskNumber = taskNumber;
         this.timeLimit = timeLimit;

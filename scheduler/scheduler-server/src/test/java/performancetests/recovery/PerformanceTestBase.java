@@ -39,9 +39,9 @@ import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.scheduler.common.job.JobId;
 
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
-import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 /**
@@ -54,7 +54,7 @@ public class PerformanceTestBase extends SchedulerFunctionalTestWithCustomConfig
 
     @Rule
     public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() * 10,
-            TimeUnit.MILLISECONDS);
+                                             TimeUnit.MILLISECONDS);
 
     public static final String SUCCESS = "SUCCESS";
 
@@ -75,7 +75,7 @@ public class PerformanceTestBase extends SchedulerFunctionalTestWithCustomConfig
     @After
     public void after() throws Exception {
         if (schedulerHelper != null) {
-            if(jobId != null) {
+            if (jobId != null) {
                 if (!schedulerHelper.getSchedulerInterface().getJobState(jobId).isFinished()) {
                     schedulerHelper.getSchedulerInterface().killJob(jobId);
                 }
