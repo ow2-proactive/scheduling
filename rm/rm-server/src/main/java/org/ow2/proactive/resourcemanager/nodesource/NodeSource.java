@@ -116,11 +116,19 @@ public class NodeSource implements InitActive, RunActive {
 
     private InfrastructureManager infrastructureManager;
 
-    // The policy is not final: when the node source is defined, the policy is
-    // not an activity. When the node source is deployed, the policy is turned
-    // active, so we need to update the nodeSourcePolicy reference with the
-    // policy stub
-    private NodeSourcePolicy nodeSourcePolicy;
+    /**
+     * A reference to the plain old instance of node source policy
+     * {@see NodeSource#activeNodeSourcePolicy}. This policy object is not yet
+     * configured, and as such it should only be used in the constructor of
+     * the node source.
+     */
+    private final NodeSourcePolicy nodeSourcePolicy;
+
+    /**
+     * Node source policy reference to use when the node source policy has
+     * been turned active, i.e. when the node source is deployed.
+     */
+    private NodeSourcePolicy activeNodeSourcePolicy;
 
     private final String description;
 
@@ -212,7 +220,7 @@ public class NodeSource implements InitActive, RunActive {
         this.nodeSourcePolicy = policy;
         this.rmcore = rmcore;
         this.monitoring = monitor;
-        this.description = "Infrastructure: " + im + ", Policy: " + policy;
+        this.description = "Infrastructure: " + im + ", Policy: " + this.nodeSourcePolicy;
 
         this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
         this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
@@ -226,9 +234,9 @@ public class NodeSource implements InitActive, RunActive {
         // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
         // or PrincipalPermission (anyone)
         this.providerPermission = new PrincipalPermission(administrator.getName(),
-                                                          nodeSourcePolicy.getProviderAccessType()
-                                                                          .getIdentityPrincipals(administrator));
-        this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
+                                                          this.nodeSourcePolicy.getProviderAccessType()
+                                                                               .getIdentityPrincipals(administrator));
+        this.nodeUserAccessType = this.nodeSourcePolicy.getUserAccessType();
 
         this.descriptor = nodeSourceDescriptor;
     }
@@ -240,30 +248,30 @@ public class NodeSource implements InitActive, RunActive {
      */
     public void initActivity(Body body) {
 
-        stub = (NodeSource) PAActiveObject.getStubOnThis();
-        infrastructureManager.setNodeSource(this);
+        this.stub = (NodeSource) PAActiveObject.getStubOnThis();
+        this.infrastructureManager.setNodeSource(this);
         // Infrastructure has been configured and linked to the node source, so we can now persist the runtime
         // variables of the infrastructure for the first time (they have been initialized during the creation of the
         // infrastructure, in its configuration.
-        infrastructureManager.persistInfrastructureVariables();
-        nodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
+        this.infrastructureManager.persistInfrastructureVariables();
+        this.activeNodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
         // Set permissions again according to the activated node source policy
 
         // node source admin permission
         // it's the PrincipalPermission of the user who created the node source
-        this.adminPermission = new PrincipalPermission(administrator.getName(),
-                                                       administrator.getSubject()
-                                                                    .getPrincipals(UserNamePrincipal.class));
+        this.adminPermission = new PrincipalPermission(this.administrator.getName(),
+                                                       this.administrator.getSubject()
+                                                                         .getPrincipals(UserNamePrincipal.class));
         // creating node source provider permission
         // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
         // or PrincipalPermission (anyone)
-        this.providerPermission = new PrincipalPermission(administrator.getName(),
-                                                          nodeSourcePolicy.getProviderAccessType()
-                                                                          .getIdentityPrincipals(administrator));
-        this.nodeUserAccessType = nodeSourcePolicy.getUserAccessType();
+        this.providerPermission = new PrincipalPermission(this.administrator.getName(),
+                                                          this.activeNodeSourcePolicy.getProviderAccessType()
+                                                                                     .getIdentityPrincipals(this.administrator));
+        this.nodeUserAccessType = this.activeNodeSourcePolicy.getUserAccessType();
 
-        Thread.currentThread().setName("Node Source \"" + name + "\"");
+        Thread.currentThread().setName("Node Source \"" + this.name + "\"");
     }
 
     public void runActivity(Body body) {
@@ -537,16 +545,16 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     public NodeSourcePolicy getPolicy() {
-        return nodeSourcePolicy;
+        return this.nodeSourcePolicy;
     }
 
-    public void setPolicy(NodeSourcePolicy policy) {
-        nodeSourcePolicy = policy;
+    public void setActivePolicy(NodeSourcePolicy policy) {
+        this.activeNodeSourcePolicy = policy;
     }
 
     public void setStatus(NodeSourceStatus status) {
         this.descriptor.setStatus(status);
-        this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(descriptor));
+        this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
     }
 
     /**
@@ -735,8 +743,8 @@ public class NodeSource implements InitActive, RunActive {
      * Activates a node source policy.
      */
     public BooleanWrapper activate() {
-        logger.info("[" + name + "] Activating the policy " + nodeSourcePolicy);
-        return nodeSourcePolicy.activate();
+        logger.info("[" + this.name + "] Activating the policy " + this.activeNodeSourcePolicy);
+        return this.activeNodeSourcePolicy.activate();
     }
 
     /**
@@ -744,11 +752,11 @@ public class NodeSource implements InitActive, RunActive {
      * @param initiator
      */
     protected void shutdownNodeSourceServices(Client initiator) {
-        logger.info("[" + name + "] Shutdown finalization");
+        logger.info("[" + this.name + "] Shutdown finalization");
 
-        if (descriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
-            nodeSourcePolicy.shutdown(initiator);
-            infrastructureManager.internalShutDown();
+        if (this.descriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
+            this.activeNodeSourcePolicy.shutdown(initiator);
+            this.infrastructureManager.internalShutDown();
         }
     }
 

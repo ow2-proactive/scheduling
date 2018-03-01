@@ -1014,7 +1014,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, preemptive, isTriggeredFromShutdownHook));
     }
 
-    protected void recoverEligibleNodes(List<RMNode> eligibleNodes) {
+    protected void setEligibleNodesToRecover(List<RMNode> eligibleNodes) {
         this.eligibleNodes = eligibleNodes;
     }
 
@@ -1224,7 +1224,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 }
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("Parameter " + currentParam + " of defined node source " +
-                                                   nodeSourceName + " is not Serializable");
+                                                   nodeSourceName + " is not Serializable", e);
             }
         }
         return serializableParams;
@@ -1253,7 +1253,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     protected void prepareNodeSource(NodeSourceData persistedNodeSource) {
         InfrastructureManager infrastructureManager = InfrastructureManagerFactory.create(persistedNodeSource.toNodeSourceDescriptor());
 
-        NodeSourcePolicy notActivePolicy = NodeSourcePolicyFactory.createNotActive(persistedNodeSource.getPolicyType());
+        NodeSourcePolicy notActivePolicy = NodeSourcePolicyFactory.create(persistedNodeSource.getPolicyType());
 
         NodeSource nodeSource = new NodeSource(this.getUrl(),
                                                persistedNodeSource.getName(),
@@ -1314,9 +1314,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                                           descriptor);
         }
 
-        NodeSourcePolicy policy = NodeSourcePolicyFactory.turnActivePolicy(nodeSourceToDeploy.getPolicy(),
-                                                                           descriptor.getPolicyParameters());
-        nodeSourceToDeploy.setPolicy(policy);
+        NodeSourcePolicy activePolicy = NodeSourcePolicyFactory.activate(nodeSourceToDeploy.getPolicy(),
+                                                                         descriptor.getPolicyParameters());
+        nodeSourceToDeploy.setActivePolicy(activePolicy);
 
         nodeSourceToDeploy.setStatus(NodeSourceStatus.NODES_DEPLOYED);
         this.undeployedNodeSources.remove(nodeSourceToDeploy.getName());
@@ -1336,7 +1336,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // In order to do it node source and policy active objects are added to the clients list.
         // They will be removed from this list when node source is unregistered.
         UniqueID nsId = Client.getId(nodeSourceToDeploy);
-        UniqueID policyId = Client.getId(policy);
+        UniqueID policyId = Client.getId(activePolicy);
         if (nsId == null || policyId == null) {
             throw new IllegalStateException("Cannot register the node source");
         }
