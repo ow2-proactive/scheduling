@@ -25,11 +25,9 @@
  */
 package performancetests.metrics;
 
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,7 +45,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
 
 import functionaltests.utils.SchedulerTHelper;
-import performancetests.recovery.PeformanceTestBase;
+import performancetests.recovery.PerformanceTestBase;
 
 
 /**
@@ -56,13 +54,7 @@ import performancetests.recovery.PeformanceTestBase;
  * This test DOES require to have as many cores as there are tasks.
  */
 @RunWith(Parameterized.class)
-public class SchedulerEfficiencyMetricsTest extends PeformanceTestBase {
-
-    public static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyMetricsTest.class.getResource("/performancetests/config/scheduler-start-memory.ini");
-
-    public static final URL RM_CONFIGURATION_START = SchedulerEfficiencyMetricsTest.class.getResource("/performancetests/config/rm-start-memory.ini");
-
-    private static final Logger LOGGER = Logger.getLogger(SchedulerEfficiencyMetricsTest.class);
+public class SchedulerEfficiencyMetricsTest extends PerformanceTestBase {
 
     private static final String OPTIMAL_JOB_DURATION = "OPTIMAL_JOB_DURATION";
 

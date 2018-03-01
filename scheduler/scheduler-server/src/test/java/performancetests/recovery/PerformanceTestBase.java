@@ -30,21 +30,31 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 /**
  * We need this class only to increase timeout rule for performance tests.
  */
 @SuppressWarnings("squid:S2187")
-public class PeformanceTestBase extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class PerformanceTestBase extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+
+    protected static final Logger LOGGER = Logger.getLogger(PerformanceTestBase.class);
+
+    @Rule
+    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() * 10,
+            TimeUnit.MILLISECONDS);
 
     public static final String SUCCESS = "SUCCESS";
 
@@ -56,9 +66,25 @@ public class PeformanceTestBase extends SchedulerFunctionalTestWithCustomConfigA
 
     public static final String ERROR = "ERROR";
 
-    @Rule
-    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() * 10,
-                                             TimeUnit.MILLISECONDS);
+    protected static final URL SCHEDULER_CONFIGURATION_START = PerformanceTestBase.class.getResource("/performancetests/config/scheduler-start-memory.ini");
+
+    protected static final URL RM_CONFIGURATION_START = PerformanceTestBase.class.getResource("/performancetests/config/rm-start-memory.ini");
+
+    protected JobId jobId;
+
+    @After
+    public void after() throws Exception {
+        if (schedulerHelper != null) {
+            if(jobId != null) {
+                if (!schedulerHelper.getSchedulerInterface().getJobState(jobId).isFinished()) {
+                    schedulerHelper.getSchedulerInterface().killJob(jobId);
+                }
+                schedulerHelper.getSchedulerInterface().removeJob(jobId);
+            }
+            schedulerHelper.log("Kill Scheduler after test.");
+            schedulerHelper.killScheduler();
+        }
+    }
 
     public static String makeCSVString(Object... strings) {
         String result = new String();

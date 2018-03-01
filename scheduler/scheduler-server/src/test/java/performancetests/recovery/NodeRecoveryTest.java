@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,9 +52,7 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class NodeRecoveryTest extends PeformanceTestBase {
-
-    private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
+public class NodeRecoveryTest extends PerformanceTestBase {
 
     public static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
                                                                               .getPath();
@@ -133,7 +130,7 @@ public class NodeRecoveryTest extends PeformanceTestBase {
                                       ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(PeformanceTestBase.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
+            LOGGER.info(PerformanceTestBase.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
                                                          nodesNumber,
                                                          timeLimit,
                                                          -1,

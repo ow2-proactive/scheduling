@@ -28,19 +28,16 @@ package performancetests.metrics;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
 import functionaltests.utils.SchedulerTHelper;
-import performancetests.recovery.PeformanceTestBase;
+import performancetests.recovery.PerformanceTestBase;
 
 
 /**
@@ -49,9 +46,7 @@ import performancetests.recovery.PeformanceTestBase;
  * This test DOES require to have as many cores as there are tasks.
  */
 @RunWith(Parameterized.class)
-public class GetResultMetricTest extends PeformanceTestBase {
-
-    private static final Logger LOGGER = Logger.getLogger(GetResultMetricTest.class);
+public class GetResultMetricTest extends PerformanceTestBase {
 
     SchedulerTHelper schedulerHelper;
 
@@ -64,7 +59,6 @@ public class GetResultMetricTest extends PeformanceTestBase {
 
     private final long timeLimit;
 
-    private JobId jobId;
 
     public GetResultMetricTest(int taskNumber, int timeLimit) {
         this.taskNumber = taskNumber;
@@ -80,8 +74,8 @@ public class GetResultMetricTest extends PeformanceTestBase {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                                               SchedulerEfficiencyMetricsTest.SCHEDULER_CONFIGURATION_START.getPath(),
-                                               SchedulerEfficiencyMetricsTest.RM_CONFIGURATION_START.getPath(),
+                                               SCHEDULER_CONFIGURATION_START.getPath(),
+                                               RM_CONFIGURATION_START.getPath(),
                                                null);
 
         schedulerHelper.createNodeSourceWithInfiniteTimeout("local", nodeNumber);
@@ -107,15 +101,4 @@ public class GetResultMetricTest extends PeformanceTestBase {
                                   ((timeToGetResult < timeLimit) ? SUCCESS : FAILURE)));
     }
 
-    @After
-    public void after() throws Exception {
-        if (schedulerHelper != null) {
-            if (!schedulerHelper.getSchedulerInterface().getJobState(jobId).isFinished()) {
-                schedulerHelper.getSchedulerInterface().killJob(jobId);
-            }
-            schedulerHelper.getSchedulerInterface().removeJob(jobId);
-            schedulerHelper.log("Kill Scheduler after test.");
-            schedulerHelper.killScheduler();
-        }
-    }
 }
