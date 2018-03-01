@@ -447,11 +447,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         nodesRecoveryManager.initialize();
         if (RM_NODES_RECOVERY.getValueAsBoolean()) {
             logger.info("Starting Nodes Recovery");
-            recoverNodeSourcesAndNodes();
         } else {
             logger.info("Nodes Recovery is disabled. Removing all nodes from database");
             dbManager.removeAllNodes();
         }
+        recoverNodeSourcesAndNodes();
     }
 
     Function<RMCore, NodesRecoveryManager> getNodesRecoveryManagerBuilder() {
