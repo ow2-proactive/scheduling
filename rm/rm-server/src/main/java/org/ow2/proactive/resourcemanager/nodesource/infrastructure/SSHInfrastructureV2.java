@@ -29,6 +29,7 @@ import static com.google.common.base.Throwables.getStackTraceAsString;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
@@ -98,7 +99,8 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     protected Properties sshOptions;
 
     @Configurable(description = "Absolute path of the java executable on the remote hosts")
-    protected String javaPath = "java";
+    protected String javaPath = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "jre" +
+                                File.separator + "bin" + File.separator + "java";
 
     @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)root directory on the remote hosts")
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
