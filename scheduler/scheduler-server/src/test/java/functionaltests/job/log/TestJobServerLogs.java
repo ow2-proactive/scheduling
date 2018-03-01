@@ -196,48 +196,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
         String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist" : "not exist");
         final boolean actualExistings = jobLogFile.exists();
         if (actualExistings != shouldExist) {
-            int LIMIT = 5;
-            System.out.println("This test is going to fail, but before we print diagnostic message." +
-                               simpleDateFormat.format(new Date()));
-            // iterate over all files in the 'logsLocation'
-            for (File file : FileUtils.listFiles(new File(logsLocation),
-                                                 TrueFileFilter.INSTANCE,
-                                                 TrueFileFilter.INSTANCE)) {
-                try {
-                    BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                    System.out.println(String.format("Name: %s, Size: %d, Created: %s, Modified: %s",
-                                                     file.getAbsolutePath(),
-                                                     attr.size(),
-                                                     attr.creationTime(),
-                                                     attr.lastModifiedTime()));
-                    BufferedReader br = new BufferedReader(new FileReader(file));
-                    String line;
-                    int i;
-                    // print up to LIMIT first lines
-                    for (i = 0; i < LIMIT && (line = br.readLine()) != null; ++i) {
-                        System.out.println(line);
-                    }
-                    Queue<String> queue = new CircularFifoQueue<>(LIMIT);
-
-                    // gather up to LIMIT last lines
-                    for (i = 0; i < LIMIT && (line = br.readLine()) != null; ++i) {
-                        queue.add(line);
-                    }
-                    if (br.readLine() != null) { // if there is more line than 2*LIMIT
-                        System.out.println(".......");
-                        System.out.println("....... (skipped content)");
-                        System.out.println(".......");
-                    }
-                    for (String l : queue) { // print rest of the file
-                        System.out.println(l);
-                    }
-
-                    System.out.println("------------------------------------");
-                    System.out.println();
-                } catch (IOException e) {
-                    System.out.println("Exception ocurred during accessing file attributes " + e);
-                }
-            }
+            printDiagnosticMessage();
         }
         assertEquals(message, shouldExist, actualExistings);
     }
@@ -245,6 +204,52 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
     public static boolean matchLine(String text, String regex) {
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         return pattern.matcher(text).find();
+    }
+
+    private void printDiagnosticMessage() {
+        int LIMIT = 5;
+        System.out.println("This test is going to fail, but before we print diagnostic message." +
+                           simpleDateFormat.format(new Date()));
+        // iterate over all files in the 'logsLocation'
+        for (File file : FileUtils.listFiles(new File(logsLocation),
+                                             TrueFileFilter.INSTANCE,
+                                             TrueFileFilter.INSTANCE)) {
+            try {
+                BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                System.out.println(String.format("Name: %s, Size: %d, Created: %s, Modified: %s",
+                                                 file.getAbsolutePath(),
+                                                 attr.size(),
+                                                 attr.creationTime(),
+                                                 attr.lastModifiedTime()));
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String line;
+                int i;
+                // print up to LIMIT first lines
+                for (i = 0; i < LIMIT && (line = br.readLine()) != null; ++i) {
+                    System.out.println(line);
+                }
+
+                Queue<String> queue = new CircularFifoQueue<>(LIMIT);
+                // reading last LIMIT lines
+                for (; (line = br.readLine()) != null; ++i) {
+                    queue.add(line);
+                }
+
+                if (i >= LIMIT * 2) { // if there is more line than 2*LIMIT
+                    System.out.println(".......");
+                    System.out.println("....... (skipped content)");
+                    System.out.println(".......");
+                }
+                for (String l : queue) { // print rest of the file
+                    System.out.println(l);
+                }
+
+                System.out.println("------------------------------------");
+                System.out.println();
+            } catch (IOException e) {
+                System.out.println("Exception ocurred during accessing file attributes " + e);
+            }
+        }
     }
 
 }
