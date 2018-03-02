@@ -1138,19 +1138,24 @@ public class RMRest implements RMRestInterface {
 
     private Object[] concatenateParametersAndFileParameters(String[] parameters, String[] fileParameters,
             Collection<ConfigurableField> fields) {
-        Object[] preparedParameters = new Object[parameters.length + fileParameters.length];
-        int preparedParametersIndex = 0, parametersIndex = 0, fileParametersIndex = 0;
+        Object[] concatenatedParameters = new Object[parameters.length + fileParameters.length];
+
+        int parametersIndex = 0;
+        int fileParametersIndex = 0;
+        int concatenatedParametersIndex = 0;
+
         for (ConfigurableField field : fields) {
             if (field.getMeta().credential() || field.getMeta().password() || field.getMeta().fileBrowser()) {
-                preparedParameters[preparedParametersIndex] = fileParameters[fileParametersIndex].getBytes();
+                concatenatedParameters[concatenatedParametersIndex] = fileParameters[fileParametersIndex].getBytes();
                 fileParametersIndex++;
             } else {
-                preparedParameters[preparedParametersIndex] = parameters[parametersIndex];
+                concatenatedParameters[concatenatedParametersIndex] = parameters[parametersIndex];
                 parametersIndex++;
             }
-            preparedParametersIndex++;
+            concatenatedParametersIndex++;
         }
-        return preparedParameters;
+
+        return concatenatedParameters;
     }
 
 }

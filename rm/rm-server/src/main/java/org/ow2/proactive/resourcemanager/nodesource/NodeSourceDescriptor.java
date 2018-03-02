@@ -126,11 +126,6 @@ public class NodeSourceDescriptor implements Serializable {
         this.status = status;
     }
 
-    private void
-            setLastRecoveredInfrastructureVariables(Map<String, Serializable> lastRecoveredInfrastructureVariables) {
-        this.lastRecoveredInfrastructureVariables = lastRecoveredInfrastructureVariables;
-    }
-
     public static class Builder {
 
         private String name;
@@ -206,7 +201,7 @@ public class NodeSourceDescriptor implements Serializable {
                                                                   this.provider,
                                                                   this.nodesRecoverable,
                                                                   this.status);
-            built.setLastRecoveredInfrastructureVariables(this.lastRecoveredInfrastructureVariables);
+            built.lastRecoveredInfrastructureVariables = this.lastRecoveredInfrastructureVariables;
             return built;
         }
 
