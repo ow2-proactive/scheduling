@@ -82,7 +82,7 @@ public interface ResourceManager {
             String policyType, Object[] policyParams, boolean nodesRecoverable);
 
     /**
-     * @deprecated  As of release 7.37, replaced by {@link #defineNodeSource(String, String, Object[], String, Object[],
+     * @deprecated  As of version 8, replaced by {@link #defineNodeSource(String, String, Object[], String, Object[],
      * boolean)} and {@link #deployNodeSource(String)}
      *
      * The node source is the set of nodes acquired from specific infrastructure and characterized

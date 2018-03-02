@@ -695,7 +695,7 @@ public class CommandSet {
                                                                            .entry();
 
     /**
-     * @deprecated  As of release 7.37, replaced by
+     * @deprecated  As of version 8, replaced by
      * {@link CommandSet#NS_DEFINE} and {@link CommandSet#NS_DEPLOY}
      */
     @Deprecated

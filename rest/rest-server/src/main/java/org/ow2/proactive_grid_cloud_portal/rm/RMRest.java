@@ -362,12 +362,13 @@ public class RMRest implements RMRestInterface {
             @FormParam("policyFileParameters") String[] policyFileParameters,
             @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
-        Object[] infraParams = new Object[infrastructureParameters.length + infrastructureFileParameters.length];
-        Object[] policyParams = new Object[policyParameters.length + policyFileParameters.length];
         NSState nsState = new NSState();
 
-        prepareInfraParams(infrastructureType, infrastructureParameters, infrastructureFileParameters, rm, infraParams);
-        preparePolicyParams(policyType, policyParameters, policyFileParameters, rm, policyParams);
+        Object[] infraParams = this.getAllInfrastructureParameters(infrastructureType,
+                                                                   infrastructureParameters,
+                                                                   infrastructureFileParameters,
+                                                                   rm);
+        Object[] policyParams = this.getAllPolicyParameters(policyType, policyParameters, policyFileParameters, rm);
 
         try {
             nsState.setResult(rm.defineNodeSource(nodeSourceName,
@@ -387,7 +388,7 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
-     * @deprecated  As of release 7.37, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
+     * @deprecated  As of version 8, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
      * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
      *
      * {@see #createNodeSource(String, String, String, String[], String[], String, String[], String[])}
@@ -416,7 +417,7 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
-     * @deprecated  As of release 7.37, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
+     * @deprecated  As of version 8, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
      * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
      *
      * Create a NodeSource
@@ -459,20 +460,24 @@ public class RMRest implements RMRestInterface {
             @FormParam("policyFileParameters") String[] policyFileParameters,
             @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
-        Object[] infraParams = new Object[infrastructureParameters.length + infrastructureFileParameters.length];
-        Object[] policyParams = new Object[policyParameters.length + policyFileParameters.length];
         NSState nsState = new NSState();
 
-        prepareInfraParams(infrastructureType, infrastructureParameters, infrastructureFileParameters, rm, infraParams);
+        Object[] allInfrastructureParameters = this.getAllInfrastructureParameters(infrastructureType,
+                                                                                   infrastructureParameters,
+                                                                                   infrastructureFileParameters,
+                                                                                   rm);
 
-        preparePolicyParams(policyType, policyParameters, policyFileParameters, rm, policyParams);
+        Object[] allPolicyParameters = this.getAllPolicyParameters(policyType,
+                                                                   policyParameters,
+                                                                   policyFileParameters,
+                                                                   rm);
 
         try {
             nsState.setResult(rm.createNodeSource(nodeSourceName,
                                                   infrastructureType,
-                                                  infraParams,
+                                                  allInfrastructureParameters,
                                                   policyType,
-                                                  policyParams,
+                                                  allPolicyParameters,
                                                   Boolean.parseBoolean(nodesRecoverable))
                                 .getBooleanValue());
         } catch (RuntimeException ex) {
@@ -1103,73 +1108,49 @@ public class RMRest implements RMRestInterface {
         return Response.seeOther(new URI("doc/jaxrsdocs/rm/index.html")).build();
     }
 
-    private void prepareInfraParams(@FormParam("infrastructureType") String infrastructureType,
-            @FormParam("infrastructureParameters") String[] infrastructureParameters,
-            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters, ResourceManager rm,
-            Object[] infraParams) {
-        /*
-         * we need to merge both infrastructureParameters and
-         * infrastructureFileParameters into one to do so we need the
-         * infrastructure parameter order from the RM
-         */
-        for (PluginDescriptor infra : rm.getSupportedNodeSourceInfrastructures()) {
-            if (infra.getPluginName().equals(infrastructureType)) {
-                assignInfraFieldToNormalParamOrToFileParam(infrastructureParameters,
-                                                           infrastructureFileParameters,
-                                                           infraParams,
-                                                           infra);
+    private Object[] getAllInfrastructureParameters(String infrastructureType, String[] infrastructureParameters,
+            String[] infrastructureFileParameters, ResourceManager rm) {
+        for (PluginDescriptor infrastructureDescriptor : rm.getSupportedNodeSourceInfrastructures()) {
+            if (infrastructureDescriptor.getPluginName().equals(infrastructureType)) {
+                Collection<ConfigurableField> infrastructureFields = infrastructureDescriptor.getConfigurableFields();
+                return this.concatenateParametersAndFileParameters(infrastructureParameters,
+                                                                   infrastructureFileParameters,
+                                                                   infrastructureFields);
             }
         }
+
+        throw new IllegalArgumentException("Infrastructure " + infrastructureType + " is unknown");
     }
 
-    private void assignInfraFieldToNormalParamOrToFileParam(
-            @FormParam("infrastructureParameters") String[] infrastructureParameters,
-            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters, Object[] infraParams,
-            PluginDescriptor infra) {
-        int i = 0, j = 0, k = 0;
-        for (ConfigurableField field : infra.getConfigurableFields()) {
-            if (field.getMeta().credential() || field.getMeta().fileBrowser()) {
-                /*
-                 * file parameter : insert from the other array, convert
-                 * to byte[]
-                 */
-                infraParams[i] = infrastructureFileParameters[k].getBytes();
-                k++;
+    private Object[] getAllPolicyParameters(String policyType, String[] policyParameters, String[] policyFileParameters,
+            ResourceManager rm) {
+        for (PluginDescriptor policyDescriptor : rm.getSupportedNodeSourcePolicies()) {
+            if (policyDescriptor.getPluginName().equals(policyType)) {
+                Collection<ConfigurableField> policyFields = policyDescriptor.getConfigurableFields();
+                return this.concatenateParametersAndFileParameters(policyParameters,
+                                                                   policyFileParameters,
+                                                                   policyFields);
+            }
+        }
+
+        throw new IllegalArgumentException("Policy " + policyType + " is unknown");
+    }
+
+    private Object[] concatenateParametersAndFileParameters(String[] parameters, String[] fileParameters,
+            Collection<ConfigurableField> fields) {
+        Object[] preparedParameters = new Object[parameters.length + fileParameters.length];
+        int preparedParametersIndex = 0, parametersIndex = 0, fileParametersIndex = 0;
+        for (ConfigurableField field : fields) {
+            if (field.getMeta().credential() || field.getMeta().password() || field.getMeta().fileBrowser()) {
+                preparedParameters[preparedParametersIndex] = fileParameters[fileParametersIndex].getBytes();
+                fileParametersIndex++;
             } else {
-                infraParams[i] = infrastructureParameters[j];
-                j++;
+                preparedParameters[preparedParametersIndex] = parameters[parametersIndex];
+                parametersIndex++;
             }
-            i++;
+            preparedParametersIndex++;
         }
-    }
-
-    private void preparePolicyParams(@FormParam("policyType") String policyType,
-            @FormParam("policyParameters") String[] policyParameters,
-            @FormParam("policyFileParameters") String[] policyFileParameters, ResourceManager rm,
-            Object[] policyParams) {
-        for (PluginDescriptor pol : rm.getSupportedNodeSourcePolicies()) {
-            if (pol.getPluginName().equals(policyType)) {
-                assignPolicyFieldToNormalParamOrToFileParam(policyParameters, policyFileParameters, policyParams, pol);
-            }
-        }
-    }
-
-    private void assignPolicyFieldToNormalParamOrToFileParam(@FormParam("policyParameters") String[] policyParameters,
-            @FormParam("policyFileParameters") String[] policyFileParameters, Object[] policyParams,
-            PluginDescriptor pol) {
-        int i = 0, j = 0, k = 0;
-        for (ConfigurableField field : pol.getConfigurableFields()) {
-            if (field.getMeta().credential() || field.getMeta().password()) {
-                // file parameter : insert from the other array, convert
-                // to byte[]
-                policyParams[i] = policyFileParameters[k].getBytes();
-                k++;
-            } else {
-                policyParams[i] = policyParameters[j];
-                j++;
-            }
-            i++;
-        }
+        return preparedParameters;
     }
 
 }
