@@ -32,8 +32,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import functionaltests.utils.SchedulerStartForFunctionalTest;
-import functionaltests.utils.SchedulerTHelper;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +45,8 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 
 import functionaltests.nodesrecovery.NodesRecoveryProcessHelper;
+import functionaltests.utils.SchedulerStartForFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
 import performancetests.helper.LogProcessor;
 
 
