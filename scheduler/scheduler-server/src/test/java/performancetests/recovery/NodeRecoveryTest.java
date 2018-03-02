@@ -28,8 +28,6 @@ package performancetests.recovery;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.*;
-
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +43,10 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import functionaltests.nodesrecovery.RecoverInfrastructureTestHelper;
 import functionaltests.utils.*;
 import performancetests.helper.LogProcessor;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
