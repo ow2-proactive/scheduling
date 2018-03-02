@@ -1279,7 +1279,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
-     * @deprecated  As of version 8, replaced by {@link #defineNodeSource(String, String, Object[], String, Object[],
+     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String, Object[], String, Object[],
      * boolean)} and {@link #deployNodeSource(String)}
      */
     @Deprecated

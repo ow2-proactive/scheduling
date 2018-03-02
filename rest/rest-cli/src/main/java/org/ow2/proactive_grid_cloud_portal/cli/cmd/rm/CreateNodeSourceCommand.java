@@ -43,7 +43,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
 /**
- * @deprecated  As of version 8, replaced by
+ * @deprecated  As of version 8.1, replaced by
  * {@link DefineNodeSourceCommand)} and {@link DeployNodeSourceCommand}
  */
 @Deprecated

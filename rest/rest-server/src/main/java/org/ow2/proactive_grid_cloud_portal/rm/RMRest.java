@@ -388,7 +388,7 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
-     * @deprecated  As of version 8, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
+     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
      * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
      *
      * {@see #createNodeSource(String, String, String, String[], String[], String, String[], String[])}
@@ -417,7 +417,7 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
-     * @deprecated  As of version 8, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
+     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
      * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
      *
      * Create a NodeSource
