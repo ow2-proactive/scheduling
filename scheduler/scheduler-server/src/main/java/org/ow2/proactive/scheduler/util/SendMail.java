@@ -84,8 +84,7 @@ class EmailConfiguration {
 
     public Properties getProperties() {
         Properties props = new Properties();
-        try {
-            InputStream fis = new FileInputStream(getPath());
+        try (InputStream fis = new FileInputStream(getPath())) {
             props.load(fis);
         } catch (IOException e) {
             logger.warn("Email Configuration file: " + getPath() + " not found!", e);

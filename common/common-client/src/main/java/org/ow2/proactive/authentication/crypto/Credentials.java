@@ -153,11 +153,8 @@ public class Credentials implements Serializable {
      */
     public void writeToDisk(String path) throws KeyException {
         File f = new File(path);
-        FileOutputStream fs;
-        try {
-            fs = new FileOutputStream(f);
+        try (FileOutputStream fs = new FileOutputStream(f)) {
             fs.write(getBase64());
-            fs.close();
         } catch (Exception e) {
             throw new KeyException("Could not write credentials to " + path, e);
         }
@@ -177,12 +174,9 @@ public class Credentials implements Serializable {
 
         byte[] bytes;
         File f = new File(pubPath);
-        FileInputStream fin;
 
         // recover public key bytes
-        try {
-            fin = new FileInputStream(f);
-            DataInputStream in = new DataInputStream(fin);
+        try (DataInputStream in = new DataInputStream(new FileInputStream(f))) {
             int read, tot = 0;
             while ((read = in.read()) != '\n') {
                 algo += (char) read;
@@ -197,7 +191,6 @@ public class Credentials implements Serializable {
 
             bytes = new byte[(int) f.length() - tot];
             in.readFully(bytes);
-            in.close();
         } catch (Exception e) {
             throw new KeyException("Could not retrieve public key from " + pubPath, e);
         }
@@ -273,12 +266,10 @@ public class Credentials implements Serializable {
 
                 // recover private key bytes
                 byte[] bytes;
-                try {
-                    File pkFile = new File(privPath);
-                    DataInputStream pkStream = new DataInputStream(new FileInputStream(pkFile));
+                File pkFile = new File(privPath);
+                try (DataInputStream pkStream = new DataInputStream(new FileInputStream(pkFile))) {
                     bytes = new byte[(int) pkFile.length()];
                     pkStream.readFully(bytes);
-                    pkStream.close();
                 } catch (Exception e) {
                     throw new KeyException("Could not recover private key (algo=" + algo + ")", e);
                 }
@@ -333,11 +324,8 @@ public class Credentials implements Serializable {
     public static Credentials getCredentials(String path) throws KeyException {
         File f = new File(path);
         byte[] bytes = new byte[(int) f.length()];
-        FileInputStream fin;
-        try {
-            fin = new FileInputStream(f);
+        try (FileInputStream fin = new FileInputStream(f)) {
             fin.read(bytes);
-            fin.close();
         } catch (Exception e) {
             throw new KeyException("Could not read credentials from " + path, e);
         }

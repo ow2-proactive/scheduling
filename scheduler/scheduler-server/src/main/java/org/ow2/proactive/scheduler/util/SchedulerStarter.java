@@ -85,6 +85,7 @@ import org.ow2.proactive.utils.JettyStarter;
 import org.ow2.proactive.utils.PAMRRouterStarter;
 import org.ow2.proactive.utils.SecurityPolicyLoader;
 import org.ow2.proactive.utils.Tools;
+import org.ow2.proactive.utils.Version;
 import org.ow2.proactive.web.WebProperties;
 
 
@@ -100,7 +101,7 @@ import org.ow2.proactive.web.WebProperties;
  */
 public class SchedulerStarter {
 
-    private static Logger logger = Logger.getLogger(SchedulerStarter.class);
+    private static final Logger LOGGER = Logger.getLogger(SchedulerStarter.class);
 
     private static final String OPTION_HELP = "help";
 
@@ -165,7 +166,7 @@ public class SchedulerStarter {
                 start(commandLine);
             }
         } catch (Exception e) {
-            logger.error("Error when starting the scheduler", e);
+            LOGGER.error("Error when starting the scheduler", e);
             displayHelp(options);
             System.exit(6);
         }
@@ -235,7 +236,7 @@ public class SchedulerStarter {
             config.setReservedAgentConfigFile(new File(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
                                                        PAMRRouterStarter.PATH_TO_ROUTER_CONFIG_FILE));
             Router.createAndStart(config);
-            logger.info("The router created on " + ProActiveInet.getInstance().getHostname() + ":" + routerPort);
+            LOGGER.info("The router created on " + ProActiveInet.getInstance().getHostname() + ":" + routerPort);
         }
     }
 
@@ -273,17 +274,22 @@ public class SchedulerStarter {
             throws URISyntaxException, InternalSchedulerException, ParseException, SocketException,
             UnknownHostException, IllegalArgumentException {
         String policyFullName = getPolicyFullName(commandLine);
-        logger.info("Starting the scheduler...");
+        LOGGER.info("Scheduler version is " + getSchedulerVersion());
+        LOGGER.info("Starting the scheduler...");
         SchedulerAuthenticationInterface sai = null;
         try {
             sai = SchedulerFactory.startLocal(new URI(rmUrl), policyFullName);
             startDiscovery(commandLine, rmUrl);
-            logger.info("The scheduler created on " + sai.getHostURL());
+            LOGGER.info("The scheduler created on " + sai.getHostURL());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         return sai;
+    }
+
+    private static String getSchedulerVersion() {
+        return Version.PA_VERSION;
     }
 
     private static void startDiscovery(CommandLine commandLine, String urlToDiscover)
@@ -299,11 +305,11 @@ public class SchedulerStarter {
             throws ProActiveException, URISyntaxException, ParseException {
         if (rmUrl != null) {
             try {
-                logger.info("Connecting to the resource manager on " + rmUrl);
+                LOGGER.info("Connecting to the resource manager on " + rmUrl);
                 int rmConnectionTimeout = PASchedulerProperties.RESOURCE_MANAGER_CONNECTION_TIMEOUT.getValueAsInt();
                 SchedulerFactory.waitAndJoinRM(new URI(rmUrl), rmConnectionTimeout);
             } catch (Exception e) {
-                logger.error("ERROR while connecting to the RM on " + rmUrl + ", no RM found !");
+                LOGGER.error("ERROR while connecting to the RM on " + rmUrl + ", no RM found !");
                 System.exit(2);
             }
         } else {
@@ -312,7 +318,7 @@ public class SchedulerStarter {
             //trying to connect to a started local RM
             try {
                 SchedulerFactory.tryJoinRM(uri);
-                logger.info("Connected to the existing resource manager at " + uri);
+                LOGGER.info("Connected to the existing resource manager at " + uri);
             } catch (Exception e) {
                 int defaultNodesNumber = PAResourceManagerProperties.RM_NB_LOCAL_NODES.getValueAsInt();
 
@@ -348,7 +354,7 @@ public class SchedulerStarter {
 
         if (commandLine.hasOption(OPTION_RMURL)) {
             rmUrl = commandLine.getOptionValue(OPTION_RMURL);
-            logger.info("RM URL : " + rmUrl);
+            LOGGER.info("RM URL : " + rmUrl);
         }
         return rmUrl;
     }
@@ -358,7 +364,7 @@ public class SchedulerStarter {
 
         if (commandLine.hasOption(OPTION_SCHEDULER_URL)) {
             schedulerUrl = commandLine.getOptionValue(OPTION_SCHEDULER_URL);
-            logger.info("Scheduler URL : " + schedulerUrl);
+            LOGGER.info("Scheduler URL : " + schedulerUrl);
         }
         return schedulerUrl;
     }
@@ -368,7 +374,7 @@ public class SchedulerStarter {
 
         if (commandLine.hasOption(OPTION_POLICY)) {
             policyFullName = commandLine.getOptionValue(OPTION_POLICY);
-            logger.info("Used policy : " + policyFullName);
+            LOGGER.info("Used policy : " + policyFullName);
         }
         return policyFullName;
     }
@@ -377,7 +383,7 @@ public class SchedulerStarter {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                logger.info("Shutting down...");
+                LOGGER.info("Shutting down...");
 
                 if (discoveryService != null) {
                     discoveryService.stop();
@@ -521,20 +527,20 @@ public class SchedulerStarter {
                 try {
                     //Starting a local RM using default deployment descriptor
                     RMFactory.setOsJavaProperty();
-                    logger.info("Starting the resource manager...");
+                    LOGGER.info("Starting the resource manager...");
                     RMAuthentication rmAuth = RMFactory.startLocal();
 
                     if (numberLocalNodes > 0) {
                         addLocalNodes(rmAuth, numberLocalNodes, nodeTimeoutValue);
                     }
 
-                    logger.info("The resource manager with " + numberLocalNodes + " local nodes created on " +
+                    LOGGER.info("The resource manager with " + numberLocalNodes + " local nodes created on " +
                                 rmAuth.getHostURL());
                 } catch (AlreadyBoundException abe) {
-                    logger.error("The resource manager already exists on local host", abe);
+                    LOGGER.error("The resource manager already exists on local host", abe);
                     System.exit(4);
                 } catch (Exception aoce) {
-                    logger.error("Unable to create local resource manager", aoce);
+                    LOGGER.error("Unable to create local resource manager", aoce);
                     System.exit(5);
                 }
             }
@@ -625,7 +631,7 @@ public class SchedulerStarter {
 
             scriptFile = new File(PASchedulerProperties.getAbsolutePath(scriptPath));
             if (scriptFile.exists()) {
-                logger.info("Executing " + scriptPath);
+                LOGGER.info("Executing " + scriptPath);
                 scriptResult = scriptHandler.handle(new SimpleScript(scriptFile, new String[0]), ps, ps);
                 if (scriptResult.errorOccured()) {
 
@@ -636,11 +642,11 @@ public class SchedulerStarter {
                                                      scriptResult.getException().getMessage(),
                                                      scriptResult.getException());
                 }
-                logger.info(os.toString());
+                LOGGER.info(os.toString());
 
                 os.reset();
             } else
-                logger.warn("Start script " + scriptPath + " not found");
+                LOGGER.warn("Start script " + scriptPath + " not found");
         }
         // Close streams
         os.close();

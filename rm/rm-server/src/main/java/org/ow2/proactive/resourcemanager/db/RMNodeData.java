@@ -53,6 +53,7 @@ import org.ow2.proactive.resourcemanager.rmnode.RMNode;
  */
 @Entity
 @NamedQueries({ @NamedQuery(name = "deleteAllRMNodeData", query = "delete from RMNodeData"),
+                @NamedQuery(name = "deleteAllRMNodeDataFromNodeSource", query = "delete from RMNodeData where nodeSource.name=:name"),
                 @NamedQuery(name = "getAllRMNodeData", query = "from RMNodeData"),
                 @NamedQuery(name = "getRMNodeDataByNameAndUrl", query = "from RMNodeData where name=:name and nodeUrl=:url"),
                 @NamedQuery(name = "getRMNodeDataByNodeSource", query = "from RMNodeData where nodeSource.name=:name") })

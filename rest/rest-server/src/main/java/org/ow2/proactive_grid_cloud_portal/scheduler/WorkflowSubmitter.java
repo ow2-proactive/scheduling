@@ -69,9 +69,7 @@ public class WorkflowSubmitter {
     public JobId submit(File workflowFile, Map<String, String> variables) throws NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, JobCreationRestException {
         try {
-            JobId jobId = scheduler.submit(createJobObject(workflowFile, variables));
-            storeWorkflowFile(jobId);
-            return jobId;
+            return scheduler.submit(createJobObject(workflowFile, variables));
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -88,19 +86,6 @@ public class WorkflowSubmitter {
 
     private Job createJobObject(File jobFile, Map<String, String> jobVariables) throws JobCreationException {
         return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(), jobVariables);
-    }
-
-    private void storeWorkflowFile(JobId jobid) {
-        File archiveToStore = new File(PortalConfiguration.jobIdToPath(jobid.value()));
-        // the job is not an archive, however an archive file can
-        // exist for this new job (due to an old submission)
-        // In that case, we remove the existing file preventing erronous
-        // access
-        // to this previously submitted archive.
-
-        if (archiveToStore.exists()) {
-            archiveToStore.delete();
-        }
     }
 
 }

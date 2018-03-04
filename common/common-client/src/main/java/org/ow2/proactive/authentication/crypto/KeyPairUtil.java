@@ -68,22 +68,16 @@ public class KeyPairUtil {
         PrivateKey privKey = keyPair.getPrivate();
         PublicKey pubKey = keyPair.getPublic();
 
-        FileOutputStream out = null;
-
-        try {
-            out = new FileOutputStream(new File(privPath));
+        try (FileOutputStream out = new FileOutputStream(new File(privPath))) {
             out.write(privKey.getEncoded());
-            out.close();
         } catch (Exception e) {
             throw new KeyException("Cannot write private key to disk", e);
         }
 
-        try {
-            out = new FileOutputStream(new File(pubPath));
+        try (FileOutputStream out = new FileOutputStream(new File(pubPath))) {
             out.write((algorithm + "\n").getBytes());
             out.write((size + "\n").getBytes());
             out.write(pubKey.getEncoded());
-            out.close();
         } catch (Exception e) {
             throw new KeyException("Cannot write public key to disk", e);
         }

@@ -30,6 +30,7 @@ import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filter
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -175,19 +176,22 @@ public class StaxJobFactory extends JobFactory {
             relativePathRoot = updatedFile.getParentFile().getAbsolutePath();
             //create and get XML STAX reader
             XMLStreamReader xmlsr;
-            // use the server side property to accept encoding
-            if (PASchedulerProperties.FILE_ENCODING.isSet()) {
-                xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(updatedFile),
-                                                              PASchedulerProperties.FILE_ENCODING.getValueAsString());
-            } else {
-                xmlsr = xmlInputFactory.createXMLStreamReader(new FileInputStream(updatedFile));
-            }
-            //Dependencies
             Map<String, ArrayList<String>> dependencies = new HashMap<>();
-            //Create the job starting at the first cursor position of the XML Stream reader
-            Job job = createJob(xmlsr, replacementVariables, dependencies);
-            //Close the stream
-            xmlsr.close();
+            Job job;
+            try (InputStream inputStream = new FileInputStream(updatedFile)) {
+                // use the server side property to accept encoding
+                if (PASchedulerProperties.FILE_ENCODING.isSet()) {
+                    xmlsr = xmlInputFactory.createXMLStreamReader(inputStream,
+                                                                  PASchedulerProperties.FILE_ENCODING.getValueAsString());
+                } else {
+                    xmlsr = xmlInputFactory.createXMLStreamReader(inputStream);
+                }
+
+                //Create the job starting at the first cursor position of the XML Stream reader
+                job = createJob(xmlsr, replacementVariables, dependencies);
+                //Close the stream
+                xmlsr.close();
+            }
             //make dependencies
             makeDependences(job, dependencies);
 

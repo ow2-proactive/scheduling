@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.studio.storage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -85,8 +86,8 @@ public class FileStorageSupportFactory {
     private static Properties getProperties() {
         File restPropertiesFile = new File(getSchedulerHome(), REST_CONFIG_PATH);
         Properties properties = new Properties();
-        try {
-            properties.load(new FileInputStream(restPropertiesFile));
+        try (InputStream inputStream = new FileInputStream(restPropertiesFile)) {
+            properties.load(inputStream);
         } catch (IOException e) {
             logger.warn("Could not load properties from file " + restPropertiesFile, e);
         }

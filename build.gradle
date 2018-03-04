@@ -393,6 +393,7 @@ def createStartScripts(className, name, String outputFolder) {
 createStartScripts('org.ow2.proactive.scheduler.util.SchedulerStarter', 'proactive-server', 'bin')
 createStartScripts('org.ow2.proactive_grid_cloud_portal.cli.CommonEntryPoint', 'proactive-client', 'bin')
 createStartScripts('org.ow2.proactive.resourcemanager.utils.RMNodeStarter', 'proactive-node', 'bin')
+createStartScripts('org.ow2.proactive.resourcemanager.updater.RMNodeUpdater', 'proactive-node-autoupdate', 'bin')
 createStartScripts('org.objectweb.proactive.extensions.vfsprovider.console.PADataserverStarter', 'proactive-dataserver', 'tools')
 createStartScripts('org.objectweb.proactive.extensions.vfsprovider.gui.ServerBrowser', 'proactive-dataserver-gui', 'tools')
 createStartScripts('org.ow2.proactive.authentication.crypto.CreateCredentials', 'proactive-create-cred', 'tools')

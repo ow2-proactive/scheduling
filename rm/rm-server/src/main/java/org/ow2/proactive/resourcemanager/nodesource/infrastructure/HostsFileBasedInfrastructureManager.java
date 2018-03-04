@@ -147,33 +147,34 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * @throws IOException parsing failed
      */
     protected void readHosts(File f) throws IOException {
-        BufferedReader in = new BufferedReader(new FileReader(f));
-        String line = "";
+        try (BufferedReader in = new BufferedReader(new FileReader(f))) {
+            String line = "";
 
-        while ((line = in.readLine()) != null) {
-            if (line == "" || line.trim().length() == 0)
-                continue;
+            while ((line = in.readLine()) != null) {
+                if (line == "" || line.trim().length() == 0)
+                    continue;
 
-            String[] elts = line.split(" ");
-            int configuredNodeNumber = 1;
-            if (elts.length > 1) {
-                try {
-                    configuredNodeNumber = Integer.parseInt(elts[1]);
-                    if (configuredNodeNumber < 1) {
-                        throw new IllegalArgumentException("Cannot launch less than one runtime per host.");
+                String[] elts = line.split(" ");
+                int configuredNodeNumber = 1;
+                if (elts.length > 1) {
+                    try {
+                        configuredNodeNumber = Integer.parseInt(elts[1]);
+                        if (configuredNodeNumber < 1) {
+                            throw new IllegalArgumentException("Cannot launch less than one runtime per host.");
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Error while parsing hosts file: " + e.getMessage(), e);
+                        configuredNodeNumber = 1;
                     }
-                } catch (Exception e) {
-                    logger.warn("Error while parsing hosts file: " + e.getMessage(), e);
-                    configuredNodeNumber = 1;
                 }
-            }
-            String hostNameInFile = elts[0];
-            try {
-                InetAddress reifiedHost = InetAddress.getByName(hostNameInFile);
-                HostTracker hostTracker = new HostTracker(hostNameInFile, configuredNodeNumber, reifiedHost);
-                putHostTrackerForHost(hostNameInFile, hostTracker);
-            } catch (UnknownHostException ex) {
-                throw new RuntimeException("Unknown host: " + hostNameInFile, ex);
+                String hostNameInFile = elts[0];
+                try {
+                    InetAddress reifiedHost = InetAddress.getByName(hostNameInFile);
+                    HostTracker hostTracker = new HostTracker(hostNameInFile, configuredNodeNumber, reifiedHost);
+                    putHostTrackerForHost(hostNameInFile, hostTracker);
+                } catch (UnknownHostException ex) {
+                    throw new RuntimeException("Unknown host: " + hostNameInFile, ex);
+                }
             }
         }
     }

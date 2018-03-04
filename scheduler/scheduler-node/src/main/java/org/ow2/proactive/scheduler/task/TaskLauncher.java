@@ -28,13 +28,12 @@ package org.ow2.proactive.scheduler.task;
 import java.io.File;
 import java.io.Serializable;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -46,6 +45,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.resourcemanager.nodesource.dataspace.DataSpaceNodeConfigurationAgent;
+import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
@@ -104,6 +104,8 @@ public class TaskLauncher implements InitActive {
 
     private TaskLauncherRebinder taskLauncherRebinder;
 
+    private AtomicBoolean taskStarted = new AtomicBoolean(false);
+
     /**
      * Needed for ProActive but should never be used manually to create an instance of the object.
      */
@@ -143,6 +145,11 @@ public class TaskLauncher implements InitActive {
         return true;
     }
 
+    @ImmediateService
+    public boolean isTaskStarted() {
+        return taskStarted.get();
+    }
+
     void doTask(ExecutableContainer executableContainer, TaskResult[] previousTasksResults,
             TaskTerminateNotification terminateNotification) {
         doTask(executableContainer, previousTasksResults, terminateNotification, null, false);
@@ -159,6 +166,8 @@ public class TaskLauncher implements InitActive {
         TaskDataspaces dataspaces = null;
 
         try {
+            taskStarted.set(true);
+
             logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
 
             this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
@@ -449,11 +458,12 @@ public class TaskLauncher implements InitActive {
         taskLogger.getStoredLogs(logSink);
     }
 
+    public KeyPair getKeyPair() throws NoSuchAlgorithmException {
+        return RMNodeStarter.getKeyPair();
+    }
+
     public PublicKey generatePublicKey() throws NoSuchAlgorithmException {
-        KeyPairGenerator keyGen;
-        keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(1024, new SecureRandom());
-        KeyPair keyPair = keyGen.generateKeyPair();
+        final KeyPair keyPair = getKeyPair();
         decrypter = new Decrypter(keyPair.getPrivate());
         return keyPair.getPublic();
     }
