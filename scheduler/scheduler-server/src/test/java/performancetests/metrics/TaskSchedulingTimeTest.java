@@ -25,13 +25,11 @@
  */
 package performancetests.metrics;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +41,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
 import functionaltests.utils.SchedulerTHelper;
-import performancetests.recovery.PeformanceTestBase;
+import performancetests.recovery.PerformanceTestBase;
 
 
 /**
@@ -54,13 +52,7 @@ import performancetests.recovery.PeformanceTestBase;
  * and timestamp when task was started.
  */
 @RunWith(Parameterized.class)
-public class TaskSchedulingTimeTest extends PeformanceTestBase {
-
-    public static final URL SCHEDULER_CONFIGURATION_START = SchedulerEfficiencyMetricsTest.class.getResource("/performancetests/config/scheduler-start-memory.ini");
-
-    public static final URL RM_CONFIGURATION_START = SchedulerEfficiencyMetricsTest.class.getResource("/performancetests/config/rm-start-memory.ini");
-
-    private static final Logger LOGGER = Logger.getLogger(SchedulerEfficiencyMetricsTest.class);
+public class TaskSchedulingTimeTest extends PerformanceTestBase {
 
     /**
      * initialize test with static parameters, where first argument is a number of experiments, and second

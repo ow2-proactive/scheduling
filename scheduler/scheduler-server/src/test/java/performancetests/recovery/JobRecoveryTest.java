@@ -32,8 +32,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -45,7 +45,8 @@ import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 
 import functionaltests.nodesrecovery.NodesRecoveryProcessHelper;
-import functionaltests.utils.*;
+import functionaltests.utils.SchedulerStartForFunctionalTest;
+import functionaltests.utils.SchedulerTHelper;
 import performancetests.helper.LogProcessor;
 
 
@@ -54,7 +55,7 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class JobRecoveryTest extends PeformanceTestBase {
+public class JobRecoveryTest extends PerformanceTestBase {
 
     public static final String SCHEDULER_CONFIGURATION_START = JobRecoveryTest.class.getResource("/performancetests/config/scheduler-start.ini")
                                                                                     .getPath();
@@ -63,8 +64,6 @@ public class JobRecoveryTest extends PeformanceTestBase {
                                                                                        .getPath();
 
     private static URL runningJob = JobRecoveryTest.class.getResource("/functionaltests/descriptors/Job_running.xml");
-
-    private static final Logger LOGGER = Logger.getLogger(JobRecoveryTest.class);
 
     /**
      * @return an array of parameters which is used by JUnit to create objects of JobRecoveryTest,
@@ -131,30 +130,30 @@ public class JobRecoveryTest extends PeformanceTestBase {
             final long timeSpent = timeSpentToRecoverJobs();
 
             assertEquals(jobsNumber, recovered);
-            LOGGER.info(PeformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName(),
-                                                         jobsNumber,
-                                                         timeLimit,
-                                                         recovered,
-                                                         timeSpent,
-                                                         ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
+            LOGGER.info(PerformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName(),
+                                                          jobsNumber,
+                                                          timeLimit,
+                                                          recovered,
+                                                          timeSpent,
+                                                          ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
 
             final Integer numberOfJobsOfLastTestCase = (Integer) parameters[parameters.length - 1][0];
             if (jobsNumber == numberOfJobsOfLastTestCase) {
-                LOGGER.info(PeformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName() + "WithNodes",
-                                                             jobsNumber,
-                                                             timeLimit,
-                                                             jobsNumber,
-                                                             timeSpentToRecoverNodesAndJobs(),
-                                                             SUCCESS));
+                LOGGER.info(PerformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName() + "WithNodes",
+                                                              jobsNumber,
+                                                              timeLimit,
+                                                              jobsNumber,
+                                                              timeSpentToRecoverNodesAndJobs(),
+                                                              SUCCESS));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(PeformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName(),
-                                                         jobsNumber,
-                                                         timeLimit,
-                                                         -1,
-                                                         -1,
-                                                         ERROR));
+            LOGGER.info(PerformanceTestBase.makeCSVString(JobRecoveryTest.class.getSimpleName(),
+                                                          jobsNumber,
+                                                          timeLimit,
+                                                          -1,
+                                                          -1,
+                                                          ERROR));
         }
     }
 
