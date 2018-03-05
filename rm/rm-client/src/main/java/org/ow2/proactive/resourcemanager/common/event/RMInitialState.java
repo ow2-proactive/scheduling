@@ -118,4 +118,19 @@ public class RMInitialState implements Serializable {
     public void nodeAdded(RMNodeEvent event) {
         nodesList.add(event);
     }
+
+    public void nodeSourceStateChanged(RMNodeSourceEvent stateChangedEvent) {
+        boolean existNodeSource = false;
+        int size = nodeSources.size();
+        for (int i = 0; i < size; i++) {
+            if (stateChangedEvent.getSourceName().equals(nodeSources.get(i).getSourceName())) {
+                existNodeSource = true;
+                nodeSources.set(i, stateChangedEvent);
+                break;
+            }
+        }
+        if (!existNodeSource) {
+            nodeSources.add(stateChangedEvent);
+        }
+    }
 }

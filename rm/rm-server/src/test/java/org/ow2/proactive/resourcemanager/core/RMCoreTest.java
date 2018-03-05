@@ -66,6 +66,8 @@ import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNodeHelper;
@@ -119,6 +121,9 @@ public class RMCoreTest {
     @Mock
     private RMNode mockedFreeButLockedNode;
 
+    @Mock
+    private NodeSourceDescriptor nodeSourceDescriptor;
+
     private NodesLockRestorationManager nodesLockRestorationManager;
 
     private NodesRecoveryManager nodesRecoveryManager;
@@ -128,6 +133,8 @@ public class RMCoreTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        when(mockedNodeSource.getDescriptor()).thenReturn(nodeSourceDescriptor);
+        when(nodeSourceDescriptor.getStatus()).thenReturn(NodeSourceStatus.NODES_DEPLOYED);
         populateRMCore();
     }
 
@@ -350,7 +357,7 @@ public class RMCoreTest {
     public void testNodesRestorationManagerHandleInSetDeploying() {
         verify(nodesLockRestorationManager, never()).handle(Mockito.any(RMNode.class), Mockito.any(Client.class));
         rmCore.setDeploying(mockedBusyNode);
-        verify(nodesRecoveryManager).restoreLocks(Mockito.any(RMNode.class), Mockito.any(Client.class));
+        verify(nodesRecoveryManager).restoreLock(Mockito.any(RMNode.class), Mockito.any(Client.class));
     }
 
     @Test
@@ -604,7 +611,6 @@ public class RMCoreTest {
         ArrayList<RMNode> freeNodes = Lists.newArrayList((RMNode) rmNode);
 
         RMCore rmCore = new RMCore(new HashMap<String, NodeSource>(),
-                                   new ArrayList<String>(),
                                    allNodes,
                                    Mockito.mock(Client.class),
                                    Mockito.mock(RMMonitoringImpl.class),
@@ -781,7 +787,6 @@ public class RMCoreTest {
 
     private RMCore createRmCore(ImmutableMap<String, RMNode> allNodes, List<RMNode> freeNodes) {
         RMCore rmCore = new RMCore(null,
-                                   null,
                                    allNodes,
                                    null,
                                    Mockito.mock(RMMonitoringImpl.class),
@@ -863,7 +868,6 @@ public class RMCoreTest {
         freeNodes.add(mockedFreeButLockedNode);
 
         rmCore = new RMCore(nodeSources,
-                            new ArrayList<String>(),
                             nodes,
                             mockedCaller,
                             mockedMonitoring,

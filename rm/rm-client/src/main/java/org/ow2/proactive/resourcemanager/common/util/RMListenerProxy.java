@@ -162,8 +162,11 @@ public class RMListenerProxy extends RMGroupEventListener {
      */
     public void nodeSourceEvent(RMNodeSourceEvent event) {
         switch (event.getEventType()) {
-            case NODESOURCE_CREATED:
+            case NODESOURCE_DEFINED:
                 rmInitialState.getNodeSource().add(event);
+                break;
+            case NODESOURCE_CREATED:
+                rmInitialState.nodeSourceStateChanged(event);
                 break;
             case NODESOURCE_REMOVED:
                 for (int i = 0; i < rmInitialState.getNodeSource().size(); i++) {

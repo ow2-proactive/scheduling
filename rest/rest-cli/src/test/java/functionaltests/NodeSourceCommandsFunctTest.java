@@ -32,18 +32,24 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.collect.Range;
-
 
 /**
  * This class tests the CLI commands related to the node sources.
  */
 public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
+    private static final int NB_NODES = 4;
+
+    private static final int NODE_SOURCE_DEPLOYED_WAIT_TIME_MILLIS = 5000;
+
+    private static String rmCredentialPath;
+
     @BeforeClass
     public static void beforeClass() throws Exception {
         System.out.println("Init class: " + NodeSourceCommandsFunctTest.class);
         init();
+        rmCredentialPath = RestFuncTHelper.getRmCredentialsPath();
+        rmCredentialPath = rmCredentialPath.replace("\\", "\\\\");
         System.out.println("Finished init class: " + NodeSourceCommandsFunctTest.class);
     }
 
@@ -53,20 +59,36 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
     }
 
     @Test
-    public void testCreateNodeSourceAndListNodeSources() throws Exception {
+    public void testCreateNodeSourceRecoverableParam() throws Exception {
+        createNodeSourceAndListNodeSources("nsCreatedThroughCLIRecoverableParam", true);
+    }
+
+    @Test
+    public void testCreateNotRecoverableNodeSourceNoRecoverableParam() throws Exception {
+        createNodeSourceAndListNodeSources("nsCreatedThroughCLINoRecoverableParam", false);
+    }
+
+    private void createNodeSourceAndListNodeSources(String nodeSourceName, boolean nodesRecoverableParameter)
+            throws Exception {
         String testLogString = "[" + NodeSourceCommandsFunctTest.class.getSimpleName() + "]";
 
-        int nbNodes = 4;
-        String nodeSourceName = "nsCreatedThroughCLI";
         String nodeSourceInfrastructureClass = "org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure";
         String nodeSourcePolicyClass = "org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy";
 
         System.out.println(testLogString + "Test createns command");
 
-        typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
-                 RestFuncTHelper.getRmCredentialsPath() + "', " + nbNodes + ", 60000, ''], ['" + nodeSourcePolicyClass +
-                 "', 'ALL', 'ALL'])");
+        if (nodesRecoverableParameter) {
+            typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                     rmCredentialPath + "', " + NB_NODES + ", 60000, ''], ['" + nodeSourcePolicyClass +
+                     "', 'ALL', 'ALL'], 'tRuE')");
+        } else {
+            typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                     rmCredentialPath + "', " + NB_NODES + ", 60000, ''], ['" + nodeSourcePolicyClass +
+                     "', 'ALL', 'ALL'])");
+        }
+
         runCli();
+        waitForNodeSourceToBeDeployed();
 
         String out = this.capturedOutput.toString();
         System.setOut(stdOut);
@@ -74,9 +96,68 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         assertThat(out).contains("Node source successfully created.");
 
+        checkOccurrencesOfNodeSourceNameInNodeSourceList(testLogString, nodeSourceName);
+    }
+
+    @Test
+    public void testDefineAndDeployNodeSourceRecoverableParam() throws Exception {
+        defineNodeSourceAndListNodeSources("nsDefinedAndDeployedThroughCLIRecoverableParam", true);
+    }
+
+    @Test
+    public void testDefineAndDeployNodeSourceNoRecoverableParam() throws Exception {
+        defineNodeSourceAndListNodeSources("nsDefinedAndDeployedThroughCLINoRecoverableParam", false);
+    }
+
+    private void defineNodeSourceAndListNodeSources(String nodeSourceName, boolean nodesRecoverableParameter)
+            throws Exception {
+        String testLogString = "[" + NodeSourceCommandsFunctTest.class.getSimpleName() + "]";
+
+        String nodeSourceInfrastructureClass = "org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure";
+        String nodeSourcePolicyClass = "org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy";
+
+        System.out.println(testLogString + "Test definens command");
+
+        if (nodesRecoverableParameter) {
+            typeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                     rmCredentialPath + "', " + NB_NODES + ", 60000, ''], ['" + nodeSourcePolicyClass +
+                     "', 'ALL', 'ALL'], 'TrUe')");
+        } else {
+            typeLine("definens( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                     rmCredentialPath + "', " + NB_NODES + ", 60000, ''], ['" + nodeSourcePolicyClass +
+                     "', 'ALL', 'ALL'])");
+        }
+
+        runCli();
+        waitForNodeSourceToBeDeployed();
+
+        String out = this.capturedOutput.toString();
+        System.setOut(stdOut);
+        System.out.println(out);
+
+        assertThat(out).contains("Node source successfully defined.");
+
+        System.out.println(testLogString + "Test deployns command");
+
+        clearAndTypeLine("deployns( '" + nodeSourceName + "')");
+        runCli();
+        waitForNodeSourceToBeDeployed();
+
+        out = this.capturedOutput.toString();
+        System.setOut(stdOut);
+        System.out.println(out);
+
+        assertThat(out).contains("Node source successfully deployed.");
+
+        checkOccurrencesOfNodeSourceNameInNodeSourceList(testLogString, nodeSourceName);
+
+    }
+
+    private void checkOccurrencesOfNodeSourceNameInNodeSourceList(String testLogString, String nodeSourceName) {
+        String out;
         System.out.println(testLogString + "Test listns command");
 
-        typeLine("listns()");
+        clearAndTypeLine("listns()");
         runCli();
 
         out = this.capturedOutput.toString();
@@ -87,7 +168,7 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         System.out.println(testLogString + "Test listnodes command");
 
-        typeLine("listnodes(\"" + nodeSourceName + "\")");
+        clearAndTypeLine("listnodes(\"" + nodeSourceName + "\")");
         runCli();
 
         out = this.capturedOutput.toString();
@@ -99,7 +180,15 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         // source name can appear once per node or more per node, whether the
         // node is deploying or registered (in which case the node source name
         // appears also in the URL of the node)
-        assertThat(nbOccurrencesOfNodeSourceNameInNodeList).isAtLeast(nbNodes);
+        assertThat(nbOccurrencesOfNodeSourceNameInNodeList).isAtLeast(NB_NODES);
+    }
+
+    private void waitForNodeSourceToBeDeployed() {
+        try {
+            Thread.sleep(NODE_SOURCE_DEPLOYED_WAIT_TIME_MILLIS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }
