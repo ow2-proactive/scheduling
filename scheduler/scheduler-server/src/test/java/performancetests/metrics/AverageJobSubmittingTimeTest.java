@@ -65,7 +65,7 @@ public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 1000, 40000 } });
+        return Arrays.asList(new Object[][] { { 8, 1000, 40000 } });
     }
 
     private final int numberOfThreads;
@@ -86,7 +86,7 @@ public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
     public void before(){
         PrintStream dummyStream = new PrintStream(new OutputStream(){
             public void write(int b) {
-                // NO-OP
+                // supress all output to not lost time to print anything to console
             }
         });
         System.setOut(dummyStream);
