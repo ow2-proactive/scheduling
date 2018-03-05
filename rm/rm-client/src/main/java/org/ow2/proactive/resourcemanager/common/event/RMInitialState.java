@@ -144,6 +144,11 @@ public class RMInitialState implements Serializable {
         nodeSourceEvents.put(event.getSourceName(), event);
     }
 
+    public void nodeSourceStateChanged(RMNodeSourceEvent event) {
+        updateCounter(event);
+        nodeSourceEvents.put(event.getSourceName(), event);
+    }
+
     private void updateCounter(RMEvent event) {
         latestCounter.set(Math.max(latestCounter.get(), event.getCounter()));
     }
@@ -197,18 +202,4 @@ public class RMInitialState implements Serializable {
         return result;
     }
 
-    public void nodeSourceStateChanged(RMNodeSourceEvent stateChangedEvent) {
-        boolean existNodeSource = false;
-        int size = nodeSourceEvents.size();
-        for (int i = 0; i < size; i++) {
-            if (stateChangedEvent.getSourceName().equals(nodeSourceEvents.get(i).getSourceName())) {
-                existNodeSource = true;
-                nodeSourceEvents.put(stateChangedEvent.getSourceName(), stateChangedEvent);
-                break;
-            }
-        }
-        if (!existNodeSource) {
-            nodeSourceEvents.put(stateChangedEvent.getSourceName(), stateChangedEvent);
-        }
-    }
 }

@@ -1599,8 +1599,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState() {
-        Collection<RMNode> nodes = this.allNodes.values();
-        ArrayList<RMNodeEvent> nodesList = new ArrayList<>(nodes.size());
+        ArrayList<RMNodeEvent> nodesList = new ArrayList<>(this.allNodes.values().size());
 
         Map<String, RMNodeEvent> nodeEvents = new HashMap<>();
         for (RMNode rmnode : this.allNodes.values()) {
@@ -1612,7 +1611,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                        this.undeployedNodeSources.size());
 
         for (NodeSource s : this.deployedNodeSources.values()) {
-            nodeSourcesList.put(s.getName(), new RMNodeSourceEvent(s.getName(),
+            nodeSourcesList.put(s.getName(),
+                                new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
                                                       s.getDescriptor().getStatus().toString()));
@@ -1622,7 +1622,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         for (NodeSource s : this.undeployedNodeSources.values()) {
-            nodeSourcesList.put(s.getName(), new RMNodeSourceEvent(s.getName(),
+            nodeSourcesList.put(s.getName(),
+                                new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
                                                       s.getDescriptor().getStatus().toString()));

@@ -88,13 +88,6 @@ public class RMListenerProxy extends RMGroupEventListener {
 
     protected AtomicLong counter = new AtomicLong(0);
 
-    /**
-     * This locks are needed to synchronize access to rmInitialState.
-     * RMRest via RMStateCaching will read state of rmInitialState.
-     * AO will change the state of rmInitialState.
-     * */
-    private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-
     public boolean init(String url, CredData credData) throws RMException, KeyException, LoginException {
         this.rmAuth = RMConnection.join(url);
         Credentials cred = Credentials.createCredentials(credData, rmAuth.getPublicKey());
@@ -170,55 +163,41 @@ public class RMListenerProxy extends RMGroupEventListener {
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceEvent(RMNodeSourceEvent event) {
-        readWriteLock.writeLock().lock();
-        try {
-            switch (event.getEventType()) {
-                case NODESOURCE_DEFINED:
-                    rmInitialState.getNodeSource().add(event);
-                case NODESOURCE_CREATED:
-                    rmInitialState.nodeSourceStateChanged(event);
-                    break;
-                case NODESOURCE_REMOVED:
-                    rmInitialState.nodeSourceRemoved(event);
-                    break;
-            }
-            checkCounter(event);
-        } finally {
-            readWriteLock.writeLock().unlock();
+        switch (event.getEventType()) {
+            case NODESOURCE_DEFINED:
+                rmInitialState.getNodeSource().add(event);
+                break;
+            case NODESOURCE_CREATED:
+                rmInitialState.nodeSourceStateChanged(event);
+                break;
+            case NODESOURCE_REMOVED:
+                rmInitialState.nodeSourceRemoved(event);
+                break;
         }
+        checkCounter(event);
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeEvent(RMNodeEvent event) {
-        readWriteLock.writeLock().lock();
-        try {
-            switch (event.getEventType()) {
-                case NODE_REMOVED:
-                    rmInitialState.nodeRemoved(event);
-                    break;
-                case NODE_ADDED:
-                    rmInitialState.nodeAdded(event);
-                    break;
-                case NODE_STATE_CHANGED:
-                    rmInitialState.nodeStateChanged(event);
-                    break;
+        switch (event.getEventType()) {
+            case NODE_REMOVED:
+                rmInitialState.nodeRemoved(event);
+                break;
+            case NODE_ADDED:
+                rmInitialState.nodeAdded(event);
+                break;
+            case NODE_STATE_CHANGED:
+                rmInitialState.nodeStateChanged(event);
+                break;
 
-            }
-            checkCounter(event);
-        } finally {
-            readWriteLock.writeLock().unlock();
         }
+        checkCounter(event);
     }
 
     public RMInitialState getRMInitialState(long filter) {
-        readWriteLock.readLock().lock();
-        try {
-            return rmInitialState.cloneAndFilter(filter);
-        } finally {
-            readWriteLock.readLock().unlock();
-        }
+        return rmInitialState.cloneAndFilter(filter);
     }
 
     /**

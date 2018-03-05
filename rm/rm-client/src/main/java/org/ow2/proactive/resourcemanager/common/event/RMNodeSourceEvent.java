@@ -62,8 +62,6 @@ public class RMNodeSourceEvent extends RMEvent {
     /** string representation of the status of node source */
     private String nodeSourceStatus;
 
-    private Type type = Type.ADDED;
-
     /**
      * ProActive Empty constructor.
      */
@@ -93,19 +91,6 @@ public class RMNodeSourceEvent extends RMEvent {
         this.nodeSourceDescription = nodeSourceDescription;
         this.nodeSourceAdmin = nodeSourceAdmin;
         this.nodeSourceStatus = nodeSourceStatus;
-    }
-
-    enum Type {
-        ADDED,
-        REMOVED;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
     }
 
     // for testing purpose RMinitialStateTest
