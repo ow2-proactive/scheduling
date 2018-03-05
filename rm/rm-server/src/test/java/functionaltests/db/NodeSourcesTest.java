@@ -28,9 +28,7 @@ package functionaltests.db;
 import static com.google.common.truth.Truth.assertThat;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.cfg.Configuration;
@@ -42,10 +40,12 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
-import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.tests.ProActiveTest;
+
+import com.google.common.collect.Lists;
 
 
 public class NodeSourcesTest extends ProActiveTest {
@@ -100,9 +100,9 @@ public class NodeSourcesTest extends ProActiveTest {
         NodeSourceData nodeSource = nodeSources.iterator().next();
         Assert.assertEquals("ns1", nodeSource.getName());
         Assert.assertEquals(DefaultInfrastructureManager.class.getName(), nodeSource.getInfrastructureType());
-        Assert.assertEquals("infrastructure", nodeSource.getInfrastructureParameters()[0]);
+        Assert.assertEquals("infrastructure", nodeSource.getInfrastructureParameters().toArray()[0]);
         Assert.assertEquals(StaticPolicy.class.getName(), nodeSource.getPolicyType());
-        Assert.assertEquals("policy", nodeSource.getPolicyParameters()[0]);
+        Assert.assertEquals("policy", nodeSource.getPolicyParameters().toArray()[0]);
         assertThat(nodeSource.getInfrastructureVariables()).hasSize(1);
         Assert.assertEquals(INFRASTRUCTURE_VARIABLE_VALUE,
                             nodeSource.getInfrastructureVariables().get(INFRASTRUCTURE_VARIABLE_KEY));
@@ -161,13 +161,18 @@ public class NodeSourcesTest extends ProActiveTest {
     }
 
     private NodeSourceData createNodeSource() {
+        List<Serializable> infraParams = new ArrayList<>(1);
+        infraParams.add("infrastructure");
+        List<Serializable> policyParams = new ArrayList<>(1);
+        policyParams.add("policy");
         return new NodeSourceData("ns1",
                                   DefaultInfrastructureManager.class.getName(),
-                                  new String[] { "infrastructure" },
+                                  infraParams,
                                   StaticPolicy.class.getName(),
-                                  new String[] { "policy" },
+                                  policyParams,
                                   new Client(null, false),
-                                  false);
+                                  false,
+                                  NodeSourceStatus.NODES_DEPLOYED);
     }
 
 }

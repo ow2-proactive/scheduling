@@ -34,6 +34,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 
 
 /**
@@ -53,10 +54,10 @@ public class InfrastructureManagerFactory {
      *
      * @return new infrastructure manager
      */
-    public static InfrastructureManager create(NodeSourceData nodeSourceData) {
+    public static InfrastructureManager create(NodeSourceDescriptor nodeSourceDescriptor) {
         InfrastructureManager im = null;
-        String infrastructureType = nodeSourceData.getInfrastructureType();
-        Object[] infrastructureParameters = nodeSourceData.getInfrastructureParameters();
+        String infrastructureType = nodeSourceDescriptor.getInfrastructureType();
+        Object[] infrastructureParameters = nodeSourceDescriptor.getInfrastructureParameters();
         try {
 
             boolean supported = false;
@@ -73,7 +74,7 @@ public class InfrastructureManagerFactory {
             Class<?> imClass = Class.forName(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
             im.internalConfigure(infrastructureParameters);
-            im.setPersistedNodeSourceData(nodeSourceData);
+            im.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(nodeSourceDescriptor));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -81,15 +82,15 @@ public class InfrastructureManagerFactory {
     }
 
     /**
-     * Creates a new infrastructure manager and recovers its state thanks to
-     * the variables contained in {@param infrastructureVariables}.
-     *
-     * @param nodeSourceData the persisted information about the node source
-     * @return recovered infrastructure manager
-     */
-    public static InfrastructureManager recover(NodeSourceData nodeSourceData) {
-        InfrastructureManager infrastructure = create(nodeSourceData);
-        infrastructure.recoverPersistedInfraVariables(nodeSourceData.getInfrastructureVariables());
+      * Creates a new infrastructure manager and recovers its state thanks to
+      * the variables contained in {@param infrastructureVariables}.
+      *
+      * @param nodeSourceDescriptor the persisted information about the node source
+      * @return recovered infrastructure manager
+      */
+    public static InfrastructureManager recover(NodeSourceDescriptor nodeSourceDescriptor) {
+        InfrastructureManager infrastructure = create(nodeSourceDescriptor);
+        infrastructure.recoverPersistedInfraVariables(nodeSourceDescriptor.getLastRecoveredInfrastructureVariables());
         return infrastructure;
     }
 

@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 
 
 /**
@@ -52,16 +51,26 @@ public class NodeSourcePolicyFactory {
     private static Collection<Class<?>> supportedPolicies;
 
     /**
-     * Creates a new node source policy using reflection mechanism.
+     * Creates a new active node source policy using reflection mechanism.
      *
      * @param policyClassName full class name of the policy
      * @param infrastructureType infrastructure class name (for compatibility check)
      * @param policyParameters policy parameters
+     * @return a stub of the node source policy
+     */
+    public static NodeSourcePolicy createAndActivate(String policyClassName, String infrastructureType,
+            Object[] policyParameters) {
+        NodeSourcePolicy policy = create(policyClassName);
+        return activate(policy, policyParameters);
+    }
+
+    /**
+     * Creates a new node source policy.
+     *
+     * @param policyClassName full class name of the policy
      * @return new instance of the node source policy
      */
-    public static NodeSourcePolicy create(String policyClassName, String infrastructureType,
-            Object[] policyParameters) {
-
+    public static NodeSourcePolicy create(String policyClassName) {
         NodeSourcePolicy policy;
         try {
             boolean supported = false;
@@ -80,7 +89,17 @@ public class NodeSourcePolicyFactory {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return policy;
+    }
 
+    /**
+     * Creates the node source policy activity, given a node source policy instance.
+     *
+     * @param policy the node source policy to turn active
+     * @param policyParameters the policy parameters needed to configure it once it is turned active
+     * @return a stub to the node source policy activity
+     */
+    public static NodeSourcePolicy activate(NodeSourcePolicy policy, Object[] policyParameters) {
         // turning policy into an active object
         NodeSourcePolicy stub;
         try {
@@ -92,7 +111,7 @@ public class NodeSourcePolicyFactory {
         // initializing parameters
         BooleanWrapper result = stub.configure(policyParameters);
         if (!result.getBooleanValue()) {
-            throw new RuntimeException("Cannot configure the policy " + policyClassName);
+            throw new RuntimeException("Cannot configure the policy " + policy.getClass().getSimpleName());
         }
 
         return stub;
@@ -130,4 +149,5 @@ public class NodeSourcePolicyFactory {
         }
         return supportedPolicies;
     }
+
 }
