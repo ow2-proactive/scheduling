@@ -59,6 +59,9 @@ public class RMNodeSourceEvent extends RMEvent {
 
     private String nodeSourceAdmin = null;
 
+    /** string representation of the status of node source */
+    private String nodeSourceStatus;
+
     /**
      * ProActive Empty constructor.
      */
@@ -69,22 +72,25 @@ public class RMNodeSourceEvent extends RMEvent {
      * Creates an RMNodesourceEvent object.
      * Used to represent the resource manager state @see RMInitialState.
      */
-    public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription, String nodeSourceAdmin) {
+    public RMNodeSourceEvent(String nodeSourceName, String nodeSourceDescription, String nodeSourceAdmin,
+            String nodeSourceStatus) {
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
         this.nodeSourceAdmin = nodeSourceAdmin;
+        this.nodeSourceStatus = nodeSourceStatus;
     }
 
     /**
      * Creates an RMNodesourceEvent object.
      */
     public RMNodeSourceEvent(RMEventType type, String initiator, String nodeSourceName, String nodeSourceDescription,
-            String nodeSourceAdmin) {
+            String nodeSourceAdmin, String nodeSourceStatus) {
         super(type);
         this.initiator = initiator;
         this.nodeSourceName = nodeSourceName;
         this.nodeSourceDescription = nodeSourceDescription;
         this.nodeSourceAdmin = nodeSourceAdmin;
+        this.nodeSourceStatus = nodeSourceStatus;
     }
 
     @Override
@@ -139,6 +145,14 @@ public class RMNodeSourceEvent extends RMEvent {
      */
     public String getNodeSourceAdmin() {
         return nodeSourceAdmin;
+    }
+
+    /**
+     * Returns node source status under String representation
+     * @return string value of node source status
+     */
+    public String getNodeSourceStatus() {
+        return nodeSourceStatus;
     }
 
     /**

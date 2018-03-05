@@ -23,18 +23,34 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
-
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ TagCommandsFunctTest.class, NodeSourceCommandsFunctTest.class })
+package org.ow2.proactive.resourcemanager.nodesource;
 
 /**
- * @author ActiveEon Team
- * @since 12/01/2018
+ * Indicate the status of a node source.
  */
-public class StandardTestSuite {
+public enum NodeSourceStatus {
+
+    /**
+     * A deployed node source means that the nodes acquisition of this node
+     * source has been triggered.
+     */
+    NODES_DEPLOYED("deployed"),
+
+    /**
+     * An undeployed node source means that no node of the node source is
+     * acquired, and that the node source activity does not exist,
+     */
+    NODES_UNDEPLOYED("undeployed");
+
+    private String stringValue;
+
+    NodeSourceStatus(String stringValue) {
+        this.stringValue = stringValue;
+    }
+
+    @Override
+    public String toString() {
+        return stringValue;
+    }
+
 }

@@ -61,6 +61,7 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -348,9 +349,51 @@ public class RMRest implements RMRestInterface {
         return rm.getExistingNodeSourcesList();
     }
 
+    @Override
+    @POST
+    @Path("nodesource")
+    @Produces("application/json")
+    public NSState defineNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters,
+            @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        NSState nsState = new NSState();
+
+        Object[] infraParams = this.getAllInfrastructureParameters(infrastructureType,
+                                                                   infrastructureParameters,
+                                                                   infrastructureFileParameters,
+                                                                   rm);
+        Object[] policyParams = this.getAllPolicyParameters(policyType, policyParameters, policyFileParameters, rm);
+
+        try {
+            nsState.setResult(rm.defineNodeSource(nodeSourceName,
+                                                  infrastructureType,
+                                                  infraParams,
+                                                  policyType,
+                                                  policyParams,
+                                                  Boolean.parseBoolean(nodesRecoverable))
+                                .getBooleanValue());
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
+        }
+
+        return nsState;
+    }
+
     /**
-     * {@link RMRest#createNodeSource(String, String, String, String[], String[], String, String[], String[], String)}
+     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
+     * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
+     *
+     * {@see #createNodeSource(String, String, String, String[], String[], String, String[], String[])}
      */
+    @Deprecated
     @Override
     @POST
     @Path("nodesource/create")
@@ -374,6 +417,9 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
+     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
+     * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
+     *
      * Create a NodeSource
      * <p>
      *
@@ -400,6 +446,7 @@ public class RMRest implements RMRestInterface {
      * @return true if a node source has been created
      * @throws NotConnectedException 
      */
+    @Deprecated
     @Override
     @POST
     @Path("nodesource/create/recovery")
@@ -413,55 +460,24 @@ public class RMRest implements RMRestInterface {
             @FormParam("policyFileParameters") String[] policyFileParameters,
             @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
-        Object[] infraParams = new Object[infrastructureParameters.length + infrastructureFileParameters.length];
-        Object[] policyParams = new Object[policyParameters.length + policyFileParameters.length];
         NSState nsState = new NSState();
-        /*
-         * we need to merge both infrastructureParameters and infrastructureFileParameters into one
-         * to do so we need the infrastructure parameter order from the RM
-         */
-        for (PluginDescriptor infra : rm.getSupportedNodeSourceInfrastructures()) {
-            if (infra.getPluginName().equals(infrastructureType)) {
-                int i = 0, j = 0, k = 0;
-                for (ConfigurableField field : infra.getConfigurableFields()) {
-                    if (field.getMeta().credential() || field.getMeta().fileBrowser()) {
-                        // file parameter : insert from the other array, convert
-                        // to byte[]
-                        infraParams[i] = infrastructureFileParameters[k].getBytes();
-                        k++;
-                    } else {
-                        infraParams[i] = infrastructureParameters[j];
-                        j++;
-                    }
-                    i++;
-                }
-            }
-        }
-        for (PluginDescriptor pol : rm.getSupportedNodeSourcePolicies()) {
-            if (pol.getPluginName().equals(policyType)) {
-                int i = 0, j = 0, k = 0;
-                for (ConfigurableField
 
-                field : pol.getConfigurableFields()) {
-                    if (field.getMeta().credential() || field.getMeta().password()) {
-                        // file parameter : insert from the other array, convert
-                        // to byte[]
-                        policyParams[i] = policyFileParameters[k].getBytes();
-                        k++;
-                    } else {
-                        policyParams[i] = policyParameters[j];
-                        j++;
-                    }
-                    i++;
-                }
-            }
-        }
+        Object[] allInfrastructureParameters = this.getAllInfrastructureParameters(infrastructureType,
+                                                                                   infrastructureParameters,
+                                                                                   infrastructureFileParameters,
+                                                                                   rm);
+
+        Object[] allPolicyParameters = this.getAllPolicyParameters(policyType,
+                                                                   policyParameters,
+                                                                   policyFileParameters,
+                                                                   rm);
+
         try {
             nsState.setResult(rm.createNodeSource(nodeSourceName,
                                                   infrastructureType,
-                                                  infraParams,
+                                                  allInfrastructureParameters,
                                                   policyType,
-                                                  policyParams,
+                                                  allPolicyParameters,
                                                   Boolean.parseBoolean(nodesRecoverable))
                                 .getBooleanValue());
         } catch (RuntimeException ex) {
@@ -481,6 +497,32 @@ public class RMRest implements RMRestInterface {
             errorMessage = matcher.group(1);
         }
         return (errorMessage);
+    }
+
+    /**
+     * Start the nodes acquisition of the node source
+     *
+     * @param sessionId a valid session id
+     * @param nodeSourceName the name of the node source to start
+     * @return the result of the action, possibly containing the error message
+     * @throws NotConnectedException
+     */
+    @Override
+    @PUT
+    @Path("nodesource/deploy")
+    @Produces("application/json")
+    public NSState deployNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        NSState nsState = new NSState();
+        try {
+            nsState.setResult(rm.deployNodeSource(nodeSourceName).getBooleanValue());
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
+        }
+        return nsState;
     }
 
     /**
@@ -1064,6 +1106,56 @@ public class RMRest implements RMRestInterface {
     @Path("/")
     public Response index() throws URISyntaxException {
         return Response.seeOther(new URI("doc/jaxrsdocs/rm/index.html")).build();
+    }
+
+    private Object[] getAllInfrastructureParameters(String infrastructureType, String[] infrastructureParameters,
+            String[] infrastructureFileParameters, ResourceManager rm) {
+        for (PluginDescriptor infrastructureDescriptor : rm.getSupportedNodeSourceInfrastructures()) {
+            if (infrastructureDescriptor.getPluginName().equals(infrastructureType)) {
+                Collection<ConfigurableField> infrastructureFields = infrastructureDescriptor.getConfigurableFields();
+                return this.concatenateParametersAndFileParameters(infrastructureParameters,
+                                                                   infrastructureFileParameters,
+                                                                   infrastructureFields);
+            }
+        }
+
+        throw new IllegalArgumentException("Infrastructure " + infrastructureType + " is unknown");
+    }
+
+    private Object[] getAllPolicyParameters(String policyType, String[] policyParameters, String[] policyFileParameters,
+            ResourceManager rm) {
+        for (PluginDescriptor policyDescriptor : rm.getSupportedNodeSourcePolicies()) {
+            if (policyDescriptor.getPluginName().equals(policyType)) {
+                Collection<ConfigurableField> policyFields = policyDescriptor.getConfigurableFields();
+                return this.concatenateParametersAndFileParameters(policyParameters,
+                                                                   policyFileParameters,
+                                                                   policyFields);
+            }
+        }
+
+        throw new IllegalArgumentException("Policy " + policyType + " is unknown");
+    }
+
+    private Object[] concatenateParametersAndFileParameters(String[] parameters, String[] fileParameters,
+            Collection<ConfigurableField> fields) {
+        Object[] concatenatedParameters = new Object[parameters.length + fileParameters.length];
+
+        int parametersIndex = 0;
+        int fileParametersIndex = 0;
+        int concatenatedParametersIndex = 0;
+
+        for (ConfigurableField field : fields) {
+            if (field.getMeta().credential() || field.getMeta().password() || field.getMeta().fileBrowser()) {
+                concatenatedParameters[concatenatedParametersIndex] = fileParameters[fileParametersIndex].getBytes();
+                fileParametersIndex++;
+            } else {
+                concatenatedParameters[concatenatedParametersIndex] = parameters[parametersIndex];
+                parametersIndex++;
+            }
+            concatenatedParametersIndex++;
+        }
+
+        return concatenatedParameters;
     }
 
 }

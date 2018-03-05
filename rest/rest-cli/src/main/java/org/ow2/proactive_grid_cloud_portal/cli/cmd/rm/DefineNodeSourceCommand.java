@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import static org.apache.http.entity.ContentType.*;
+import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand.SET_INFRASTRUCTURE;
@@ -42,22 +42,20 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
-/**
- * @deprecated  As of version 8.1, replaced by
- * {@link DefineNodeSourceCommand)} and {@link DeployNodeSourceCommand}
- */
-@Deprecated
-public class CreateNodeSourceCommand extends AbstractCommand implements Command {
+public class DefineNodeSourceCommand extends AbstractCommand implements Command {
+
+    private static final String RM_REST_ENDPOINT = "nodesource";
+
     private String nodeSource;
 
     private String nodesRecoverable;
 
-    public CreateNodeSourceCommand(String nodeSource) {
+    public DefineNodeSourceCommand(String nodeSource) {
         this.nodeSource = nodeSource;
         this.nodesRecoverable = "true";
     }
 
-    public CreateNodeSourceCommand(String nodeSource, String nodesRecoverable) {
+    public DefineNodeSourceCommand(String nodeSource, String nodesRecoverable) {
         this.nodeSource = nodeSource;
         this.nodesRecoverable = nodesRecoverable;
     }
@@ -75,7 +73,7 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
         if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
             nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
         }
-        HttpPost request = new HttpPost(currentContext.getResourceUrl("nodesource/create/recovery"));
+        HttpPost request = new HttpPost(currentContext.getResourceUrl(RM_REST_ENDPOINT));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
         queryStringBuilder.add("nodeSourceName", nodeSource)
                           .addAll(infrastructure)
@@ -88,12 +86,12 @@ public class CreateNodeSourceCommand extends AbstractCommand implements Command 
             boolean success = nsState.isResult();
             resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext, "Node source successfully created.");
+                writeLine(currentContext, "Node source successfully defined.");
             } else {
-                writeLine(currentContext, "%s %s", "Cannot create node source:", nodeSource);
+                writeLine(currentContext, "%s %s", "Cannot define node source:", nodeSource);
             }
         } else {
-            handleError("An error occurred while creating node source:", response, currentContext);
+            handleError("An error occurred while defining node source:", response, currentContext);
 
         }
     }

@@ -40,6 +40,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.NodesRecoveryManager;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -154,7 +155,7 @@ public class NodeRecoveryTest extends PerformanceTestBase {
     }
 
     private long nodesRecovered() {
-        final String line = LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY);
+        final String line = LogProcessor.getFirstLineThatMatch(NodesRecoveryManager.END_OF_NODES_RECOVERY);
         final List<Integer> numbersFromLine = LogProcessor.getNumbersFromLine(line);
 
         if (!numbersFromLine.isEmpty()) {
@@ -167,18 +168,20 @@ public class NodeRecoveryTest extends PerformanceTestBase {
     private long timeSpentToRecoverNodes() {
         final long time = endedToRecover() - startedToRecover();
         if (time < 0) {
-            throw new RuntimeException("First occurence of " + RMCore.START_TO_RECOVER_NODES + " goes after " +
-                                       RMCore.END_OF_NODES_RECOVERY);
+            throw new RuntimeException("First occurence of " + NodesRecoveryManager.START_TO_RECOVER_NODES +
+                                       " goes after " + NodesRecoveryManager.END_OF_NODES_RECOVERY);
         }
 
         return time;
     }
 
     static long startedToRecover() {
-        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.START_TO_RECOVER_NODES)).getTime();
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(NodesRecoveryManager.START_TO_RECOVER_NODES))
+                           .getTime();
     }
 
     static long endedToRecover() {
-        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY)).getTime();
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(NodesRecoveryManager.END_OF_NODES_RECOVERY))
+                           .getTime();
     }
 }

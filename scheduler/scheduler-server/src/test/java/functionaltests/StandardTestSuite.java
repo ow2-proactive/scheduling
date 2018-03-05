@@ -117,7 +117,6 @@ import functionaltests.policy.ram.TestRamPolicy;
 import functionaltests.rm.TestNodeDiesAtSchedulerRestart;
 import functionaltests.rm.TestRMProxy;
 import functionaltests.rm.TestRMProxyRebind;
-import functionaltests.rm.nodesource.TestBrokenNodeSourceRemoval;
 import functionaltests.rm.nodesource.TestJobNodeAccessToken;
 import functionaltests.runasme.TestRunAsMeLinuxKey;
 import functionaltests.runasme.TestRunAsMeLinuxNone;
@@ -231,13 +230,12 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestWorkflowFailedScript.class,
 
                       // Tests with different configurations (and restart)
-                      TestBrokenNodeSourceRemoval.class, TestCacheSpaceCleaning.class,
-                      TestChildProcessOfNodeKilled.class, TestDisabledListenJobLogs.class, TestJobKilled.class,
-                      TestJobScriptVariables.class, TestKillPendingTask.class, TestLicensePolicy.class,
-                      TestListenJobLogs.class, TestNodeDiesAtSchedulerRestart.class, TestPreemptRestartKillTask.class,
-                      TestPreemptRestartKillTaskSchema33.class, TestRamPolicy.class, TestRunAsMeLinuxKey.class,
-                      TestRunAsMeLinuxNone.class, TestRunAsMeLinuxPwd.class, TestRunAsMeWindows.class,
-                      TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
+                      TestCacheSpaceCleaning.class, TestChildProcessOfNodeKilled.class, TestDisabledListenJobLogs.class,
+                      TestJobKilled.class, TestJobScriptVariables.class, TestKillPendingTask.class,
+                      TestLicensePolicy.class, TestListenJobLogs.class, TestNodeDiesAtSchedulerRestart.class,
+                      TestPreemptRestartKillTask.class, TestPreemptRestartKillTaskSchema33.class, TestRamPolicy.class,
+                      TestRunAsMeLinuxKey.class, TestRunAsMeLinuxNone.class, TestRunAsMeLinuxPwd.class,
+                      TestRunAsMeWindows.class, TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
                       TestSubmitJobWithUnaccessibleDataSpaces.class, TestTaskRestartOnNodeFailure.class,
                       TestTasksCompleteAfterSelectiontimeout.class, TestUnauthorizedScripts.class,
                       TestVariablesPropagation.class })
