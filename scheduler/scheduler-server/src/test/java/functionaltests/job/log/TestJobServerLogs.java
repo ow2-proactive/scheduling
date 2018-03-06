@@ -160,6 +160,8 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
         checkJobAndTaskLogFiles(jobId, tasks, true);
 
+        schedulerHelper.killJob(jobId.value());
+        Thread.sleep(5000);
         schedulerHelper.removeJob(jobId);
         schedulerHelper.waitForEventJobRemoved(jobId);
 
