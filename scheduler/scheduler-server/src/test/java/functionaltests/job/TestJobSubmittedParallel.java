@@ -41,6 +41,7 @@ import java.util.stream.Stream;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 
@@ -67,8 +68,13 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
         // submit all jobs
         repeater.accept(THREAD_POOL_SIZE, () -> futures.add(executorService.submit(() -> {
             List<JobId> result = new ArrayList<>();
-            repeater.accept(NUMBER_OF_JOBS_PER_THREAD,
-                            () -> result.add(schedulerHelper.submitJob(simpleJob.getPath())));
+            repeater.accept(NUMBER_OF_JOBS_PER_THREAD, () -> {
+                final JobId jobId = schedulerHelper.submitJob(simpleJob.getPath());
+                final JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
+                jobState.getId().equals(jobId);
+                jobState.getSubmittedTime();
+                result.add(jobId);
+            });
             return result;
         })));
 
@@ -88,10 +94,10 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
     /**
      * repeats func function limit number of times
      */
-    private static BiConsumer<Integer, Callable> repeater = (limit, func) -> {
+    private static BiConsumer<Integer, RunnableThatThrows> repeater = (limit, func) -> {
         for (int i = 0; i < limit; ++i) {
             try {
-                func.call();
+                func.run();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -115,9 +121,16 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
         });
     }
 
+    @FunctionalInterface
+    private interface RunnableThatThrows<T, R> {
+        void run() throws Exception;
+
+    }
+
     /**
      * How come java does not have Function that throws Exception
      */
+    @FunctionalInterface
     private interface FunctionThatThrows<T, R> {
         R apply(T var1) throws Exception;
 
