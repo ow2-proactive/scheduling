@@ -63,9 +63,9 @@ import performancetests.recovery.PerformanceTestBase;
  *
  */
 @RunWith(Parameterized.class)
-public class AverageJobSubmittingTimeTest extends PerformanceTestBase {
+public class ParallelSequentionalJobSubmition extends PerformanceTestBase {
 
-    private static final Logger LOGGER = Logger.getLogger(AverageJobSubmittingTimeTest.class);
+    private static final Logger LOGGER = Logger.getLogger(ParallelSequentionalJobSubmition.class);
 
     SchedulerTHelper schedulerHelper;
 
@@ -78,7 +78,7 @@ public class AverageJobSubmittingTimeTest extends PerformanceTestBase {
 
     private final int numberOfJobSubmittedByThread;
 
-    public AverageJobSubmittingTimeTest(int numberOfThreads, int numberOfJobSubmittedByThread, double rate) {
+    public ParallelSequentionalJobSubmition(int numberOfThreads, int numberOfJobSubmittedByThread, double rate) {
         this.numberOfThreads = numberOfThreads;
         this.numberOfJobSubmittedByThread = numberOfJobSubmittedByThread;
     }
@@ -100,7 +100,7 @@ public class AverageJobSubmittingTimeTest extends PerformanceTestBase {
 
         double faster = ((double) parallel) / sequential;
 
-        LOGGER.info(makeCSVString(AverageJobSubmittingTimeTest.class.getSimpleName(),
+        LOGGER.info(makeCSVString(ParallelSequentionalJobSubmition.class.getSimpleName(),
                                   String.format("%d * %d", numberOfThreads, numberOfJobSubmittedByThread),
                                   1.0,
                                   faster,

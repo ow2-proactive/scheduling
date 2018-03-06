@@ -28,8 +28,8 @@ package performancetests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import performancetests.metrics.AverageJobSubmittingTimeTest;
 import performancetests.metrics.GetResultMetricTest;
+import performancetests.metrics.ParallelSequentionalJobSubmition;
 import performancetests.metrics.ParallelTaskSchedulingTest;
 import performancetests.metrics.SchedulerEfficiencyMetricsTest;
 import performancetests.metrics.TaskCreationTimeTest;
@@ -45,13 +45,12 @@ import performancetests.recovery.NodeRecoveryTest;
 
                       // Metrics
                       TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class,
-                      ParallelTaskSchedulingTest.class,
+                      ParallelTaskSchedulingTest.class, ParallelSequentionalJobSubmition.class,
 
                       // Test which computes average metrics
-                      TaskSchedulingTimeTest.class,
+                      TaskSchedulingTimeTest.class
 
-                      // Average
-                      AverageJobSubmittingTimeTest.class })
+})
 
 /**
  * @author ActiveEon Team

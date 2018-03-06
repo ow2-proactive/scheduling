@@ -25,7 +25,6 @@
  */
 package functionaltests;
 
-import functionaltests.job.TestJobSubmittedParallel;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -84,6 +83,7 @@ import functionaltests.jmx.SchedulerRuntimeDataMBeanTest;
 import functionaltests.job.TagTest;
 import functionaltests.job.TestJobRemoved;
 import functionaltests.job.TestJobSchedulerHome;
+import functionaltests.job.TestJobSubmittedParallel;
 import functionaltests.job.TestJobWalltime;
 import functionaltests.job.TestPauseJob;
 import functionaltests.job.TestPreemptRestartKillTask;
