@@ -25,6 +25,7 @@
  */
 package functionaltests;
 
+import functionaltests.job.TestJobSubmittedParallel;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -219,7 +220,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestTaskNotRestarted.class, TestTaskNotStarted.class, TestTaskScriptVariables.class,
                       TestThirdPartyCredentialsDefined.class, TestUserSpace.class, TestWorkflowDataspace.class,
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
-                      Test_SCHEDULING_2034.class,
+                      Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,
