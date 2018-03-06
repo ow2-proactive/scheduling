@@ -48,7 +48,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
 import functionaltests.utils.SchedulerTHelper;
-import performancetests.recovery.PeformanceTestBase;
+import performancetests.recovery.PerformanceTestBase;
 
 
 /**
@@ -57,7 +57,7 @@ import performancetests.recovery.PeformanceTestBase;
  *
  */
 @RunWith(Parameterized.class)
-public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
+public class AverageJobSubmittingTimeTest extends PerformanceTestBase {
 
     private static final Logger LOGGER = Logger.getLogger(AverageJobSubmittingTimeTest.class);
 
