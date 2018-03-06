@@ -53,6 +53,8 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.VersionCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DefineNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DeployNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
@@ -680,6 +682,23 @@ public class CommandSet {
                                                                           .commandClass(AddNodeCommand.class)
                                                                           .entry();
 
+    public static final CommandSet.Entry NS_DEFINE = CommandSetEntryBuilder.newInstance()
+                                                                           .opt("dfns")
+                                                                           .longOpt("definens")
+                                                                           .description("Define new node source")
+                                                                           .hasArgs(true)
+                                                                           .numOfArgs(1)
+                                                                           .hasOptionalArg(true)
+                                                                           .argNames("node-source [nodes-recoverable]")
+                                                                           .jsCommand("definens(node-source[,nodes-recoverable])")
+                                                                           .commandClass(DefineNodeSourceCommand.class)
+                                                                           .entry();
+
+    /**
+     * @deprecated  As of version 8.1, replaced by
+     * {@link CommandSet#NS_DEFINE} and {@link CommandSet#NS_DEPLOY}
+     */
+    @Deprecated
     public static final CommandSet.Entry NS_CREATE = CommandSetEntryBuilder.newInstance()
                                                                            .opt("cn")
                                                                            .longOpt("createns")
@@ -690,6 +709,17 @@ public class CommandSet {
                                                                            .argNames("node-source [nodes-recoverable]")
                                                                            .jsCommand("createns(node-source[,nodes-recoverable])")
                                                                            .commandClass(CreateNodeSourceCommand.class)
+                                                                           .entry();
+
+    public static final CommandSet.Entry NS_DEPLOY = CommandSetEntryBuilder.newInstance()
+                                                                           .opt("dpns")
+                                                                           .longOpt("deployns")
+                                                                           .description("Deploy defined node source")
+                                                                           .hasArgs(true)
+                                                                           .numOfArgs(1)
+                                                                           .argNames("node-source-name")
+                                                                           .jsCommand("deployns(node-source-name)")
+                                                                           .commandClass(DeployNodeSourceCommand.class)
                                                                            .entry();
 
     public static final CommandSet.Entry NODE_REMOVE = CommandSetEntryBuilder.newInstance()
@@ -924,10 +954,10 @@ public class CommandSet {
      */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] { LOGIN, NODE_ADD, NODE_LIST, NODE_INFO,
                                                                               NODE_LOCK, NODE_UNLOCK, NODE_REMOVE,
-                                                                              NS_CREATE, NS_LIST, NS_REMOVE, NS,
-                                                                              INFRASTRUCTURE, INFRASTRUCTURE_LIST,
-                                                                              POLICY, POLICY_LIST, TOPOLOGY, FORCE,
-                                                                              RM_STATS, RM_HELP };
+                                                                              NS_DEFINE, NS_CREATE, NS_DEPLOY, NS_LIST,
+                                                                              NS_REMOVE, NS, INFRASTRUCTURE,
+                                                                              INFRASTRUCTURE_LIST, POLICY, POLICY_LIST,
+                                                                              TOPOLOGY, FORCE, RM_STATS, RM_HELP };
 
     public static final Entry[] INTERACTIVE_COMMANDS = { JS_LIST_ALL, JS_LIST_LATEST, JS_LIST_FROM, EXIT, RM_JS_HELP,
                                                          SCHED_JS_HELP, COMMON_JS_HELP, VERSION };

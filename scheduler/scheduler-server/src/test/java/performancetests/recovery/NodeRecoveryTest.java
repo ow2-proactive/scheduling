@@ -28,9 +28,10 @@ package performancetests.recovery;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,6 +40,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.core.NodesRecoveryManager;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -53,9 +55,7 @@ import performancetests.helper.LogProcessor;
  * @since 01/12/17
  */
 @RunWith(Parameterized.class)
-public class NodeRecoveryTest extends PeformanceTestBase {
-
-    private static final Logger LOGGER = Logger.getLogger(NodeRecoveryTest.class);
+public class NodeRecoveryTest extends PerformanceTestBase {
 
     public static final String RM_CONFIGURATION_START = NodeRecoveryTest.class.getResource("/performancetests/config/rm-start.ini")
                                                                               .getPath();
@@ -133,12 +133,12 @@ public class NodeRecoveryTest extends PeformanceTestBase {
                                       ((timeSpent < timeLimit) ? SUCCESS : FAILURE)));
         } catch (Exception e) {
             e.printStackTrace();
-            LOGGER.info(PeformanceTestBase.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
-                                                         nodesNumber,
-                                                         timeLimit,
-                                                         -1,
-                                                         -1,
-                                                         ERROR));
+            LOGGER.info(PerformanceTestBase.makeCSVString(NodeRecoveryTest.class.getSimpleName(),
+                                                          nodesNumber,
+                                                          timeLimit,
+                                                          -1,
+                                                          -1,
+                                                          ERROR));
         }
     }
 
@@ -155,7 +155,7 @@ public class NodeRecoveryTest extends PeformanceTestBase {
     }
 
     private long nodesRecovered() {
-        final String line = LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY);
+        final String line = LogProcessor.getFirstLineThatMatch(NodesRecoveryManager.END_OF_NODES_RECOVERY);
         final List<Integer> numbersFromLine = LogProcessor.getNumbersFromLine(line);
 
         if (!numbersFromLine.isEmpty()) {
@@ -168,18 +168,20 @@ public class NodeRecoveryTest extends PeformanceTestBase {
     private long timeSpentToRecoverNodes() {
         final long time = endedToRecover() - startedToRecover();
         if (time < 0) {
-            throw new RuntimeException("First occurence of " + RMCore.START_TO_RECOVER_NODES + " goes after " +
-                                       RMCore.END_OF_NODES_RECOVERY);
+            throw new RuntimeException("First occurence of " + NodesRecoveryManager.START_TO_RECOVER_NODES +
+                                       " goes after " + NodesRecoveryManager.END_OF_NODES_RECOVERY);
         }
 
         return time;
     }
 
     static long startedToRecover() {
-        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.START_TO_RECOVER_NODES)).getTime();
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(NodesRecoveryManager.START_TO_RECOVER_NODES))
+                           .getTime();
     }
 
     static long endedToRecover() {
-        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(RMCore.END_OF_NODES_RECOVERY)).getTime();
+        return LogProcessor.getDateOfLine(LogProcessor.getFirstLineThatMatch(NodesRecoveryManager.END_OF_NODES_RECOVERY))
+                           .getTime();
     }
 }

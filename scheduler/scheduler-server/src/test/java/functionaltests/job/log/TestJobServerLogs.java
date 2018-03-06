@@ -29,11 +29,24 @@ import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
@@ -71,6 +84,8 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
     private final String SCRIPT_OUTPUT = "SCRIPT_OUTPUT_" + Math.random();
 
     private String logsLocation = ServerJobAndTaskLogs.getLogsLocation();
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("kk:mm:ss:SSS");
 
     private Job createPendingJob() throws Exception {
         final TaskFlowJob job = new TaskFlowJob();
@@ -148,6 +163,8 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
         schedulerHelper.removeJob(jobId);
         schedulerHelper.waitForEventJobRemoved(jobId);
 
+        System.out.println("Suppose to remove all logs at " + simpleDateFormat.format(new Date()));
+
         checkNoLogsFromAPI(jobId, tasks);
         checkJobAndTaskLogFiles(jobId, tasks, false);
     }
@@ -177,12 +194,62 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
     private void checkFile(boolean shouldExist, File jobLogFile) {
         String message = String.format("Log file %s should %s", jobLogFile, shouldExist ? "exist" : "not exist");
-        assertEquals(message, shouldExist, jobLogFile.exists());
+        final boolean actualExistings = jobLogFile.exists();
+        if (actualExistings != shouldExist) {
+            printDiagnosticMessage();
+        }
+        assertEquals(message, shouldExist, actualExistings);
     }
 
     public static boolean matchLine(String text, String regex) {
         Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
         return pattern.matcher(text).find();
+    }
+
+    private void printDiagnosticMessage() {
+        int LIMIT = 5;
+        System.out.println("This test is going to fail, but before we print diagnostic message." +
+                           simpleDateFormat.format(new Date()));
+        // iterate over all files in the 'logsLocation'
+        for (File file : FileUtils.listFiles(new File(logsLocation),
+                                             TrueFileFilter.INSTANCE,
+                                             TrueFileFilter.INSTANCE)) {
+            try {
+                BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                System.out.println(String.format("Name: %s, Size: %d, Created: %s, Modified: %s",
+                                                 file.getAbsolutePath(),
+                                                 attr.size(),
+                                                 attr.creationTime(),
+                                                 attr.lastModifiedTime()));
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String line;
+                int i;
+                // print up to LIMIT first lines
+                for (i = 0; i < LIMIT && (line = br.readLine()) != null; ++i) {
+                    System.out.println(line);
+                }
+
+                Queue<String> queue = new CircularFifoQueue<>(LIMIT);
+                // reading last LIMIT lines
+                for (; (line = br.readLine()) != null; ++i) {
+                    queue.add(line);
+                }
+
+                if (i >= LIMIT * 2) { // if there is more line than 2*LIMIT
+                    System.out.println(".......");
+                    System.out.println("....... (skipped content)");
+                    System.out.println(".......");
+                }
+                for (String l : queue) { // print rest of the file
+                    System.out.println(l);
+                }
+
+                System.out.println("------------------------------------");
+                System.out.println();
+            } catch (IOException e) {
+                System.out.println("Exception ocurred during accessing file attributes " + e);
+            }
+        }
     }
 
 }

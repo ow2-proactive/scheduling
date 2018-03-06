@@ -55,6 +55,10 @@ public enum RMEventType {
      */
     STARTED,
     /**
+     * The node source has been defined.
+     */
+    NODESOURCE_DEFINED,
+    /**
      * A new node source has been created in Resource manager.
      */
     NODESOURCE_CREATED,
@@ -62,6 +66,11 @@ public enum RMEventType {
      * A node source has been removed removed from resource manager.
      */
     NODESOURCE_REMOVED,
+    /**
+     * The node source state has been undefined, it is not known anymore.
+     */
+    NODESOURCE_UNDEFINED,
+    /**
     /**
      * A new node has been added to Resource manager, and is ready to
      * be provided to a RM user.

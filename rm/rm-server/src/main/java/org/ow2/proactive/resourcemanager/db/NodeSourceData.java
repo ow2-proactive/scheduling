@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.db;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -40,6 +41,8 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 
 
 @Entity
@@ -54,15 +57,17 @@ public class NodeSourceData implements Serializable {
 
     private String infrastructureType;
 
-    private Object[] infrastructureParameters;
+    private List<Serializable> infrastructureParameters;
 
     private String policyType;
 
-    private Object[] policyParameters;
+    private List<Serializable> policyParameters;
 
     private Client provider;
 
     private boolean nodesRecoverable;
+
+    private NodeSourceStatus status;
 
     /**
      * name of the variable --> value of the variable
@@ -72,8 +77,9 @@ public class NodeSourceData implements Serializable {
     public NodeSourceData() {
     }
 
-    public NodeSourceData(String nodeSourceName, String infrastructureType, Object[] infrastructureParameters,
-            String policyType, Object[] policyParameters, Client provider, boolean nodesRecoverable) {
+    public NodeSourceData(String nodeSourceName, String infrastructureType, List<Serializable> infrastructureParameters,
+            String policyType, List<Serializable> policyParameters, Client provider, boolean nodesRecoverable,
+            NodeSourceStatus status) {
 
         this.name = nodeSourceName;
         this.infrastructureType = infrastructureType;
@@ -82,7 +88,21 @@ public class NodeSourceData implements Serializable {
         this.policyParameters = policyParameters;
         this.provider = provider;
         this.nodesRecoverable = nodesRecoverable;
+        this.status = status;
         this.infrastructureVariables = new HashMap<>();
+    }
+
+    public static NodeSourceData fromNodeSourceDescriptor(NodeSourceDescriptor descriptor) {
+        NodeSourceData nodeSourceData = new NodeSourceData(descriptor.getName(),
+                                                           descriptor.getInfrastructureType(),
+                                                           descriptor.getSerializableInfrastructureParameters(),
+                                                           descriptor.getPolicyType(),
+                                                           descriptor.getSerializablePolicyParameters(),
+                                                           descriptor.getProvider(),
+                                                           descriptor.nodesRecoverable(),
+                                                           descriptor.getStatus());
+        nodeSourceData.setInfrastructureVariables(descriptor.getLastRecoveredInfrastructureVariables());
+        return nodeSourceData;
     }
 
     @Id
@@ -107,11 +127,11 @@ public class NodeSourceData implements Serializable {
 
     @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Object[] getInfrastructureParameters() {
+    public List<Serializable> getInfrastructureParameters() {
         return infrastructureParameters;
     }
 
-    public void setInfrastructureParameters(Object[] infrastructureParameters) {
+    public void setInfrastructureParameters(List<Serializable> infrastructureParameters) {
         this.infrastructureParameters = infrastructureParameters;
     }
 
@@ -126,11 +146,11 @@ public class NodeSourceData implements Serializable {
 
     @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
-    public Object[] getPolicyParameters() {
+    public List<Serializable> getPolicyParameters() {
         return policyParameters;
     }
 
-    public void setPolicyParameters(Object[] policyParameters) {
+    public void setPolicyParameters(List<Serializable> policyParameters) {
         this.policyParameters = policyParameters;
     }
 
@@ -153,6 +173,15 @@ public class NodeSourceData implements Serializable {
         this.nodesRecoverable = nodesRecoverable;
     }
 
+    @Column
+    public NodeSourceStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(NodeSourceStatus status) {
+        this.status = status;
+    }
+
     @Column(length = Integer.MAX_VALUE)
     @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
     public Map<String, Serializable> getInfrastructureVariables() {
@@ -161,6 +190,24 @@ public class NodeSourceData implements Serializable {
 
     public void setInfrastructureVariables(Map<String, Serializable> infrastructureVariables) {
         this.infrastructureVariables = infrastructureVariables;
+    }
+
+    public NodeSourceDescriptor toNodeSourceDescriptor() {
+        return new NodeSourceDescriptor.Builder().name(this.name)
+                                                 .infrastructureType(this.infrastructureType)
+                                                 .infrastructureParameters(this.infrastructureParameters)
+                                                 .policyType(this.policyType)
+                                                 .policyParameters(this.policyParameters)
+                                                 .provider(this.provider)
+                                                 .nodesRecoverable(this.nodesRecoverable)
+                                                 .status(this.status)
+                                                 .lastRecoveredInfrastructureVariables(this.infrastructureVariables)
+                                                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
     @Override
