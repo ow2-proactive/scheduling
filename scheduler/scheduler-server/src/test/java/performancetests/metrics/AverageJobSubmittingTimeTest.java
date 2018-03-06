@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -74,8 +75,6 @@ public class AverageJobSubmittingTimeTest extends PerformanceTestBase {
 
     private final double rate;
 
-    private List<JobId> allJobs = new ArrayList<>();
-
     public AverageJobSubmittingTimeTest(int numberOfThreads, int numberOfJobSubmittedByThread, double rate) {
         this.numberOfThreads = numberOfThreads;
         this.numberOfJobSubmittedByThread = numberOfJobSubmittedByThread;
@@ -108,7 +107,10 @@ public class AverageJobSubmittingTimeTest extends PerformanceTestBase {
     }
 
     public long parallel() throws Exception {
+        List<JobId> allJobs = new LinkedList<>();
+
         ProActiveConfiguration.load();
+
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
                                                SchedulerEfficiencyMetricsTest.SCHEDULER_CONFIGURATION_START.getPath(),
@@ -146,11 +148,22 @@ public class AverageJobSubmittingTimeTest extends PerformanceTestBase {
         long endTime = System.currentTimeMillis();
         long actualTime = endTime - startTime;
 
+        // kill and remove jobs
+        for (JobId jobId : allJobs) {
+            if (!schedulerHelper.getSchedulerInterface().getJobState(jobId).isFinished()) {
+                schedulerHelper.getSchedulerInterface().killJob(jobId);
+            }
+            schedulerHelper.getSchedulerInterface().removeJob(jobId);
+        }
+
         return actualTime;
     }
 
     public long sequential() throws Exception {
+        List<JobId> allJobs = new LinkedList<>();
+
         ProActiveConfiguration.load();
+
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
                                                SchedulerEfficiencyMetricsTest.SCHEDULER_CONFIGURATION_START.getPath(),
@@ -185,21 +198,24 @@ public class AverageJobSubmittingTimeTest extends PerformanceTestBase {
         for (Future<List<JobId>> future : futures) {
             allJobs.addAll(future.get());
         }
+
         long endTime = System.currentTimeMillis();
         long actualTime = endTime - startTime;
+
+        // kill and remove jobs
+        for (JobId jobId : allJobs) {
+            if (!schedulerHelper.getSchedulerInterface().getJobState(jobId).isFinished()) {
+                schedulerHelper.getSchedulerInterface().killJob(jobId);
+            }
+            schedulerHelper.getSchedulerInterface().removeJob(jobId);
+        }
+
         return actualTime;
     }
 
     @After
     public void after() throws Exception {
         if (schedulerHelper != null) {
-            for (JobId jobId : allJobs) {
-                if (!schedulerHelper.getSchedulerInterface().getJobState(jobId).isFinished()) {
-                    schedulerHelper.getSchedulerInterface().killJob(jobId);
-                }
-                schedulerHelper.getSchedulerInterface().removeJob(jobId);
-            }
-
             schedulerHelper.log("Kill Scheduler after test.");
             schedulerHelper.killScheduler();
         }
