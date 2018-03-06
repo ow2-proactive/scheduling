@@ -65,26 +65,26 @@ public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 8, 1000, 40000 } });
+        return Arrays.asList(new Object[][] { { 8, 1000, 1.0 } });
     }
 
     private final int numberOfThreads;
 
     private final int numberOfJobSubmittedByThread;
 
-    private final long timeLimit;
+    private final double rate;
 
     private List<JobId> allJobs = new ArrayList<>();
 
-    public AverageJobSubmittingTimeTest(int numberOfThreads, int numberOfJobSubmittedByThread, int timeLimit) {
+    public AverageJobSubmittingTimeTest(int numberOfThreads, int numberOfJobSubmittedByThread, double rate) {
         this.numberOfThreads = numberOfThreads;
         this.numberOfJobSubmittedByThread = numberOfJobSubmittedByThread;
-        this.timeLimit = timeLimit;
+        this.rate = rate;
     }
 
     @Before
-    public void before(){
-        PrintStream dummyStream = new PrintStream(new OutputStream(){
+    public void before() {
+        PrintStream dummyStream = new PrintStream(new OutputStream() {
             public void write(int b) {
                 // supress all output to not lost time to print anything to console
             }
@@ -93,7 +93,21 @@ public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
     }
 
     @Test(timeout = 3600000)
-    public void parallel() throws Exception {
+    public void parallelComparingToSequntial() throws Exception {
+        long parallel = parallel();
+        long sequential = sequential();
+
+        double faster = ((double) parallel) / sequential;
+
+        LOGGER.info(makeCSVString(AverageJobSubmittingTimeTest.class.getSimpleName(),
+                                  String.format("%d * %d", numberOfThreads, numberOfJobSubmittedByThread),
+                                  rate,
+                                  faster,
+                                  ((faster < rate) ? SUCCESS : FAILURE)));
+
+    }
+
+    public long parallel() throws Exception {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
@@ -132,15 +146,10 @@ public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
         long endTime = System.currentTimeMillis();
         long actualTime = endTime - startTime;
 
-        LOGGER.info(makeCSVString(AverageJobSubmittingTimeTest.class.getSimpleName() + "-parallel",
-                                  String.format("%d * %d", numberOfThreads, numberOfJobSubmittedByThread),
-                                  timeLimit,
-                                  actualTime,
-                                  ((actualTime < timeLimit) ? SUCCESS : FAILURE)));
+        return actualTime;
     }
 
-    @Test(timeout = 3600000)
-    public void sequential() throws Exception {
+    public long sequential() throws Exception {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
@@ -178,12 +187,7 @@ public class AverageJobSubmittingTimeTest extends PeformanceTestBase {
         }
         long endTime = System.currentTimeMillis();
         long actualTime = endTime - startTime;
-
-        LOGGER.info(makeCSVString(AverageJobSubmittingTimeTest.class.getSimpleName() + "-sequential",
-                                  String.format("1 * %d", numberOfJobSubmittedByThread),
-                                  timeLimit,
-                                  actualTime,
-                                  ((actualTime < timeLimit) ? SUCCESS : FAILURE)));
+        return actualTime;
     }
 
     @After
