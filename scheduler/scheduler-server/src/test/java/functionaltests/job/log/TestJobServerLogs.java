@@ -160,7 +160,22 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
         checkJobAndTaskLogFiles(jobId, tasks, true);
 
+        // Before it was only job removal but it was bug prone (for pendingJob only)
+        // because the following sequence of the events could happen:
+        // 1. SchedulerMethodImpl main loop retrieves info about this forever pending job
+        // 2. we call removeJob
+        // 3. SchedulerMethodImpl main loop asks for RM::getRMNodes.
+        //
+        // Third action would print "[SelectionManager.doSelectNodes] "scheduler"..." to the task log
+        // which would actually re-created removed log file which would cause an error
+        // in the last line of this method
+        // that is why kill the job and after wait 5s to make sure that
+        // iteration of SchedulerMethodImpl main loop is finished,
+        // and finally, we remove job with its log files.
+        schedulerHelper.killJob(jobId.value());
+        Thread.sleep(5000);
         schedulerHelper.removeJob(jobId);
+
         schedulerHelper.waitForEventJobRemoved(jobId);
 
         System.out.println("Suppose to remove all logs at " + simpleDateFormat.format(new Date()));
