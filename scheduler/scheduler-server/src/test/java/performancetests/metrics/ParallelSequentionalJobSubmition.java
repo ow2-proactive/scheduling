@@ -25,6 +25,8 @@
  */
 package performancetests.metrics;
 
+import static functionaltests.job.TestJobSubmittedParallel.repeater;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -32,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,6 +47,7 @@ import org.junit.runners.Parameterized;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
 import functionaltests.utils.SchedulerTHelper;
@@ -58,9 +60,8 @@ import performancetests.recovery.PerformanceTestBase;
  * measures time needed to submit all these jobs for each part.
  * Finally, it outputs ratio between parallel and sequentional time.
  * It always should be less or equal 1.0.
- *
+ * <p>
  * This checks will show improvement due to adding ImmediateService annotation to submit method SchedulerFrontend.
- *
  */
 @RunWith(Parameterized.class)
 public class ParallelSequentionalJobSubmition extends PerformanceTestBase {
@@ -126,19 +127,14 @@ public class ParallelSequentionalJobSubmition extends PerformanceTestBase {
         long startTime = System.currentTimeMillis();
         List<Future<List<JobId>>> futures = new ArrayList<>();
         for (int i = 0; i < threadPoolSize; ++i) {
-            final Future<List<JobId>> future = executorService.submit(new Callable<List<JobId>>() {
-                @Override
-                public List<JobId> call() throws Exception {
-                    List<JobId> result = new ArrayList<>();
-                    try {
-                        for (int i = 0; i < numberOfJobSubmittedByThread; ++i) {
-                            result.add(schedulerHelper.submitJob(job));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return result;
-                }
+            final Future<List<JobId>> future = executorService.submit(() -> {
+                List<JobId> result = new ArrayList<>(numberOfJobSubmittedByThread);
+
+                repeater.accept(numberOfJobSubmittedByThread, () -> {
+                    result.add(schedulerHelper.submitJob(job));
+                });
+
+                return result;
             });
             futures.add(future);
         }

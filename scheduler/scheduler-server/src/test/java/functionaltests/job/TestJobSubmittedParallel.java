@@ -94,7 +94,7 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
     /**
      * repeats func function limit number of times
      */
-    private static BiConsumer<Integer, RunnableThatThrows> repeater = (limit, func) -> {
+    public static BiConsumer<Integer, RunnableThatThrows> repeater = (limit, func) -> {
         for (int i = 0; i < limit; ++i) {
             try {
                 func.run();
@@ -110,7 +110,7 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
                schedulerState.getRunningJobs().size();
     }
 
-    private static <S, T> Stream<T> silentMap(Stream<S> stream, FunctionThatThrows<S, T> op) {
+    public static <S, T> Stream<T> silentMap(Stream<S> stream, FunctionThatThrows<S, T> op) {
         return stream.map(item -> {
             try {
                 return op.apply(item);
@@ -122,7 +122,7 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
     }
 
     @FunctionalInterface
-    private interface RunnableThatThrows<T, R> {
+    public interface RunnableThatThrows<T, R> {
         void run() throws Exception;
 
     }
@@ -131,7 +131,7 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
      * How come java does not have Function that throws Exception
      */
     @FunctionalInterface
-    private interface FunctionThatThrows<T, R> {
+    public interface FunctionThatThrows<T, R> {
         R apply(T var1) throws Exception;
 
     }
