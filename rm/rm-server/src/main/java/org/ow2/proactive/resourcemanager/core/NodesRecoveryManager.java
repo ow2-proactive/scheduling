@@ -178,17 +178,7 @@ public class NodesRecoveryManager {
     private void recoverNodeSourceSuccessfullyOrRemove(NodeSourceData nodeSourceData, String nodeSourceName) {
         try {
             logger.info("Recover node source " + nodeSourceName);
-            // retrieve node source status
-            boolean deployNodeSource = false;
-            if (nodeSourceData.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
-                // reset node source status to be able to deploy again
-                nodeSourceData.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
-                deployNodeSource = true;
-            }
-            this.rmCore.prepareNodeSource(nodeSourceData.toNodeSourceDescriptor());
-            if (deployNodeSource) {
-                this.rmCore.deployNodeSource(nodeSourceName);
-            }
+            this.rmCore.recoverNodeSource(nodeSourceData.toNodeSourceDescriptor());
         } catch (Throwable t) {
             logger.error("Failed to recover node source " + nodeSourceName, t);
             this.rmCore.undefineNodeSource(nodeSourceName);
