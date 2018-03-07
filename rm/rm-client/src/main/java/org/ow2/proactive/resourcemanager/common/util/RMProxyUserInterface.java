@@ -135,6 +135,13 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     /**
+     * @see ResourceManager#undeployNodeSource(String)
+     */
+    public BooleanWrapper undeployNodeSource(String arg0) {
+        return target.undeployNodeSource(arg0);
+    }
+
+    /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getAtMostNodes(int, org.ow2.proactive.scripting.SelectionScript)
      */
     @SuppressWarnings("deprecation")

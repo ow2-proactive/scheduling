@@ -533,6 +533,32 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
+     * Remove the nodes of the node source and keep the node source undeployed
+     *
+     * @param sessionId a valid session id
+     * @param nodeSourceName the name of the node source to undeploy
+     * @return the result of the action, possibly containing the error message
+     * @throws NotConnectedException
+     */
+    @Override
+    @PUT
+    @Path("nodesource/undeploy")
+    @Produces("application/json")
+    public NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        NSState nsState = new NSState();
+        try {
+            nsState.setResult(rm.undeployNodeSource(nodeSourceName).getBooleanValue());
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
+        }
+        return nsState;
+    }
+
+    /**
      * Returns the ping frequency of a node source
      *
      * @param sessionId a valid session id
