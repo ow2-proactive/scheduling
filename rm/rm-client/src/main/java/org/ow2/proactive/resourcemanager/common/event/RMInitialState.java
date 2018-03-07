@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -192,7 +193,11 @@ public class RMInitialState implements Serializable {
     }
 
     private <T extends RMEvent> long findLargestCounter(Collection<T> events) {
-        return events.stream().max(Comparator.comparing(RMEvent::getCounter)).get().getCounter();
+        final Optional<T> max = events.stream().max(Comparator.comparing(RMEvent::getCounter));
+        if (max.isPresent()) {
+            return max.get().getCounter();
+        } else {
+            return 0;
+        }
     }
-
 }
