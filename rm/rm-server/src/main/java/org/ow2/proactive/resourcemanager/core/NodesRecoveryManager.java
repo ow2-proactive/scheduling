@@ -185,13 +185,13 @@ public class NodesRecoveryManager {
                 nodeSourceData.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
                 deployNodeSource = true;
             }
-            this.rmCore.prepareNodeSource(nodeSourceData);
+            this.rmCore.prepareNodeSource(nodeSourceData.toNodeSourceDescriptor());
             if (deployNodeSource) {
                 this.rmCore.deployNodeSource(nodeSourceName);
             }
         } catch (Throwable t) {
             logger.error("Failed to recover node source " + nodeSourceName, t);
-            this.rmCore.removeNodeSource(nodeSourceName);
+            this.rmCore.undefineNodeSource(nodeSourceName);
             this.rmCore.getDbManager().removeNodeSource(nodeSourceName);
         }
     }

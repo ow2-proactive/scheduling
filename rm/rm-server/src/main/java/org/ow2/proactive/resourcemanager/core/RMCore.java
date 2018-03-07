@@ -247,7 +247,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private boolean shutedDown = false;
 
-    private Client caller = null;
+    private Client caller = localClient;
 
     /**
      * Any local active object (including a half body) will act as the same single client
@@ -1022,7 +1022,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Remove a node source regardless of whether it is deployed.
      * @param nodeSourceName name of the node source to remove
      */
-    public void removeNodeSource(String nodeSourceName) {
+    protected void undefineNodeSource(String nodeSourceName) {
         this.deployedNodeSources.remove(nodeSourceName);
         this.undeployedNodeSources.remove(nodeSourceName);
     }
@@ -1179,37 +1179,67 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return node.getState();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BooleanWrapper defineNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable) {
         if (nodeSourceName == null) {
             throw new IllegalArgumentException("Node Source name cannot be null");
         }
-
-        List<Serializable> serializableInfraParams = getSerializableParamsOrFail(nodeSourceName, infraParams);
-        List<Serializable> serializablePolicyParams = getSerializableParamsOrFail(nodeSourceName, policyParams);
-
         logger.info("Define a node source : " + nodeSourceName);
-
         nodeSourceName = nodeSourceName.trim();
+
+        NodeSourceDescriptor nodeSourceDescriptor = this.extractNodeSourceParamAndPersist(nodeSourceName,
+                                                                                          infrastructureType,
+                                                                                          infraParams,
+                                                                                          policyType,
+                                                                                          policyParams,
+                                                                                          nodesRecoverable);
+
+        try {
+            this.validateNodeSourceNameOrFail(nodeSourceName);
+        } catch (RuntimeException e) {
+            logger.error(e.getMessage(), e);
+            this.dbManager.removeNodeSource(nodeSourceName);
+            throw e;
+        }
+        this.prepareNodeSource(nodeSourceDescriptor);
+
+        return new BooleanWrapper(true);
+    }
+
+    private void redefineNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
+            String policyType, Object[] policyParams, boolean nodesRecoverable) {
+
+        NodeSourceDescriptor nodeSourceDescriptor = this.extractNodeSourceParamAndPersist(nodeSourceName,
+                                                                                          infrastructureType,
+                                                                                          infraParams,
+                                                                                          policyType,
+                                                                                          policyParams,
+                                                                                          nodesRecoverable);
+
+        this.prepareNodeSource(nodeSourceDescriptor);
+    }
+
+    private NodeSourceDescriptor extractNodeSourceParamAndPersist(String nodeSourceName, String infrastructureType,
+            Object[] infraParams, String policyType, Object[] policyParams, boolean nodesRecoverable) {
+        List<Serializable> serializableInfraParams = this.getSerializableParamsOrFail(nodeSourceName, infraParams);
+        List<Serializable> serializablePolicyParams = this.getSerializableParamsOrFail(nodeSourceName, policyParams);
 
         NodeSourceData persistedNodeSource = new NodeSourceData(nodeSourceName,
                                                                 infrastructureType,
                                                                 serializableInfraParams,
                                                                 policyType,
                                                                 serializablePolicyParams,
-                                                                caller,
+                                                                this.caller,
                                                                 nodesRecoverable,
                                                                 NodeSourceStatus.NODES_UNDEPLOYED);
 
-        boolean added = dbManager.addNodeSource(persistedNodeSource);
+        this.dbManager.addNodeSource(persistedNodeSource);
 
-        if (!added) {
-            return new BooleanWrapper(false);
-        } else {
-            return validateAndPrepareNodeSource(nodeSourceName, persistedNodeSource, added);
-        }
-
+        return persistedNodeSource.toNodeSourceDescriptor();
     }
 
     private List<Serializable> getSerializableParamsOrFail(String nodeSourceName, Object[] params) {
@@ -1230,52 +1260,38 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return serializableParams;
     }
 
-    private BooleanWrapper validateAndPrepareNodeSource(String nodeSourceName, NodeSourceData persistedNodeSource,
-            boolean added) {
+    protected void prepareNodeSource(NodeSourceDescriptor nodeSourceDescriptor) {
         try {
-            validateNodeSourceNameOrFail(nodeSourceName);
+            InfrastructureManager infrastructureManager = InfrastructureManagerFactory.create(nodeSourceDescriptor);
 
-            prepareNodeSource(persistedNodeSource);
+            NodeSourcePolicy notActivePolicy = NodeSourcePolicyFactory.create(nodeSourceDescriptor.getPolicyType());
 
-            return new BooleanWrapper(true);
-        } catch (NodeSourceNameAlreadyExistException e) {
-            logger.error(e.getMessage(), e);
-            throw e;
+            NodeSource nodeSource = new NodeSource(this.getUrl(),
+                                                   nodeSourceDescriptor.getName(),
+                                                   infrastructureManager,
+                                                   notActivePolicy,
+                                                   (RMCore) PAActiveObject.getStubOnThis(),
+                                                   this.monitoring,
+                                                   nodeSourceDescriptor);
+
+            String nodeSourceName = nodeSource.getName();
+
+            this.undeployedNodeSources.put(nodeSourceName, nodeSource);
+
+            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_DEFINED,
+                                                                  this.caller.getName(),
+                                                                  nodeSourceName,
+                                                                  nodeSource.getDescription(),
+                                                                  nodeSourceDescriptor.getProvider().getName(),
+                                                                  nodeSource.getStatus().toString()));
+
+            logger.info("The node source " + nodeSourceName + " has been successfully defined by " +
+                        this.caller.getName());
         } catch (RuntimeException ex) {
             logger.error(ex.getMessage(), ex);
-            if (added) {
-                dbManager.removeNodeSource(nodeSourceName);
-            }
+            this.dbManager.removeNodeSource(nodeSourceDescriptor.getName());
             throw ex;
         }
-    }
-
-    protected void prepareNodeSource(NodeSourceData persistedNodeSource) {
-        InfrastructureManager infrastructureManager = InfrastructureManagerFactory.create(persistedNodeSource.toNodeSourceDescriptor());
-
-        NodeSourcePolicy notActivePolicy = NodeSourcePolicyFactory.create(persistedNodeSource.getPolicyType());
-
-        NodeSource nodeSource = new NodeSource(this.getUrl(),
-                                               persistedNodeSource.getName(),
-                                               infrastructureManager,
-                                               notActivePolicy,
-                                               (RMCore) PAActiveObject.getStubOnThis(),
-                                               this.monitoring,
-                                               persistedNodeSource.toNodeSourceDescriptor());
-
-        String nodeSourceName = nodeSource.getName();
-
-        this.undeployedNodeSources.put(nodeSourceName, nodeSource);
-
-        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_DEFINED,
-                                                              persistedNodeSource.getProvider().getName(),
-                                                              nodeSourceName,
-                                                              nodeSource.getDescription(),
-                                                              persistedNodeSource.getProvider().getName(),
-                                                              nodeSource.getDescriptor().getStatus().toString()));
-
-        logger.info("The node source " + nodeSourceName + " has been successfully defined by " +
-                    persistedNodeSource.getProvider().getName());
     }
 
     /**
@@ -1283,6 +1299,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * boolean)} and {@link #deployNodeSource(String)}
      */
     @Deprecated
+    @Override
     public BooleanWrapper createNodeSource(String nodeSourceName, String infrastructureType,
             Object[] infrastructureParameters, String policyType, Object[] policyParameters, boolean nodesRecoverable) {
         defineNodeSource(nodeSourceName,
@@ -1298,85 +1315,98 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BooleanWrapper deployNodeSource(String nodeSourceName) {
 
-        NodeSource nodeSourceToDeploy = retrieveNodeSourceOrFail(nodeSourceName);
+        if (!this.deployedNodeSources.containsKey(nodeSourceName)) {
 
-        NodeSourceDescriptor descriptor = nodeSourceToDeploy.getDescriptor();
+            NodeSource nodeSourceToDeploy = this.retrieveNodeSourceOrFail(nodeSourceName);
 
-        logger.info("Deploy node source : " + nodeSourceName);
+            NodeSourceDescriptor descriptor = nodeSourceToDeploy.getDescriptor();
 
-        boolean recoverNodes = false;
+            logger.info("Deploy node source : " + nodeSourceName);
 
-        if (isNodeRecoveryEnabledForNodeSource(nodeSourceToDeploy)) {
-            recoverNodes = nodesRecoveryManager.recoverFullyDeployedInfrastructureOrReset(nodeSourceName,
-                                                                                          nodeSourceToDeploy,
-                                                                                          descriptor);
+            boolean recoverNodes = false;
+
+            if (this.isNodeRecoveryEnabledForNodeSource(nodeSourceToDeploy)) {
+                recoverNodes = this.nodesRecoveryManager.recoverFullyDeployedInfrastructureOrReset(nodeSourceName,
+                                                                                                   nodeSourceToDeploy,
+                                                                                                   descriptor);
+            }
+
+            NodeSourcePolicy activePolicy = NodeSourcePolicyFactory.activate(nodeSourceToDeploy.getPolicy(),
+                                                                             descriptor.getPolicyParameters());
+            nodeSourceToDeploy.setActivePolicy(activePolicy);
+
+            try {
+                nodeSourceToDeploy = PAActiveObject.turnActive(nodeSourceToDeploy, this.nodeRM);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
+            }
+
+            if (recoverNodes) {
+                this.nodesRecoveryManager.recoverNodes(nodeSourceToDeploy);
+            }
+
+            // Adding access to the core for node source and policy.
+            // In order to do it node source and policy active objects are added to the clients list.
+            // They will be removed from this list when node source is unregistered.
+            UniqueID nsId = Client.getId(nodeSourceToDeploy);
+            UniqueID policyId = Client.getId(activePolicy);
+            if (nsId == null || policyId == null) {
+                throw new IllegalStateException("Cannot register the node source");
+            }
+
+            BooleanWrapper result = nodeSourceToDeploy.activate();
+            if (!result.getBooleanValue()) {
+                logger.error("Node source " + nodeSourceName + " cannot be activated");
+            }
+
+            Client provider = descriptor.getProvider();
+
+            Client nsService = new Client(provider.getSubject(), false);
+            Client policyService = new Client(provider.getSubject(), false);
+
+            nsService.setId(nsId);
+            policyService.setId(policyId);
+
+            RMCore.clients.put(nsId, nsService);
+            RMCore.clients.put(policyId, policyService);
+
+            this.updateNodeSourceWithStatus(nodeSourceToDeploy, NodeSourceStatus.NODES_DEPLOYED);
+
+            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_CREATED,
+                                                                  this.caller.getName(),
+                                                                  nodeSourceToDeploy.getName(),
+                                                                  nodeSourceToDeploy.getDescription(),
+                                                                  nodeSourceToDeploy.getAdministrator().getName(),
+                                                                  nodeSourceToDeploy.getStatus().toString()));
+
+            logger.info("The node source " + nodeSourceName + " has been successfully deployed by " + provider);
         }
-
-        NodeSourcePolicy activePolicy = NodeSourcePolicyFactory.activate(nodeSourceToDeploy.getPolicy(),
-                                                                         descriptor.getPolicyParameters());
-        nodeSourceToDeploy.setActivePolicy(activePolicy);
-
-        nodeSourceToDeploy.setStatus(NodeSourceStatus.NODES_DEPLOYED);
-        this.undeployedNodeSources.remove(nodeSourceToDeploy.getName());
-
-        try {
-            nodeSourceToDeploy = PAActiveObject.turnActive(nodeSourceToDeploy, nodeRM);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
-        }
-
-        if (recoverNodes) {
-            nodesRecoveryManager.recoverNodes(nodeSourceToDeploy);
-        }
-
-        // Adding access to the core for node source and policy.
-        // In order to do it node source and policy active objects are added to the clients list.
-        // They will be removed from this list when node source is unregistered.
-        UniqueID nsId = Client.getId(nodeSourceToDeploy);
-        UniqueID policyId = Client.getId(activePolicy);
-        if (nsId == null || policyId == null) {
-            throw new IllegalStateException("Cannot register the node source");
-        }
-
-        BooleanWrapper result = nodeSourceToDeploy.activate();
-        if (!result.getBooleanValue()) {
-            logger.error("Node source " + nodeSourceName + " cannot be activated");
-        }
-
-        Client provider = descriptor.getProvider();
-
-        Client nsService = new Client(provider.getSubject(), false);
-        Client policyService = new Client(provider.getSubject(), false);
-
-        nsService.setId(nsId);
-        policyService.setId(policyId);
-
-        RMCore.clients.put(nsId, nsService);
-        RMCore.clients.put(policyId, policyService);
-
-        updateNodeSourceInfo(nodeSourceToDeploy);
-
-        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_CREATED,
-                                                              provider.getName(),
-                                                              nodeSourceToDeploy.getName(),
-                                                              nodeSourceToDeploy.getDescription(),
-                                                              nodeSourceToDeploy.getAdministrator().getName(),
-                                                              nodeSourceToDeploy.getDescriptor()
-                                                                                .getStatus()
-                                                                                .toString()));
-
-        logger.info("The node source " + nodeSourceName + " has been successfully deployed by " + provider);
 
         return new BooleanWrapper(true);
     }
 
-    private void updateNodeSourceInfo(NodeSource nodeSource) {
-        this.deployedNodeSources.put(nodeSource.getName(), nodeSource);
+    private void updateNodeSourceWithStatus(NodeSource nodeSource, NodeSourceStatus status) {
+        nodeSource.setStatus(status);
+
+        switch (status) {
+            case NODES_DEPLOYED:
+                this.undeployedNodeSources.remove(nodeSource.getName());
+                this.deployedNodeSources.put(nodeSource.getName(), nodeSource);
+                break;
+            case NODES_UNDEPLOYED:
+                this.deployedNodeSources.remove(nodeSource.getName());
+                this.undeployedNodeSources.put(nodeSource.getName(), nodeSource);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown node source status: " + status);
+        }
+
         NodeSourceData nodeSourceData = NodeSourceData.fromNodeSourceDescriptor(nodeSource.getDescriptor());
-        dbManager.updateNodeSource(nodeSourceData);
+        this.dbManager.updateNodeSource(nodeSourceData);
     }
 
     private NodeSource retrieveNodeSourceOrFail(String nodeSourceName) {
@@ -1387,6 +1417,29 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         return nodeSource;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public BooleanWrapper undeployNodeSource(String nodeSourceName) {
+        if (this.deployedNodeSources.containsKey(nodeSourceName)) {
+            NodeSource nodeSource = this.deployedNodeSources.get(nodeSourceName);
+            NodeSourceDescriptor descriptor = nodeSource.getDescriptor();
+
+            boolean nodeSourceRemoved = this.removeNodeSource(nodeSourceName, false).getBooleanValue();
+            if (nodeSourceRemoved) {
+                this.redefineNodeSource(nodeSourceName,
+                                        descriptor.getInfrastructureType(),
+                                        descriptor.getInfrastructureParameters(),
+                                        descriptor.getPolicyType(),
+                                        descriptor.getPolicyParameters(),
+                                        descriptor.nodesRecoverable());
+            } else {
+                return new BooleanWrapper(false);
+            }
+        }
+        return new BooleanWrapper(true);
     }
 
     /**
@@ -1615,18 +1668,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                 new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
-                                                      s.getDescriptor().getStatus().toString()));
+                                                      s.getStatus().toString()));
             for (RMDeployingNode pn : s.getDeployingAndLostNodes()) {
                 nodesList.add(pn.createNodeEvent());
             }
         }
-
         for (NodeSource s : this.undeployedNodeSources.values()) {
             nodeSourcesList.put(s.getName(),
                                 new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
-                                                      s.getDescriptor().getStatus().toString()));
+                                                      s.getStatus().toString()));
         }
 
         return new RMInitialState(nodeEvents, nodeSourcesList);
@@ -1888,9 +1940,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                   nodeSourceToRemove.getName(),
                                                                   nodeSourceToRemove.getDescription(),
                                                                   nodeSourceToRemove.getAdministrator().getName(),
-                                                                  nodeSourceToRemove.getDescriptor()
-                                                                                    .getStatus()
-                                                                                    .toString()));
+                                                                  nodeSourceToRemove.getStatus().toString()));
             return new BooleanWrapper(true);
         } else {
             throw new IllegalArgumentException("Unknown node source " + sourceName);

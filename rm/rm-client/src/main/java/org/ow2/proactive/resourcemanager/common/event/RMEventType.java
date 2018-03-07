@@ -63,10 +63,6 @@ public enum RMEventType {
      */
     NODESOURCE_CREATED,
     /**
-     * The node source has been undeployed, i.e. its nodes have been removed.
-     */
-    NODESOURCE_UNDEPLOYED,
-    /**
      * A node source has been removed removed from resource manager.
      */
     NODESOURCE_REMOVED,

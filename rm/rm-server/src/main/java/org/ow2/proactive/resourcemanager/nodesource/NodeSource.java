@@ -212,10 +212,9 @@ public class NodeSource implements InitActive, RunActive {
      */
     public NodeSource(String registrationURL, String name, InfrastructureManager im, NodeSourcePolicy policy,
             RMCore rmcore, RMMonitoringImpl monitor, NodeSourceDescriptor nodeSourceDescriptor) {
-        Client provider = nodeSourceDescriptor.getProvider();
         this.registrationURL = registrationURL;
         this.name = name;
-        this.administrator = provider;
+        this.administrator = nodeSourceDescriptor.getProvider();
         this.infrastructureManager = im;
         this.nodeSourcePolicy = policy;
         this.rmcore = rmcore;
@@ -227,15 +226,15 @@ public class NodeSource implements InitActive, RunActive {
 
         // node source admin permission
         // it's the PrincipalPermission of the user who created the node source
-        this.adminPermission = new PrincipalPermission(administrator.getName(),
-                                                       administrator.getSubject()
-                                                                    .getPrincipals(UserNamePrincipal.class));
+        this.adminPermission = new PrincipalPermission(this.administrator.getName(),
+                                                       this.administrator.getSubject()
+                                                                         .getPrincipals(UserNamePrincipal.class));
         // creating node source provider permission
         // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
         // or PrincipalPermission (anyone)
-        this.providerPermission = new PrincipalPermission(administrator.getName(),
+        this.providerPermission = new PrincipalPermission(this.administrator.getName(),
                                                           this.nodeSourcePolicy.getProviderAccessType()
-                                                                               .getIdentityPrincipals(administrator));
+                                                                               .getIdentityPrincipals(this.administrator));
         this.nodeUserAccessType = this.nodeSourcePolicy.getUserAccessType();
 
         this.descriptor = nodeSourceDescriptor;
@@ -550,6 +549,10 @@ public class NodeSource implements InitActive, RunActive {
 
     public void setActivePolicy(NodeSourcePolicy policy) {
         this.activeNodeSourcePolicy = policy;
+    }
+
+    public NodeSourceStatus getStatus() {
+        return this.descriptor.getStatus();
     }
 
     public void setStatus(NodeSourceStatus status) {
