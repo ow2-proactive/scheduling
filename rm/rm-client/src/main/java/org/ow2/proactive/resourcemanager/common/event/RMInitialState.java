@@ -29,10 +29,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -183,23 +185,14 @@ public class RMInitialState implements Serializable {
     }
 
     private <T extends RMEvent> Map<String, T> newFilteredEvents(Map<String, T> events, long filter) {
-        Map<String, T> result = new ConcurrentHashMap<>();
-        for (Map.Entry<String, T> entry : events.entrySet()) {
-            if (entry.getValue().getCounter() > filter) {
-                result.put(entry.getKey(), entry.getValue());
-            }
-        }
-        return result;
+        return events.entrySet()
+                     .stream()
+                     .filter(entry -> entry.getValue().getCounter() > filter)
+                     .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
     }
 
     private <T extends RMEvent> long findLargestCounter(Collection<T> events) {
-        long result = 0;
-        for (T event : events) {
-            if (result < event.getCounter()) {
-                result = event.getCounter();
-            }
-        }
-        return result;
+        return events.stream().max(Comparator.comparing(RMEvent::getCounter)).get().getCounter();
     }
 
 }
