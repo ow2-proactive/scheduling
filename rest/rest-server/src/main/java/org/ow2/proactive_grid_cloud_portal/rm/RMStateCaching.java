@@ -40,15 +40,7 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 
 /**
- * Periodically request {@link RMProxyUserInterface#getMonitoring()} and store it locally.
- * <p>
- * The {@link RMInitialState} fetched from {@link RMProxyUserInterface} is a large object
- * that is long to serialize, but is always the same for every client.
- * <p>
- * Use this class to start a thread that will periodically get this object
- * using a watcher account, making the cached version available to any client instantly.
- * <p>
- * Refresh rate can be configured using {@link PortalConfiguration#RM_CACHE_REFRESHRATE}
+ * Creates new AO {@link RMProxyUserInterface} in order to access filtered events.
  */
 public class RMStateCaching {
 
@@ -56,37 +48,18 @@ public class RMStateCaching {
 
     private static RMProxyUserInterface rm;
 
-    private static RMInitialState state;
-
-    private static Thread rmUpdater;
-
-    private static int refreshInterval;
-
-    private static boolean kill = false;
-
     /**
      * Start a thread that will periodically fetch {@link RMProxyUserInterface#getMonitoring()}.
      * <p>
      * Thread frequency can be customized using {@link PortalConfiguration#RM_CACHE_REFRESHRATE}.
      * <p>
-     * Cached object can be retrieved using {@link #getRMInitialState()}.
-     * <p>
-     * Stop this thread by calling {@link #kill()}.
+     * Cached object can be retrieved using {@link #getRMInitialState(long)}
      */
     public synchronized static void init() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                state = new RMInitialState();
-                init_();
-                run_();
-            }
-        }).start();
+        init_();
     }
 
     private static void init_() {
-        refreshInterval = PortalConfiguration.RM_CACHE_REFRESHRATE.getValueAsInt();
-
         while (rm == null) {
             String url = PortalConfiguration.RM_URL.getValueAsString();
             String cred_path = PortalConfiguration.RM_CACHE_CREDENTIALS.getValueAsStringOrNull();
@@ -121,51 +94,23 @@ public class RMStateCaching {
         }
     }
 
-    private static void run_() {
-        rmUpdater = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean isDebugEnabled = logger.isDebugEnabled();
-                long startTime = 0;
-
-                while (!kill) {
-                    try {
-                        if (isDebugEnabled) {
-                            startTime = System.currentTimeMillis();
-                        }
-
-                        state = PAFuture.getFutureValue(rm.getRMInitialState());
-
-                        if (isDebugEnabled) {
-                            logger.debug("Updated RM initial state in " + (System.currentTimeMillis() - startTime) +
-                                         "ms");
-                        }
-                    } catch (Throwable t) {
-                        logger.error("Exception occurrend while updating RM state cache, connection reset", t);
-                        init_();
-                    }
-
-                    new Sleeper(refreshInterval, logger).sleep();
-                }
-            }
-        });
-        rmUpdater.setName("RM Initial State Cache Updater");
-        rmUpdater.setDaemon(true);
-        rmUpdater.start();
-    }
-
     /**
-     * @return cached RM State as returned by {@link RMProxyUserInterface#getMonitoring()}
+     * @return cached RM State as returned by {@link RMProxyUserInterface#getRMInitialState(long)}
      */
-    public static RMInitialState getRMInitialState() {
-        return state;
-    }
+    public static RMInitialState getRMInitialState(long counter) {
+        try {
+            long startTime = System.currentTimeMillis();
 
-    /**
-     * Stop the RM State polling thread.
-     */
-    public static void kill() {
-        RMStateCaching.kill = true;
-    }
+            final RMInitialState state = PAFuture.getFutureValue(rm.getRMInitialState(counter));
 
+            long time = System.currentTimeMillis() - startTime;
+
+            logger.debug(String.format("Updated RM initial state in %d ms", time));
+
+            return state;
+        } catch (Exception e) {
+            logger.error("Exception occurrend while updating RM state cache, connection reset", e);
+            throw e;
+        }
+    }
 }

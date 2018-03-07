@@ -55,6 +55,17 @@ public class NodeEventView {
 
     private String nodeLocker;
 
+    private String eventType;
+
+    /**
+     * @return true is node was removed
+     *
+     * String constant should be aligned with {@link RMEventType} from rm-client
+     */
+    public boolean isRemoved() {
+        return "NODE_REMOVED".equalsIgnoreCase(this.eventType);
+    }
+
     public String getHostName() {
         return hostName;
     }
@@ -167,4 +178,11 @@ public class NodeEventView {
         this.nodeLocker = nodeLocker;
     }
 
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
 }

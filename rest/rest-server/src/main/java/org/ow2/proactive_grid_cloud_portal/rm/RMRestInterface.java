@@ -127,7 +127,9 @@ public interface RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+    RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("clientCounter") @DefaultValue("-1") String latestCounterClientAware)
+            throws NotConnectedException;
 
     @GET
     @Path("isactive")

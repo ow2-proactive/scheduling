@@ -140,7 +140,6 @@ public class RestRuntime {
         sessionCleaner.stop();
 
         SchedulerStateListener.getInstance().kill();
-        RMStateCaching.kill();
 
         if (needToKillProActiveRuntime) {
             // force the shutdown of the runtime

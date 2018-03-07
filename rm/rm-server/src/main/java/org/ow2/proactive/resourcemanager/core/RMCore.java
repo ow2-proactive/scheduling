@@ -1599,18 +1599,20 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState() {
-        Collection<RMNode> nodes = this.allNodes.values();
-        ArrayList<RMNodeEvent> nodesList = new ArrayList<>(nodes.size());
+        ArrayList<RMNodeEvent> nodesList = new ArrayList<>(this.allNodes.values().size());
 
-        for (RMNode rmnode : nodes) {
-            nodesList.add(rmnode.createNodeEvent());
+        Map<String, RMNodeEvent> nodeEvents = new HashMap<>();
+        for (RMNode rmnode : this.allNodes.values()) {
+            final RMNodeEvent nodeEvent = rmnode.createNodeEvent();
+            nodeEvents.put(nodeEvent.getNodeUrl(), nodeEvent);
         }
 
-        ArrayList<RMNodeSourceEvent> nodeSourcesList = new ArrayList<>(this.deployedNodeSources.size() +
+        Map<String, RMNodeSourceEvent> nodeSourcesList = new HashMap<>(this.deployedNodeSources.size() +
                                                                        this.undeployedNodeSources.size());
 
         for (NodeSource s : this.deployedNodeSources.values()) {
-            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(),
+            nodeSourcesList.put(s.getName(),
+                                new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
                                                       s.getDescriptor().getStatus().toString()));
@@ -1620,13 +1622,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
 
         for (NodeSource s : this.undeployedNodeSources.values()) {
-            nodeSourcesList.add(new RMNodeSourceEvent(s.getName(),
+            nodeSourcesList.put(s.getName(),
+                                new RMNodeSourceEvent(s.getName(),
                                                       s.getDescription(),
                                                       s.getAdministrator().getName(),
                                                       s.getDescriptor().getStatus().toString()));
         }
 
-        return new RMInitialState(nodesList, nodeSourcesList);
+        return new RMInitialState(nodeEvents, nodeSourcesList);
     }
 
     /**

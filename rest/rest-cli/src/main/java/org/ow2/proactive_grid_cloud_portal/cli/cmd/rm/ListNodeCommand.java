@@ -30,7 +30,6 @@ import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
@@ -76,8 +75,20 @@ public class ListNodeCommand extends AbstractCommand implements Command {
                     selectedNodeEvents = selectedList.toArray(new NodeEventView[selectedList.size()]);
                 }
             }
-            resultStack(currentContext).push(selectedNodeEvents);
-            writeLine(currentContext, "%s", StringUtility.string(selectedNodeEvents));
+
+            // filter out all node events that was removed
+            // so rm client does not display them
+            List<NodeEventView> filtered = new ArrayList<>();
+            for (NodeEventView nodeEvent : selectedNodeEvents) {
+                if (!nodeEvent.isRemoved()) {
+                    filtered.add(nodeEvent);
+                }
+            }
+
+            NodeEventView[] result = new NodeEventView[filtered.size()];
+            result = filtered.toArray(result);
+            resultStack(currentContext).push(result);
+            writeLine(currentContext, "%s", StringUtility.string(result));
 
         } else {
             handleError("An error occurred while retrieving nodes:", response, currentContext);

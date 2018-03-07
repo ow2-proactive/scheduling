@@ -29,8 +29,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static functionaltests.nodesrecovery.RecoverInfrastructureTestHelper.NODES_RECOVERABLE;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.After;
@@ -120,7 +120,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
                                             this.rmHelper.getMonitorsHandler());
 
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
-        ArrayList<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
+        List<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
         assertThat(nodeSourceEvent.size()).isEqualTo(1);
         assertThat(nodeSourceEvent.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
         assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
@@ -135,7 +135,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
         // re-snapshot the RM state
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
-        ArrayList<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
+        List<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
 
         // the node source has been recovered on restart: we should have one node source with the same name
         assertThat(nodeSourceEvent.size()).isEqualTo(1);
