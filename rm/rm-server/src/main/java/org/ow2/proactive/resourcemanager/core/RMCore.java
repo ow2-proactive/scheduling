@@ -2457,9 +2457,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private void persistNewRMNodeIfRecoveryEnabled(RMNode rmNode) {
         if (nodesRecoveryEnabledForNode(rmNode)) {
             RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-            NodeSourceData nodeSourceData = dbManager.getNodeSource(rmNode.getNodeSourceName());
-            rmNodeData.setNodeSource(nodeSourceData);
-            dbManager.addNode(rmNodeData);
+            dbManager.addNode(rmNodeData, rmNode.getNodeSourceName());
         }
     }
 
@@ -2471,7 +2469,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private void persistUpdatedRMNodeIfRecoveryEnabled(RMNode rmNode) {
         if (nodesRecoveryEnabledForNode(rmNode)) {
             RMNodeData rmNodeData = RMNodeData.createRMNodeData(rmNode);
-            dbManager.updateNode(rmNodeData);
+            dbManager.updateNode(rmNodeData, rmNode.getNodeSourceName());
         }
     }
 

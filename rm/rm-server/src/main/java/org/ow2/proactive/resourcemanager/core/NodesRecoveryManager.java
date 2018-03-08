@@ -218,7 +218,7 @@ public class NodesRecoveryManager {
         } else {
             // the node is not recoverable and does not appear in any data
             // structures: we can remove it safely from database
-            this.rmCore.getDbManager().removeNode(rmNodeData);
+            this.rmCore.getDbManager().removeNode(rmNodeData, rmNodeData.getNodeSource().getName());
             this.markNodesNotInDeployingStateAsDown(nodeSource, rmNodeData, nodeUrl);
             this.updateRecoveredNodeStateCounter(nodeStates, NodeState.DOWN);
         }
