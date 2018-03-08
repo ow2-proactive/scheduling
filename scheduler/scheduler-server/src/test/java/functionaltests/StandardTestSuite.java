@@ -83,6 +83,7 @@ import functionaltests.jmx.SchedulerRuntimeDataMBeanTest;
 import functionaltests.job.TagTest;
 import functionaltests.job.TestJobRemoved;
 import functionaltests.job.TestJobSchedulerHome;
+import functionaltests.job.TestJobSubmittedParallel;
 import functionaltests.job.TestJobWalltime;
 import functionaltests.job.TestPauseJob;
 import functionaltests.job.TestPreemptRestartKillTask;
@@ -219,7 +220,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestTaskNotRestarted.class, TestTaskNotStarted.class, TestTaskScriptVariables.class,
                       TestThirdPartyCredentialsDefined.class, TestUserSpace.class, TestWorkflowDataspace.class,
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
-                      Test_SCHEDULING_2034.class,
+                      Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,
