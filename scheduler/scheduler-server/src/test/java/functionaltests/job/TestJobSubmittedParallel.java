@@ -72,6 +72,8 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
                 final JobId jobId = schedulerHelper.submitJob(simpleJob.getPath());
                 final JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
                 jobState.getId().equals(jobId);
+                jobState.getSubmittedTime(); // call to chech there is no exception thrown
+                jobState.isFinished(); // call to chech there is no exception thrown
                 result.add(jobId);
             });
             return result;
