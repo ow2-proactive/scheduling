@@ -168,6 +168,7 @@ public class RMListenerProxy extends RMGroupEventListener {
                 rmInitialState.nodeSourceAdded(event);
                 break;
             case NODESOURCE_CREATED:
+            case NODESOURCE_UNDEPLOYED:
                 rmInitialState.nodeSourceStateChanged(event);
                 break;
             case NODESOURCE_REMOVED:

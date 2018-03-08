@@ -76,8 +76,7 @@ public class RMNodeSourceHelper {
     public static void waitForNodeSourceUndeployment(String name, int numberOfNodesToBeRemoved,
             RMMonitorsHandler monitor) {
         RMTHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, numberOfNodesToBeRemoved, monitor);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, name, monitor);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_DEFINED, name, monitor);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_UNDEPLOYED, name, monitor);
     }
 
     public static void waitForNodeSourceRemoval(String name, int numberOfNodesToBeRemoved, RMMonitorsHandler monitor) {

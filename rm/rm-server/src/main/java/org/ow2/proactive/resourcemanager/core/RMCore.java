@@ -25,8 +25,6 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import static org.ow2.proactive.resourcemanager.common.event.RMEventType.NODE_STATE_CHANGED;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -581,7 +579,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
 
-        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED, previousNodeState, client.getName()));
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED, previousNodeState, client.getName()));
 
         return new BooleanWrapper(true);
     }
@@ -623,7 +621,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
 
         // create the event
-        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(NODE_STATE_CHANGED,
+        this.registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
                                                              previousNodeState,
                                                              initiator.getName()));
     }
@@ -1190,7 +1188,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         nodeSourceName = nodeSourceName.trim();
 
-        logger.info("Define a node source : " + nodeSourceName);
+        logger.info("Define node source " + nodeSourceName + " requested by " + this.caller.getName());
 
         NodeSourceDescriptor nodeSourceDescriptor = this.persistNodeSourceAndGetDescriptor(nodeSourceName,
                                                                                            infrastructureType,
@@ -1210,7 +1208,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               nodeSourceDescriptor.getProvider().getName(),
                                                               nodeSource.getStatus().toString()));
 
-        logger.info("The node source " + nodeSourceName + " has been successfully defined by " + this.caller.getName());
+        logger.info("Node source " + nodeSourceName + " has been successfully defined");
 
         return new BooleanWrapper(true);
     }
@@ -1313,7 +1311,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             NodeSourceDescriptor nodeSourceDescriptor = this.retrieveNodeSourceDescriptorOrFail(nodeSourceName);
 
-            logger.info("Deploy node source : " + nodeSourceName);
+            logger.info("Deploy node source " + nodeSourceName + " requested by " + this.caller.getName());
 
             this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
 
@@ -1338,8 +1336,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                   nodeSourceStub.getAdministrator().getName(),
                                                                   nodeSourceStub.getStatus().toString()));
 
-            logger.info("The node source " + nodeSourceName + " has been successfully deployed by " +
-                        this.caller.getName());
+            logger.info("Node source " + nodeSourceName + " has been successfully deployed");
         }
 
         return new BooleanWrapper(true);
@@ -1469,25 +1466,31 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public BooleanWrapper undeployNodeSource(String nodeSourceName) {
-        if (this.deployedNodeSources.containsKey(nodeSourceName)) {
-            NodeSource nodeSource = this.deployedNodeSources.get(nodeSourceName);
-            NodeSourceDescriptor descriptor = nodeSource.getDescriptor();
 
-            boolean nodeSourceRemoved = this.removeNodeSource(nodeSourceName, false).getBooleanValue();
-            if (nodeSourceRemoved) {
-                // TODO redo
-                /*
-                 * this.redefineNodeSource(nodeSourceName,
-                 * descriptor.getInfrastructureType(),
-                 * descriptor.getInfrastructureParameters(),
-                 * descriptor.getPolicyType(),
-                 * descriptor.getPolicyParameters(),
-                 * descriptor.nodesRecoverable());
-                 */
-            } else {
-                return new BooleanWrapper(false);
-            }
+        if (!this.definedNodeSources.containsKey(nodeSourceName)) {
+            throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
         }
+
+        if (this.deployedNodeSources.containsKey(nodeSourceName)) {
+
+            NodeSource nodeSourceToRemove = this.deployedNodeSources.get(nodeSourceName);
+
+            this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
+                    this.caller + " is not authorized to remove " + nodeSourceName);
+
+            logger.info("Undeploy node source " + nodeSourceName + " requested by " + this.caller.getName());
+
+            this.removeAllNodes(nodeSourceName, false);
+
+            // delegate the removal process to the node source that will
+            // eventually call back the RMCore to unregister the node source
+            nodeSourceToRemove.undeploy(this.caller);
+
+            this.updateNodeSourceDescriptorWithStatusAndPersist(this.definedNodeSources.get(nodeSourceName).getDescriptor(), NodeSourceStatus.NODES_UNDEPLOYED);
+
+            logger.info("Node source " + nodeSourceName + " has been successfully undeployed");
+        }
+
         return new BooleanWrapper(true);
     }
 
