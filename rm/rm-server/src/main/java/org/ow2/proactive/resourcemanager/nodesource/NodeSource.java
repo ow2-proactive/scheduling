@@ -799,12 +799,12 @@ public class NodeSource implements InitActive, RunActive {
      */
     public void finishNodeSourceUndeploy(Client initiator) {
         PAFuture.waitFor(rmcore.nodeSourceUnregister(name,
-                new RMNodeSourceEvent(RMEventType.NODESOURCE_UNDEPLOYED,
-                        initiator.getName(),
-                        this.getName(),
-                        this.getDescription(),
-                        this.getAdministrator().getName(),
-                        descriptor.getStatus().toString())));
+                                                     new RMNodeSourceEvent(RMEventType.NODESOURCE_UNDEPLOYED,
+                                                                           initiator.getName(),
+                                                                           this.getName(),
+                                                                           this.getDescription(),
+                                                                           this.getAdministrator().getName(),
+                                                                           descriptor.getStatus().toString())));
 
         PAActiveObject.terminateActiveObject(false);
     }

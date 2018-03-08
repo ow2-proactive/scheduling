@@ -181,8 +181,7 @@ public class NodesRecoveryManager {
             this.rmCore.recoverNodeSource(nodeSourceData.toNodeSourceDescriptor());
         } catch (Throwable t) {
             logger.error("Failed to recover node source " + nodeSourceName, t);
-            this.rmCore.undefineNodeSource(nodeSourceName);
-            this.rmCore.getDbManager().removeNodeSource(nodeSourceName);
+            this.rmCore.removeNodeSource(nodeSourceName, true);
         }
     }
 
