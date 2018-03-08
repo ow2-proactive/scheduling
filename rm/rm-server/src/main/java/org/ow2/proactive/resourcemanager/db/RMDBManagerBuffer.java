@@ -63,6 +63,8 @@ public class RMDBManagerBuffer {
 
     private static final String IN_DATABASE_WITH_NO_DELAY_STRING = IN_DATABASE_STRING + " with no delay";
 
+    private static final int MAXIMUM_BUFFERIZED_NODE_OPERATIONS = 1000;
+
     private RMDBManager rmdbManager;
 
     /**
@@ -239,53 +241,53 @@ public class RMDBManagerBuffer {
         return RM_NODES_DB_SYNCHRONOUS_UPDATES.getValueAsBoolean();
     }
 
-    void addCreateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    void addCreateNodeToPendingDatabaseOperations(RMNodeData rmNodeData, String nodeSourceName) {
         cancelScheduledNodeTransaction();
-        registerPendingNodeOperations(DatabaseOperation.CREATE, rmNodeData);
+        registerPendingNodeOperations(DatabaseOperation.CREATE, rmNodeData, nodeSourceName);
         if (delayEqualsToZero) {
             logger.debug("Apply create node " + rmNodeData.getName() + IN_DATABASE_WITH_NO_DELAY_STRING);
             buildNodesTransactionAndCommit();
         } else {
             logger.debug("Schedule create node " + rmNodeData.getName() + IN_DATABASE_STRING);
-            scheduleNodeTransaction();
+            scheduleNodeTransactionOrFlush();
         }
     }
 
-    void addUpdateNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    void addUpdateNodeToPendingDatabaseOperations(RMNodeData rmNodeData, String nodeSourceName) {
         cancelScheduledNodeTransaction();
-        registerPendingNodeOperations(DatabaseOperation.UPDATE, rmNodeData);
+        registerPendingNodeOperations(DatabaseOperation.UPDATE, rmNodeData, nodeSourceName);
         if (delayEqualsToZero) {
             logger.debug("Apply update node " + rmNodeData.getName() + IN_DATABASE_WITH_NO_DELAY_STRING);
             buildNodesTransactionAndCommit();
         } else {
             logger.debug("Schedule update node " + rmNodeData.getName() + IN_DATABASE_STRING);
-            scheduleNodeTransaction();
+            scheduleNodeTransactionOrFlush();
         }
     }
 
-    void addRemoveNodeToPendingDatabaseOperations(RMNodeData rmNodeData) {
+    void addRemoveNodeToPendingDatabaseOperations(RMNodeData rmNodeData, String nodeSourceName) {
         cancelScheduledNodeTransaction();
-        registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData);
+        registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData, nodeSourceName);
         if (delayEqualsToZero) {
             logger.debug("Apply remove node " + rmNodeData.getName() + IN_DATABASE_WITH_NO_DELAY_STRING);
             buildNodesTransactionAndCommit();
         } else {
             logger.debug("Schedule remove node " + rmNodeData.getName() + IN_DATABASE_STRING);
-            scheduleNodeTransaction();
+            scheduleNodeTransactionOrFlush();
         }
     }
 
-    void addRemoveNodesToPendingDatabaseOperations(Collection<RMNodeData> nodes) {
+    void addRemoveNodesToPendingDatabaseOperations(Collection<RMNodeData> nodes, String nodeSourceName) {
         cancelScheduledNodeTransaction();
         for (RMNodeData rmNodeData : nodes) {
-            registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData);
+            registerPendingNodeOperations(DatabaseOperation.DELETE, rmNodeData, nodeSourceName);
         }
         if (delayEqualsToZero) {
             logger.debug("Apply " + nodes.size() + " remove node" + IN_DATABASE_WITH_NO_DELAY_STRING);
             buildNodesTransactionAndCommit();
         } else {
             logger.debug("Schedule " + nodes.size() + " remove node" + IN_DATABASE_STRING);
-            scheduleNodeTransaction();
+            scheduleNodeTransactionOrFlush();
         }
     }
 
@@ -324,22 +326,27 @@ public class RMDBManagerBuffer {
         }
     }
 
-    private void registerPendingNodeOperations(DatabaseOperation databaseOperation, RMNodeData rmNodeData) {
+    private void registerPendingNodeOperations(DatabaseOperation databaseOperation, RMNodeData rmNodeData,
+            String nodeSourceName) {
         pendingNodeOperationsLock.lock();
         try {
-            pendingNodesOperations.add(new NodeOperation(rmNodeData, databaseOperation));
+            pendingNodesOperations.add(new NodeOperation(rmNodeData, databaseOperation, nodeSourceName));
         } finally {
             pendingNodeOperationsLock.unlock();
         }
     }
 
-    private void scheduleNodeTransaction() {
-        scheduledNodeTransaction = databaseTransactionExecutor.schedule(new Runnable() {
-            @Override
-            public void run() {
-                buildNodesTransactionAndCommit();
-            }
-        }, RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt(), TimeUnit.MILLISECONDS);
+    private void scheduleNodeTransactionOrFlush() {
+        if (pendingNodesOperations.size() < MAXIMUM_BUFFERIZED_NODE_OPERATIONS) {
+            scheduledNodeTransaction = databaseTransactionExecutor.schedule(new Runnable() {
+                @Override
+                public void run() {
+                    buildNodesTransactionAndCommit();
+                }
+            }, RM_NODES_DB_OPERATIONS_DELAY.getValueAsInt(), TimeUnit.MILLISECONDS);
+        } else {
+            buildNodesTransactionAndCommit();
+        }
     }
 
     private void buildNodesTransactionAndCommit() {
@@ -356,6 +363,9 @@ public class RMDBManagerBuffer {
                         try {
                             for (NodeOperation nodeOperation : currentNodesOperations) {
                                 RMNodeData rmNodeData = nodeOperation.node;
+                                NodeSourceData nodeSourceData = session.load(NodeSourceData.class,
+                                                                             nodeOperation.nodeSourceName);
+                                rmNodeData.setNodeSource(nodeSourceData);
                                 DatabaseOperation databaseOperation = nodeOperation.operation;
                                 switch (databaseOperation) {
                                     case CREATE:
@@ -419,11 +429,10 @@ public class RMDBManagerBuffer {
 
         boolean operationAddedToNextTransaction = false;
         RMNodeData rmNodeData = nodeOperation.node;
-        DatabaseOperation databaseOperation = nodeOperation.operation;
 
         if (!nodesOfNextTransaction.contains(rmNodeData)) {
             nodesOfNextTransaction.add(rmNodeData);
-            operationsOfNextTransaction.add(new NodeOperation(rmNodeData, databaseOperation));
+            operationsOfNextTransaction.add(nodeOperation);
             pendingOperationsIterator.remove();
             operationAddedToNextTransaction = true;
         }
@@ -452,9 +461,12 @@ public class RMDBManagerBuffer {
 
         protected final DatabaseOperation operation;
 
-        protected NodeOperation(RMNodeData node, DatabaseOperation operation) {
+        protected final String nodeSourceName;
+
+        protected NodeOperation(RMNodeData node, DatabaseOperation operation, String nodeSourceName) {
             this.node = node;
             this.operation = operation;
+            this.nodeSourceName = nodeSourceName;
         }
 
         @Override

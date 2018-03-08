@@ -217,7 +217,7 @@ public class RMDBManagerTest {
         RMNodeData rmNodeData = addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
         rmNodeData.setState(NodeState.BUSY);
         rmNodeData.setStateChangeTime(5678);
-        dbManager.updateNode(rmNodeData);
+        dbManager.updateNode(rmNodeData, NODE_SOURCE_NAME_BASE);
 
         Collection<RMNodeData> allNodes = dbManager.getAllNodes();
         assertThat(allNodes).hasSize(1);
@@ -265,7 +265,7 @@ public class RMDBManagerTest {
     public void testRemoveRMNodeData() {
 
         RMNodeData rmNodeData = addRMNodeData(NODE_NAME_BASE, NODE_STATE_BASE);
-        dbManager.removeNode(rmNodeData);
+        dbManager.removeNode(rmNodeData, NODE_SOURCE_NAME_BASE);
 
         Collection<RMNodeData> allNodes = dbManager.getAllNodes();
         assertThat(allNodes).hasSize(0);
@@ -292,7 +292,7 @@ public class RMDBManagerTest {
         newNodeSourceData.setPolicyType("aPolicyType");
         dbManager.addNodeSource(newNodeSourceData);
         rmNodeData2.setNodeSource(newNodeSourceData);
-        dbManager.addNode(rmNodeData2);
+        dbManager.addNode(rmNodeData2, newNodeSourceData.getName());
 
         Collection<RMNodeData> nodes = dbManager.getNodesByNodeSource(nodeSourceData.getName());
 
@@ -324,7 +324,7 @@ public class RMDBManagerTest {
         newNodeSourceData.setPolicyType("aPolicyType");
         dbManager.addNodeSource(newNodeSourceData);
         rmNodeData2.setNodeSource(newNodeSourceData);
-        dbManager.addNode(rmNodeData2);
+        dbManager.addNode(rmNodeData2, newNodeSourceData.getName());
 
         RMNodeData rmNodeData3 = addRMNodeData(NODE_NAME_BASE + "3", NODE_STATE_BASE);
 
@@ -367,7 +367,7 @@ public class RMDBManagerTest {
         RMNodeData rmNodeData = addRMNodeData(NODE_NAME_BASE + "2", NodeState.DEPLOYING);
         addRMNodeData(NODE_NAME_BASE + "3", NODE_STATE_BASE);
 
-        dbManager.removeNode(rmNodeData);
+        dbManager.removeNode(rmNodeData, NODE_SOURCE_NAME_BASE);
 
         Collection<RMNodeData> allNodes = dbManager.getAllNodes();
         assertThat(allNodes).hasSize(2);
@@ -407,7 +407,7 @@ public class RMDBManagerTest {
                                                JMX_URLS,
                                                JVM_NAME);
         rmNodeData.setNodeSource(nodeSourceData);
-        dbManager.addNode(rmNodeData);
+        dbManager.addNode(rmNodeData, NODE_SOURCE_NAME_BASE);
         return rmNodeData;
     }
 
