@@ -44,10 +44,13 @@ public class RMNodeSourceHelper {
 
     public static void defineLocalNodeSourceAndWait(String name, int nodeNumber, ResourceManager rm,
             RMMonitorsHandler monitor) throws Exception {
+
         RMFactory.setOsJavaProperty();
+
         RMTHelper.log("Define a node source " + name);
-        //first emtpy im parameter is default rm url
+
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+
         rm.defineNodeSource(name,
                             LocalInfrastructure.class.getName(),
                             new Object[] { creds, nodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT,
@@ -62,9 +65,10 @@ public class RMNodeSourceHelper {
 
     public static void deployNodeSourceAndWait(String name, ResourceManager rm, RMMonitorsHandler monitor,
             int nodesNumberToWaitFor) {
+
         RMTHelper.log("Deploy node source " + name);
+
         rm.deployNodeSource(name);
-        rm.setNodeSourcePingFrequency(5000, name);
 
         RMTHelper.waitForNodeSourceCreation(name, nodesNumberToWaitFor, monitor);
     }
@@ -75,11 +79,13 @@ public class RMNodeSourceHelper {
 
     public static void waitForNodeSourceUndeployment(String name, int numberOfNodesToBeRemoved,
             RMMonitorsHandler monitor) {
+
         RMTHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, numberOfNodesToBeRemoved, monitor);
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_UNDEPLOYED, name, monitor);
     }
 
     public static void waitForNodeSourceRemoval(String name, int numberOfNodesToBeRemoved, RMMonitorsHandler monitor) {
+
         RMTHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, numberOfNodesToBeRemoved, monitor);
         RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, name, monitor);
     }

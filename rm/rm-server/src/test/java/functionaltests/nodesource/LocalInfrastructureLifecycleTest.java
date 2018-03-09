@@ -45,6 +45,8 @@ public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
 
     private static final int NUMBER_OF_NODES = 5;
 
+    private static final int NO_NODES_EXPECTED = 0;
+
     private ResourceManager resourceManager;
 
     private RMMonitorsHandler monitor;
@@ -63,14 +65,14 @@ public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
                                                         NUMBER_OF_NODES,
                                                         this.resourceManager,
                                                         this.monitor);
-        this.checkResourceManagerState(0);
+        this.checkResourceManagerState(NO_NODES_EXPECTED);
 
         this.deployNodeSourceAndCheck();
 
         RMTHelper.log("Undeploy node source");
         this.resourceManager.undeployNodeSource(NODE_SOURCE_NAME);
         RMNodeSourceHelper.waitForNodeSourceUndeployment(NODE_SOURCE_NAME, NUMBER_OF_NODES, this.monitor);
-        this.checkResourceManagerState(0);
+        this.checkResourceManagerState(NO_NODES_EXPECTED);
 
         RMTHelper.log("Deploy node source again");
         this.deployNodeSourceAndCheck();
@@ -78,7 +80,7 @@ public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
         RMTHelper.log("Remove node source");
         this.resourceManager.removeNodeSource(NODE_SOURCE_NAME, true);
         RMNodeSourceHelper.waitForNodeSourceRemoval(NODE_SOURCE_NAME, NUMBER_OF_NODES, this.monitor);
-        this.checkResourceManagerState(0);
+        this.checkResourceManagerState(NO_NODES_EXPECTED);
     }
 
     private void deployNodeSourceAndCheck() {

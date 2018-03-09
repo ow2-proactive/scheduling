@@ -246,6 +246,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private boolean shutedDown = false;
 
+    /**
+     * The client that initiated the resource manager action. In a regular
+     * execution, the caller should always be set at each runActivity loop.
+     * However, during a recovery of the resource manager the caller might be
+     * lost for a given action, this is why we use the localClient as default
+     * caller.
+     */
     private Client caller = localClient;
 
     /**
@@ -1210,8 +1217,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private NodeSourceDescriptor persistNodeSourceAndGetDescriptor(String nodeSourceName, String infrastructureType,
             Object[] infraParams, String policyType, Object[] policyParams, boolean nodesRecoverable) {
 
-        List<Serializable> serializableInfraParams = this.getSerializableParamsOrFail(nodeSourceName, infraParams);
-        List<Serializable> serializablePolicyParams = this.getSerializableParamsOrFail(nodeSourceName, policyParams);
+        List<Serializable> serializableInfraParams = this.getSerializableParamsOrFail(infraParams);
+        List<Serializable> serializablePolicyParams = this.getSerializableParamsOrFail(policyParams);
 
         NodeSourceData persistedNodeSource = new NodeSourceData(nodeSourceName,
                                                                 infrastructureType,
@@ -1231,7 +1238,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return persistedNodeSource.toNodeSourceDescriptor();
     }
 
-    private List<Serializable> getSerializableParamsOrFail(String nodeSourceName, Object[] parameters) {
+    private List<Serializable> getSerializableParamsOrFail(Object[] parameters) {
 
         List<Serializable> serializableParameters = null;
 
@@ -1312,9 +1319,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             NodeSource nodeSourceToDeploy = this.createNodeSourceInstance(nodeSourceDescriptor);
             NodeSourcePolicy nodeSourcePolicyStub = this.createNodeSourcePolicyActivity(nodeSourceDescriptor,
                                                                                         nodeSourceToDeploy);
-            NodeSource nodeSourceStub = this.createNodeSourceActivity(nodeSourceName,
-                                                                      nodeSourceDescriptor,
-                                                                      nodeSourceToDeploy);
+            NodeSource nodeSourceStub = this.createNodeSourceActivity(nodeSourceName, nodeSourceToDeploy);
 
             this.configureDeployedNodeSource(nodeSourceName,
                                              nodeSourceDescriptor,
@@ -1377,14 +1382,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return nodeSourcePolicyStub;
     }
 
-    private NodeSource createNodeSourceActivity(String nodeSourceName, NodeSourceDescriptor nodeSourceDescriptor,
-            NodeSource nodeSourceToDeploy) {
+    private NodeSource createNodeSourceActivity(String nodeSourceName, NodeSource nodeSourceToDeploy) {
 
         try {
             nodeSourceToDeploy = PAActiveObject.turnActive(nodeSourceToDeploy, this.nodeRM);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw new RuntimeException("Cannot create node source " + nodeSourceName, e);
+            throw new RuntimeException("Cannot create node source activity " + nodeSourceName, e);
         }
 
         return nodeSourceToDeploy;
@@ -1439,9 +1443,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             NodeSourcePolicy nodeSourcePolicyStub = this.createNodeSourcePolicyActivity(nodeSourceDescriptor,
                                                                                         nodeSourceToDeploy);
-            NodeSource nodeSourceStub = this.createNodeSourceActivity(nodeSourceName,
-                                                                      nodeSourceDescriptor,
-                                                                      nodeSourceToDeploy);
+            NodeSource nodeSourceStub = this.createNodeSourceActivity(nodeSourceName, nodeSourceToDeploy);
 
             if (recoverNodes) {
                 this.nodesRecoveryManager.recoverNodes(nodeSourceStub);
@@ -1477,7 +1479,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.removeAllNodes(nodeSourceName, false);
 
             // delegate the removal process to the node source that will
-            // eventually call back the RMCore to unregister the node source
+            // eventually call back the RMCore to unregister the deployed node
+            // source
             nodeSourceToRemove.undeploy(this.caller);
 
             this.updateNodeSourceDescriptorWithStatusAndPersist(this.definedNodeSources.get(nodeSourceName)
@@ -1978,7 +1981,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         logger.info("Remove node source " + nodeSourceName + " requested by " + this.caller.getName());
 
-        this.shutDownDeployedNodeSource(nodeSourceName, preempt);
+        this.shutDownNodeSourceIfDeployed(nodeSourceName, preempt);
 
         this.removeDefinedNodeSource(nodeSourceName, nodeSourceToRemove);
 
@@ -2006,7 +2009,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    private void shutDownDeployedNodeSource(String nodeSourceName, boolean preempt) {
+    private void shutDownNodeSourceIfDeployed(String nodeSourceName, boolean preempt) {
 
         if (this.deployedNodeSources.containsKey(nodeSourceName)) {
 

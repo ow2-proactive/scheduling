@@ -48,6 +48,8 @@ public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
 
     private static final int NUMBER_OF_NODES = TestSSHInfrastructureV2.NB_NODES;
 
+    private static final int NO_NODES_EXPECTED = 0;
+
     private ResourceManager resourceManager;
 
     private RMMonitorsHandler monitor;
@@ -71,7 +73,7 @@ public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
                                               TestSSHInfrastructureV2.policyParameters,
                                               RMFunctionalTest.NODES_NOT_RECOVERABLE);
         RMNodeSourceHelper.waitForNodeSourceDefinition(NODE_SOURCE_NAME, this.monitor);
-        this.checkResourceManagerState(0);
+        this.checkResourceManagerState(NO_NODES_EXPECTED);
 
         RMTHelper.log("Deploy node source");
         this.deployNodeSourceAndCheck();
@@ -79,7 +81,7 @@ public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
         RMTHelper.log("Undeploy node source");
         this.resourceManager.undeployNodeSource(NODE_SOURCE_NAME);
         RMNodeSourceHelper.waitForNodeSourceUndeployment(NODE_SOURCE_NAME, NUMBER_OF_NODES, this.monitor);
-        this.checkResourceManagerState(0);
+        this.checkResourceManagerState(NO_NODES_EXPECTED);
 
         RMTHelper.log("Deploy node source again");
         this.deployNodeSourceAndCheck();
@@ -87,7 +89,7 @@ public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
         RMTHelper.log("Remove node source");
         this.resourceManager.removeNodeSource(NODE_SOURCE_NAME, true);
         RMNodeSourceHelper.waitForNodeSourceRemoval(NODE_SOURCE_NAME, NUMBER_OF_NODES, this.monitor);
-        this.checkResourceManagerState(0);
+        this.checkResourceManagerState(NO_NODES_EXPECTED);
     }
 
     @After

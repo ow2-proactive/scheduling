@@ -551,11 +551,6 @@ public class NodeSource implements InitActive, RunActive {
         this.activePolicy = policy;
     }
 
-    @ImmediateService
-    public NodeSourcePolicy getActivePolicy() {
-        return this.activePolicy;
-    }
-
     public NodeSourceStatus getStatus() {
         return this.descriptor.getStatus();
     }
@@ -673,7 +668,7 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     /**
-     * Shutdowns the node source and releases all its nodes.
+     * Undeploy the node source, shut down policy, and release nodes.
      */
     public BooleanWrapper undeploy(Client initiator) {
         logger.info("[" + this.name + "] is shutting down by " + initiator);
