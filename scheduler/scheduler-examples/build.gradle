@@ -4,6 +4,8 @@ dependencies {
             "org.objectweb.proactive:programming-core:${programmingVersion}",
             "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
     )
+    compile group: 'commons-net', name: 'commons-net', version: '3.3'
+
 }
 
 task stub(type: StubTask) {
