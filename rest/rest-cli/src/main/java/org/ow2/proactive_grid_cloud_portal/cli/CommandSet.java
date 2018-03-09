@@ -71,6 +71,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UndeployNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
@@ -714,13 +715,24 @@ public class CommandSet {
     public static final CommandSet.Entry NS_DEPLOY = CommandSetEntryBuilder.newInstance()
                                                                            .opt("dpns")
                                                                            .longOpt("deployns")
-                                                                           .description("Deploy defined node source")
+                                                                           .description("Deploy node source")
                                                                            .hasArgs(true)
                                                                            .numOfArgs(1)
                                                                            .argNames("node-source-name")
                                                                            .jsCommand("deployns(node-source-name)")
                                                                            .commandClass(DeployNodeSourceCommand.class)
                                                                            .entry();
+
+    public static final CommandSet.Entry NS_UNDEPLOY = CommandSetEntryBuilder.newInstance()
+                                                                             .opt("udpns")
+                                                                             .longOpt("undeployns")
+                                                                             .description("Undeploy node source")
+                                                                             .hasArgs(true)
+                                                                             .numOfArgs(1)
+                                                                             .argNames("node-source-name")
+                                                                             .jsCommand("undeployns(node-source-name)")
+                                                                             .commandClass(UndeployNodeSourceCommand.class)
+                                                                             .entry();
 
     public static final CommandSet.Entry NODE_REMOVE = CommandSetEntryBuilder.newInstance()
                                                                              .opt("d")

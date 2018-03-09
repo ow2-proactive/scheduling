@@ -663,11 +663,11 @@ public class NodeSource implements InitActive, RunActive {
      * Shutdowns the node source and releases all its nodes.
      */
     public BooleanWrapper shutdown(Client initiator) {
-        logger.info("[" + name + "] is shutting down by " + initiator);
-        toShutdown = true;
+        logger.info("[" + this.name + "] is shutting down by " + initiator);
+        this.toShutdown = true;
 
-        if (nodes.size() == 0) {
-            shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_REMOVED);
+        if (this.nodes.size() == 0) {
+            this.shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_REMOVED);
         }
         return new BooleanWrapper(true);
     }
@@ -676,11 +676,11 @@ public class NodeSource implements InitActive, RunActive {
      * Shutdowns the node source and releases all its nodes.
      */
     public BooleanWrapper undeploy(Client initiator) {
-        logger.info("[" + name + "] is shutting down by " + initiator);
-        toShutdown = true;
+        logger.info("[" + this.name + "] is shutting down by " + initiator);
+        this.toShutdown = true;
 
-        if (nodes.size() == 0) {
-            shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_UNDEPLOYED);
+        if (this.nodes.size() == 0) {
+            this.shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_UNDEPLOYED);
         }
         return new BooleanWrapper(true);
     }
@@ -798,13 +798,14 @@ public class NodeSource implements InitActive, RunActive {
      * Undeploy a node source active object when the policy is shutdown.
      */
     public void finishNodeSourceUndeploy(Client initiator) {
-        PAFuture.waitFor(rmcore.nodeSourceUnregister(name,
-                                                     new RMNodeSourceEvent(RMEventType.NODESOURCE_UNDEPLOYED,
-                                                                           initiator.getName(),
-                                                                           this.getName(),
-                                                                           this.getDescription(),
-                                                                           this.getAdministrator().getName(),
-                                                                           descriptor.getStatus().toString())));
+        PAFuture.waitFor(this.rmcore.nodeSourceUnregister(this.name,
+                                                          new RMNodeSourceEvent(RMEventType.NODESOURCE_UNDEPLOYED,
+                                                                                initiator.getName(),
+                                                                                this.getName(),
+                                                                                this.getDescription(),
+                                                                                this.getAdministrator().getName(),
+                                                                                this.descriptor.getStatus()
+                                                                                               .toString())));
 
         PAActiveObject.terminateActiveObject(false);
     }

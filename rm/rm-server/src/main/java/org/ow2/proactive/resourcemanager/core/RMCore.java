@@ -213,14 +213,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private RMAuthenticationImpl authentication;
 
     /**
-     * HashMap of undeployed node sources by name (undeployed node sources
-     * are standard Java objects -- not activated)
+     * HashMap of all node sources by name. It contains both deployed and
+     * undeployed node sources. Contrarily to undeployed node sources,
+     * deployed node sources have the node source activity and the node source
+     * policy activity running.
      */
     private Map<String, NodeSource> definedNodeSources;
 
     /**
-     * HashMap of deployed node sources by name (deployed node sources have
-     * their activity running, and acquire nodes)
+     * HashMap of deployed node sources by name {@link #definedNodeSources}
      */
     private Map<String, NodeSource> deployedNodeSources;
 
@@ -1403,7 +1404,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
 
         if (nodeSource == null) {
-            throw new IllegalStateException("Undeployed node source " + nodeSourceName + " is unknown");
+            throw new IllegalStateException("Node source " + nodeSourceName + " is unknown");
         }
 
         return nodeSource.getDescriptor();
@@ -1767,6 +1768,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     public BooleanWrapper nodeSourceUnregister(String nodeSourceName, RMNodeSourceEvent evt) {
 
+        if (!evt.getEventType().equals(RMEventType.NODESOURCE_REMOVED) &&
+            !evt.getEventType().equals(RMEventType.NODESOURCE_UNDEPLOYED)) {
+            throw new IllegalArgumentException("Event " + evt.getEventType() +
+                                               " is incompatible with the node source unregister action");
+        }
+
         NodeSource nodeSource = this.deployedNodeSources.remove(nodeSourceName);
 
         if (nodeSource == null) {
@@ -1781,7 +1788,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.error("Cannot extract the body id of the node source " + nodeSourceName);
         }
 
-        logger.info("Node source " + nodeSourceName + " has been successfully removed");
+        // currently, two events can end up in unregistering the node source:
+        // node source removal and node source undeployment
+        logger.info("Node source " + nodeSourceName + " has been successfully " + evt.getEventType());
 
         this.monitoring.nodeSourceEvent(evt);
 
