@@ -29,7 +29,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.security.Permission;
-import java.util.AbstractMap;
 import java.util.List;
 
 import org.junit.Before;
@@ -235,13 +234,13 @@ public class RMDBManagerBufferTest {
                                                JMX_URLS,
                                                JVM_NAME);
         rmNodeData.setNodeSource(nodeSourceData);
-        dbManager.addNode(rmNodeData);
+        dbManager.addNode(rmNodeData, NODE_SOURCE_NAME_BASE);
         return rmNodeData;
     }
 
     private void updateRMNodeData(RMNodeData rmNodeData, NodeState nodeState) {
         rmNodeData.setState(nodeState);
-        dbManager.updateNode(rmNodeData);
+        dbManager.updateNode(rmNodeData, NODE_SOURCE_NAME_BASE);
     }
 
     private void checkPendingNodeOperationsIsEmpty() {
