@@ -102,16 +102,16 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
     @Test
     public void testDefineAndDeployNodeSourceRecoverableParam() throws Exception {
-        this.defineNodeSourceAndListNodeSources("nsDefinedAndDeployedThroughCLIRecoverableParam", true);
+        this.defineNodeSourceAndListNodeSources("nsDefinedAndDeployedThroughCLIRecoverableParam", true, true);
     }
 
     @Test
     public void testDefineAndDeployNodeSourceNoRecoverableParam() throws Exception {
-        this.defineNodeSourceAndListNodeSources("nsDefinedAndDeployedThroughCLINoRecoverableParam", false);
+        this.defineNodeSourceAndListNodeSources("nsDefinedAndDeployedThroughCLINoRecoverableParam", false, false);
     }
 
-    private void defineNodeSourceAndListNodeSources(String nodeSourceName, boolean nodesRecoverableParameter)
-            throws Exception {
+    private void defineNodeSourceAndListNodeSources(String nodeSourceName, boolean nodesRecoverableParameter,
+            boolean preemptUndeploy) throws Exception {
         String testLogString = "[" + NodeSourceCommandsFunctTest.class.getSimpleName() + "]";
 
         String nodeSourceInfrastructureClass = "org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure";
@@ -155,7 +155,11 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         System.out.println(testLogString + "Test undeployns command");
 
-        this.clearAndTypeLine("undeployns( '" + nodeSourceName + "')");
+        if (preemptUndeploy) {
+            this.clearAndTypeLine("undeployns( '" + nodeSourceName + "', 'true')");
+        } else {
+            this.clearAndTypeLine("undeployns( '" + nodeSourceName + "')");
+        }
         this.runCli();
         this.waitForNodeSourceStatusToChange();
 

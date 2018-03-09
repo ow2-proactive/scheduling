@@ -1474,7 +1474,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                         this.caller + " is not authorized to remove " + nodeSourceName);
 
-            logger.info("Undeploy node source " + nodeSourceName + " requested by " + this.caller.getName());
+            logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + " requested by " +
+                        this.caller.getName());
 
             this.removeAllNodes(nodeSourceName, preempt);
 
@@ -1979,7 +1980,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                     this.caller + " is not authorized to remove " + nodeSourceName);
 
-        logger.info("Remove node source " + nodeSourceName + " requested by " + this.caller.getName());
+        logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + " requested by " +
+                    this.caller.getName());
 
         this.shutDownNodeSourceIfDeployed(nodeSourceName, preempt);
 

@@ -490,8 +490,12 @@ function deployns(nodeSourceName) {
     execute(new DeployNodeSourceCommand('' + nodeSourceName));
 }
 
-function undeployns(nodeSourceName) {
-    execute(new UndeployNodeSourceCommand('' + nodeSourceName));
+function undeployns(nodeSourceName, preempt) {
+    if(typeof preempt == 'undefined'){
+        execute(new UndeployNodeSourceCommand('' + nodeSourceName));
+    } else {
+        execute(new UndeployNodeSourceCommand('' + nodeSourceName, preempt));
+    }
 }
 
 function removens(nodeSource, preempt) {

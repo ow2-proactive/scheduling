@@ -729,8 +729,9 @@ public class CommandSet {
                                                                              .description("Undeploy node source")
                                                                              .hasArgs(true)
                                                                              .numOfArgs(1)
-                                                                             .argNames("node-source-name")
-                                                                             .jsCommand("undeployns(node-source-name)")
+                                                                             .hasOptionalArg(true)
+                                                                             .argNames("node-source-name [preempt]")
+                                                                             .jsCommand("undeployns(node-source-name[, preempt])")
                                                                              .commandClass(UndeployNodeSourceCommand.class)
                                                                              .entry();
 
@@ -966,10 +967,11 @@ public class CommandSet {
      */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] { LOGIN, NODE_ADD, NODE_LIST, NODE_INFO,
                                                                               NODE_LOCK, NODE_UNLOCK, NODE_REMOVE,
-                                                                              NS_DEFINE, NS_CREATE, NS_DEPLOY, NS_LIST,
-                                                                              NS_REMOVE, NS, INFRASTRUCTURE,
-                                                                              INFRASTRUCTURE_LIST, POLICY, POLICY_LIST,
-                                                                              TOPOLOGY, FORCE, RM_STATS, RM_HELP };
+                                                                              NS_DEFINE, NS_CREATE, NS_DEPLOY,
+                                                                              NS_UNDEPLOY, NS_LIST, NS_REMOVE, NS,
+                                                                              INFRASTRUCTURE, INFRASTRUCTURE_LIST,
+                                                                              POLICY, POLICY_LIST, TOPOLOGY, FORCE,
+                                                                              RM_STATS, RM_HELP };
 
     public static final Entry[] INTERACTIVE_COMMANDS = { JS_LIST_ALL, JS_LIST_LATEST, JS_LIST_FROM, EXIT, RM_JS_HELP,
                                                          SCHED_JS_HELP, COMMON_JS_HELP, VERSION };

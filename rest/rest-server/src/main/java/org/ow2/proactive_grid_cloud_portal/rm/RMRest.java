@@ -545,7 +545,8 @@ public class RMRest implements RMRestInterface {
     @Path("nodesource/undeploy")
     @Produces("application/json")
     public NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
-            @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt) throws NotConnectedException {
+            @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt)
+            throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         NSState nsState = new NSState();
         try {

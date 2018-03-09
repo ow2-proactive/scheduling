@@ -44,8 +44,15 @@ public class UndeployNodeSourceCommand extends AbstractCommand implements Comman
 
     private String nodeSourceName;
 
+    private boolean preempt;
+
     public UndeployNodeSourceCommand(String nodeSourceName) {
+        this(nodeSourceName, Boolean.toString(false));
+    }
+
+    public UndeployNodeSourceCommand(String nodeSourceName, String preempt) {
         this.nodeSourceName = nodeSourceName;
+        this.preempt = Boolean.valueOf(preempt);
     }
 
     @Override
@@ -53,7 +60,7 @@ public class UndeployNodeSourceCommand extends AbstractCommand implements Comman
 
         HttpPut request = new HttpPut(currentContext.getResourceUrl(RM_REST_ENDPOINT));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("nodeSourceName", this.nodeSourceName);
+        queryStringBuilder.add("nodeSourceName", this.nodeSourceName).add("preempt", Boolean.toString(this.preempt));
         request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = this.execute(request, currentContext);
 
