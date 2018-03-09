@@ -70,7 +70,7 @@ public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
         this.deployNodeSourceAndCheck();
 
         RMTHelper.log("Undeploy node source");
-        this.resourceManager.undeployNodeSource(NODE_SOURCE_NAME);
+        this.resourceManager.undeployNodeSource(NODE_SOURCE_NAME, true);
         RMNodeSourceHelper.waitForNodeSourceUndeployment(NODE_SOURCE_NAME, NUMBER_OF_NODES, this.monitor);
         this.checkResourceManagerState(NO_NODES_EXPECTED);
 

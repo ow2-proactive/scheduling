@@ -1461,7 +1461,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
-    public BooleanWrapper undeployNodeSource(String nodeSourceName) {
+    public BooleanWrapper undeployNodeSource(String nodeSourceName, boolean preempt) {
 
         if (!this.definedNodeSources.containsKey(nodeSourceName)) {
             throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
@@ -1476,7 +1476,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             logger.info("Undeploy node source " + nodeSourceName + " requested by " + this.caller.getName());
 
-            this.removeAllNodes(nodeSourceName, false);
+            this.removeAllNodes(nodeSourceName, preempt);
 
             // delegate the removal process to the node source that will
             // eventually call back the RMCore to unregister the deployed node

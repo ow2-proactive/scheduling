@@ -545,11 +545,11 @@ public class RMRest implements RMRestInterface {
     @Path("nodesource/undeploy")
     @Produces("application/json")
     public NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
-            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException {
+            @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         NSState nsState = new NSState();
         try {
-            nsState.setResult(rm.undeployNodeSource(nodeSourceName).getBooleanValue());
+            nsState.setResult(rm.undeployNodeSource(nodeSourceName, preempt).getBooleanValue());
         } catch (RuntimeException ex) {
             nsState.setResult(false);
             nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
