@@ -1790,7 +1790,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         // currently, two events can end up in unregistering the node source:
         // node source removal and node source undeployment
-        logger.info("Node source " + nodeSourceName + " has been successfully " + evt.getEventType());
+        logger.info("Node source " + nodeSourceName + " has been successfully " + evt.getEventType().getDescription());
 
         this.monitoring.nodeSourceEvent(evt);
 

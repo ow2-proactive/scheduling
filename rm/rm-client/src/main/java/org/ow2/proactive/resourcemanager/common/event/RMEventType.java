@@ -86,15 +86,14 @@ public enum RMEventType {
      */
     NODE_REMOVED("removed");
 
-    private final String stringValue;
+    private final String description;
 
-    RMEventType(String stringValue) {
-        this.stringValue = stringValue;
+    RMEventType(String description) {
+        this.description = description;
     }
 
-    @Override
-    public String toString() {
-        return this.stringValue;
+    public String getDescription() {
+        return this.description;
     }
 
 }
