@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -65,6 +66,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 import com.google.common.collect.ImmutableList;
 
+import functionaltests.monitor.JobEventMonitor;
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 
@@ -750,12 +752,46 @@ public class SchedulerTHelper {
         return waitForEventJobFinished(getSchedulerInterface(), id);
     }
 
+    /**
+     * @param userInterface
+     * @param id of the job
+     * @return jobInfo, if job went from RUNNNIG or PENDING to FINISHED, otherwise null will be returned
+     * @throws Exception
+     */
     public JobInfo waitForEventJobFinished(Scheduler userInterface, JobId id) throws Exception {
         try {
-            return waitForJobEvent(userInterface, id, 0, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+            JobEventMonitor monitorRunningToFinished = null;
+            JobEventMonitor monitorPendingToFinished = null;
+            synchronized (getSchedulerMonitorsHandler()) {
+                Optional<JobEventMonitor> opJobMonitor = getSchedulerMonitorsHandler().removeJobEvent(id,
+                                                                                                      SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+                if (opJobMonitor.isPresent()) {
+                    //event occurred, remove it and return associated Job object
+                    return opJobMonitor.get().getJobInfo();
+                }
+                opJobMonitor = getSchedulerMonitorsHandler().removeJobEvent(id, SchedulerEvent.JOB_PENDING_TO_FINISHED);
+                if (opJobMonitor.isPresent()) {
+                    //event occurred, remove it and return associated Job object
+                    return opJobMonitor.get().getJobInfo();
+                }
+
+                monitorRunningToFinished = (JobEventMonitor) getSchedulerMonitorsHandler().getMonitor(new JobEventMonitor(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                                                                                                                          id));
+                monitorPendingToFinished = (JobEventMonitor) getSchedulerMonitorsHandler().getMonitor(new JobEventMonitor(SchedulerEvent.JOB_PENDING_TO_FINISHED,
+                                                                                                                          id));
+            }
+
+            getSchedulerMonitorsHandler().waitWithAnyMonitor(0, monitorRunningToFinished, monitorPendingToFinished);
+
+            if (monitorRunningToFinished.eventOccured()) {
+                return monitorRunningToFinished.getJobInfo();
+            } else if (monitorPendingToFinished.eventOccured()) {
+                return monitorPendingToFinished.getJobInfo();
+            } else {
+                // erorr
+                return null;
+            }
         } catch (ProActiveTimeoutException e) {
-            //unreachable block, 0 means infinite, no timeout
-            //log sthing ?
             return null;
         }
     }
@@ -784,6 +820,9 @@ public class SchedulerTHelper {
         return waitForJobEvent(getSchedulerInterface(), id, timeout, jobStatusAfterEvent, jobEvent);
     }
 
+    /**
+     * @param timeout 0 means - infinite timeout
+     */
     private JobInfo waitForJobEvent(Scheduler userInterface, JobId id, long timeout, JobStatus jobStatusAfterEvent,
             SchedulerEvent jobEvent) throws Exception {
         JobState jobState = null;

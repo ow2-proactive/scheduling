@@ -26,9 +26,11 @@
 package functionaltests.monitor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -134,11 +136,12 @@ public class SchedulerMonitorsHandler {
     public JobState waitForEventJobSubmitted(JobId id, long timeout) throws ProActiveTimeoutException {
         JobEventMonitor monitor = null;
         synchronized (this) {
-            monitor = removeJobEvent(id, SchedulerEvent.JOB_SUBMITTED);
-            if (monitor != null) {
+            final Optional<JobEventMonitor> opJobMonitor = removeJobEvent(id, SchedulerEvent.JOB_SUBMITTED);
+            if (opJobMonitor.isPresent()) {
                 //event occurred, remove it and return associated Job object
-                return monitor.getJobState();
+                return opJobMonitor.get().getJobState();
             }
+
             monitor = (JobEventMonitor) getMonitor(new JobEventMonitor(SchedulerEvent.JOB_SUBMITTED, id));
         }
         waitWithMonitor(monitor, timeout);
@@ -160,13 +163,14 @@ public class SchedulerMonitorsHandler {
     public JobInfo waitForEventJob(SchedulerEvent event, JobId id, long timeout) throws ProActiveTimeoutException {
         JobEventMonitor monitor = null;
         synchronized (this) {
-            monitor = removeJobEvent(id, event);
-            if (monitor != null) {
+            final Optional<JobEventMonitor> opJobMonitor = removeJobEvent(id, event);
+            if (opJobMonitor.isPresent()) {
                 //event occurred, remove it and return associated Job object
-                return monitor.getJobInfo();
+                return opJobMonitor.get().getJobInfo();
             }
             monitor = (JobEventMonitor) getMonitor(new JobEventMonitor(event, id));
         }
+
         waitWithMonitor(monitor, timeout);
         return monitor.getJobInfo();
     }
@@ -294,12 +298,13 @@ public class SchedulerMonitorsHandler {
      * @param event type to look for
      * @return removed JobEventMonitor, or null if not exists.
      */
-    private JobEventMonitor removeJobEvent(JobId id, SchedulerEvent event) {
+    public Optional<JobEventMonitor> removeJobEvent(JobId id, SchedulerEvent event) {
         JobEventMonitor tmp = new JobEventMonitor(event, id);
         if (jobsEvents.containsKey(id) && jobsEvents.get(id).contains(tmp)) {
-            return jobsEvents.get(id).remove((jobsEvents.get(id).indexOf(tmp)));
-        } else
-            return null;
+            return Optional.of(jobsEvents.get(id).remove((jobsEvents.get(id).indexOf(tmp))));
+        } else {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -412,7 +417,7 @@ public class SchedulerMonitorsHandler {
      * @param monitor representing event to wait for.
      * @return an EventMonitorJob to use as waiting Monitor.
      */
-    private EventMonitor getMonitor(EventMonitor monitor) {
+    public EventMonitor getMonitor(EventMonitor monitor) {
         if (!eventsMonitors.contains(monitor)) {
             eventsMonitors.add(monitor);
             return monitor;
@@ -457,6 +462,26 @@ public class SchedulerMonitorsHandler {
                 }
             }
             monitor.setTimeouted(true);
+        }
+        throw new ProActiveTimeoutException("timeout elapsed");
+    }
+
+    public void waitWithAnyMonitor(long timeout, EventMonitor... monitors)
+            throws ProActiveTimeoutException, InterruptedException {
+        TimeoutAccounter counter = TimeoutAccounter.getAccounter(timeout);
+        synchronized (monitors) {
+            Arrays.stream(monitors).forEach(monitor -> monitor.setTimeouted(false));
+
+            while (!counter.isTimeoutElapsed()) {
+                if (Arrays.stream(monitors).anyMatch(monitor -> monitor.eventOccured)) {
+                    return;
+                }
+
+                Thread.sleep(1000);
+            }
+
+            Arrays.stream(monitors).forEach(monitor -> monitor.setTimeouted(true));
+
         }
         throw new ProActiveTimeoutException("timeout elapsed");
     }
