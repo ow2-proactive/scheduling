@@ -555,6 +555,11 @@ public class NodeSource implements InitActive, RunActive {
         return this.descriptor.getStatus();
     }
 
+    public void setStatus(NodeSourceStatus status) {
+        this.getDescriptor().setStatus(status);
+        this.infrastructureManager.setPersistedNodeSourceDescriptor(this.descriptor);
+    }
+
     /**
      * Looks up the node
      */
@@ -647,8 +652,11 @@ public class NodeSource implements InitActive, RunActive {
         }
 
         if (toShutdown && nodes.size() == 0) {
-            // shutdown all pending nodes
-            shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_REMOVED);
+            if (this.getStatus().equals(NodeSourceStatus.NODES_UNDEPLOYED)) {
+                shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_UNDEPLOYED);
+            } else {
+                shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_REMOVED);
+            }
         }
 
         return new BooleanWrapper(true);

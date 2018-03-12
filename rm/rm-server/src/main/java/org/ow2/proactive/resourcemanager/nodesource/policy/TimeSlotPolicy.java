@@ -203,6 +203,17 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     }
 
     /**
+     * Undeploy the policy and clears the timer.
+     */
+    @Override
+    public void undeploy(Client initiator) {
+        synchronized (timer) {
+            timer.cancel();
+        }
+        super.undeploy(initiator);
+    }
+
+    /**
      * Converts ms to Date object
      */
     private Date getDate(long millis) {

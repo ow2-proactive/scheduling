@@ -1477,6 +1477,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + " requested by " +
                         this.caller.getName());
 
+            nodeSourceToRemove.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
+
             this.removeAllNodes(nodeSourceName, preempt);
 
             // delegate the removal process to the node source that will

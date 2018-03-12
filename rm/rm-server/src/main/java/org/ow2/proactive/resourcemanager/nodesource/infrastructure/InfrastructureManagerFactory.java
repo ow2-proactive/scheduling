@@ -74,7 +74,7 @@ public class InfrastructureManagerFactory {
             Class<?> imClass = Class.forName(infrastructureType);
             im = (InfrastructureManager) imClass.newInstance();
             im.internalConfigure(infrastructureParameters);
-            im.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(nodeSourceDescriptor));
+            im.setPersistedNodeSourceDescriptor(nodeSourceDescriptor);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -146,6 +146,15 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
     }
 
     /**
+     * Undeploy the policy and clears the timer.
+     */
+    @Override
+    public void undeploy(Client initiator) {
+        cronScheduler.stop();
+        super.undeploy(initiator);
+    }
+
+    /**
      * Policy description for UI
      * @return policy description
      */

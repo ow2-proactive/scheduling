@@ -250,7 +250,7 @@ public class InfrastructureManagerTest {
 
     @Test
     public void testPersistInfrastructureVariables() {
-        infrastructureManager.setPersistedNodeSourceData(nodeSourceData);
+        infrastructureManager.setPersistedNodeSourceDescriptor(nodeSourceData.toNodeSourceDescriptor());
         infrastructureManager.persistInfrastructureVariables();
         verify(nodeSourceData, times(1)).setInfrastructureVariables(anyMap());
         verify(dbManager, times(1)).updateNodeSource(eq(nodeSourceData));
