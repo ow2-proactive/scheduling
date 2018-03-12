@@ -176,6 +176,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private static final String CONTACT_UPGRADE_MESSAGE = "Number of nodes exceed the limitation from your contract. Please send an email to contact@activeeon.com for an upgrade.";
 
+    public static final String NODE_SOURCE_STRING = "Node source ";
+
+    public static final String REQUESTED_BY_STRING = " requested by ";
+
     /**
      * Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
      * Explanation: This software can be licensed to a certain amount of nodes.
@@ -1189,7 +1193,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         nodeSourceName = nodeSourceName.trim();
 
-        logger.info("Define node source " + nodeSourceName + " requested by " + this.caller.getName());
+        logger.info("Define node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
 
         NodeSourceDescriptor nodeSourceDescriptor = this.persistNodeSourceAndGetDescriptor(nodeSourceName,
                                                                                            infrastructureType,
@@ -1209,7 +1213,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               nodeSourceDescriptor.getProvider().getName(),
                                                               nodeSource.getStatus().toString()));
 
-        logger.info("Node source " + nodeSourceName + " has been successfully defined");
+        logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully defined");
 
         return new BooleanWrapper(true);
     }
@@ -1312,7 +1316,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             NodeSourceDescriptor nodeSourceDescriptor = this.retrieveNodeSourceDescriptorOrFail(nodeSourceName);
 
-            logger.info("Deploy node source " + nodeSourceName + " requested by " + this.caller.getName());
+            logger.info("Deploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
 
             this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
 
@@ -1335,7 +1339,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                   nodeSourceStub.getAdministrator().getName(),
                                                                   nodeSourceStub.getStatus().toString()));
 
-            logger.info("Node source " + nodeSourceName + " has been successfully deployed");
+            logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully deployed");
         }
 
         return new BooleanWrapper(true);
@@ -1357,7 +1361,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         BooleanWrapper result = nodeSourceStub.activate();
 
         if (!result.getBooleanValue()) {
-            logger.error("Node source " + nodeSourceName + " cannot be activated");
+            logger.error(NODE_SOURCE_STRING + nodeSourceName + " cannot be activated");
         }
 
         Client provider = nodeSourceDescriptor.getProvider();
@@ -1408,7 +1412,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
 
         if (nodeSource == null) {
-            throw new IllegalStateException("Node source " + nodeSourceName + " is unknown");
+            throw new IllegalStateException(NODE_SOURCE_STRING + nodeSourceName + " is unknown");
         }
 
         return nodeSource.getDescriptor();
@@ -1474,7 +1478,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                         this.caller + " is not authorized to remove " + nodeSourceName);
 
-            logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + " requested by " +
+            logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
                         this.caller.getName());
 
             nodeSourceToRemove.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
@@ -1490,7 +1494,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                                        .getDescriptor(),
                                                                 NodeSourceStatus.NODES_UNDEPLOYED);
 
-            logger.info("Node source " + nodeSourceName + " has been successfully undeployed");
+            logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully undeployed");
         }
 
         return new BooleanWrapper(true);
@@ -1796,7 +1800,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         // currently, two events can end up in unregistering the node source:
         // node source removal and node source undeployment
-        logger.info("Node source " + nodeSourceName + " has been successfully " + evt.getEventType().getDescription());
+        logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
+                    evt.getEventType().getDescription());
 
         this.monitoring.nodeSourceEvent(evt);
 
@@ -1982,7 +1987,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                     this.caller + " is not authorized to remove " + nodeSourceName);
 
-        logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + " requested by " +
+        logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
                     this.caller.getName());
 
         this.shutDownNodeSourceIfDeployed(nodeSourceName, preempt);
@@ -1999,7 +2004,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         if (nodeSourceToRemove.getStatus().equals(NodeSourceStatus.NODES_UNDEPLOYED)) {
 
-            logger.info("Node source " + nodeSourceName + " has been successfully removed");
+            logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully removed");
 
             // if the node source to remove is not deployed, we need to issue
             // the node source removed event right now, because we will not

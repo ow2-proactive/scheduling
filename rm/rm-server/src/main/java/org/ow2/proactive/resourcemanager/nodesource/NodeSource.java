@@ -557,7 +557,7 @@ public class NodeSource implements InitActive, RunActive {
 
     public void setStatus(NodeSourceStatus status) {
         this.getDescriptor().setStatus(status);
-        this.infrastructureManager.setPersistedNodeSourceDescriptor(this.descriptor);
+        this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
     }
 
     /**

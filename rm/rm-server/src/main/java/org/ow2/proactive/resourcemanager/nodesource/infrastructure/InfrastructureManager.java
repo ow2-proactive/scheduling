@@ -56,7 +56,6 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
@@ -1039,8 +1038,8 @@ public abstract class InfrastructureManager implements Serializable {
      */
     protected abstract void initializePersistedInfraVariables();
 
-    public void setPersistedNodeSourceDescriptor(NodeSourceDescriptor nodeSourceDescriptor) {
-        this.nodeSourceData = NodeSourceData.fromNodeSourceDescriptor(nodeSourceDescriptor);
+    public void setPersistedNodeSourceData(NodeSourceData nodeSourceData) {
+        this.nodeSourceData = nodeSourceData;
     }
 
     /**
