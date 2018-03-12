@@ -298,21 +298,12 @@ public class SchedulerMonitorsHandler {
      * @param event type to look for
      * @return removed JobEventMonitor, or null if not exists.
      */
-    private Optional<JobEventMonitor> removeJobEvent(JobId id, SchedulerEvent event) {
+    public Optional<JobEventMonitor> removeJobEvent(JobId id, SchedulerEvent event) {
         JobEventMonitor tmp = new JobEventMonitor(event, id);
         if (jobsEvents.containsKey(id) && jobsEvents.get(id).contains(tmp)) {
             return Optional.of(jobsEvents.get(id).remove((jobsEvents.get(id).indexOf(tmp))));
         } else {
             return Optional.empty();
-        }
-    }
-
-    public JobEventMonitor getAndRemoveOrAdd(JobId id, SchedulerEvent event) {
-        final Optional<JobEventMonitor> opJobMonitor = removeJobEvent(id, event);
-        if (opJobMonitor.isPresent()) {
-            return opJobMonitor.get();
-        } else {
-            return (JobEventMonitor) getMonitor(new JobEventMonitor(event, id));
         }
     }
 
@@ -426,7 +417,7 @@ public class SchedulerMonitorsHandler {
      * @param monitor representing event to wait for.
      * @return an EventMonitorJob to use as waiting Monitor.
      */
-    private EventMonitor getMonitor(EventMonitor monitor) {
+    public EventMonitor getMonitor(EventMonitor monitor) {
         if (!eventsMonitors.contains(monitor)) {
             eventsMonitors.add(monitor);
             return monitor;

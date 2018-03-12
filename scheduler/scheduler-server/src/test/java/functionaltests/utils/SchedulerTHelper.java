@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Assert;
@@ -759,10 +760,26 @@ public class SchedulerTHelper {
      */
     public JobInfo waitForEventJobFinished(Scheduler userInterface, JobId id) throws Exception {
         try {
-            final JobEventMonitor monitorRunningToFinished = getSchedulerMonitorsHandler().getAndRemoveOrAdd(id,
-                                                                                                             SchedulerEvent.JOB_RUNNING_TO_FINISHED);
-            final JobEventMonitor monitorPendingToFinished = getSchedulerMonitorsHandler().getAndRemoveOrAdd(id,
-                                                                                                             SchedulerEvent.JOB_PENDING_TO_FINISHED);
+            JobEventMonitor monitorRunningToFinished = null;
+            JobEventMonitor monitorPendingToFinished = null;
+            synchronized (getSchedulerMonitorsHandler()) {
+                Optional<JobEventMonitor> opJobMonitor = getSchedulerMonitorsHandler().removeJobEvent(id,
+                                                                                                      SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+                if (opJobMonitor.isPresent()) {
+                    //event occurred, remove it and return associated Job object
+                    return opJobMonitor.get().getJobInfo();
+                }
+                opJobMonitor = getSchedulerMonitorsHandler().removeJobEvent(id, SchedulerEvent.JOB_PENDING_TO_FINISHED);
+                if (opJobMonitor.isPresent()) {
+                    //event occurred, remove it and return associated Job object
+                    return opJobMonitor.get().getJobInfo();
+                }
+
+                monitorRunningToFinished = (JobEventMonitor) getSchedulerMonitorsHandler().getMonitor(new JobEventMonitor(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
+                                                                                                                          id));
+                monitorPendingToFinished = (JobEventMonitor) getSchedulerMonitorsHandler().getMonitor(new JobEventMonitor(SchedulerEvent.JOB_PENDING_TO_FINISHED,
+                                                                                                                          id));
+            }
 
             getSchedulerMonitorsHandler().waitWithAnyMonitor(0, monitorRunningToFinished, monitorPendingToFinished);
 
