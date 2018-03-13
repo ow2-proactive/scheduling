@@ -250,14 +250,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private boolean shutedDown = false;
 
-    /**
-     * The client that initiated the resource manager action. In a regular
-     * execution, the caller should always be set at each runActivity loop.
-     * However, during a recovery of the resource manager the caller might be
-     * lost for a given action, this is why we use the localClient as default
-     * caller.
-     */
-    private Client caller = localClient;
+    private Client caller = null;
 
     /**
      * Any local active object (including a half body) will act as the same single client
@@ -1766,8 +1759,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public Set<String> listAliveNodeUrls(Set<String> nodeSourceNames) {
         HashSet<String> aliveNodes = new HashSet<>();
         for (String nodeSource : nodeSourceNames) {
-            for (Node node : this.deployedNodeSources.get(nodeSource).getAliveNodes()) {
-                aliveNodes.add(node.getNodeInformation().getURL());
+            if (this.deployedNodeSources.containsKey(nodeSource)) {
+                for (Node node : this.deployedNodeSources.get(nodeSource).getAliveNodes()) {
+                    aliveNodes.add(node.getNodeInformation().getURL());
+                }
             }
         }
         return aliveNodes;

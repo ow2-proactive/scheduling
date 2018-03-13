@@ -87,6 +87,8 @@ public class TestRM {
 
         List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
+
+        commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005");
         commandLine.add("-Djava.security.manager");
 
         String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();

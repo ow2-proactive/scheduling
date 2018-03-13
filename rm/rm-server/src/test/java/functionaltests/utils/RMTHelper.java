@@ -157,10 +157,8 @@ public class RMTHelper {
 
     public static void createNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
             RMMonitorsHandler monitor, boolean nodesRecoverable) throws Exception {
-        RMFactory.setOsJavaProperty();
+        byte[] creds = setJavaPropertyAndGetCredentials();
         log("Creating a node source " + name);
-        //first emtpy im parameter is default rm url
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rm.createNodeSource(name,
                             LocalInfrastructure.class.getName(),
                             new Object[] { creds, nodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT,
@@ -172,6 +170,38 @@ public class RMTHelper {
         rm.setNodeSourcePingFrequency(5000, name);
 
         waitForNodeSourceCreation(name, nodeNumber, monitor);
+    }
+
+    public void defineNodeSource(String name, int nodeNumber) throws Exception {
+        defineNodeSource(name,
+                         nodeNumber,
+                         setup.getJvmParametersAsList(),
+                         getResourceManager(),
+                         getMonitorsHandler(),
+                         NODES_RECOVERABLE);
+    }
+
+    public static void defineNodeSource(String name, int nodeNumber, List<String> vmOptions, ResourceManager rm,
+            RMMonitorsHandler monitor, boolean nodesRecoverable) throws Exception {
+        byte[] creds = setJavaPropertyAndGetCredentials();
+        log("Defining a node source " + name);
+        rm.defineNodeSource(name,
+                            LocalInfrastructure.class.getName(),
+                            new Object[] { creds, nodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT,
+                                           vmOptions != null ? setup.listToString(vmOptions)
+                                                             : setup.getJvmParameters() },
+                            StaticPolicy.class.getName(),
+                            null,
+                            nodesRecoverable);
+
+        waitForNodeSourceEvent(RMEventType.NODESOURCE_DEFINED, name, monitor);
+    }
+
+    private static byte[] setJavaPropertyAndGetCredentials() throws IOException {
+        RMFactory.setOsJavaProperty();
+
+        //first emtpy im parameter is default rm url
+        return FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
     }
 
     public static void createNodeSourceWithInfiniteTimeout(String name, int nodeNumber, List<String> vmOptions,
