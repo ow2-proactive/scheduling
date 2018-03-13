@@ -466,26 +466,6 @@ public class SchedulerMonitorsHandler {
         throw new ProActiveTimeoutException("timeout elapsed");
     }
 
-    public void waitWithAnyMonitor(long timeout, EventMonitor... monitors)
-            throws ProActiveTimeoutException, InterruptedException {
-        TimeoutAccounter counter = TimeoutAccounter.getAccounter(timeout);
-        synchronized (monitors) {
-            Arrays.stream(monitors).forEach(monitor -> monitor.setTimeouted(false));
-
-            while (!counter.isTimeoutElapsed()) {
-                if (Arrays.stream(monitors).anyMatch(monitor -> monitor.eventOccured)) {
-                    return;
-                }
-
-                Thread.sleep(1000);
-            }
-
-            Arrays.stream(monitors).forEach(monitor -> monitor.setTimeouted(true));
-
-        }
-        throw new ProActiveTimeoutException("timeout elapsed");
-    }
-
     //---------------------------------------------------------------//
     //Method called by SchedulerEventListener
     //---------------------------------------------------------------//

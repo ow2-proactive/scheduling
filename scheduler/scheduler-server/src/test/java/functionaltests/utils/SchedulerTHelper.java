@@ -759,41 +759,15 @@ public class SchedulerTHelper {
      * @throws Exception
      */
     public JobInfo waitForEventJobFinished(Scheduler userInterface, JobId id) throws Exception {
-        try {
-            JobEventMonitor monitorRunningToFinished = null;
-            JobEventMonitor monitorPendingToFinished = null;
-            synchronized (getSchedulerMonitorsHandler()) {
-                Optional<JobEventMonitor> opJobMonitor = getSchedulerMonitorsHandler().removeJobEvent(id,
-                                                                                                      SchedulerEvent.JOB_RUNNING_TO_FINISHED);
-                if (opJobMonitor.isPresent()) {
-                    //event occurred, remove it and return associated Job object
-                    return opJobMonitor.get().getJobInfo();
-                }
-                opJobMonitor = getSchedulerMonitorsHandler().removeJobEvent(id, SchedulerEvent.JOB_PENDING_TO_FINISHED);
-                if (opJobMonitor.isPresent()) {
-                    //event occurred, remove it and return associated Job object
-                    return opJobMonitor.get().getJobInfo();
-                }
-
-                monitorRunningToFinished = (JobEventMonitor) getSchedulerMonitorsHandler().getMonitor(new JobEventMonitor(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-                                                                                                                          id));
-                monitorPendingToFinished = (JobEventMonitor) getSchedulerMonitorsHandler().getMonitor(new JobEventMonitor(SchedulerEvent.JOB_PENDING_TO_FINISHED,
-                                                                                                                          id));
+        JobState jobState = null;
+        while (jobState == null || !jobState.isFinished()) {
+            try {
+                jobState = getSchedulerInterface().getJobState(id);
+            } catch (UnknownJobException e) {
             }
-
-            getSchedulerMonitorsHandler().waitWithAnyMonitor(0, monitorRunningToFinished, monitorPendingToFinished);
-
-            if (monitorRunningToFinished.eventOccured()) {
-                return monitorRunningToFinished.getJobInfo();
-            } else if (monitorPendingToFinished.eventOccured()) {
-                return monitorPendingToFinished.getJobInfo();
-            } else {
-                // erorr
-                return null;
-            }
-        } catch (ProActiveTimeoutException e) {
-            return null;
+            Thread.sleep(1000);
         }
+        return jobState.getJobInfo();
     }
 
     /**
