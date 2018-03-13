@@ -29,7 +29,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Vector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.utils.TimeoutAccounter;
@@ -300,6 +303,15 @@ public class SchedulerMonitorsHandler {
             return jobsEvents.get(id).remove((jobsEvents.get(id).indexOf(tmp)));
         } else
             return null;
+    }
+
+    public List<JobEventMonitor> getJobEvents(JobId id) {
+        return jobsEvents.entrySet()
+                         .stream()
+                         .filter(entry -> entry.getKey().equals(id))
+                         .map(entry -> entry.getValue())
+                         .findFirst()
+                         .orElse(new ArrayList<>());
     }
 
     /**

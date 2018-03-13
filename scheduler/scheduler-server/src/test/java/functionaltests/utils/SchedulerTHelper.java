@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 
 import com.google.common.collect.ImmutableList;
 
+import functionaltests.monitor.JobEventMonitor;
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.monitor.SchedulerMonitorsHandler;
 
@@ -752,8 +753,33 @@ public class SchedulerTHelper {
 
     public JobInfo waitForEventJobFinished(Scheduler userInterface, JobId id) throws Exception {
         try {
-            return waitForJobEvent(userInterface, id, 0, JobStatus.FINISHED, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+            return waitForJobEvent(userInterface,
+                                   id,
+                                   600000,
+                                   JobStatus.FINISHED,
+                                   SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         } catch (ProActiveTimeoutException e) {
+            JobState jobState = null;
+            try {
+                jobState = userInterface.getJobState(id);
+            } catch (UnknownJobException un) {
+                System.out.println(un);
+            }
+
+            if (jobState != null) {
+                System.out.println("jobState.getId = " + jobState.getId());
+                System.out.println("jobState.getJobInfo = " + jobState.getJobInfo());
+                System.out.println("jobState.getStatus = " + jobState.getStatus());
+                System.out.println("jobState.isFinished " + jobState.isFinished());
+                for (JobEventMonitor event : getSchedulerMonitorsHandler().getJobEvents(id)) {
+                    System.out.println("event.getJobInfo().getJobId = " + event.getJobInfo().getJobId());
+                    System.out.println("event.getJobInfo = " + event.getJobInfo());
+                    System.out.println("monitorRTF.eventOccured = " + event.eventOccured());
+                    System.out.println("monitorRTF.isTimeouted = " + event.isTimeouted());
+                    System.out.println("monitorRTF.getJobId = " + event.getJobId());
+                }
+            }
+
             //unreachable block, 0 means infinite, no timeout
             //log sthing ?
             return null;
@@ -784,6 +810,10 @@ public class SchedulerTHelper {
         return waitForJobEvent(getSchedulerInterface(), id, timeout, jobStatusAfterEvent, jobEvent);
     }
 
+    public JobInfo waitForEventPendingJobFinished(JobId id, long timeout) throws ProActiveTimeoutException {
+        return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_FINISHED, id, timeout);
+    }
+
     private JobInfo waitForJobEvent(Scheduler userInterface, JobId id, long timeout, JobStatus jobStatusAfterEvent,
             SchedulerEvent jobEvent) throws Exception {
         JobState jobState = null;
@@ -798,10 +828,6 @@ public class SchedulerTHelper {
             System.err.println("Waiting for the job finished event");
             return getSchedulerMonitorsHandler().waitForEventJob(jobEvent, id, timeout);
         }
-    }
-
-    public JobInfo waitForEventPendingJobFinished(JobId id, long timeout) throws ProActiveTimeoutException {
-        return getSchedulerMonitorsHandler().waitForEventJob(SchedulerEvent.JOB_PENDING_TO_FINISHED, id, timeout);
     }
 
     /**
