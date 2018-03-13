@@ -99,7 +99,7 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
             FileToBytesConverter.convertByteArrayToFile(implemtationClassfile, classFile);
             URLClassLoader cl = new URLClassLoader(new URL[] { f.toURL() }, this.getClass().getClassLoader());
             Class<? extends BatchJobInfrastructure> implementationClass = (Class<? extends BatchJobInfrastructure>) cl.loadClass(this.implementationClassname);
-            setBatchJobInfrastructure(implementationClass.newInstance());
+            persistedInfraVariables.put(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY, implementationClass.newInstance());
         } catch (ClassNotFoundException e) {
             throw new IllegalArgumentException("Class " + this.implementationClassname + " does not exist", e);
         } catch (MalformedURLException e) {
@@ -151,16 +151,6 @@ public class GenericBatchJobInfrastructure extends BatchJobInfrastructure {
             @Override
             public BatchJobInfrastructure handle() {
                 return (BatchJobInfrastructure) persistedInfraVariables.get(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY);
-            }
-        });
-    }
-
-    private void setBatchJobInfrastructure(final BatchJobInfrastructure batchJobInfrastructure) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                persistedInfraVariables.put(BATCH_JOB_INFRASTRUCTURE_IMPLEMENTATION_KEY, batchJobInfrastructure);
-                return null;
             }
         });
     }
