@@ -40,6 +40,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
@@ -755,7 +756,7 @@ public class SchedulerTHelper {
         try {
             return waitForJobEvent(userInterface,
                                    id,
-                                   700000, // 700s to wait, when overall junit timeout is 800s
+                                   CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() - 100000, // the idea is to put smaller timeout than existing timeout for tests
                                    JobStatus.FINISHED,
                                    SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         } catch (ProActiveTimeoutException e) {
