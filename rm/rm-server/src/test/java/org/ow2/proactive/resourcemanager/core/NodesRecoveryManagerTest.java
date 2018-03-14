@@ -31,13 +31,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
+import java.util.function.Function;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
 
@@ -64,16 +65,13 @@ public class NodesRecoveryManagerTest {
 
         nodesLockRestorationManager = null;
 
-        doReturn(new Function<RMCore, NodesLockRestorationManager>() {
-            @Override
-            public NodesLockRestorationManager apply(RMCore rmCore) {
-                nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
-                nodesLockRestorationManager = spy(nodesLockRestorationManager);
+        doReturn((Function<RMCore, NodesLockRestorationManager>) rmCore -> {
+            nodesLockRestorationManager = new NodesLockRestorationManager(rmCore);
+            nodesLockRestorationManager = spy(nodesLockRestorationManager);
 
-                doReturn(Maps.newHashMap()).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
+            doReturn(Maps.newHashMap()).when(nodesLockRestorationManager).findNodesLockedOnPreviousRun();
 
-                return nodesLockRestorationManager;
-            }
+            return nodesLockRestorationManager;
         }).when(nodesRecoveryManager).getNodesLockRestorationManagerBuilder();
 
         initialize();

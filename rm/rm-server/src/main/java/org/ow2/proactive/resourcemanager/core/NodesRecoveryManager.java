@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
@@ -42,12 +43,9 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManagerFactory;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-
-import com.google.common.base.Function;
 
 
 /**
@@ -91,12 +89,7 @@ public class NodesRecoveryManager {
     }
 
     protected Function<RMCore, NodesLockRestorationManager> getNodesLockRestorationManagerBuilder() {
-        return new Function<RMCore, NodesLockRestorationManager>() {
-            @Override
-            public NodesLockRestorationManager apply(RMCore rmCore) {
-                return new NodesLockRestorationManager(rmCore);
-            }
-        };
+        return NodesLockRestorationManager::new;
     }
 
     protected void recoverNodeSourcesAndNodes() {
