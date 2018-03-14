@@ -34,7 +34,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -45,8 +44,6 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
-import lombok.val;
 
 
 /**
