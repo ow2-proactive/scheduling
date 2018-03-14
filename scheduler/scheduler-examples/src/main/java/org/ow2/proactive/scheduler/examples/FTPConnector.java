@@ -254,7 +254,7 @@ public class FTPConnector extends JavaExecutable {
     }
 
     private List<String> uploadDirectory(FTPClient ftpClient, String remoteDirPath, String localParentDir,
-                                         String remoteParentDir) throws IOException {
+            String remoteParentDir) throws IOException {
         List<String> filesRelativePathName = new ArrayList<>();
         getOut().println("LISTING directory: " + localParentDir);
 
@@ -263,17 +263,17 @@ public class FTPConnector extends JavaExecutable {
         if (subFiles != null) {
             for (File item : subFiles) {
                 filesRelativePathName.addAll(uploadSubFilesDirectory(ftpClient,
-                        remoteDirPath,
-                        localParentDir,
-                        remoteParentDir,
-                        item));
+                                                                     remoteDirPath,
+                                                                     localParentDir,
+                                                                     remoteParentDir,
+                                                                     item));
             }
         }
         return filesRelativePathName;
     }
 
     private List<String> uploadSubFilesDirectory(FTPClient ftpClient, String remoteDirPath, String localParentDir,
-                                                 String remoteParentDir, File item) throws IOException {
+            String remoteParentDir, File item) throws IOException {
         List<String> filesRelativePathName = new ArrayList<>();
         String remoteFilePath = Paths.get(remoteDirPath, remoteParentDir, item.getName()).toString();
         if (remoteParentDir.isEmpty()) {
@@ -353,12 +353,12 @@ public class FTPConnector extends JavaExecutable {
                 }
 
                 filesRelativePathName.addAll(downloadSubFilesDirectory(ftpClient,
-                        newDirPath,
-                        filePath,
-                        saveDir,
-                        dirToList,
-                        currentFileName,
-                        aFile));
+                                                                       newDirPath,
+                                                                       filePath,
+                                                                       saveDir,
+                                                                       dirToList,
+                                                                       currentFileName,
+                                                                       aFile));
 
             }
         }
@@ -366,7 +366,7 @@ public class FTPConnector extends JavaExecutable {
     }
 
     private List<String> downloadSubFilesDirectory(FTPClient ftpClient, String newDirPath, String filePath,
-                                                   String saveDir, String dirToList, String currentFileName, FTPFile aFile) throws IOException {
+            String saveDir, String dirToList, String currentFileName, FTPFile aFile) throws IOException {
         List<String> filesRelativePathName = new ArrayList<>();
         if (aFile.isDirectory()) {
             // create the directory in saveDir
