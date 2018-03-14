@@ -71,8 +71,7 @@ public class TestJobLegacySchemas extends SchedulerFunctionalTestNoRestart {
                      .map(descriptor -> TestJobLegacySchemas.class.getResource("/functionaltests/schemas/" +
                                                                                descriptor))
                      .map(url -> {
-                         Object[] ar = new Object[1];
-                         ar[0] = url;
+                         Object[] ar = { url };
                          return ar;
                      })
                      .collect(Collectors.toList());
