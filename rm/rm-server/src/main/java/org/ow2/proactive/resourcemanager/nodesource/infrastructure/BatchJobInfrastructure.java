@@ -493,7 +493,8 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
                 throw new IllegalArgumentException("Credentials must be specified");
             }
             try {
-                setCredentials(Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                persistedInfraVariables.put(CREDENTIALS_KEY,
+                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
@@ -819,16 +820,6 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             @Override
             public Credentials handle() {
                 return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
-            }
-        });
-    }
-
-    private void setCredentials(final Credentials credentials) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                persistedInfraVariables.put(CREDENTIALS_KEY, credentials);
-                return null;
             }
         });
     }

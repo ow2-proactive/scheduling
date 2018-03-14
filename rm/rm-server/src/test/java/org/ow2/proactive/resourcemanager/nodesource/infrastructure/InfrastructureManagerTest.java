@@ -63,6 +63,9 @@ public class InfrastructureManagerTest {
     @Mock
     private NodeSourceData nodeSourceData;
 
+    @Mock
+    private InfrastructureManager infrastructureManagerMock;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -261,7 +264,26 @@ public class InfrastructureManagerTest {
         verify(dbManager, times(0)).updateNodeSource(eq(nodeSourceData));
     }
 
-    private static final class TestingInfrastructureManager extends InfrastructureManager {
+    @Test
+    public void testInternalInfrastructureConfigurationDoesNotPersistAnything() {
+        when(dbManager.getNodeSource(anyString())).thenReturn(null);
+        infrastructureManager.internalConfigure();
+        verify(nodeSource, times(0)).nodesRecoverable();
+    }
+
+    @Test
+    public void testAttemptToPersistInInternalInfrastructureConfigurationIsHandled() {
+        WrongTestingInfrastructureManager wrongInfrastructureManager = new WrongTestingInfrastructureManager();
+        wrongInfrastructureManager.setRmDbManager(dbManager);
+        when(dbManager.getNodeSource(anyString())).thenReturn(null);
+
+        wrongInfrastructureManager.internalConfigure();
+        // the invocation to the following method should still be avoided
+        // because an exception should be thrown and caught instead
+        verify(nodeSource, times(0)).nodesRecoverable();
+    }
+
+    private static class TestingInfrastructureManager extends InfrastructureManager {
 
         @Override
         public String getDescription() {
@@ -301,6 +323,23 @@ public class InfrastructureManagerTest {
         @Override
         public void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
 
+        }
+
+    }
+
+    private static final class WrongTestingInfrastructureManager extends TestingInfrastructureManager {
+
+        @Override
+        public String getDescription() {
+            return null;
+        }
+
+        @Override
+        protected void configure(Object... parameters) {
+            setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
+                persistedInfraVariables.put("testKey", "testValue");
+                return null;
+            });
         }
 
     }
