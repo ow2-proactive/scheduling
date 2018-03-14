@@ -755,28 +755,32 @@ public class SchedulerTHelper {
         try {
             return waitForJobEvent(userInterface,
                                    id,
-                                   600000,
+                                   700000, // 700s to wait, when overall junit timeout is 800s
                                    JobStatus.FINISHED,
                                    SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         } catch (ProActiveTimeoutException e) {
+            /**
+             * Print diagnostic messages in order to figure out
+             * why we did not catch Running-to-Finished event.
+             */
             JobState jobState = null;
             try {
                 jobState = userInterface.getJobState(id);
             } catch (UnknownJobException un) {
-                System.out.println(un);
+                System.err.println(un);
             }
 
             if (jobState != null) {
-                System.out.println("jobState.getId = " + jobState.getId());
-                System.out.println("jobState.getJobInfo = " + jobState.getJobInfo());
-                System.out.println("jobState.getStatus = " + jobState.getStatus());
-                System.out.println("jobState.isFinished " + jobState.isFinished());
+                System.err.println("jobState.getId = " + jobState.getId());
+                System.err.println("jobState.getJobInfo = " + jobState.getJobInfo());
+                System.err.println("jobState.getStatus = " + jobState.getStatus());
+                System.err.println("jobState.isFinished " + jobState.isFinished());
                 for (JobEventMonitor event : getSchedulerMonitorsHandler().getJobEvents(id)) {
-                    System.out.println("event.getJobInfo().getJobId = " + event.getJobInfo().getJobId());
-                    System.out.println("event.getJobInfo = " + event.getJobInfo());
-                    System.out.println("monitorRTF.eventOccured = " + event.eventOccured());
-                    System.out.println("monitorRTF.isTimeouted = " + event.isTimeouted());
-                    System.out.println("monitorRTF.getJobId = " + event.getJobId());
+                    System.err.println("event.getJobInfo().getJobId = " + event.getJobInfo());
+                    System.err.println("event.getJobInfo = " + event.getJobInfo());
+                    System.err.println("monitorRTF.eventOccured = " + event.eventOccured());
+                    System.err.println("monitorRTF.isTimeouted = " + event.isTimeouted());
+                    System.err.println("monitorRTF.getJobId = " + event.getJobId());
                 }
             }
 

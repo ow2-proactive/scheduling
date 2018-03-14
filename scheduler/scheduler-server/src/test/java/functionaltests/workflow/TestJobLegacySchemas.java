@@ -31,15 +31,22 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import lombok.val;
 
 
 /**
@@ -55,31 +62,40 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  * @author The ProActive Team
  * @since ProActive Scheduling 3.4.0
  */
+@RunWith(Parameterized.class)
 public class TestJobLegacySchemas extends SchedulerFunctionalTestNoRestart {
 
     private static String[] jobDescriptorsLoc = { "3_0/Job_Schemas.xml", "3_1/Job_Schemas.xml", "3_2/Job_Schemas.xml",
                                                   "3_3/Job_Schemas.xml", "3_4/Job_Schemas.xml", "3_5/Job_Schemas.xml" };
 
-    private URL[] jobDescriptors = new URL[jobDescriptorsLoc.length];
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return Arrays.stream(jobDescriptorsLoc)
+                     .map(descriptor -> TestJobLegacySchemas.class.getResource("/functionaltests/schemas/" +
+                                                                               descriptor))
+                     .map(url -> {
+                         Object[] ar = new Object[1];
+                         ar[0] = url;
+                         return ar;
+                     })
+                     .collect(Collectors.toList());
+    }
 
-    {
-        for (int i = 0; i < jobDescriptorsLoc.length; i++) {
-            jobDescriptors[i] = TestJobLegacySchemas.class.getResource("/functionaltests/schemas/" +
-                                                                       jobDescriptorsLoc[i]);
-        }
+    private URL jobDescriptor;
+
+    public TestJobLegacySchemas(URL jobDescriptor) {
+        this.jobDescriptor = jobDescriptor;
     }
 
     @Test
     public void testJobLegacySchemas() throws Throwable {
-        for (URL jobDescriptor : jobDescriptors) {
-            log("Testing submission of job descriptor : " + jobDescriptor);
-            prepareDataspaceFolder();
-            String jobDescPath = new File(jobDescriptor.toURI()).getAbsolutePath();
-            Job testJob = JobFactory.getFactory().createJob(jobDescPath);
-            // This line prints the debug information of the job, checking that no toString method produces a NPE
-            log(testJob.display());
-            schedulerHelper.testJobSubmission(jobDescPath);
-        }
+        log("Testing submission of job descriptor : " + jobDescriptor);
+        prepareDataspaceFolder();
+        String jobDescPath = new File(jobDescriptor.toURI()).getAbsolutePath();
+        Job testJob = JobFactory.getFactory().createJob(jobDescPath);
+        // This line prints the debug information of the job, checking that no toString method produces a NPE
+        log(testJob.display());
+        schedulerHelper.testJobSubmission(jobDescPath);
     }
 
     private void prepareDataspaceFolder() throws IOException {
