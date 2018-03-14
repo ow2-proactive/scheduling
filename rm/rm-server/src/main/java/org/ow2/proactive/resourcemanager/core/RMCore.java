@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -1698,37 +1699,35 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * Builds and returns a snapshot of RMCore's current state. Initial state
      * must be understood as a new Monitor point of view. A new monitor start to
      * receive RMCore events, so must be informed of the current state of the
-     * Core at the beginning of monitoring.
+     * Core at the beginning of monitoring. The monitor is built in three parts
+     * first with all the nodes knows by the RMCore, then with all deploying
+     * nodes known by the deployed node sources and then with all the defined
+     * node sources.
      *
      * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState() {
 
-        Map<String, RMNodeEvent> nodeEvents = new HashMap<>(this.allNodes.size());
+        final Map<String, RMNodeEvent> nodeEvents = this.allNodes.values()
+                                                                 .stream()
+                                                                 .map(RMNode::createNodeEvent)
+                                                                 .collect(Collectors.toMap(RMNodeEvent::getNodeUrl,
+                                                                                           event -> event));
 
-        for (RMNode rmnode : this.allNodes.values()) {
-            final RMNodeEvent nodeEvent = rmnode.createNodeEvent();
-            nodeEvents.put(nodeEvent.getNodeUrl(), nodeEvent);
-        }
-
-        Map<String, RMNodeSourceEvent> nodeSourcesList = new HashMap<>(this.deployedNodeSources.size());
-
-        for (NodeSource nodeSource : this.definedNodeSources.values()) {
-            nodeSourcesList.put(nodeSource.getName(),
-                                new RMNodeSourceEvent(nodeSource.getName(),
-                                                      nodeSource.getDescription(),
-                                                      nodeSource.getAdministrator().getName(),
-                                                      nodeSource.getStatus().toString()));
-
-            if (this.deployedNodeSources.containsKey(nodeSource.getName())) {
-                for (RMDeployingNode node : nodeSource.getDeployingAndLostNodes()) {
-                    final RMNodeEvent nodeEvent = node.createNodeEvent();
-                    nodeEvents.put(nodeEvent.getNodeUrl(), nodeEvent);
-                }
+        for (NodeSource source : this.deployedNodeSources.values()) {
+            for (RMDeployingNode node : source.getDeployingAndLostNodes()) {
+                final RMNodeEvent nodeEvent = node.createNodeEvent();
+                nodeEvents.put(nodeEvent.getNodeUrl(), nodeEvent);
             }
         }
 
-        return new RMInitialState(nodeEvents, nodeSourcesList);
+        final Map<String, RMNodeSourceEvent> nodeSourceEvents = this.definedNodeSources.values()
+                                                                                       .stream()
+                                                                                       .map(NodeSource::createNodeSourceEvent)
+                                                                                       .collect(Collectors.toMap(RMNodeSourceEvent::getSourceName,
+                                                                                                                 event -> event));
+
+        return new RMInitialState(nodeEvents, nodeSourceEvents);
     }
 
     /**

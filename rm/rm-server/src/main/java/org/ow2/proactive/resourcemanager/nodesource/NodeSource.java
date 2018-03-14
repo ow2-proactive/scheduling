@@ -989,4 +989,11 @@ public class NodeSource implements InitActive, RunActive {
     public String getRegistrationURL() {
         return this.registrationURL;
     }
+
+    public RMNodeSourceEvent createNodeSourceEvent() {
+        return new RMNodeSourceEvent(this.name,
+                                     this.description,
+                                     this.administrator.getName(),
+                                     this.getStatus().toString());
+    }
 }
