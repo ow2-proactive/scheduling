@@ -756,7 +756,7 @@ public class SchedulerTHelper {
         try {
             return waitForJobEvent(userInterface,
                                    id,
-                                   CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue() - 100000, // the idea is to put smaller timeout than existing timeout for tests
+                                   (long) (0.8 * CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue()), // the idea is to put smaller timeout (80%) than existing timeout for tests
                                    JobStatus.FINISHED,
                                    SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         } catch (ProActiveTimeoutException e) {
