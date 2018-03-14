@@ -26,7 +26,6 @@
 package functionaltests.utils;
 
 import java.io.File;
-import java.util.List;
 
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
@@ -35,7 +34,6 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
-import org.ow2.tests.ProActiveSetup;
 
 import functionaltests.monitor.RMMonitorsHandler;
 
@@ -81,7 +79,7 @@ public class RMNodeSourceHelper {
             RMMonitorsHandler monitor) {
 
         RMTHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_REMOVED, numberOfNodesToBeRemoved, monitor);
-        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_UNDEPLOYED, name, monitor);
+        RMTHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN, name, monitor);
     }
 
     public static void waitForNodeSourceRemoval(String name, int numberOfNodesToBeRemoved, RMMonitorsHandler monitor) {

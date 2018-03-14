@@ -651,12 +651,8 @@ public class NodeSource implements InitActive, RunActive {
             }
         }
 
-        if (toShutdown && nodes.size() == 0) {
-            if (this.getStatus().equals(NodeSourceStatus.NODES_UNDEPLOYED)) {
-                shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_UNDEPLOYED);
-            } else {
-                shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_REMOVED);
-            }
+        if (this.toShutdown && this.nodes.size() == 0) {
+            this.shutdownNodeSourceServices(initiator);
         }
 
         return new BooleanWrapper(true);
@@ -670,20 +666,7 @@ public class NodeSource implements InitActive, RunActive {
         this.toShutdown = true;
 
         if (this.nodes.size() == 0) {
-            this.shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_REMOVED);
-        }
-        return new BooleanWrapper(true);
-    }
-
-    /**
-     * Undeploy the node source, shut down policy, and release nodes.
-     */
-    public BooleanWrapper undeploy(Client initiator) {
-        logger.info("[" + this.name + "] is shutting down by " + initiator);
-        this.toShutdown = true;
-
-        if (this.nodes.size() == 0) {
-            this.shutdownNodeSourceServices(initiator, RMEventType.NODESOURCE_UNDEPLOYED);
+            this.shutdownNodeSourceServices(initiator);
         }
         return new BooleanWrapper(true);
     }
@@ -768,17 +751,11 @@ public class NodeSource implements InitActive, RunActive {
 
     /**
      * Initiates node source services shutdown, such as pinger, policy, thread pool.
-     * @param initiator
      */
-    protected void shutdownNodeSourceServices(Client initiator, RMEventType eventType) {
+    protected void shutdownNodeSourceServices(Client initiator) {
         logger.info("[" + this.name + "] Shutdown finalization");
 
-        if (eventType.equals(RMEventType.NODESOURCE_UNDEPLOYED)) {
-            this.activePolicy.undeploy(initiator);
-        } else if (this.descriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
-            this.activePolicy.shutdown(initiator);
-        }
-
+        this.activePolicy.shutdown(initiator);
         this.infrastructureManager.internalShutDown();
     }
 
@@ -786,29 +763,17 @@ public class NodeSource implements InitActive, RunActive {
      * Terminates a node source active object when the policy is shutdown. 
      */
     public void finishNodeSourceShutdown(Client initiator) {
-        PAFuture.waitFor(rmcore.nodeSourceUnregister(name,
-                                                     new RMNodeSourceEvent(RMEventType.NODESOURCE_REMOVED,
-                                                                           initiator.getName(),
-                                                                           this.getName(),
-                                                                           this.getDescription(),
-                                                                           this.getAdministrator().getName(),
-                                                                           descriptor.getStatus().toString())));
 
-        PAActiveObject.terminateActiveObject(false);
-    }
+        NodeSourceStatus status = this.descriptor.getStatus();
 
-    /**
-     * Undeploy a node source active object when the policy is shutdown.
-     */
-    public void finishNodeSourceUndeploy(Client initiator) {
         PAFuture.waitFor(this.rmcore.nodeSourceUnregister(this.name,
-                                                          new RMNodeSourceEvent(RMEventType.NODESOURCE_UNDEPLOYED,
+                                                          status,
+                                                          new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
                                                                                 initiator.getName(),
                                                                                 this.getName(),
                                                                                 this.getDescription(),
                                                                                 this.getAdministrator().getName(),
-                                                                                this.descriptor.getStatus()
-                                                                                               .toString())));
+                                                                                status.toString())));
 
         PAActiveObject.terminateActiveObject(false);
     }

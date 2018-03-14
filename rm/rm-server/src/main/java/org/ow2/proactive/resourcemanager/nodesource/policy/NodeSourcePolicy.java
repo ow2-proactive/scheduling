@@ -115,18 +115,6 @@ public abstract class NodeSourcePolicy implements Serializable {
     }
 
     /**
-     * Undeploy the policy
-     */
-    public void undeploy(Client initiator) {
-
-        this.nodeSource.finishNodeSourceUndeploy(initiator);
-
-        this.nodeSource.getRMCore().disconnect(Client.getId(PAActiveObject.getStubOnThis()));
-
-        PAActiveObject.terminateActiveObject(false);
-    }
-
-    /**
      * Policy description for UI
      * @return policy description
      */

@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
@@ -168,7 +167,7 @@ public class RMListenerProxy extends RMGroupEventListener {
                 rmInitialState.nodeSourceAdded(event);
                 break;
             case NODESOURCE_CREATED:
-            case NODESOURCE_UNDEPLOYED:
+            case NODESOURCE_SHUTDOWN:
                 rmInitialState.nodeSourceStateChanged(event);
                 break;
             case NODESOURCE_REMOVED:

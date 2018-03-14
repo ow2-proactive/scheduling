@@ -81,21 +81,6 @@ public abstract class RMAwareNodeSourcePolicy extends NodeSourcePolicy implement
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void undeploy(Client initiator) {
-        if (!rmShuttingDown) {
-            try {
-                rmMonitoring.removeRMEventListener();
-            } catch (RMException e) {
-                e.printStackTrace();
-            }
-        }
-        super.undeploy(initiator);
-    }
-
-    /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#rmEvent(org.ow2.proactive.resourcemanager.common.event.RMEvent)
      */
     public void rmEvent(RMEvent event) {

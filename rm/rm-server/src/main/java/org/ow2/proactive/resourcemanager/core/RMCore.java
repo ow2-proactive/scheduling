@@ -1482,7 +1482,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // delegate the removal process to the node source that will
             // eventually call back the RMCore to unregister the deployed node
             // source
-            nodeSourceToRemove.undeploy(this.caller);
+            nodeSourceToRemove.shutdown(this.caller);
 
             this.updateNodeSourceDescriptorWithStatusAndPersist(this.definedNodeSources.get(nodeSourceName)
                                                                                        .getDescriptor(),
@@ -1770,40 +1770,61 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Unregisters node source from the resource manager core.
      */
-    public BooleanWrapper nodeSourceUnregister(String nodeSourceName, RMNodeSourceEvent evt) {
-
-        if (!evt.getEventType().equals(RMEventType.NODESOURCE_REMOVED) &&
-            !evt.getEventType().equals(RMEventType.NODESOURCE_UNDEPLOYED)) {
-            throw new IllegalArgumentException("Event " + evt.getEventType() +
-                                               " is incompatible with the node source unregister action");
-        }
+    public BooleanWrapper nodeSourceUnregister(String nodeSourceName, NodeSourceStatus nodeSourceStatus,
+            RMNodeSourceEvent evt) {
 
         NodeSource nodeSource = this.deployedNodeSources.remove(nodeSourceName);
 
         if (nodeSource == null) {
             logger.warn("Attempt to remove non-existing node source " + nodeSourceName);
-            new BooleanWrapper(false);
+            return new BooleanWrapper(false);
         }
 
-        UniqueID id = Client.getId(nodeSource);
-        if (id != null) {
-            this.disconnect(id);
-        } else {
-            logger.error("Cannot extract the body id of the node source " + nodeSourceName);
-        }
+        this.disconnectNodeSourceClient(nodeSourceName, nodeSource);
 
-        // currently, two events can end up in unregistering the node source:
-        // node source removal and node source undeployment
         logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
                     evt.getEventType().getDescription());
 
         this.monitoring.nodeSourceEvent(evt);
+
+        this.emitRemovedEventIfNodeSourceWasNotUndeployed(nodeSource, nodeSourceStatus);
 
         if ((this.deployedNodeSources.isEmpty()) && this.toShutDown) {
             this.finalizeShutdown();
         }
 
         return new BooleanWrapper(true);
+    }
+
+    private void emitRemovedEventIfNodeSourceWasNotUndeployed(NodeSource nodeSource,
+            NodeSourceStatus nodeSourceStatus) {
+
+        if (!nodeSourceStatus.equals(NodeSourceStatus.NODES_UNDEPLOYED)) {
+
+            String nodeSourceAdministratorName = nodeSource.getAdministrator().getName();
+            String nodeSourceName = nodeSource.getName();
+
+            RMNodeSourceEvent removedEvent = new RMNodeSourceEvent(RMEventType.NODESOURCE_REMOVED,
+                                                                   nodeSourceAdministratorName,
+                                                                   nodeSourceName,
+                                                                   nodeSource.getDescription(),
+                                                                   nodeSourceAdministratorName,
+                                                                   nodeSourceStatus.toString());
+
+            logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
+                        removedEvent.getEventType().getDescription());
+
+            this.monitoring.nodeSourceEvent(removedEvent);
+        }
+    }
+
+    private void disconnectNodeSourceClient(String nodeSourceName, NodeSource nodeSource) {
+        UniqueID id = Client.getId(nodeSource);
+        if (id != null) {
+            this.disconnect(id);
+        } else {
+            logger.error("Cannot extract the body id of the node source " + nodeSourceName);
+        }
     }
 
     private void finalizeShutdown() {

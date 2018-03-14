@@ -117,12 +117,6 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
         super.shutdown(initiator);
     }
 
-    @Override
-    public void undeploy(Client initiator) {
-        timer.cancel();
-        super.undeploy(initiator);
-    }
-
     /**
      * Description for the UI
      */
