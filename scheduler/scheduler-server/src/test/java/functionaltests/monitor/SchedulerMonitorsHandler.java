@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Vector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.utils.TimeoutAccounter;
@@ -137,10 +135,10 @@ public class SchedulerMonitorsHandler {
     public JobState waitForEventJobSubmitted(JobId id, long timeout) throws ProActiveTimeoutException {
         JobEventMonitor monitor = null;
         synchronized (this) {
-            monitor = removeJobEvent(id, SchedulerEvent.JOB_SUBMITTED);
-            if (monitor != null) {
+            final Optional<JobEventMonitor> opMonitor = removeJobEvent(id, SchedulerEvent.JOB_SUBMITTED);
+            if (opMonitor.isPresent()) {
                 //event occurred, remove it and return associated Job object
-                return monitor.getJobState();
+                return opMonitor.get().getJobState();
             }
             monitor = (JobEventMonitor) getMonitor(new JobEventMonitor(SchedulerEvent.JOB_SUBMITTED, id));
         }
@@ -163,10 +161,10 @@ public class SchedulerMonitorsHandler {
     public JobInfo waitForEventJob(SchedulerEvent event, JobId id, long timeout) throws ProActiveTimeoutException {
         JobEventMonitor monitor = null;
         synchronized (this) {
-            monitor = removeJobEvent(id, event);
-            if (monitor != null) {
+            final Optional<JobEventMonitor> opMonitor = removeJobEvent(id, event);
+            if (opMonitor.isPresent()) {
                 //event occurred, remove it and return associated Job object
-                return monitor.getJobInfo();
+                return opMonitor.get().getJobInfo();
             }
             monitor = (JobEventMonitor) getMonitor(new JobEventMonitor(event, id));
         }
@@ -297,12 +295,12 @@ public class SchedulerMonitorsHandler {
      * @param event type to look for
      * @return removed JobEventMonitor, or null if not exists.
      */
-    private JobEventMonitor removeJobEvent(JobId id, SchedulerEvent event) {
+    private Optional<JobEventMonitor> removeJobEvent(JobId id, SchedulerEvent event) {
         JobEventMonitor tmp = new JobEventMonitor(event, id);
         if (jobsEvents.containsKey(id) && jobsEvents.get(id).contains(tmp)) {
-            return jobsEvents.get(id).remove((jobsEvents.get(id).indexOf(tmp)));
+            return Optional.of(jobsEvents.get(id).remove((jobsEvents.get(id).indexOf(tmp))));
         } else
-            return null;
+            return Optional.empty();
     }
 
     public List<JobEventMonitor> getJobEvents(JobId id) {
