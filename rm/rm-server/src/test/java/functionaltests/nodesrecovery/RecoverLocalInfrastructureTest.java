@@ -72,8 +72,11 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
     @After
     public void tearDown() throws Exception {
-
-        RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
+        try {
+            RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
+        } catch (NodesRecoveryProcessHelper.ProcessNotFoundException e) {
+            RMTHelper.log("Cannot kill the node process: " + e.getMessage());
+        }
     }
 
     @Test

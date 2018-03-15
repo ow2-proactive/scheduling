@@ -41,12 +41,7 @@ public class RecoverInfrastructureTestHelper {
 
     public static void killNodesWithStrongSigKill() throws Exception {
         RMTHelper.log("Kill nodes abruptly (for the sake of down nodes recovery test -- expect exceptions)");
-        try {
-            NodesRecoveryProcessHelper.findPidAndSendSigKill(RMNodeStarter.class.getSimpleName());
-        } catch (NodesRecoveryProcessHelper.ProcessNotFoundException e) {
-            RMTHelper.log("Cannot kill the node process: " + e.getMessage());
-        }
-
+        NodesRecoveryProcessHelper.findPidAndSendSigKill(RMNodeStarter.class.getSimpleName());
     }
 
     public static void killRmWithStrongSigKill() throws Exception {
