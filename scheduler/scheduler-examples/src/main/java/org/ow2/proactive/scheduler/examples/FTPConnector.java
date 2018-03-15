@@ -33,16 +33,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -50,6 +45,7 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.zeroturnaround.zip.ZipUtil;
 
 
 /**
@@ -70,8 +66,7 @@ public class FTPConnector extends JavaExecutable {
 
     private boolean ftpExtractArchive;
 
-    //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
-    private String ftpLocalFilePath = getLocalSpace();
+    private String ftpLocalFilePath = null;
 
     private String ftpRemoteFilePath = null;
 
@@ -94,18 +89,26 @@ public class FTPConnector extends JavaExecutable {
         if (args.containsKey("ftpPort")) {
             ftpPort = Integer.parseInt(args.get("ftpPort").toString());
         }
+        if (args.containsKey("ftpMode")) {
+            ftpMode = args.get("ftpMode").toString();
+        }
         if (args.containsKey("ftpExtractArchive")) {
             ftpExtractArchive = Boolean.parseBoolean(args.get("ftpExtractArchive").toString());
         }
-        if (args.containsKey(FTP_LOCAL_FILE_PATH) && args.get(FTP_LOCAL_FILE_PATH).toString() != null) {
+        if (args.containsKey(FTP_LOCAL_FILE_PATH) && !args.get(FTP_LOCAL_FILE_PATH).toString().isEmpty()) {
             ftpLocalFilePath = args.get(FTP_LOCAL_FILE_PATH).toString();
+        } else {
+            //We throw an exception tp prevent transferring all the contents of the global space.
+            if (ftpMode.equals("PUT")) {
+                throw new IllegalArgumentException("You have to specify the local resource path. Empty value is not allowed.");
+            }
+            //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
+            ftpLocalFilePath = getLocalSpace();
         }
         if (args.containsKey("ftpRemoteFilePath")) {
             ftpRemoteFilePath = args.get("ftpRemoteFilePath").toString();
         }
-        if (args.containsKey("ftpMode")) {
-            ftpMode = args.get("ftpMode").toString();
-        }
+
         ftpUsername = getThirdPartyCredential("FTP_USERNAME");
         ftpPassword = getThirdPartyCredential("FTP_PASSWORD");
         if (ftpUsername == null || ftpPassword == null) {
@@ -176,7 +179,8 @@ public class FTPConnector extends JavaExecutable {
 
             // If the file is a zip, and ftpExtractArchive is set to true
             if (ftpExtractArchive && ftpRemoteFilePath.endsWith(".zip")) {
-                extractArchive(saveFilePath);
+                ZipUtil.unpack(new File(saveFilePath), new File(ftpLocalFilePath));
+                //extractArchive(saveFilePath);
             }
         } // If it is a folder, download all its contents recursively
         else {
@@ -185,34 +189,6 @@ public class FTPConnector extends JavaExecutable {
         }
         getOut().println("END Import file(s) from FTP.");
         return filesRelativePathName;
-    }
-
-    private void extractArchive(String saveFilePath) throws IOException {
-        try (ZipFile zipFile = new ZipFile(saveFilePath)) {
-            // Create an enumeration of the entries in the zip file
-            Enumeration zipFileEntries = zipFile.entries();
-            // Process each entry
-            while (zipFileEntries.hasMoreElements()) {
-                // grab a zip file entry
-                ZipEntry entry = (ZipEntry) zipFileEntries.nextElement();
-                Path path = Paths.get(ftpLocalFilePath, entry.getName());
-                getOut().println("path: " + path.toString());
-                if (entry.isDirectory()) {
-                    Files.createDirectories(path);
-                } else {
-                    Path parentDir = path.getParent();
-                    getOut().println("parentDir of path: " + parentDir.toString());
-                    if (!Files.exists(parentDir)) {
-                        Files.createDirectories(parentDir);
-                    }
-                    if (Files.exists(path)) {
-                        new File(path.toString()).delete();
-                    }
-
-                    Files.copy(zipFile.getInputStream(entry), path);
-                }
-            }
-        }
     }
 
     private List<String> FtpPut(FTPClient ftpClient) throws IOException {
@@ -405,5 +381,4 @@ public class FTPConnector extends JavaExecutable {
             return ftpClient.retrieveFile(remoteFilePath, outputStream);
         }
     }
-
 }
