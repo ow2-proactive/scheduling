@@ -5,6 +5,8 @@ dependencies {
             "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
     )
     compile group: 'commons-net', name: 'commons-net', version: '3.3'
+    compile group: 'org.zeroturnaround', name: 'zt-zip', version: '1.12'
+
 }
 
 task stub(type: StubTask) {
