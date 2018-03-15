@@ -27,22 +27,28 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.truth.Truth.assertThat;
 import static functionaltests.nodesrecovery.RecoverInfrastructureTestHelper.NODES_RECOVERABLE;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import java.io.Serializable;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 
 

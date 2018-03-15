@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
@@ -42,12 +43,9 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManagerFactory;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-
-import com.google.common.base.Function;
 
 
 /**
@@ -91,12 +89,7 @@ public class NodesRecoveryManager {
     }
 
     protected Function<RMCore, NodesLockRestorationManager> getNodesLockRestorationManagerBuilder() {
-        return new Function<RMCore, NodesLockRestorationManager>() {
-            @Override
-            public NodesLockRestorationManager apply(RMCore rmCore) {
-                return new NodesLockRestorationManager(rmCore);
-            }
-        };
+        return NodesLockRestorationManager::new;
     }
 
     protected void recoverNodeSourcesAndNodes() {
@@ -178,21 +171,10 @@ public class NodesRecoveryManager {
     private void recoverNodeSourceSuccessfullyOrRemove(NodeSourceData nodeSourceData, String nodeSourceName) {
         try {
             logger.info("Recover node source " + nodeSourceName);
-            // retrieve node source status
-            boolean deployNodeSource = false;
-            if (nodeSourceData.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
-                // reset node source status to be able to deploy again
-                nodeSourceData.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
-                deployNodeSource = true;
-            }
-            this.rmCore.prepareNodeSource(nodeSourceData);
-            if (deployNodeSource) {
-                this.rmCore.deployNodeSource(nodeSourceName);
-            }
+            this.rmCore.recoverNodeSource(nodeSourceData.toNodeSourceDescriptor());
         } catch (Throwable t) {
             logger.error("Failed to recover node source " + nodeSourceName, t);
-            this.rmCore.removeNodeSource(nodeSourceName);
-            this.rmCore.getDbManager().removeNodeSource(nodeSourceName);
+            this.rmCore.removeNodeSource(nodeSourceName, true);
         }
     }
 
