@@ -88,22 +88,23 @@ public class ExecuterInformationData implements Serializable {
                 if (loadFullState) {
                     logger.warn("Task launcher " + taskLauncherNodeUrl + " of task " + taskId +
                                 " cannot be looked up, try to rebind it");
-                    taskLauncher = getReboundTaskLauncher(e);
+                    taskLauncher = getReboundTaskLauncherIfStillExist(e);
                 }
             }
         }
         return new ExecuterInformation(taskLauncher, nodes, nodeName, hostName);
     }
 
-    private TaskLauncher getReboundTaskLauncher(Exception e) {
+    private TaskLauncher getReboundTaskLauncherIfStillExist(Exception e) {
         try {
             logger.debug("List AOs on " + taskLauncherNodeUrl + " (expect only one): " +
                          Arrays.toString(NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects()));
             Object[] aos = NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects();
             return (TaskLauncher) aos[0];
         } catch (Throwable t) {
-            logger.error("Failed to rebind TaskLauncher " + taskLauncherNodeUrl + " of task " + taskId +
-                         " after exception " + e.getMessage(), t);
+            logger.warn("Failed to rebind TaskLauncher of task " + taskId + ". TaskLauncher with node URL: " +
+                        taskLauncherNodeUrl +
+                        " could not be looked up. Running task cannot be recovered, it will be restarted if possible.");
             return new TaskLauncher();
         }
     }
