@@ -106,10 +106,10 @@ public abstract class NodeSourcePolicy implements Serializable {
      * Shutdown the policy
      */
     public void shutdown(Client initiator) {
-        nodeSource.finishNodeSourceShutdown(initiator);
-        // the policy shutdown is finished and it has to be removed from clients
-        // list of the resource manager
-        nodeSource.getRMCore().disconnect(Client.getId(PAActiveObject.getStubOnThis()));
+
+        this.nodeSource.finishNodeSourceShutdown(initiator);
+
+        this.nodeSource.getRMCore().disconnect(Client.getId(PAActiveObject.getStubOnThis()));
 
         PAActiveObject.terminateActiveObject(false);
     }

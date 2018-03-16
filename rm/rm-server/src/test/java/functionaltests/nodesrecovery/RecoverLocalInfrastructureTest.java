@@ -40,6 +40,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
 import functionaltests.utils.RMFunctionalTest;
@@ -65,62 +66,100 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
     @Before
     public void setup() throws Exception {
-        startRmAndCheckInitialState();
+
+        this.startRmAndCheckInitialState();
     }
 
     @After
     public void tearDown() throws Exception {
-        // kill the remaining nodes that were preserved for the test
-        RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
+        try {
+            RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
+        } catch (NodesRecoveryProcessHelper.ProcessNotFoundException e) {
+            RMTHelper.log("Cannot kill the node process: " + e.getMessage());
+        }
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithAliveNodes() throws Exception {
-        // kill only the RM by sending a SIGKILL and leave node processes alive
+
+        this.createNodeSourceAndCheckState();
+
         RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
-        // nodes should be re-taken into account by the restarted RM
-        restartRmAndCheckFinalState(false);
+
+        this.restartRmAndCheckFinalState(false);
+
+        this.checkNodesStateAfterRecovery(NODE_NUMBER);
     }
 
     @Test
     public void testRecoverLocalInfrastructureWithDownNodes() throws Exception {
-        // kill RM and nodes with SIGKILL
+
+        this.createNodeSourceAndCheckState();
+
         RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
-        // nodes should be re-deployed by the restarted RM
-        restartRmAndCheckFinalState(true);
+
+        this.restartRmAndCheckFinalState(true);
+
+        this.checkNodesStateAfterRecovery(NODE_NUMBER);
+    }
+
+    @Test
+    public void testRecoverUndeployedNodeSource() throws Exception {
+
+        this.defineNodeSourceAndCheckState();
+
+        this.restartRmAndCheckFinalState(false);
+
+        this.checkNodesStateAfterRecovery(0);
     }
 
     private void startRmWithConfig(String configurationFilePath) throws Exception {
         String rmconf = new File(RMTHelper.class.getResource(configurationFilePath).toURI()).getAbsolutePath();
-        rmHelper.startRM(rmconf);
-        resourceManager = rmHelper.getResourceManager();
+        this.rmHelper.startRM(rmconf);
+        this.resourceManager = this.rmHelper.getResourceManager();
     }
 
     private void startRmAndCheckInitialState() throws Exception {
         // start RM
-        startRmWithConfig(START_CONFIG);
+        this.startRmWithConfig(START_CONFIG);
         assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isTrue();
-        assertThat(rmHelper.isRMStarted()).isTrue();
+        assertThat(this.rmHelper.isRMStarted()).isTrue();
 
         // check the initial state of the RM
-        assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(0);
-        rmHelper.createNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME, NODE_NUMBER);
-        RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
+        assertThat(this.resourceManager.getState().getAllNodes().size()).isEqualTo(0);
+    }
+
+    private void createNodeSourceAndCheckState() throws Exception {
+        this.rmHelper.createNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME, NODE_NUMBER);
+        RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
+
+        List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState().getNodeSource();
+        assertThat(nodeSourceEventPerNodeSource.size()).isEqualTo(1);
+
+        RMNodeSourceEvent rmNodeSourceEvent = nodeSourceEventPerNodeSource.get(0);
+        assertThat(rmNodeSourceEvent.getSourceName()).isEqualTo(NODE_SOURCE_NAME);
+        assertThat(rmNodeSourceEvent.getNodeSourceStatus()).isEqualTo(NodeSourceStatus.NODES_DEPLOYED.toString());
+
+        assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(NODE_NUMBER);
+    }
+
+    private void defineNodeSourceAndCheckState() throws Exception {
+        this.rmHelper.defineNodeSource(NODE_SOURCE_NAME, NODE_NUMBER);
+        RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
         List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState().getNodeSource();
         assertThat(nodeSourceEventPerNodeSource.size()).isEqualTo(1);
         assertThat(nodeSourceEventPerNodeSource.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
-        assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(NODE_NUMBER);
     }
 
     private void restartRmAndCheckFinalState(boolean nodesShouldBeRecreated) throws Exception {
         // restart RM
-        rmHelper = new RMTHelper();
-        startRmWithConfig(RESTART_CONFIG);
+        this.rmHelper = new RMTHelper();
+        this.startRmWithConfig(RESTART_CONFIG);
         assertThat(PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean()).isFalse();
-        assertThat(rmHelper.isRMStarted()).isTrue();
+        assertThat(this.rmHelper.isRMStarted()).isTrue();
 
         // re-snapshot the RM state
-        RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
+        RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
         List<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
 
         // the node source has been recovered on restart: we should have one node source with the same name
@@ -129,22 +168,27 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
         // wait for nodes to be recreated if needed
         if (nodesShouldBeRecreated) {
-            rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NODE_NUMBER);
+            this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NODE_NUMBER);
         }
+    }
 
+    private void checkNodesStateAfterRecovery(int expectedNumberOfNodes) {
+        RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
         // the nodes should have been recovered too, and should be alive
         Set<String> allNodes = resourceManagerMonitor.getState().getAllNodes();
-        assertThat(allNodes.size()).isEqualTo(NODE_NUMBER);
+        assertThat(allNodes.size()).isEqualTo(expectedNumberOfNodes);
         Set<String> nodeSourceNames = new HashSet<>();
         nodeSourceNames.add(NODE_SOURCE_NAME);
-        Set<String> aliveNodeUrls = resourceManager.listAliveNodeUrls(nodeSourceNames);
-        assertThat(aliveNodeUrls.size()).isEqualTo(NODE_NUMBER);
+        Set<String> aliveNodeUrls = this.resourceManager.listAliveNodeUrls(nodeSourceNames);
+        assertThat(aliveNodeUrls.size()).isEqualTo(expectedNumberOfNodes);
 
-        // the recovered nodes should be usable, try to lock/unlock them to see
-        BooleanWrapper lockSucceeded = resourceManager.lockNodes(allNodes);
-        assertThat(lockSucceeded).isEqualTo(new BooleanWrapper(true));
-        BooleanWrapper unlockSucceeded = resourceManager.unlockNodes(allNodes);
-        assertThat(unlockSucceeded).isEqualTo(new BooleanWrapper(true));
+        if (expectedNumberOfNodes > 0) {
+            // the recovered nodes should be usable, try to lock/unlock them to see
+            BooleanWrapper lockSucceeded = this.resourceManager.lockNodes(allNodes);
+            assertThat(lockSucceeded).isEqualTo(new BooleanWrapper(true));
+            BooleanWrapper unlockSucceeded = this.resourceManager.unlockNodes(allNodes);
+            assertThat(unlockSucceeded).isEqualTo(new BooleanWrapper(true));
+        }
     }
 
 }

@@ -51,8 +51,7 @@ public class DefineNodeSourceCommand extends AbstractCommand implements Command 
     private String nodesRecoverable;
 
     public DefineNodeSourceCommand(String nodeSource) {
-        this.nodeSource = nodeSource;
-        this.nodesRecoverable = "true";
+        this(nodeSource, Boolean.toString(true));
     }
 
     public DefineNodeSourceCommand(String nodeSource, String nodesRecoverable) {
@@ -95,4 +94,5 @@ public class DefineNodeSourceCommand extends AbstractCommand implements Command 
 
         }
     }
+
 }

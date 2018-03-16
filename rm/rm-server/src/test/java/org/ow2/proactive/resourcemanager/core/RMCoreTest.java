@@ -135,6 +135,7 @@ public class RMCoreTest {
         MockitoAnnotations.initMocks(this);
         when(mockedNodeSource.getDescriptor()).thenReturn(nodeSourceDescriptor);
         when(nodeSourceDescriptor.getStatus()).thenReturn(NodeSourceStatus.NODES_DEPLOYED);
+        when(mockedNodeSource.getStatus()).thenReturn(NodeSourceStatus.NODES_DEPLOYED);
         populateRMCore();
     }
 

@@ -38,34 +38,45 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
-public class DeployNodeSourceCommand extends AbstractCommand implements Command {
+public class UndeployNodeSourceCommand extends AbstractCommand implements Command {
 
-    private static final String RM_REST_ENDPOINT = "nodesource/deploy";
+    private static final String RM_REST_ENDPOINT = "nodesource/undeploy";
 
     private String nodeSourceName;
 
-    public DeployNodeSourceCommand(String nodeSourceName) {
+    private boolean preempt;
+
+    public UndeployNodeSourceCommand(String nodeSourceName) {
+        this(nodeSourceName, Boolean.toString(false));
+    }
+
+    public UndeployNodeSourceCommand(String nodeSourceName, String preempt) {
         this.nodeSourceName = nodeSourceName;
+        this.preempt = Boolean.valueOf(preempt);
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+
         HttpPut request = new HttpPut(currentContext.getResourceUrl(RM_REST_ENDPOINT));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("nodeSourceName", nodeSourceName);
+        queryStringBuilder.add("nodeSourceName", this.nodeSourceName).add("preempt", Boolean.toString(this.preempt));
         request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            NSStateView nsState = readValue(response, NSStateView.class, currentContext);
+        HttpResponseWrapper response = this.execute(request, currentContext);
+
+        if (this.statusCode(OK) == this.statusCode(response)) {
+
+            NSStateView nsState = this.readValue(response, NSStateView.class, currentContext);
             boolean success = nsState.isResult();
-            resultStack(currentContext).push(success);
+            this.resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext, "Node source successfully deployed.");
+                writeLine(currentContext, "Node source successfully undeployed.");
             } else {
-                writeLine(currentContext, "%s %s", "Cannot deploy node source:", nodeSourceName);
+                writeLine(currentContext, "%s %s", "Cannot undeploy node source:", this.nodeSourceName);
             }
         } else {
-            handleError("An error occurred while deploying node source:", response, currentContext);
+
+            this.handleError("An error occurred while undeploying node source:", response, currentContext);
 
         }
     }

@@ -206,6 +206,13 @@ public interface RMRestInterface {
     NSState deployNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException;
 
+    @PUT
+    @Path("nodesource/undeploy")
+    @Produces("application/json")
+    NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt)
+            throws NotConnectedException;
+
     @POST
     @Path("nodesource/pingfrequency")
     @Produces("application/json")

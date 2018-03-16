@@ -113,6 +113,9 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
         return target.getExistingNodeSourcesList();
     }
 
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#defineNodeSource(String, String, Object[], String, Object[], boolean)
+     */
     @Override
     public BooleanWrapper defineNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
             boolean arg5) {
@@ -120,7 +123,7 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     /**
-     * @see ResourceManager#createNodeSource(String, String, Object[], String, Object[], boolean)
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#createNodeSource(String, String, Object[], String, Object[], boolean)
      */
     public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
             boolean arg5) {
@@ -128,10 +131,17 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     /**
-     * @see ResourceManager#deployNodeSource(String)
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#deployNodeSource(String)
      */
     public BooleanWrapper deployNodeSource(String arg0) {
         return target.deployNodeSource(arg0);
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#undeployNodeSource(String, boolean)
+     */
+    public BooleanWrapper undeployNodeSource(String arg0, boolean arg1) {
+        return target.undeployNodeSource(arg0, arg1);
     }
 
     /**

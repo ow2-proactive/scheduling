@@ -80,7 +80,7 @@ public class TestLocalInfrastructureStaticPolicy extends RMFunctionalTest {
                                   null,
                                   NODES_NOT_RECOVERABLE);
 
-        rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
+        rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb, rmHelper.getMonitorsHandler());
     }
 
     protected void removeNodeSource(String sourceName) throws Exception {
