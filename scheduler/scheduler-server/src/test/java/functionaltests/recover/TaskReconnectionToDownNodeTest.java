@@ -49,19 +49,19 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import functionaltests.nodesrecovery.RecoverInfrastructureTestHelper;
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestNode;
 import functionaltests.utils.TestScheduler;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
- * This test verifies that when
- * @author ActiveEon Team
- * @since 20/09/17
+ * This test verifies that when a running task cannot be recovered because the
+ * node is down, then we avoid waiting for the ping timeout to continue the
+ * scheduler state recovery.
  */
 public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
@@ -136,10 +136,12 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
         this.checkSchedulerStateRecoveryDoesNotWaitTaskPingAttemptTimesFrequency(schedulerStartTime, schedulerUpTime);
     }
 
-    private void checkSchedulerStateRecoveryDoesNotWaitTaskPingAttemptTimesFrequency(long schedulerStartTime, long schedulerUpTime) {
+    private void checkSchedulerStateRecoveryDoesNotWaitTaskPingAttemptTimesFrequency(long schedulerStartTime,
+            long schedulerUpTime) {
         int attempts = PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt();
         int frequency = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt();
-        int minimumTotalRecoveryDurationIfRetryMechanismIsExecuted = attempts * frequency * 1000 * NUMBER_OF_REPLICATE_TASKS;
+        int minimumTotalRecoveryDurationIfRetryMechanismIsExecuted = attempts * frequency * 1000 *
+                                                                     NUMBER_OF_REPLICATE_TASKS;
 
         int schedulerTimeToBeUpAndRunning = (int) (schedulerUpTime - schedulerStartTime);
         assertThat(schedulerTimeToBeUpAndRunning).isLessThan(minimumTotalRecoveryDurationIfRetryMechanismIsExecuted);

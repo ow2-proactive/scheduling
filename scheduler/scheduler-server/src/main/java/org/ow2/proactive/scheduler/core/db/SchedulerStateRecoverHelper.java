@@ -25,11 +25,16 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.*;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -62,29 +67,23 @@ public class SchedulerStateRecoverHelper {
         Vector<InternalJob> pendingJobs = new Vector<>();
         Vector<InternalJob> runningJobs = new Vector<>();
 
+        ExecutorService jobRecovererThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVERER_NBTHREAD.getValueAsInt());
+        CountDownLatch allJobRecoveredLatch = new CountDownLatch(notFinishedJobs.size());
+
         for (InternalJob job : notFinishedJobs) {
-            switch (job.getStatus()) {
-                case PENDING:
-                    pendingJobs.add(job);
-                    break;
-                case STALLED:
-                case RUNNING:
-                case IN_ERROR:
-                    runningJobs.add(job);
-                    recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
-                    break;
-                case PAUSED:
-                    if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() +
-                         job.getNumberOfFinishedTasks()) == 0) {
-                        pendingJobs.add(job);
-                    } else {
-                        runningJobs.add(job);
-                        recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected job status: " + job.getStatus());
-            }
+            jobRecovererThreadPool.submit(() -> {
+                handleJob(rmProxy, pendingJobs, runningJobs, job);
+                allJobRecoveredLatch.countDown();
+            });
+        }
+
+        try {
+            allJobRecoveredLatch.await();
+        } catch (InterruptedException e) {
+            logger.error("Interruption while waiting to recover Scheduler state", e);
+            throw new RuntimeException(e);
+        } finally {
+            jobRecovererThreadPool.shutdown();
         }
 
         Vector<InternalJob> finishedJobs = new Vector<>();
@@ -124,6 +123,32 @@ public class SchedulerStateRecoverHelper {
                     " Finished: " + finishedJobs.size());
 
         return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
+    }
+
+    private void handleJob(RMProxy rmProxy, Vector<InternalJob> pendingJobs, Vector<InternalJob> runningJobs,
+            InternalJob job) {
+        switch (job.getStatus()) {
+            case PENDING:
+                pendingJobs.add(job);
+                break;
+            case STALLED:
+            case RUNNING:
+            case IN_ERROR:
+                runningJobs.add(job);
+                recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
+                break;
+            case PAUSED:
+                if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() +
+                     job.getNumberOfFinishedTasks()) == 0) {
+                    pendingJobs.add(job);
+                } else {
+                    runningJobs.add(job);
+                    recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
+                }
+                break;
+            default:
+                throw new IllegalStateException("Unexpected job status: " + job.getStatus());
+        }
     }
 
     private void recoverRunningTasksOrResetToPending(InternalJob job, List<InternalTask> tasks, RMProxy rmProxy) {
