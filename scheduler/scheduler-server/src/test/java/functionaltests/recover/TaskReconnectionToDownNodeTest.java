@@ -65,6 +65,10 @@ import functionaltests.utils.TestScheduler;
  */
 public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
+    private static final URL SCHEDULER_CONFIGURATION_START = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
+
+    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
+
     private static final URL JOB_DESCRIPTOR = TaskReconnectionToDownNodeTest.class.getResource("/functionaltests/descriptors/Job_TaskReconnectionOnRestart_25_Parallel_Tasks.xml");
 
     private static final URL RM_CONFIGURATION_START = TaskReconnectionToDownNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
@@ -83,23 +87,11 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
 
     private Map<Long, String> taskExecutionHostnamePerTaskId;
 
-    private static final URL SCHEDULER_CONFIGURATION_START = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
-
-    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
-
-    protected URL getSchedulerStartConfigurationURL() {
-        return SCHEDULER_CONFIGURATION_START;
-    }
-
-    protected URL getSchedulerReStartConfigurationURL() {
-        return SCHEDULER_CONFIGURATION_RESTART;
-    }
-
     @Before
     public void startDedicatedScheduler() throws Exception {
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
-                                               new File(getSchedulerStartConfigurationURL().toURI()).getAbsolutePath(),
+                                               new File(SCHEDULER_CONFIGURATION_START.toURI()).getAbsolutePath(),
                                                new File(RM_CONFIGURATION_START.toURI()).getAbsolutePath(),
                                                null);
         this.taskExecutionHostnamePerTaskId = new HashMap<>();
@@ -199,8 +191,7 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
 
     private void restartScheduler() throws Exception {
         schedulerHelper = new SchedulerTHelper(false,
-                                               new File(this.getSchedulerReStartConfigurationURL()
-                                                            .toURI()).getAbsolutePath(),
+                                               new File(SCHEDULER_CONFIGURATION_RESTART.toURI()).getAbsolutePath(),
                                                new File(RM_CONFIGURATION_RESTART.toURI()).getAbsolutePath(),
                                                null,
                                                false);

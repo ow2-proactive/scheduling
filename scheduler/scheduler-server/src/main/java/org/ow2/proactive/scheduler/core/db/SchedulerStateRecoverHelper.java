@@ -67,23 +67,23 @@ public class SchedulerStateRecoverHelper {
         Vector<InternalJob> pendingJobs = new Vector<>();
         Vector<InternalJob> runningJobs = new Vector<>();
 
-        ExecutorService jobRecovererThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVERER_NBTHREAD.getValueAsInt());
-        CountDownLatch allJobRecoveredLatch = new CountDownLatch(notFinishedJobs.size());
+        ExecutorService recoverJobsThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVERER_NBTHREAD.getValueAsInt());
+        CountDownLatch allJobsRecoveredLatch = new CountDownLatch(notFinishedJobs.size());
 
         for (InternalJob job : notFinishedJobs) {
-            jobRecovererThreadPool.submit(() -> {
+            recoverJobsThreadPool.submit(() -> {
                 handleJob(rmProxy, pendingJobs, runningJobs, job);
-                allJobRecoveredLatch.countDown();
+                allJobsRecoveredLatch.countDown();
             });
         }
 
         try {
-            allJobRecoveredLatch.await();
+            allJobsRecoveredLatch.await();
         } catch (InterruptedException e) {
             logger.error("Interruption while waiting to recover Scheduler state", e);
             throw new RuntimeException(e);
         } finally {
-            jobRecovererThreadPool.shutdown();
+            recoverJobsThreadPool.shutdown();
         }
 
         Vector<InternalJob> finishedJobs = new Vector<>();

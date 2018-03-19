@@ -88,14 +88,14 @@ public class ExecuterInformationData implements Serializable {
                 if (loadFullState) {
                     logger.warn("Task launcher " + taskLauncherNodeUrl + " of task " + taskId +
                                 " cannot be looked up, try to rebind it");
-                    taskLauncher = getReboundTaskLauncherIfStillExist(e);
+                    taskLauncher = getReboundTaskLauncherIfStillExist();
                 }
             }
         }
         return new ExecuterInformation(taskLauncher, nodes, nodeName, hostName);
     }
 
-    private TaskLauncher getReboundTaskLauncherIfStillExist(Exception e) {
+    private TaskLauncher getReboundTaskLauncherIfStillExist() {
         try {
             logger.debug("List AOs on " + taskLauncherNodeUrl + " (expect only one): " +
                          Arrays.toString(NodeFactory.getNode(taskLauncherNodeUrl).getActiveObjects()));
