@@ -31,6 +31,9 @@ import java.util.concurrent.locks.Lock;
 
 public class Lambda {
 
+    private Lambda() {
+    }
+
     public static void lock(Lock lock, Runnable runnable) {
         lock.lock();
         try {

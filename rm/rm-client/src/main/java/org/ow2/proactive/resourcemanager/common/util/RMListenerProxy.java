@@ -216,9 +216,7 @@ public class RMListenerProxy extends RMGroupEventListener {
 
     @ImmediateService
     public RMInitialState getRMInitialState(long filter) {
-        return Lambda.lock(lockState.readLock(), () -> {
-            return rmInitialState.cloneAndFilter(filter);
-        });
+        return Lambda.lock(lockState.readLock(), () -> rmInitialState.cloneAndFilter(filter));
     }
 
     /**
