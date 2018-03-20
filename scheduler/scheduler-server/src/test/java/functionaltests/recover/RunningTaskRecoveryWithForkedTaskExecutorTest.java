@@ -34,11 +34,11 @@ import java.net.URL;
  * @author ActiveEon Team
  * @since 20/09/17
  */
-public class TaskReconnectionWithForkedTaskExecutorTest extends TaskReconnectionToRecoveredNodeTest {
+public class RunningTaskRecoveryWithForkedTaskExecutorTest extends RunningTaskRecoveryWithRecoveredNodeTestBase {
 
-    private static final URL SCHEDULER_CONFIGURATION_START = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
+    private static final URL SCHEDULER_CONFIGURATION_START = RunningTaskRecoveryWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
 
-    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
+    private static final URL SCHEDULER_CONFIGURATION_RESTART = RunningTaskRecoveryWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
 
     @Override
     protected URL getSchedulerStartConfigurationURL() {

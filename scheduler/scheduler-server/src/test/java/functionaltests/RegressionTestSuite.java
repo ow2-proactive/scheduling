@@ -37,9 +37,10 @@ import functionaltests.db.schedulerdb.TestJobRemove;
 import functionaltests.db.schedulerdb.TestMultipleTasks;
 import functionaltests.job.taskkill.TestJobKilled;
 import functionaltests.job.taskkill.TestProcessTreeKiller;
-import functionaltests.recover.TaskReconnectionWithForkedTaskExecutorTest;
-import functionaltests.recover.TaskReconnectionWithInProcessTaskExecutorTest;
-import functionaltests.recover.TaskRecoveryWhenNodesAreReservedInBatchTest;
+import functionaltests.recover.RunningTaskRecoveryWhenNodesAreReservedInBatchTest;
+import functionaltests.recover.RunningTaskRecoveryWithDownNodeTest;
+import functionaltests.recover.RunningTaskRecoveryWithForkedTaskExecutorTest;
+import functionaltests.recover.RunningTaskRecoveryWithInProcessTaskExecutorTest;
 import functionaltests.rm.TestOperationsWhenUnlinked;
 import functionaltests.workflow.TestJobLegacySchemas;
 import functionaltests.workflow.TestWorkflowSubmission;
@@ -82,9 +83,9 @@ import functionaltests.workflow.complex.TestWorkflowReplicateJobs3;
                       TestJobKilled.class,
 
                       TestDataspaceConcurrentTransfer.class, TestDataspaceConcurrentKilling.class,
-                      TaskReconnectionWithForkedTaskExecutorTest.class,
-                      TaskReconnectionWithInProcessTaskExecutorTest.class,
-                      TaskRecoveryWhenNodesAreReservedInBatchTest.class })
+                      RunningTaskRecoveryWithDownNodeTest.class, RunningTaskRecoveryWithForkedTaskExecutorTest.class,
+                      RunningTaskRecoveryWithInProcessTaskExecutorTest.class,
+                      RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class })
 
 /**
  * @author ActiveEon Team

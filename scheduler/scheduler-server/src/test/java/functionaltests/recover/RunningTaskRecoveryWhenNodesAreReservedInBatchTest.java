@@ -57,17 +57,18 @@ import functionaltests.utils.TestScheduler;
  * the tasks still manage to be continued/started/restarted depending on their
  * state when the scheduler crashed.
  */
-public class TaskRecoveryWhenNodesAreReservedInBatchTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class RunningTaskRecoveryWhenNodesAreReservedInBatchTest
+        extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-    private static final URL SCHEDULER_CONFIGURATION_START = TaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
+    private static final URL SCHEDULER_CONFIGURATION_START = RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
 
-    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
+    private static final URL SCHEDULER_CONFIGURATION_RESTART = RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
 
-    private static final URL JOB_DESCRIPTOR = TaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/descriptors/Job_TaskReconnectionOnRestart_25_Parallel_Tasks.xml");
+    private static final URL JOB_DESCRIPTOR = RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/descriptors/Job_TaskReconnectionOnRestart_25_Parallel_Tasks.xml");
 
-    private static final URL RM_CONFIGURATION_START = TaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
+    private static final URL RM_CONFIGURATION_START = RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
 
-    private static final URL RM_CONFIGURATION_RESTART = TaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/config/functionalTRMProperties-keep-db.ini");
+    private static final URL RM_CONFIGURATION_RESTART = RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class.getResource("/functionaltests/config/functionalTRMProperties-keep-db.ini");
 
     private static final int NB_NODES = 26;
 
@@ -84,7 +85,7 @@ public class TaskRecoveryWhenNodesAreReservedInBatchTest extends SchedulerFuncti
 
     @Test
     public void action() throws Throwable {
-        nodes = schedulerHelper.createRMNodeStarterNodes(TaskRecoveryWhenNodesAreReservedInBatchTest.class.getSimpleName(),
+        nodes = schedulerHelper.createRMNodeStarterNodes(RunningTaskRecoveryWhenNodesAreReservedInBatchTest.class.getSimpleName(),
                                                          NB_NODES);
         for (int i = 0; i < NB_NODES; i++) {
             schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);

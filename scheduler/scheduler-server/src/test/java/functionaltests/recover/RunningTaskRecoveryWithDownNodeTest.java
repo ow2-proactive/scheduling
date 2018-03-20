@@ -63,15 +63,15 @@ import functionaltests.utils.TestScheduler;
  * down, then we avoid waiting for the ping timeout to continue the scheduler
  * state recovery.
  */
-public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class RunningTaskRecoveryWithDownNodeTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-    private static final URL SCHEDULER_CONFIGURATION_START = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
+    private static final URL SCHEDULER_CONFIGURATION_START = RunningTaskRecoveryWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
 
-    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
+    private static final URL SCHEDULER_CONFIGURATION_RESTART = RunningTaskRecoveryWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
 
-    private static final URL RM_CONFIGURATION_START = TaskReconnectionToDownNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
+    private static final URL RM_CONFIGURATION_START = RunningTaskRecoveryWithDownNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
 
-    private static final URL RM_CONFIGURATION_RESTART = TaskReconnectionToDownNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-keep-db.ini");
+    private static final URL RM_CONFIGURATION_RESTART = RunningTaskRecoveryWithDownNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-keep-db.ini");
 
     private static final int NUMBER_OF_NODES = 10;
 
@@ -79,7 +79,7 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
 
     private static final int RESTART_SCHEDULER_INTER_TIME_MILLIS = 1000;
 
-    private static final String TASK_BASE_NAME = "TASK-" + TaskReconnectionToDownNodeTest.class.getSimpleName();
+    private static final String TASK_BASE_NAME = "TASK-" + RunningTaskRecoveryWithDownNodeTest.class.getSimpleName();
 
     private List<TestNode> nodes;
 
@@ -183,7 +183,7 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
     private JobId submitJob() throws Exception {
         TaskFlowJob job = new TaskFlowJob();
 
-        job.setName("JOB-" + TaskReconnectionToDownNodeTest.class.getSimpleName());
+        job.setName("JOB-" + RunningTaskRecoveryWithDownNodeTest.class.getSimpleName());
 
         for (int i = 0; i < NUMBER_OF_TASKS; i++) {
 
@@ -199,7 +199,7 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
     }
 
     private void createNodes() throws Exception {
-        this.nodes = schedulerHelper.createRMNodeStarterNodes(TaskReconnectionWithForkedTaskExecutorTest.class.getSimpleName(),
+        this.nodes = schedulerHelper.createRMNodeStarterNodes(RunningTaskRecoveryWithForkedTaskExecutorTest.class.getSimpleName(),
                                                               NUMBER_OF_NODES);
     }
 

@@ -34,7 +34,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.RMFactory;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -55,13 +54,14 @@ import functionaltests.utils.TestScheduler;
  * @author ActiveEon Team
  * @since 20/09/17
  */
-public abstract class TaskReconnectionToRecoveredNodeTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public abstract class RunningTaskRecoveryWithRecoveredNodeTestBase
+        extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-    private static final URL JOB_DESCRIPTOR = TaskReconnectionToRecoveredNodeTest.class.getResource("/functionaltests/descriptors/Job_TaskReconnectionOnRestart.xml");
+    private static final URL JOB_DESCRIPTOR = RunningTaskRecoveryWithRecoveredNodeTestBase.class.getResource("/functionaltests/descriptors/Job_TaskReconnectionOnRestart.xml");
 
-    private static final URL RM_CONFIGURATION_START = TaskReconnectionToRecoveredNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
+    private static final URL RM_CONFIGURATION_START = RunningTaskRecoveryWithRecoveredNodeTestBase.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
 
-    private static final URL RM_CONFIGURATION_RESTART = TaskReconnectionToRecoveredNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-keep-db.ini");
+    private static final URL RM_CONFIGURATION_RESTART = RunningTaskRecoveryWithRecoveredNodeTestBase.class.getResource("/functionaltests/config/functionalTRMProperties-keep-db.ini");
 
     private static final int NB_NODES = 3;
 
@@ -101,7 +101,7 @@ public abstract class TaskReconnectionToRecoveredNodeTest extends SchedulerFunct
     @Test
     public void action() throws Throwable {
 
-        nodes = schedulerHelper.createRMNodeStarterNodes(TaskReconnectionWithForkedTaskExecutorTest.class.getSimpleName(),
+        nodes = schedulerHelper.createRMNodeStarterNodes(RunningTaskRecoveryWithForkedTaskExecutorTest.class.getSimpleName(),
                                                          NB_NODES);
 
         JobId jobid = schedulerHelper.submitJob(new File(JOB_DESCRIPTOR.toURI()).getAbsolutePath());
