@@ -298,7 +298,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * should be destroyed along with the nodes termination when the scheduler 
      * is shut down.
      */
-    RM_CLOUD_INFRASTRUCTURES_DESTROY_INSTANCES_ON_SHUTDOWN("pa.rm.cloud.infrastructures.destroy.instances.on.shutdown", PropertyType.BOOLEAN, "false");
+    RM_CLOUD_INFRASTRUCTURES_DESTROY_INSTANCES_ON_SHUTDOWN("pa.rm.cloud.infrastructures.destroy.instances.on.shutdown", PropertyType.BOOLEAN, "false"),
+
+    /**
+     * Defines the maximum number of RMEvents which can be send to the client in one request.
+     */
+    RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE("pa.rm.rest.monitoring.maximum.chunk.size", PropertyType.INTEGER, "100");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
