@@ -34,6 +34,7 @@ import java.net.URL;
  * @author ActiveEon Team
  * @since 20/09/17
  */
+@SuppressWarnings("squid:S2187")
 public class RunningTaskRecoveryWithInProcessTaskExecutorTest extends RunningTaskRecoveryWithRecoveredNodeTestBase {
 
     private static final URL SCHEDULER_CONFIGURATION_START = RunningTaskRecoveryWithInProcessTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-nonforkedtasks.ini");

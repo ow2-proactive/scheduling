@@ -168,12 +168,8 @@ public class RunningTaskRecoveryWithDownNodeTest extends SchedulerFunctionalTest
     }
 
     private void killSchedulerAndNodes() throws Exception {
-        Thread.sleep(RESTART_SCHEDULER_INTER_TIME_MILLIS);
-
         TestScheduler.kill();
         RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
-
-        Thread.sleep(RESTART_SCHEDULER_INTER_TIME_MILLIS);
     }
 
     private void waitForAllTasksToRun(JobId jobid) throws Exception {
