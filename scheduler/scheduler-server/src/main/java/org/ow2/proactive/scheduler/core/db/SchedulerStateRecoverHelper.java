@@ -26,8 +26,10 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -55,6 +58,8 @@ public class SchedulerStateRecoverHelper {
     public static final String FAIL_TO_RECOVER_RUNNING_TASK_STRING = "Fail to recover running task ";
 
     private final SchedulerDBManager dbManager;
+
+    private final Map<JobId, TaskStatusCounter> jobsToUpdate = new HashMap<>();
 
     public SchedulerStateRecoverHelper(SchedulerDBManager dbManager) {
         this.dbManager = dbManager;
@@ -89,6 +94,8 @@ public class SchedulerStateRecoverHelper {
         }
 
         failIfSchedulerStateRecoveryTimeout(terminatedWithoutTimeout);
+
+        applyJobUpdates(notFinishedJobs);
 
         Vector<InternalJob> finishedJobs = new Vector<>();
 
@@ -127,6 +134,14 @@ public class SchedulerStateRecoverHelper {
                     " Finished: " + finishedJobs.size());
 
         return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
+    }
+
+    private void applyJobUpdates(List<InternalJob> notFinishedJobs) {
+        for (InternalJob job : notFinishedJobs) {
+            if (this.jobsToUpdate.containsKey(job.getId())) {
+                updateJobWithCounters(job, this.jobsToUpdate.get(job.getId()));
+            }
+        }
     }
 
     private void failIfSchedulerStateRecoveryTimeout(boolean terminatedWithoutTimeout) {
@@ -179,7 +194,7 @@ public class SchedulerStateRecoverHelper {
             }
             logger.debug("Task " + task.getId() + " status is " + task.getStatus().name());
         }
-        updateJobWithCounters(job, counter);
+        this.jobsToUpdate.put(job.getId(), counter);
     }
 
     private void recoverRunningTaskAsynchronously(RMProxy rmProxy, ExecutorService recoverRunningTasksThreadPool,
