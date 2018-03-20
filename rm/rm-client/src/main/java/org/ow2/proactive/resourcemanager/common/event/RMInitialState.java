@@ -41,6 +41,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
@@ -63,6 +64,8 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 @PublicAPI
 @XmlRootElement
 public class RMInitialState implements Serializable {
+
+    public static final Long EMPTY_STATE = -1l;
 
     private static final Logger LOGGER = Logger.getLogger(RMInitialState.class);
 
@@ -172,12 +175,16 @@ public class RMInitialState implements Serializable {
                                       "Probably because there was network server restart.",
                                       filter,
                                       latestCounter.get()));
-            actualFilter = -1; // reset filter to default  value
+            actualFilter = EMPTY_STATE; // reset filter to default  value
         }
         RMInitialState clone = new RMInitialState();
 
-        clone.nodeEvents = newFilteredEvents(this.nodeEvents, actualFilter);
-        clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, actualFilter);
+        clone.nodeEvents = newFilteredEvents(this.nodeEvents,
+                                             actualFilter,
+                                             actualFilter + PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt());
+        clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents,
+                                                   actualFilter,
+                                                   actualFilter + PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt());
 
         clone.latestCounter.set(Math.max(actualFilter,
                                          Math.max(findLargestCounter(clone.nodeEvents.values()),
@@ -185,19 +192,15 @@ public class RMInitialState implements Serializable {
         return clone;
     }
 
-    private <T extends RMEvent> Map<String, T> newFilteredEvents(Map<String, T> events, long filter) {
+    private <T extends RMEvent> Map<String, T> newFilteredEvents(Map<String, T> events, long from, long to) {
         return events.entrySet()
                      .stream()
-                     .filter(entry -> entry.getValue().getCounter() > filter)
-                     .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
+                     .filter(entry -> from < entry.getValue().getCounter() && entry.getValue().getCounter() <= to)
+                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private <T extends RMEvent> long findLargestCounter(Collection<T> events) {
         final Optional<T> max = events.stream().max(Comparator.comparing(RMEvent::getCounter));
-        if (max.isPresent()) {
-            return max.get().getCounter();
-        } else {
-            return 0;
-        }
+        return max.map(RMEvent::getCounter).orElse(0l);
     }
 }
