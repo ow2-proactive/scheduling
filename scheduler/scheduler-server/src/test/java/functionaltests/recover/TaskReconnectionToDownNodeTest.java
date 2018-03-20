@@ -29,9 +29,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -45,11 +43,13 @@ import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 
 import functionaltests.nodesrecovery.RecoverInfrastructureTestHelper;
 import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
@@ -59,9 +59,9 @@ import functionaltests.utils.TestScheduler;
 
 
 /**
- * This test verifies that when a running task cannot be recovered because the
- * node is down, then we avoid waiting for the ping timeout to continue the
- * scheduler state recovery.
+ * This test verifies that when tasks cannot be recovered because the node is
+ * down, then we avoid waiting for the ping timeout to continue the scheduler
+ * state recovery.
  */
 public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
@@ -69,23 +69,19 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
 
     private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
 
-    private static final URL JOB_DESCRIPTOR = TaskReconnectionToDownNodeTest.class.getResource("/functionaltests/descriptors/Job_TaskReconnectionOnRestart_25_Parallel_Tasks.xml");
-
     private static final URL RM_CONFIGURATION_START = TaskReconnectionToDownNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-clean-db.ini");
 
     private static final URL RM_CONFIGURATION_RESTART = TaskReconnectionToDownNodeTest.class.getResource("/functionaltests/config/functionalTRMProperties-keep-db.ini");
 
-    private static final int NUMBER_OF_NODES = 25;
+    private static final int NUMBER_OF_NODES = 10;
 
-    private static final int NUMBER_OF_REPLICATE_TASKS = 25;
+    private static final int NUMBER_OF_TASKS = NUMBER_OF_NODES;
 
-    private static final int RESTART_SCHEDULER_INTER_TIME_IN_MILLISECONDS = 1000;
+    private static final int RESTART_SCHEDULER_INTER_TIME_MILLIS = 1000;
 
-    private static final String LAST_REPLICATE_TASK_NAME = "Groovy_Task26";
+    private static final String TASK_BASE_NAME = "TASK-" + TaskReconnectionToDownNodeTest.class.getSimpleName();
 
     private List<TestNode> nodes;
-
-    private Map<Long, String> taskExecutionHostnamePerTaskId;
 
     @Before
     public void startDedicatedScheduler() throws Exception {
@@ -94,7 +90,10 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
                                                new File(SCHEDULER_CONFIGURATION_START.toURI()).getAbsolutePath(),
                                                new File(RM_CONFIGURATION_START.toURI()).getAbsolutePath(),
                                                null);
-        this.taskExecutionHostnamePerTaskId = new HashMap<>();
+
+        // timeout of 30 seconds for the running task and the scheduler to reconnect
+        PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.updateProperty("3");
+        PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.updateProperty("10");
     }
 
     @Test
@@ -106,37 +105,35 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
 
         this.waitForAllTasksToRun(jobid);
 
-        this.recordTaskExecutionHostInfo(jobid);
-
         this.killSchedulerAndNodes();
 
-        long schedulerStartTime = System.currentTimeMillis();
-        this.restartScheduler();
-        long schedulerUpTime = System.currentTimeMillis();
+        long timeForSchedulerToBeUp = this.recordSchedulerRestartTime();
 
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
         JobState jobState = scheduler.getJobState(jobid);
 
-        this.checkFirstAndLastTask(jobState);
-
-        this.checkReplicateTasks(jobState);
+        this.checkTasks(jobState);
 
         this.waitForJobToFinish(jobid);
 
         this.checkJobResult(jobid, scheduler);
 
-        this.checkSchedulerStateRecoveryDoesNotWaitTaskPingAttemptTimesFrequency(schedulerStartTime, schedulerUpTime);
+        this.checkSchedulerStateRecoveryDoesNotWaitTaskPingAttemptTimesFrequency(timeForSchedulerToBeUp);
     }
 
-    private void checkSchedulerStateRecoveryDoesNotWaitTaskPingAttemptTimesFrequency(long schedulerStartTime,
-            long schedulerUpTime) {
+    private long recordSchedulerRestartTime() throws Exception {
+        long schedulerStartTime = System.currentTimeMillis();
+        this.restartScheduler();
+        long schedulerUpTime = System.currentTimeMillis();
+        return schedulerUpTime - schedulerStartTime;
+    }
+
+    private void checkSchedulerStateRecoveryDoesNotWaitTaskPingAttemptTimesFrequency(long timeForSchedulerToBeUp) {
         int attempts = PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt();
         int frequency = PASchedulerProperties.SCHEDULER_NODE_PING_FREQUENCY.getValueAsInt();
-        int minimumTotalRecoveryDurationIfRetryMechanismIsExecuted = attempts * frequency * 1000 *
-                                                                     NUMBER_OF_REPLICATE_TASKS;
+        int minimumTotalRecoveryDurationIfRetryMechanismIsExecuted = attempts * frequency * 1000 * NUMBER_OF_TASKS;
 
-        int schedulerTimeToBeUpAndRunning = (int) (schedulerUpTime - schedulerStartTime);
-        assertThat(schedulerTimeToBeUpAndRunning).isLessThan(minimumTotalRecoveryDurationIfRetryMechanismIsExecuted);
+        assertThat((int) timeForSchedulerToBeUp).isLessThan(minimumTotalRecoveryDurationIfRetryMechanismIsExecuted);
     }
 
     private void checkJobResult(JobId jobid, Scheduler scheduler)
@@ -149,43 +146,15 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
         schedulerHelper.waitForEventJobFinished(jobid);
     }
 
-    private void checkReplicateTasks(JobState jobState) {
-        int maximumNumberOfPendingReplicateTasks = jobState.getNumberOfPendingTasks() - 1;
+    private void checkTasks(JobState jobState) {
+        int maximumNumberOfPendingTasks = jobState.getNumberOfPendingTasks();
 
-        for (int i = 1; i <= maximumNumberOfPendingReplicateTasks; i++) {
+        for (int i = 0; i < maximumNumberOfPendingTasks; i++) {
 
             TaskState taskState = jobState.getTasks().get(i);
             TaskStatus taskStatus = taskState.getTaskInfo().getStatus();
 
             assertThat(taskStatus.equals(TaskStatus.PENDING) || taskStatus.equals(TaskStatus.RUNNING)).isTrue();
-
-            if (taskStatus.equals(TaskStatus.RUNNING)) {
-                this.checkThatExecutionHostnameIsDifferent(taskState);
-            }
-        }
-    }
-
-    private void checkThatExecutionHostnameIsDifferent(TaskState taskState) {
-        String formerExecutionHost = this.taskExecutionHostnamePerTaskId.get(taskState.getTaskInfo()
-                                                                                      .getTaskId()
-                                                                                      .longValue());
-        String currentExecutionHost = taskState.getTaskInfo().getExecutionHostName();
-
-        assertThat(formerExecutionHost).isNotEqualTo(currentExecutionHost);
-    }
-
-    private void checkFirstAndLastTask(JobState jobState) {
-        // we have exactly one task that is finished (the first one)
-        assertThat(jobState.getNumberOfFinishedTasks()).isEqualTo(1);
-        // at least we have the last task that is pending (the merge task)
-        assertThat(jobState.getNumberOfPendingTasks()).isAtLeast(1);
-    }
-
-    private void recordTaskExecutionHostInfo(JobId jobid) throws Exception {
-        for (int i = 0; i < NUMBER_OF_REPLICATE_TASKS; i++) {
-            TaskState taskState = schedulerHelper.getSchedulerInterface().getJobState(jobid).getTasks().get(i);
-            TaskInfo taskInfo = taskState.getTaskInfo();
-            this.taskExecutionHostnamePerTaskId.put(taskInfo.getTaskId().longValue(), taskInfo.getExecutionHostName());
         }
     }
 
@@ -199,20 +168,32 @@ public class TaskReconnectionToDownNodeTest extends SchedulerFunctionalTestWithC
     }
 
     private void killSchedulerAndNodes() throws Exception {
-        Thread.sleep(RESTART_SCHEDULER_INTER_TIME_IN_MILLISECONDS);
+        Thread.sleep(RESTART_SCHEDULER_INTER_TIME_MILLIS);
 
         TestScheduler.kill();
         RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
 
-        Thread.sleep(RESTART_SCHEDULER_INTER_TIME_IN_MILLISECONDS);
+        Thread.sleep(RESTART_SCHEDULER_INTER_TIME_MILLIS);
     }
 
     private void waitForAllTasksToRun(JobId jobid) throws Exception {
-        schedulerHelper.waitForEventTaskRunning(jobid, LAST_REPLICATE_TASK_NAME);
+        schedulerHelper.waitForEventTaskRunning(jobid, TASK_BASE_NAME + (NUMBER_OF_TASKS - 1));
     }
 
     private JobId submitJob() throws Exception {
-        JobId jobid = schedulerHelper.submitJob(new File(JOB_DESCRIPTOR.toURI()).getAbsolutePath());
+        TaskFlowJob job = new TaskFlowJob();
+
+        job.setName("JOB-" + TaskReconnectionToDownNodeTest.class.getSimpleName());
+
+        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
+
+            ScriptTask st1 = new ScriptTask();
+            st1.setName(TASK_BASE_NAME + i);
+            st1.setScript(new TaskScript(new SimpleScript("Thread.sleep(60000)", "groovy")));
+            job.addTask(st1);
+        }
+
+        JobId jobid = schedulerHelper.submitJob(job);
         schedulerHelper.waitForEventJobRunning(jobid);
         return jobid;
     }
