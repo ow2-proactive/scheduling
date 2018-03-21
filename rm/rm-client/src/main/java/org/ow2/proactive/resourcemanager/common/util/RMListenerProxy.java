@@ -204,7 +204,6 @@ public class RMListenerProxy extends RMGroupEventListener {
         checkCounter(event);
     }
 
-    @ImmediateService
     public RMInitialState getRMInitialState(long filter) {
         return rmInitialState.cloneAndFilter(filter);
     }
