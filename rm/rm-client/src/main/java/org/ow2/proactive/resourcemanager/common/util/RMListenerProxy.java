@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -65,7 +64,6 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.utils.Lambda;
 
 
 /**
@@ -96,8 +94,6 @@ public class RMListenerProxy extends RMGroupEventListener {
     protected String nodeConnectorUrl;
 
     protected AtomicLong counter = new AtomicLong(0);
-
-    private final ReentrantReadWriteLock lockState = new ReentrantReadWriteLock();
 
     public boolean init(String url, CredData credData) throws RMException, KeyException, LoginException {
         this.rmAuth = RMConnection.join(url);
@@ -174,47 +170,43 @@ public class RMListenerProxy extends RMGroupEventListener {
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
     public void nodeSourceEvent(RMNodeSourceEvent event) {
-        Lambda.lock(lockState.writeLock(), () -> {
-            switch (event.getEventType()) {
-                case NODESOURCE_DEFINED:
-                    rmInitialState.nodeSourceAdded(event);
-                    break;
-                case NODESOURCE_CREATED:
-                case NODESOURCE_SHUTDOWN:
-                    rmInitialState.nodeSourceStateChanged(event);
-                    break;
-                case NODESOURCE_REMOVED:
-                    rmInitialState.nodeSourceRemoved(event);
-                    break;
-            }
-            checkCounter(event);
-        });
+        switch (event.getEventType()) {
+            case NODESOURCE_DEFINED:
+                rmInitialState.nodeSourceAdded(event);
+                break;
+            case NODESOURCE_CREATED:
+            case NODESOURCE_SHUTDOWN:
+                rmInitialState.nodeSourceStateChanged(event);
+                break;
+            case NODESOURCE_REMOVED:
+                rmInitialState.nodeSourceRemoved(event);
+                break;
+        }
+        checkCounter(event);
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeEvent(RMNodeEvent event) {
-        Lambda.lock(lockState.writeLock(), () -> {
-            switch (event.getEventType()) {
-                case NODE_REMOVED:
-                    rmInitialState.nodeRemoved(event);
-                    break;
-                case NODE_ADDED:
-                    rmInitialState.nodeAdded(event);
-                    break;
-                case NODE_STATE_CHANGED:
-                    rmInitialState.nodeStateChanged(event);
-                    break;
+        switch (event.getEventType()) {
+            case NODE_REMOVED:
+                rmInitialState.nodeRemoved(event);
+                break;
+            case NODE_ADDED:
+                rmInitialState.nodeAdded(event);
+                break;
+            case NODE_STATE_CHANGED:
+                rmInitialState.nodeStateChanged(event);
+                break;
 
-            }
-            checkCounter(event);
-        });
+        }
+        checkCounter(event);
     }
 
     @ImmediateService
     public RMInitialState getRMInitialState(long filter) {
-        return Lambda.lock(lockState.readLock(), () -> rmInitialState.cloneAndFilter(filter));
+        return rmInitialState.cloneAndFilter(filter);
     }
 
     /**
