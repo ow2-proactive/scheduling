@@ -173,7 +173,6 @@ public class RMListenerProxy extends RMGroupEventListener {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    @ImmediateService
     public void nodeSourceEvent(RMNodeSourceEvent event) {
         Lambda.lock(lockState.writeLock(), () -> {
             switch (event.getEventType()) {
@@ -195,7 +194,6 @@ public class RMListenerProxy extends RMGroupEventListener {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
-    @ImmediateService
     public void nodeEvent(RMNodeEvent event) {
         Lambda.lock(lockState.writeLock(), () -> {
             switch (event.getEventType()) {
