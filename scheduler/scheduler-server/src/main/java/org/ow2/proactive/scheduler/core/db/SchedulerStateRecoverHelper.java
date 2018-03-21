@@ -90,6 +90,7 @@ public class SchedulerStateRecoverHelper {
                                                                                       TimeUnit.MINUTES);
         } catch (InterruptedException e) {
             logger.error("Interrupted while waiting for the Scheduler state to be recovered", e);
+            Thread.currentThread().interrupt();
             throw new SchedulerStateNotRecoveredException(e);
         }
 
