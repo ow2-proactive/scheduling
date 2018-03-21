@@ -25,16 +25,17 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 
 
 public class RMInitialStateTest {
 
-    RMInitialState rmInitialState;
+    private RMInitialState rmInitialState;
 
-    long counter = 0;
+    private long counter = 0;
 
     @Before
     public void init() {
@@ -53,46 +54,46 @@ public class RMInitialStateTest {
 
     @Test
     public void testLatestCounter() {
-        Assert.assertEquals(6, rmInitialState.getLatestCounter());
+        assertEquals(6, rmInitialState.getLatestCounter());
     }
 
     @Test
     public void testCloneAndFilter0() {
         final RMInitialState rmInitialState = this.rmInitialState.cloneAndFilter(1);
-        Assert.assertEquals(4, rmInitialState.getNodesEvents().size());
-        Assert.assertEquals(1, rmInitialState.getNodeSource().size());
+        assertEquals(4, rmInitialState.getNodesEvents().size());
+        assertEquals(1, rmInitialState.getNodeSource().size());
     }
 
     @Test
     public void testCloneAndFilter1() {
-        final RMInitialState rmInitialState = this.rmInitialState.cloneAndFilter(-1);
-        Assert.assertEquals(5, rmInitialState.getNodesEvents().size());
-        Assert.assertEquals(2, rmInitialState.getNodeSource().size());
+        final RMInitialState rmInitialState = this.rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE);
+        assertEquals(5, rmInitialState.getNodesEvents().size());
+        assertEquals(2, rmInitialState.getNodeSource().size());
     }
 
     @Test
     public void testCloneAndFilter2() {
         final RMInitialState rmInitialState = this.rmInitialState.cloneAndFilter(20);
-        Assert.assertEquals(5, rmInitialState.getNodesEvents().size());
-        Assert.assertEquals(2, rmInitialState.getNodeSource().size());
+        assertEquals(5, rmInitialState.getNodesEvents().size());
+        assertEquals(2, rmInitialState.getNodeSource().size());
     }
 
     @Test
     public void testRemoveNodeEvent() {
         rmInitialState.nodeRemoved(new RMNodeEvent("http://localhost:0003", 5));
-        Assert.assertEquals(5, rmInitialState.cloneAndFilter(-1).getNodesEvents().size());
+        assertEquals(5, rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE).getNodesEvents().size());
     }
 
     @Test
     public void testChnageNodeEvent() {
         rmInitialState.nodeStateChanged(new RMNodeEvent("http://localhost:0003", 5));
-        Assert.assertEquals(5, rmInitialState.cloneAndFilter(-1).getNodesEvents().size());
+        assertEquals(5, rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE).getNodesEvents().size());
     }
 
     @Test
     public void testRemoveNodeSourceEvent() {
         rmInitialState.nodeSourceRemoved(new RMNodeSourceEvent("LocalNodes", counter++));
-        Assert.assertEquals(2, rmInitialState.cloneAndFilter(-1).getNodeSource().size());
+        assertEquals(2, rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE).getNodeSource().size());
     }
 
 }
