@@ -27,6 +27,8 @@ package org.ow2.proactive.utils;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
+import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 
 public class Lambda {
@@ -52,5 +54,44 @@ public class Lambda {
         } finally {
             lock.unlock();
         }
+    }
+
+    /**
+     * repeats func function limit number of times
+     */
+    public static BiConsumer<Integer, RunnableThatThrows> repeater = (limit, func) -> {
+        for (int i = 0; i < limit; ++i) {
+            try {
+                func.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    public static <S, T> Stream<T> silentMap(Stream<S> stream, FunctionThatThrows<S, T> op) {
+        return stream.map(item -> {
+            try {
+                return op.apply(item);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
+    }
+
+    @FunctionalInterface
+    public interface RunnableThatThrows<T, R> {
+        void run() throws Exception;
+
+    }
+
+    /**
+     * How come java does not have Function that throws Exception
+     */
+    @FunctionalInterface
+    public interface FunctionThatThrows<T, R> {
+        R apply(T var1) throws Exception;
+
     }
 }

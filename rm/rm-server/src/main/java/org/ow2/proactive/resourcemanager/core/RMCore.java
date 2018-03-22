@@ -1721,13 +1721,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
         }
 
-        final Map<String, RMNodeSourceEvent> nodeSourceEvents = this.definedNodeSources.values()
-                                                                                       .stream()
-                                                                                       .map(NodeSource::createNodeSourceEvent)
-                                                                                       .collect(Collectors.toMap(RMNodeSourceEvent::getSourceName,
-                                                                                                                 event -> event));
+        final List<RMNodeSourceEvent> nodeSourceEvents = new ArrayList<>(this.definedNodeSources.values()
+                                                                                                .stream()
+                                                                                                .map(NodeSource::createNodeSourceEvent)
+                                                                                                .collect(Collectors.toList()));
 
-        return new RMInitialState(nodeEvents, nodeSourceEvents);
+        return new RMInitialState(new ArrayList<>(nodeEvents.values()), nodeSourceEvents);
     }
 
     /**

@@ -26,17 +26,15 @@
 package functionaltests.job;
 
 import static org.junit.Assert.assertEquals;
+import static org.ow2.proactive.utils.Lambda.*;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerState;
@@ -92,49 +90,10 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
 
     }
 
-    /**
-     * repeats func function limit number of times
-     */
-    public static BiConsumer<Integer, RunnableThatThrows> repeater = (limit, func) -> {
-        for (int i = 0; i < limit; ++i) {
-            try {
-                func.run();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
     private int GetTotalJobCount() throws Exception {
         final SchedulerState schedulerState = schedulerHelper.getSchedulerInterface().getState();
         return schedulerState.getFinishedJobs().size() + schedulerState.getPendingJobs().size() +
                schedulerState.getRunningJobs().size();
-    }
-
-    public static <S, T> Stream<T> silentMap(Stream<S> stream, FunctionThatThrows<S, T> op) {
-        return stream.map(item -> {
-            try {
-                return op.apply(item);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        });
-    }
-
-    @FunctionalInterface
-    public interface RunnableThatThrows<T, R> {
-        void run() throws Exception;
-
-    }
-
-    /**
-     * How come java does not have Function that throws Exception
-     */
-    @FunctionalInterface
-    public interface FunctionThatThrows<T, R> {
-        R apply(T var1) throws Exception;
-
     }
 
 }

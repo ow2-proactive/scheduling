@@ -49,7 +49,6 @@ import javax.management.remote.JMXServiceURL;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -173,50 +172,43 @@ public class RMListenerProxy extends RMGroupEventListener {
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
-    @ImmediateService
     public void nodeSourceEvent(RMNodeSourceEvent event) {
-        Lambda.lock(lockState.writeLock(), () -> {
-            switch (event.getEventType()) {
-                case NODESOURCE_DEFINED:
-                    rmInitialState.nodeSourceAdded(event);
-                    break;
-                case NODESOURCE_CREATED:
-                case NODESOURCE_SHUTDOWN:
-                    rmInitialState.nodeSourceStateChanged(event);
-                    break;
-                case NODESOURCE_REMOVED:
-                    rmInitialState.nodeSourceRemoved(event);
-                    break;
-            }
-            checkCounter(event);
-        });
+        switch (event.getEventType()) {
+            case NODESOURCE_DEFINED:
+                rmInitialState.nodeSourceAdded(event);
+                break;
+            case NODESOURCE_CREATED:
+            case NODESOURCE_SHUTDOWN:
+                rmInitialState.nodeSourceStateChanged(event);
+                break;
+            case NODESOURCE_REMOVED:
+                rmInitialState.nodeSourceRemoved(event);
+                break;
+        }
+        checkCounter(event);
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
-    @ImmediateService
     public void nodeEvent(RMNodeEvent event) {
-        Lambda.lock(lockState.writeLock(), () -> {
-            switch (event.getEventType()) {
-                case NODE_REMOVED:
-                    rmInitialState.nodeRemoved(event);
-                    break;
-                case NODE_ADDED:
-                    rmInitialState.nodeAdded(event);
-                    break;
-                case NODE_STATE_CHANGED:
-                    rmInitialState.nodeStateChanged(event);
-                    break;
+        switch (event.getEventType()) {
+            case NODE_REMOVED:
+                rmInitialState.nodeRemoved(event);
+                break;
+            case NODE_ADDED:
+                rmInitialState.nodeAdded(event);
+                break;
+            case NODE_STATE_CHANGED:
+                rmInitialState.nodeStateChanged(event);
+                break;
 
-            }
-            checkCounter(event);
-        });
+        }
+        checkCounter(event);
     }
 
-    @ImmediateService
     public RMInitialState getRMInitialState(long filter) {
-        return Lambda.lock(lockState.readLock(), () -> rmInitialState.cloneAndFilter(filter));
+        return rmInitialState.cloneAndFilter(filter);
     }
 
     /**

@@ -30,12 +30,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -70,14 +68,30 @@ public class RMInitialState implements Serializable {
     private static final Logger LOGGER = Logger.getLogger(RMInitialState.class);
 
     /**
-     * Nodes events
+     * Node events are stored in sorted collection,
+     * where nodeUrl is unique (key),
+     * but events are sorted based on counter.
+     * Because main usage suggests that
+     * there will be more read the writes to this collection
+     * thus when we add/update event, we spend O(length) time
+     * to remove previous event with the same key (nodeUrl),
+     * and after this we sort collection to keep it always sorted.
+     * PS: Starting from Java 8 AraryList are faster to sort than LinkedList
      */
-    private Map<String, RMNodeEvent> nodeEvents = new ConcurrentHashMap<>();
+    private List<RMNodeEvent> nodeEvents = new ArrayList<>();
 
     /**
-     * Nodes sources AO living in RM
+     * Nodesource events are stored in sorted collection,
+     * where sourceName is unique (key),
+     * but events are sorted based on counter.
+     * Because main usage suggests that
+     * there will be more read the writes to this collection
+     * thus when we add/update event, we spend O(length) time
+     * to remove previous event with the same key (nodeUrl),
+     * and after this we sort collection to keep it always sorted.
+     * PS: Starting from Java 8 AraryList are faster to sort than LinkedList
      */
-    private Map<String, RMNodeSourceEvent> nodeSourceEvents = new ConcurrentHashMap<>();
+    private List<RMNodeSourceEvent> nodeSourceEvents = new ArrayList<>();
 
     /**
      * keeps track of the latest (biggest) counter among the 'nodeEvents' and 'nodeSourceEvents'
@@ -91,15 +105,11 @@ public class RMInitialState implements Serializable {
 
     }
 
-    /**
-     * Creates an InitialState object.
-     *
-     * @param nodesEventList  RM's node events.
-     * @param nodeSourcesList RM's node sources list.
-     */
-    public RMInitialState(Map<String, RMNodeEvent> nodesEventList, Map<String, RMNodeSourceEvent> nodeSourcesList) {
-        this.nodeEvents = nodesEventList;
-        this.nodeSourceEvents = nodeSourcesList;
+    public RMInitialState(List<RMNodeEvent> nodeEvents, List<RMNodeSourceEvent> nodeSourceEvents) {
+        this.nodeEvents = nodeEvents;
+        this.nodeSourceEvents = nodeSourceEvents;
+        Collections.sort(nodeEvents, Comparator.comparingLong(RMEvent::getCounter));
+        Collections.sort(nodeSourceEvents, Comparator.comparingLong(RMEvent::getCounter));
     }
 
     /**
@@ -108,7 +118,7 @@ public class RMInitialState implements Serializable {
      * @return
      */
     public List<RMNodeEvent> getNodesEvents() {
-        return Collections.unmodifiableList(new ArrayList<>(this.nodeEvents.values()));
+        return Collections.unmodifiableList(this.nodeEvents);
     }
 
     /**
@@ -117,7 +127,7 @@ public class RMInitialState implements Serializable {
      * @return
      */
     public List<RMNodeSourceEvent> getNodeSource() {
-        return Collections.unmodifiableList(new ArrayList<>(this.nodeSourceEvents.values()));
+        return Collections.unmodifiableList(this.nodeSourceEvents);
     }
 
     public long getLatestCounter() {
@@ -125,34 +135,71 @@ public class RMInitialState implements Serializable {
     }
 
     public void nodeAdded(RMNodeEvent event) {
-        updateCounter(event);
-        nodeEvents.put(event.getNodeUrl(), event);
-
+        updateNode(event);
     }
 
     public void nodeStateChanged(RMNodeEvent event) {
-        updateCounter(event);
-        nodeEvents.put(event.getNodeUrl(), event);
+        updateNode(event);
     }
 
     public void nodeRemoved(RMNodeEvent event) {
+        updateNode(event);
+    }
+
+    protected void updateNode(RMNodeEvent event) {
         updateCounter(event);
-        nodeEvents.put(event.getNodeUrl(), event);
+
+        // try to remove existing node with the same node url
+        // PS: I do not see how I can extract method without changing RMNodeEvent and RMNodeSourceEvent types.
+        final Iterator<RMNodeEvent> iterator = nodeEvents.iterator();
+        while (iterator.hasNext()) {
+            final RMNodeEvent existedEvent = iterator.next();
+            final String keyExistedEvent = existedEvent.getNodeUrl();
+            final String keyEvent = event.getNodeUrl();
+            if (keyExistedEvent.equals(keyEvent)) {
+                iterator.remove();
+                break;
+            }
+        }
+
+        nodeEvents.add(event);
+
+        // keep list sorted by counter
+        Collections.sort(nodeEvents, Comparator.comparingLong(RMEvent::getCounter));
     }
 
     public void nodeSourceAdded(RMNodeSourceEvent event) {
-        updateCounter(event);
-        nodeSourceEvents.put(event.getSourceName(), event);
+        updateNodeSource(event);
     }
 
     public void nodeSourceRemoved(RMNodeSourceEvent event) {
-        updateCounter(event);
-        nodeSourceEvents.put(event.getSourceName(), event);
+        updateNodeSource(event);
     }
 
     public void nodeSourceStateChanged(RMNodeSourceEvent event) {
+        updateNodeSource(event);
+    }
+
+    protected void updateNodeSource(RMNodeSourceEvent event) {
         updateCounter(event);
-        nodeSourceEvents.put(event.getSourceName(), event);
+
+        // try to remove existing node with the same source name
+        // PS: I do not see how I can extract method without changing RMNodeEvent and RMNodeSourceEvent types.
+        final Iterator<RMNodeSourceEvent> iterator = nodeSourceEvents.iterator();
+        while (iterator.hasNext()) {
+            final RMNodeSourceEvent existedEvent = iterator.next();
+            final String keyExistedEvent = existedEvent.getSourceName();
+            final String keyEvent = event.getSourceName();
+            if (keyExistedEvent.equals(keyEvent)) {
+                iterator.remove();
+                break;
+            }
+        }
+
+        nodeSourceEvents.add(event);
+
+        // keep list sorted by counter
+        Collections.sort(nodeSourceEvents, Comparator.comparingLong(RMEvent::getCounter));
     }
 
     private void updateCounter(RMEvent event) {
@@ -179,24 +226,59 @@ public class RMInitialState implements Serializable {
         }
         RMInitialState clone = new RMInitialState();
 
-        clone.nodeEvents = newFilteredEvents(this.nodeEvents,
-                                             actualFilter,
-                                             actualFilter + PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt());
-        clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents,
-                                                   actualFilter,
-                                                   actualFilter + PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt());
+        int indexNode = 0;
+        int indexNodeSoruce = 0;
+
+        // move indexes to skip all node and nodesource events which has counter smaller or equal to filter,
+        // i.e. client is already aware about them
+        for (; indexNode < this.nodeEvents.size() &&
+               this.nodeEvents.get(indexNode).getCounter() <= actualFilter; ++indexNode) {
+        }
+        for (; indexNodeSoruce < this.nodeSourceEvents.size() &&
+               this.nodeSourceEvents.get(indexNodeSoruce).getCounter() <= actualFilter; ++indexNodeSoruce) {
+        }
+
+        // this loop finds at most 'RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE' events with the smallest existing counter
+        for (int elementInChunk = 0; elementInChunk < PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt(); ++elementInChunk) {
+
+            // these are candidates to add to chunk that will be send to client
+            Optional<RMNodeEvent> candidateNode = indexNode < nodeEvents.size() ? Optional.of(nodeEvents.get(indexNode))
+                                                                                : Optional.empty();
+
+            Optional<RMNodeSourceEvent> candidateNodeSource = indexNodeSoruce < nodeSourceEvents.size() ? Optional.of(nodeSourceEvents.get(indexNodeSoruce))
+                                                                                                        : Optional.empty();
+
+            // if both candidates are present we take that with smallest counter
+            if (candidateNode.isPresent() && candidateNodeSource.isPresent()) {
+                if (candidateNode.get().getCounter() < candidateNodeSource.get().getCounter()) {
+                    clone.nodeEvents.add(candidateNode.get());
+                    ++indexNode;
+                } else {
+                    clone.nodeSourceEvents.add(candidateNodeSource.get());
+                    ++indexNodeSoruce;
+                }
+                // in case only one candidate is present than we have to add it to the chunk
+            } else if (candidateNode.isPresent() && !candidateNodeSource.isPresent()) {
+                clone.nodeEvents.add(candidateNode.get());
+                ++indexNode;
+            } else if (!candidateNode.isPresent() && candidateNodeSource.isPresent()) {
+                clone.nodeSourceEvents.add(candidateNodeSource.get());
+                ++indexNodeSoruce;
+            } else { // in case there is no more candidates, we stop our search
+                break;
+            }
+        }
 
         clone.latestCounter.set(Math.max(actualFilter,
-                                         Math.max(findLargestCounter(clone.nodeEvents.values()),
-                                                  findLargestCounter(clone.nodeSourceEvents.values()))));
-        return clone;
-    }
+                                         Math.max(findLargestCounter(clone.nodeEvents),
+                                                  findLargestCounter(clone.nodeSourceEvents))));
 
-    private <T extends RMEvent> Map<String, T> newFilteredEvents(Map<String, T> events, long from, long to) {
-        return events.entrySet()
-                     .stream()
-                     .filter(entry -> from < entry.getValue().getCounter() && entry.getValue().getCounter() <= to)
-                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        LOGGER.debug(String.format("Provided %d, return #nodes %d, #nodesource %d, latest %d",
+                actualFilter,
+                clone.nodeEvents.size(),
+                clone.nodeSourceEvents.size(),
+                clone.latestCounter.get()));
+        return clone;
     }
 
     private <T extends RMEvent> long findLargestCounter(Collection<T> events) {

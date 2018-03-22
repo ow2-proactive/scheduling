@@ -44,9 +44,12 @@ public class RMInitialStateChunksTest {
     public void init() {
         rmInitialState = new RMInitialState();
 
-        IntStream.range(0, 10).forEach(nodeSourceId -> {
+        RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.updateProperty("50");
+
+        IntStream.range(0, 4).forEach(nodeSourceId -> {
+            counter += 500;
             rmInitialState.nodeSourceAdded(new RMNodeSourceEvent("LocalNodes" + nodeSourceId, counter++));
-            IntStream.range(0, 100).forEach(nodeId -> {
+            IntStream.range(0, 50).forEach(nodeId -> {
                 rmInitialState.nodeAdded(new RMNodeEvent("http://localhost:0" + nodeSourceId + nodeId, counter++));
             });
         });
@@ -54,14 +57,41 @@ public class RMInitialStateChunksTest {
     }
 
     @Test
-    public void testProperty() {
-        RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.updateProperty("50");
+    public void clientKnowsNothing() {
 
-        final RMInitialState cloned = this.rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE);
-        assertEquals(RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt() - 1, cloned.getLatestCounter());
+        final RMInitialState response = this.rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE);
+        assertEquals(1, response.getNodeSource().size());
+        assertEquals(49, response.getNodesEvents().size());
+        assertEquals(549, response.getLatestCounter());
 
-        RMInitialState cloned2 = this.rmInitialState.cloneAndFilter(cloned.getLatestCounter());
-        assertEquals(2 * RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt() - 1, cloned2.getLatestCounter());
     }
 
+    @Test
+    public void clientKnowsSomething() {
+
+        final RMInitialState response = this.rmInitialState.cloneAndFilter(549);
+        assertEquals(1, response.getNodeSource().size());
+        assertEquals(49, response.getNodesEvents().size());
+        assertEquals(1099, response.getLatestCounter());
+    }
+
+    @Test
+    public void clientKnowsEverything() {
+        long latestExisted = counter - 1;
+        final RMInitialState response = this.rmInitialState.cloneAndFilter(latestExisted);
+
+        assertEquals(0, response.getNodeSource().size());
+        assertEquals(0, response.getNodesEvents().size());
+        assertEquals(latestExisted, response.getLatestCounter());
+    }
+
+    @Test
+    public void clientWentCrazy() {
+        long latestExisted = counter - 1;
+        final RMInitialState response = this.rmInitialState.cloneAndFilter(latestExisted + 1000);
+        assertEquals(1, response.getNodeSource().size());
+        assertEquals(49, response.getNodesEvents().size());
+        assertEquals(549, response.getLatestCounter());
+
+    }
 }
