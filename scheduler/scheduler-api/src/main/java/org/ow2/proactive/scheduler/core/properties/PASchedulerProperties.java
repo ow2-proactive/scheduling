@@ -97,6 +97,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Number of threads used to handle scheduled operations related to housekeeping */
     SCHEDULER_HOUSEKEEPING_SCHEDULED_POOL_NBTHREAD("pa.scheduler.core.housekeeping.scheduledpoolnbthreads", PropertyType.INTEGER, "5"),
 
+    /** The number of threads in the thread pool that serves to recover running tasks in parallel at scheduler start up */
+    SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_NBTHREAD("pa.scheduler.core.parallel.scheduler.state.recover.nbthreads", PropertyType.INTEGER, "16"),
+
+    /** The timeout - to be used in minutes - for the scheduler state to be fully recovered */
+    SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_TIMEOUT("pa.scheduler.core.parallel.scheduler.state.recover.timeout", PropertyType.INTEGER, "60"),
+
     /** Name of the JMX MBean for the scheduler */
     SCHEDULER_JMX_CONNECTOR_NAME("pa.scheduler.core.jmx.connectorname", PropertyType.STRING, "JMXSchedulerAgent"),
 

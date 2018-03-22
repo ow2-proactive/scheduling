@@ -29,16 +29,17 @@ import java.net.URL;
 
 
 /**
- * Tests that a task that is run in a forked JVM is able to reconnect to the scheduler after restart.
+ * Tests that a task that is run in-process is able to reconnect to the scheduler after restart.
  *
  * @author ActiveEon Team
  * @since 20/09/17
  */
-public class TaskReconnectionWithForkedTaskExecutorTest extends TaskReconnectionToRecoveredNodeTest {
+@SuppressWarnings("squid:S2187")
+public class RunningTaskRecoveryWithInProcessTaskExecutorTest extends RunningTaskRecoveryWithRecoveredNodeTestBase {
 
-    private static final URL SCHEDULER_CONFIGURATION_START = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
+    private static final URL SCHEDULER_CONFIGURATION_START = RunningTaskRecoveryWithInProcessTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-nonforkedtasks.ini");
 
-    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
+    private static final URL SCHEDULER_CONFIGURATION_RESTART = RunningTaskRecoveryWithInProcessTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB-nonforkedtasks.ini");
 
     @Override
     protected URL getSchedulerStartConfigurationURL() {
