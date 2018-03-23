@@ -28,7 +28,7 @@ package org.ow2.proactive.utils;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
-import java.util.stream.Stream;
+import java.util.function.Function;
 
 
 public class Lambda {
@@ -69,15 +69,14 @@ public class Lambda {
         }
     };
 
-    public static <S, T> Stream<T> silentMap(Stream<S> stream, FunctionThatThrows<S, T> op) {
-        return stream.map(item -> {
+    public static <T, R> Function<T, R> silent(FunctionThatThrows<T, R> functionThatThrows) {
+        return arg -> {
             try {
-                return op.apply(item);
+                return functionThatThrows.apply(arg);
             } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+                throw new RuntimeException(e);
             }
-        });
+        };
     }
 
     @FunctionalInterface

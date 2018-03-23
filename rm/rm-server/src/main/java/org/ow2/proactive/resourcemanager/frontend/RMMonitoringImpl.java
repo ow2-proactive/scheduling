@@ -363,7 +363,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
             RMInitialState rmInitialState = rmcore.getRMInitialState();
 
             eventDispatcher.setCounter(rmInitialState.getLatestCounter());
-            return  rmInitialState;
+            return rmInitialState;
         }
     }
 

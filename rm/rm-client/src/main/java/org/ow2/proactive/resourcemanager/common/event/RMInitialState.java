@@ -104,9 +104,9 @@ public class RMInitialState implements Serializable {
 
     public List<RMNodeEvent> getNodesEvents(Collection<RMEvent> rmEvents) {
         return rmEvents.stream()
-                .filter(event -> event instanceof RMNodeEvent)
-                .map(event -> (RMNodeEvent) event)
-                .collect(Collectors.toList());
+                       .filter(event -> event instanceof RMNodeEvent)
+                       .map(event -> (RMNodeEvent) event)
+                       .collect(Collectors.toList());
     }
 
     public List<RMNodeSourceEvent> getNodeSource(Collection<RMEvent> rmevents) {

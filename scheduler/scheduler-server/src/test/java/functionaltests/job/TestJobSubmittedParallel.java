@@ -30,16 +30,18 @@ import static org.ow2.proactive.utils.Lambda.*;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.utils.Lambda;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 
@@ -77,10 +79,11 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
             return result;
         })));
 
-        List<JobId> allJobId = new LinkedList<>();
-
         // wait until all jobs are finished
-        silentMap(futures.stream(), future -> future.get()).forEach(col -> allJobId.addAll(col));
+        List<JobId> allJobId = futures.stream()
+                                      .map(Lambda.silent(Future::get))
+                                      .flatMap(Collection::stream)
+                                      .collect(Collectors.toList());
 
         int EXPECTER_NUMBER_OF_JOBS = THREAD_POOL_SIZE * NUMBER_OF_JOBS_PER_THREAD;
 
