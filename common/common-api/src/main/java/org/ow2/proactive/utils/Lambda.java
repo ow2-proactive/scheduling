@@ -31,6 +31,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 
+// because we dont like checked exceptions
+@SuppressWarnings("squid:S00112")
 public class Lambda {
 
     private Lambda() {
@@ -59,12 +61,12 @@ public class Lambda {
     /**
      * repeats func function limit number of times
      */
-    public static BiConsumer<Integer, RunnableThatThrows> repeater = (limit, func) -> {
+    public static final BiConsumer<Integer, RunnableThatThrows> repeater = (limit, func) -> {
         for (int i = 0; i < limit; ++i) {
             try {
                 func.run();
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     };
@@ -79,15 +81,38 @@ public class Lambda {
         };
     }
 
+    public static <T> Callable<T> silent(CallableThatThrows<T> functionThatThrows) {
+        return () -> {
+            try {
+                return functionThatThrows.apply();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    public static Runnable silent(RunnableThatThrows functionThatThrows) {
+        return () -> {
+            try {
+                functionThatThrows.run();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
     @FunctionalInterface
-    public interface RunnableThatThrows<T, R> {
+    public interface RunnableThatThrows {
         void run() throws Exception;
 
     }
 
-    /**
-     * How come java does not have Function that throws Exception
-     */
+    @FunctionalInterface
+    public interface CallableThatThrows<T> {
+        T apply() throws Exception;
+
+    }
+
     @FunctionalInterface
     public interface FunctionThatThrows<T, R> {
         R apply(T var1) throws Exception;

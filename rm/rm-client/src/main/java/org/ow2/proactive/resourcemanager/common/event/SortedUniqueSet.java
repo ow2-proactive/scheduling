@@ -52,9 +52,9 @@ interface Unique {
  */
 public class SortedUniqueSet<T extends Unique & Comparable<T> & Serializable> implements Serializable {
 
-    private SortedSet<T> sortedItems = new TreeSet<>();
+    private TreeSet<T> sortedItems = new TreeSet<>();
 
-    private Map<String, T> items = new HashMap<>();
+    private HashMap<String, T> items = new HashMap<>();
 
     public void add(T toAdd) {
         remove(toAdd);

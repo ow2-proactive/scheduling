@@ -114,7 +114,7 @@ public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, Un
 
     @Override
     public String getKey() {
-        return getRMUrl();
+        return Long.toString(getCounter());
     }
 
     /**
@@ -144,6 +144,23 @@ public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, Un
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        RMEvent rmEvent = (RMEvent) o;
+
+        return counter == rmEvent.counter;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (counter ^ (counter >>> 32));
     }
 
     @Override

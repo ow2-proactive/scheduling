@@ -100,8 +100,6 @@ public class RMListenerProxy extends RMGroupEventListener {
 
     protected AtomicLong counter = new AtomicLong(0);
 
-    private final ReentrantReadWriteLock lockState = new ReentrantReadWriteLock();
-
     public boolean init(String url, CredData credData) throws RMException, KeyException, LoginException {
         this.rmAuth = RMConnection.join(url);
         Credentials cred = Credentials.createCredentials(credData, rmAuth.getPublicKey());
