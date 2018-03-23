@@ -23,31 +23,16 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.recover;
+package org.ow2.proactive.scheduler.core.db;
 
-import java.net.URL;
+public class SchedulerStateNotRecoveredException extends RuntimeException {
 
-
-/**
- * Tests that a task that is run in-process is able to reconnect to the scheduler after restart.
- *
- * @author ActiveEon Team
- * @since 20/09/17
- */
-public class TaskReconnectionWithInProcessTaskExecutorTest extends TaskReconnectionToRecoveredNodeTest {
-
-    private static final URL SCHEDULER_CONFIGURATION_START = TaskReconnectionWithInProcessTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-nonforkedtasks.ini");
-
-    private static final URL SCHEDULER_CONFIGURATION_RESTART = TaskReconnectionWithInProcessTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB-nonforkedtasks.ini");
-
-    @Override
-    protected URL getSchedulerStartConfigurationURL() {
-        return SCHEDULER_CONFIGURATION_START;
+    public SchedulerStateNotRecoveredException(String message) {
+        super(message);
     }
 
-    @Override
-    protected URL getSchedulerReStartConfigurationURL() {
-        return SCHEDULER_CONFIGURATION_RESTART;
+    public SchedulerStateNotRecoveredException(Exception exception) {
+        super(exception);
     }
 
 }
