@@ -251,6 +251,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                 }
             }
         }
+
+        public void setCounter(long counter) {
+            this.counter = counter;
+        }
     }
 
     private class GroupEventDispatcher extends EventDispatcher {
@@ -348,13 +352,19 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
                 throw new IllegalArgumentException("Unknown client " + id.shortString());
             }
 
+            EventDispatcher eventDispatcher = null;
             if (stub instanceof RMGroupEventListener) {
-                this.dispatchers.put(id, new GroupEventDispatcher(client, stub, events));
+                eventDispatcher = new GroupEventDispatcher(client, stub, events);
             } else {
-                this.dispatchers.put(id, new EventDispatcher(client, stub, events));
+                eventDispatcher = new EventDispatcher(client, stub, events);
             }
+            this.dispatchers.put(id, eventDispatcher);
+
+            RMInitialState rmInitialState = rmcore.getRMInitialState();
+
+            eventDispatcher.setCounter(rmInitialState.getLatestCounter());
+            return  rmInitialState;
         }
-        return rmcore.getRMInitialState();
     }
 
     /**

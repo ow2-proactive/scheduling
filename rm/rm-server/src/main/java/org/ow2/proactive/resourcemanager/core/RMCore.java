@@ -1726,7 +1726,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                                                 .map(NodeSource::createNodeSourceEvent)
                                                                                                 .collect(Collectors.toList()));
 
-        return new RMInitialState(new ArrayList<>(nodeEvents.values()), nodeSourceEvents);
+        long eventCounter = 0;
+        for (RMNodeSourceEvent nodeSourceEvent : nodeSourceEvents) {
+            nodeSourceEvent.setCounter(eventCounter++);
+        }
+        for (RMNodeEvent nodeEvent : nodeEvents.values()) {
+            nodeEvent.setCounter(eventCounter++);
+        }
+
+        final RMInitialState rmInitialState = new RMInitialState();
+        rmInitialState.addAll(nodeEvents.values());
+        rmInitialState.addAll(nodeSourceEvents);
+
+        return rmInitialState;
     }
 
     /**

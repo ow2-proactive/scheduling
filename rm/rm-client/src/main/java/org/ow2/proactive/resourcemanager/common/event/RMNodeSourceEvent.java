@@ -100,10 +100,15 @@ public class RMNodeSourceEvent extends RMEvent {
     }
 
     @Override
+    public String getKey() {
+        return getSourceName();
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((nodeSourceName == null) ? 0 : nodeSourceName.hashCode());
+        result = prime * result + ((getKey() == null) ? 0 : getKey().hashCode());
         return result;
     }
 
@@ -121,10 +126,10 @@ public class RMNodeSourceEvent extends RMEvent {
         if (!(obj instanceof RMNodeSourceEvent))
             return false;
         RMNodeSourceEvent other = (RMNodeSourceEvent) obj;
-        if (nodeSourceName == null) {
-            if (other.nodeSourceName != null)
+        if (getKey() == null) {
+            if (other.getKey() != null)
                 return false;
-        } else if (!nodeSourceName.equals(other.nodeSourceName))
+        } else if (!getKey().equals(other.getKey()))
             return false;
         return true;
     }

@@ -58,13 +58,17 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.event.*;
+import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDTO;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMGroupEventListener;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.utils.Lambda;
 
 
 /**
@@ -207,7 +211,7 @@ public class RMListenerProxy extends RMGroupEventListener {
         checkCounter(event);
     }
 
-    public RMInitialState getRMInitialState(long filter) {
+    public RMStateDTO getRMInitialState(long filter) {
         return rmInitialState.cloneAndFilter(filter);
     }
 

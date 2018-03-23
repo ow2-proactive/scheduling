@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public class RMEvent implements Serializable, Cloneable {
+public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, Unique {
 
     /** Resource manager URL */
     private String RMUrl = null;
@@ -58,6 +58,10 @@ public class RMEvent implements Serializable, Cloneable {
      * ProActive empty constructor
      */
     public RMEvent() {
+    }
+
+    public RMEvent(long counter) {
+        this.counter = counter;
     }
 
     /**
@@ -108,6 +112,11 @@ public class RMEvent implements Serializable, Cloneable {
         return new SimpleDateFormat().format(new Date(timeStamp));
     }
 
+    @Override
+    public String getKey() {
+        return getRMUrl();
+    }
+
     /**
      * Gets the number of events sent to a client during the current session.
      * @return the number of events sent to a client during the current session
@@ -136,4 +145,10 @@ public class RMEvent implements Serializable, Cloneable {
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
+
+    @Override
+    public int compareTo(RMEvent event) {
+        return (int) this.getCounter() - (int) event.getCounter();
+    }
+
 }

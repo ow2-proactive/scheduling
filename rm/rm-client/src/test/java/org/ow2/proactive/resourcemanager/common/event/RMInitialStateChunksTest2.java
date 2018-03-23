@@ -35,7 +35,7 @@ import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDTO;
 
 
-public class RMInitialStateChunksTest {
+public class RMInitialStateChunksTest2 {
 
     private RMInitialState rmInitialState;
 
@@ -48,51 +48,16 @@ public class RMInitialStateChunksTest {
         RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.updateProperty("50");
 
         IntStream.range(0, 4).forEach(nodeSourceId -> {
-            counter += 500;
-            rmInitialState.nodeSourceAdded(new RMNodeSourceEvent("LocalNodes" + nodeSourceId, counter++));
-            IntStream.range(0, 50).forEach(nodeId -> {
-                rmInitialState.nodeAdded(new RMNodeEvent("http://localhost:0" + nodeSourceId + nodeId, counter++));
-            });
+            rmInitialState.nodeSourceAdded(new RMNodeSourceEvent("LocalNodes", counter++));
+            rmInitialState.nodeAdded(new RMNodeEvent("pnp...", counter++));
         });
 
     }
 
     @Test
     public void clientKnowsNothing() {
-
-        final RMStateDTO response = this.rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE);
-        assertEquals(1, response.getNodeSource().size());
-        assertEquals(49, response.getNodesEvents().size());
-        assertEquals(549, response.getLatestCounter());
-
+        assertEquals(1, rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE).getNodeSource().size());
+        assertEquals(1, rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE).getNodesEvents().size());
     }
 
-    @Test
-    public void clientKnowsSomething() {
-
-        final RMStateDTO response = this.rmInitialState.cloneAndFilter(549);
-        assertEquals(1, response.getNodeSource().size());
-        assertEquals(49, response.getNodesEvents().size());
-        assertEquals(1099, response.getLatestCounter());
-    }
-
-    @Test
-    public void clientKnowsEverything() {
-        long latestExisted = counter - 1;
-        final RMStateDTO response = this.rmInitialState.cloneAndFilter(latestExisted);
-
-        assertEquals(0, response.getNodeSource().size());
-        assertEquals(0, response.getNodesEvents().size());
-        assertEquals(latestExisted, response.getLatestCounter());
-    }
-
-    @Test
-    public void clientWentCrazy() {
-        long latestExisted = counter - 1;
-        final RMStateDTO response = this.rmInitialState.cloneAndFilter(latestExisted + 1000);
-        assertEquals(1, response.getNodeSource().size());
-        assertEquals(49, response.getNodesEvents().size());
-        assertEquals(549, response.getLatestCounter());
-
-    }
 }
