@@ -70,13 +70,6 @@ public class RMInitialState implements Serializable {
      */
     private AtomicLong latestCounter = new AtomicLong(0);
 
-    /**
-     * ProActive empty constructor
-     */
-    public RMInitialState() {
-
-    }
-
     public void addAll(Collection<? extends RMEvent> toAdd) {
         toAdd.forEach(rmEvent -> events.add(rmEvent));
         latestCounter.set(Math.max(latestCounter.get(), findLargestCounter(events.getSortedItems())));
