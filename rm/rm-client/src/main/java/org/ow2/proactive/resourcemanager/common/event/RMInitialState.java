@@ -78,9 +78,7 @@ public class RMInitialState implements Serializable {
     }
 
     public void addAll(Collection<? extends RMEvent> toAdd) {
-        for (RMEvent rmEvent : toAdd) {
-            events.add(rmEvent);
-        }
+        toAdd.forEach(rmEvent -> events.add(rmEvent));
         latestCounter.set(Math.max(latestCounter.get(), findLargestCounter(events.getSortedItems())));
     }
 
