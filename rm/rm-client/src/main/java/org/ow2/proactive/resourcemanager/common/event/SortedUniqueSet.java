@@ -28,7 +28,6 @@ package org.ow2.proactive.resourcemanager.common.event;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
