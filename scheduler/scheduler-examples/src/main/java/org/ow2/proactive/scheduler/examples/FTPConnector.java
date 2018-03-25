@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,7 @@ public class FTPConnector extends JavaExecutable {
             }
             //login to the server
             if (!ftpClient.login(ftpUsername, ftpPassword)) {
-                throw new IOException("Logging refused.");
+                throw new IOException("Logging refused. check the FTP_USERNAME and the FTP_PASSWORD values.");
             }
 
             // use local passive mode to pass firewall
@@ -159,7 +160,7 @@ public class FTPConnector extends JavaExecutable {
 
             }
         } catch (IOException e) {
-            throw new IOException("Connection issues. Verify values of the FTP parameters (username, password, hostname..).");
+            throw new IOException(e);
         } finally {
             // log out and disconnect from the server
             ftpClient.logout();
@@ -292,10 +293,19 @@ public class FTPConnector extends JavaExecutable {
     }
 
     private void createRemoteDirectory(FTPClient ftpClient, String remoteDirPath) throws IOException {
-        if (ftpClient.makeDirectory(remoteDirPath)) {
-            getOut().println("CREATED the directory: " + remoteDirPath);
+        ArrayList folderList = new ArrayList<>(Arrays.asList(ftpClient.listDirectories()));
+        ArrayList<String> folderNames = new ArrayList();
+        for (int i = 0; i < folderList.size(); i++) {
+            folderNames.add(((FTPFile) (folderList.get(i))).getName());
+        }
+        if (!folderNames.contains(remoteDirPath)) {
+            if (ftpClient.makeDirectory(remoteDirPath)) {
+                getOut().println("CREATED the directory: " + remoteDirPath);
+            } else {
+                throw new IOException("Error: COULD NOT create the directory: " + remoteDirPath);
+            }
         } else {
-            throw new IOException("Error: COULD NOT create the directory: " + remoteDirPath);
+            throw new IOException("Error: COULD NOT create an existing directory: " + remoteDirPath);
         }
     }
 
