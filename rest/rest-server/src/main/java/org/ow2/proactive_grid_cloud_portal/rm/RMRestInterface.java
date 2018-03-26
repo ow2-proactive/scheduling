@@ -127,7 +127,9 @@ public interface RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+    RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("clientCounter") @DefaultValue("-1") String latestCounterClientAware)
+            throws NotConnectedException;
 
     @GET
     @Path("isactive")
@@ -203,6 +205,13 @@ public interface RMRestInterface {
     @Produces("application/json")
     NSState deployNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException;
+
+    @PUT
+    @Path("nodesource/undeploy")
+    @Produces("application/json")
+    NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt)
+            throws NotConnectedException;
 
     @POST
     @Path("nodesource/pingfrequency")

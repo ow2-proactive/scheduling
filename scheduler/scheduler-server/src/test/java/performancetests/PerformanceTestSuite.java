@@ -47,7 +47,9 @@ import performancetests.recovery.NodeRecoveryTest;
                       ParallelTaskSchedulingTest.class,
 
                       // Test which computes average metrics
-                      TaskSchedulingTimeTest.class })
+                      TaskSchedulingTimeTest.class
+
+})
 
 /**
  * @author ActiveEon Team

@@ -110,10 +110,21 @@ public interface ResourceManager {
      *
      * @param nodeSourceName the name of the node source to deploy
      * @return true if the node source was deployed successfully, false if the
-     * node source is already deployed or if it is deployed already, runtime
-     * exception otherwise
+     * node source is already deployed, runtime exception otherwise
      */
     BooleanWrapper deployNodeSource(String nodeSourceName);
+
+    /**
+     * Remove the nodes of a node source that has been deployed before, and
+     * keep the node source defined in the resource manager.
+     * If the node source is already undeployed, then this method does nothing.
+     *
+     * @param nodeSourceName the name of the node source to undeploy
+     * @param preempt if true remove the nodes immediately without waiting them to be freed.
+     * @return true if the node source was undeployed successfully, false if the
+     * node source is already undeployed, runtime exception otherwise
+     */
+    BooleanWrapper undeployNodeSource(String nodeSourceName, boolean preempt);
 
     /**
      * Remove a node source from the RM.

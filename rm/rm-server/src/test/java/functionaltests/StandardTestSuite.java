@@ -45,12 +45,13 @@ import functionaltests.jmx.account.AddGetRemoveTest;
 import functionaltests.jmx.account.AddGetTest;
 import functionaltests.monitor.TestRMMonitoring;
 import functionaltests.monitor.TestRMNodeMonitoring;
+import functionaltests.nodesource.LocalInfrastructureLifecycleTest;
+import functionaltests.nodesource.SSHInfrastructureV2LifecycleTest;
 import functionaltests.nodesource.TestLocalInfrastructureRestartDownNodesPolicy;
 import functionaltests.nodesource.TestLocalInfrastructureStaticPolicy;
 import functionaltests.nodesource.TestLocalInfrastructureTimeSlotPolicy;
 import functionaltests.nodesource.TestNodeSourceAfterRestart;
 import functionaltests.nodesource.TestSSHInfrastructureV2;
-import functionaltests.nodesource.TestSSHInfrastructureV2RestartDownNodesPolicy;
 import functionaltests.nodestate.TestAddRemoveAll;
 import functionaltests.nodestate.TestAdminAddingNodes;
 import functionaltests.nodestate.TestConcurrentUsers;
@@ -84,7 +85,8 @@ import functionaltests.topology.SelectionTest;
                       DynamicSelectionScriptTest.class, SelectionWithNodesExclusionTest.class,
                       SelectionWithSeveralScriptsTest.class, SelectionWithSeveralScriptsTest2.class,
                       StaticSelectionScriptTest.class, UnauthorizedSelectionScriptTest.class, LocalSelectionTest.class,
-                      SelectionTest.class })
+                      SelectionTest.class, SSHInfrastructureV2LifecycleTest.class,
+                      LocalInfrastructureLifecycleTest.class })
 
 /**
  * @author ActiveEon Team

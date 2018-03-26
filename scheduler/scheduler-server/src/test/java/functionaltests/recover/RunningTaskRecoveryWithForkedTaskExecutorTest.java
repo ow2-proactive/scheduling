@@ -23,12 +23,32 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.core;
+package functionaltests.recover;
 
-public class NodeSourceNameAlreadyExistException extends RuntimeException {
+import java.net.URL;
 
-    public NodeSourceNameAlreadyExistException(String message) {
-        super(message);
+
+/**
+ * Tests that a task that is run in a forked JVM is able to reconnect to the scheduler after restart.
+ *
+ * @author ActiveEon Team
+ * @since 20/09/17
+ */
+@SuppressWarnings("squid:S2187")
+public class RunningTaskRecoveryWithForkedTaskExecutorTest extends RunningTaskRecoveryWithRecoveredNodeTestBase {
+
+    private static final URL SCHEDULER_CONFIGURATION_START = RunningTaskRecoveryWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties.ini");
+
+    private static final URL SCHEDULER_CONFIGURATION_RESTART = RunningTaskRecoveryWithForkedTaskExecutorTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-updateDB.ini");
+
+    @Override
+    protected URL getSchedulerStartConfigurationURL() {
+        return SCHEDULER_CONFIGURATION_START;
+    }
+
+    @Override
+    protected URL getSchedulerReStartConfigurationURL() {
+        return SCHEDULER_CONFIGURATION_RESTART;
     }
 
 }

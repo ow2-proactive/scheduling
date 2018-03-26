@@ -254,9 +254,14 @@ public class RMRest implements RMRestInterface {
     }
 
     /**
-     * Returns the initial state of the resource manager
+     * Returns difference between current state of the resource manager
+     * and state that the client is aware of. Each event that changes state fo the RM
+     * has counter assosiacted to it. Thus client has to provide 'latestCounter',
+     * i.e. latest event he is aware of.
      * @param sessionId a valid session id
-     * @return the initial state of the resource manager 
+     * @param clientCounter (optional) is the latest counter client has, if parameter is not provided then
+     *                                 method returns all events
+     * @return the difference between current state and state that client knows
      * @throws NotConnectedException 
      */
     @Override
@@ -264,9 +269,11 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+    public RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
         checkAccess(sessionId);
-        return RMStateCaching.getRMInitialState();
+        long counter = Integer.valueOf(clientCounter);
+        return RMStateCaching.getRMInitialState(counter);
     }
 
     /**
@@ -517,6 +524,33 @@ public class RMRest implements RMRestInterface {
         NSState nsState = new NSState();
         try {
             nsState.setResult(rm.deployNodeSource(nodeSourceName).getBooleanValue());
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
+        }
+        return nsState;
+    }
+
+    /**
+     * Remove the nodes of the node source and keep the node source undeployed
+     *
+     * @param sessionId a valid session id
+     * @param nodeSourceName the name of the node source to undeploy
+     * @return the result of the action, possibly containing the error message
+     * @throws NotConnectedException
+     */
+    @Override
+    @PUT
+    @Path("nodesource/undeploy")
+    @Produces("application/json")
+    public NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt)
+            throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        NSState nsState = new NSState();
+        try {
+            nsState.setResult(rm.undeployNodeSource(nodeSourceName, preempt).getBooleanValue());
         } catch (RuntimeException ex) {
             nsState.setResult(false);
             nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));

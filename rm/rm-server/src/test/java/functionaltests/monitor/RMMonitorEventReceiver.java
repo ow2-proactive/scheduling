@@ -79,7 +79,7 @@ public class RMMonitorEventReceiver extends RMProxyUserInterface {
 
     public void removeRMEventListener() throws RMException {
         monitorsHandler.clear();
-        counter = 0;
+        counter.set(0);
         super.getMonitoring().removeRMEventListener();
     }
 

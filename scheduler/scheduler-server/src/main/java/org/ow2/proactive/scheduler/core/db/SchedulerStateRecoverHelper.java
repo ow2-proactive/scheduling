@@ -25,11 +25,22 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -48,6 +59,8 @@ public class SchedulerStateRecoverHelper {
 
     private final SchedulerDBManager dbManager;
 
+    private final Map<JobId, TaskStatusCounter> jobsToUpdate = new HashMap<>();
+
     public SchedulerStateRecoverHelper(SchedulerDBManager dbManager) {
         this.dbManager = dbManager;
     }
@@ -62,30 +75,28 @@ public class SchedulerStateRecoverHelper {
         Vector<InternalJob> pendingJobs = new Vector<>();
         Vector<InternalJob> runningJobs = new Vector<>();
 
+        ExecutorService recoverRunningTasksThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_NBTHREAD.getValueAsInt());
+
         for (InternalJob job : notFinishedJobs) {
-            switch (job.getStatus()) {
-                case PENDING:
-                    pendingJobs.add(job);
-                    break;
-                case STALLED:
-                case RUNNING:
-                case IN_ERROR:
-                    runningJobs.add(job);
-                    recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
-                    break;
-                case PAUSED:
-                    if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() +
-                         job.getNumberOfFinishedTasks()) == 0) {
-                        pendingJobs.add(job);
-                    } else {
-                        runningJobs.add(job);
-                        recoverRunningTasksOrResetToPending(job, job.getITasks(), rmProxy);
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected job status: " + job.getStatus());
-            }
+            recoverJob(rmProxy, pendingJobs, runningJobs, job, recoverRunningTasksThreadPool);
         }
+
+        recoverRunningTasksThreadPool.shutdown();
+
+        boolean terminatedWithoutTimeout;
+
+        try {
+            terminatedWithoutTimeout = recoverRunningTasksThreadPool.awaitTermination(PASchedulerProperties.SCHEDULER_PARALLEL_SCHEDULER_STATE_RECOVER_TIMEOUT.getValueAsInt(),
+                                                                                      TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            logger.error("Interrupted while waiting for the Scheduler state to be recovered", e);
+            Thread.currentThread().interrupt();
+            throw new SchedulerStateNotRecoveredException(e);
+        }
+
+        failIfSchedulerStateRecoveryTimeout(terminatedWithoutTimeout);
+
+        applyJobUpdates(notFinishedJobs);
 
         Vector<InternalJob> finishedJobs = new Vector<>();
 
@@ -126,7 +137,50 @@ public class SchedulerStateRecoverHelper {
         return new RecoveredSchedulerState(pendingJobs, runningJobs, finishedJobs);
     }
 
-    private void recoverRunningTasksOrResetToPending(InternalJob job, List<InternalTask> tasks, RMProxy rmProxy) {
+    private void applyJobUpdates(List<InternalJob> notFinishedJobs) {
+        for (InternalJob job : notFinishedJobs) {
+            if (this.jobsToUpdate.containsKey(job.getId())) {
+                updateJobWithCounters(job, this.jobsToUpdate.get(job.getId()));
+            }
+        }
+    }
+
+    private void failIfSchedulerStateRecoveryTimeout(boolean terminatedWithoutTimeout) {
+        if (!terminatedWithoutTimeout) {
+            String errorMessage = "Timeout while waiting for the Scheduler state to be recovered";
+            logger.error(errorMessage);
+            throw new SchedulerStateNotRecoveredException(errorMessage);
+        }
+    }
+
+    private void recoverJob(RMProxy rmProxy, Vector<InternalJob> pendingJobs, Vector<InternalJob> runningJobs,
+            InternalJob job, ExecutorService recoverRunningTasksThreadPool) {
+        switch (job.getStatus()) {
+            case PENDING:
+                pendingJobs.add(job);
+                break;
+            case STALLED:
+            case RUNNING:
+            case IN_ERROR:
+                runningJobs.add(job);
+                recoverJobTasks(job, job.getITasks(), rmProxy, recoverRunningTasksThreadPool);
+                break;
+            case PAUSED:
+                if ((job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks() +
+                     job.getNumberOfFinishedTasks()) == 0) {
+                    pendingJobs.add(job);
+                } else {
+                    runningJobs.add(job);
+                    recoverJobTasks(job, job.getITasks(), rmProxy, recoverRunningTasksThreadPool);
+                }
+                break;
+            default:
+                throw new IllegalStateException("Unexpected job status: " + job.getStatus());
+        }
+    }
+
+    private void recoverJobTasks(InternalJob job, List<InternalTask> tasks, RMProxy rmProxy,
+            ExecutorService recoverRunningTasksThreadPool) {
         TaskStatusCounter counter = new TaskStatusCounter();
         for (InternalTask task : tasks) {
             // we only need to take into account the tasks that were running
@@ -135,38 +189,43 @@ public class SchedulerStateRecoverHelper {
             // pending task
             if ((task.getStatus() == TaskStatus.RUNNING || task.getStatus() == TaskStatus.PAUSED) &&
                 task.getExecuterInformation() != null) {
-                handleRunningTask(rmProxy, counter, task);
+                recoverRunningTaskAsynchronously(rmProxy, recoverRunningTasksThreadPool, counter, task);
             } else {
-                handleTaskOtherThanRunning(counter, task);
+                recoverTaskOtherThanRunning(counter, task);
             }
             logger.debug("Task " + task.getId() + " status is " + task.getStatus().name());
         }
-        updateJobWithCounters(job, counter);
+        this.jobsToUpdate.put(job.getId(), counter);
     }
 
-    private void handleTaskOtherThanRunning(TaskStatusCounter counter, InternalTask task) {
+    private void recoverRunningTaskAsynchronously(RMProxy rmProxy, ExecutorService recoverRunningTasksThreadPool,
+            TaskStatusCounter counter, InternalTask task) {
+        recoverRunningTasksThreadPool.submit(() -> recoverRunningTask(rmProxy, counter, task));
+    }
+
+    private void recoverTaskOtherThanRunning(TaskStatusCounter counter, InternalTask task) {
         // recount existing pending tasks. We base this number on the
         // definition provided in SchedulerDBManager#PENDING_TASKS
         if (task.getStatus().equals(TaskStatus.PENDING) || task.getStatus().equals(TaskStatus.SUBMITTED) ||
             task.getStatus().equals(TaskStatus.NOT_STARTED)) {
-            counter.pendingTasks++;
+            counter.incrementPendingTasks();
         } else {
             // recount existing running tasks that are not recoverable
             // These tasks are "running" by the definition provided in
             // SchedulerDBManager#RUNNING_TASKS
             if (task.getStatus() == TaskStatus.IN_ERROR || task.getStatus() == TaskStatus.WAITING_ON_ERROR ||
                 task.getStatus() == TaskStatus.WAITING_ON_FAILURE) {
-                counter.runningTasks++;
+                counter.incrementRunningTasks();
             }
         }
     }
 
-    private void handleRunningTask(RMProxy rmProxy, TaskStatusCounter counter, InternalTask task) {
+    private void recoverRunningTask(RMProxy rmProxy, TaskStatusCounter counter, InternalTask task) {
         try {
             if (runningTaskMustBeResetToPending(task, rmProxy)) {
                 setTaskStatusAndIncrementPendingCounter(counter, task);
             } else {
-                counter.runningTasks++;
+                counter.incrementRunningTasks();
             }
         } catch (Throwable e) {
             logger.warn(FAIL_TO_RECOVER_RUNNING_TASK_STRING + task.getId() + " (" + task.getName() + ")", e);
@@ -176,11 +235,11 @@ public class SchedulerStateRecoverHelper {
 
     private void updateJobWithCounters(InternalJob job, TaskStatusCounter counter) {
         // reapply definition of stalled job
-        if (counter.runningTasks == 0 && job.getStatus().equals(JobStatus.RUNNING)) {
+        if (counter.getRunningTaskNumber() == 0 && job.getStatus().equals(JobStatus.RUNNING)) {
             job.setStatus(JobStatus.STALLED);
         }
-        job.setNumberOfPendingTasks(counter.pendingTasks);
-        job.setNumberOfRunningTasks(counter.runningTasks);
+        job.setNumberOfPendingTasks(counter.getPendingTaskNumber());
+        job.setNumberOfRunningTasks(counter.getRunningTaskNumber());
     }
 
     private boolean runningTaskMustBeResetToPending(InternalTask task, RMProxy rmProxy) {
@@ -221,7 +280,7 @@ public class SchedulerStateRecoverHelper {
     private void setTaskStatusAndIncrementPendingCounter(TaskStatusCounter counter, InternalTask task) {
         logger.info("Changing task status to " + TaskStatus.PENDING);
         task.setStatus(TaskStatus.PENDING);
-        counter.pendingTasks++;
+        counter.incrementPendingTasks();
     }
 
     /**
@@ -253,9 +312,26 @@ public class SchedulerStateRecoverHelper {
 
     private class TaskStatusCounter {
 
-        private int pendingTasks = 0;
+        private AtomicInteger pendingTasks = new AtomicInteger(0);
 
-        private int runningTasks = 0;
+        private AtomicInteger runningTasks = new AtomicInteger(0);
+
+        private void incrementPendingTasks() {
+            this.pendingTasks.incrementAndGet();
+        }
+
+        private void incrementRunningTasks() {
+            this.runningTasks.incrementAndGet();
+        }
+
+        private int getPendingTaskNumber() {
+            return this.pendingTasks.get();
+        }
+
+        private int getRunningTaskNumber() {
+            return this.runningTasks.get();
+        }
+
     }
 
 }

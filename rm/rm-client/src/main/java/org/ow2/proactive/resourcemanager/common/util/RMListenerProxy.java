@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
@@ -84,7 +85,7 @@ public class RMListenerProxy extends RMGroupEventListener {
 
     protected String nodeConnectorUrl;
 
-    protected long counter = 0;
+    protected AtomicLong counter = new AtomicLong(0);
 
     public boolean init(String url, CredData credData) throws RMException, KeyException, LoginException {
         this.rmAuth = RMConnection.join(url);
@@ -126,7 +127,7 @@ public class RMListenerProxy extends RMGroupEventListener {
 
     private void checkCounter(RMEvent event) {
 
-        if (counter > 0 && counter != event.getCounter() - 1) {
+        if (counter.get() > 0 && counter.get() != event.getCounter() - 1) {
             logger.warn("Missing events detected - resetting the rm state");
             logger.warn("Local event counter is " + counter + " vs. rm event counter " + event.getCounter());
             try {
@@ -135,9 +136,9 @@ public class RMListenerProxy extends RMGroupEventListener {
                 logger.error(e.getMessage(), e);
             }
             rebindListener();
-            counter = 0;
+            counter.set(0);
         } else {
-            counter = event.getCounter();
+            counter.set(event.getCounter());
         }
 
     }
@@ -163,21 +164,16 @@ public class RMListenerProxy extends RMGroupEventListener {
     public void nodeSourceEvent(RMNodeSourceEvent event) {
         switch (event.getEventType()) {
             case NODESOURCE_DEFINED:
-                rmInitialState.getNodeSource().add(event);
+                rmInitialState.nodeSourceAdded(event);
                 break;
             case NODESOURCE_CREATED:
+            case NODESOURCE_SHUTDOWN:
                 rmInitialState.nodeSourceStateChanged(event);
                 break;
             case NODESOURCE_REMOVED:
-                for (int i = 0; i < rmInitialState.getNodeSource().size(); i++) {
-                    if (rmInitialState.getNodeSource().get(i).getSourceName().equals(event.getSourceName())) {
-                        rmInitialState.getNodeSource().remove(i);
-                        break;
-                    }
-                }
+                rmInitialState.nodeSourceRemoved(event);
                 break;
         }
-
         checkCounter(event);
     }
 
@@ -200,12 +196,8 @@ public class RMListenerProxy extends RMGroupEventListener {
         checkCounter(event);
     }
 
-    /**
-     * give access to the cached initial state
-     * @return the local version of the initial state
-     */
-    public RMInitialState getRMInitialState() {
-        return rmInitialState;
+    public RMInitialState getRMInitialState(long filter) {
+        return rmInitialState.cloneAndFilter(filter);
     }
 
     /**

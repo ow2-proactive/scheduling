@@ -27,22 +27,28 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import static com.google.common.truth.Truth.assertThat;
 import static functionaltests.nodesrecovery.RecoverInfrastructureTestHelper.NODES_RECOVERABLE;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+
+import java.io.Serializable;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.objectweb.proactive.core.node.Node;
+import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 
 
@@ -62,6 +68,9 @@ public class InfrastructureManagerTest {
 
     @Mock
     private NodeSourceData nodeSourceData;
+
+    @Mock
+    private InfrastructureManager infrastructureManagerMock;
 
     @Before
     public void setUp() {
@@ -261,7 +270,26 @@ public class InfrastructureManagerTest {
         verify(dbManager, times(0)).updateNodeSource(eq(nodeSourceData));
     }
 
-    private static final class TestingInfrastructureManager extends InfrastructureManager {
+    @Test
+    public void testInternalInfrastructureConfigurationDoesNotPersistAnything() {
+        when(dbManager.getNodeSource(anyString())).thenReturn(null);
+        infrastructureManager.internalConfigure();
+        verify(nodeSource, times(0)).nodesRecoverable();
+    }
+
+    @Test
+    public void testAttemptToPersistInInternalInfrastructureConfigurationIsHandled() {
+        WrongTestingInfrastructureManager wrongInfrastructureManager = new WrongTestingInfrastructureManager();
+        wrongInfrastructureManager.setRmDbManager(dbManager);
+        when(dbManager.getNodeSource(anyString())).thenReturn(null);
+
+        wrongInfrastructureManager.internalConfigure();
+        // the invocation to the following method should still be avoided
+        // because an exception should be thrown and caught instead
+        verify(nodeSource, times(0)).nodesRecoverable();
+    }
+
+    private static class TestingInfrastructureManager extends InfrastructureManager {
 
         @Override
         public String getDescription() {
@@ -301,6 +329,23 @@ public class InfrastructureManagerTest {
         @Override
         public void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
 
+        }
+
+    }
+
+    private static final class WrongTestingInfrastructureManager extends TestingInfrastructureManager {
+
+        @Override
+        public String getDescription() {
+            return null;
+        }
+
+        @Override
+        protected void configure(Object... parameters) {
+            setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
+                persistedInfraVariables.put("testKey", "testValue");
+                return null;
+            });
         }
 
     }

@@ -175,6 +175,8 @@ public abstract class InfrastructureManager implements Serializable {
         try {
             variable = t.handle();
             persistInfrastructureVariables();
+        } catch (IllegalArgumentException e) {
+            logger.warn("Infrastructure variables not persisted", e);
         } catch (RuntimeException e) {
             logger.error("Exception while setting runtime variable: " + e.getMessage());
             throw e;
@@ -607,6 +609,9 @@ public abstract class InfrastructureManager implements Serializable {
      * the {@link NodeSource#DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME}.
      */
     public void persistInfrastructureVariables() {
+        if (nodeSource == null) {
+            throw new IllegalArgumentException("Invalid invocation to persist infrastructure variables: the node source is not yet set for this infrastructure");
+        }
         if (recoveryActivated()) {
             String nodeSourceName = nodeSource.getName();
             readLock.lock();

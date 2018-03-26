@@ -27,7 +27,9 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.http.client.methods.HttpGet;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
@@ -48,9 +50,21 @@ public class ListNodeSourceCommand extends AbstractCommand implements Command {
         if (statusCode(OK) == statusCode(response)) {
             RmStateView state = readValue(response, RmStateView.class, currentContext);
             NodeSourceView[] nodeSources = state.getNodeSource();
-            resultStack(currentContext).push(nodeSources);
+
+            // filter out all node source events that was removed
+            // so rm client does not display them
+            List<NodeSourceView> filtered = new ArrayList<>(nodeSources.length);
+            for (NodeSourceView nodeSourceEvent : nodeSources) {
+                if (!nodeSourceEvent.isRemoved()) {
+                    filtered.add(nodeSourceEvent);
+                }
+            }
+
+            NodeSourceView[] result = new NodeSourceView[filtered.size()];
+            result = filtered.toArray(result);
+            resultStack(currentContext).push(result);
             if (!currentContext.isSilent()) {
-                writeLine(currentContext, "%s", StringUtility.string(nodeSources));
+                writeLine(currentContext, "%s", StringUtility.string(result));
             }
         } else {
             handleError("An error occurred while retrieving node sources:", response, currentContext);

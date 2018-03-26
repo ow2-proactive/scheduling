@@ -44,45 +44,56 @@ public enum RMEventType {
     /**
      * Resource manager has been shutdown.
      */
-    SHUTDOWN,
+    SHUTDOWN("shutdown"),
     /**
      * Resource manager cessation as been asked, so Resource manager performs 
      * shutting down operations.  
      */
-    SHUTTING_DOWN,
+    SHUTTING_DOWN("shutting down"),
     /**
      * Resource manager has been launched. 
      */
-    STARTED,
+    STARTED("started"),
     /**
-     * The node source has been defined.
+     * The node source has been defined in the resource manager.
      */
-    NODESOURCE_DEFINED,
+    NODESOURCE_DEFINED("defined"),
     /**
-     * A new node source has been created in Resource manager.
+     * The node source has been deployed, i.e. its nodes are being acquired.
      */
-    NODESOURCE_CREATED,
+    NODESOURCE_CREATED("created"),
     /**
-     * A node source has been removed removed from resource manager.
+     * The node source has been shutdown, i.e. its nodes have been removed
+     * and it does not try to acquire nodes anymore.
      */
-    NODESOURCE_REMOVED,
+    NODESOURCE_SHUTDOWN("shutdown"),
     /**
-     * The node source state has been undefined, it is not known anymore.
+     * A node source has been removed from resource manager.
      */
-    NODESOURCE_UNDEFINED,
+    NODESOURCE_REMOVED("removed"),
     /**
     /**
      * A new node has been added to Resource manager, and is ready to
      * be provided to a RM user.
      */
-    NODE_ADDED,
+    NODE_ADDED("added"),
     /**
      * Node state has been changed.
      */
-    NODE_STATE_CHANGED,
+    NODE_STATE_CHANGED("changed"),
     /**
      * A node has been removed from Resource manager
      */
-    NODE_REMOVED,
+    NODE_REMOVED("removed");
+
+    private final String description;
+
+    RMEventType(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
 
 }

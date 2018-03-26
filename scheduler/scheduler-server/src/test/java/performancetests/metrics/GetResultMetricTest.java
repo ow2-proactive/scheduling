@@ -48,7 +48,7 @@ import performancetests.recovery.PerformanceTestBase;
 @RunWith(Parameterized.class)
 public class GetResultMetricTest extends PerformanceTestBase {
 
-    SchedulerTHelper schedulerHelper;
+    private SchedulerTHelper schedulerHelper;
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {

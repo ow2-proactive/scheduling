@@ -122,13 +122,13 @@ public class NodeSource implements InitActive, RunActive {
      * configured, and as such it should only be used in the constructor of
      * the node source.
      */
-    private final NodeSourcePolicy nodeSourcePolicy;
+    private final NodeSourcePolicy policy;
 
     /**
      * Node source policy reference to use when the node source policy has
      * been turned active, i.e. when the node source is deployed.
      */
-    private NodeSourcePolicy activeNodeSourcePolicy;
+    private NodeSourcePolicy activePolicy;
 
     private final String description;
 
@@ -191,7 +191,7 @@ public class NodeSource implements InitActive, RunActive {
         registrationURL = null;
         name = null;
         infrastructureManager = null;
-        nodeSourcePolicy = null;
+        policy = null;
         description = null;
         rmcore = null;
         administrator = null;
@@ -212,31 +212,30 @@ public class NodeSource implements InitActive, RunActive {
      */
     public NodeSource(String registrationURL, String name, InfrastructureManager im, NodeSourcePolicy policy,
             RMCore rmcore, RMMonitoringImpl monitor, NodeSourceDescriptor nodeSourceDescriptor) {
-        Client provider = nodeSourceDescriptor.getProvider();
         this.registrationURL = registrationURL;
         this.name = name;
-        this.administrator = provider;
+        this.administrator = nodeSourceDescriptor.getProvider();
         this.infrastructureManager = im;
-        this.nodeSourcePolicy = policy;
+        this.policy = policy;
         this.rmcore = rmcore;
         this.monitoring = monitor;
-        this.description = "Infrastructure: " + im + ", Policy: " + this.nodeSourcePolicy;
+        this.description = "Infrastructure: " + im + ", Policy: " + this.policy;
 
         this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
         this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
 
         // node source admin permission
         // it's the PrincipalPermission of the user who created the node source
-        this.adminPermission = new PrincipalPermission(administrator.getName(),
-                                                       administrator.getSubject()
-                                                                    .getPrincipals(UserNamePrincipal.class));
+        this.adminPermission = new PrincipalPermission(this.administrator.getName(),
+                                                       this.administrator.getSubject()
+                                                                         .getPrincipals(UserNamePrincipal.class));
         // creating node source provider permission
         // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
         // or PrincipalPermission (anyone)
-        this.providerPermission = new PrincipalPermission(administrator.getName(),
-                                                          this.nodeSourcePolicy.getProviderAccessType()
-                                                                               .getIdentityPrincipals(administrator));
-        this.nodeUserAccessType = this.nodeSourcePolicy.getUserAccessType();
+        this.providerPermission = new PrincipalPermission(this.administrator.getName(),
+                                                          this.policy.getProviderAccessType()
+                                                                     .getIdentityPrincipals(this.administrator));
+        this.nodeUserAccessType = this.policy.getUserAccessType();
 
         this.descriptor = nodeSourceDescriptor;
     }
@@ -254,7 +253,7 @@ public class NodeSource implements InitActive, RunActive {
         // variables of the infrastructure for the first time (they have been initialized during the creation of the
         // infrastructure, in its configuration.
         this.infrastructureManager.persistInfrastructureVariables();
-        this.activeNodeSourcePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
+        this.activePolicy.setNodeSource((NodeSource) PAActiveObject.getStubOnThis());
 
         // Set permissions again according to the activated node source policy
 
@@ -267,9 +266,9 @@ public class NodeSource implements InitActive, RunActive {
         // could be one of the following: PrincipalPermission (NS creator) or PrincipalPermission (NS creator groups)
         // or PrincipalPermission (anyone)
         this.providerPermission = new PrincipalPermission(this.administrator.getName(),
-                                                          this.activeNodeSourcePolicy.getProviderAccessType()
-                                                                                     .getIdentityPrincipals(this.administrator));
-        this.nodeUserAccessType = this.activeNodeSourcePolicy.getUserAccessType();
+                                                          this.activePolicy.getProviderAccessType()
+                                                                           .getIdentityPrincipals(this.administrator));
+        this.nodeUserAccessType = this.activePolicy.getUserAccessType();
 
         Thread.currentThread().setName("Node Source \"" + this.name + "\"");
     }
@@ -545,15 +544,19 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     public NodeSourcePolicy getPolicy() {
-        return this.nodeSourcePolicy;
+        return this.policy;
     }
 
     public void setActivePolicy(NodeSourcePolicy policy) {
-        this.activeNodeSourcePolicy = policy;
+        this.activePolicy = policy;
+    }
+
+    public NodeSourceStatus getStatus() {
+        return this.descriptor.getStatus();
     }
 
     public void setStatus(NodeSourceStatus status) {
-        this.descriptor.setStatus(status);
+        this.getDescriptor().setStatus(status);
         this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
     }
 
@@ -648,9 +651,8 @@ public class NodeSource implements InitActive, RunActive {
             }
         }
 
-        if (toShutdown && nodes.size() == 0) {
-            // shutdown all pending nodes
-            shutdownNodeSourceServices(initiator);
+        if (this.toShutdown && this.nodes.size() == 0) {
+            this.shutdownNodeSourceServices(initiator);
         }
 
         return new BooleanWrapper(true);
@@ -660,11 +662,11 @@ public class NodeSource implements InitActive, RunActive {
      * Shutdowns the node source and releases all its nodes.
      */
     public BooleanWrapper shutdown(Client initiator) {
-        logger.info("[" + name + "] is shutting down by " + initiator);
-        toShutdown = true;
+        logger.info("[" + this.name + "] is shutting down by " + initiator);
+        this.toShutdown = true;
 
-        if (nodes.size() == 0) {
-            shutdownNodeSourceServices(initiator);
+        if (this.nodes.size() == 0) {
+            this.shutdownNodeSourceServices(initiator);
         }
         return new BooleanWrapper(true);
     }
@@ -743,34 +745,35 @@ public class NodeSource implements InitActive, RunActive {
      * Activates a node source policy.
      */
     public BooleanWrapper activate() {
-        logger.info("[" + this.name + "] Activating the policy " + this.activeNodeSourcePolicy);
-        return this.activeNodeSourcePolicy.activate();
+        logger.info("[" + this.name + "] Activating the policy " + this.activePolicy);
+        return this.activePolicy.activate();
     }
 
     /**
      * Initiates node source services shutdown, such as pinger, policy, thread pool.
-     * @param initiator
      */
     protected void shutdownNodeSourceServices(Client initiator) {
         logger.info("[" + this.name + "] Shutdown finalization");
 
-        if (this.descriptor.getStatus().equals(NodeSourceStatus.NODES_DEPLOYED)) {
-            this.activeNodeSourcePolicy.shutdown(initiator);
-            this.infrastructureManager.internalShutDown();
-        }
+        this.activePolicy.shutdown(initiator);
+        this.infrastructureManager.internalShutDown();
     }
 
     /**
      * Terminates a node source active object when the policy is shutdown. 
      */
     public void finishNodeSourceShutdown(Client initiator) {
-        PAFuture.waitFor(rmcore.nodeSourceUnregister(name,
-                                                     new RMNodeSourceEvent(RMEventType.NODESOURCE_REMOVED,
-                                                                           initiator.getName(),
-                                                                           this.getName(),
-                                                                           this.getDescription(),
-                                                                           this.getAdministrator().getName(),
-                                                                           descriptor.getStatus().toString())));
+
+        NodeSourceStatus status = this.descriptor.getStatus();
+
+        PAFuture.waitFor(this.rmcore.nodeSourceUnregister(this.name,
+                                                          status,
+                                                          new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
+                                                                                initiator.getName(),
+                                                                                this.getName(),
+                                                                                this.getDescription(),
+                                                                                this.getAdministrator().getName(),
+                                                                                status.toString())));
 
         PAActiveObject.terminateActiveObject(false);
     }
@@ -950,5 +953,12 @@ public class NodeSource implements InitActive, RunActive {
     @ImmediateService
     public String getRegistrationURL() {
         return this.registrationURL;
+    }
+
+    public RMNodeSourceEvent createNodeSourceEvent() {
+        return new RMNodeSourceEvent(this.name,
+                                     this.description,
+                                     this.administrator.getName(),
+                                     this.getStatus().toString());
     }
 }
