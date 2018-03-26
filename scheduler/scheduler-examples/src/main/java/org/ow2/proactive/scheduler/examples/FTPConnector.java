@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -136,7 +135,7 @@ public class FTPConnector extends JavaExecutable {
             }
             //login to the server
             if (!ftpClient.login(ftpUsername, ftpPassword)) {
-                throw new IOException("Logging refused. check the FTP_USERNAME and the FTP_PASSWORD values.");
+                throw new IOException("Logging refused. check the FTP_USERNAME and FTP_PASSWORD values.");
             }
 
             // use local passive mode to pass firewall
@@ -159,8 +158,6 @@ public class FTPConnector extends JavaExecutable {
                     throw new IllegalArgumentException("FTP MODE can only be PUT or GET.");
 
             }
-        } catch (IOException e) {
-            throw new IOException(e);
         } finally {
             // log out and disconnect from the server
             ftpClient.logout();
@@ -293,10 +290,10 @@ public class FTPConnector extends JavaExecutable {
     }
 
     private void createRemoteDirectory(FTPClient ftpClient, String remoteDirPath) throws IOException {
-        ArrayList folderList = new ArrayList<>(Arrays.asList(ftpClient.listDirectories()));
+        ArrayList<FTPFile> folderList = new ArrayList(Arrays.asList(ftpClient.listDirectories()));
         ArrayList<String> folderNames = new ArrayList();
         for (int i = 0; i < folderList.size(); i++) {
-            folderNames.add(((FTPFile) (folderList.get(i))).getName());
+            folderNames.add(folderList.get(i).getName());
         }
         if (!folderNames.contains(remoteDirPath)) {
             if (ftpClient.makeDirectory(remoteDirPath)) {
@@ -354,6 +351,7 @@ public class FTPConnector extends JavaExecutable {
         try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile))) {
 
             //retrieve a single file from the FTP server
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             if (ftpClient.retrieveFile(remoteFilePath, outputStream)) {
                 getOut().println("DOWNLOADED successfully the file " + remoteFilePath + " to " + ftpLocalRelativePath);
                 return savePath;
