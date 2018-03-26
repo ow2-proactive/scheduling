@@ -64,7 +64,7 @@ public class ParallelTaskSchedulingTest extends PerformanceTestBase {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 1000, 50, 100000 } });
+        return Arrays.asList(new Object[][] { { 1000, 50, 200000 } });
     }
 
     // number of tasks (all task are empty) inside single job

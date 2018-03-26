@@ -1721,13 +1721,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
         }
 
-        final Map<String, RMNodeSourceEvent> nodeSourceEvents = this.definedNodeSources.values()
-                                                                                       .stream()
-                                                                                       .map(NodeSource::createNodeSourceEvent)
-                                                                                       .collect(Collectors.toMap(RMNodeSourceEvent::getSourceName,
-                                                                                                                 event -> event));
+        final List<RMNodeSourceEvent> nodeSourceEvents = new ArrayList<>(this.definedNodeSources.values()
+                                                                                                .stream()
+                                                                                                .map(NodeSource::createNodeSourceEvent)
+                                                                                                .collect(Collectors.toList()));
 
-        return new RMInitialState(nodeEvents, nodeSourceEvents);
+        long eventCounter = 0;
+        for (RMNodeSourceEvent nodeSourceEvent : nodeSourceEvents) {
+            nodeSourceEvent.setCounter(eventCounter++);
+        }
+        for (RMNodeEvent nodeEvent : nodeEvents.values()) {
+            nodeEvent.setCounter(eventCounter++);
+        }
+
+        final RMInitialState rmInitialState = new RMInitialState();
+        rmInitialState.addAll(nodeEvents.values());
+        rmInitialState.addAll(nodeSourceEvents);
+
+        return rmInitialState;
     }
 
     /**
@@ -1977,7 +1988,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return list of existing Node Sources
      */
     public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
-        return getRMInitialState().getNodeSource();
+        return getRMInitialState().getNodeSourceEvents();
     }
 
     /**
@@ -1985,7 +1996,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Deprecated
     public List<RMNodeEvent> getNodesList() {
-        return getRMInitialState().getNodesEvents();
+        return getRMInitialState().getNodeEvents();
     }
 
     /**

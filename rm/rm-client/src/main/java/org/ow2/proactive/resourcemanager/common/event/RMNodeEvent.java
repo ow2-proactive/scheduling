@@ -192,10 +192,15 @@ public final class RMNodeEvent extends RMEvent {
     }
 
     @Override
+    public String getKey() {
+        return getNodeUrl();
+    }
+
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((nodeUrl == null) ? 0 : nodeUrl.hashCode());
+        result = prime * result + ((getKey() == null) ? 0 : getKey().hashCode());
         return result;
     }
 
@@ -214,10 +219,10 @@ public final class RMNodeEvent extends RMEvent {
         if (!(obj instanceof RMNodeEvent))
             return false;
         RMNodeEvent other = (RMNodeEvent) obj;
-        if (nodeUrl == null) {
-            if (other.nodeUrl != null)
+        if (getKey() == null) {
+            if (other.getKey() != null)
                 return false;
-        } else if (!nodeUrl.equals(other.nodeUrl))
+        } else if (!getKey().equals(other.getKey()))
             return false;
         return true;
     }

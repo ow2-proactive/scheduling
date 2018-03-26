@@ -76,9 +76,9 @@ public final class TestExecRemote extends RMFunctionalTest {
         rmHelper.createNodeSource(nsName);
 
         RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
-        String hostname = state.getNodesEvents().get(0).getHostName();
+        String hostname = state.getNodeEvents().get(0).getHostName();
         HashSet<String> nodesUrls = new HashSet<>();
-        for (RMNodeEvent ne : state.getNodesEvents()) {
+        for (RMNodeEvent ne : state.getNodeEvents()) {
             nodesUrls.add(ne.getNodeUrl());
         }
 

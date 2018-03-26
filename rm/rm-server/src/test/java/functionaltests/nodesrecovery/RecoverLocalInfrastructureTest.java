@@ -133,7 +133,8 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         this.rmHelper.createNodeSourceWithNodesRecoverable(NODE_SOURCE_NAME, NODE_NUMBER);
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
 
-        List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState().getNodeSource();
+        List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState()
+                                                                                     .getNodeSourceEvents();
         assertThat(nodeSourceEventPerNodeSource.size()).isEqualTo(1);
 
         RMNodeSourceEvent rmNodeSourceEvent = nodeSourceEventPerNodeSource.get(0);
@@ -146,7 +147,8 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
     private void defineNodeSourceAndCheckState() throws Exception {
         this.rmHelper.defineNodeSource(NODE_SOURCE_NAME, NODE_NUMBER);
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
-        List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState().getNodeSource();
+        List<RMNodeSourceEvent> nodeSourceEventPerNodeSource = resourceManagerMonitor.getInitialState()
+                                                                                     .getNodeSourceEvents();
         assertThat(nodeSourceEventPerNodeSource.size()).isEqualTo(1);
         assertThat(nodeSourceEventPerNodeSource.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
     }
@@ -160,7 +162,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
         // re-snapshot the RM state
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
-        List<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSource();
+        List<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSourceEvents();
 
         // the node source has been recovered on restart: we should have one node source with the same name
         assertThat(nodeSourceEvent.size()).isEqualTo(1);
