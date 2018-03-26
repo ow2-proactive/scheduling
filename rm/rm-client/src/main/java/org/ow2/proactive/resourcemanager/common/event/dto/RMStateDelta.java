@@ -32,7 +32,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 
 
-public class RMStateDTO implements Serializable {
+public class RMStateDelta implements Serializable {
 
     private long latestCounter;
 
@@ -48,6 +48,11 @@ public class RMStateDTO implements Serializable {
         this.latestCounter = latestCounter;
     }
 
+    /**
+     * Current version of RM portal and maybe other clients expects "nodeSource" inside JSON
+     *
+     * @return list of RMNodeSourceEvent
+     */
     public List<RMNodeSourceEvent> getNodeSource() {
         return nodeSource;
     }
@@ -56,6 +61,11 @@ public class RMStateDTO implements Serializable {
         this.nodeSource = nodeSource;
     }
 
+    /**
+     * Current version of RM portal and maybe other clients expects "nodesEvents" inside JSON
+     *
+     * @return list of RMNodeEvent
+     */
     public List<RMNodeEvent> getNodesEvents() {
         return nodesEvents;
     }

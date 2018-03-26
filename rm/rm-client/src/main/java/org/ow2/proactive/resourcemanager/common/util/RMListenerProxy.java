@@ -62,7 +62,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDTO;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
@@ -208,7 +208,7 @@ public class RMListenerProxy extends RMGroupEventListener {
         checkCounter(event);
     }
 
-    public RMStateDTO getRMInitialState(long filter) {
+    public RMStateDelta getRMInitialState(long filter) {
         return rmInitialState.cloneAndFilter(filter);
     }
 

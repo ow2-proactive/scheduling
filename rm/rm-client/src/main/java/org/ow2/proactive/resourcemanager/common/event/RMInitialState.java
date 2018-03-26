@@ -33,9 +33,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDTO;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -57,6 +59,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
+@XmlRootElement
 public class RMInitialState implements Serializable {
 
     public static final Long EMPTY_STATE = -1L;
@@ -75,32 +78,22 @@ public class RMInitialState implements Serializable {
         latestCounter.set(Math.max(latestCounter.get(), findLargestCounter(events.getSortedItems())));
     }
 
-    /**
-     * Current version of RM portal and maybe other clients expects "nodesEvents" inside JSON
-     *
-     * @return list of RMNodeEvent
-     */
-    public List<RMNodeEvent> getNodesEvents() {
-        return getNodesEvents(events.getSortedItems());
+    public List<RMNodeEvent> getNodeEvents() {
+        return getNodeEvents(events.getSortedItems());
     }
 
-    /**
-     * Current version of RM portal and maybe other clients expects "nodeSource" inside JSON
-     *
-     * @return list of RMNodeSourceEvent
-     */
-    public List<RMNodeSourceEvent> getNodeSource() {
-        return getNodeSource(events.getSortedItems());
+    public List<RMNodeSourceEvent> getNodeSourceEvents() {
+        return getNodeSourceEvents(events.getSortedItems());
     }
 
-    public List<RMNodeEvent> getNodesEvents(Collection<RMEvent> rmEvents) {
+    private List<RMNodeEvent> getNodeEvents(Collection<RMEvent> rmEvents) {
         return rmEvents.stream()
                        .filter(event -> event instanceof RMNodeEvent)
                        .map(event -> (RMNodeEvent) event)
                        .collect(Collectors.toList());
     }
 
-    public List<RMNodeSourceEvent> getNodeSource(Collection<RMEvent> rmevents) {
+    private List<RMNodeSourceEvent> getNodeSourceEvents(Collection<RMEvent> rmevents) {
         return rmevents.stream()
                        .filter(event -> event instanceof RMNodeSourceEvent)
                        .map(event -> (RMNodeSourceEvent) event)
@@ -147,7 +140,7 @@ public class RMInitialState implements Serializable {
      * @param filter
      * @return rmInitialState where all the events bigger than 'filter'
      */
-    public RMStateDTO cloneAndFilter(long filter) {
+    public RMStateDelta cloneAndFilter(long filter) {
         long actualFilter = computeActualFilter(filter);
 
         final List<RMEvent> responseEvents = events.getSortedItems()
@@ -156,10 +149,10 @@ public class RMInitialState implements Serializable {
                                                    .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
                                                    .collect(Collectors.toList());
 
-        RMStateDTO response = new RMStateDTO();
+        RMStateDelta response = new RMStateDelta();
 
-        response.setNodeSource(getNodeSource(responseEvents));
-        response.setNodesEvents(getNodesEvents(responseEvents));
+        response.setNodeSource(getNodeSourceEvents(responseEvents));
+        response.setNodesEvents(getNodeEvents(responseEvents));
         response.setLatestCounter(Math.max(actualFilter, findLargestCounter(responseEvents)));
 
         return response;
@@ -183,6 +176,6 @@ public class RMInitialState implements Serializable {
 
     private <T extends RMEvent> long findLargestCounter(Collection<T> events) {
         final Optional<T> max = events.stream().max(Comparator.comparing(RMEvent::getCounter));
-        return max.map(RMEvent::getCounter).orElse(0l);
+        return max.map(RMEvent::getCounter).orElse(EMPTY_STATE);
     }
 }

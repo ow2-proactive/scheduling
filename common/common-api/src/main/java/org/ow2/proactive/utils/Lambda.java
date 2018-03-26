@@ -31,14 +31,16 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 
-// because we dont like checked exceptions
+// Sonar does not like that I wrap checked exception into unchecked.
+// But it is exactly the purpose of some of these functions,
+// thus we suppress this warnings.
 @SuppressWarnings("squid:S00112")
 public class Lambda {
 
     private Lambda() {
     }
 
-    public static void lock(Lock lock, Runnable runnable) {
+    public static void withLock(Lock lock, Runnable runnable) {
         lock.lock();
         try {
             runnable.run();
@@ -47,7 +49,7 @@ public class Lambda {
         }
     }
 
-    public static <T> T lock(Lock lock, Callable<T> callable) {
+    public static <T> T withLock(Lock lock, Callable<T> callable) {
         lock.lock();
         try {
             return callable.call();

@@ -32,7 +32,7 @@ import java.util.stream.IntStream;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDTO;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 
 
 public class RMInitialStateChunksTest {
@@ -58,9 +58,17 @@ public class RMInitialStateChunksTest {
     }
 
     @Test
+    public void clientKnowsInitialState() {
+        final RMStateDelta response = this.rmInitialState.cloneAndFilter(0);
+        assertEquals(1, response.getNodeSource().size());
+        assertEquals(500, response.getNodeSource().get(0).getCounter());
+
+    }
+
+    @Test
     public void clientKnowsNothing() {
 
-        final RMStateDTO response = this.rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE);
+        final RMStateDelta response = this.rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE);
         assertEquals(1, response.getNodeSource().size());
         assertEquals(49, response.getNodesEvents().size());
         assertEquals(549, response.getLatestCounter());
@@ -70,7 +78,7 @@ public class RMInitialStateChunksTest {
     @Test
     public void clientKnowsSomething() {
 
-        final RMStateDTO response = this.rmInitialState.cloneAndFilter(549);
+        final RMStateDelta response = this.rmInitialState.cloneAndFilter(549);
         assertEquals(1, response.getNodeSource().size());
         assertEquals(49, response.getNodesEvents().size());
         assertEquals(1099, response.getLatestCounter());
@@ -79,7 +87,7 @@ public class RMInitialStateChunksTest {
     @Test
     public void clientKnowsEverything() {
         long latestExisted = counter - 1;
-        final RMStateDTO response = this.rmInitialState.cloneAndFilter(latestExisted);
+        final RMStateDelta response = this.rmInitialState.cloneAndFilter(latestExisted);
 
         assertEquals(0, response.getNodeSource().size());
         assertEquals(0, response.getNodesEvents().size());
@@ -89,10 +97,11 @@ public class RMInitialStateChunksTest {
     @Test
     public void clientWentCrazy() {
         long latestExisted = counter - 1;
-        final RMStateDTO response = this.rmInitialState.cloneAndFilter(latestExisted + 1000);
+        final RMStateDelta response = this.rmInitialState.cloneAndFilter(latestExisted + 1000);
         assertEquals(1, response.getNodeSource().size());
         assertEquals(49, response.getNodesEvents().size());
         assertEquals(549, response.getLatestCounter());
 
     }
+
 }

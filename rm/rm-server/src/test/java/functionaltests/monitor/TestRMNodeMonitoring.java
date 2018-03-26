@@ -93,7 +93,7 @@ public class TestRMNodeMonitoring extends RMFunctionalTest {
         String jmxurl = null;
 
         RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
-        jmxurl = state.getNodesEvents().get(0).getDefaultJMXUrl();
+        jmxurl = state.getNodeEvents().get(0).getDefaultJMXUrl();
 
         assertNotNull("The JMX URL of a node could not be obtained.", jmxurl);
 

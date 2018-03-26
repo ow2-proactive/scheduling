@@ -83,7 +83,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDTO;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -269,7 +269,7 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    public RMStateDTO getInitialState(@HeaderParam("sessionid") String sessionId,
+    public RMStateDelta getInitialState(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
         checkAccess(sessionId);
         long counter = Integer.valueOf(clientCounter);

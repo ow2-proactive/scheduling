@@ -1988,7 +1988,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return list of existing Node Sources
      */
     public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
-        return getRMInitialState().getNodeSource();
+        return getRMInitialState().getNodeSourceEvents();
     }
 
     /**
@@ -1996,7 +1996,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Deprecated
     public List<RMNodeEvent> getNodesList() {
-        return getRMInitialState().getNodesEvents();
+        return getRMInitialState().getNodeEvents();
     }
 
     /**

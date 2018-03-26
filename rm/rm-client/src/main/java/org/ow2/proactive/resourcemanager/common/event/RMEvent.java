@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
-public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, Unique {
+public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, SortedUniqueSet.Unique {
 
     /** Resource manager URL */
     private String RMUrl = null;
@@ -148,13 +148,14 @@ public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, Un
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         RMEvent rmEvent = (RMEvent) o;
-
         return counter == rmEvent.counter;
     }
 
@@ -165,7 +166,7 @@ public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, Un
 
     @Override
     public int compareTo(RMEvent event) {
-        return (int) this.getCounter() - (int) event.getCounter();
+        return Long.compare(this.counter, event.counter);
     }
 
 }

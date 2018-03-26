@@ -34,7 +34,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDTO;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
@@ -97,11 +97,11 @@ public class RMStateCaching {
     /**
      * @return cached RM State as returned by {@link RMProxyUserInterface#getRMInitialState(long)}
      */
-    public static RMStateDTO getRMInitialState(long counter) {
+    public static RMStateDelta getRMInitialState(long counter) {
         try {
             long startTime = System.currentTimeMillis();
 
-            final RMStateDTO state = PAFuture.getFutureValue(rm.getRMInitialState(counter));
+            final RMStateDelta state = PAFuture.getFutureValue(rm.getRMInitialState(counter));
 
             long time = System.currentTimeMillis() - startTime;
 

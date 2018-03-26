@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDTO;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 
 
 public class RMInitialStateTest {
@@ -60,21 +60,21 @@ public class RMInitialStateTest {
 
     @Test
     public void testCloneAndFilter0() {
-        final RMStateDTO rmInitialState = this.rmInitialState.cloneAndFilter(1);
+        final RMStateDelta rmInitialState = this.rmInitialState.cloneAndFilter(1);
         assertEquals(4, rmInitialState.getNodesEvents().size());
         assertEquals(1, rmInitialState.getNodeSource().size());
     }
 
     @Test
     public void testCloneAndFilter1() {
-        final RMStateDTO rmInitialState = this.rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE);
+        final RMStateDelta rmInitialState = this.rmInitialState.cloneAndFilter(RMInitialState.EMPTY_STATE);
         assertEquals(5, rmInitialState.getNodesEvents().size());
         assertEquals(2, rmInitialState.getNodeSource().size());
     }
 
     @Test
     public void testCloneAndFilter2() {
-        final RMStateDTO rmInitialState = this.rmInitialState.cloneAndFilter(20);
+        final RMStateDelta rmInitialState = this.rmInitialState.cloneAndFilter(20);
         assertEquals(5, rmInitialState.getNodesEvents().size());
         assertEquals(2, rmInitialState.getNodeSource().size());
     }

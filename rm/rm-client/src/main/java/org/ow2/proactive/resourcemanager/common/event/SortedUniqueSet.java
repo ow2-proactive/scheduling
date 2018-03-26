@@ -32,24 +32,24 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 
-interface Unique {
-
-    /**
-     * @return key which should be unique
-     */
-    String getKey();
-
-    /**
-     * @return counter which is used to keep sorted collection
-     */
-    long getCounter();
-}
-
 /**
  * Set based on #getKey() that provides log(N) to add and remove, but keeps sorted version of items based on #getCounter().
  * @param <T>
  */
-public class SortedUniqueSet<T extends Unique & Comparable<T> & Serializable> implements Serializable {
+public class SortedUniqueSet<T extends SortedUniqueSet.Unique & Comparable<T> & Serializable> implements Serializable {
+
+    interface Unique {
+
+        /**
+         * @return key which should be unique
+         */
+        String getKey();
+
+        /**
+         * @return counter which is used to keep sorted collection
+         */
+        long getCounter();
+    }
 
     private TreeSet<T> sortedItems = new TreeSet<>();
 
