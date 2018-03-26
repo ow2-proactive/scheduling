@@ -90,6 +90,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
+import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -847,6 +848,17 @@ public class RMRest implements RMRestInterface {
             throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getSupportedNodeSourcePolicies();
+    }
+
+    @Override
+    @GET
+    @GZIP
+    @Path("nodesource/configuration")
+    @Produces("application/json")
+    public NodeSourceConfiguration getNodeSourceConfiguration(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodeSourceName") String nodeSourceName) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getNodeSourceConfiguration(nodeSourceName);
     }
 
     /**

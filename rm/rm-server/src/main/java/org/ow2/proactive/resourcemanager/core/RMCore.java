@@ -102,6 +102,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator;
+import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
@@ -2148,6 +2149,30 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             descriptors.add(new PluginDescriptor(cls, defaultValues));
         }
         return descriptors;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName) {
+        NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
+        if (nodeSource == null) {
+            throw new IllegalArgumentException("Cannot find the configuration of unknown node source " + nodeSourceName);
+        }
+        Class<InfrastructureManager> infrastructureClass = null;
+        Class<NodeSourcePolicy> policyClass = null;
+        try {
+            infrastructureClass = (Class<InfrastructureManager>) Class.forName(nodeSource.getDescriptor()
+                                                                                         .getInfrastructureType());
+            policyClass = (Class<NodeSourcePolicy>) Class.forName(nodeSource.getDescriptor().getPolicyType());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("The configuration of node source " + nodeSourceName + " cannot be retrieved", e);
+        }
+        return new NodeSourceConfiguration(nodeSourceName,
+                                           nodeSource.nodesRecoverable(),
+                                           new PluginDescriptor(infrastructureClass, new HashMap<>()),
+                                           new PluginDescriptor(policyClass, new HashMap<>()));
     }
 
     /**
