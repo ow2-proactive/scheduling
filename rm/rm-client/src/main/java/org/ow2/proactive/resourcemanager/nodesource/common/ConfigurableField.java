@@ -71,27 +71,4 @@ public class ConfigurableField implements Serializable {
         return meta;
     }
 
-    public static Map<String, String> mapNodeSourceParametersToConfigurableFields(Object[] parameters,
-            Class<?> classWithAnnotatedFields) {
-        Map<String, String> configurableFieldNames = new HashMap<>();
-        int configurableFieldIndex = 0;
-
-        for (Field f : classWithAnnotatedFields.getDeclaredFields()) {
-            Configurable configurable = f.getAnnotation(Configurable.class);
-            if (configurable != null) {
-                String name = f.getName();
-                Object infrastructureParameterObject = parameters[configurableFieldIndex];
-                String infrastructureParameterString;
-                if (infrastructureParameterObject instanceof byte[]) {
-                    infrastructureParameterString = new String((byte[]) infrastructureParameterObject);
-                } else {
-                    infrastructureParameterString = String.valueOf(infrastructureParameterObject);
-                }
-                configurableFieldNames.put(name, infrastructureParameterString);
-                configurableFieldIndex++;
-            }
-        }
-        return configurableFieldNames;
-    }
-
 }

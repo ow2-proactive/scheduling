@@ -2178,16 +2178,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                             " cannot be retrieved", e);
         }
 
-        Map<String, String> infrastructureFields = ConfigurableField.mapNodeSourceParametersToConfigurableFields(nodeSourceDescriptor.getInfrastructureParameters(),
-                                                                                                                 infrastructureClass);
         PluginDescriptor infrastructurePluginDescriptor = new PluginDescriptor(infrastructureClass,
-                                                                               infrastructureFields);
-        infrastructurePluginDescriptor.applyDefaultValuesToConfigurableFields();
+                                                                               nodeSourceDescriptor.getInfrastructureParameters());
 
-        Map<String, String> policyFields = ConfigurableField.mapNodeSourceParametersToConfigurableFields(nodeSourceDescriptor.getPolicyParameters(),
-                                                                                                         policyClass);
-        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(policyClass, policyFields);
-        policyPluginDescriptor.applyDefaultValuesToConfigurableFields();
+        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(policyClass,
+                                                                       nodeSourceDescriptor.getPolicyParameters());
 
         return new NodeSourceConfiguration(nodeSourceName,
                                            nodeSource.nodesRecoverable(),

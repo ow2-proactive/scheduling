@@ -32,6 +32,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,29 @@ public class PluginDescriptor implements Serializable {
         }
     }
 
+    /**
+     * Create a plugin descriptor populated with the given parameters
+     */
+    public PluginDescriptor(Class<?> cls, Object[] parameters) {
+        this(cls, new HashMap<>());
+
+        int configurableFieldIndex = 0;
+
+        Object parameterObject;
+        for (ConfigurableField field : this.configurableFields) {
+
+            parameterObject = parameters[configurableFieldIndex];
+
+            if (parameterObject instanceof byte[]) {
+                field.setValue(new String((byte[]) parameterObject));
+            } else {
+                field.setValue(String.valueOf(parameterObject));
+            }
+
+            configurableFieldIndex++;
+        }
+    }
+
     /*
      * Looks through cls which represents a plugin. Collects a configurable
      * skeleton of the plugin.
@@ -110,13 +134,6 @@ public class PluginDescriptor implements Serializable {
                                                 : valueObj.toString();
                 configurableFields.add(new ConfigurableField(name, value, configurable));
             }
-        }
-    }
-
-    public void applyDefaultValuesToConfigurableFields() {
-        for (ConfigurableField field : this.configurableFields) {
-            String valueToSet = this.defaultValues.get(field.getName());
-            field.setValue(valueToSet);
         }
     }
 
