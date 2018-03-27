@@ -39,23 +39,23 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "nodeSource")
+@XmlRootElement(name = "nodeSourceConfiguration")
 public class NodeSourceConfiguration implements Serializable {
 
     private String nodeSourceName;
 
     private boolean nodesRecoverable;
 
-    /** An array of two plugin descriptors: the first is the descriptor of the
-     * infrastructure and the second is the descriptor of the policy */
-    private PluginDescriptor[] infrastructureAndPolicyDescriptors;
+    private PluginDescriptor infrastructurePluginDescriptor;
+
+    private PluginDescriptor policyPluginDescriptor;
 
     public NodeSourceConfiguration(String nodeSourceName, boolean nodesRecoverable,
             PluginDescriptor infrastructurePluginDescriptor, PluginDescriptor policyPluginDescriptor) {
         this.nodeSourceName = nodeSourceName;
         this.nodesRecoverable = nodesRecoverable;
-        this.infrastructureAndPolicyDescriptors = new PluginDescriptor[] { infrastructurePluginDescriptor,
-                                                                           policyPluginDescriptor };
+        this.infrastructurePluginDescriptor = infrastructurePluginDescriptor;
+        this.policyPluginDescriptor = policyPluginDescriptor;
     }
 
     public String getNodeSourceName() {
@@ -64,14 +64,6 @@ public class NodeSourceConfiguration implements Serializable {
 
     public boolean isNodesRecoverable() {
         return this.nodesRecoverable;
-    }
-
-    public PluginDescriptor getInfrastructurePluginDescriptors() {
-        return this.infrastructureAndPolicyDescriptors[0];
-    }
-
-    public PluginDescriptor getPolicyPluginDescriptors() {
-        return this.infrastructureAndPolicyDescriptors[1];
     }
 
 }
