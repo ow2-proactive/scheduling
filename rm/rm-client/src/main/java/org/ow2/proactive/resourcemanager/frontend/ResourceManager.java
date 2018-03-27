@@ -83,6 +83,20 @@ public interface ResourceManager {
             String policyType, Object[] policyParams, boolean nodesRecoverable);
 
     /**
+     * Edit an existing node source in the resource manager.
+     *
+     * @param nodeSourceName the name of the node source to edit
+     * @param infrastructureType type of the underlying infrastructure
+     * @param infraParams parameters for infrastructure creation
+     * @param policyType name of the policy type. It passed as a string due to plug-able approach
+     * @param policyParams parameters for policy creation
+     * @param nodesRecoverable whether the nodes can be recovered in case of a scheduler crash
+     * @return true if a new node source was edited successfully, runtime exception otherwise
+     */
+    BooleanWrapper editNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
+            String policyType, Object[] policyParams, boolean nodesRecoverable);
+
+    /**
      * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String, Object[], String, Object[],
      * boolean)} and {@link #deployNodeSource(String)}
      *

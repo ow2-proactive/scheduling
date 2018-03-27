@@ -1193,13 +1193,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         logger.info("Define node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
 
-        NodeSourceDescriptor nodeSourceDescriptor = this.persistNodeSourceAndGetDescriptor(nodeSourceName,
-                                                                                           infrastructureType,
-                                                                                           infraParams,
-                                                                                           policyType,
-                                                                                           policyParams,
-                                                                                           nodesRecoverable);
+        NodeSourceData nodeSourceData = this.getNodeSourceToPersist(nodeSourceName,
+                                                                    infrastructureType,
+                                                                    infraParams,
+                                                                    policyType,
+                                                                    policyParams,
+                                                                    nodesRecoverable);
 
+        this.dbManager.addNodeSource(nodeSourceData);
+
+        NodeSourceDescriptor nodeSourceDescriptor = nodeSourceData.toNodeSourceDescriptor();
         NodeSource nodeSource = this.createNodeSourceInstance(nodeSourceDescriptor);
 
         this.definedNodeSources.put(nodeSourceName, nodeSource);
@@ -1216,7 +1219,34 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(true);
     }
 
-    private NodeSourceDescriptor persistNodeSourceAndGetDescriptor(String nodeSourceName, String infrastructureType,
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BooleanWrapper editNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
+            String policyType, Object[] policyParams, boolean nodesRecoverable) {
+
+        logger.info("Edit node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
+
+        NodeSourceData nodeSourceData = this.getNodeSourceToPersist(nodeSourceName,
+                                                                    infrastructureType,
+                                                                    infraParams,
+                                                                    policyType,
+                                                                    policyParams,
+                                                                    nodesRecoverable);
+
+        this.dbManager.updateNodeSource(nodeSourceData);
+
+        NodeSource nodeSource = this.createNodeSourceInstance(nodeSourceData.toNodeSourceDescriptor());
+
+        this.definedNodeSources.put(nodeSourceName, nodeSource);
+
+        logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully edited");
+
+        return new BooleanWrapper(true);
+    }
+
+    private NodeSourceData getNodeSourceToPersist(String nodeSourceName, String infrastructureType,
             Object[] infraParams, String policyType, Object[] policyParams, boolean nodesRecoverable) {
 
         List<Serializable> serializableInfraParams = this.getSerializableParamsOrFail(infraParams);
@@ -1231,13 +1261,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                 nodesRecoverable,
                                                                 NodeSourceStatus.NODES_UNDEPLOYED);
 
-        boolean success = this.dbManager.addNodeSource(persistedNodeSource);
-
-        if (!success) {
-            this.dbManager.removeNodeSource(nodeSourceName);
-        }
-
-        return persistedNodeSource.toNodeSourceDescriptor();
+        return persistedNodeSource;
     }
 
     private List<Serializable> getSerializableParamsOrFail(Object[] parameters) {

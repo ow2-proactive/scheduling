@@ -124,6 +124,15 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#editNodeSource(String, String, Object[], String, Object[], boolean)
+     */
+    @Override
+    public BooleanWrapper editNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
+            boolean arg5) {
+        return target.editNodeSource(arg0, arg1, arg2, arg3, arg4, arg5);
+    }
+
+    /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#createNodeSource(String, String, Object[], String, Object[], boolean)
      */
     public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
