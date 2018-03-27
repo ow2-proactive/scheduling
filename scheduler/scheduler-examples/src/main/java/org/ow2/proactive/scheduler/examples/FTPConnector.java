@@ -292,7 +292,6 @@ public class FTPConnector extends JavaExecutable {
     private void makeRemoteDirectoriesIfNotExist(FTPClient ftpClient, Path path) throws IOException {
         if (path.getParent() == null) {
             createRemoteDirectoryIfNotExists(ftpClient, path.toString());
-            return;
         } else {
             makeRemoteDirectoriesIfNotExist(ftpClient, path.getParent());
             createRemoteDirectoryIfNotExists(ftpClient, path.getFileName().toString());
