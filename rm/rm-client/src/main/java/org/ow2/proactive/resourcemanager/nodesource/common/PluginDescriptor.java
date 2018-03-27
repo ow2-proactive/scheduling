@@ -113,6 +113,13 @@ public class PluginDescriptor implements Serializable {
         }
     }
 
+    public void applyDefaultValuesToConfigurableFields() {
+        for (ConfigurableField field : this.configurableFields) {
+            String valueToSet = this.defaultValues.get(field.getName());
+            field.setValue(valueToSet);
+        }
+    }
+
     public String getPluginName() {
         return pluginName;
     }

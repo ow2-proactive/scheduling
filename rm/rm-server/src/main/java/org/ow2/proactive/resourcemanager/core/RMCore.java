@@ -2161,43 +2161,38 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName) {
         NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
         if (nodeSource == null) {
-            throw new IllegalArgumentException("Cannot find the configuration of unknown node source " + nodeSourceName);
+            throw new IllegalArgumentException("Cannot find the configuration of unknown node source " +
+                                               nodeSourceName);
         }
+
+        NodeSourceDescriptor nodeSourceDescriptor = nodeSource.getDescriptor();
+
         Class<InfrastructureManager> infrastructureClass = null;
         Class<NodeSourcePolicy> policyClass = null;
+
         try {
-            infrastructureClass = (Class<InfrastructureManager>) Class.forName(nodeSource.getDescriptor()
-                                                                                         .getInfrastructureType());
-            policyClass = (Class<NodeSourcePolicy>) Class.forName(nodeSource.getDescriptor().getPolicyType());
+            infrastructureClass = (Class<InfrastructureManager>) Class.forName(nodeSourceDescriptor.getInfrastructureType());
+            policyClass = (Class<NodeSourcePolicy>) Class.forName(nodeSourceDescriptor.getPolicyType());
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("The configuration of node source " + nodeSourceName + " cannot be retrieved", e);
+            throw new IllegalStateException("The configuration of node source " + nodeSourceName +
+                                            " cannot be retrieved", e);
         }
 
-        Map<String, String> configurableFieldNames = new HashMap<>();
-        Object[] infrastructureParameters = nodeSource.getDescriptor().getInfrastructureParameters();
-        int configurableFieldIndex = 0;
+        Map<String, String> infrastructureFields = ConfigurableField.mapNodeSourceParametersToConfigurableFields(nodeSourceDescriptor.getInfrastructureParameters(),
+                                                                                                                 infrastructureClass);
+        PluginDescriptor infrastructurePluginDescriptor = new PluginDescriptor(infrastructureClass,
+                                                                               infrastructureFields);
+        infrastructurePluginDescriptor.applyDefaultValuesToConfigurableFields();
 
-        for (Field f : infrastructureClass.getDeclaredFields()) {
-            Configurable configurable = f.getAnnotation(Configurable.class);
-            if (configurable != null) {
-                String name = f.getName();
-                Object infrastructureParameterObject = infrastructureParameters[configurableFieldIndex];
-                String infrastructureParameterString;
-                if (infrastructureParameterObject instanceof byte[]) {
-                    infrastructureParameterString = new String((byte[])infrastructureParameterObject);
-                } else {
-                    infrastructureParameterString = String.valueOf(infrastructureParameterObject);
-                }
-                configurableFieldNames.put(name, infrastructureParameterString);
-                configurableFieldIndex++;
-            }
-        }
-
+        Map<String, String> policyFields = ConfigurableField.mapNodeSourceParametersToConfigurableFields(nodeSourceDescriptor.getPolicyParameters(),
+                                                                                                         policyClass);
+        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(policyClass, policyFields);
+        policyPluginDescriptor.applyDefaultValuesToConfigurableFields();
 
         return new NodeSourceConfiguration(nodeSourceName,
                                            nodeSource.nodesRecoverable(),
-                                           new PluginDescriptor(infrastructureClass, configurableFieldNames),
-                                           new PluginDescriptor(policyClass, new HashMap<>()));
+                                           infrastructurePluginDescriptor,
+                                           policyPluginDescriptor);
     }
 
     /**
