@@ -33,9 +33,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -201,9 +202,11 @@ public class FTPConnector extends JavaExecutable {
         List<String> filesRelativePathName = new ArrayList<>();
         getOut().println("Exporting file(s) from " + ftpLocalRelativePath + " to " + ftpRemoteRelativePath);
         File localFile = new File(ftpLocalRelativePath);
-
+        if (!localFile.exists()) {
+            throw new IllegalArgumentException(localFile + " not found. Please, enter a valid path.");
+        }
         // if the ftp remote file path does not exist then it is created.
-        createRemoteDirectoryIfNotExists(ftpClient, ftpRemoteRelativePath);
+        makeRemoteDirectoriesIfNotExist(ftpClient, Paths.get(ftpRemoteRelativePath));
 
         // If it is a single file:
         if (localFile.isFile()) {
@@ -212,14 +215,11 @@ public class FTPConnector extends JavaExecutable {
             filesRelativePathName.add(uploadSingleFile(ftpClient, ftpLocalRelativePath, localFile.getName()));
 
         }
-
         // If it is a folder, upload all its contents recursively
-        else if (localFile.isDirectory()) {
+        else {
             getOut().println("A DIRECTORY to upload");
             ftpClient.changeWorkingDirectory(ftpRemoteRelativePath);
             filesRelativePathName.addAll(new HashSet(uploadDirectory(ftpClient, "", ftpLocalRelativePath, "")));
-        } else {
-            throw new IllegalArgumentException(localFile + " not found. Please, enter a valid path.");
         }
         getOut().println("END Export file(s) to FTP.");
         return filesRelativePathName;
@@ -231,23 +231,19 @@ public class FTPConnector extends JavaExecutable {
 
         File localDir = new File(localParentDir);
         getOut().println("LISTING directory: " + localDir.getName());
+
         File[] subFiles = localDir.listFiles();
         if (subFiles != null) {
             for (File item : subFiles) {
-                String remoteFilePath = Paths.get(remoteDirPath, remoteParentDir, item.getName()).toString();
-                if (remoteParentDir.isEmpty()) {
-                    remoteFilePath = Paths.get(remoteDirPath, item.getName()).toString();
-                }
-
                 if (item.isFile()) {
                     // upload the file
                     String localFilePath = item.getAbsolutePath();
                     getOut().println("About to UPLOAD the file: " + item.getName());
-                    filesRelativePathName.add(uploadSingleFile(ftpClient, localFilePath, remoteFilePath));
+                    filesRelativePathName.add(uploadSingleFile(ftpClient, localFilePath, item.getName()));
 
                 } else {
                     // create directory on the server
-                    createRemoteDirectory(ftpClient, remoteFilePath);
+                    createRemoteDirectoryIfNotExists(ftpClient, item.getName());
 
                     // upload the sub directory
                     String parent = Paths.get(remoteParentDir, item.getName()).toString();
@@ -257,6 +253,8 @@ public class FTPConnector extends JavaExecutable {
 
                     localParentDir = item.getAbsolutePath();
                     filesRelativePathName.addAll(uploadDirectory(ftpClient, remoteDirPath, localParentDir, parent));
+                    //cd ..
+                    ftpClient.changeWorkingDirectory("..");
                 }
             }
         }
@@ -272,11 +270,10 @@ public class FTPConnector extends JavaExecutable {
 
             //upload a single file to the FTP server
             if (ftpClient.storeFile(remoteFilePath, inputStream)) {
-                getOut().println("file UPLOADED successfully to: " +
-                                 Paths.get(ftpRemoteRelativePath, localFile.getName()));
+                getOut().println("file UPLOADED successfully to: " + Paths.get(remoteFilePath));
                 return remoteFilePath;
             } else {
-                throw new IOException("Error: COULD NOT upload the file: " + ftpLocalRelativePath);
+                throw new IOException("Error: COULD NOT upload the file: " + localFilePath + " to " + remoteFilePath);
             }
         }
     }
@@ -285,24 +282,28 @@ public class FTPConnector extends JavaExecutable {
         ftpClient.changeWorkingDirectory(dirPath);
         int returnCode = ftpClient.getReplyCode();
         if (returnCode == 550) {
-            createRemoteDirectory(ftpClient, ftpRemoteRelativePath);
+            createRemoteDirectory(ftpClient, dirPath);
+            ftpClient.changeWorkingDirectory(dirPath);
+
+        }
+
+    }
+
+    private void makeRemoteDirectoriesIfNotExist(FTPClient ftpClient, Path path) throws IOException {
+        if (path.getParent() == null) {
+            createRemoteDirectoryIfNotExists(ftpClient, path.toString());
+            return;
+        } else {
+            makeRemoteDirectoriesIfNotExist(ftpClient, path.getParent());
+            createRemoteDirectoryIfNotExists(ftpClient, path.getFileName().toString());
         }
     }
 
     private void createRemoteDirectory(FTPClient ftpClient, String remoteDirPath) throws IOException {
-        ArrayList<FTPFile> folderList = new ArrayList(Arrays.asList(ftpClient.listDirectories()));
-        ArrayList<String> folderNames = new ArrayList();
-        for (int i = 0; i < folderList.size(); i++) {
-            folderNames.add(folderList.get(i).getName());
-        }
-        if (!folderNames.contains(remoteDirPath)) {
-            if (ftpClient.makeDirectory(remoteDirPath)) {
-                getOut().println("CREATED the directory: " + remoteDirPath);
-            } else {
-                throw new IOException("Error: COULD NOT create the directory: " + remoteDirPath);
-            }
+        if (ftpClient.makeDirectory(remoteDirPath)) {
+            getOut().println("CREATED the directory: " + remoteDirPath);
         } else {
-            throw new IOException("Error: COULD NOT create an existing directory: " + remoteDirPath);
+            throw new IOException("Error: COULD NOT create the directory: " + remoteDirPath);
         }
     }
 
@@ -324,7 +325,6 @@ public class FTPConnector extends JavaExecutable {
                 String remoteFilePath = Paths.get(parentDir, currentDir, currentFileName).toString();
                 String savePath = Paths.get(saveDir, parentDir, currentDir, currentFileName).toString();
                 if (aFile.isDirectory()) {
-
                     // create the directory savePath inside saveDir
                     makeDirectories(savePath);
 
@@ -362,11 +362,10 @@ public class FTPConnector extends JavaExecutable {
     }
 
     private void makeDirectories(String newDirPath) throws IOException {
-        File newDir = new File(newDirPath);
-        if (newDir.mkdirs()) {
-            getOut().println("CREATED the directory: " + newDirPath);
-        } else {
-            throw new IOException("Error: COULD NOT create the directory: " + newDirPath);
+        File dir = new File(newDirPath);
+        if (!(dir.exists() && dir.isDirectory())) {
+            Files.createDirectories(Paths.get(newDirPath));
         }
+
     }
 }
