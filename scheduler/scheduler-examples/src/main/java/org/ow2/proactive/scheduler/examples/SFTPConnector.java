@@ -66,15 +66,17 @@ public class SFTPConnector extends JavaExecutable {
 
     private boolean sftpExtractArchive;
 
-    private String sftpLocalRelativePath = null;
+    private String sftpLocalRelativePath;
 
-    private String sftpRemoteRelativePath = null;
+    private String sftpRemoteRelativePath;
 
-    private String sftpMode = null;
+    private String sftpMode;
 
-    private String sftpUsername = null;
+    private String sftpUsername;
 
-    private String sftpPassword = null;
+    private String sftpUrlKey;
+
+    private String sftpPassword;
 
     private static final String SFTP_LOCAL_RELATIVE_PATH_ARG = "sftpLocalRelativePath";
 
@@ -98,7 +100,7 @@ public class SFTPConnector extends JavaExecutable {
         } else {
             //we throw an exception tp prevent transferring all the contents of the global space.
             if (sftpMode.equals("PUT")) {
-                throw new IllegalArgumentException("you have to specify the local relative path. empty value is not allowed.");
+                throw new IllegalArgumentException("Please specify a local relative path. Empty value is not allowed.");
             }
             //default value is getlocalspace() because it will always be writable and moreover can be used to transfer files to another data space(global, user)
             sftpLocalRelativePath = getLocalSpace();
@@ -107,11 +109,22 @@ public class SFTPConnector extends JavaExecutable {
             sftpRemoteRelativePath = args.get("sftpRemoteRelativePath").toString();
         }
 
-        sftpUsername = getThirdPartyCredential("SFTP_USERNAME");
-        sftpPassword = getThirdPartyCredential("SFTP_PASSWORD");
+        if (args.containsKey("sftpUsername")) {
+            sftpUsername = args.get("sftpUsername").toString();
+        }
 
-        if (sftpUsername == null || sftpPassword == null) {
-            throw new IllegalArgumentException("you first need to add your ftp username and password (SFTP_USERNAME, SFTP_PASSWORD) to the third party credentials");
+        if (sftpUsername == null) {
+            throw new IllegalArgumentException("Username is required to access an SFTP server");
+        }
+
+        // This key is used for logs and for getting the password from 3rd party credentials.
+        sftpUrlKey = "sftp://" + sftpUsername + "@" + sftpHostname + ":" + sftpPort;
+
+        sftpPassword = getThirdPartyCredential(sftpUrlKey);
+
+        if (sftpPassword == null) {
+            throw new IllegalArgumentException("Please add your sftp password to 3rd-party credentials under the key :\"" +
+                                               sftpUrlKey + "\"");
         }
     }
 
@@ -131,15 +144,18 @@ public class SFTPConnector extends JavaExecutable {
             Properties config = new Properties();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
-            session.connect(); // create sftp Session
-            channel = session.openChannel("sftp"); // open sftp Channel
+            // create sftp Session
+            getOut().println("Connecting to " + sftpUrlKey);
+            session.connect();
+            // open sftp Channel
+            channel = session.openChannel("sftp");
             channel.connect();
             channelsftp = (ChannelSftp) channel;
 
             switch (sftpMode) {
                 //ftp mode is get
                 case "GET":
-                    getOut().println("BEGIN DOWNLOAD FROM SFTP SERVER: " + sftpHostname + ":" + sftpPort);
+                    getOut().println("BEGIN DOWNLOAD FROM SFTP SERVER: " + sftpUrlKey);
                     // recursive folder content download from sftp server
                     filesRelativePathName = recursiveFolderDownload(channelsftp,
                                                                     sftpRemoteRelativePath,
@@ -149,7 +165,7 @@ public class SFTPConnector extends JavaExecutable {
 
                 //ftp mode is put
                 case "PUT":
-                    getOut().println("BEGIN UPLOAD TO SFTP SERVER: " + sftpHostname + ":" + sftpPort);
+                    getOut().println("BEGIN UPLOAD TO SFTP SERVER: " + sftpUrlKey);
                     // Create remote directory(ies) if it(they) does(do) not exist
                     if (!remoteDirExists(channelsftp, sftpRemoteRelativePath)) {
                         makeRemoteDirectories(channelsftp, Paths.get(sftpRemoteRelativePath));
@@ -195,29 +211,25 @@ public class SFTPConnector extends JavaExecutable {
             throws SftpException, FileNotFoundException {
 
         List<String> filesRelativePathName = new ArrayList<>();
-
         File sourceFile = new File(sourcePath);
+        String remoteFilePath = Paths.get(destinationPath, sourceFile.getName()).toString();
+
         if (sourceFile.isFile()) {
             // copy if it is a file
-            channelSftp.cd(destinationPath);
             getOut().println("Uploading " + sourcePath);
-            channelSftp.put(new FileInputStream(sourceFile), sourceFile.getName(), ChannelSftp.OVERWRITE);
-            getOut().println("File uploaded successfully to " +
-                             Paths.get(destinationPath, sourceFile.getName()).toString());
-            filesRelativePathName.add(Paths.get(destinationPath, sourceFile.getName()).toString());
+            channelSftp.put(new FileInputStream(sourceFile), remoteFilePath, ChannelSftp.OVERWRITE);
+            getOut().println("File uploaded successfully to " + remoteFilePath);
+            filesRelativePathName.add(remoteFilePath);
 
         } else {
 
-            String remoteFilePath = Paths.get(destinationPath, sourceFile.getName()).toString();
             File[] files = sourceFile.listFiles();
 
-            if (files != null && !sourceFile.getName().startsWith(".")) {
-
-                channelSftp.cd(destinationPath);
+            if (files != null && !sourceFile.isHidden()) {
 
                 // create a directory if it does not exist
                 if (!remoteDirExists(channelSftp, remoteFilePath)) {
-                    channelSftp.mkdir(sourceFile.getName());
+                    channelSftp.mkdir(remoteFilePath);
                 }
 
                 for (File f : files) {
