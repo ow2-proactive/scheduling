@@ -68,15 +68,25 @@ public class FTPConnector extends JavaExecutable {
 
     private boolean ftpExtractArchive;
 
-    private String ftpLocalRelativePath = null;
+    private String ftpLocalRelativePath;
 
-    private String ftpRemoteRelativePath = null;
+    private String ftpRemoteRelativePath;
 
-    private String ftpMode = null;
+    private String ftpMode;
 
-    private String ftpUsername = null;
+    private String ftpUsername;
 
-    private String ftpPassword = null;
+    private String ftpPassword;
+
+    private String ftpUrlKey;
+
+    private static final String GET = "GET";
+
+    private static final String PUT = "PUT";
+
+    private static final String CURRENT_FOLDER = ".";
+
+    private static final String PARENT_FOLDER = "..";
 
     private static final String FTP_LOCAL_RELATIVE_PATH = "ftpLocalRelativePath";
 
@@ -102,7 +112,7 @@ public class FTPConnector extends JavaExecutable {
         } else {
             //We throw an exception tp prevent transferring all the contents of the global space.
             if (ftpMode.equals("PUT")) {
-                throw new IllegalArgumentException("You have to specify the local relative path. Empty value is not allowed.");
+                throw new IllegalArgumentException("Please specify a local relative path. Empty value is not allowed.");
             }
             //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
             ftpLocalRelativePath = getLocalSpace();
@@ -110,11 +120,22 @@ public class FTPConnector extends JavaExecutable {
         if (args.containsKey("ftpRemoteRelativePath")) {
             ftpRemoteRelativePath = args.get("ftpRemoteRelativePath").toString();
         }
+        if (args.containsKey("ftpUsername")) {
+            ftpUsername = args.get("ftpUsername").toString();
+        }
 
-        ftpUsername = getThirdPartyCredential("FTP_USERNAME");
-        ftpPassword = getThirdPartyCredential("FTP_PASSWORD");
-        if (ftpUsername == null || ftpPassword == null) {
-            throw new IllegalArgumentException("You first need to add your ftp username and password (FTP_USERNAME, FTP_PASSWORD) to the third party credentials");
+        if (ftpUsername == null) {
+            throw new IllegalArgumentException("Username is required to access an SFTP server");
+        }
+
+        // This key is used for logs and for getting the password from 3rd party credentials.
+        ftpUrlKey = "ftp://" + ftpUsername + "@" + ftpHostname + ":" + ftpPort;
+
+        ftpPassword = getThirdPartyCredential(ftpUrlKey);
+
+        if (ftpPassword == null) {
+            throw new IllegalArgumentException("Please add your ftp password to 3rd-party credentials under the key :\"" +
+                                               ftpUrlKey + "\"");
         }
     }
 
@@ -146,7 +167,7 @@ public class FTPConnector extends JavaExecutable {
 
             switch (ftpMode) {
                 //FTP mode is GET
-                case "GET":
+                case GET:
                     filesRelativePathName = ftpGet(ftpClient);
                     break;
 
@@ -156,7 +177,7 @@ public class FTPConnector extends JavaExecutable {
                     break;
 
                 default:
-                    throw new IllegalArgumentException("FTP MODE can only be PUT or GET.");
+                    throw new IllegalArgumentException("FTP MODE can only be " + PUT + " or " + GET);
 
             }
         } finally {
@@ -254,7 +275,7 @@ public class FTPConnector extends JavaExecutable {
                     localParentDir = item.getAbsolutePath();
                     filesRelativePathName.addAll(uploadDirectory(ftpClient, remoteDirPath, localParentDir, parent));
                     //cd ..
-                    ftpClient.changeWorkingDirectory("..");
+                    ftpClient.changeWorkingDirectory(PARENT_FOLDER);
                 }
             }
         }
@@ -317,7 +338,7 @@ public class FTPConnector extends JavaExecutable {
         if (subFiles != null) {
             for (FTPFile aFile : subFiles) {
                 String currentFileName = aFile.getName();
-                if (currentFileName.equals(".") || currentFileName.equals("..")) {
+                if (currentFileName.equals(CURRENT_FOLDER) || currentFileName.equals(PARENT_FOLDER)) {
                     // skip parent directory and the directory itself
                     continue;
                 }
