@@ -254,7 +254,6 @@ public class FTPConnector extends JavaExecutable {
         getOut().println("LISTING directory: " + localDir.getName());
 
         File[] subFiles = localDir.listFiles();
-        if (subFiles != null) {
             for (File item : subFiles) {
                 if (item.isFile()) {
                     // upload the file
@@ -278,7 +277,6 @@ public class FTPConnector extends JavaExecutable {
                     ftpClient.changeWorkingDirectory(PARENT_FOLDER);
                 }
             }
-        }
         return filesRelativePathName;
     }
 
@@ -335,7 +333,6 @@ public class FTPConnector extends JavaExecutable {
             dirToList = Paths.get(dirToList, currentDir).toString();
         }
         FTPFile[] subFiles = ftpClient.listFiles(dirToList);
-        if (subFiles != null) {
             for (FTPFile aFile : subFiles) {
                 String currentFileName = aFile.getName();
                 if (currentFileName.equals(CURRENT_FOLDER) || currentFileName.equals(PARENT_FOLDER)) {
@@ -355,7 +352,6 @@ public class FTPConnector extends JavaExecutable {
                     filesRelativePathName.add(downloadSingleFile(ftpClient, remoteFilePath, savePath));
                 }
             }
-        }
         return filesRelativePathName;
     }
 
