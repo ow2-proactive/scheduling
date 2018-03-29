@@ -56,13 +56,11 @@ import com.jcraft.jsch.SftpException;
  */
 public class SFTPConnector extends JavaExecutable {
 
+    private static final String SFTP_LOCAL_RELATIVE_PATH_ARG = "sftpLocalRelativePath";
+
     private static final String DEFAULT_SFTP_HOSTNAME = "localhost";
 
     private static final int DEFAULT_SFTP_PORT = 22;
-
-    private String sftpHostname = DEFAULT_SFTP_HOSTNAME;
-
-    private int sftpPort = DEFAULT_SFTP_PORT;
 
     private static final String GET = "GET";
 
@@ -74,9 +72,13 @@ public class SFTPConnector extends JavaExecutable {
 
     private static final String PARENT_FOLDER = "..";
 
+    private String sftpHostname = DEFAULT_SFTP_HOSTNAME;
+
+    private int sftpPort = DEFAULT_SFTP_PORT;
+
     private boolean sftpExtractArchive;
 
-    private String sftpLocalRelativePath;
+    private String sftpLocalAbsolutePath;
 
     private String sftpRemoteRelativePath;
 
@@ -87,8 +89,6 @@ public class SFTPConnector extends JavaExecutable {
     private String sftpUrlKey;
 
     private String sftpPassword;
-
-    private static final String SFTP_LOCAL_RELATIVE_PATH_ARG = "sftpLocalRelativePath";
 
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
@@ -110,14 +110,15 @@ public class SFTPConnector extends JavaExecutable {
         }
         if (args.containsKey(SFTP_LOCAL_RELATIVE_PATH_ARG) &&
             !args.get(SFTP_LOCAL_RELATIVE_PATH_ARG).toString().isEmpty()) {
-            sftpLocalRelativePath = args.get(SFTP_LOCAL_RELATIVE_PATH_ARG).toString();
+            sftpLocalAbsolutePath = Paths.get(getLocalSpace(), args.get(SFTP_LOCAL_RELATIVE_PATH_ARG).toString())
+                                         .toString();
         } else {
             //we throw an exception tp prevent transferring all the contents of the global space.
             if (sftpMode.equals(PUT)) {
                 throw new IllegalArgumentException("Please specify a local relative path. Empty value is not allowed.");
             }
             //default value is getlocalspace() because it will always be writable and moreover can be used to transfer files to another data space(global, user)
-            sftpLocalRelativePath = getLocalSpace();
+            sftpLocalAbsolutePath = getLocalSpace();
         }
         if (args.containsKey("sftpRemoteRelativePath")) {
             sftpRemoteRelativePath = args.get("sftpRemoteRelativePath").toString();
@@ -173,7 +174,7 @@ public class SFTPConnector extends JavaExecutable {
                     // recursive folder content download from sftp server
                     filesRelativePathName = recursiveFolderDownload(channelsftp,
                                                                     sftpRemoteRelativePath,
-                                                                    sftpLocalRelativePath);
+                                                                    sftpLocalAbsolutePath);
                     getOut().println("END DOWNLOAD FROM SFTP");
                     break;
 
@@ -186,7 +187,7 @@ public class SFTPConnector extends JavaExecutable {
                     }
                     // recursive folder content upload to sftp server
                     filesRelativePathName = recursiveFolderUpload(channelsftp,
-                                                                  sftpLocalRelativePath,
+                                                                  sftpLocalAbsolutePath,
                                                                   sftpRemoteRelativePath);
                     getOut().println("END UPLOAD TO SFTP");
                     break;
@@ -195,18 +196,21 @@ public class SFTPConnector extends JavaExecutable {
                     throw new IllegalArgumentException("SFTP mode can only be " + PUT + " or " + GET);
             }
         } catch (JSchException e) {
-            throw new JSchException("An error occured while trying to connect to SFTP server: ", e);
+            throw new JSchException("An error occured while trying to connect to SFTP server: ", e.getCause());
         } catch (SftpException e) {
             throw new SftpException(e.id,
                                     "File not found, permission denied or operation not supported by SFTP server.",
                                     e);
         } finally {
-            if (channelsftp != null)
+            if (channelsftp != null) {
                 channelsftp.disconnect();
-            if (channel != null)
+            }
+            if (channel != null) {
                 channel.disconnect();
-            if (session != null)
+            }
+            if (session != null) {
                 session.disconnect();
+            }
             getOut().println("Disconnected from SFTP server");
         }
 
