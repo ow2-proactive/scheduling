@@ -96,7 +96,11 @@ public class SFTPConnector extends JavaExecutable {
             sftpHostname = args.get("sftpHostname").toString();
         }
         if (args.containsKey("sftpPort")) {
-            sftpPort = Integer.parseInt(args.get("sftpPort").toString());
+            try {
+                sftpPort = Integer.parseInt(args.get("sftpPort").toString());
+            } catch (NumberFormatException e) {
+                getOut().println("Invalid port number. Using default sftp port=" + DEFAULT_SFTP_PORT);
+            }
         }
         if (args.containsKey("sftpMode")) {
             sftpMode = args.get("sftpMode").toString();
