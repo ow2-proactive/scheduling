@@ -35,7 +35,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Object holding the instantaneous configuration of a node source.
+ * Object holding the current configuration of a node source.
  */
 @PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -62,8 +62,16 @@ public class NodeSourceConfiguration implements Serializable {
         return this.nodeSourceName;
     }
 
-    public boolean isNodesRecoverable() {
+    public boolean getNodesRecoverable() {
         return this.nodesRecoverable;
+    }
+
+    public PluginDescriptor getInfrastructurePluginDescriptor() {
+        return this.infrastructurePluginDescriptor;
+    }
+
+    public PluginDescriptor getPolicyPluginDescriptor() {
+        return this.policyPluginDescriptor;
     }
 
 }

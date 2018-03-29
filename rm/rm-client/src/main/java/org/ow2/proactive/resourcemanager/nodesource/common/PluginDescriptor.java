@@ -93,20 +93,30 @@ public class PluginDescriptor implements Serializable {
     public PluginDescriptor(Class<?> cls, Object[] parameters) {
         this(cls, new HashMap<>());
 
-        int configurableFieldIndex = 0;
+        this.validateParametersOrFail(cls, parameters);
 
         Object parameterObject;
+        int fieldIndex = 0;
+
         for (ConfigurableField field : this.configurableFields) {
 
-            parameterObject = parameters[configurableFieldIndex];
+            parameterObject = parameters[fieldIndex++];
+            this.setFieldToStringValueOf(field, parameterObject);
+        }
+    }
 
-            if (parameterObject instanceof byte[]) {
-                field.setValue(new String((byte[]) parameterObject));
-            } else {
-                field.setValue(String.valueOf(parameterObject));
-            }
+    private void validateParametersOrFail(Class<?> cls, Object[] parameters) {
+        if (parameters == null || this.configurableFields.size() > parameters.length) {
+            throw new IllegalArgumentException("There are not enough parameters to populate the plugin descriptor of " +
+                                               cls.getSimpleName());
+        }
+    }
 
-            configurableFieldIndex++;
+    private void setFieldToStringValueOf(ConfigurableField field, Object parameterObject) {
+        if (parameterObject instanceof byte[]) {
+            field.setValue(new String((byte[]) parameterObject));
+        } else {
+            field.setValue(String.valueOf(parameterObject));
         }
     }
 
