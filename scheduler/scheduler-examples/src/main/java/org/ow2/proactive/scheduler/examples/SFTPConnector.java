@@ -64,6 +64,16 @@ public class SFTPConnector extends JavaExecutable {
 
     private int sftpPort = DEFAULT_SFTP_PORT;
 
+    private static final String GET = "GET";
+
+    private static final String PUT = "PUT";
+
+    private static final String STRICT_HOST_KEY_CHEKING = "StrictHostKeyChecking";
+
+    private static final String CURRENT_FOLDER = ".";
+
+    private static final String PARENT_FOLDER = "..";
+
     private boolean sftpExtractArchive;
 
     private String sftpLocalRelativePath;
@@ -99,7 +109,7 @@ public class SFTPConnector extends JavaExecutable {
             sftpLocalRelativePath = args.get(SFTP_LOCAL_RELATIVE_PATH_ARG).toString();
         } else {
             //we throw an exception tp prevent transferring all the contents of the global space.
-            if (sftpMode.equals("PUT")) {
+            if (sftpMode.equals(PUT)) {
                 throw new IllegalArgumentException("Please specify a local relative path. Empty value is not allowed.");
             }
             //default value is getlocalspace() because it will always be writable and moreover can be used to transfer files to another data space(global, user)
@@ -142,7 +152,7 @@ public class SFTPConnector extends JavaExecutable {
             session = jsch.getSession(sftpUsername, sftpHostname, sftpPort);
             session.setPassword(sftpPassword);
             Properties config = new Properties();
-            config.put("StrictHostKeyChecking", "no");
+            config.put(STRICT_HOST_KEY_CHEKING, "no");
             session.setConfig(config);
             // create sftp Session
             getOut().println("Connecting to " + sftpUrlKey);
@@ -154,7 +164,7 @@ public class SFTPConnector extends JavaExecutable {
 
             switch (sftpMode) {
                 //ftp mode is get
-                case "GET":
+                case GET:
                     getOut().println("BEGIN DOWNLOAD FROM SFTP SERVER: " + sftpUrlKey);
                     // recursive folder content download from sftp server
                     filesRelativePathName = recursiveFolderDownload(channelsftp,
@@ -164,7 +174,7 @@ public class SFTPConnector extends JavaExecutable {
                     break;
 
                 //ftp mode is put
-                case "PUT":
+                case PUT:
                     getOut().println("BEGIN UPLOAD TO SFTP SERVER: " + sftpUrlKey);
                     // Create remote directory(ies) if it(they) does(do) not exist
                     if (!remoteDirExists(channelsftp, sftpRemoteRelativePath)) {
@@ -178,7 +188,7 @@ public class SFTPConnector extends JavaExecutable {
                     break;
 
                 default:
-                    throw new IllegalArgumentException("SFTP mode can only be PUT or GET.");
+                    throw new IllegalArgumentException("SFTP mode can only be " + PUT + " or " + GET);
             }
         } catch (JSchException e) {
             throw new JSchException("An error occured while trying to connect to SFTP server: ", e);
@@ -301,9 +311,7 @@ public class SFTPConnector extends JavaExecutable {
 
             // if the file is a zip and sftpextractarchive == true then extract the archive
             if (sftpExtractArchive && sftpRemoteRelativePath.endsWith(".zip")) {
-                getOut().println("Decompressing archive: " + localFilePath);
-                ZipUtil.unpack(new File(localFilePath), new File(sftpLocalRelativePath));
-                getOut().println("Archive decompressed successfully at: " + sftpLocalRelativePath);
+                extractArchive(localFilePath, sftpLocalRelativePath);
             }
 
             return filesRelativePathName;
@@ -321,7 +329,7 @@ public class SFTPConnector extends JavaExecutable {
                 filesRelativePathName.add(downloadSingleFile(channelSftp, remoteFilePath, localFilePath));
 
             } else // skip '.' and '..'
-            if (!(".".equals(item.getFilename()) || "..".equals(item.getFilename()))) {
+            if (!(CURRENT_FOLDER.equals(item.getFilename()) || PARENT_FOLDER.equals(item.getFilename()))) {
                 // Copy empty folder.
                 localFile.mkdirs();
                 // Enter found folder on server to read its contents and create locally.
@@ -374,5 +382,11 @@ public class SFTPConnector extends JavaExecutable {
                 channelSftp.mkdir(path.toString());
             }
         }
+    }
+
+    private void extractArchive(String localFilePath, String sftpLocalRelativePath) {
+        getOut().println("Decompressing archive: " + localFilePath);
+        ZipUtil.unpack(new File(localFilePath), new File(sftpLocalRelativePath));
+        getOut().println("Archive decompressed successfully at: " + sftpLocalRelativePath);
     }
 }
