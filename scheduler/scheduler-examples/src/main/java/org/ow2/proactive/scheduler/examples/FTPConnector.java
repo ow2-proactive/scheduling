@@ -88,6 +88,8 @@ public class FTPConnector extends JavaExecutable {
 
     private static final String PARENT_FOLDER = "..";
 
+    private static final String FTP_URL_KEY = "ftp://<username>@<hostname>";
+
     private static final String FTP_LOCAL_RELATIVE_PATH = "ftpLocalRelativePath";
 
     /**
@@ -129,13 +131,13 @@ public class FTPConnector extends JavaExecutable {
         }
 
         // This key is used for logs and for getting the password from 3rd party credentials.
-        ftpUrlKey = "ftp://" + ftpUsername + "@" + ftpHostname + ":" + ftpPort;
+        ftpUrlKey = "ftp://" + ftpUsername + "@" + ftpHostname;
 
         ftpPassword = getThirdPartyCredential(ftpUrlKey);
 
         if (ftpPassword == null) {
             throw new IllegalArgumentException("Please add your ftp password to 3rd-party credentials under the key :\"" +
-                                               ftpUrlKey + "\"");
+                                               FTP_URL_KEY + "\"");
         }
     }
 
@@ -254,29 +256,29 @@ public class FTPConnector extends JavaExecutable {
         getOut().println("LISTING directory: " + localDir.getName());
 
         File[] subFiles = localDir.listFiles();
-            for (File item : subFiles) {
-                if (item.isFile()) {
-                    // upload the file
-                    String localFilePath = item.getAbsolutePath();
-                    getOut().println("About to UPLOAD the file: " + item.getName());
-                    filesRelativePathName.add(uploadSingleFile(ftpClient, localFilePath, item.getName()));
+        for (File item : subFiles) {
+            if (item.isFile()) {
+                // upload the file
+                String localFilePath = item.getAbsolutePath();
+                getOut().println("About to UPLOAD the file: " + item.getName());
+                filesRelativePathName.add(uploadSingleFile(ftpClient, localFilePath, item.getName()));
 
-                } else {
-                    // create directory on the server
-                    createRemoteDirectoryIfNotExists(ftpClient, item.getName());
+            } else {
+                // create directory on the server
+                createRemoteDirectoryIfNotExists(ftpClient, item.getName());
 
-                    // upload the sub directory
-                    String parent = Paths.get(remoteParentDir, item.getName()).toString();
-                    if (remoteParentDir.equals("")) {
-                        parent = item.getName();
-                    }
-
-                    localParentDir = item.getAbsolutePath();
-                    filesRelativePathName.addAll(uploadDirectory(ftpClient, remoteDirPath, localParentDir, parent));
-                    //cd ..
-                    ftpClient.changeWorkingDirectory(PARENT_FOLDER);
+                // upload the sub directory
+                String parent = Paths.get(remoteParentDir, item.getName()).toString();
+                if (remoteParentDir.equals("")) {
+                    parent = item.getName();
                 }
+
+                localParentDir = item.getAbsolutePath();
+                filesRelativePathName.addAll(uploadDirectory(ftpClient, remoteDirPath, localParentDir, parent));
+                //cd ..
+                ftpClient.changeWorkingDirectory(PARENT_FOLDER);
             }
+        }
         return filesRelativePathName;
     }
 
@@ -333,25 +335,25 @@ public class FTPConnector extends JavaExecutable {
             dirToList = Paths.get(dirToList, currentDir).toString();
         }
         FTPFile[] subFiles = ftpClient.listFiles(dirToList);
-            for (FTPFile aFile : subFiles) {
-                String currentFileName = aFile.getName();
-                if (currentFileName.equals(CURRENT_FOLDER) || currentFileName.equals(PARENT_FOLDER)) {
-                    // skip parent directory and the directory itself
-                    continue;
-                }
-                String remoteFilePath = Paths.get(parentDir, currentDir, currentFileName).toString();
-                String savePath = Paths.get(saveDir, parentDir, currentDir, currentFileName).toString();
-                if (aFile.isDirectory()) {
-                    // create the directory savePath inside saveDir
-                    makeDirectories(savePath);
-
-                    // download the sub directory
-                    filesRelativePathName.addAll(downloadDirectory(ftpClient, dirToList, currentFileName, saveDir));
-                } else {
-                    // download the file
-                    filesRelativePathName.add(downloadSingleFile(ftpClient, remoteFilePath, savePath));
-                }
+        for (FTPFile aFile : subFiles) {
+            String currentFileName = aFile.getName();
+            if (currentFileName.equals(CURRENT_FOLDER) || currentFileName.equals(PARENT_FOLDER)) {
+                // skip parent directory and the directory itself
+                continue;
             }
+            String remoteFilePath = Paths.get(parentDir, currentDir, currentFileName).toString();
+            String savePath = Paths.get(saveDir, parentDir, currentDir, currentFileName).toString();
+            if (aFile.isDirectory()) {
+                // create the directory savePath inside saveDir
+                makeDirectories(savePath);
+
+                // download the sub directory
+                filesRelativePathName.addAll(downloadDirectory(ftpClient, dirToList, currentFileName, saveDir));
+            } else {
+                // download the file
+                filesRelativePathName.add(downloadSingleFile(ftpClient, remoteFilePath, savePath));
+            }
+        }
         return filesRelativePathName;
     }
 
