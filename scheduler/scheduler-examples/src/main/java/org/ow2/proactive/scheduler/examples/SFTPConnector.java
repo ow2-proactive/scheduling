@@ -62,6 +62,11 @@ public class SFTPConnector extends JavaExecutable {
 
     private static final int DEFAULT_SFTP_PORT = 22;
 
+    /**
+     * The SFTP_URL_KEY = "sftp://<username>@<host>" is used as a key to store sftp passwords in 3rd party credentials
+     */
+    private static final String SFTP_URL_KEY = "sftp://<username>@<host>";
+
     private static final String GET = "GET";
 
     private static final String PUT = "PUT";
@@ -133,13 +138,13 @@ public class SFTPConnector extends JavaExecutable {
         }
 
         // This key is used for logs and for getting the password from 3rd party credentials.
-        sftpUrlKey = "sftp://" + sftpUsername + "@" + sftpHostname + ":" + sftpPort;
+        sftpUrlKey = "sftp://" + sftpUsername + "@" + sftpHostname;
 
         sftpPassword = getThirdPartyCredential(sftpUrlKey);
 
         if (sftpPassword == null) {
             throw new IllegalArgumentException("Please add your sftp password to 3rd-party credentials under the key :\"" +
-                                               sftpUrlKey + "\"");
+                                               SFTP_URL_KEY + "\"");
         }
     }
 
@@ -243,7 +248,7 @@ public class SFTPConnector extends JavaExecutable {
 
             File[] files = sourceFile.listFiles();
 
-            if (files != null && !sourceFile.isHidden()) {
+            if (!sourceFile.isHidden()) {
 
                 // create a directory if it does not exist
                 if (!remoteDirExists(channelSftp, remoteFilePath)) {
@@ -294,7 +299,7 @@ public class SFTPConnector extends JavaExecutable {
 
     /**
      * This file downloads recursively a folder and all its contents over SFTP. <br>
-     * By default, this method <b>OVERWRITES </b>existing files and <b>APPENDS</b> existing folders.
+     * By default, this method <b>OVERWRITES</b> existing files and <b>APPENDS</b> existing folders.
      *
      * @param channelSftp
      * @param sftpRemoteRelativePath
@@ -307,7 +312,16 @@ public class SFTPConnector extends JavaExecutable {
             String sftpLocalRelativePath) throws SftpException, IOException {
 
         List<String> filesRelativePathName = new ArrayList<>();
-        List<ChannelSftp.LsEntry> fileAndFolderList = channelSftp.ls(sftpRemoteRelativePath);
+
+        // Do an ls on the remote path (sftpRemoteRelativePath)
+        List<ChannelSftp.LsEntry> fileAndFolderList = null;
+        try {
+            fileAndFolderList = channelSftp.ls(sftpRemoteRelativePath);
+        } catch (SftpException e) {
+            throw new SftpException(e.id,
+                                    "File not found or permission denied at " + sftpRemoteRelativePath,
+                                    e.getCause());
+        }
 
         // Check if the LS results point to a file not a directory
         if (isRemoteFile(fileAndFolderList)) {
@@ -317,7 +331,7 @@ public class SFTPConnector extends JavaExecutable {
             // Download single file
             filesRelativePathName.add(downloadSingleFile(channelSftp, sftpRemoteRelativePath, localFilePath));
 
-            // if the file is a zip and sftpextractarchive == true then extract the archive
+            // if the file is a zip and sftpExtractArchive == true then extract the archive
             if (sftpExtractArchive && sftpRemoteRelativePath.endsWith(".zip")) {
                 extractArchive(localFilePath, sftpLocalRelativePath);
             }
@@ -325,7 +339,7 @@ public class SFTPConnector extends JavaExecutable {
             return filesRelativePathName;
         }
 
-        //Iterate through list of folder content
+        // Iterate through list of folder content
         for (ChannelSftp.LsEntry item : fileAndFolderList) {
 
             String remoteFilePath = Paths.get(sftpRemoteRelativePath, item.getFilename()).toString();
@@ -379,7 +393,7 @@ public class SFTPConnector extends JavaExecutable {
      *
      * @param channelSftp
      * @param path
-     * @throws SftpException
+     * @throws SftpException if the remote folder(s) cannot be created
      */
     private void makeRemoteDirectories(ChannelSftp channelSftp, Path path) throws SftpException {
         if (!remoteDirExists(channelSftp, path.toString())) {
@@ -392,6 +406,11 @@ public class SFTPConnector extends JavaExecutable {
         }
     }
 
+    /**
+     * This method extracts a zip file located at localFilePath and saves the unpacked files to sftpLocalRelativePath.
+     * @param localFilePath
+     * @param sftpLocalRelativePath
+     */
     private void extractArchive(String localFilePath, String sftpLocalRelativePath) {
         getOut().println("Decompressing archive: " + localFilePath);
         ZipUtil.unpack(new File(localFilePath), new File(sftpLocalRelativePath));
