@@ -27,6 +27,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DefineNodeSourceCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.EditNodeSourceCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DeployNodeSourceCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UndeployNodeSourceCommand);

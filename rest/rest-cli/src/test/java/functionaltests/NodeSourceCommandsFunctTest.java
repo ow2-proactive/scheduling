@@ -42,6 +42,8 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
     private static final int NB_NODES = 4;
 
+    private static final int MODIFIED_NB_NODES = 6;
+
     private static final int NODE_SOURCE_DEPLOYED_WAIT_TIME_MILLIS = 5000;
 
     private static String rmCredentialPath;
@@ -72,12 +74,11 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
     private void createNodeSourceAndListNodeSources(String nodeSourceName, boolean nodesRecoverableParameter)
             throws Exception {
-        String testLogString = "[" + NodeSourceCommandsFunctTest.class.getSimpleName() + "]";
 
         String nodeSourceInfrastructureClass = "org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure";
         String nodeSourcePolicyClass = "org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy";
 
-        System.out.println(testLogString + " Test createns command");
+        System.out.println(LOG_HEADER + " Test createns command");
 
         if (nodesRecoverableParameter) {
             this.typeLine("createns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
@@ -99,24 +100,30 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         assertThat(out).contains("Node source successfully created.");
 
         this.checkOccurrencesOfNodeSourceInNodeSourceList(nodeSourceName);
-        this.checkOccurrencesOfNodeSourceInNodesList(nodeSourceName);
+        this.checkOccurrencesOfNodeSourceInNodesList(nodeSourceName, NB_NODES);
     }
 
     @Test
     public void testDefineAndDeployNodeSourceRecoverableParam() throws Exception {
         String nodeSourceName = "nsDefinedAndDeployedThroughCLIRecoverableParam";
-        this.defineAndDeployNodeSourceAndListNodeSources(nodeSourceName, true, true);
-        this.undeployNodeSourceAndListNodeSources(nodeSourceName, true);
+        this.defineNodeSourceAndCheckOutput(nodeSourceName, true, true);
+        this.deployNodeSourceAndCheckOutput(nodeSourceName, NB_NODES);
+        this.undeployNodeSourceAndCheckOutput(nodeSourceName, true);
+        this.editNodeSourceAndCheckOutput(nodeSourceName);
+        this.deployNodeSourceAndCheckOutput(nodeSourceName, MODIFIED_NB_NODES);
     }
 
     @Test
     public void testDefineAndDeployNodeSourceNoRecoverableParam() throws Exception {
         String nodeSourceName = "nsDefinedAndDeployedThroughCLINoRecoverableParam";
-        this.defineAndDeployNodeSourceAndListNodeSources(nodeSourceName, false, false);
-        this.undeployNodeSourceAndListNodeSources(nodeSourceName, false);
+        this.defineNodeSourceAndCheckOutput(nodeSourceName, false, false);
+        this.deployNodeSourceAndCheckOutput(nodeSourceName, NB_NODES);
+        this.undeployNodeSourceAndCheckOutput(nodeSourceName, false);
+        this.editNodeSourceAndCheckOutput(nodeSourceName);
+        this.deployNodeSourceAndCheckOutput(nodeSourceName, MODIFIED_NB_NODES);
     }
 
-    private void defineAndDeployNodeSourceAndListNodeSources(String nodeSourceName, boolean nodesRecoverableParameter,
+    private void defineNodeSourceAndCheckOutput(String nodeSourceName, boolean nodesRecoverableParameter,
             boolean preemptUndeploy) throws Exception {
 
         String nodeSourceInfrastructureClass = "org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure";
@@ -142,7 +149,10 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         System.out.println(out);
 
         assertThat(out).contains("Node source successfully defined.");
+    }
 
+    private void deployNodeSourceAndCheckOutput(String nodeSourceName, int expectedNumberOfNodes) {
+        String out;
         System.out.println(LOG_HEADER + " Test deployns command");
 
         this.clearAndTypeLine("deployns( '" + nodeSourceName + "')");
@@ -156,14 +166,12 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         assertThat(out).contains("Node source successfully deployed.");
 
         this.checkOccurrencesOfNodeSourceInNodeSourceList(nodeSourceName);
-        this.checkOccurrencesOfNodeSourceInNodesList(nodeSourceName);
+        this.checkOccurrencesOfNodeSourceInNodesList(nodeSourceName, expectedNumberOfNodes);
     }
 
-    private void undeployNodeSourceAndListNodeSources(String nodeSourceName, boolean preemptUndeploy) {
+    private void undeployNodeSourceAndCheckOutput(String nodeSourceName, boolean preemptUndeploy) {
 
-        String testLogString = "[" + NodeSourceCommandsFunctTest.class.getSimpleName() + "]";
-
-        System.out.println(testLogString + "Test undeployns command");
+        System.out.println(LOG_HEADER + "Test undeployns command");
 
         if (preemptUndeploy) {
             this.clearAndTypeLine("undeployns( '" + nodeSourceName + "', 'true')");
@@ -183,7 +191,29 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         this.checkNoOccurrenceOfNodeSourceInNodesList(nodeSourceName);
     }
 
+    private void editNodeSourceAndCheckOutput(String nodeSourceName) {
+
+        String nodeSourceInfrastructureClass = "org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure";
+        String nodeSourcePolicyClass = "org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy";
+
+        System.out.println(LOG_HEADER + " Test editns command");
+
+        this.clearAndTypeLine("editns( '" + nodeSourceName + "', ['" + nodeSourceInfrastructureClass + "', '" +
+                              rmCredentialPath + "', " + MODIFIED_NB_NODES + ", 60000, ''], ['" +
+                              nodeSourcePolicyClass + "', 'ALL', 'ALL'], 'false')");
+
+        this.runCli();
+        this.waitForNodeSourceStatusToChange();
+
+        String out = this.capturedOutput.toString();
+        System.setOut(this.stdOut);
+        System.out.println(out);
+
+        assertThat(out).contains("Node source successfully edited.");
+    }
+
     private void checkOccurrencesOfNodeSourceInNodeSourceList(String nodeSourceName) {
+
         System.out.println(LOG_HEADER + " List node sources");
 
         this.clearAndTypeLine("listns()");
@@ -196,14 +226,18 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         assertThat(out).contains(nodeSourceName);
     }
 
-    private void checkOccurrencesOfNodeSourceInNodesList(String nodeSourceName) {
+    private void checkOccurrencesOfNodeSourceInNodesList(String nodeSourceName, int expectedNumberOfNodes) {
 
         int nbOccurrencesOfNodeSourceNameInNodeList = this.listNodes(nodeSourceName);
 
-        assertThat(nbOccurrencesOfNodeSourceNameInNodeList).isAtLeast(NB_NODES);
+        // The name of the node source appears once in the command
+        // (hence "+ 1"), and, for each nodes, once in the node name and once 
+        // in the node URL (hence 2 times expectedNumberOfNodes)
+        assertThat(nbOccurrencesOfNodeSourceNameInNodeList).isEqualTo(expectedNumberOfNodes * 2 + 1);
     }
 
     private int listNodes(String nodeSourceName) {
+
         System.out.println(LOG_HEADER + " List nodes");
 
         this.clearAndTypeLine("listnodes(\"" + nodeSourceName + "\")");
@@ -212,6 +246,7 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         String out = this.capturedOutput.toString();
         System.setOut(this.stdOut);
         System.out.println(out);
+
         return StringUtils.countMatches(out, nodeSourceName);
     }
 
