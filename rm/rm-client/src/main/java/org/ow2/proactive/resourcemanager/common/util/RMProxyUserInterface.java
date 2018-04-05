@@ -54,6 +54,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -120,6 +121,15 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public BooleanWrapper defineNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
             boolean arg5) {
         return target.defineNodeSource(arg0, arg1, arg2, arg3, arg4, arg5);
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#editNodeSource(String, String, Object[], String, Object[], boolean)
+     */
+    @Override
+    public BooleanWrapper editNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,
+            boolean arg5) {
+        return target.editNodeSource(arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
     /**
@@ -211,6 +221,13 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
      */
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
         return target.getSupportedNodeSourcePolicies();
+    }
+
+    /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#getNodeSourceConfiguration(String)
+     */
+    public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName) {
+        return target.getNodeSourceConfiguration(nodeSourceName);
     }
 
     /**

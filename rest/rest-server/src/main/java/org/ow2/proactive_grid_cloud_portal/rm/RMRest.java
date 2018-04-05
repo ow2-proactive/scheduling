@@ -90,6 +90,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
+import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -384,6 +385,44 @@ public class RMRest implements RMRestInterface {
                                                   policyType,
                                                   policyParams,
                                                   Boolean.parseBoolean(nodesRecoverable))
+                                .getBooleanValue());
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
+        }
+
+        return nsState;
+    }
+
+    @Override
+    @PUT
+    @Path("nodesource/edit")
+    @Produces("application/json")
+    public NSState editNodeSource(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters,
+            @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        NSState nsState = new NSState();
+
+        Object[] infraParams = this.getAllInfrastructureParameters(infrastructureType,
+                                                                   infrastructureParameters,
+                                                                   infrastructureFileParameters,
+                                                                   rm);
+        Object[] policyParams = this.getAllPolicyParameters(policyType, policyParameters, policyFileParameters, rm);
+
+        try {
+            nsState.setResult(rm.editNodeSource(nodeSourceName,
+                                                infrastructureType,
+                                                infraParams,
+                                                policyType,
+                                                policyParams,
+                                                Boolean.parseBoolean(nodesRecoverable))
                                 .getBooleanValue());
         } catch (RuntimeException ex) {
             nsState.setResult(false);
@@ -849,6 +888,17 @@ public class RMRest implements RMRestInterface {
         return rm.getSupportedNodeSourcePolicies();
     }
 
+    @Override
+    @GET
+    @GZIP
+    @Path("nodesource/configuration")
+    @Produces("application/json")
+    public NodeSourceConfiguration getNodeSourceConfiguration(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodeSourceName") String nodeSourceName) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getNodeSourceConfiguration(nodeSourceName);
+    }
+
     /**
      * Returns the attributes <code>attr</code> of the mbean
      * registered as <code>name</code>.
@@ -1172,7 +1222,11 @@ public class RMRest implements RMRestInterface {
 
     private Object[] concatenateParametersAndFileParameters(String[] parameters, String[] fileParameters,
             Collection<ConfigurableField> fields) {
-        Object[] concatenatedParameters = new Object[parameters.length + fileParameters.length];
+
+        int parametersLength = this.getParametersLength(parameters);
+        int fileParametersLength = this.getParametersLength(fileParameters);
+
+        Object[] concatenatedParameters = new Object[parametersLength + fileParametersLength];
 
         int parametersIndex = 0;
         int fileParametersIndex = 0;
@@ -1190,6 +1244,14 @@ public class RMRest implements RMRestInterface {
         }
 
         return concatenatedParameters;
+    }
+
+    private int getParametersLength(String[] parameters) {
+        if (parameters != null) {
+            return parameters.length;
+        } else {
+            return 0;
+        }
     }
 
 }
