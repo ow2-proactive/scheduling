@@ -475,6 +475,12 @@ function definens(nodeSource, infrastructure, policy, nodesRecoverable) {
     }
 }
 
+function editns(nodeSource, infrastructure, policy, nodesRecoverable) {
+    execute(new SetInfrastructureCommand(infrastructure));
+    execute(new SetPolicyCommand(policy));
+    execute(new EditNodeSourceCommand('' + nodeSource, '' + nodesRecoverable));
+}
+
 function createns(nodeSource, infrastructure, policy, nodesRecoverable) {
     execute(new SetInfrastructureCommand(infrastructure));
     execute(new SetPolicyCommand(policy));
