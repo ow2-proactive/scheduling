@@ -51,7 +51,29 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.VersionCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.*;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DefineNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DeployNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.EditNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListInfrastructureCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.LockNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UndeployNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
@@ -679,7 +701,7 @@ public class CommandSet {
                                                                          .longOpt("editns")
                                                                          .description("Edit the configuration of an undeployed node source")
                                                                          .hasArgs(true)
-                                                                         .numOfArgs(1)
+                                                                         .numOfArgs(2)
                                                                          .argNames("node-source nodes-recoverable")
                                                                          .jsCommand("editns(node-source,nodes-recoverable)")
                                                                          .commandClass(EditNodeSourceCommand.class)
