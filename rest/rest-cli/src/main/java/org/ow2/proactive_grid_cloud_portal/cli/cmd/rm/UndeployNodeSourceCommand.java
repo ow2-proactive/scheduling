@@ -72,7 +72,12 @@ public class UndeployNodeSourceCommand extends AbstractCommand implements Comman
             if (success) {
                 writeLine(currentContext, "Node source successfully undeployed.");
             } else {
-                writeLine(currentContext, "%s %s", "Cannot undeploy node source:", this.nodeSourceName);
+                writeLine(currentContext,
+                          "%s %s. %s",
+                          "Cannot undeploy node source:",
+                          this.nodeSourceName,
+                          nsState.getErrorMessage());
+                writeLine(currentContext, nsState.getStackTrace().replace("\\n", "%n").replace("\\t", "    "));
             }
         } else {
 

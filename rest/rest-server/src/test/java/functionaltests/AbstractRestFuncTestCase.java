@@ -26,7 +26,6 @@
 package functionaltests;
 
 import java.security.Policy;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
@@ -43,9 +42,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.rules.Timeout;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -64,10 +60,6 @@ import functionaltests.utils.RestFuncTUtils;
 
 
 public abstract class AbstractRestFuncTestCase {
-
-    @Rule
-    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
-                                             TimeUnit.MILLISECONDS);
 
     static {
         configureSecurityManager();

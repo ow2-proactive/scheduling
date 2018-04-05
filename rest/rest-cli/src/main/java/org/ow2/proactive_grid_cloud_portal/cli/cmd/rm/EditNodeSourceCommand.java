@@ -46,12 +46,12 @@ public class EditNodeSourceCommand extends AbstractCommand implements Command {
 
     private static final String RM_REST_ENDPOINT = "nodesource/edit";
 
-    private String nodeSource;
+    private String nodeSourceName;
 
     private String nodesRecoverable;
 
-    public EditNodeSourceCommand(String nodeSource, String nodesRecoverable) {
-        this.nodeSource = nodeSource;
+    public EditNodeSourceCommand(String nodeSourceName, String nodesRecoverable) {
+        this.nodeSourceName = nodeSourceName;
         this.nodesRecoverable = nodesRecoverable;
     }
 
@@ -66,27 +66,32 @@ public class EditNodeSourceCommand extends AbstractCommand implements Command {
             throw new CLIException(REASON_INVALID_ARGUMENTS, "Policy not specified");
         }
         if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
-            nodeSource = currentContext.getProperty(SET_NODE_SOURCE, String.class);
+            this.nodeSourceName = currentContext.getProperty(SET_NODE_SOURCE, String.class);
         }
         HttpPut request = new HttpPut(currentContext.getResourceUrl(RM_REST_ENDPOINT));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("nodeSourceName", nodeSource)
+        queryStringBuilder.add("nodeSourceName", this.nodeSourceName)
                           .addAll(infrastructure)
                           .addAll(policy)
-                          .add("nodesRecoverable", nodesRecoverable);
+                          .add("nodesRecoverable", this.nodesRecoverable);
         request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            NSStateView nsState = readValue(response, NSStateView.class, currentContext);
+        HttpResponseWrapper response = this.execute(request, currentContext);
+        if (this.statusCode(OK) == this.statusCode(response)) {
+            NSStateView nsState = this.readValue(response, NSStateView.class, currentContext);
             boolean success = nsState.isResult();
-            resultStack(currentContext).push(success);
+            this.resultStack(currentContext).push(success);
             if (success) {
                 writeLine(currentContext, "Node source successfully edited.");
             } else {
-                writeLine(currentContext, "%s %s", "Cannot edit node source:", nodeSource);
+                writeLine(currentContext,
+                          "%s %s. %s",
+                          "Cannot edit node source",
+                          this.nodeSourceName,
+                          nsState.getErrorMessage());
+                writeLine(currentContext, nsState.getStackTrace().replace("\\n", "%n").replace("\\t", "    "));
             }
         } else {
-            handleError("An error occurred while editing node source:", response, currentContext);
+            this.handleError("An error occurred while editing node source:", response, currentContext);
 
         }
     }

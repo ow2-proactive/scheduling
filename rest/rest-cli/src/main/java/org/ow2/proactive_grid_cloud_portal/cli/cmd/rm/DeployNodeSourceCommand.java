@@ -52,20 +52,25 @@ public class DeployNodeSourceCommand extends AbstractCommand implements Command 
     public void execute(ApplicationContext currentContext) throws CLIException {
         HttpPut request = new HttpPut(currentContext.getResourceUrl(RM_REST_ENDPOINT));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("nodeSourceName", nodeSourceName);
+        queryStringBuilder.add("nodeSourceName", this.nodeSourceName);
         request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
-        HttpResponseWrapper response = execute(request, currentContext);
-        if (statusCode(OK) == statusCode(response)) {
-            NSStateView nsState = readValue(response, NSStateView.class, currentContext);
+        HttpResponseWrapper response = this.execute(request, currentContext);
+        if (this.statusCode(OK) == this.statusCode(response)) {
+            NSStateView nsState = this.readValue(response, NSStateView.class, currentContext);
             boolean success = nsState.isResult();
-            resultStack(currentContext).push(success);
+            this.resultStack(currentContext).push(success);
             if (success) {
                 writeLine(currentContext, "Node source successfully deployed.");
             } else {
-                writeLine(currentContext, "%s %s", "Cannot deploy node source:", nodeSourceName);
+                writeLine(currentContext,
+                          "%s %s. %s",
+                          "Cannot deploy node source:",
+                          this.nodeSourceName,
+                          nsState.getErrorMessage());
+                writeLine(currentContext, nsState.getStackTrace().replace("\\n", "%n").replace("\\t", "    "));
             }
         } else {
-            handleError("An error occurred while deploying node source:", response, currentContext);
+            this.handleError("An error occurred while deploying node source:", response, currentContext);
 
         }
     }
