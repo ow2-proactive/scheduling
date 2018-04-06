@@ -1184,11 +1184,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public BooleanWrapper defineNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable) {
 
+        logger.info("Define node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
+
         this.validateNodeSourceNameOrFail(nodeSourceName);
 
         nodeSourceName = nodeSourceName.trim();
-
-        logger.info("Define node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
 
         NodeSourceData nodeSourceData = this.getNodeSourceToPersist(nodeSourceName,
                                                                     infrastructureType,
@@ -1225,6 +1225,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         logger.info("Edit node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
 
+        this.checkWhetherNodeSourceIsEditableOrFail(nodeSourceName);
+
         NodeSourceData nodeSourceData = this.getNodeSourceToPersist(nodeSourceName,
                                                                     infrastructureType,
                                                                     infraParams,
@@ -1241,6 +1243,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully edited");
 
         return new BooleanWrapper(true);
+    }
+
+    private void checkWhetherNodeSourceIsEditableOrFail(String nodeSourceName) {
+
+        NodeSource editedNodeSource = this.definedNodeSources.get(nodeSourceName);
+
+        if (editedNodeSource == null) {
+            throw new IllegalArgumentException("Edited node source " + nodeSourceName + " does not exist");
+        }
+        if (!editedNodeSource.getStatus().equals(NodeSourceStatus.NODES_UNDEPLOYED)) {
+            throw new IllegalArgumentException("A node source must be undeployed to be edited");
+        }
     }
 
     private NodeSourceData getNodeSourceToPersist(String nodeSourceName, String infrastructureType,
@@ -1331,11 +1345,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public BooleanWrapper deployNodeSource(String nodeSourceName) {
 
+        logger.info("Deploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
+
         if (!this.deployedNodeSources.containsKey(nodeSourceName)) {
 
             NodeSourceDescriptor nodeSourceDescriptor = this.retrieveNodeSourceDescriptorOrFail(nodeSourceName);
-
-            logger.info("Deploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
 
             this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
 
@@ -1486,6 +1500,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     public BooleanWrapper undeployNodeSource(String nodeSourceName, boolean preempt) {
 
+        logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
+                    this.caller.getName());
+
         if (!this.definedNodeSources.containsKey(nodeSourceName)) {
             throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
         }
@@ -1496,9 +1513,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                         this.caller + " is not authorized to remove " + nodeSourceName);
-
-            logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
-                        this.caller.getName());
 
             nodeSourceToRemove.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
 
@@ -2029,6 +2043,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     public BooleanWrapper removeNodeSource(String nodeSourceName, boolean preempt) {
 
+        logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
+                    this.caller.getName());
+
         if (!this.definedNodeSources.containsKey(nodeSourceName)) {
             throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
         }
@@ -2037,9 +2054,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                     this.caller + " is not authorized to remove " + nodeSourceName);
-
-        logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
-                    this.caller.getName());
 
         this.shutDownNodeSourceIfDeployed(nodeSourceName, preempt);
 
@@ -2300,7 +2314,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Node Source name cannot be null");
         }
         if (nodeSourceName.length() == 0) {
-            throw new IllegalArgumentException("Node Source Name cannot be empty");
+            throw new IllegalArgumentException("Node Source name cannot be empty");
         }
         if (this.definedNodeSources.containsKey(nodeSourceName) ||
             this.deployedNodeSources.containsKey(nodeSourceName)) {
