@@ -310,6 +310,43 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * Returns a list of jobs with each jobs is described using -
+     * its id - its owner - the JobInfo class
+     *
+     * @param jobsId
+     *            the list of id of the jobs to return
+     * @param sessionId
+     *            a valid session id
+     * @return a list of UserJobData
+     */
+    @Override
+    @GET
+    @Path("listjobinfo")
+    @Produces({ "application/json", "application/xml" })
+    public List<UserJobData> listJobInfo(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") Set<String> jobsId)
+            throws PermissionRestException, NotConnectedRestException, UnknownJobRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
+
+            List<UserJobData> userJobInfoList = new ArrayList<>();
+            for (String jobId : jobsId) {
+                try {
+                    JobInfoData job = mapper.map(s.getJobInfo(jobId), JobInfoData.class);
+                    userJobInfoList.add(new UserJobData(job));
+                } catch (UnknownJobException e) {
+                    throw new UnknownJobRestException(e);
+                }
+            }
+            return userJobInfoList;
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
+    }
+
+    /**
      * Returns a map containing one entry with the revision id as key and the
      * list of UserJobData as value. each jobs is described using - its id - its
      * owner - the JobInfo class
