@@ -28,7 +28,10 @@ package org.ow2.proactive.scheduler.common.util;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 

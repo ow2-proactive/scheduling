@@ -328,7 +328,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @QueryParam("jobsid") List<String> jobsId)
             throws PermissionRestException, NotConnectedRestException, UnknownJobRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
+            Scheduler s = checkAccess(sessionId, "/scheduler/listjobinfo");
             List<JobInfo> jobInfoList = s.getListJobInfo(jobsId);
             return jobInfoList.stream()
                               .map(jobInfo -> new UserJobData(mapper.map(jobInfo, JobInfoData.class)))
