@@ -28,10 +28,7 @@ package org.ow2.proactive.scheduler.common.util;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.security.auth.login.LoginException;
 
@@ -576,6 +573,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public Page<JobInfo> getJobs(int index, int range, JobFilterCriteria filterCriteria,
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException {
         return uischeduler.getJobs(index, range, filterCriteria, sortParameters);
+    }
+
+    @Override
+    public List<JobInfo> getListJobInfo(List<String> jobsId)
+            throws PermissionException, NotConnectedException, UnknownJobException {
+        return uischeduler.getListJobInfo(jobsId);
     }
 
     @Override

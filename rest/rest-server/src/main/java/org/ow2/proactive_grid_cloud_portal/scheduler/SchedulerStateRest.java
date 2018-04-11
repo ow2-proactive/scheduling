@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
@@ -324,25 +325,20 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("listjobinfo")
     @Produces({ "application/json", "application/xml" })
     public List<UserJobData> listJobInfo(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("jobsid") Set<String> jobsId)
+            @QueryParam("jobsid") List<String> jobsId)
             throws PermissionRestException, NotConnectedRestException, UnknownJobRestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfo");
-
-            List<UserJobData> userJobInfoList = new ArrayList<>();
-            for (String jobId : jobsId) {
-                try {
-                    JobInfoData job = mapper.map(s.getJobInfo(jobId), JobInfoData.class);
-                    userJobInfoList.add(new UserJobData(job));
-                } catch (UnknownJobException e) {
-                    throw new UnknownJobRestException(e);
-                }
-            }
-            return userJobInfoList;
+            List<JobInfo> jobInfoList = s.getListJobInfo(jobsId);
+            return jobInfoList.stream()
+                              .map(jobInfo -> new UserJobData(mapper.map(jobInfo, JobInfoData.class)))
+                              .collect(Collectors.toList());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
         }
     }
 
