@@ -311,8 +311,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * Returns a list of jobs with each jobs is described using -
-     * its id - its owner - the JobInfo class
+     * Returns a list of jobs info corresponding to the given job IDs (in the same order)
      *
      * @param jobsId
      *            the list of id of the jobs to return
@@ -322,14 +321,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     @Override
     @GET
-    @Path("listjobinfo")
+    @Path("jobsinfolist")
     @Produces({ "application/json", "application/xml" })
-    public List<UserJobData> listJobInfo(@HeaderParam("sessionid") String sessionId,
+    public List<UserJobData> jobsInfoList(@HeaderParam("sessionid") String sessionId,
             @QueryParam("jobsid") List<String> jobsId)
             throws PermissionRestException, NotConnectedRestException, UnknownJobRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "/scheduler/listjobinfo");
-            List<JobInfo> jobInfoList = s.getListJobInfo(jobsId);
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfolist");
+            List<JobInfo> jobInfoList = s.getjobsInfoList(jobsId);
             return jobInfoList.stream()
                               .map(jobInfo -> new UserJobData(mapper.map(jobInfo, JobInfoData.class)))
                               .collect(Collectors.toList());

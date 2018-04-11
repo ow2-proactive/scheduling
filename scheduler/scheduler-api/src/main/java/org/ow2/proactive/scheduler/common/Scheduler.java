@@ -1289,7 +1289,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException;
 
     /**
-     * Returns a list of jobs with each jobs is described using
+     * Returns a list of jobs info corresponding to the given job IDs (in the same order)
      *
      * @param jobsId
      *             the list of id of the jobs to return
@@ -1302,7 +1302,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if a job id wasn't found
      */
-    List<JobInfo> getListJobInfo(List<String> jobsId)
+    List<JobInfo> getjobsInfoList(List<String> jobsId)
             throws PermissionException, NotConnectedException, UnknownJobException;
 
     /**

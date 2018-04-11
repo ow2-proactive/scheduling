@@ -240,9 +240,9 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public List<JobInfo> getListJobInfo(List<String> jobsId)
+    public List<JobInfo> getjobsInfoList(List<String> jobsId)
             throws PermissionException, NotConnectedException, UnknownJobException {
-        return getScheduler().getListJobInfo(jobsId);
+        return getScheduler().getjobsInfoList(jobsId);
     }
 
     @Override

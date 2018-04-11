@@ -579,9 +579,9 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public List<JobInfo> getListJobInfo(List<String> jobsId)
+    public List<JobInfo> getjobsInfoList(List<String> jobsId)
             throws PermissionException, NotConnectedException, UnknownJobException {
-        return uischeduler.getListJobInfo(jobsId);
+        return uischeduler.getjobsInfoList(jobsId);
     }
 
     @Override

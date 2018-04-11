@@ -139,9 +139,10 @@ public interface SchedulerRestInterface {
      * @return a list of UserJobData
      */
     @GET
-    @Path("listjobinfo")
+    @Path("jobsinfolist")
     @Produces({ "application/json", "application/xml" })
-    List<UserJobData> listJobInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
+    List<UserJobData> jobsInfoList(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId)
             throws PermissionRestException, NotConnectedRestException, UnknownJobRestException;
 
     /**
