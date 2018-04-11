@@ -25,160 +25,132 @@
  */
 package org.ow2.proactive.boot.microservices;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
 import org.apache.log4j.Logger;
 
 
-/**
- * Created by nebil on 09/04/18.
- */
-public class MicroServiceStarter {
+public enum IAMStarter {
 
-    private static final Logger logger = Logger.getLogger(MicroServiceStarter.class);
+    //singleton instance of IAMStarter
+    INSTANCE;
+
+    private static final Logger logger = Logger.getLogger(IAMStarter.class);
 
     private static final String separator = File.separator;
 
     private static final String os = System.getProperty("os.name");
-    //private static final String ready_indicator = "Ready to process requests";
 
-    private String pa_home;
+    private static final String microservice_name = "iam.war";
 
-    private String microservice_name;
+    private static final String ready_marker = "Ready to process requests";
 
-    private boolean detached;
+    private static final int timeout = 180;
 
-    private int timeout;
+    private static Process process;
 
-    private String ready_marker;
+    private static List<String> command = new ArrayList<String>();
 
-    private List<String> command = new ArrayList<String>();
+    private static boolean started = false;
 
-    public MicroServiceStarter(String pa_home, String microservice_name, boolean detached, String ready_marker,
-            int timeout) {
-        this.pa_home = pa_home;
-        this.microservice_name = microservice_name;
-        this.detached = detached;
-        this.timeout = timeout;
-        this.ready_marker = ready_marker;
-    }
+    /**
+     *  Start IAM microservice
+     */
+    public Process start(String pa_home, String microservices_path, String[] jvmArgs)
+            throws InterruptedException, IOException, ExecutionException {
 
-    public Process start() throws InterruptedException, IOException {
+        if (!started  && buildJavaCommand(pa_home,jvmArgs) && buildMicroservicePath(pa_home,microservices_path)) {
 
-        prepareCommand();
+            System.out.println("Starting IAM microservice");
 
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
-        processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
+            ProcessBuilder processBuilder = new ProcessBuilder(command);
+            processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
 
-        System.out.println("Starting microservice " + microservice_name);
-        Process process = processBuilder.start();
-        System.out.println(streamOutput(process.getInputStream(), timeout));
+            process = processBuilder.start();
+            System.out.println(streamOutput(process.getInputStream()));
 
+            started = true;
+        }
         return process;
     }
 
-    private String streamOutput(InputStream inputStream, int timeout) {
+    /**
+     * Stream microservice output (using an executor) to check that it starts properly
+     */
+    private String streamOutput(InputStream inputStream) throws IOException, InterruptedException, ExecutionException {
 
+        // Stream microservice output
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<String> future = executor.submit(new Callable() {
 
-            public String call() throws Exception {
-                StringBuilder sb = new StringBuilder();
-                BufferedReader br = null;
+            public String call() throws IOException {
 
                 try {
-                    br = new BufferedReader(new InputStreamReader(inputStream));
                     String line = null;
 
                     while ((line = br.readLine()) != null) {
                         System.out.print(".");
                         if (line.contains(ready_marker)) {
                             break;
-                        } else
-                            sb.append(line + System.getProperty("line.separator"));
+                        }
                     }
                 } finally {
                     br.close();
                 }
-                return "\nMicroservice " + microservice_name + " started";
+                return "\nIAM Microservice started";
             }
         });
 
+        // Check for timeout
         try {
             return future.get(timeout, TimeUnit.SECONDS);
-        } /*
-           * catch (TimeoutException e) {
-           * return "\nWarning: Microservice "
-           * +microservice_name+" timed out to start. See the logs for the details.";
-           * }
-           */ catch (Exception e) {
-            System.exit(1);
-            return e.getMessage();
+        } catch (TimeoutException toe) {
+            // Stop streaming the output, but the microservice continues to execute
+            br.close();
+            return "\nWarning: IAM Microservice timed out to start. See the logs for the details.";
         } finally {
             executor.shutdownNow();
+            future.cancel(true);
         }
     }
 
-    private void prepareCommand() throws InterruptedException, IOException {
-        if (detached)
-            buildDetachedCommand(command);
-
-        if (!buildJavaCommand(pa_home)) {
-            System.out.println("java command not found");
-            return;
-        } else if (!buildMicroservicePath(pa_home, microservice_name)) {
-            System.out.println("microservice " + microservice_name + " is not deployed");
-            return;
-        }
-
-    }
-
-    private void buildDetachedCommand(List<String> command) {
-
-        if (os.equals(OperatingSystem.UNIX)) {
-            // if the system is unix-based, we need to start the process with
-            // the nohup indicator it normally goes with the end of the
-            // command finished with the background indicator '&' (see the end
-            // of command building)
-
-            command.add("nohup");
-
-        } else if (os.equals(OperatingSystem.WINDOWS)) {
-            // Windows equivalent is to use the start command with /b option
-
-            command.add("start /b");
-        }
-    }
-
-    private boolean buildJavaCommand(String pa_home) {
+    /**
+     * Prepare java command with jvm args
+     */
+    private boolean buildJavaCommand(String pa_home, String[] jvmArgs) {
 
         String javaCmd = pa_home + separator + "jre" + separator + "bin" + separator + "java";
 
         if (new File(javaCmd).exists()) {
             command.add(javaCmd);
             command.add("-jar");
+            command.addAll(Arrays.asList(jvmArgs));
             return true;
-        } else
+        } else {
+            System.out.println("Java command not found when starting IAM microservice");
             return false;
+        }
 
     }
 
-    private boolean buildMicroservicePath(String pa_home, String microservice_name) {
+    /**
+     * Check the microservice executable war
+     */
+    private boolean buildMicroservicePath(String pa_home, String microservices_path) {
 
-        String microservice_file = pa_home + separator + "dist" + separator + "boot" + separator + microservice_name;
+        String microservice_file = pa_home + separator + microservices_path + separator + microservice_name;
 
         if (new File(microservice_file).exists()) {
             command.add(microservice_file);
             return true;
-        } else
+        } else {
+            System.out.println("IAM microservice is not deployed");
             return false;
+        }
     }
-
 }
