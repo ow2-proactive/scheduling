@@ -564,10 +564,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public List<JobInfo> getjobsInfoList(List<String> jobsId)
+    public List<JobInfo> getJobsInfoList(List<String> jobsId)
             throws PermissionException, NotConnectedException, UnknownJobException {
         renewSession();
-        return client.getjobsInfoList(jobsId);
+        return client.getJobsInfoList(jobsId);
     }
 
     @Override

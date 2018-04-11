@@ -129,11 +129,10 @@ public interface SchedulerRestInterface {
             throws PermissionRestException, NotConnectedRestException;
 
     /**
-     * Returns a list of jobs with each jobs is described using -
-     * its id - its owner - the JobInfo class
+     * Returns a list of jobs info corresponding to the given job IDs (in the same order)
      *
      * @param jobsId
-     *            the list of id of the jobs to return
+     *            the list of id of the jobs to return, in the same order
      * @param sessionId
      *            a valid session id
      * @return a list of UserJobData

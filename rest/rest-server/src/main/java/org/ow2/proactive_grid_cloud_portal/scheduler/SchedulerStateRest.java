@@ -314,7 +314,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Returns a list of jobs info corresponding to the given job IDs (in the same order)
      *
      * @param jobsId
-     *            the list of id of the jobs to return
+     *            the list of id of the jobs to return, in the same order
      * @param sessionId
      *            a valid session id
      * @return a list of UserJobData
@@ -328,7 +328,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws PermissionRestException, NotConnectedRestException, UnknownJobRestException {
         try {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobsinfolist");
-            List<JobInfo> jobInfoList = s.getjobsInfoList(jobsId);
+            List<JobInfo> jobInfoList = s.getJobsInfoList(jobsId);
             return jobInfoList.stream()
                               .map(jobInfo -> new UserJobData(mapper.map(jobInfo, JobInfoData.class)))
                               .collect(Collectors.toList());

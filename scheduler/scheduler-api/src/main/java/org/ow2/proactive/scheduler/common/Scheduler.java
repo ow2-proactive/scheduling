@@ -1292,7 +1292,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * Returns a list of jobs info corresponding to the given job IDs (in the same order)
      *
      * @param jobsId
-     *             the list of id of the jobs to return
+     *             the list of id of the jobs to return, in the same order
      *
      * @return jobs list of the given list of id
      * @throws NotConnectedException
@@ -1300,9 +1300,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      *             if you have not enough permission to access this method.
      * @throws UnknownJobException
-     *             if a job id wasn't found
+     *             if one of the job IDs wasn't found
      */
-    List<JobInfo> getjobsInfoList(List<String> jobsId)
+    List<JobInfo> getJobsInfoList(List<String> jobsId)
             throws PermissionException, NotConnectedException, UnknownJobException;
 
     /**

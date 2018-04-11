@@ -1252,9 +1252,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
-    public List<JobInfo> getjobsInfoList(List<String> jobsId)
+    public List<JobInfo> getJobsInfoList(List<String> jobsId)
             throws PermissionException, NotConnectedException, UnknownJobException {
-        frontendState.checkPermission("getjobsInfoList", "You don't have permissions to load jobs");
+        frontendState.checkPermission("getJobsInfoList", "You don't have permissions to load jobs");
         List<JobInfo> jobsInfoList = new ArrayList<>();
         for (String jobId : jobsId) {
             try {
