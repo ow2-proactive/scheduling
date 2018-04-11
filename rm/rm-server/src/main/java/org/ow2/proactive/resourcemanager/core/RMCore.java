@@ -1204,12 +1204,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.definedNodeSources.put(nodeSourceName, nodeSource);
 
-        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_DEFINED,
-                                                              this.caller.getName(),
-                                                              nodeSourceName,
-                                                              nodeSource.getDescription(),
-                                                              nodeSourceDescriptor.getProvider().getName(),
-                                                              nodeSource.getStatus().toString()));
+        this.emitNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_DEFINED);
 
         logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully defined");
 
@@ -1240,6 +1235,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.definedNodeSources.put(nodeSourceName, nodeSource);
 
+        this.emitNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_DEFINED);
+
         logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully edited");
 
         return new BooleanWrapper(true);
@@ -1263,16 +1260,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         List<Serializable> serializableInfraParams = this.getSerializableParamsOrFail(infraParams);
         List<Serializable> serializablePolicyParams = this.getSerializableParamsOrFail(policyParams);
 
-        NodeSourceData persistedNodeSource = new NodeSourceData(nodeSourceName,
-                                                                infrastructureType,
-                                                                serializableInfraParams,
-                                                                policyType,
-                                                                serializablePolicyParams,
-                                                                this.caller,
-                                                                nodesRecoverable,
-                                                                NodeSourceStatus.NODES_UNDEPLOYED);
-
-        return persistedNodeSource;
+        return new NodeSourceData(nodeSourceName,
+                                  infrastructureType,
+                                  serializableInfraParams,
+                                  policyType,
+                                  serializablePolicyParams,
+                                  this.caller,
+                                  nodesRecoverable,
+                                  NodeSourceStatus.NODES_UNDEPLOYED);
     }
 
     private List<Serializable> getSerializableParamsOrFail(Object[] parameters) {
@@ -1365,12 +1360,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
 
-            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_CREATED,
-                                                                  this.caller.getName(),
-                                                                  nodeSourceStub.getName(),
-                                                                  nodeSourceStub.getDescription(),
-                                                                  nodeSourceStub.getAdministrator().getName(),
-                                                                  nodeSourceStub.getStatus().toString()));
+            this.emitNodeSourceEvent(nodeSourceStub, RMEventType.NODESOURCE_CREATED);
 
             logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully deployed");
         }
@@ -1555,6 +1545,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
         }
         return new BooleanWrapper(true);
+    }
+
+    private void emitNodeSourceEvent(NodeSource nodeSource, RMEventType eventType) {
+
+        NodeSourceDescriptor descriptor = nodeSource.getDescriptor();
+
+        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(eventType,
+                                                              this.caller.getName(),
+                                                              descriptor.getName(),
+                                                              nodeSource.getDescription(),
+                                                              descriptor.getProvider().getName(),
+                                                              nodeSource.getStatus().toString()));
     }
 
     // ----------------------------------------------------------------------
