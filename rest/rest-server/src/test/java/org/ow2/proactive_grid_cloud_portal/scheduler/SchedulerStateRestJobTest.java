@@ -32,6 +32,9 @@ import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.JobFilterCriteria;
@@ -111,6 +114,29 @@ public class SchedulerStateRestJobTest extends RestTestServer {
         RestPage<UserJobData> actualPage = restInterface.jobsInfo(sessionId, -1, -1);
 
         RestTestUtils.assertJobsInfoPage(expectedJobs, actualPage);
+    }
+
+    @Test
+    public void testJobsInfoList() throws Throwable {
+        List<JobInfo> expectedJobs = new ArrayList<>();
+        JobInfo jobData1 = RestTestUtils.newMockedJobInfo("2", null, 10);
+        expectedJobs.add(jobData1);
+        JobInfo jobData2 = RestTestUtils.newMockedJobInfo("4", null, 2);
+        expectedJobs.add(jobData2);
+        JobInfo jobData3 = RestTestUtils.newMockedJobInfo("10", null, 8);
+        expectedJobs.add(jobData3);
+
+        List<String> jobIds = new ArrayList<>();
+        jobIds.add("2");
+        jobIds.add("4");
+        jobIds.add("10");
+        when(mockOfScheduler.getJobsInfoList(jobIds)).thenReturn(expectedJobs);
+
+        List<UserJobData> actualList = restInterface.jobsInfoList(sessionId, jobIds);
+
+        for (int i = 0; i < expectedJobs.size() && i < actualList.size(); i++) {
+            RestTestUtils.assertJobInfo(expectedJobs.get(i), actualList.get(i));
+        }
     }
 
     @Test
