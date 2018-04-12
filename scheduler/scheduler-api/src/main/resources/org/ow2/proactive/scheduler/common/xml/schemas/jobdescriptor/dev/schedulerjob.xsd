@@ -58,10 +58,15 @@
     </xs:complexType>
   </xs:element>
   <xs:attributeGroup name="jobName">
-    <xs:attribute name="name" use="required" type="xs:string">
+    <xs:attribute name="name" use="required">
       <xs:annotation>
         <xs:documentation>Identification of this job</xs:documentation>
       </xs:annotation>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:minLength value="1"/>
+        </xs:restriction>
+      </xs:simpleType>
     </xs:attribute>
   </xs:attributeGroup>
   <xs:group name="variables">
