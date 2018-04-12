@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.nodesource.common;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -73,26 +74,34 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
 
         public String description;
 
+        public boolean dynamic;
+
         ConfigurableWrapper() {
         }
 
-        public ConfigurableWrapper(ConfigurableValues type, String desc) {
+        public ConfigurableWrapper(ConfigurableValues type, String desc, boolean dynamic) {
             this.description = desc;
             this.type = type;
+            this.dynamic = dynamic;
         }
     }
 
     @Override
     public ConfigurableWrapper marshal(Configurable arg0) throws Exception {
-        if (arg0.credential())
-            return new ConfigurableWrapper(ConfigurableValues.CREDENTIAL, arg0.description());
-        else if (arg0.password())
-            return new ConfigurableWrapper(ConfigurableValues.PASSWORD, arg0.description());
-        else if (arg0.fileBrowser())
-            return new ConfigurableWrapper(ConfigurableValues.FILEBROWSER, arg0.description());
-        else
-            return new ConfigurableWrapper(ConfigurableValues.NONE, arg0.description());
 
+        ConfigurableValues type;
+
+        if (arg0.credential()) {
+            type = ConfigurableValues.CREDENTIAL;
+        } else if (arg0.password()) {
+            type = ConfigurableValues.PASSWORD;
+        } else if (arg0.fileBrowser()) {
+            type = ConfigurableValues.FILEBROWSER;
+        } else {
+            type = ConfigurableValues.NONE;
+        }
+
+        return new ConfigurableWrapper(type, arg0.description(), arg0.dynamic());
     }
 
     @Override
@@ -101,7 +110,39 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
         if (arg0 == null || arg0.type == null)
             return null;
 
-        return (Configurable) Configurable.class.getMethod(arg0.type.toString()).getDefaultValue();
+        return new Configurable() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Configurable.class;
+            }
+
+            @Override
+            public String description() {
+                return arg0.description;
+            }
+
+            @Override
+            public boolean password() {
+                return arg0.type == ConfigurableValues.PASSWORD;
+            }
+
+            @Override
+            public boolean credential() {
+                return arg0.type == ConfigurableValues.CREDENTIAL;
+            }
+
+            @Override
+            public boolean fileBrowser() {
+                return arg0.type == ConfigurableValues.FILEBROWSER;
+            }
+
+            @Override
+            public boolean dynamic() {
+                return arg0.dynamic;
+            }
+
+        };
     }
 
 }
