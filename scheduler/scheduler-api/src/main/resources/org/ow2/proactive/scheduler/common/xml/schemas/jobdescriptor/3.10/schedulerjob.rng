@@ -55,7 +55,7 @@
     <attribute name="name">
       <doc:documentation>Identification of this job</doc:documentation>
       <data type="string">
-        <param name="minLength">1</param>
+        <param name="minLength">3</param>
       </data>
     </attribute>
   </define>

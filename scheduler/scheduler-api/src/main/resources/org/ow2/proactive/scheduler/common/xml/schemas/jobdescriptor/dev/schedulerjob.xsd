@@ -64,7 +64,7 @@
       </xs:annotation>
       <xs:simpleType>
         <xs:restriction base="xs:string">
-          <xs:minLength value="1"/>
+          <xs:minLength value="3"/>
         </xs:restriction>
       </xs:simpleType>
     </xs:attribute>
