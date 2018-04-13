@@ -129,6 +129,22 @@ public interface SchedulerRestInterface {
             throws PermissionRestException, NotConnectedRestException;
 
     /**
+     * Returns a list of jobs info corresponding to the given job IDs (in the same order)
+     *
+     * @param jobsId
+     *            the list of id of the jobs to return, in the same order
+     * @param sessionId
+     *            a valid session id
+     * @return a list of UserJobData
+     */
+    @GET
+    @Path("jobsinfolist")
+    @Produces({ "application/json", "application/xml" })
+    List<UserJobData> jobsInfoList(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId)
+            throws PermissionRestException, NotConnectedRestException, UnknownJobRestException;
+
+    /**
      * Returns a map containing one entry with the revision id as key and the
      * list of UserJobData as value. each jobs is described using - its id - its
      * owner - the JobInfo class

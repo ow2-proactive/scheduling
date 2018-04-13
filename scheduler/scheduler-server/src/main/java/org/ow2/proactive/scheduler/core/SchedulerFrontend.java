@@ -1252,6 +1252,24 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
+    public List<JobInfo> getJobsInfoList(List<String> jobsId)
+            throws PermissionException, NotConnectedException, UnknownJobException {
+        List<JobInfo> jobsInfoList = new ArrayList<>();
+        for (String jobId : jobsId) {
+            try {
+                jobsInfoList.add(this.getJobInfo(jobId));
+            } catch (UnknownJobException e) {
+                throw new UnknownJobException(e);
+            }
+        }
+        return jobsInfoList;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
     public List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("getUsers", "You don't have permissions to get users");
         return frontendState.getUsers();

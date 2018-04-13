@@ -1289,6 +1289,23 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             List<SortParameter<JobSortParameter>> sortParameters) throws NotConnectedException, PermissionException;
 
     /**
+     * Returns a list of jobs info corresponding to the given job IDs (in the same order)
+     *
+     * @param jobsId
+     *             the list of id of the jobs to return, in the same order
+     *
+     * @return jobs list of the given list of id
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws PermissionException
+     *             if you have not enough permission to access this method.
+     * @throws UnknownJobException
+     *             if one of the job IDs wasn't found
+     */
+    List<JobInfo> getJobsInfoList(List<String> jobsId)
+            throws PermissionException, NotConnectedException, UnknownJobException;
+
+    /**
      * Returns a list of connected users.
      */
     List<SchedulerUserInfo> getUsers() throws NotConnectedException, PermissionException;

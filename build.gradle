@@ -361,7 +361,11 @@ class CustomCreateStartScripts extends CreateStartScripts {
         generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8"]
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
         generator.exitEnvironmentVar = getExitEnvironmentVar()
-        generator.classpath = ["dist/lib/*", "addons", "addons/*"]
+        if (getApplicationName().equals("proactive-client")) {
+            generator.classpath = ["dist/lib/*"]
+        } else {
+            generator.classpath = ["dist/lib/*", "addons", "addons/*"]
+        }
         generator.scriptRelPath = "bin/${getUnixScript().name}"
 
         generator.windowsStartScriptGenerator.template = project.resources.text.fromFile("src/main/resources/org/gradle/api/internal/plugins/windowsStartScript.txt")
