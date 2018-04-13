@@ -49,7 +49,7 @@ public enum IAMStarter {
 
     private static final int TIMEOUT = 180;
 
-    private static final String[] JVM_ARGS = {};
+    private static final String[] JVM_ARGS = { "-Xmx2048M" };
 
     private static Process process;
 
@@ -63,9 +63,11 @@ public enum IAMStarter {
     public static Process start(String paHome, String microservicesPath)
             throws InterruptedException, IOException, ExecutionException {
 
-        if (!started && buildJavaCommand(paHome) && buildMicroservicePath(paHome, microservicesPath)) {
+        if (!started) {
+            LOGGER.info("Starting IAM microservice...");
 
-            LOGGER.info("Starting IAM microservice");
+            buildJavaCommand(paHome);
+            buildMicroservicePath(paHome, microservicesPath);
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -81,39 +83,29 @@ public enum IAMStarter {
     /**
      * Stream microservice output (using an executor) to check that it starts properly
      */
-    private static String streamOutput(InputStream inputStream)
-            throws IOException, InterruptedException, ExecutionException {
+    private static String streamOutput(InputStream inputStream) throws InterruptedException, ExecutionException {
 
         // Stream microservice output
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<String> future = executor.submit(new Callable() {
+        Future<String> future = executor.submit((Callable) () -> {
 
-            public String call() throws IOException {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line;
 
-                try {
-                    String line = null;
-
-                    while ((line = br.readLine()) != null) {
-                        System.out.print(".");
-                        if (line.contains(READY_MARKER)) {
-                            break;
-                        }
+                while ((line = br.readLine()) != null) {
+                    if (line.contains(READY_MARKER)) {
+                        break;
                     }
-                } finally {
-                    br.close();
                 }
-                return "\nIAM Microservice started";
             }
+            return "IAM Microservice started";
         });
 
         // Check for timeout
         try {
             return future.get(TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException toe) {
-            // Stop streaming the output, but the microservice continues to execute
-            br.close();
-            return "\nWarning: IAM Microservice timed out to start. See the logs for the details.";
+            return "IAM Microservice timed out to start. See the logs for the details.";
         } finally {
             executor.shutdownNow();
             future.cancel(true);
@@ -123,35 +115,32 @@ public enum IAMStarter {
     /**
      * Prepare java command with jvm args
      */
-    private static boolean buildJavaCommand(String paHome) {
+    private static void buildJavaCommand(String paHome) {
 
         String javaCmd = paHome + SEPARATOR + "jre" + SEPARATOR + "bin" + SEPARATOR + "java";
 
         if (new File(javaCmd).exists()) {
             command.add(javaCmd);
-            command.add("-jar");
-            command.addAll(Arrays.asList(JVM_ARGS));
-            return true;
         } else {
-            LOGGER.error("Java command not found when starting IAM microservice");
-            return false;
+            command.add("java");
         }
 
+        command.add("-jar");
+        command.addAll(Arrays.asList(JVM_ARGS));
     }
 
     /**
      * Check the microservice executable war
      */
-    private static boolean buildMicroservicePath(String paHome, String microservices_path) {
+    private static void buildMicroservicePath(String paHome, String microservicesPath) {
 
-        String microservice_file = paHome + SEPARATOR + microservices_path + SEPARATOR + MICROSERVICE_NAME;
+        String microserviceFile = paHome + SEPARATOR + microservicesPath + SEPARATOR + MICROSERVICE_NAME;
 
-        if (new File(microservice_file).exists()) {
-            command.add(microservice_file);
-            return true;
+        if (new File(microserviceFile).exists()) {
+            command.add(microserviceFile);
+
         } else {
-            LOGGER.error("IAM microservice is not deployed");
-            return false;
+            throw new IAMStarterException("IAM microservice is not deployed in: " + microservicesPath);
         }
     }
 }
