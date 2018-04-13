@@ -185,6 +185,7 @@ echo $IAM_CMD
 $APP_HOME/bin/proactive-iam "$IAM_CMD"
 IAM_PID=$!
 
+## Starting Core ProActive
 exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" org.ow2.proactive.scheduler.util.SchedulerStarter "$@"
 
 ## Killing IAM microservice properly
