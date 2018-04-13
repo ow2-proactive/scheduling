@@ -95,7 +95,7 @@ public enum IAMStarter {
                     String line = null;
 
                     while ((line = br.readLine()) != null) {
-                        System.out.print(".");
+                        //System.out.print(".");
                         if (line.contains(READY_MARKER)) {
                             break;
                         }
@@ -103,7 +103,7 @@ public enum IAMStarter {
                 } finally {
                     br.close();
                 }
-                return "\nIAM Microservice started";
+                return "IAM Microservice started";
             }
         });
 
@@ -113,7 +113,7 @@ public enum IAMStarter {
         } catch (TimeoutException toe) {
             // Stop streaming the output, but the microservice continues to execute
             br.close();
-            return "\nWarning: IAM Microservice timed out to start. See the logs for the details.";
+            return "Warning: IAM Microservice timed out to start. See the logs for the details.";
         } finally {
             executor.shutdownNow();
             future.cancel(true);
@@ -133,8 +133,10 @@ public enum IAMStarter {
             command.addAll(Arrays.asList(JVM_ARGS));
             return true;
         } else {
-            LOGGER.error("Java command not found when starting IAM microservice");
-            return false;
+            throw new RuntimeException("Java command not found when starting IAM microservice");
+            //LOGGER.error("Java command not found when starting IAM microservice");
+            //System.exit(1);
+            //return false;
         }
 
     }
@@ -142,16 +144,19 @@ public enum IAMStarter {
     /**
      * Check the microservice executable war
      */
-    private static boolean buildMicroservicePath(String paHome, String microservices_path) {
+    private static boolean buildMicroservicePath(String paHome, String microservicesPath) {
 
-        String microservice_file = paHome + SEPARATOR + microservices_path + SEPARATOR + MICROSERVICE_NAME;
+        String microserviceFile = paHome + SEPARATOR + microservicesPath + SEPARATOR + MICROSERVICE_NAME;
 
-        if (new File(microservice_file).exists()) {
-            command.add(microservice_file);
+        if (new File(microserviceFile).exists()) {
+            command.add(microserviceFile);
             return true;
         } else {
-            LOGGER.error("IAM microservice is not deployed");
-            return false;
+            throw new RuntimeException("IAM microservice is not deployed");
+
+            //LOGGER.error("IAM microservice is not deployed");
+            //System.exit(0);
+            //return false;
         }
     }
 }

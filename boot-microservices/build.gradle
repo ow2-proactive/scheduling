@@ -1,0 +1,35 @@
+/**
+ * Include Ivy into build script classpath. Only necessary for this example.
+ */
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        // only necessary for downloadDirectory task below
+        if (gradle.gradleVersion.split("\\.")[0].toInteger() >= 2) {
+            classpath 'org.apache.ivy:ivy:2.3.0'
+        }
+    }
+}
+
+plugins {
+    id "de.undercouch.download" version "3.4.2"
+}
+
+task downloadFile(type: Download) {
+    def warBaseName = "iam"
+    def remoteDir = "http://repository.activeeon.com/content/groups/proactive/org/ow2/proactive/iam/${schedulingVersion}/"
+    def urlLister = new org.apache.ivy.util.url.ApacheURLLister()
+    def warFiles = urlLister.listFiles(new URL(remoteDir))
+    def warIndex = warFiles.stream().findLastIndexOf {file -> file.toString().endsWith(".war")}
+    def war = warFiles.get(warIndex)
+    def destDir = "${project(':').projectDir}/dist/boot"
+
+    src war
+    dest new File(destDir, "$warBaseName"+'.war')
+    onlyIfModified true
+}
+
+compileJava.dependsOn downloadFile
+defaultTasks 'downloadFile'
