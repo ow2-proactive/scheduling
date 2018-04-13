@@ -177,7 +177,6 @@ function splitJvmOpts() {
 }
 eval splitJvmOpts $DEFAULT_JVM_OPTS $JAVA_OPTS $PROACTIVE_SERVER_OPTS
 
-
 ### Starting IAM microservice
 # build the command that will start IAM
 IAM_CMD="$JAVACMD -jar $JAVA_OPTS $APP_HOME/dist/boot/iam.war"
@@ -186,7 +185,6 @@ $APP_HOME/bin/proactive-iam "$IAM_CMD"
 #get the PID of the JVM started process
 IAM_PID=$!
 
-### Starting Core ProActive
 exec "$JAVACMD" "${JVM_OPTS[@]}" -classpath "$CLASSPATH" org.ow2.proactive.scheduler.util.SchedulerStarter "$@"
 
 ### Killing IAM microservice properly
