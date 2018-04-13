@@ -29,6 +29,8 @@ dependencies {
     compile project(':scheduler:scheduler-node')
     compile project(':rm:rm-server')
     compile project(':rm:rm-client')
+    compile project(':rest:rest-server')
+    compile project(':boot-microservices')
 
 
 
