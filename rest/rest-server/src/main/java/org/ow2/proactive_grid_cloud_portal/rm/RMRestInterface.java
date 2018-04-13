@@ -180,6 +180,17 @@ public interface RMRestInterface {
             @FormParam("policyFileParameters") String[] policyFileParameters,
             @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException;
 
+    @PUT
+    @Path("nodesource/parameter")
+    @Produces("application/json")
+    NSState updateDynamicParameters(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException;
+
     /**
      * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String, String, String[], String[],
      * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}

@@ -49,7 +49,7 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
 
     private Timer timer = new Timer("RestartDownNodesPolicy node status check");
 
-    @Configurable(description = "ms (30 mins by default)")
+    @Configurable(description = "ms (30 mins by default)", dynamic = true)
     private int checkNodeStateEach = 30 * 60 * 1000; // 30 mins by default;
 
     /**

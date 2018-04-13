@@ -91,10 +91,24 @@ public interface ResourceManager {
      * @param policyType name of the policy type. It passed as a string due to plug-able approach
      * @param policyParams parameters for policy creation
      * @param nodesRecoverable whether the nodes can be recovered in case of a scheduler crash
-     * @return true if a new node source was edited successfully, runtime exception otherwise
+     * @return true if the node source was edited successfully, runtime exception otherwise
      */
     BooleanWrapper editNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable);
+
+    /**
+     * Update the infrastructure or policy parameters of a node source that
+     * marked with 'dynamic'. Only these parameters will be updated.
+     *
+     * @param nodeSourceName the name of the node source
+     * @param infrastructureType type of the underlying infrastructure
+     * @param infraParams parameters of the infrastructure, including the dynamic parameters values to update
+     * @param policyType name of the policy type
+     * @param policyParams parameters of the policy, including the dynamic parameters values to update
+     * @return true if a new node source was edited successfully, runtime exception otherwise
+     */
+    BooleanWrapper updateDynamicParameters(String nodeSourceName, String infrastructureType, Object[] infraParams,
+            String policyType, Object[] policyParams);
 
     /**
      * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String, Object[], String, Object[],
