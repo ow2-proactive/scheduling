@@ -39,39 +39,39 @@ public enum IAMStarter {
     //singleton instance of IAMStarter
     INSTANCE;
 
-    private static final Logger logger = Logger.getLogger(IAMStarter.class);
+    private static final Logger LOGGER = Logger.getLogger(IAMStarter.class);
 
-    private static final String separator = File.separator;
+    private static final String SEPARATOR = File.separator;
 
-    private static final String os = System.getProperty("os.name");
+    private static final String MICROSERVICE_NAME = "iam.war";
 
-    private static final String microservice_name = "iam.war";
+    private static final String READY_MARKER = "Ready to process requests";
 
-    private static final String ready_marker = "Ready to process requests";
+    private static final int TIMEOUT = 180;
 
-    private static final int timeout = 180;
+    private static final String JVM_ARGS = "";
 
     private static Process process;
 
-    private static List<String> command = new ArrayList<String>();
+    private static List<String> command = new ArrayList<>();
 
     private static boolean started = false;
 
     /**
      *  Start IAM microservice
      */
-    public Process start(String pa_home, String microservices_path, String[] jvmArgs)
+    public static Process start(String paHome, String microservicesPath)
             throws InterruptedException, IOException, ExecutionException {
 
-        if (!started  && buildJavaCommand(pa_home,jvmArgs) && buildMicroservicePath(pa_home,microservices_path)) {
+        if (!started && buildJavaCommand(paHome) && buildMicroservicePath(paHome, microservicesPath)) {
 
-            System.out.println("Starting IAM microservice");
+            LOGGER.info("Starting IAM microservice");
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
 
             process = processBuilder.start();
-            System.out.println(streamOutput(process.getInputStream()));
+            LOGGER.info(streamOutput(process.getInputStream()));
 
             started = true;
         }
@@ -81,7 +81,8 @@ public enum IAMStarter {
     /**
      * Stream microservice output (using an executor) to check that it starts properly
      */
-    private String streamOutput(InputStream inputStream) throws IOException, InterruptedException, ExecutionException {
+    private static String streamOutput(InputStream inputStream)
+            throws IOException, InterruptedException, ExecutionException {
 
         // Stream microservice output
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
@@ -95,7 +96,7 @@ public enum IAMStarter {
 
                     while ((line = br.readLine()) != null) {
                         System.out.print(".");
-                        if (line.contains(ready_marker)) {
+                        if (line.contains(READY_MARKER)) {
                             break;
                         }
                     }
@@ -108,10 +109,11 @@ public enum IAMStarter {
 
         // Check for timeout
         try {
-            return future.get(timeout, TimeUnit.SECONDS);
+            return future.get(TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException toe) {
             // Stop streaming the output, but the microservice continues to execute
             br.close();
+            LOGGER.warn("Warning: IAM Microservice timed out to start. See the logs for the details.");
             return "\nWarning: IAM Microservice timed out to start. See the logs for the details.";
         } finally {
             executor.shutdownNow();
@@ -122,14 +124,14 @@ public enum IAMStarter {
     /**
      * Prepare java command with jvm args
      */
-    private boolean buildJavaCommand(String pa_home, String[] jvmArgs) {
+    private static boolean buildJavaCommand(String paHome) {
 
-        String javaCmd = pa_home + separator + "jre" + separator + "bin" + separator + "java";
+        String javaCmd = paHome + SEPARATOR + "jre" + SEPARATOR + "bin" + SEPARATOR + "java";
 
         if (new File(javaCmd).exists()) {
             command.add(javaCmd);
             command.add("-jar");
-            command.addAll(Arrays.asList(jvmArgs));
+            command.addAll(Arrays.asList(JVM_ARGS));
             return true;
         } else {
             System.out.println("Java command not found when starting IAM microservice");
@@ -141,9 +143,9 @@ public enum IAMStarter {
     /**
      * Check the microservice executable war
      */
-    private boolean buildMicroservicePath(String pa_home, String microservices_path) {
+    private static boolean buildMicroservicePath(String paHome, String microservices_path) {
 
-        String microservice_file = pa_home + separator + microservices_path + separator + microservice_name;
+        String microservice_file = paHome + SEPARATOR + microservices_path + SEPARATOR + MICROSERVICE_NAME;
 
         if (new File(microservice_file).exists()) {
             command.add(microservice_file);
