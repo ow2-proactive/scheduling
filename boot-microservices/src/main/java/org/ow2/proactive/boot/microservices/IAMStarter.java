@@ -113,6 +113,7 @@ public enum IAMStarter {
         } catch (TimeoutException toe) {
             // Stop streaming the output, but the microservice continues to execute
             br.close();
+            LOGGER.warn("Warning: IAM Microservice timed out to start. See the logs for the details.");
             return "\nWarning: IAM Microservice timed out to start. See the logs for the details.";
         } finally {
             executor.shutdownNow();
