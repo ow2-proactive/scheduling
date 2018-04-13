@@ -26,14 +26,10 @@
 package org.ow2.proactive.resourcemanager.common.event;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -41,6 +37,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
@@ -64,57 +62,42 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 @XmlRootElement
 public class RMInitialState implements Serializable {
 
+    public static final Long EMPTY_STATE = -1L;
+
     private static final Logger LOGGER = Logger.getLogger(RMInitialState.class);
 
-    /**
-     * Nodes events
-     */
-    private Map<String, RMNodeEvent> nodeEvents = new ConcurrentHashMap<>();
-
-    /**
-     * Nodes sources AO living in RM
-     */
-    private Map<String, RMNodeSourceEvent> nodeSourceEvents = new ConcurrentHashMap<>();
+    private SortedUniqueSet<RMEvent> events = new SortedUniqueSet<>();
 
     /**
      * keeps track of the latest (biggest) counter among the 'nodeEvents' and 'nodeSourceEvents'
      */
     private AtomicLong latestCounter = new AtomicLong(0);
 
-    /**
-     * ProActive empty constructor
-     */
-    public RMInitialState() {
-
+    public void addAll(Collection<? extends RMEvent> toAdd) {
+        toAdd.forEach(rmEvent -> events.add(rmEvent));
+        latestCounter.set(Math.max(latestCounter.get(), findLargestCounter(events.getSortedItems())));
     }
 
-    /**
-     * Creates an InitialState object.
-     *
-     * @param nodesEventList  RM's node events.
-     * @param nodeSourcesList RM's node sources list.
-     */
-    public RMInitialState(Map<String, RMNodeEvent> nodesEventList, Map<String, RMNodeSourceEvent> nodeSourcesList) {
-        this.nodeEvents = nodesEventList;
-        this.nodeSourceEvents = nodeSourcesList;
+    public List<RMNodeEvent> getNodeEvents() {
+        return getNodeEvents(events.getSortedItems());
     }
 
-    /**
-     * Current version of RM portal and maybe other clients expects "nodesEvents" inside JSON
-     *
-     * @return
-     */
-    public List<RMNodeEvent> getNodesEvents() {
-        return Collections.unmodifiableList(new ArrayList<>(this.nodeEvents.values()));
+    public List<RMNodeSourceEvent> getNodeSourceEvents() {
+        return getNodeSourceEvents(events.getSortedItems());
     }
 
-    /**
-     * Current version of RM portal and maybe other clients expects "nodeSource" inside JSON
-     *
-     * @return
-     */
-    public List<RMNodeSourceEvent> getNodeSource() {
-        return Collections.unmodifiableList(new ArrayList<>(this.nodeSourceEvents.values()));
+    private List<RMNodeEvent> getNodeEvents(Collection<RMEvent> rmEvents) {
+        return rmEvents.stream()
+                       .filter(event -> event instanceof RMNodeEvent)
+                       .map(event -> (RMNodeEvent) event)
+                       .collect(Collectors.toList());
+    }
+
+    private List<RMNodeSourceEvent> getNodeSourceEvents(Collection<RMEvent> rmevents) {
+        return rmevents.stream()
+                       .filter(event -> event instanceof RMNodeSourceEvent)
+                       .map(event -> (RMNodeSourceEvent) event)
+                       .collect(Collectors.toList());
     }
 
     public long getLatestCounter() {
@@ -122,38 +105,32 @@ public class RMInitialState implements Serializable {
     }
 
     public void nodeAdded(RMNodeEvent event) {
-        updateCounter(event);
-        nodeEvents.put(event.getNodeUrl(), event);
-
+        update(event);
     }
 
     public void nodeStateChanged(RMNodeEvent event) {
-        updateCounter(event);
-        nodeEvents.put(event.getNodeUrl(), event);
+        update(event);
     }
 
     public void nodeRemoved(RMNodeEvent event) {
-        updateCounter(event);
-        nodeEvents.put(event.getNodeUrl(), event);
+        update(event);
     }
 
     public void nodeSourceAdded(RMNodeSourceEvent event) {
-        updateCounter(event);
-        nodeSourceEvents.put(event.getSourceName(), event);
+        update(event);
     }
 
     public void nodeSourceRemoved(RMNodeSourceEvent event) {
-        updateCounter(event);
-        nodeSourceEvents.put(event.getSourceName(), event);
+        update(event);
     }
 
     public void nodeSourceStateChanged(RMNodeSourceEvent event) {
-        updateCounter(event);
-        nodeSourceEvents.put(event.getSourceName(), event);
+        update(event);
     }
 
-    private void updateCounter(RMEvent event) {
-        latestCounter.set(Math.max(latestCounter.get(), event.getCounter()));
+    protected void update(RMEvent event) {
+        events.add(event);
+        updateCounter(event);
     }
 
     /**
@@ -163,41 +140,42 @@ public class RMInitialState implements Serializable {
      * @param filter
      * @return rmInitialState where all the events bigger than 'filter'
      */
-    public RMInitialState cloneAndFilter(long filter) {
-        long actualFilter;
-        if (filter <= latestCounter.get()) {
-            actualFilter = filter;
+    public RMStateDelta cloneAndFilter(long filter) {
+        long actualFilter = computeActualFilter(filter);
+
+        final List<RMEvent> responseEvents = events.getSortedItems()
+                                                   .tailSet(new RMEvent(actualFilter + 1)) // because tailSet returns event which is equal or greater
+                                                   .stream()
+                                                   .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
+                                                   .collect(Collectors.toList());
+
+        RMStateDelta response = new RMStateDelta();
+
+        response.setNodeSource(getNodeSourceEvents(responseEvents));
+        response.setNodesEvents(getNodeEvents(responseEvents));
+        response.setLatestCounter(Math.max(actualFilter, findLargestCounter(responseEvents)));
+
+        return response;
+    }
+
+    private long computeActualFilter(long clientFilter) {
+        if (clientFilter <= latestCounter.get()) {
+            return clientFilter;
         } else {
             LOGGER.info(String.format("Client is aware of %d but server knows only about %d counter. " +
                                       "Probably because there was network server restart.",
-                                      filter,
+                                      clientFilter,
                                       latestCounter.get()));
-            actualFilter = -1; // reset filter to default  value
+            return EMPTY_STATE; // reset filter to default  value
         }
-        RMInitialState clone = new RMInitialState();
-
-        clone.nodeEvents = newFilteredEvents(this.nodeEvents, actualFilter);
-        clone.nodeSourceEvents = newFilteredEvents(this.nodeSourceEvents, actualFilter);
-
-        clone.latestCounter.set(Math.max(actualFilter,
-                                         Math.max(findLargestCounter(clone.nodeEvents.values()),
-                                                  findLargestCounter(clone.nodeSourceEvents.values()))));
-        return clone;
     }
 
-    private <T extends RMEvent> Map<String, T> newFilteredEvents(Map<String, T> events, long filter) {
-        return events.entrySet()
-                     .stream()
-                     .filter(entry -> entry.getValue().getCounter() > filter)
-                     .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
+    private void updateCounter(RMEvent event) {
+        latestCounter.set(Math.max(latestCounter.get(), event.getCounter()));
     }
 
     private <T extends RMEvent> long findLargestCounter(Collection<T> events) {
         final Optional<T> max = events.stream().max(Comparator.comparing(RMEvent::getCounter));
-        if (max.isPresent()) {
-            return max.get().getCounter();
-        } else {
-            return 0;
-        }
+        return max.map(RMEvent::getCounter).orElse(EMPTY_STATE);
     }
 }

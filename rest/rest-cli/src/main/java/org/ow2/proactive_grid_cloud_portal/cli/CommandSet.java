@@ -55,6 +55,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DefineNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DeployNodeSourceCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.EditNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
@@ -695,6 +696,17 @@ public class CommandSet {
                                                                            .commandClass(DefineNodeSourceCommand.class)
                                                                            .entry();
 
+    public static final CommandSet.Entry NS_EDIT = CommandSetEntryBuilder.newInstance()
+                                                                         .opt("edns")
+                                                                         .longOpt("editns")
+                                                                         .description("Edit the configuration of an undeployed node source")
+                                                                         .hasArgs(true)
+                                                                         .numOfArgs(2)
+                                                                         .argNames("node-source nodes-recoverable")
+                                                                         .jsCommand("editns(node-source,nodes-recoverable)")
+                                                                         .commandClass(EditNodeSourceCommand.class)
+                                                                         .entry();
+
     /**
      * @deprecated  As of version 8.1, replaced by
      * {@link CommandSet#NS_DEFINE} and {@link CommandSet#NS_DEPLOY}
@@ -967,7 +979,7 @@ public class CommandSet {
      */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] { LOGIN, NODE_ADD, NODE_LIST, NODE_INFO,
                                                                               NODE_LOCK, NODE_UNLOCK, NODE_REMOVE,
-                                                                              NS_DEFINE, NS_CREATE, NS_DEPLOY,
+                                                                              NS_DEFINE, NS_EDIT, NS_CREATE, NS_DEPLOY,
                                                                               NS_UNDEPLOY, NS_LIST, NS_REMOVE, NS,
                                                                               INFRASTRUCTURE, INFRASTRUCTURE_LIST,
                                                                               POLICY, POLICY_LIST, TOPOLOGY, FORCE,

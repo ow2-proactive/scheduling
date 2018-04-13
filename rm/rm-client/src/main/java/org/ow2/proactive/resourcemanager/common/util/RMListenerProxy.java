@@ -33,7 +33,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.*;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
@@ -50,7 +57,12 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
 import org.ow2.proactive.jmx.provider.JMXProviderUtils;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
-import org.ow2.proactive.resourcemanager.common.event.*;
+import org.ow2.proactive.resourcemanager.common.event.RMEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
@@ -196,7 +208,7 @@ public class RMListenerProxy extends RMGroupEventListener {
         checkCounter(event);
     }
 
-    public RMInitialState getRMInitialState(long filter) {
+    public RMStateDelta getRMInitialState(long filter) {
         return rmInitialState.cloneAndFilter(filter);
     }
 

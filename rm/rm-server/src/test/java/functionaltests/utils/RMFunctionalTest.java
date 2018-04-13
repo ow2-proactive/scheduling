@@ -138,7 +138,7 @@ public class RMFunctionalTest extends ProActiveTest {
             int nodeNumber = rm.getState().getTotalNodesNumber();
 
             RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
-            for (RMNodeSourceEvent sourceEvent : state.getNodeSource()) {
+            for (RMNodeSourceEvent sourceEvent : state.getNodeSourceEvents()) {
                 String nodeSource = sourceEvent.getSourceName();
                 rm.removeNodeSource(nodeSource, true);
                 rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nodeSource);

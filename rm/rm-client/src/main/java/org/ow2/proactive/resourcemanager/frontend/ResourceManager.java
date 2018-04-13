@@ -39,6 +39,7 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -79,6 +80,20 @@ public interface ResourceManager {
      * @return true if a new node source was created successfully, runtime exception otherwise
      */
     BooleanWrapper defineNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
+            String policyType, Object[] policyParams, boolean nodesRecoverable);
+
+    /**
+     * Edit an existing node source in the resource manager.
+     *
+     * @param nodeSourceName the name of the node source to edit
+     * @param infrastructureType type of the underlying infrastructure
+     * @param infraParams parameters for infrastructure creation
+     * @param policyType name of the policy type. It passed as a string due to plug-able approach
+     * @param policyParams parameters for policy creation
+     * @param nodesRecoverable whether the nodes can be recovered in case of a scheduler crash
+     * @return true if a new node source was edited successfully, runtime exception otherwise
+     */
+    BooleanWrapper editNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable);
 
     /**
@@ -156,6 +171,11 @@ public interface ResourceManager {
      * @return the list of supported node source policies descriptors
      */
     Collection<PluginDescriptor> getSupportedNodeSourcePolicies();
+
+    /**
+     * Returns the current configuration of a node source.
+     */
+    NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName);
 
     /**
      * Each node source scan its nodes periodically to check their states.

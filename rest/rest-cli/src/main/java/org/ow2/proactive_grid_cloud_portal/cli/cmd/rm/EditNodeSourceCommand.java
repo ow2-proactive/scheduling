@@ -26,7 +26,11 @@
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
+import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand.SET_INFRASTRUCTURE;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand.SET_NODE_SOURCE;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand.SET_POLICY;
 
 import org.apache.http.client.methods.HttpPut;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
@@ -38,21 +42,38 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
-public class DeployNodeSourceCommand extends AbstractCommand implements Command {
+public class EditNodeSourceCommand extends AbstractCommand implements Command {
 
-    private static final String RM_REST_ENDPOINT = "nodesource/deploy";
+    private static final String RM_REST_ENDPOINT = "nodesource/edit";
 
     private String nodeSourceName;
 
-    public DeployNodeSourceCommand(String nodeSourceName) {
+    private String nodesRecoverable;
+
+    public EditNodeSourceCommand(String nodeSourceName, String nodesRecoverable) {
         this.nodeSourceName = nodeSourceName;
+        this.nodesRecoverable = nodesRecoverable;
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+        QueryStringBuilder infrastructure = currentContext.getProperty(SET_INFRASTRUCTURE, QueryStringBuilder.class);
+        QueryStringBuilder policy = currentContext.getProperty(SET_POLICY, QueryStringBuilder.class);
+        if (infrastructure == null) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "Infrastructure not specified");
+        }
+        if (policy == null) {
+            throw new CLIException(REASON_INVALID_ARGUMENTS, "Policy not specified");
+        }
+        if (currentContext.getProperty(SET_NODE_SOURCE, String.class) != null) {
+            this.nodeSourceName = currentContext.getProperty(SET_NODE_SOURCE, String.class);
+        }
         HttpPut request = new HttpPut(currentContext.getResourceUrl(RM_REST_ENDPOINT));
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
-        queryStringBuilder.add("nodeSourceName", this.nodeSourceName);
+        queryStringBuilder.add("nodeSourceName", this.nodeSourceName)
+                          .addAll(infrastructure)
+                          .addAll(policy)
+                          .add("nodesRecoverable", this.nodesRecoverable);
         request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
         HttpResponseWrapper response = this.execute(request, currentContext);
         if (this.statusCode(OK) == this.statusCode(response)) {
@@ -60,17 +81,17 @@ public class DeployNodeSourceCommand extends AbstractCommand implements Command 
             boolean success = nsState.isResult();
             this.resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext, "Node source successfully deployed.");
+                writeLine(currentContext, "Node source successfully edited.");
             } else {
                 writeLine(currentContext,
                           "%s %s. %s",
-                          "Cannot deploy node source:",
+                          "Cannot edit node source",
                           this.nodeSourceName,
                           nsState.getErrorMessage());
                 writeLine(currentContext, nsState.getStackTrace().replace("\\n", "%n").replace("\\t", "    "));
             }
         } else {
-            this.handleError("An error occurred while deploying node source:", response, currentContext);
+            this.handleError("An error occurred while editing node source:", response, currentContext);
 
         }
     }

@@ -59,7 +59,7 @@ public class RMProxyUserInterfaceTest extends RMFunctionalTest {
         rmHelper.createNodeSource("NodeSource1", 1);
 
         RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
-        String nodeSource1_NodeJmxUrl = state.getNodesEvents().get(0).getDefaultJMXUrl();
+        String nodeSource1_NodeJmxUrl = state.getNodeEvents().get(0).getDefaultJMXUrl();
 
         Object mBeanFromNodeSource1 = proxyUserInterface.getNodeMBeanInfo(nodeSource1_NodeJmxUrl,
                                                                           EXISTING_OBJECT_NAME,
@@ -73,7 +73,7 @@ public class RMProxyUserInterfaceTest extends RMFunctionalTest {
         rmHelper.createNodeSource("NodeSource2", 1);
 
         state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
-        String nodeSource2_NodeJmxUrl = state.getNodesEvents().get(0).getDefaultJMXUrl();
+        String nodeSource2_NodeJmxUrl = state.getNodeEvents().get(0).getDefaultJMXUrl();
 
         Object mBeanFromNodeSource2 = proxyUserInterface.getNodeMBeanInfo(nodeSource2_NodeJmxUrl,
                                                                           EXISTING_OBJECT_NAME,

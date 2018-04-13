@@ -27,6 +27,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DefineNodeSourceCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.EditNodeSourceCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DeployNodeSourceCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UndeployNodeSourceCommand);
@@ -473,6 +474,12 @@ function definens(nodeSource, infrastructure, policy, nodesRecoverable) {
     else{
         execute(new DefineNodeSourceCommand('' + nodeSource, '' + nodesRecoverable));
     }
+}
+
+function editns(nodeSource, infrastructure, policy, nodesRecoverable) {
+    execute(new SetInfrastructureCommand(infrastructure));
+    execute(new SetPolicyCommand(policy));
+    execute(new EditNodeSourceCommand('' + nodeSource, '' + nodesRecoverable));
 }
 
 function createns(nodeSource, infrastructure, policy, nodesRecoverable) {

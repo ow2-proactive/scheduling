@@ -54,7 +54,9 @@
   <define name="jobName">
     <attribute name="name">
       <doc:documentation>Identification of this job</doc:documentation>
-      <data type="string"/>
+      <data type="string">
+        <param name="minLength">3</param>
+      </data>
     </attribute>
   </define>
   <define name="variables">

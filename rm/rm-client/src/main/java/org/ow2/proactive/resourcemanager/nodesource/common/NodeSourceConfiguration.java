@@ -29,43 +29,49 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- *
- * Encapsulation of field name, value and its meta data.
- *
+ * Object holding the current configuration of a node source.
  */
+@PublicAPI
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ConfigurableField implements Serializable {
-    private String name;
+@XmlRootElement(name = "nodeSourceConfiguration")
+public class NodeSourceConfiguration implements Serializable {
 
-    private String value;
+    private String nodeSourceName;
 
-    @XmlJavaTypeAdapter(ConfigurableAdapter.class)
-    private Configurable meta;
+    private boolean nodesRecoverable;
 
-    public ConfigurableField(String name, String value, Configurable configurable) {
-        this.name = name;
-        this.value = value;
-        this.meta = configurable;
+    private PluginDescriptor infrastructurePluginDescriptor;
+
+    private PluginDescriptor policyPluginDescriptor;
+
+    public NodeSourceConfiguration(String nodeSourceName, boolean nodesRecoverable,
+            PluginDescriptor infrastructurePluginDescriptor, PluginDescriptor policyPluginDescriptor) {
+        this.nodeSourceName = nodeSourceName;
+        this.nodesRecoverable = nodesRecoverable;
+        this.infrastructurePluginDescriptor = infrastructurePluginDescriptor;
+        this.policyPluginDescriptor = policyPluginDescriptor;
     }
 
-    public String getName() {
-        return name;
+    public String getNodeSourceName() {
+        return this.nodeSourceName;
     }
 
-    public String getValue() {
-        return value;
+    public boolean getNodesRecoverable() {
+        return this.nodesRecoverable;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public PluginDescriptor getInfrastructurePluginDescriptor() {
+        return this.infrastructurePluginDescriptor;
     }
 
-    public Configurable getMeta() {
-        return meta;
+    public PluginDescriptor getPolicyPluginDescriptor() {
+        return this.policyPluginDescriptor;
     }
 
 }

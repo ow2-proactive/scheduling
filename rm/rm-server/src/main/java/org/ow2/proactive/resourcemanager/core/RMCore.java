@@ -102,6 +102,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator;
+import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
@@ -1183,57 +1184,90 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public BooleanWrapper defineNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
             String policyType, Object[] policyParams, boolean nodesRecoverable) {
 
+        logger.info("Define node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
+
         this.validateNodeSourceNameOrFail(nodeSourceName);
 
         nodeSourceName = nodeSourceName.trim();
 
-        logger.info("Define node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
+        NodeSourceData nodeSourceData = this.getNodeSourceToPersist(nodeSourceName,
+                                                                    infrastructureType,
+                                                                    infraParams,
+                                                                    policyType,
+                                                                    policyParams,
+                                                                    nodesRecoverable);
 
-        NodeSourceDescriptor nodeSourceDescriptor = this.persistNodeSourceAndGetDescriptor(nodeSourceName,
-                                                                                           infrastructureType,
-                                                                                           infraParams,
-                                                                                           policyType,
-                                                                                           policyParams,
-                                                                                           nodesRecoverable);
+        this.dbManager.addNodeSource(nodeSourceData);
 
+        NodeSourceDescriptor nodeSourceDescriptor = nodeSourceData.toNodeSourceDescriptor();
         NodeSource nodeSource = this.createNodeSourceInstance(nodeSourceDescriptor);
 
         this.definedNodeSources.put(nodeSourceName, nodeSource);
 
-        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_DEFINED,
-                                                              this.caller.getName(),
-                                                              nodeSourceName,
-                                                              nodeSource.getDescription(),
-                                                              nodeSourceDescriptor.getProvider().getName(),
-                                                              nodeSource.getStatus().toString()));
+        this.emitNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_DEFINED);
 
         logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully defined");
 
         return new BooleanWrapper(true);
     }
 
-    private NodeSourceDescriptor persistNodeSourceAndGetDescriptor(String nodeSourceName, String infrastructureType,
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BooleanWrapper editNodeSource(String nodeSourceName, String infrastructureType, Object[] infraParams,
+            String policyType, Object[] policyParams, boolean nodesRecoverable) {
+
+        logger.info("Edit node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
+
+        this.checkWhetherNodeSourceIsEditableOrFail(nodeSourceName);
+
+        NodeSourceData nodeSourceData = this.getNodeSourceToPersist(nodeSourceName,
+                                                                    infrastructureType,
+                                                                    infraParams,
+                                                                    policyType,
+                                                                    policyParams,
+                                                                    nodesRecoverable);
+
+        this.dbManager.updateNodeSource(nodeSourceData);
+
+        NodeSource nodeSource = this.createNodeSourceInstance(nodeSourceData.toNodeSourceDescriptor());
+
+        this.definedNodeSources.put(nodeSourceName, nodeSource);
+
+        this.emitNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_DEFINED);
+
+        logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully edited");
+
+        return new BooleanWrapper(true);
+    }
+
+    private void checkWhetherNodeSourceIsEditableOrFail(String nodeSourceName) {
+
+        NodeSource editedNodeSource = this.definedNodeSources.get(nodeSourceName);
+
+        if (editedNodeSource == null) {
+            throw new IllegalArgumentException("Edited node source " + nodeSourceName + " does not exist");
+        }
+        if (!editedNodeSource.getStatus().equals(NodeSourceStatus.NODES_UNDEPLOYED)) {
+            throw new IllegalArgumentException("A node source must be undeployed to be edited");
+        }
+    }
+
+    private NodeSourceData getNodeSourceToPersist(String nodeSourceName, String infrastructureType,
             Object[] infraParams, String policyType, Object[] policyParams, boolean nodesRecoverable) {
 
         List<Serializable> serializableInfraParams = this.getSerializableParamsOrFail(infraParams);
         List<Serializable> serializablePolicyParams = this.getSerializableParamsOrFail(policyParams);
 
-        NodeSourceData persistedNodeSource = new NodeSourceData(nodeSourceName,
-                                                                infrastructureType,
-                                                                serializableInfraParams,
-                                                                policyType,
-                                                                serializablePolicyParams,
-                                                                this.caller,
-                                                                nodesRecoverable,
-                                                                NodeSourceStatus.NODES_UNDEPLOYED);
-
-        boolean success = this.dbManager.addNodeSource(persistedNodeSource);
-
-        if (!success) {
-            this.dbManager.removeNodeSource(nodeSourceName);
-        }
-
-        return persistedNodeSource.toNodeSourceDescriptor();
+        return new NodeSourceData(nodeSourceName,
+                                  infrastructureType,
+                                  serializableInfraParams,
+                                  policyType,
+                                  serializablePolicyParams,
+                                  this.caller,
+                                  nodesRecoverable,
+                                  NodeSourceStatus.NODES_UNDEPLOYED);
     }
 
     private List<Serializable> getSerializableParamsOrFail(Object[] parameters) {
@@ -1306,11 +1340,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public BooleanWrapper deployNodeSource(String nodeSourceName) {
 
+        logger.info("Deploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
+
         if (!this.deployedNodeSources.containsKey(nodeSourceName)) {
 
             NodeSourceDescriptor nodeSourceDescriptor = this.retrieveNodeSourceDescriptorOrFail(nodeSourceName);
-
-            logger.info("Deploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
 
             this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
 
@@ -1326,12 +1360,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
 
-            this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(RMEventType.NODESOURCE_CREATED,
-                                                                  this.caller.getName(),
-                                                                  nodeSourceStub.getName(),
-                                                                  nodeSourceStub.getDescription(),
-                                                                  nodeSourceStub.getAdministrator().getName(),
-                                                                  nodeSourceStub.getStatus().toString()));
+            this.emitNodeSourceEvent(nodeSourceStub, RMEventType.NODESOURCE_CREATED);
 
             logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully deployed");
         }
@@ -1461,6 +1490,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     public BooleanWrapper undeployNodeSource(String nodeSourceName, boolean preempt) {
 
+        logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
+                    this.caller.getName());
+
         if (!this.definedNodeSources.containsKey(nodeSourceName)) {
             throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
         }
@@ -1471,9 +1503,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                         this.caller + " is not authorized to remove " + nodeSourceName);
-
-            logger.info("Undeploy node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
-                        this.caller.getName());
 
             nodeSourceToRemove.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
 
@@ -1516,6 +1545,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
         }
         return new BooleanWrapper(true);
+    }
+
+    private void emitNodeSourceEvent(NodeSource nodeSource, RMEventType eventType) {
+
+        NodeSourceDescriptor descriptor = nodeSource.getDescriptor();
+
+        this.monitoring.nodeSourceEvent(new RMNodeSourceEvent(eventType,
+                                                              this.caller.getName(),
+                                                              descriptor.getName(),
+                                                              nodeSource.getDescription(),
+                                                              descriptor.getProvider().getName(),
+                                                              nodeSource.getStatus().toString()));
     }
 
     // ----------------------------------------------------------------------
@@ -1721,13 +1762,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
         }
 
-        final Map<String, RMNodeSourceEvent> nodeSourceEvents = this.definedNodeSources.values()
-                                                                                       .stream()
-                                                                                       .map(NodeSource::createNodeSourceEvent)
-                                                                                       .collect(Collectors.toMap(RMNodeSourceEvent::getSourceName,
-                                                                                                                 event -> event));
+        final List<RMNodeSourceEvent> nodeSourceEvents = new ArrayList<>(this.definedNodeSources.values()
+                                                                                                .stream()
+                                                                                                .map(NodeSource::createNodeSourceEvent)
+                                                                                                .collect(Collectors.toList()));
 
-        return new RMInitialState(nodeEvents, nodeSourceEvents);
+        long eventCounter = 0;
+        for (RMNodeSourceEvent nodeSourceEvent : nodeSourceEvents) {
+            nodeSourceEvent.setCounter(eventCounter++);
+        }
+        for (RMNodeEvent nodeEvent : nodeEvents.values()) {
+            nodeEvent.setCounter(eventCounter++);
+        }
+
+        final RMInitialState rmInitialState = new RMInitialState();
+        rmInitialState.addAll(nodeEvents.values());
+        rmInitialState.addAll(nodeSourceEvents);
+
+        return rmInitialState;
     }
 
     /**
@@ -1977,7 +2029,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @return list of existing Node Sources
      */
     public List<RMNodeSourceEvent> getExistingNodeSourcesList() {
-        return getRMInitialState().getNodeSource();
+        return getRMInitialState().getNodeSourceEvents();
     }
 
     /**
@@ -1985,13 +2037,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Deprecated
     public List<RMNodeEvent> getNodesList() {
-        return getRMInitialState().getNodesEvents();
+        return getRMInitialState().getNodeEvents();
     }
 
     /**
      * {@inheritDoc}
      */
     public BooleanWrapper removeNodeSource(String nodeSourceName, boolean preempt) {
+
+        logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
+                    this.caller.getName());
 
         if (!this.definedNodeSources.containsKey(nodeSourceName)) {
             throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
@@ -2001,9 +2056,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                     this.caller + " is not authorized to remove " + nodeSourceName);
-
-        logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
-                    this.caller.getName());
 
         this.shutDownNodeSourceIfDeployed(nodeSourceName, preempt);
 
@@ -2140,6 +2192,42 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName) {
+        NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
+        if (nodeSource == null) {
+            throw new IllegalArgumentException("Cannot find the configuration of unknown node source " +
+                                               nodeSourceName);
+        }
+
+        NodeSourceDescriptor nodeSourceDescriptor = nodeSource.getDescriptor();
+
+        Class<InfrastructureManager> infrastructureClass = null;
+        Class<NodeSourcePolicy> policyClass = null;
+
+        try {
+            infrastructureClass = (Class<InfrastructureManager>) Class.forName(nodeSourceDescriptor.getInfrastructureType());
+            policyClass = (Class<NodeSourcePolicy>) Class.forName(nodeSourceDescriptor.getPolicyType());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("The configuration of node source " + nodeSourceName +
+                                            " cannot be retrieved", e);
+        }
+
+        PluginDescriptor infrastructurePluginDescriptor = new PluginDescriptor(infrastructureClass,
+                                                                               nodeSourceDescriptor.getInfrastructureParameters());
+
+        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(policyClass,
+                                                                       nodeSourceDescriptor.getPolicyParameters());
+
+        return new NodeSourceConfiguration(nodeSourceName,
+                                           nodeSource.nodesRecoverable(),
+                                           infrastructurePluginDescriptor,
+                                           policyPluginDescriptor);
+    }
+
+    /**
      * Checks if the caller thread has permissions to call particular method name
      *
      * @return client object corresponding to the caller thread
@@ -2228,7 +2316,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Node Source name cannot be null");
         }
         if (nodeSourceName.length() == 0) {
-            throw new IllegalArgumentException("Node Source Name cannot be empty");
+            throw new IllegalArgumentException("Node Source name cannot be empty");
         }
         if (this.definedNodeSources.containsKey(nodeSourceName) ||
             this.deployedNodeSources.containsKey(nodeSourceName)) {

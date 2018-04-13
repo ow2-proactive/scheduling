@@ -60,10 +60,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
-import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -127,7 +128,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    RMInitialState getInitialState(@HeaderParam("sessionid") String sessionId,
+    RMStateDelta getInitialState(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("clientCounter") @DefaultValue("-1") String latestCounterClientAware)
             throws NotConnectedException;
 
@@ -159,6 +160,18 @@ public interface RMRestInterface {
     @Path("nodesource")
     @Produces("application/json")
     NSState defineNodeSource(@HeaderParam("sessionid") String sessionId, //NOSONAR
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters,
+            @FormParam("nodesRecoverable") String nodesRecoverable) throws NotConnectedException;
+
+    @PUT
+    @Path("nodesource/edit")
+    @Produces("application/json")
+    NSState editNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName,
             @FormParam("infrastructureType") String infrastructureType,
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
@@ -311,6 +324,13 @@ public interface RMRestInterface {
     @Produces("application/json")
     Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException;
+
+    @GET
+    @GZIP
+    @Path("nodesource/configuration")
+    @Produces("application/json")
+    NodeSourceConfiguration getNodeSourceConfiguration(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodeSourceName") String nodeSourceName) throws NotConnectedException;
 
     @GET
     @GZIP

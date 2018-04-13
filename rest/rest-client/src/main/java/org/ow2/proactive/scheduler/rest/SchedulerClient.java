@@ -309,6 +309,19 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public List<JobInfo> getJobsInfoList(List<String> jobsId)
+            throws PermissionException, NotConnectedException, UnknownJobException {
+        List<JobInfo> jobsInfoList = null;
+        try {
+            List<UserJobData> userJobDataList = restApi().jobsInfoList(sid, jobsId);
+            jobsInfoList = new ArrayList<>(toJobInfos(userJobDataList));
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+        return jobsInfoList;
+    }
+
+    @Override
     public String getJobServerLogs(String jobId)
             throws UnknownJobException, NotConnectedException, PermissionException {
         String jobServerLog = "";
