@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
@@ -166,5 +167,9 @@ public class TaskContext implements Serializable {
 
     public List<String> getNodesHosts() {
         return nodesHosts;
+    }
+
+    public Synchronization getSynchronizationAPI() {
+        return initializer.getSynchronizationAPI();
     }
 }

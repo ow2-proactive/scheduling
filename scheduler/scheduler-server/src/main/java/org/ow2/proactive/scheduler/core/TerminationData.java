@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -267,7 +268,10 @@ final class TerminationData {
                                         variables,
                                         genericInformation,
                                         taskToTerminate.taskData.getTask().getId(),
-                                        service.addThirdPartyCredentials(taskData.getCredentials()));
+                                        service.addThirdPartyCredentials(taskData.getCredentials()),
+                                        new SynchronizationWrapper(taskToTerminate.internalJob.getOwner(),
+                                                                   taskData.getTask().getId(),
+                                                                   taskToTerminate.internalJob.getSynchronizationAPI()));
 
         } catch (Throwable t) {
             logger.info("Failed to release nodes for task '" + taskData.getTask().getId() + "'", t);

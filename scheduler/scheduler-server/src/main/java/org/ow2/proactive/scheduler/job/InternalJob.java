@@ -69,6 +69,8 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateIfTaskHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateLoopHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateReplicateTaskHandler;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -144,6 +146,9 @@ public abstract class InternalJob extends JobState {
 
     @XmlTransient
     private Job taskFlowJob;
+
+    @XmlTransient
+    private SynchronizationInternal synchronizationAPI;
 
     /**
      * Hibernate default constructor
@@ -300,6 +305,14 @@ public abstract class InternalJob extends JobState {
                                                                    getId());
             }
         }
+    }
+
+    public void setSynchronizationAPI(SynchronizationInternal synchronizationAPI) {
+        this.synchronizationAPI = synchronizationAPI;
+    }
+
+    public SynchronizationInternal getSynchronizationAPI() {
+        return synchronizationAPI;
     }
 
     /**

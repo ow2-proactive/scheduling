@@ -15,6 +15,8 @@ log4j.logger.org.ow2.proactive.scheduler.core.jmx=INFO
 log4j.logger.org.ow2.proactive.resourcemanager.core.jmx=INFO
 log4j.logger.org.ow2.proactive.resourcemanager.db=INFO
 
+log4j.logger.org.ow2.proactive.scheduler.synchronization=DEBUG
+
 log4j.logger.org.hibernate=WARN
 log4j.logger.com.mchange=WARN
 

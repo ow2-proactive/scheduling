@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scripting.Script;
 
 import com.google.common.collect.ImmutableMap;
@@ -105,6 +106,8 @@ public class TaskLauncherInitializer implements Serializable {
     private int pingAttempts = 1;
 
     private ForkEnvironment forkEnvironment;
+
+    private Synchronization synchronizationAPI;
 
     /**
      * Get the taskId
@@ -429,6 +432,14 @@ public class TaskLauncherInitializer implements Serializable {
 
     public void setAuthorizedForkEnvironmentScript(boolean authorizedForkEnvironmentScript) {
         this.authorizedForkEnvironmentScript = authorizedForkEnvironmentScript;
+    }
+
+    public Synchronization getSynchronizationAPI() {
+        return synchronizationAPI;
+    }
+
+    public void setSynchronizationAPI(Synchronization synchronizationAPI) {
+        this.synchronizationAPI = synchronizationAPI;
     }
 
 }

@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.core.SchedulingInfrastructure;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxiesManager;
 import org.ow2.proactive.scheduler.core.rmproxies.RMProxy;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.NodeSet;
@@ -139,7 +140,8 @@ public class MockSchedulingInfrastructure implements SchedulingInfrastructure {
                                         (VariablesMap) anyObject(),
                                         (Map<String, String>) anyObject(),
                                         (TaskId) anyObject(),
-                                        (Credentials) anyObject());
+                                        (Credentials) anyObject(),
+                                        (Synchronization) anyObject());
 
         rmProxiesManager = mock(RMProxiesManager.class);
         when(rmProxiesManager.getUserRMProxy(anyString(), (Credentials) anyObject())).thenReturn(userProxy);

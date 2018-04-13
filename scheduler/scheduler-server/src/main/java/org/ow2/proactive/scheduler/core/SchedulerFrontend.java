@@ -75,6 +75,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -143,6 +144,8 @@ import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.JobLogger;
@@ -314,6 +317,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             logger.debug("Booting jmx...");
             this.jmxHelper.boot(authentication);
+            SynchronizationInternal publicStore = startSynchronizationService();
 
             RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(dbManager).recover(loadJobPeriod,
                                                                                                         rmProxy);
@@ -335,7 +339,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                                            frontendState,
                                                            recoveredState,
                                                            policyFullName,
-                                                           null);
+                                                           null,
+                                                           publicStore);
 
             recoveredState.enableLiveLogsForRunningTasks(schedulingService);
             releaseBusyNodesWithNoRunningTask(rmProxy, recoveredState);
@@ -363,6 +368,27 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private SynchronizationInternal startSynchronizationService() throws java.io.IOException, ProActiveException {
+        // Create and start the Synchronization Service Active Object
+        final AOSynchronization privateStore = PAActiveObject.newActive(AOSynchronization.class,
+                                                                        new Object[] { PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_SYNCHRONIZATION_DATABASE.getValueAsString()) });
+
+        // Wait for the service to be actually started
+        privateStore.isStarted();
+
+        Runtime.getRuntime()
+               .addShutdownHook(new Thread(() -> PAActiveObject.terminateActiveObject(privateStore, true)));
+
+        // We use the following trick to obtain a ProActive Stub which only implements methods declared in the SynchronizationInternal interface.
+        // As this stub will be used remotely inside task, we make sure that it does not drag unnecessary dependencies (static fields, internal methods, etc)
+        SynchronizationInternal publicStore = PAActiveObject.lookupActive(SynchronizationInternal.class,
+                                                                          PAActiveObject.getUrl(privateStore));
+
+        // register this service and give it a name
+        PAActiveObject.registerByName(publicStore, SchedulerConstants.SYNCHRONIZATION_DEFAULT_NAME);
+        return publicStore;
     }
 
     private void releaseBusyNodesWithNoRunningTask(RMProxy rmProxy, RecoveredSchedulerState recoveredState) {

@@ -450,7 +450,7 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
             systemVariables.put(SchedulerVars.PA_JOB_ID.toString(), getTaskInfo().getJobId().value());
             systemVariables.put(SchedulerVars.PA_JOB_NAME.toString(), getTaskInfo().getJobId().getReadableName());
             if (getId() != null) {
-                systemVariables.put(SchedulerVars.PA_TASK_ID.toString(), getId().toString());
+                systemVariables.put(SchedulerVars.PA_TASK_ID.toString(), getId().value());
                 systemVariables.put(SchedulerVars.PA_TASK_NAME.toString(), getName());
             }
             systemVariables.put(SchedulerVars.PA_USER.toString(), getTaskInfo().getJobInfo().getJobOwner());

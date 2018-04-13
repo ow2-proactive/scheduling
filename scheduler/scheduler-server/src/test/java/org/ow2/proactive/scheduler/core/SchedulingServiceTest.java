@@ -30,7 +30,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 
 import java.util.Collections;
@@ -56,6 +55,8 @@ import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.tests.ProActiveTestClean;
@@ -83,6 +84,9 @@ public class SchedulingServiceTest extends ProActiveTestClean {
     @Mock
     private SchedulerDBManager schedulerDBManager;
 
+    @Mock
+    private SynchronizationInternal synchronizationAPI;
+
     private final String policyClassName = DefaultPolicy.class.getName();
 
     @Before
@@ -101,7 +105,8 @@ public class SchedulingServiceTest extends ProActiveTestClean {
                                                   listener,
                                                   recoveredState,
                                                   policyClassName,
-                                                  schedulingMethod);
+                                                  schedulingMethod,
+                                                  synchronizationAPI);
     }
 
     @Test
