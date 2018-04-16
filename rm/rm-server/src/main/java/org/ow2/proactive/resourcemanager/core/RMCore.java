@@ -102,7 +102,6 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.RMNodeConfigurator;
-import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
@@ -296,6 +295,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private NodesRecoveryManager nodesRecoveryManager;
 
+    private NodeSourcePluginManager nodeSourcePluginManager;
+
     /**
      * A barrier to prevent the {@link RMCore#setNodesAvailable} immediate
      * service to run before the initActivity of the RM is finished.
@@ -440,6 +441,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             authentication.setActivated(true);
 
             clientPinger.ping();
+
+            nodeSourcePluginManager = new NodeSourcePluginManager();
 
             initiateRecoveryIfRequired();
 
@@ -1262,109 +1265,31 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceDescriptor descriptor = deployedNodeSource.getDescriptor();
 
-        List<Serializable> updatedInfrastructureParams = this.getParametersWithDynamicUpdated(infraParams,
-                                                                                              descriptor.getSerializableInfrastructureParameters(),
-                                                                                              this.getInfrastructureConfigurableFields(nodeSourceName,
-                                                                                                                                       descriptor));
-
-        List<Serializable> updatedPolicyParams = this.getParametersWithDynamicUpdated(policyParams,
-                                                                                      descriptor.getSerializablePolicyParameters(),
-                                                                                      this.getPolicyConfigurableFields(nodeSourceName,
-                                                                                                                       descriptor));
+        List<Serializable> updatedInfrastructureParams = this.nodeSourcePluginManager.getParametersWithDynamicUpdated(infraParams,
+                                                                                                                      descriptor.getSerializableInfrastructureParameters(),
+                                                                                                                      this.nodeSourcePluginManager.getInfrastructureConfigurableFields(nodeSourceName,
+                                                                                                                                                                                       descriptor));
+        List<Serializable> updatedPolicyParams = this.nodeSourcePluginManager.getParametersWithDynamicUpdated(policyParams,
+                                                                                                              descriptor.getSerializablePolicyParameters(),
+                                                                                                              this.nodeSourcePluginManager.getPolicyConfigurableFields(nodeSourceName,
+                                                                                                                                                                       descriptor));
 
         deployedNodeSource.updateDynamicParameters(updatedInfrastructureParams, updatedPolicyParams);
-
         NodeSource definedNodeSource = this.retrieveDefinedNodeSourceOrFail(nodeSourceName);
-
         NodeSourceDescriptor updatedDescriptor = definedNodeSource.updateDynamicParameters(updatedInfrastructureParams,
                                                                                            updatedPolicyParams);
 
         NodeSourceData nodeSourceData = NodeSourceData.fromNodeSourceDescriptor(updatedDescriptor);
         this.dbManager.updateNodeSource(nodeSourceData);
 
-        this.emitNodeSourceEvent(definedNodeSource, RMEventType.NODESOURCE_UPDATED);
-
         // reconfiguration happens asynchronously
         deployedNodeSource.reconfigure(updatedInfrastructureParams.toArray(), updatedPolicyParams.toArray());
+
+        this.emitNodeSourceEvent(definedNodeSource, RMEventType.NODESOURCE_UPDATED);
 
         logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully updated with dynamic parameters");
 
         return new BooleanWrapper(true);
-    }
-
-    private Collection<ConfigurableField> getPolicyConfigurableFields(String nodeSourceName,
-            NodeSourceDescriptor descriptor) {
-        Class<NodeSourcePolicy> nodeSourcePolicyClass = this.getNodeSourcePolicyClassOrFail(nodeSourceName, descriptor);
-        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(nodeSourcePolicyClass, new HashMap<>());
-        return policyPluginDescriptor.getConfigurableFields();
-    }
-
-    private Collection<ConfigurableField> getInfrastructureConfigurableFields(String nodeSourceName,
-            NodeSourceDescriptor descriptor) {
-        Class<InfrastructureManager> infrastructureManagerClass = this.getInfrastructureManagerClassOrFail(nodeSourceName,
-                                                                                                           descriptor);
-        PluginDescriptor infrastructurePluginDescriptor = new PluginDescriptor(infrastructureManagerClass,
-                                                                               new HashMap<>());
-        return infrastructurePluginDescriptor.getConfigurableFields();
-    }
-
-    private List<Serializable> getParametersWithDynamicUpdated(Object[] newParameters, List<Serializable> oldParameters,
-            Collection<ConfigurableField> configurableFields) {
-
-        List<Serializable> parametersWithDynamicUpdated = new LinkedList<>();
-        parametersWithDynamicUpdated.addAll(oldParameters);
-
-        int oldValueIndex;
-        String newValue;
-        String oldValue;
-
-        for (int newValueIndex = 0; newValueIndex < newParameters.length; newValueIndex++) {
-
-            oldValueIndex = 0;
-
-            for (ConfigurableField configurableField : configurableFields) {
-
-                // we know if two parameters are comparable thanks to the
-                // order in which they appear in the parameter list
-                if (oldValueIndex == newValueIndex) {
-
-                    if (configurableField.getMeta().credential() || configurableField.getMeta().fileBrowser() ||
-                        configurableField.getMeta().password()) {
-                        newValue = new String((byte[]) newParameters[newValueIndex]);
-                        oldValue = new String((byte[]) oldParameters.get(newValueIndex));
-                    } else {
-                        newValue = (String) newParameters[newValueIndex];
-                        oldValue = (String) oldParameters.get(newValueIndex);
-                    }
-
-                    this.updateDynamicParameterIfNotEqual(newParameters,
-                                                          parametersWithDynamicUpdated,
-                                                          newValue,
-                                                          oldValue,
-                                                          newValueIndex,
-                                                          configurableField);
-                }
-
-                oldValueIndex++;
-            }
-        }
-
-        return parametersWithDynamicUpdated;
-    }
-
-    private void updateDynamicParameterIfNotEqual(Object[] newParameters,
-            List<Serializable> parametersWithDynamicUpdated, String newValue, String oldValue, int valueIndex,
-            ConfigurableField configurableField) {
-
-        if (!newValue.equals(oldValue)) {
-
-            if (configurableField.getMeta().dynamic()) {
-                parametersWithDynamicUpdated.set(valueIndex, (Serializable) newParameters[valueIndex]);
-            } else {
-                throw new IllegalArgumentException("Attempt to update parameter " + configurableField.getName() +
-                                                   " failed because this parameter is not dynamic");
-            }
-        }
     }
 
     private void checkWhetherNodeSourceIsEditableOrFail(String nodeSourceName) {
@@ -2304,23 +2229,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
-        return getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
+        return this.nodeSourcePluginManager.getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
     }
 
     /**
      * {@inheritDoc}
      */
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
-        return getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
-    }
-
-    private Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
-        Collection<PluginDescriptor> descriptors = new ArrayList<>(plugins.size());
-        for (Class<?> cls : plugins) {
-            Map<String, String> defaultValues = new HashMap<>();
-            descriptors.add(new PluginDescriptor(cls, defaultValues));
-        }
-        return descriptors;
+        return this.nodeSourcePluginManager.getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
     }
 
     /**
@@ -2336,44 +2252,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceDescriptor nodeSourceDescriptor = nodeSource.getDescriptor();
 
-        Class<InfrastructureManager> infrastructureClass = this.getInfrastructureManagerClassOrFail(nodeSourceName,
-                                                                                                    nodeSourceDescriptor);
-        ;
-        Class<NodeSourcePolicy> policyClass = this.getNodeSourcePolicyClassOrFail(nodeSourceName, nodeSourceDescriptor);
+        PluginDescriptor infrastructurePluginDescriptor = this.nodeSourcePluginManager.getInfrastructurePluginDescriptor(nodeSourceName,
+                                                                                                                         nodeSourceDescriptor);
 
-        PluginDescriptor infrastructurePluginDescriptor = new PluginDescriptor(infrastructureClass,
-                                                                               nodeSourceDescriptor.getInfrastructureParameters());
-
-        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(policyClass,
-                                                                       nodeSourceDescriptor.getPolicyParameters());
+        PluginDescriptor policyPluginDescriptor = this.nodeSourcePluginManager.getPolicyPluginDescriptor(nodeSourceName,
+                                                                                                         nodeSourceDescriptor);
 
         return new NodeSourceConfiguration(nodeSourceName,
                                            nodeSource.nodesRecoverable(),
                                            infrastructurePluginDescriptor,
                                            policyPluginDescriptor);
-    }
-
-    private Class<InfrastructureManager> getInfrastructureManagerClassOrFail(String nodeSourceName,
-            NodeSourceDescriptor nodeSourceDescriptor) {
-        Class<InfrastructureManager> infrastructureClass;
-        try {
-            infrastructureClass = (Class<InfrastructureManager>) Class.forName(nodeSourceDescriptor.getInfrastructureType());
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Infrastructure class of node source " + nodeSourceName + " cannot be read",
-                                            e);
-        }
-        return infrastructureClass;
-    }
-
-    private Class<NodeSourcePolicy> getNodeSourcePolicyClassOrFail(String nodeSourceName,
-            NodeSourceDescriptor nodeSourceDescriptor) {
-        Class<NodeSourcePolicy> policyClass;
-        try {
-            policyClass = (Class<NodeSourcePolicy>) Class.forName(nodeSourceDescriptor.getPolicyType());
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Policy class of node source " + nodeSourceName + " cannot be read", e);
-        }
-        return policyClass;
     }
 
     /**

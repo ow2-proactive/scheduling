@@ -313,7 +313,9 @@ public class InfrastructureManagerTest {
 
         @Override
         protected void configure(Object... parameters) {
-            this.dynamicNumberTest = (int) parameters[0];
+            if (parameters.length > 0) {
+                this.dynamicNumberTest = (int) parameters[0];
+            }
         }
 
         @Override
