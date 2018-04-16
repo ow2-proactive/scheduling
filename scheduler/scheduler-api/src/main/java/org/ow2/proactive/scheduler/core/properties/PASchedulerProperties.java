@@ -137,6 +137,11 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** List of the scripts paths to execute at scheduler start. Paths are separated by a ';'. */
     SCHEDULER_STARTSCRIPTS_PATHS("pa.scheduler.startscripts.paths", PropertyType.LIST),
 
+    /** Path to boot (early starting) microservices (e.g., configuration and iam micro-services). */
+    SCHEDULER_BOOT_MICROSERVICES_PATH("pa.boot.microservices.path", PropertyType.LIST),
+
+    /* ***************************************************************** */
+
     /* ***************************************************************** */
     /* ********************** AUTHENTICATION PROPERTIES **************** */
     /* ***************************************************************** */
