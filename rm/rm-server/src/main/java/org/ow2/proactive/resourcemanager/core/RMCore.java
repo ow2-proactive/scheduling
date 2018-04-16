@@ -1262,30 +1262,30 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceDescriptor descriptor = deployedNodeSource.getDescriptor();
 
-        Collection<ConfigurableField> infrastructureConfigurableFields = this.getInfrastructureConfigurableFields(nodeSourceName,
-                                                                                                                  descriptor);
-        List<Serializable> infrastructureParamsWithDynamicUpdated = this.getParametersWithDynamicUpdated(infraParams,
-                                                                                                         descriptor.getSerializableInfrastructureParameters(),
-                                                                                                         infrastructureConfigurableFields);
+        List<Serializable> updatedInfrastructureParams = this.getParametersWithDynamicUpdated(infraParams,
+                                                                                              descriptor.getSerializableInfrastructureParameters(),
+                                                                                              this.getInfrastructureConfigurableFields(nodeSourceName,
+                                                                                                                                       descriptor));
 
-        Collection<ConfigurableField> policyConfigurableFields = this.getPolicyConfigurableFields(nodeSourceName,
-                                                                                                  descriptor);
-        List<Serializable> policyParamsWithDynamicUpdated = this.getParametersWithDynamicUpdated(policyParams,
-                                                                                                 descriptor.getSerializablePolicyParameters(),
-                                                                                                 policyConfigurableFields);
+        List<Serializable> updatedPolicyParams = this.getParametersWithDynamicUpdated(policyParams,
+                                                                                      descriptor.getSerializablePolicyParameters(),
+                                                                                      this.getPolicyConfigurableFields(nodeSourceName,
+                                                                                                                       descriptor));
 
-        deployedNodeSource.updateDynamicParameters(infrastructureParamsWithDynamicUpdated,
-                                                   policyParamsWithDynamicUpdated);
+        deployedNodeSource.updateDynamicParameters(updatedInfrastructureParams, updatedPolicyParams);
 
         NodeSource definedNodeSource = this.retrieveDefinedNodeSourceOrFail(nodeSourceName);
 
-        NodeSourceDescriptor updatedDescriptor = definedNodeSource.updateDynamicParameters(infrastructureParamsWithDynamicUpdated,
-                                                                                           policyParamsWithDynamicUpdated);
+        NodeSourceDescriptor updatedDescriptor = definedNodeSource.updateDynamicParameters(updatedInfrastructureParams,
+                                                                                           updatedPolicyParams);
 
         NodeSourceData nodeSourceData = NodeSourceData.fromNodeSourceDescriptor(updatedDescriptor);
         this.dbManager.updateNodeSource(nodeSourceData);
 
-        this.emitNodeSourceEvent(definedNodeSource, RMEventType.NODESOURCE_DEFINED);
+        this.emitNodeSourceEvent(definedNodeSource, RMEventType.NODESOURCE_UPDATED);
+
+        // reconfiguration happens asynchronously
+        deployedNodeSource.reconfigure(updatedInfrastructureParams.toArray(), updatedPolicyParams.toArray());
 
         logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully updated with dynamic parameters");
 
@@ -1314,36 +1314,38 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         List<Serializable> parametersWithDynamicUpdated = new LinkedList<>();
         parametersWithDynamicUpdated.addAll(oldParameters);
 
-        int j;
+        int oldValueIndex;
         String newValue;
         String oldValue;
 
-        for (int i = 0; i < newParameters.length; i++) {
+        for (int newValueIndex = 0; newValueIndex < newParameters.length; newValueIndex++) {
 
-            j = 0;
+            oldValueIndex = 0;
 
             for (ConfigurableField configurableField : configurableFields) {
 
-                if (j == i) {
+                // we know if two parameters are comparable thanks to the
+                // order in which they appear in the parameter list
+                if (oldValueIndex == newValueIndex) {
 
                     if (configurableField.getMeta().credential() || configurableField.getMeta().fileBrowser() ||
                         configurableField.getMeta().password()) {
-                        newValue = new String((byte[]) newParameters[i]);
-                        oldValue = new String((byte[]) oldParameters.get(i));
+                        newValue = new String((byte[]) newParameters[newValueIndex]);
+                        oldValue = new String((byte[]) oldParameters.get(newValueIndex));
                     } else {
-                        newValue = (String) newParameters[i];
-                        oldValue = (String) oldParameters.get(i);
+                        newValue = (String) newParameters[newValueIndex];
+                        oldValue = (String) oldParameters.get(newValueIndex);
                     }
 
                     this.updateDynamicParameterIfNotEqual(newParameters,
                                                           parametersWithDynamicUpdated,
                                                           newValue,
                                                           oldValue,
-                                                          i,
+                                                          newValueIndex,
                                                           configurableField);
                 }
 
-                j++;
+                oldValueIndex++;
             }
         }
 
@@ -1351,13 +1353,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private void updateDynamicParameterIfNotEqual(Object[] newParameters,
-            List<Serializable> parametersWithDynamicUpdated, String newValue, String oldValue, int i,
+            List<Serializable> parametersWithDynamicUpdated, String newValue, String oldValue, int valueIndex,
             ConfigurableField configurableField) {
 
         if (!newValue.equals(oldValue)) {
 
             if (configurableField.getMeta().dynamic()) {
-                parametersWithDynamicUpdated.set(i, (Serializable) newParameters[i]);
+                parametersWithDynamicUpdated.set(valueIndex, (Serializable) newParameters[valueIndex]);
             } else {
                 throw new IllegalArgumentException("Attempt to update parameter " + configurableField.getName() +
                                                    " failed because this parameter is not dynamic");

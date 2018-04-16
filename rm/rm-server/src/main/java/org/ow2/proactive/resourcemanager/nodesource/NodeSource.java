@@ -557,12 +557,17 @@ public class NodeSource implements InitActive, RunActive {
         this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
     }
 
-    @ImmediateService
     public NodeSourceDescriptor updateDynamicParameters(List<Serializable> infrastructureParamsWithDynamicUpdated,
             List<Serializable> policyParamsWithDynamicUpdated) {
         this.descriptor.setInfrastructureParameters(infrastructureParamsWithDynamicUpdated);
         this.descriptor.setPolicyParameters(policyParamsWithDynamicUpdated);
+
         return this.descriptor;
+    }
+
+    public void reconfigure(Object[] updatedInfrastructureParams, Object[] updatedPolicyParams) {
+        // TODO reconfigure infrastructure manager
+        this.activePolicy.reconfigure(updatedPolicyParams);
     }
 
     /**

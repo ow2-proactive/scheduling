@@ -97,6 +97,23 @@ public abstract class NodeSourcePolicy implements Serializable {
     }
 
     /**
+     * Reconfigure a policy (potentially running) with the given parameters.
+     * By default, it reapplies the policy parameters regardless whether they
+     * are currently being used. Implementation classes should handle smarter
+     * update of the dynamic parameters if needed.
+     *
+     * @see Configurable#dynamic()
+     *
+     * @param policyParameters parameters potentially containing updated dynamic
+     *                         parameters
+     *
+     * @throws IllegalArgumentException if parameters are incorrect
+     */
+    public void reconfigure(Object... policyParameters) {
+        configure(policyParameters);
+    }
+
+    /**
      * Activates the policy.
      * @return true if the policy has been activated successfully, false otherwise.
      */
