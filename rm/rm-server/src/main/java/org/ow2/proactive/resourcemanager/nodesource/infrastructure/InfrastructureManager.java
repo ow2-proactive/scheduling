@@ -56,6 +56,7 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
@@ -530,6 +531,24 @@ public abstract class InfrastructureManager implements Serializable {
      *             if the parameters are invalid
      */
     protected abstract void configure(Object... parameters);
+
+    /**
+     * Reconfigure the infrastructure of a potentially already deployed node
+     * source with the given parameters. By default, this method overrides the
+     * infrastructure parameters regardless whether they are currently being
+     * used. Implementation classes should handle smarter update of the
+     * dynamic parameters if needed.
+     *
+     * @see Configurable#dynamic()
+     *
+     * @param updatedInfrastructureParams parameters potentially containing
+     *                                    updated dynamic parameters
+     *
+     * @throws IllegalArgumentException if parameters are incorrect
+     */
+    public void reconfigure(Object... updatedInfrastructureParams) {
+        this.configure(updatedInfrastructureParams);
+    }
 
     /**
      * Asynchronous node acquisition request. Proactive node should be
