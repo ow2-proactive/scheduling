@@ -57,7 +57,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true)
     private Credentials credentials;
 
-    @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")
+    @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine", dynamic = true)
     private int maxNodes = DEFAULT_NODE_NUMBER;
 
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
