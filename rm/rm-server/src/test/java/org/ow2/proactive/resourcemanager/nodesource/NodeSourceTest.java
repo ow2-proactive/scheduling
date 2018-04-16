@@ -34,7 +34,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.Serializable;
 import java.security.Permission;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -134,6 +137,35 @@ public class NodeSourceTest {
 
         assertThat(result).isFalse();
         assertThat(nodeSource.getDownNodes()).hasSize(0);
+    }
+
+    @Test
+    public void testNodeSourceReconfigurationModifiesDescritor() {
+
+        int parameter1 = 5;
+        String parameter2 = "hello";
+
+        List<Serializable> newInfratructureParameters = new LinkedList<>();
+        List<Serializable> newPolicyParameters = new LinkedList<>();
+
+        newInfratructureParameters.add(parameter1);
+        newInfratructureParameters.add(parameter2);
+
+        newPolicyParameters.add(parameter2);
+
+        nodeSource.updateDynamicParameters(newInfratructureParameters, newPolicyParameters);
+
+        List<Serializable> updatedInfrastructureParameters = nodeSource.getDescriptor()
+                                                                       .getSerializableInfrastructureParameters();
+        List<Serializable> updatedPolicyParameters = nodeSource.getDescriptor().getSerializablePolicyParameters();
+
+        assertThat(updatedInfrastructureParameters.size()).isEqualTo(2);
+        assertThat(updatedPolicyParameters.size()).isEqualTo(1);
+
+        assertThat(updatedInfrastructureParameters.get(0)).isEqualTo(parameter1);
+        assertThat(updatedInfrastructureParameters.get(1)).isEqualTo(parameter2);
+
+        assertThat(updatedPolicyParameters.get(0)).isEqualTo(parameter2);
     }
 
     private Node createNode(String nodeUrl) {

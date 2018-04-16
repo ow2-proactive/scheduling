@@ -48,6 +48,7 @@ import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 
@@ -57,6 +58,10 @@ import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
  * @since 06/02/17
  */
 public class InfrastructureManagerTest {
+
+    private static final int INITIAL_DYNAMIC_PARAMETER_VALUE = 2;
+
+    private static final int UPDATED_DYNAMIC_PARAMETER_VALUE = 5;
 
     private TestingInfrastructureManager infrastructureManager;
 
@@ -76,7 +81,7 @@ public class InfrastructureManagerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         infrastructureManager = new TestingInfrastructureManager();
-        infrastructureManager.internalConfigure();
+        infrastructureManager.internalConfigure(new Integer(INITIAL_DYNAMIC_PARAMETER_VALUE));
         infrastructureManager.setRmDbManager(dbManager);
         infrastructureManager.setNodeSource(nodeSource);
         when(nodeSource.getName()).thenReturn("NodeSource#1");
@@ -289,7 +294,17 @@ public class InfrastructureManagerTest {
         verify(nodeSource, times(0)).nodesRecoverable();
     }
 
+    @Test
+    public void testInfrastructureReconfiguredModifiesDynamicParamters() {
+        assertThat(infrastructureManager.dynamicNumberTest).isEqualTo(INITIAL_DYNAMIC_PARAMETER_VALUE);
+        infrastructureManager.reconfigure(UPDATED_DYNAMIC_PARAMETER_VALUE);
+        assertThat(infrastructureManager.dynamicNumberTest).isEqualTo(UPDATED_DYNAMIC_PARAMETER_VALUE);
+    }
+
     private static class TestingInfrastructureManager extends InfrastructureManager {
+
+        @Configurable(description = "dynamic field", dynamic = true)
+        private int dynamicNumberTest;
 
         @Override
         public String getDescription() {
@@ -298,7 +313,7 @@ public class InfrastructureManagerTest {
 
         @Override
         protected void configure(Object... parameters) {
-
+            this.dynamicNumberTest = (int) parameters[0];
         }
 
         @Override
