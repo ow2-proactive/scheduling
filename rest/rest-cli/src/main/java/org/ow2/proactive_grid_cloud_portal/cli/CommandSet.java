@@ -123,6 +123,8 @@ import com.google.common.collect.Ordering;
  */
 public class CommandSet {
 
+    private static final String NODE_SOURCE_ARGUMENT_NAME = "node-source";
+
     public static final CommandSet.Entry URL = CommandSetEntryBuilder.newInstance()
                                                                      .opt("u")
                                                                      .longOpt("url")
@@ -714,7 +716,7 @@ public class CommandSet {
                                                                                  .description("Update the dynamic parameters of a node source")
                                                                                  .hasArgs(true)
                                                                                  .numOfArgs(1)
-                                                                                 .argNames("node-source")
+                                                                                 .argNames(NODE_SOURCE_ARGUMENT_NAME)
                                                                                  .jsCommand("updatensparam(node-source)")
                                                                                  .commandClass(UpdateDynamicParametersCommand.class)
                                                                                  .entry();
@@ -841,7 +843,7 @@ public class CommandSet {
                                                                     .description("Specify node source name")
                                                                     .hasArgs(true)
                                                                     .numOfArgs(1)
-                                                                    .argNames("node-source")
+                                                                    .argNames(NODE_SOURCE_ARGUMENT_NAME)
                                                                     .commandClass(SetNodeSourceCommand.class)
                                                                     .entry();
 
@@ -851,7 +853,7 @@ public class CommandSet {
                                                                            .description("Remove specified node source")
                                                                            .hasArgs(true)
                                                                            .numOfArgs(1)
-                                                                           .argNames("node-source")
+                                                                           .argNames(NODE_SOURCE_ARGUMENT_NAME)
                                                                            .jsCommand("removens(node-source)")
                                                                            .commandClass(RemoveNodeSourceCommand.class)
                                                                            .entry();
