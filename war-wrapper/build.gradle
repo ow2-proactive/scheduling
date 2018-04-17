@@ -21,7 +21,7 @@ task copyConfigFiles(type: Copy) {
 }
 
 task copyDistFiles(type: Copy) {
-    from project(':').files('dist/boot', '*')
+    from project(':').files('dist/boot')
     into 'build/classes/main/dist/boot'
 }
 
