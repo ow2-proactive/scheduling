@@ -34,13 +34,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
+import org.ow2.proactive.utils.Lambda;
 
 
-public class NodeSourcePluginManager {
+public class NodeSourceDescriptorManager {
 
     public Collection<ConfigurableField> getPolicyConfigurableFields(String nodeSourceName,
             NodeSourceDescriptor descriptor) {
@@ -65,45 +67,33 @@ public class NodeSourcePluginManager {
     public List<Serializable> getParametersWithDynamicUpdated(Object[] newParameters, List<Serializable> oldParameters,
             Collection<ConfigurableField> configurableFields) {
 
-        List<Serializable> parametersWithDynamicUpdated = new LinkedList<>();
-        parametersWithDynamicUpdated.addAll(oldParameters);
+        List<Serializable> mergedParameters = new LinkedList<>();
+        mergedParameters.addAll(oldParameters);
 
-        int oldValueIndex;
+        Lambda.forEachWithIndex(configurableFields, (configurableField, index) -> {
+
+            Configurable meta = configurableField.getMeta();
+
+            String newValue = getStringValue(newParameters, index, meta);
+            String oldValue = getStringValue(oldParameters.toArray(), index, meta);
+
+            this.updateDynamicParameterIfNotEqual(mergedParameters, newValue, oldValue, index, configurableField);
+        });
+
+        return mergedParameters;
+    }
+
+    private String getStringValue(Object[] newParameters, int index, Configurable meta) {
+
         String newValue;
-        String oldValue;
 
-        for (int newValueIndex = 0; newValueIndex < newParameters.length; newValueIndex++) {
-
-            oldValueIndex = 0;
-
-            for (ConfigurableField configurableField : configurableFields) {
-
-                // we know if two parameters are comparable thanks to the
-                // order in which they appear in the parameter list
-                if (oldValueIndex == newValueIndex) {
-
-                    if (configurableField.getMeta().credential() || configurableField.getMeta().fileBrowser() ||
-                        configurableField.getMeta().password()) {
-                        newValue = new String((byte[]) newParameters[newValueIndex]);
-                        oldValue = new String((byte[]) oldParameters.get(newValueIndex));
-                    } else {
-                        newValue = (String) newParameters[newValueIndex];
-                        oldValue = (String) oldParameters.get(newValueIndex);
-                    }
-
-                    this.updateDynamicParameterIfNotEqual(newParameters,
-                                                          parametersWithDynamicUpdated,
-                                                          newValue,
-                                                          oldValue,
-                                                          newValueIndex,
-                                                          configurableField);
-                }
-
-                oldValueIndex++;
-            }
+        if (meta.credential() || meta.fileBrowser() || meta.password()) {
+            newValue = new String((byte[]) newParameters[index]);
+        } else {
+            newValue = (String) newParameters[index];
         }
 
-        return parametersWithDynamicUpdated;
+        return newValue;
     }
 
     public Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
@@ -130,14 +120,13 @@ public class NodeSourcePluginManager {
         return new PluginDescriptor(infrastructureClass, nodeSourceDescriptor.getInfrastructureParameters());
     }
 
-    private void updateDynamicParameterIfNotEqual(Object[] newParameters,
-            List<Serializable> parametersWithDynamicUpdated, String newValue, String oldValue, int valueIndex,
-            ConfigurableField configurableField) {
+    private void updateDynamicParameterIfNotEqual(List<Serializable> mergedParameters, String newValue, String oldValue,
+            int valueIndex, ConfigurableField configurableField) {
 
         if (!newValue.equals(oldValue)) {
 
             if (configurableField.getMeta().dynamic()) {
-                parametersWithDynamicUpdated.set(valueIndex, (Serializable) newParameters[valueIndex]);
+                mergedParameters.set(valueIndex, newValue);
             } else {
                 throw new IllegalArgumentException("Attempt to update parameter " + configurableField.getName() +
                                                    " failed because this parameter is not dynamic");

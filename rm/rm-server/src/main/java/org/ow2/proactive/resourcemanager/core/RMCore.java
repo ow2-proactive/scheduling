@@ -295,7 +295,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private NodesRecoveryManager nodesRecoveryManager;
 
-    private NodeSourcePluginManager nodeSourcePluginManager;
+    private NodeSourceDescriptorManager nodeSourceDescriptorManager;
 
     /**
      * A barrier to prevent the {@link RMCore#setNodesAvailable} immediate
@@ -442,7 +442,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             clientPinger.ping();
 
-            nodeSourcePluginManager = new NodeSourcePluginManager();
+            nodeSourceDescriptorManager = new NodeSourceDescriptorManager();
 
             initiateRecoveryIfRequired();
 
@@ -1265,14 +1265,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceDescriptor descriptor = deployedNodeSource.getDescriptor();
 
-        List<Serializable> updatedInfrastructureParams = this.nodeSourcePluginManager.getParametersWithDynamicUpdated(infraParams,
-                                                                                                                      descriptor.getSerializableInfrastructureParameters(),
-                                                                                                                      this.nodeSourcePluginManager.getInfrastructureConfigurableFields(nodeSourceName,
-                                                                                                                                                                                       descriptor));
-        List<Serializable> updatedPolicyParams = this.nodeSourcePluginManager.getParametersWithDynamicUpdated(policyParams,
-                                                                                                              descriptor.getSerializablePolicyParameters(),
-                                                                                                              this.nodeSourcePluginManager.getPolicyConfigurableFields(nodeSourceName,
-                                                                                                                                                                       descriptor));
+        List<Serializable> updatedInfrastructureParams = this.nodeSourceDescriptorManager.getParametersWithDynamicUpdated(infraParams,
+                                                                                                                          descriptor.getSerializableInfrastructureParameters(),
+                                                                                                                          this.nodeSourceDescriptorManager.getInfrastructureConfigurableFields(nodeSourceName,
+                                                                                                                                                                                               descriptor));
+        List<Serializable> updatedPolicyParams = this.nodeSourceDescriptorManager.getParametersWithDynamicUpdated(policyParams,
+                                                                                                                  descriptor.getSerializablePolicyParameters(),
+                                                                                                                  this.nodeSourceDescriptorManager.getPolicyConfigurableFields(nodeSourceName,
+                                                                                                                                                                               descriptor));
 
         deployedNodeSource.updateDynamicParameters(updatedInfrastructureParams, updatedPolicyParams);
         NodeSource definedNodeSource = this.retrieveDefinedNodeSourceOrFail(nodeSourceName);
@@ -2229,14 +2229,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
-        return this.nodeSourcePluginManager.getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
+        return this.nodeSourceDescriptorManager.getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
     }
 
     /**
      * {@inheritDoc}
      */
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
-        return this.nodeSourcePluginManager.getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
+        return this.nodeSourceDescriptorManager.getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
     }
 
     /**
@@ -2252,11 +2252,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceDescriptor nodeSourceDescriptor = nodeSource.getDescriptor();
 
-        PluginDescriptor infrastructurePluginDescriptor = this.nodeSourcePluginManager.getInfrastructurePluginDescriptor(nodeSourceName,
-                                                                                                                         nodeSourceDescriptor);
+        PluginDescriptor infrastructurePluginDescriptor = this.nodeSourceDescriptorManager.getInfrastructurePluginDescriptor(nodeSourceName,
+                                                                                                                             nodeSourceDescriptor);
 
-        PluginDescriptor policyPluginDescriptor = this.nodeSourcePluginManager.getPolicyPluginDescriptor(nodeSourceName,
-                                                                                                         nodeSourceDescriptor);
+        PluginDescriptor policyPluginDescriptor = this.nodeSourceDescriptorManager.getPolicyPluginDescriptor(nodeSourceName,
+                                                                                                             nodeSourceDescriptor);
 
         return new NodeSourceConfiguration(nodeSourceName,
                                            nodeSource.nodesRecoverable(),

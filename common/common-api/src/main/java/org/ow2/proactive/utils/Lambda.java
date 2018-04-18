@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.utils;
 
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
@@ -101,6 +102,27 @@ public class Lambda {
                 throw new RuntimeException(e);
             }
         };
+    }
+
+    public static <T> void forEachWithIndex(Iterable<T> iterable, IteratorWithIndex<T> iteratorWithIndex) {
+
+        Iterator<T> iterator = iterable.iterator();
+
+        int index = 0;
+
+        while (iterator.hasNext()) {
+            T nextT = iterator.next();
+            iteratorWithIndex.forEachWithIndex(nextT, index);
+            index++;
+        }
+    }
+
+    private static <T, U, V> boolean allHaveNext(Iterator<T> iteratorT, Iterator<U> iteratorU, Iterator<V> iteratorV) {
+        return iteratorT.hasNext() && iteratorU.hasNext() && iteratorV.hasNext();
+    }
+
+    public interface IteratorWithIndex<T> {
+        void forEachWithIndex(T itemT, int index);
     }
 
     @FunctionalInterface

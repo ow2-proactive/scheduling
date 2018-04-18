@@ -113,7 +113,6 @@ public abstract class NodeSourceCommand extends AbstractCommand implements Comma
     }
 
     protected enum HttpVerb {
-
         POST,
         PUT
     }
