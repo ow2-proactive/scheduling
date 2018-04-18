@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.task.executors.forked.env;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +90,15 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         // if they are running in a forked task or not
         jvmArguments.add(PASchedulerProperties.TASK_FORK.getCmdLine() + "true");
 
+        if (CentralPAPropertyRepository.PA_CONFIGURATION_FILE.isSet()) {
+            jvmArguments.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() +
+                             CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getValue());
+        }
+        if (CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
+            jvmArguments.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
+                             CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
+        }
+
         configureLogging(jvmArguments, variables);
 
         StringBuilder classpath = new StringBuilder("." + File.pathSeparatorChar);
@@ -139,7 +149,11 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                              "scriptengines.properties";
 
         if (new File(log4jConfig).exists()) {
-            log4jFileUrl = "file:" + log4jConfig;
+            try {
+                log4jFileUrl = "file:" + new File(log4jConfig).getCanonicalPath();
+            } catch (IOException e) {
+                logger.warn("Error when converting log4j path: " + log4jConfig, e);
+            }
         } else {
             URL log4jConfigFromJar = ForkedJvmTaskExecutionCommandCreator.class.getResource("/config/log/scriptengines.properties");
             if (log4jConfigFromJar != null) {

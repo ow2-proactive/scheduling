@@ -170,16 +170,19 @@ public class ProbablisticSelectionManager extends SelectionManager {
      */
     @Override
     public synchronized boolean isPassed(SelectionScript script, Map<String, Serializable> bindings, RMNode rmnode) {
-        String digest;
+        String digest = null;
         SelectionScript scriptWithReplacedBindings = replaceBindings(script, bindings);
+        if (logger.isTraceEnabled()) {
+            logger.trace(rmnode.getNodeURL() + " : script with replaced bindings : " +
+                         scriptWithReplacedBindings.getId());
+        }
         try {
             digest = new String(scriptWithReplacedBindings.digest());
             if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
                 Probability p = probabilities.get(digest).get(rmnode.getNodeURL());
                 String scriptType = scriptWithReplacedBindings.isDynamic() ? "dynamic" : "static";
                 if (logger.isDebugEnabled())
-                    logger.debug(rmnode.getNodeURL() + " : " + scriptWithReplacedBindings.hashCode() + " known " +
-                                 scriptType + " script");
+                    logger.debug(rmnode.getNodeURL() + " : " + digest.hashCode() + " known " + scriptType + " script");
                 return p.value() == 1;
             }
         } catch (NoSuchAlgorithmException e) {
@@ -187,7 +190,7 @@ public class ProbablisticSelectionManager extends SelectionManager {
         }
 
         if (logger.isDebugEnabled())
-            logger.debug(rmnode.getNodeURL() + " : " + scriptWithReplacedBindings.hashCode() + " unknown script");
+            logger.debug(rmnode.getNodeURL() + " : " + digest.hashCode() + " unknown script");
         return false;
     }
 

@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -163,12 +164,12 @@ public class RMProxyActiveObject {
      */
     @ImmediateService
     public void releaseNodes(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId, Credentials creds) {
+            Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store) {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes).booleanValue();
             } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript))
-                handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId, creds);
+                handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId, creds, store);
             else {
                 TaskLogger.getInstance().error(taskId,
                                                "Unauthorized clean script: " + System.getProperty("line.separator") +
@@ -189,7 +190,7 @@ public class RMProxyActiveObject {
      * @param creds credentials with CredData containing third party credentials
      */
     private void handleCleaningScript(NodeSet nodes, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId, Credentials creds) {
+            Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store) {
         TaskLogger instance = TaskLogger.getInstance();
 
         try {
@@ -214,6 +215,7 @@ public class RMProxyActiveObject {
             resolvedMap.setScopeMap(VariableSubstitutor.resolveVariables(variables.getScopeMap(), dictionary));
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) resolvedMap);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
+            handler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME, store);
 
             //retrieve scheduler URL to bind with schedulerapi, globalspaceapi, and userspaceapi
             String schedulerUrl = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
@@ -266,7 +268,7 @@ public class RMProxyActiveObject {
      * <p>
      * Check the nodes to release and release the one that have to (clean script has returned)
      * Take care when renaming this method, method name is linked to
-     * {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map, TaskId, Credentials)}
+     * {@link #handleCleaningScript(NodeSet, Script, VariablesMap, Map, TaskId, Credentials, Synchronization)}
      */
     @ImmediateService
     public synchronized void cleanCallBack(Future<ScriptResult<?>> future, NodeSet nodes) {

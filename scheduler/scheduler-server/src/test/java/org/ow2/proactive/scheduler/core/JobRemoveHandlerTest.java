@@ -44,6 +44,8 @@ import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.tests.ProActiveTestClean;
 
 
@@ -74,6 +76,9 @@ public class JobRemoveHandlerTest extends ProActiveTestClean {
     @Mock
     private JobInfoImpl jobInfo;
 
+    @Mock
+    private SynchronizationInternal synchronizationAPI;
+
     private JobId jobId;
 
     private String policyClassName = DefaultPolicy.class.getName();
@@ -91,7 +96,12 @@ public class JobRemoveHandlerTest extends ProActiveTestClean {
         Mockito.when(rmProxiesManager.getRmUrl()).thenReturn(null);
         Mockito.when(dbManager.loadJobWithTasksIfNotRemoved(jobId)).thenReturn(Collections.singletonList(job));
         Mockito.when(job.getJobInfo()).thenReturn(jobInfo);
-        service = new SchedulingService(infrastructure, listener, null, policyClassName, schedulingMethod);
+        service = new SchedulingService(infrastructure,
+                                        listener,
+                                        null,
+                                        policyClassName,
+                                        schedulingMethod,
+                                        synchronizationAPI);
         jobRemoveHandler = new JobRemoveHandler(service, jobId);
     }
 

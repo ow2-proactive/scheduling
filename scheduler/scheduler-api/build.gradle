@@ -42,6 +42,6 @@ task convertSchemas
 }
 
 task stub(type: StubTask) {
-    classes = ['org.ow2.proactive.scheduler.common.Scheduler']
+    classes = ['org.ow2.proactive.scheduler.common.Scheduler', 'org.ow2.proactive.scheduler.synchronization.SynchronizationInternal']
 }
 serialver.dependsOn stub

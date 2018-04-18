@@ -43,6 +43,8 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.DefaultPolicy;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -72,7 +74,8 @@ public class BaseServiceTest extends ProActiveTest {
                                         listener,
                                         null,
                                         DefaultPolicy.class.getName(),
-                                        Mockito.mock(SchedulingMethod.class));
+                                        Mockito.mock(SchedulingMethod.class),
+                                        Mockito.mock(SynchronizationInternal.class));
     }
 
     @After
