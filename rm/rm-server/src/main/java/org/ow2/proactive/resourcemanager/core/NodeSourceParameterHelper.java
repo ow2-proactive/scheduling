@@ -42,7 +42,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.utils.Lambda;
 
 
-public class NodeSourceDescriptorManager {
+public class NodeSourceParameterHelper {
 
     public Collection<ConfigurableField> getPolicyConfigurableFields(String nodeSourceName,
             NodeSourceDescriptor descriptor) {
