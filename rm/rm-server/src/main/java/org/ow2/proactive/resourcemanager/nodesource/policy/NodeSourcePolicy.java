@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.Pluggable;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
@@ -55,7 +56,7 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
  * </ul>
  */
 @ActiveObject
-public abstract class NodeSourcePolicy implements Serializable {
+public abstract class NodeSourcePolicy implements Pluggable, Serializable {
 
     /** logger */
     private static Logger logger = Logger.getLogger(NodeSourcePolicy.class);

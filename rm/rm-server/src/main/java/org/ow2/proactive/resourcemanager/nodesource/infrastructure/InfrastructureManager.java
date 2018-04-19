@@ -56,6 +56,7 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.Pluggable;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -85,7 +86,7 @@ import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
  * manager configuration file (config/rm/nodesource/infrastructures).
  *
  */
-public abstract class InfrastructureManager implements Serializable {
+public abstract class InfrastructureManager implements Pluggable, Serializable {
 
     /** class' logger */
     protected static final Logger logger = Logger.getLogger(InfrastructureManager.class);

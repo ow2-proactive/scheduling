@@ -26,46 +26,35 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
+import org.ow2.proactive.resourcemanager.nodesource.Pluggable;
+import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager;
-import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy;
 import org.ow2.proactive.utils.Lambda;
 
 
 public class NodeSourceParameterHelper {
 
-    public Collection<ConfigurableField> getPolicyConfigurableFields(String nodeSourceName,
-            NodeSourceDescriptor descriptor) {
+    public Collection<ConfigurableField> getConfigurableFieldsOfClass(String pluginClassName)
+            throws PluginNotFoundException {
 
-        Class<NodeSourcePolicy> nodeSourcePolicyClass = this.getNodeSourcePolicyClassOrFail(nodeSourceName, descriptor);
-        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(nodeSourcePolicyClass, new HashMap<>());
+        Class<Pluggable> pluginClass = this.getPluginClassOrFail(pluginClassName);
 
-        return policyPluginDescriptor.getConfigurableFields();
+        PluginDescriptor pluginDescriptor = new PluginDescriptor(pluginClass, new HashMap<>());
+
+        return pluginDescriptor.getConfigurableFields();
     }
 
-    public Collection<ConfigurableField> getInfrastructureConfigurableFields(String nodeSourceName,
-            NodeSourceDescriptor descriptor) {
-
-        Class<InfrastructureManager> infrastructureManagerClass = this.getInfrastructureManagerClassOrFail(nodeSourceName,
-                                                                                                           descriptor);
-        PluginDescriptor infrastructurePluginDescriptor = new PluginDescriptor(infrastructureManagerClass,
-                                                                               new HashMap<>());
-
-        return infrastructurePluginDescriptor.getConfigurableFields();
-    }
-
-    public List<Serializable> getParametersWithDynamicUpdated(Object[] newParameters, List<Serializable> oldParameters,
-            Collection<ConfigurableField> configurableFields) {
+    public List<Serializable> getParametersWithDynamicParametersUpdatedOnly(Object[] newParameters,
+            List<Serializable> oldParameters, Collection<ConfigurableField> configurableFields) {
 
         List<Serializable> mergedParameters = new LinkedList<>();
         mergedParameters.addAll(oldParameters);
@@ -97,25 +86,33 @@ public class NodeSourceParameterHelper {
     }
 
     public Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
-        Collection<PluginDescriptor> descriptors = new ArrayList<>(plugins.size());
-        for (Class<?> cls : plugins) {
-            Map<String, String> defaultValues = new HashMap<>();
-            descriptors.add(new PluginDescriptor(cls, defaultValues));
-        }
-        return descriptors;
+        return plugins.stream().map(cls -> new PluginDescriptor(cls, new HashMap<>())).collect(Collectors.toList());
     }
 
     public PluginDescriptor getPolicyPluginDescriptor(String nodeSourceName,
             NodeSourceDescriptor nodeSourceDescriptor) {
-        Class<NodeSourcePolicy> policyClass = this.getNodeSourcePolicyClassOrFail(nodeSourceName, nodeSourceDescriptor);
+
+        Class<Pluggable> policyClass;
+
+        try {
+            policyClass = this.getPluginClassOrFail(nodeSourceDescriptor.getPolicyType());
+        } catch (PluginNotFoundException e) {
+            throw new IllegalStateException(e.getMessageWithContext(nodeSourceName), e);
+        }
 
         return new PluginDescriptor(policyClass, nodeSourceDescriptor.getPolicyParameters());
     }
 
     public PluginDescriptor getInfrastructurePluginDescriptor(String nodeSourceName,
             NodeSourceDescriptor nodeSourceDescriptor) {
-        Class<InfrastructureManager> infrastructureClass = this.getInfrastructureManagerClassOrFail(nodeSourceName,
-                                                                                                    nodeSourceDescriptor);
+
+        Class<Pluggable> infrastructureClass;
+
+        try {
+            infrastructureClass = this.getPluginClassOrFail(nodeSourceDescriptor.getInfrastructureType());
+        } catch (PluginNotFoundException e) {
+            throw new IllegalStateException(e.getMessageWithContext(nodeSourceName), e);
+        }
 
         return new PluginDescriptor(infrastructureClass, nodeSourceDescriptor.getInfrastructureParameters());
     }
@@ -134,27 +131,17 @@ public class NodeSourceParameterHelper {
         }
     }
 
-    private Class<InfrastructureManager> getInfrastructureManagerClassOrFail(String nodeSourceName,
-            NodeSourceDescriptor nodeSourceDescriptor) {
-        Class<InfrastructureManager> infrastructureClass;
-        try {
-            infrastructureClass = (Class<InfrastructureManager>) Class.forName(nodeSourceDescriptor.getInfrastructureType());
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Infrastructure class of node source " + nodeSourceName + " cannot be read",
-                                            e);
-        }
-        return infrastructureClass;
-    }
+    private Class<Pluggable> getPluginClassOrFail(String pluginClassName) throws PluginNotFoundException {
 
-    private Class<NodeSourcePolicy> getNodeSourcePolicyClassOrFail(String nodeSourceName,
-            NodeSourceDescriptor nodeSourceDescriptor) {
-        Class<NodeSourcePolicy> policyClass;
+        Class<Pluggable> pluginClass;
+
         try {
-            policyClass = (Class<NodeSourcePolicy>) Class.forName(nodeSourceDescriptor.getPolicyType());
+            pluginClass = (Class<Pluggable>) Class.forName(pluginClassName);
         } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Policy class of node source " + nodeSourceName + " cannot be read", e);
+            throw new PluginNotFoundException(pluginClassName, e);
         }
-        return policyClass;
+
+        return pluginClass;
     }
 
 }
