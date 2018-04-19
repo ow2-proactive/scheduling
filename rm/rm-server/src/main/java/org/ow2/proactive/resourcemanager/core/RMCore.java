@@ -99,6 +99,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.nodesource.*;
+import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
@@ -292,6 +293,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private NodesRecoveryManager nodesRecoveryManager;
 
+    private NodeSourceParameterHelper nodeSourceParameterHelper;
+
     /**
      * A barrier to prevent the {@link RMCore#setNodesAvailable} immediate
      * service to run before the initActivity of the RM is finished.
@@ -436,6 +439,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             authentication.setActivated(true);
 
             clientPinger.ping();
+
+            nodeSourceParameterHelper = new NodeSourceParameterHelper();
 
             initiateRecoveryIfRequired();
 
@@ -1292,15 +1297,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private List<Serializable> getUpdatedParameters(String pluginClassName, List<Serializable> oldParameters,
             Object[] newParameters, String nodeSourceName) {
 
-        NodeSourceParameterHelper nodeSourceParameterHelper;
+        Collection<ConfigurableField> configurableFields;
 
         try {
-            nodeSourceParameterHelper = new NodeSourceParameterHelper(pluginClassName);
+            configurableFields = this.nodeSourceParameterHelper.getPluginConfigurableFields(pluginClassName);
         } catch (PluginNotFoundException e) {
             throw new IllegalArgumentException(e.getMessageWithContext(nodeSourceName), e);
         }
 
-        return nodeSourceParameterHelper.getParametersWithDynamicParametersUpdatedOnly(newParameters, oldParameters);
+        return this.nodeSourceParameterHelper.getParametersWithDynamicParametersUpdatedOnly(configurableFields,
+                                                                                            newParameters,
+                                                                                            oldParameters);
     }
 
     private void persistNodeSourceWithNewDescriptor(NodeSourceDescriptor updatedDescriptor) {
@@ -2266,14 +2273,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
-        return new NodeSourceParameterHelper().getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
+        return this.nodeSourceParameterHelper.getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
     }
 
     /**
      * {@inheritDoc}
      */
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
-        return new NodeSourceParameterHelper().getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
+        return this.nodeSourceParameterHelper.getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
     }
 
     /**
@@ -2286,12 +2293,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         NodeSourceDescriptor nodeSourceDescriptor = nodeSource.getDescriptor();
 
-        PluginDescriptor infrastructurePluginDescriptor = new NodeSourceParameterHelper().getPluginDescriptor(nodeSourceDescriptor.getInfrastructureType(),
-                                                                                                              nodeSourceDescriptor.getInfrastructureParameters(),
-                                                                                                              nodeSourceName);
-        PluginDescriptor policyPluginDescriptor = new NodeSourceParameterHelper().getPluginDescriptor(nodeSourceDescriptor.getPolicyType(),
-                                                                                                      nodeSourceDescriptor.getPolicyParameters(),
-                                                                                                      nodeSourceName);
+        PluginDescriptor infrastructurePluginDescriptor = this.nodeSourceParameterHelper.getPluginDescriptor(nodeSourceDescriptor.getInfrastructureType(),
+                                                                                                             nodeSourceDescriptor.getInfrastructureParameters(),
+                                                                                                             nodeSourceName);
+        PluginDescriptor policyPluginDescriptor = this.nodeSourceParameterHelper.getPluginDescriptor(nodeSourceDescriptor.getPolicyType(),
+                                                                                                     nodeSourceDescriptor.getPolicyParameters(),
+                                                                                                     nodeSourceName);
 
         return new NodeSourceConfiguration(nodeSourceName,
                                            nodeSource.nodesRecoverable(),

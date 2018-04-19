@@ -80,7 +80,9 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
 
         this.timer.cancel();
 
-        super.reconfigure(updatedPolicyParameters);
+        if (updatedPolicyParameters != null && updatedPolicyParameters.length > 2) {
+            this.checkNodeStateEach = Integer.parseInt(updatedPolicyParameters[2].toString());
+        }
 
         this.scheduleRestartTimer();
     }

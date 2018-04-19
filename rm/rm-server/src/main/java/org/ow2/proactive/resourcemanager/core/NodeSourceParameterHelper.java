@@ -26,14 +26,12 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.Plugin;
 import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
@@ -44,35 +42,23 @@ import org.ow2.proactive.utils.Lambda;
 
 public class NodeSourceParameterHelper {
 
-    private String pluginClassName;
+    public Collection<ConfigurableField> getPluginConfigurableFields(String pluginClassName)
+            throws PluginNotFoundException {
 
-    private Collection<ConfigurableField> configurableFields;
+        Class<Plugin> pluginClass = this.getPluginClassOrFail(pluginClassName);
+        PluginDescriptor policyPluginDescriptor = new PluginDescriptor(pluginClass, new HashMap<>());
 
-    public NodeSourceParameterHelper() {
-        this.pluginClassName = "";
-        this.configurableFields = new LinkedList<>();
+        return policyPluginDescriptor.getConfigurableFields();
     }
 
-    public NodeSourceParameterHelper(String pluginClassName) throws PluginNotFoundException {
-
-        this.pluginClassName = pluginClassName;
-
-        Class<Plugin> pluginClass = this.getPluginClassOrFail(this.pluginClassName);
-        PluginDescriptor pluginDescriptor = new PluginDescriptor(pluginClass, new HashMap<>());
-        this.configurableFields = pluginDescriptor.getConfigurableFields();
-    }
-
-    public Collection<ConfigurableField> getConfigurableFields() {
-        return this.configurableFields;
-    }
-
-    public List<Serializable> getParametersWithDynamicParametersUpdatedOnly(Object[] newParameters,
+    public List<Serializable> getParametersWithDynamicParametersUpdatedOnly(
+            Collection<ConfigurableField> configurableFields, Object[] newParameters,
             List<Serializable> oldParameters) {
 
         List<Serializable> mergedParameters = new LinkedList<>();
         mergedParameters.addAll(oldParameters);
 
-        Lambda.forEachWithIndex(this.configurableFields, (configurableField, index) -> {
+        Lambda.forEachWithIndex(configurableFields, (configurableField, index) -> {
 
             Configurable meta = configurableField.getMeta();
 
@@ -83,25 +69,6 @@ public class NodeSourceParameterHelper {
         });
 
         return mergedParameters;
-    }
-
-    public void setUpdatedDynamicParameters(Plugin plugin, Object[] parameters) {
-
-        Lambda.forEachWithIndex(this.configurableFields, (configurableField, index) -> {
-            if (configurableField.getMeta().dynamic()) {
-
-                String configurableFieldName = configurableField.getName();
-                try {
-                    Field field = plugin.getClass().getDeclaredField(configurableFieldName);
-                    field.setAccessible(true);
-                    field.set(plugin, parameters[index]);
-
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    throw new IllegalArgumentException("Cannot apply new value to updated parameter " +
-                                                       configurableFieldName);
-                }
-            }
-        });
     }
 
     private String getStringValue(Object[] newParameters, int index, Configurable meta) {
@@ -119,20 +86,6 @@ public class NodeSourceParameterHelper {
 
     public Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
         return plugins.stream().map(cls -> new PluginDescriptor(cls, new HashMap<>())).collect(Collectors.toList());
-    }
-
-    public PluginDescriptor getPolicyPluginDescriptor(String nodeSourceName,
-            NodeSourceDescriptor nodeSourceDescriptor) {
-
-        Class<Plugin> policyClass;
-
-        try {
-            policyClass = this.getPluginClassOrFail(nodeSourceDescriptor.getPolicyType());
-        } catch (PluginNotFoundException e) {
-            throw new IllegalStateException(e.getMessageWithContext(nodeSourceName), e);
-        }
-
-        return new PluginDescriptor(policyClass, nodeSourceDescriptor.getPolicyParameters());
     }
 
     public PluginDescriptor getPluginDescriptor(String pluginClassName, Object[] parameters, String nodeSourceName) {

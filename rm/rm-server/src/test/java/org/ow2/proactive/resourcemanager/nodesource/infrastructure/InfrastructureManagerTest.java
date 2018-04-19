@@ -313,9 +313,12 @@ public class InfrastructureManagerTest {
 
         @Override
         protected void configure(Object... parameters) {
-            if (parameters.length > 0) {
-                this.dynamicNumberTest = (int) parameters[0];
-            }
+            setDynamicNumberTest(parameters);
+        }
+
+        @Override
+        public void reconfigure(Object... parameters) {
+            setDynamicNumberTest(parameters);
         }
 
         @Override
@@ -346,6 +349,12 @@ public class InfrastructureManagerTest {
         @Override
         public void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
 
+        }
+
+        private void setDynamicNumberTest(Object[] parameters) {
+            if (parameters.length > 0) {
+                this.dynamicNumberTest = (int) parameters[0];
+            }
         }
 
     }

@@ -537,10 +537,8 @@ public abstract class InfrastructureManager implements Plugin {
 
     /**
      * Reconfigure the infrastructure of a potentially already deployed node
-     * source with the given parameters. By default, this method overrides the
-     * infrastructure parameters regardless of their current usage.
-     * Implementation classes should handle smarter update of the dynamic
-     * parameters if needed.
+     * source with the given parameters.
+     * Implementations are free to handle override of parameters as they wish.
      *
      * @see Configurable#dynamic()
      *
@@ -551,15 +549,6 @@ public abstract class InfrastructureManager implements Plugin {
      */
     public void reconfigure(Object... updatedInfrastructureParameters) {
 
-        NodeSourceParameterHelper nodeSourceParameterHelper;
-
-        try {
-            nodeSourceParameterHelper = new NodeSourceParameterHelper(this.getClass().getName());
-        } catch (PluginNotFoundException e) {
-            throw new IllegalStateException(e.getMessageWithContext(this.nodeSource.getName()), e);
-        }
-
-        nodeSourceParameterHelper.setUpdatedDynamicParameters(this, updatedInfrastructureParameters);
     }
 
     /**

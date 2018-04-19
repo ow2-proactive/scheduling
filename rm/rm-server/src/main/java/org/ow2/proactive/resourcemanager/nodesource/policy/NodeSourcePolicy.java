@@ -99,10 +99,8 @@ public abstract class NodeSourcePolicy implements Plugin {
     }
 
     /**
-     * Reconfigure a policy (potentially running) with the given parameters. By
-     * default, this method overrides the infrastructure parameters regardless
-     * of their current usage. Implementation classes should handle smarter
-     * update of the dynamic parameters if needed.
+     * Reconfigure a policy (potentially running) with the given parameters.
+     * Implementations are free to handle override of parameters as they wish.
      *
      * @see Configurable#dynamic()
      *
@@ -113,15 +111,6 @@ public abstract class NodeSourcePolicy implements Plugin {
      */
     public void reconfigure(Object... updatedPolicyParameters) {
 
-        NodeSourceParameterHelper nodeSourceParameterHelper;
-
-        try {
-            nodeSourceParameterHelper = new NodeSourceParameterHelper(this.getClass().getName());
-        } catch (PluginNotFoundException e) {
-            throw new IllegalStateException(e.getMessageWithContext(this.nodeSource.getName()), e);
-        }
-
-        nodeSourceParameterHelper.setUpdatedDynamicParameters(this, updatedPolicyParameters);
     }
 
     /**
