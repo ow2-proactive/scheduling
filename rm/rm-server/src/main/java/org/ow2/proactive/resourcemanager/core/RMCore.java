@@ -1335,7 +1335,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         deployedNodeSource.updateDynamicParameters(updatedInfrastructureParams, updatedPolicyParams);
         NodeSource definedNodeSource = retrieveDefinedNodeSourceOrFail(nodeSourceName);
 
-        return definedNodeSource.updateDynamicParameters(updatedInfrastructureParams,updatedPolicyParams);
+        return definedNodeSource.updateDynamicParameters(updatedInfrastructureParams, updatedPolicyParams);
     }
 
     private void checkWhetherNodeSourceIsEditableOrFail(String nodeSourceName) {

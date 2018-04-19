@@ -98,9 +98,9 @@ public abstract class NodeSourcePolicy implements Pluggable, Serializable {
     }
 
     /**
-     * Reconfigure a policy (potentially running) with the given parameters.
-     * By default, it reapplies the policy parameters regardless whether they
-     * are currently being used. Implementation classes should handle smarter
+     * Reconfigure a policy (potentially running) with the given parameters. By
+     * default, this method overrides the infrastructure parameters regardless
+     * of their current usage. Implementation classes should handle smarter
      * update of the dynamic parameters if needed.
      *
      * @see Configurable#dynamic()

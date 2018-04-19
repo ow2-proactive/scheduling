@@ -140,7 +140,7 @@ public class NodeSourceTest {
     }
 
     @Test
-    public void testNodeSourceReconfigurationModifiesDescritor() {
+    public void testNodeSourceReconfigurationModifiesDescriptor() {
 
         int parameter1 = 5;
         String parameter2 = "hello";

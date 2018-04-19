@@ -25,8 +25,11 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
@@ -107,36 +110,29 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
 
     private void checkDownNodesAndReacquireNodesIfNeeded() {
 
-        int numberOfNodesToDeploy = 0;
+        long numberOfNodesToDeploy = this.nodeSource.getDownNodes()
+                                                    .stream()
+                                                    .map(node -> node.getNodeInformation().getURL())
+                                                    .peek(nodeUrl -> logger.info("Removing down node " + nodeUrl))
+                                                    .map(nodeUrl -> this.nodeSource.getRMCore().removeNode(nodeUrl,
+                                                                                                           true))
+                                                    .filter(BooleanWrapper::getBooleanValue)
+                                                    .peek(x -> logger.info("Down node removed"))
+                                                    .count();
 
-        for (Node downNode : this.nodeSource.getDownNodes()) {
-            String nodeUrl = downNode.getNodeInformation().getURL();
-
-            logger.info("Removing down node " + nodeUrl);
-            BooleanWrapper removed = this.nodeSource.getRMCore().removeNode(nodeUrl, true);
-            if (removed.getBooleanValue()) {
-                logger.info("Down node removed " + nodeUrl);
-                numberOfNodesToDeploy++;
-            }
-        }
-
-        for (RMDeployingNode lostNode : this.nodeSource.getDeployingAndLostNodes()) {
-            if (!lostNode.isLost()) {
-                continue;
-            }
-            String nodeUrl = lostNode.getNodeURL();
-
-            logger.info("Removing lost node " + nodeUrl);
-            BooleanWrapper removed = this.nodeSource.getRMCore().removeNode(nodeUrl, true);
-            if (removed.getBooleanValue()) {
-                logger.info("Lost node removed " + nodeUrl);
-                numberOfNodesToDeploy++;
-            }
-        }
+        numberOfNodesToDeploy += this.nodeSource.getDeployingAndLostNodes()
+                                                .stream()
+                                                .filter(RMDeployingNode::isLost)
+                                                .map(RMDeployingNode::getNodeURL)
+                                                .peek(nodeUrl -> logger.info("Removing lost node " + nodeUrl))
+                                                .map(nodeUrl -> this.nodeSource.getRMCore().removeNode(nodeUrl, true))
+                                                .filter(BooleanWrapper::getBooleanValue)
+                                                .peek(x -> logger.info("Lost node removed"))
+                                                .count();
 
         if (numberOfNodesToDeploy > 0) {
             logger.info("Acquiring " + numberOfNodesToDeploy + " nodes");
-            acquireNodes(numberOfNodesToDeploy);
+            acquireNodes((int) numberOfNodesToDeploy);
         }
     }
 
