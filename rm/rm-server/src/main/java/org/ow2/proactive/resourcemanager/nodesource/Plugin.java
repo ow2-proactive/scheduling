@@ -27,13 +27,14 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
 
+import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+
 
 /**
  * Common interface to the classes that can be plugged in as an infrastructure
- * or policy of a node source.
- *
- * @see org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager
- * @see org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy
+ * or policy of a node source. Parsing of the {@link Configurable} fields of a
+ * Plugin class is the same whether the concrete class is an infrastructure or
+ * a policy.
  */
 public interface Plugin extends Serializable {
 

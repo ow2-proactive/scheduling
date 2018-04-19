@@ -59,28 +59,23 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
      */
     @Override
     public BooleanWrapper configure(Object... policyParameters) {
-
         BooleanWrapper parentConfigured = super.configure(policyParameters);
-
-        if (policyParameters != null && policyParameters.length > 2) {
-            this.checkNodeStateEach = Integer.parseInt(policyParameters[2].toString());
-        }
-
+        setCheckNodeStateEach(policyParameters);
         this.timer = new Timer(TIMER_NAME);
-
         return parentConfigured;
     }
 
     @Override
     public void reconfigure(Object... updatedPolicyParameters) {
-
         this.timer.cancel();
-
-        if (updatedPolicyParameters != null && updatedPolicyParameters.length > 2) {
-            this.checkNodeStateEach = Integer.parseInt(updatedPolicyParameters[2].toString());
-        }
-
+        setCheckNodeStateEach(updatedPolicyParameters);
         this.scheduleRestartTimer();
+    }
+
+    private void setCheckNodeStateEach(Object[] policyParameters) {
+        if (policyParameters != null && policyParameters.length > 2) {
+            this.checkNodeStateEach = Integer.parseInt(policyParameters[2].toString());
+        }
     }
 
     /**

@@ -27,7 +27,12 @@ package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
 import java.security.Permission;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
