@@ -25,14 +25,10 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;

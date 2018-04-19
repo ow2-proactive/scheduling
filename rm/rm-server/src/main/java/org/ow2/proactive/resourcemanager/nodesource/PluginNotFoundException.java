@@ -31,7 +31,7 @@ package org.ow2.proactive.resourcemanager.nodesource;
  */
 public class PluginNotFoundException extends Exception {
 
-    private String notFoundPluginClassName;
+    private final String notFoundPluginClassName;
 
     public PluginNotFoundException(String notFoundPluginClassName, Exception e) {
         super(e);

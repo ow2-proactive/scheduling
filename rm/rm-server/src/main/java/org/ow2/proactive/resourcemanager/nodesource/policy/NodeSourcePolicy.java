@@ -33,10 +33,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.core.NodeSourceParameterHelper;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.Plugin;
-import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
