@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,8 +33,10 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.core.NodeSourceParameterHelper;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.Pluggable;
+import org.ow2.proactive.resourcemanager.nodesource.Plugin;
+import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
@@ -56,7 +57,7 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
  * </ul>
  */
 @ActiveObject
-public abstract class NodeSourcePolicy implements Pluggable, Serializable {
+public abstract class NodeSourcePolicy implements Plugin {
 
     /** logger */
     private static Logger logger = Logger.getLogger(NodeSourcePolicy.class);
@@ -105,13 +106,22 @@ public abstract class NodeSourcePolicy implements Pluggable, Serializable {
      *
      * @see Configurable#dynamic()
      *
-     * @param policyParameters parameters potentially containing updated dynamic
+     * @param updatedPolicyParameters parameters potentially containing updated dynamic
      *                         parameters
      *
      * @throws IllegalArgumentException if parameters are incorrect
      */
-    public void reconfigure(Object... policyParameters) {
-        configure(policyParameters);
+    public void reconfigure(Object... updatedPolicyParameters) {
+
+        NodeSourceParameterHelper nodeSourceParameterHelper;
+
+        try {
+            nodeSourceParameterHelper = new NodeSourceParameterHelper(this.getClass().getName());
+        } catch (PluginNotFoundException e) {
+            throw new IllegalStateException(e.getMessageWithContext(this.nodeSource.getName()), e);
+        }
+
+        nodeSourceParameterHelper.setUpdatedDynamicParameters(this, updatedPolicyParameters);
     }
 
     /**

@@ -51,12 +51,14 @@ import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.core.NodeSourceParameterHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.Pluggable;
+import org.ow2.proactive.resourcemanager.nodesource.Plugin;
+import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -86,7 +88,7 @@ import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
  * manager configuration file (config/rm/nodesource/infrastructures).
  *
  */
-public abstract class InfrastructureManager implements Pluggable, Serializable {
+public abstract class InfrastructureManager implements Plugin {
 
     /** class' logger */
     protected static final Logger logger = Logger.getLogger(InfrastructureManager.class);
@@ -542,13 +544,22 @@ public abstract class InfrastructureManager implements Pluggable, Serializable {
      *
      * @see Configurable#dynamic()
      *
-     * @param updatedInfrastructureParams parameters potentially containing
+     * @param updatedInfrastructureParameters parameters potentially containing
      *                                    updated dynamic parameters
      *
      * @throws IllegalArgumentException if parameters are incorrect
      */
-    public void reconfigure(Object... updatedInfrastructureParams) {
-        this.configure(updatedInfrastructureParams);
+    public void reconfigure(Object... updatedInfrastructureParameters) {
+
+        NodeSourceParameterHelper nodeSourceParameterHelper;
+
+        try {
+            nodeSourceParameterHelper = new NodeSourceParameterHelper(this.getClass().getName());
+        } catch (PluginNotFoundException e) {
+            throw new IllegalStateException(e.getMessageWithContext(this.nodeSource.getName()), e);
+        }
+
+        nodeSourceParameterHelper.setUpdatedDynamicParameters(this, updatedInfrastructureParameters);
     }
 
     /**

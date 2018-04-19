@@ -117,10 +117,6 @@ public class Lambda {
         }
     }
 
-    private static <T, U, V> boolean allHaveNext(Iterator<T> iteratorT, Iterator<U> iteratorU, Iterator<V> iteratorV) {
-        return iteratorT.hasNext() && iteratorU.hasNext() && iteratorV.hasNext();
-    }
-
     public interface IteratorWithIndex<T> {
         void forEachWithIndex(T itemT, int index);
     }

@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import java.io.Serializable;
+
+
 /**
  * Common interface to the classes that can be plugged in as an infrastructure
  * or policy of a node source.
@@ -32,6 +35,6 @@ package org.ow2.proactive.resourcemanager.nodesource;
  * @see org.ow2.proactive.resourcemanager.nodesource.infrastructure.InfrastructureManager
  * @see org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicy
  */
-public interface Pluggable {
+public interface Plugin extends Serializable {
 
 }

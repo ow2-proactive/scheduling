@@ -99,7 +99,6 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.nodesource.*;
-import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
@@ -293,8 +292,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private NodesRecoveryManager nodesRecoveryManager;
 
-    private NodeSourceParameterHelper nodeSourceParameterHelper;
-
     /**
      * A barrier to prevent the {@link RMCore#setNodesAvailable} immediate
      * service to run before the initActivity of the RM is finished.
@@ -439,8 +436,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             authentication.setActivated(true);
 
             clientPinger.ping();
-
-            nodeSourceParameterHelper = new NodeSourceParameterHelper();
 
             initiateRecoveryIfRequired();
 
@@ -1254,7 +1249,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         logger.info("Update dynamic parameters of node source " + nodeSourceName + REQUESTED_BY_STRING +
                     this.caller.getName());
 
-        NodeSource deployedNodeSource = retrieveDeployedNodeSourceOrFail(nodeSourceName);
+        NodeSource deployedNodeSource = getDeployedNodeSourceOrFail(nodeSourceName);
 
         NodeSourceDescriptor oldDescriptor = deployedNodeSource.getDescriptor();
         NodeSourceDescriptor newDescriptor = getUpdatedNodeSourceDescriptor(nodeSourceName,
@@ -1275,11 +1270,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(true);
     }
 
-    private NodeSourceDescriptor getUpdatedNodeSourceDescriptor(String nodeSourceName, Object[] infraParams,
-            Object[] policyParams, NodeSource deployedNodeSource, NodeSourceDescriptor descriptor) {
+    private NodeSourceDescriptor getUpdatedNodeSourceDescriptor(String nodeSourceName,
+            Object[] newInfrastructureParameters, Object[] newPolicyParameters, NodeSource deployedNodeSource,
+            NodeSourceDescriptor descriptor) {
 
-        List<Serializable> updatedInfrastructureParams = getUpdatedInfrastructureParameters(infraParams, descriptor);
-        List<Serializable> updatedPolicyParams = getUpdatedPolicyParameters(policyParams, descriptor);
+        List<Serializable> updatedInfrastructureParams = getUpdatedParameters(descriptor.getInfrastructureType(),
+                                                                              descriptor.getSerializableInfrastructureParameters(),
+                                                                              newInfrastructureParameters,
+                                                                              nodeSourceName);
+        List<Serializable> updatedPolicyParams = getUpdatedParameters(descriptor.getPolicyType(),
+                                                                      descriptor.getSerializablePolicyParameters(),
+                                                                      newPolicyParameters,
+                                                                      nodeSourceName);
 
         return updateNodeSourceDescriptor(nodeSourceName,
                                           deployedNodeSource,
@@ -1287,39 +1289,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                           updatedPolicyParams);
     }
 
-    private List<Serializable> getUpdatedInfrastructureParameters(Object[] newParameters,
-            NodeSourceDescriptor descriptor) {
+    private List<Serializable> getUpdatedParameters(String pluginClassName, List<Serializable> oldParameters,
+            Object[] newParameters, String nodeSourceName) {
 
-        Collection<ConfigurableField> configurableFields;
-
-        try {
-            configurableFields = this.nodeSourceParameterHelper.getConfigurableFieldsOfClass(descriptor.getInfrastructureType());
-        } catch (PluginNotFoundException e) {
-            throw new IllegalStateException(e.getMessageWithContext(descriptor.getName()), e);
-        }
-
-        List<Serializable> oldParameters = descriptor.getSerializableInfrastructureParameters();
-
-        return this.nodeSourceParameterHelper.getParametersWithDynamicParametersUpdatedOnly(newParameters,
-                                                                                            oldParameters,
-                                                                                            configurableFields);
-    }
-
-    private List<Serializable> getUpdatedPolicyParameters(Object[] newParameters, NodeSourceDescriptor descriptor) {
-
-        Collection<ConfigurableField> configurableFields;
+        NodeSourceParameterHelper nodeSourceParameterHelper;
 
         try {
-            configurableFields = this.nodeSourceParameterHelper.getConfigurableFieldsOfClass(descriptor.getPolicyType());
+            nodeSourceParameterHelper = new NodeSourceParameterHelper(pluginClassName);
         } catch (PluginNotFoundException e) {
-            throw new IllegalStateException(e.getMessageWithContext(descriptor.getName()), e);
+            throw new IllegalArgumentException(e.getMessageWithContext(nodeSourceName), e);
         }
 
-        List<Serializable> oldParameters = descriptor.getSerializablePolicyParameters();
-
-        return this.nodeSourceParameterHelper.getParametersWithDynamicParametersUpdatedOnly(newParameters,
-                                                                                            oldParameters,
-                                                                                            configurableFields);
+        return nodeSourceParameterHelper.getParametersWithDynamicParametersUpdatedOnly(newParameters, oldParameters);
     }
 
     private void persistNodeSourceWithNewDescriptor(NodeSourceDescriptor updatedDescriptor) {
@@ -1333,7 +1314,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             List<Serializable> updatedInfrastructureParams, List<Serializable> updatedPolicyParams) {
 
         deployedNodeSource.updateDynamicParameters(updatedInfrastructureParams, updatedPolicyParams);
-        NodeSource definedNodeSource = retrieveDefinedNodeSourceOrFail(nodeSourceName);
+        NodeSource definedNodeSource = getDefinedNodeSourceOrFail(nodeSourceName);
 
         return definedNodeSource.updateDynamicParameters(updatedInfrastructureParams, updatedPolicyParams);
     }
@@ -1440,7 +1421,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         if (!this.deployedNodeSources.containsKey(nodeSourceName)) {
 
-            NodeSourceDescriptor nodeSourceDescriptor = this.retrieveDefinedNodeSourceDescriptorOrFail(nodeSourceName);
+            NodeSourceDescriptor nodeSourceDescriptor = this.getDefinedNodeSourceDescriptorOrFail(nodeSourceName);
 
             this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
 
@@ -1525,31 +1506,30 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         persistNodeSourceWithNewDescriptor(descriptor);
     }
 
-    private NodeSourceDescriptor retrieveDefinedNodeSourceDescriptorOrFail(String nodeSourceName) {
+    private NodeSourceDescriptor getDefinedNodeSourceDescriptorOrFail(String nodeSourceName) {
 
-        NodeSource nodeSource = this.retrieveDefinedNodeSourceOrFail(nodeSourceName);
+        NodeSource nodeSource = this.getDefinedNodeSourceOrFail(nodeSourceName);
 
         return nodeSource.getDescriptor();
     }
 
-    private NodeSource retrieveDefinedNodeSourceOrFail(String nodeSourceName) {
+    private NodeSource getDefinedNodeSourceOrFail(String nodeSourceName) {
 
         NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
 
         if (nodeSource == null) {
-            throw new IllegalStateException(NODE_SOURCE_STRING + nodeSourceName + " is unknown");
+            throw new IllegalStateException(NODE_SOURCE_STRING + nodeSourceName + " is not defined");
         }
 
         return nodeSource;
     }
 
-    private NodeSource retrieveDeployedNodeSourceOrFail(String nodeSourceName) {
+    private NodeSource getDeployedNodeSourceOrFail(String nodeSourceName) {
 
         NodeSource deployedNodeSource = this.deployedNodeSources.get(nodeSourceName);
 
         if (deployedNodeSource == null) {
-            throw new IllegalArgumentException("Cannot update dynamic parameters of node source " + nodeSourceName +
-                                               " because it is not deployed");
+            throw new IllegalArgumentException(NODE_SOURCE_STRING + nodeSourceName + " is not deployed");
         }
 
         return deployedNodeSource;
@@ -2286,14 +2266,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures() {
-        return this.nodeSourceParameterHelper.getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
+        return new NodeSourceParameterHelper().getPluginsDescriptor(InfrastructureManagerFactory.getSupportedInfrastructures());
     }
 
     /**
      * {@inheritDoc}
      */
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies() {
-        return this.nodeSourceParameterHelper.getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
+        return new NodeSourceParameterHelper().getPluginsDescriptor(NodeSourcePolicyFactory.getSupportedPolicies());
     }
 
     /**
@@ -2301,19 +2281,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Override
     public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName) {
-        NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);
-        if (nodeSource == null) {
-            throw new IllegalArgumentException("Cannot find the configuration of unknown node source " +
-                                               nodeSourceName);
-        }
+
+        NodeSource nodeSource = getDefinedNodeSourceOrFail(nodeSourceName);
 
         NodeSourceDescriptor nodeSourceDescriptor = nodeSource.getDescriptor();
 
-        PluginDescriptor infrastructurePluginDescriptor = this.nodeSourceParameterHelper.getInfrastructurePluginDescriptor(nodeSourceName,
-                                                                                                                           nodeSourceDescriptor);
-
-        PluginDescriptor policyPluginDescriptor = this.nodeSourceParameterHelper.getPolicyPluginDescriptor(nodeSourceName,
-                                                                                                           nodeSourceDescriptor);
+        PluginDescriptor infrastructurePluginDescriptor = new NodeSourceParameterHelper().getPluginDescriptor(nodeSourceDescriptor.getInfrastructureType(),
+                                                                                                              nodeSourceDescriptor.getInfrastructureParameters(),
+                                                                                                              nodeSourceName);
+        PluginDescriptor policyPluginDescriptor = new NodeSourceParameterHelper().getPluginDescriptor(nodeSourceDescriptor.getPolicyType(),
+                                                                                                      nodeSourceDescriptor.getPolicyParameters(),
+                                                                                                      nodeSourceName);
 
         return new NodeSourceConfiguration(nodeSourceName,
                                            nodeSource.nodesRecoverable(),

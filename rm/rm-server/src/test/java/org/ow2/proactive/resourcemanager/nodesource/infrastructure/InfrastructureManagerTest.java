@@ -301,14 +301,14 @@ public class InfrastructureManagerTest {
         assertThat(infrastructureManager.dynamicNumberTest).isEqualTo(UPDATED_DYNAMIC_PARAMETER_VALUE);
     }
 
-    private static class TestingInfrastructureManager extends InfrastructureManager {
+    public static class TestingInfrastructureManager extends InfrastructureManager {
 
         @Configurable(description = "dynamic field", dynamic = true)
         private int dynamicNumberTest;
 
         @Override
         public String getDescription() {
-            return null;
+            return "test infrastructure";
         }
 
         @Override
