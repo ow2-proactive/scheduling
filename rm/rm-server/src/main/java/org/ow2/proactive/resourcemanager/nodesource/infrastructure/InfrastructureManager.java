@@ -56,7 +56,7 @@ import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
-import org.ow2.proactive.resourcemanager.nodesource.Plugin;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourcePlugin;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
@@ -86,7 +86,7 @@ import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
  * manager configuration file (config/rm/nodesource/infrastructures).
  *
  */
-public abstract class InfrastructureManager implements Plugin {
+public abstract class InfrastructureManager implements NodeSourcePlugin {
 
     /** class' logger */
     protected static final Logger logger = Logger.getLogger(InfrastructureManager.class);
@@ -546,7 +546,7 @@ public abstract class InfrastructureManager implements Plugin {
      * @throws IllegalArgumentException if parameters are incorrect
      */
     public void reconfigure(Object... updatedInfrastructureParameters) {
-
+        // by default, reconfiguration does not overwrite any parameter
     }
 
     /**

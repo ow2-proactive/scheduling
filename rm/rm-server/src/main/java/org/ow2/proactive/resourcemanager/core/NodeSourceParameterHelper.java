@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.ow2.proactive.resourcemanager.nodesource.Plugin;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourcePlugin;
 import org.ow2.proactive.resourcemanager.nodesource.PluginNotFoundException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
@@ -45,7 +45,7 @@ public class NodeSourceParameterHelper {
     public Collection<ConfigurableField> getPluginConfigurableFields(String pluginClassName)
             throws PluginNotFoundException {
 
-        Class<Plugin> pluginClass = this.getPluginClassOrFail(pluginClassName);
+        Class<NodeSourcePlugin> pluginClass = this.getPluginClassOrFail(pluginClassName);
         PluginDescriptor policyPluginDescriptor = new PluginDescriptor(pluginClass, new HashMap<>());
 
         return policyPluginDescriptor.getConfigurableFields();
@@ -90,7 +90,7 @@ public class NodeSourceParameterHelper {
 
     public PluginDescriptor getPluginDescriptor(String pluginClassName, Object[] parameters, String nodeSourceName) {
 
-        Class<Plugin> pluginClass;
+        Class<NodeSourcePlugin> pluginClass;
 
         try {
             pluginClass = this.getPluginClassOrFail(pluginClassName);
@@ -115,12 +115,12 @@ public class NodeSourceParameterHelper {
         }
     }
 
-    private Class<Plugin> getPluginClassOrFail(String pluginClassName) throws PluginNotFoundException {
+    private Class<NodeSourcePlugin> getPluginClassOrFail(String pluginClassName) throws PluginNotFoundException {
 
-        Class<Plugin> pluginClass;
+        Class<NodeSourcePlugin> pluginClass;
 
         try {
-            pluginClass = (Class<Plugin>) Class.forName(pluginClassName);
+            pluginClass = (Class<NodeSourcePlugin>) Class.forName(pluginClassName);
         } catch (ClassNotFoundException e) {
             throw new PluginNotFoundException(pluginClassName, e);
         }

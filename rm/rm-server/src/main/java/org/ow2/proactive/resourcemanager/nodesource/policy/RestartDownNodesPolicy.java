@@ -61,12 +61,13 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
     public BooleanWrapper configure(Object... policyParameters) {
         BooleanWrapper parentConfigured = super.configure(policyParameters);
         setCheckNodeStateEach(policyParameters);
-        this.timer = new Timer(TIMER_NAME);
         return parentConfigured;
     }
 
     @Override
     public void reconfigure(Object... updatedPolicyParameters) {
+        super.reconfigure(updatedPolicyParameters);
+
         this.timer.cancel();
         setCheckNodeStateEach(updatedPolicyParameters);
         this.scheduleRestartTimer();
@@ -91,6 +92,8 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
     }
 
     private void scheduleRestartTimer() {
+
+        this.timer = new Timer(TIMER_NAME);
 
         this.timer.schedule(new TimerTask() {
 

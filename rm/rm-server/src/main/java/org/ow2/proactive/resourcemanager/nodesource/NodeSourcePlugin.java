@@ -36,6 +36,6 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  * Plugin class is the same whether the concrete class is an infrastructure or
  * a policy.
  */
-public interface Plugin extends Serializable {
+public interface NodeSourcePlugin extends Serializable {
 
 }
