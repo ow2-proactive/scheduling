@@ -63,4 +63,10 @@ public @interface Configurable {
      * A file will be loaded and converted to a byte array.
      */
     boolean fileBrowser() default false;
+
+    /**
+     * Dynamic fields can be edited while the node source is deployed.
+     */
+    boolean dynamic() default false;
+
 }

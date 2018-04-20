@@ -133,6 +133,14 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     /**
+     * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#updateDynamicParameters(String, String, Object[], String, Object[])
+     */
+    @Override
+    public BooleanWrapper updateDynamicParameters(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4) {
+        return target.updateDynamicParameters(arg0, arg1, arg2, arg3, arg4);
+    }
+
+    /**
      * @see org.ow2.proactive.resourcemanager.frontend.ResourceManager#createNodeSource(String, String, Object[], String, Object[], boolean)
      */
     public BooleanWrapper createNodeSource(String arg0, String arg1, Object[] arg2, String arg3, Object[] arg4,

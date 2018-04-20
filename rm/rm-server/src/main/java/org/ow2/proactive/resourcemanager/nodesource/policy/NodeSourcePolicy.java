@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,6 +34,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.ow2.proactive.resourcemanager.nodesource.NodeSourcePlugin;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
 
@@ -55,7 +55,7 @@ import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
  * </ul>
  */
 @ActiveObject
-public abstract class NodeSourcePolicy implements Serializable {
+public abstract class NodeSourcePolicy implements NodeSourcePlugin {
 
     /** logger */
     private static Logger logger = Logger.getLogger(NodeSourcePolicy.class);
@@ -94,6 +94,21 @@ public abstract class NodeSourcePolicy implements Serializable {
 
         // else using default values
         return new BooleanWrapper(true);
+    }
+
+    /**
+     * Reconfigure a policy (potentially running) with the given parameters.
+     * Implementations are free to handle override of parameters as they wish.
+     *
+     * @see Configurable#dynamic()
+     *
+     * @param updatedPolicyParameters parameters potentially containing updated dynamic
+     *                         parameters
+     *
+     * @throws IllegalArgumentException if parameters are incorrect
+     */
+    public void reconfigure(Object... updatedPolicyParameters) {
+        // by default, reconfiguration does not overwrite any parameter
     }
 
     /**

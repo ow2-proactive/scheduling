@@ -25,10 +25,12 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import java.io.Serializable;
 import java.security.Permission;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -558,6 +560,22 @@ public class NodeSource implements InitActive, RunActive {
     public void setStatus(NodeSourceStatus status) {
         this.getDescriptor().setStatus(status);
         this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
+    }
+
+    public NodeSourceDescriptor updateDynamicParameters(List<Serializable> infrastructureParamsWithDynamicUpdated,
+            List<Serializable> policyParamsWithDynamicUpdated) {
+
+        this.descriptor.setInfrastructureParameters(infrastructureParamsWithDynamicUpdated);
+        this.descriptor.setPolicyParameters(policyParamsWithDynamicUpdated);
+
+        this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
+
+        return this.descriptor;
+    }
+
+    public void reconfigure(Object[] updatedInfrastructureParams, Object[] updatedPolicyParams) {
+        this.infrastructureManager.reconfigure(updatedInfrastructureParams);
+        this.activePolicy.reconfigure(updatedPolicyParams);
     }
 
     /**
