@@ -778,7 +778,9 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
 
         RMNodeEvent event = deployingNode.createNodeEvent(RMEventType.NODE_ADDED,
                                                           null,
-                                                          deployingNode.getProvider().getName());
+                                                          deployingNode.getProvider() == null ? null
+                                                                                              : deployingNode.getProvider()
+                                                                                                             .getName());
         emitEvent(event);
         this.sched(new TimerTask() {
             @Override

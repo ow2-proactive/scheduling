@@ -54,10 +54,12 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
 
     protected final static long TIME_SLOT_PERIOD = 45000;
 
+    protected final static long TIME_SLOT_REPEATED_IN = 90000;
+
     protected Object[] getPolicyParams() {
         return new Object[] { "ME", "ALL", TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
-                              TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + TIME_SLOT_PERIOD), "0",
-                              "true" };
+                              TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + TIME_SLOT_PERIOD),
+                              String.valueOf(TIME_SLOT_REPEATED_IN), "true" };
     }
 
     protected void createEmptyNodeSource(String sourceName) throws Exception {
@@ -106,14 +108,25 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
     public void action() throws Exception {
         String source1 = "Node_source_1";
 
-        log("Test 1 - creation/removal of empty node source");
+        log("Test step 1 - creation/removal of empty node source");
         createEmptyNodeSource(source1);
         removeNodeSource(source1);
 
-        log("Test 2 - creation/removal of the node source with nodes");
+        log("Test step 2 - creation/removal of the node source with nodes");
         createDefaultNodeSource(source1);
 
-        log("Test 2 - nodes will be removed in " + TIME_SLOT_PERIOD + " ms");
+        log("Test step 3 - nodes will be removed in " + TIME_SLOT_PERIOD + " ms");
+        // wait for the nodes release
+        for (int i = 0; i < descriptorNodeNumber; i++) {
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        }
+
+        log("Test step 4 - nodes will be re-added in " + (TIME_SLOT_REPEATED_IN - TIME_SLOT_PERIOD) + " ms");
+        for (int i = 0; i < descriptorNodeNumber; i++) {
+            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        }
+
+        log("Test step 5 - nodes will be definitely removed in " + TIME_SLOT_PERIOD + " ms");
         // wait for the nodes release
         for (int i = 0; i < descriptorNodeNumber; i++) {
             rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
