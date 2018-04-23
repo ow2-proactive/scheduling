@@ -71,19 +71,6 @@ public class NodeSourceParameterHelper {
         return mergedParameters;
     }
 
-    private String getStringValue(Object[] newParameters, int index, Configurable meta) {
-
-        String newValue;
-
-        if (meta.credential() || meta.fileBrowser() || meta.password()) {
-            newValue = new String((byte[]) newParameters[index]);
-        } else {
-            newValue = (String) newParameters[index];
-        }
-
-        return newValue;
-    }
-
     public Collection<PluginDescriptor> getPluginsDescriptor(Collection<Class<?>> plugins) {
         return plugins.stream().map(cls -> new PluginDescriptor(cls, new HashMap<>())).collect(Collectors.toList());
     }
@@ -101,17 +88,27 @@ public class NodeSourceParameterHelper {
         return new PluginDescriptor(pluginClass, parameters);
     }
 
+    private String getStringValue(Object[] newParameters, int index, Configurable meta) {
+
+        String newValue;
+
+        if (meta.credential() || meta.fileBrowser() || meta.password()) {
+            newValue = new String((byte[]) newParameters[index]);
+        } else {
+            newValue = String.valueOf(newParameters[index]);
+        }
+
+        return newValue;
+    }
+
     private void updateDynamicParameterIfNotEqual(List<Serializable> mergedParameters, String newValue, String oldValue,
             int valueIndex, ConfigurableField configurableField) {
 
-        if (!newValue.equals(oldValue)) {
+        String cleanNewValue = newValue.trim();
+        String cleanOldValue = oldValue.trim();
 
-            if (configurableField.getMeta().dynamic()) {
-                mergedParameters.set(valueIndex, newValue);
-            } else {
-                throw new IllegalArgumentException("Attempt to update parameter " + configurableField.getName() +
-                                                   " failed because this parameter is not dynamic");
-            }
+        if (configurableField.getMeta().dynamic() && !cleanNewValue.equals(cleanOldValue)) {
+            mergedParameters.set(valueIndex, cleanNewValue);
         }
     }
 
