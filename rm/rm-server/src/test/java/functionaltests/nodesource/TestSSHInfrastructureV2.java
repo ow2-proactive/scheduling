@@ -162,6 +162,8 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
             }
         };
 
+        sshd.setCommandFactory(cf);
+
         sshd.start();
 
         port = sshd.getPort();
