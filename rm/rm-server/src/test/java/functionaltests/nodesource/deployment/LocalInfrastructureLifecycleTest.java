@@ -23,17 +23,14 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.nodesource;
+package functionaltests.nodesource.deployment;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
-import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.utils.RMFunctionalTest;
@@ -41,12 +38,12 @@ import functionaltests.utils.RMNodeSourceHelper;
 import functionaltests.utils.RMTHelper;
 
 
-public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
+public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
 
     private static final String NODE_SOURCE_NAME = "NodeSourceFor" +
-                                                   SSHInfrastructureV2LifecycleTest.class.getSimpleName();
+                                                   LocalInfrastructureLifecycleTest.class.getSimpleName();
 
-    private static final int NUMBER_OF_NODES = TestSSHInfrastructureV2.NB_NODES;
+    private static final int NUMBER_OF_NODES = 5;
 
     private static final int NO_NODES_EXPECTED = 0;
 
@@ -56,7 +53,6 @@ public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
 
     @Before
     public void setup() throws Exception {
-        TestSSHInfrastructureV2.startSSHServer();
         this.resourceManager = this.rmHelper.getResourceManager();
         this.monitor = this.rmHelper.getMonitorsHandler();
     }
@@ -65,17 +61,12 @@ public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
     public void testDeployAndUndeploySSHInfrastructureV2() throws Exception {
         RMTHelper.log("Starting test of deployment and undeployment of node source " + NODE_SOURCE_NAME);
 
-        RMTHelper.log("Define node source");
-        this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
-                                              SSHInfrastructureV2.class.getName(),
-                                              TestSSHInfrastructureV2.infraParams,
-                                              StaticPolicy.class.getName(),
-                                              TestSSHInfrastructureV2.policyParameters,
-                                              RMFunctionalTest.NODES_NOT_RECOVERABLE);
-        RMNodeSourceHelper.waitForNodeSourceDefinition(NODE_SOURCE_NAME, this.monitor);
+        RMNodeSourceHelper.defineLocalNodeSourceAndWait(NODE_SOURCE_NAME,
+                                                        NUMBER_OF_NODES,
+                                                        this.resourceManager,
+                                                        this.monitor);
         this.checkResourceManagerState(NO_NODES_EXPECTED);
 
-        RMTHelper.log("Deploy node source");
         this.deployNodeSourceAndCheck();
 
         RMTHelper.log("Undeploy node source");
@@ -92,14 +83,11 @@ public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
         this.checkResourceManagerState(NO_NODES_EXPECTED);
     }
 
-    @After
-    public void removeNS() throws Exception {
-        TestSSHInfrastructureV2.stopSSHServer();
-    }
-
     private void deployNodeSourceAndCheck() {
-        this.resourceManager.deployNodeSource(NODE_SOURCE_NAME);
-        RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME, NUMBER_OF_NODES, this.monitor);
+        RMNodeSourceHelper.deployNodeSourceAndWait(NODE_SOURCE_NAME,
+                                                   this.resourceManager,
+                                                   this.monitor,
+                                                   NUMBER_OF_NODES);
         this.checkResourceManagerState(NUMBER_OF_NODES);
     }
 

@@ -27,110 +27,97 @@ package functionaltests.nodesource;
 
 import static functionaltests.utils.RMTHelper.log;
 
-import java.io.File;
-
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy;
-import org.ow2.proactive.utils.FileToBytesConverter;
 
+import functionaltests.nodesource.helper.LocalInfrastructureTestHelper;
+import functionaltests.nodesource.helper.TimeSlotPolicyTestHelper;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
 
 /**
- *
- * Test checks the correct behavior of node source consisted of GCM infrastructure manager
- * and time slot acquisition policy.
- *
- * This test may failed by timeout if the machine is too slow, so gcm deployment takes more than 15 secs
- *
+ * Test of the {@link TimeSlotPolicy}. Acquires the nodes of a {@link LocalInfrastructure}
+ * immediately, then alternate remove and add every 45 seconds.
  */
 public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
 
-    protected int descriptorNodeNumber = 1;
+    private static final int NODES_NUMBER = 1;
 
-    protected final static long TIME_SLOT_PERIOD = 45000;
+    private static final String NODE_SOURCE_NAME = "LocalInfrastructureTimeSlotPolicyTestNodeSource";
 
-    protected final static long TIME_SLOT_REPEATED_IN = 90000;
+    private ResourceManager resourceManager;
 
-    protected Object[] getPolicyParams() {
-        return new Object[] { "ME", "ALL", TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
-                              TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + TIME_SLOT_PERIOD),
-                              String.valueOf(TIME_SLOT_REPEATED_IN), "true" };
-    }
-
-    protected void createEmptyNodeSource(String sourceName) throws Exception {
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        //first null parameter is the rmHelper url
-        rmHelper.getResourceManager().createNodeSource(sourceName,
-                                                       LocalInfrastructure.class.getName(),
-                                                       new Object[] { creds, 0, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
-                                                       TimeSlotPolicy.class.getName(),
-                                                       getPolicyParams(),
-                                                       NODES_NOT_RECOVERABLE);
-
-        rmHelper.waitForNodeSourceCreation(sourceName);
-    }
-
-    protected void createDefaultNodeSource(String sourceName) throws Exception {
-        // creating node source
-        byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rmHelper.getResourceManager()
-                .createNodeSource(sourceName,
-                                  LocalInfrastructure.class.getName(),
-                                  new Object[] { creds, descriptorNodeNumber, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
-                                  //first parameter is empty rmHelper url
-                                  TimeSlotPolicy.class.getName(),
-                                  getPolicyParams(),
-                                  NODES_NOT_RECOVERABLE);
-
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, sourceName);
-
-        for (int i = 0; i < descriptorNodeNumber; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-            //we eat the configuring to free event
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
-        }
-    }
-
-    protected void removeNodeSource(String sourceName) throws Exception {
-        // removing node source
-        rmHelper.getResourceManager().removeNodeSource(sourceName, true);
-
-        //wait for the event of the node source removal
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
+    @Before
+    public void setup() throws Exception {
+        this.resourceManager = this.rmHelper.getResourceManager();
     }
 
     @Test
     public void action() throws Exception {
-        String source1 = "Node_source_1";
 
-        log("Test step 1 - creation/removal of empty node source");
-        createEmptyNodeSource(source1);
-        removeNodeSource(source1);
+        log("Create an remove an empty local node source with time slot policy");
+        createEmptyNodeSource(NODE_SOURCE_NAME);
+        removeNodeSource(NODE_SOURCE_NAME);
 
-        log("Test step 2 - creation/removal of the node source with nodes");
-        createDefaultNodeSource(source1);
+        log("Create a local node source with " + NODES_NUMBER + " nodes with time slot policy");
+        createDefaultNodeSource(NODE_SOURCE_NAME);
 
-        log("Test step 3 - nodes will be removed in " + TIME_SLOT_PERIOD + " ms");
-        // wait for the nodes release
-        for (int i = 0; i < descriptorNodeNumber; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        log("Waiting for the time slot policy to remove the nodes");
+        for (int i = 0; i < NODES_NUMBER; i++) {
+            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
 
-        log("Test step 4 - nodes will be re-added in " + (TIME_SLOT_REPEATED_IN - TIME_SLOT_PERIOD) + " ms");
-        for (int i = 0; i < descriptorNodeNumber; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        log("Waiting for the time slot policy to add the nodes again");
+        for (int i = 0; i < NODES_NUMBER; i++) {
+            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         }
 
-        log("Test step 5 - nodes will be definitely removed in " + TIME_SLOT_PERIOD + " ms");
-        // wait for the nodes release
-        for (int i = 0; i < descriptorNodeNumber; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        log("Waiting for the time slot policy to remove the nodes again");
+        for (int i = 0; i < NODES_NUMBER; i++) {
+            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
         }
-        removeNodeSource(source1);
     }
+
+    @After
+    public void tearDown() throws Exception {
+        removeNodeSource(NODE_SOURCE_NAME);
+    }
+
+    private void createEmptyNodeSource(String nodeSourceName) throws Exception {
+
+        this.resourceManager.defineNodeSource(nodeSourceName,
+                                              LocalInfrastructure.class.getName(),
+                                              LocalInfrastructureTestHelper.getParameters(0),
+                                              TimeSlotPolicy.class.getName(),
+                                              TimeSlotPolicyTestHelper.getParameters(),
+                                              NODES_NOT_RECOVERABLE);
+        this.resourceManager.deployNodeSource(nodeSourceName);
+
+        this.rmHelper.waitForNodeSourceCreation(nodeSourceName);
+    }
+
+    private void createDefaultNodeSource(String nodeSourceName) throws Exception {
+
+        this.resourceManager.defineNodeSource(nodeSourceName,
+                                              LocalInfrastructure.class.getName(),
+                                              LocalInfrastructureTestHelper.getParameters(NODES_NUMBER),
+                                              TimeSlotPolicy.class.getName(),
+                                              TimeSlotPolicyTestHelper.getParameters(),
+                                              NODES_NOT_RECOVERABLE);
+        this.resourceManager.deployNodeSource(nodeSourceName);
+
+        RMTHelper.waitForNodeSourceCreation(nodeSourceName, NODES_NUMBER, this.rmHelper.getMonitorsHandler());
+    }
+
+    private void removeNodeSource(String sourceName) throws Exception {
+        this.resourceManager.removeNodeSource(sourceName, true);
+        this.rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, sourceName);
+    }
+
 }

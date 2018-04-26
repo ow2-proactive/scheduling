@@ -41,8 +41,8 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
+import functionaltests.nodesource.helper.LocalInfrastructureTestHelper;
 import functionaltests.utils.RMFunctionalTest;
-import functionaltests.utils.RMTHelper;
 
 
 /**
@@ -60,7 +60,7 @@ public class TestLocalInfrastructureStaticPolicy extends RMFunctionalTest {
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rmHelper.getResourceManager().createNodeSource(sourceName,
                                                        LocalInfrastructure.class.getName(),
-                                                       new Object[] { creds, 0, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
+                                                       LocalInfrastructureTestHelper.getParameters(0),
                                                        StaticPolicy.class.getName(),
                                                        null,
                                                        NODES_NOT_RECOVERABLE);
@@ -72,13 +72,12 @@ public class TestLocalInfrastructureStaticPolicy extends RMFunctionalTest {
         // creating node source
         // first parameter of im is empty default rmHelper url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rmHelper.getResourceManager()
-                .createNodeSource(sourceName,
-                                  LocalInfrastructure.class.getName(),
-                                  new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
-                                  StaticPolicy.class.getName(),
-                                  null,
-                                  NODES_NOT_RECOVERABLE);
+        rmHelper.getResourceManager().createNodeSource(sourceName,
+                                                       LocalInfrastructure.class.getName(),
+                                                       LocalInfrastructureTestHelper.getParameters(defaultDescriptorNodesNb),
+                                                       StaticPolicy.class.getName(),
+                                                       null,
+                                                       NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb, rmHelper.getMonitorsHandler());
     }

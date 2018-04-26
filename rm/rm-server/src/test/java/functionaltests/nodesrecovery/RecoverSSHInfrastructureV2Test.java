@@ -45,7 +45,8 @@ import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastruc
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.monitor.RMMonitorEventReceiver;
-import functionaltests.nodesource.TestSSHInfrastructureV2;
+import functionaltests.nodesource.helper.SSHInfrastructureV2TestHelper;
+import functionaltests.nodesource.helper.StaticPolicyTestHelper;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
@@ -55,6 +56,8 @@ import functionaltests.utils.RMTHelper;
  * @since 22/06/17
  */
 public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
+
+    private static final int NB_NODES = 3;
 
     private static final String START_CONFIG = "/functionaltests/config/functionalTRMProperties-RM-start-clean-db-nodes-recovery-enabled.ini";
 
@@ -66,7 +69,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
     @Before
     public void setup() throws Exception {
-        TestSSHInfrastructureV2.startSSHServer();
+        SSHInfrastructureV2TestHelper.startSSHServer();
         RMTHelper.log("SSH server started");
         startRmAndCheckInitialState();
     }
@@ -75,7 +78,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     public void tearDown() throws Exception {
         // kill the remaining nodes that were preserved for the test
         RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
-        TestSSHInfrastructureV2.stopSSHServer();
+        SSHInfrastructureV2TestHelper.stopSSHServer();
     }
 
     @Test
@@ -111,19 +114,17 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
         resourceManager.createNodeSource(NODE_SOURCE_NAME,
                                          SSHInfrastructureV2.class.getName(),
-                                         TestSSHInfrastructureV2.infraParams,
+                                         SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
                                          StaticPolicy.class.getName(),
-                                         TestSSHInfrastructureV2.policyParameters,
+                                         StaticPolicyTestHelper.getParameters(),
                                          NODES_RECOVERABLE);
-        RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME,
-                                            TestSSHInfrastructureV2.NB_NODES,
-                                            this.rmHelper.getMonitorsHandler());
+        RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME, NB_NODES, this.rmHelper.getMonitorsHandler());
 
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) resourceManager;
         List<RMNodeSourceEvent> nodeSourceEvent = resourceManagerMonitor.getInitialState().getNodeSourceEvents();
         assertThat(nodeSourceEvent.size()).isEqualTo(1);
         assertThat(nodeSourceEvent.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
-        assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
+        assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(NB_NODES);
     }
 
     private void restartRmAndCheckFinalState(boolean nodesShouldBeRecreated) throws Exception {
@@ -143,16 +144,16 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
         // wait for nodes to be recreated if needed
         if (nodesShouldBeRecreated) {
-            rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, TestSSHInfrastructureV2.NB_NODES);
+            rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NB_NODES);
         }
 
         // the nodes should have been recovered too, and should be alive
         Set<String> allNodes = resourceManagerMonitor.getState().getAllNodes();
-        assertThat(allNodes.size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
+        assertThat(allNodes.size()).isEqualTo(NB_NODES);
         Set<String> nodeSourceNames = new HashSet<>();
         nodeSourceNames.add(NODE_SOURCE_NAME);
         Set<String> aliveNodeUrls = resourceManager.listAliveNodeUrls(nodeSourceNames);
-        assertThat(aliveNodeUrls.size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
+        assertThat(aliveNodeUrls.size()).isEqualTo(NB_NODES);
 
         // the recovered nodes should be usable, try to lock/unlock them to see
         BooleanWrapper lockSucceeded = resourceManager.lockNodes(allNodes);

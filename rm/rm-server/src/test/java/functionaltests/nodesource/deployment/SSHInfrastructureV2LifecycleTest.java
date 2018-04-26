@@ -23,27 +23,32 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.nodesource;
+package functionaltests.nodesource.deployment;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.monitor.RMMonitorsHandler;
+import functionaltests.nodesource.helper.SSHInfrastructureV2TestHelper;
+import functionaltests.nodesource.helper.StaticPolicyTestHelper;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMNodeSourceHelper;
 import functionaltests.utils.RMTHelper;
 
 
-public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
+public class SSHInfrastructureV2LifecycleTest extends RMFunctionalTest {
 
     private static final String NODE_SOURCE_NAME = "NodeSourceFor" +
-                                                   LocalInfrastructureLifecycleTest.class.getSimpleName();
+                                                   SSHInfrastructureV2LifecycleTest.class.getSimpleName();
 
-    private static final int NUMBER_OF_NODES = 5;
+    private static final int NUMBER_OF_NODES = 3;
 
     private static final int NO_NODES_EXPECTED = 0;
 
@@ -53,6 +58,7 @@ public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
 
     @Before
     public void setup() throws Exception {
+        SSHInfrastructureV2TestHelper.startSSHServer();
         this.resourceManager = this.rmHelper.getResourceManager();
         this.monitor = this.rmHelper.getMonitorsHandler();
     }
@@ -61,12 +67,17 @@ public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
     public void testDeployAndUndeploySSHInfrastructureV2() throws Exception {
         RMTHelper.log("Starting test of deployment and undeployment of node source " + NODE_SOURCE_NAME);
 
-        RMNodeSourceHelper.defineLocalNodeSourceAndWait(NODE_SOURCE_NAME,
-                                                        NUMBER_OF_NODES,
-                                                        this.resourceManager,
-                                                        this.monitor);
+        RMTHelper.log("Define node source");
+        this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
+                                              SSHInfrastructureV2.class.getName(),
+                                              SSHInfrastructureV2TestHelper.getParameters(NUMBER_OF_NODES),
+                                              StaticPolicy.class.getName(),
+                                              StaticPolicyTestHelper.getParameters(),
+                                              RMFunctionalTest.NODES_NOT_RECOVERABLE);
+        RMNodeSourceHelper.waitForNodeSourceDefinition(NODE_SOURCE_NAME, this.monitor);
         this.checkResourceManagerState(NO_NODES_EXPECTED);
 
+        RMTHelper.log("Deploy node source");
         this.deployNodeSourceAndCheck();
 
         RMTHelper.log("Undeploy node source");
@@ -83,11 +94,14 @@ public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
         this.checkResourceManagerState(NO_NODES_EXPECTED);
     }
 
+    @After
+    public void tearDown() throws Exception {
+        SSHInfrastructureV2TestHelper.stopSSHServer();
+    }
+
     private void deployNodeSourceAndCheck() {
-        RMNodeSourceHelper.deployNodeSourceAndWait(NODE_SOURCE_NAME,
-                                                   this.resourceManager,
-                                                   this.monitor,
-                                                   NUMBER_OF_NODES);
+        this.resourceManager.deployNodeSource(NODE_SOURCE_NAME);
+        RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME, NUMBER_OF_NODES, this.monitor);
         this.checkResourceManagerState(NUMBER_OF_NODES);
     }
 
