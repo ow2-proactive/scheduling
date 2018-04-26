@@ -25,6 +25,7 @@
  */
 package functionaltests.nodesource;
 
+import static com.google.common.truth.Truth.assertThat;
 import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.assertEquals;
 
@@ -73,91 +74,65 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
     @Before
     public void setupTest() throws Exception {
         this.resourceManager = this.rmHelper.getResourceManager();
+        RMState s = this.resourceManager.getState();
+        assertEquals(0, s.getTotalNodesNumber());
     }
 
     @Test
     public void testSSHInfrastructureV2WithStaticPolicy() throws Exception {
 
-        this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
-                                              SSHInfrastructureV2.class.getName(),
-                                              SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
-                                              StaticPolicy.class.getName(),
-                                              StaticPolicyTestHelper.getParameters(),
-                                              NODES_NOT_RECOVERABLE);
-        this.resourceManager.deployNodeSource(NODE_SOURCE_NAME);
-
-        RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME, NB_NODES, this.rmHelper.getMonitorsHandler());
-
-        RMTHelper.log("Check scheduler state after node source creation");
-        RMState s = this.resourceManager.getState();
-        assertEquals(NB_NODES, s.getTotalNodesNumber());
-        assertEquals(NB_NODES, s.getFreeNodesNumber());
+        log("Create an SSHV2 node source with " + NB_NODES + " nodes using static policy");
+        createNodeSourceWithStaticPolicy();
+        assertThatRmHasAllNodes();
     }
 
     @Test
     public void testSSHInfrastructureV2WithCronPolicy() throws Exception {
 
-        log("Create an SSHV2 node source with " + NB_NODES + " nodes with cron policy");
-        createNodeSourceWithCronPolicy(NODE_SOURCE_NAME);
+        log("Create an SSHV2 node source with " + NB_NODES + " nodes using cron policy");
+        createNodeSourceWithCronPolicy();
+        assertThatRmHasAllNodes();
 
         log("Wait for the cron policy to remove the nodes");
-        for (int i = 0; i < NB_NODES; i++) {
-            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        }
+        waitForNodesToBeRemoved();
+        assertThatRmHasNoNode();
 
         log("Wait for the cron policy to add the nodes again");
-        for (int i = 0; i < NB_NODES; i++) {
-            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        }
+        RMTHelper.waitForNodesToBeUp(NB_NODES, this.rmHelper.getMonitorsHandler());
+        assertThatRmHasAllNodes();
     }
 
     @Test
     public void testSSHInfrastructureV2WithTimeSlotPolicy() throws Exception {
 
-        log("Create a local node source with " + NB_NODES + " nodes with time slot policy");
-        createNodeSourceWithTimeSlotPolicy(NODE_SOURCE_NAME);
+        log("Create an SSHV2 node source with " + NB_NODES + " nodes using time slot policy");
+        createNodeSourceWithTimeSlotPolicy();
+        assertThatRmHasAllNodes();
 
         log("Wait for the time slot policy to remove the nodes");
-        for (int i = 0; i < NB_NODES; i++) {
-            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        }
+        waitForNodesToBeRemoved();
+        assertThatRmHasNoNode();
 
         log("Wait for the time slot policy to add the nodes again");
-        for (int i = 0; i < NB_NODES; i++) {
-            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        }
+        RMTHelper.waitForNodesToBeUp(NB_NODES, this.rmHelper.getMonitorsHandler());
+        assertThatRmHasAllNodes();
 
         log("Wait for the time slot policy to remove the nodes again");
-        for (int i = 0; i < NB_NODES; i++) {
-            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        }
+        waitForNodesToBeRemoved();
+        assertThatRmHasNoNode();
     }
 
     @Test
     public void testSSHInfrastructureV2WithRestartDownNodesPolicy() throws Exception {
 
-        this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
-                                              SSHInfrastructureV2.class.getName(),
-                                              SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
-                                              RestartDownNodesPolicy.class.getName(),
-                                              RestartDownNodesPolicyTestHelper.getParameters(10000),
-                                              NODES_NOT_RECOVERABLE);
-        this.resourceManager.deployNodeSource(NODE_SOURCE_NAME);
-
-        RMMonitorsHandler monitorsHandler = this.rmHelper.getMonitorsHandler();
-
-        RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME, NB_NODES, monitorsHandler);
-
-        RMState s = this.resourceManager.getState();
-        assertEquals(NB_NODES, s.getTotalNodesNumber());
-        assertEquals(NB_NODES, s.getFreeNodesNumber());
+        log("Create an SSHV2 node source with " + NB_NODES + " nodes using restart down nodes policy");
+        createNodeSourceWithRestartDownNodesPolicy();
+        assertThatRmHasAllNodes();
 
         NodeSet nodeset = this.resourceManager.getNodes(new Criteria(NB_NODES));
+        assertThat(nodeset.size()).isEqualTo(NB_NODES);
 
-        if (nodeset.size() != NB_NODES) {
-            RMTHelper.log("Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
-            throw new RuntimeException("Illegal state : the infrastructure could not deploy nodes or they died immediately. Ending test");
-        }
+        RMMonitorsHandler monitorsHandler = this.rmHelper.getMonitorsHandler();
 
         for (Node n : nodeset) {
             RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
@@ -190,21 +165,17 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
         monitorsHandler.dumpEvents();
 
         RMTHelper.log("Wait for nodes restart by the policy");
-        RMTHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, NB_NODES, monitorsHandler);
-        for (int i = 0; i < NB_NODES; i++) {
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED, monitorsHandler);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED, monitorsHandler);
-            RMTHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, monitorsHandler);
-        }
+        RMTHelper.waitForNodesToBeUp(NB_NODES, monitorsHandler);
 
         RMTHelper.log("Final checks on the scheduler state");
         nodeset = this.resourceManager.getNodes(new Criteria(NB_NODES));
 
         for (Node n : nodeset) {
             System.out.println("NODE::" + n.getNodeInformation().getURL());
+            assertThat(n.getNodeInformation().getURL()).contains(NODE_SOURCE_NAME);
         }
 
-        s = this.resourceManager.getState();
+        RMState s = this.resourceManager.getState();
 
         assertEquals(NB_NODES, s.getTotalNodesNumber());
         assertEquals(NB_NODES, s.getTotalAliveNodesNumber()); // check amount of all nodes that are not down
@@ -224,7 +195,18 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
         SSHInfrastructureV2TestHelper.stopSSHServer();
     }
 
-    private void createNodeSourceWithCronPolicy(String nodeSourceName) throws Exception {
+    private void createNodeSourceWithStaticPolicy() throws Exception {
+
+        this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
+                                              SSHInfrastructureV2.class.getName(),
+                                              SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
+                                              StaticPolicy.class.getName(),
+                                              StaticPolicyTestHelper.getParameters(),
+                                              NODES_NOT_RECOVERABLE);
+        deployNodeSourceAndWait();
+    }
+
+    private void createNodeSourceWithCronPolicy() throws Exception {
 
         this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
                                               SSHInfrastructureV2.class.getName(),
@@ -232,22 +214,52 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
                                               CronPolicy.class.getName(),
                                               CronPolicyTestHelper.getParameters(),
                                               RMFunctionalTest.NODES_NOT_RECOVERABLE);
-        this.resourceManager.deployNodeSource(nodeSourceName);
-
-        RMTHelper.waitForNodeSourceCreation(nodeSourceName, NB_NODES, this.rmHelper.getMonitorsHandler());
+        deployNodeSourceAndWait();
     }
 
-    private void createNodeSourceWithTimeSlotPolicy(String nodeSourceName) throws Exception {
+    private void createNodeSourceWithTimeSlotPolicy() throws Exception {
 
-        this.resourceManager.defineNodeSource(nodeSourceName,
+        this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
                                               SSHInfrastructureV2.class.getName(),
                                               SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
                                               TimeSlotPolicy.class.getName(),
                                               TimeSlotPolicyTestHelper.getParameters(),
                                               NODES_NOT_RECOVERABLE);
-        this.resourceManager.deployNodeSource(nodeSourceName);
+        deployNodeSourceAndWait();
+    }
 
-        RMTHelper.waitForNodeSourceCreation(nodeSourceName, NB_NODES, this.rmHelper.getMonitorsHandler());
+    private void createNodeSourceWithRestartDownNodesPolicy() {
+
+        this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
+                                              SSHInfrastructureV2.class.getName(),
+                                              SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
+                                              RestartDownNodesPolicy.class.getName(),
+                                              RestartDownNodesPolicyTestHelper.getParameters(10000),
+                                              NODES_NOT_RECOVERABLE);
+        deployNodeSourceAndWait();
+    }
+
+    private void deployNodeSourceAndWait() {
+
+        this.resourceManager.deployNodeSource(NODE_SOURCE_NAME);
+        RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME, NB_NODES, this.rmHelper.getMonitorsHandler());
+    }
+
+    private void assertThatRmHasNoNode() {
+        RMState s = this.resourceManager.getState();
+        assertEquals(0, s.getTotalNodesNumber());
+    }
+
+    private void assertThatRmHasAllNodes() {
+        RMState s = this.resourceManager.getState();
+        assertThat(s.getTotalNodesNumber()).isEqualTo(NB_NODES);
+        assertThat(s.getFreeNodesNumber()).isEqualTo(NB_NODES);
+    }
+
+    private void waitForNodesToBeRemoved() {
+        for (int i = 0; i < NB_NODES; i++) {
+            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        }
     }
 
     private void removeNodeSource(String sourceName) throws Exception {

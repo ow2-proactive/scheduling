@@ -58,7 +58,7 @@ public class LocalInfrastructureLifecycleTest extends RMFunctionalTest {
     }
 
     @Test
-    public void testDeployAndUndeploySSHInfrastructureV2() throws Exception {
+    public void testDeployAndUndeployLocalInfrastructure() throws Exception {
         RMTHelper.log("Starting test of deployment and undeployment of node source " + NODE_SOURCE_NAME);
 
         RMNodeSourceHelper.defineLocalNodeSourceAndWait(NODE_SOURCE_NAME,

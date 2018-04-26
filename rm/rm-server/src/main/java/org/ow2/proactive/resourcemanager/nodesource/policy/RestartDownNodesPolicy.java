@@ -67,10 +67,9 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
     @Override
     public void reconfigure(Object... updatedPolicyParameters) {
         super.reconfigure(updatedPolicyParameters);
-
         this.timer.cancel();
         setCheckNodeStateEach(updatedPolicyParameters);
-        this.scheduleRestartTimer();
+        scheduleRestartTimer();
     }
 
     private void setCheckNodeStateEach(Object[] policyParameters) {

@@ -54,19 +54,19 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
     /**
      * Initial time for nodes acquisition
      */
-    @Configurable(description = "Time of the nodes acquisition (crontab format)")
+    @Configurable(description = "Time of the nodes acquisition (crontab format)", dynamic = true)
     private String nodeAcquision = "* * * * *";
 
-    @Configurable(description = "Time of the nodes removal (crontab format)")
+    @Configurable(description = "Time of the nodes removal (crontab format)", dynamic = true)
     private String nodeRemoval = "* * * * *";
 
     /**
      * The way of nodes removing
      */
-    @Configurable(description = "the mode how nodes are removed")
+    @Configurable(description = "the mode how nodes are removed", dynamic = true)
     private boolean preemptive = false;
 
-    @Configurable(description = "Start deployment immediately")
+    @Configurable(description = "Start deployment immediately", dynamic = true)
     private boolean forceDeployment = false;
 
     private Scheduler cronScheduler;
@@ -89,25 +89,35 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
     @Override
     public BooleanWrapper configure(Object... policyParameters) {
         super.configure(policyParameters);
-        try {
-            cronScheduler = new Scheduler();
-            int index = 2;
+        configureCronParametersStartingFromIndex(2, policyParameters);
+        return new BooleanWrapper(true);
+    }
 
-            nodeAcquision = policyParameters[index++].toString();
-            nodeRemoval = policyParameters[index++].toString();
-            preemptive = Boolean.parseBoolean(policyParameters[index++].toString());
-            forceDeployment = Boolean.parseBoolean(policyParameters[index++].toString());
+    @Override
+    public void reconfigure(Object... updatedPolicyParameters) {
+        super.reconfigure(updatedPolicyParameters);
+        this.cronScheduler.stop();
+        configureCronParametersStartingFromIndex(2, updatedPolicyParameters);
+        this.scheduleAcquireAndReleaseCron();
+    }
+
+    private void configureCronParametersStartingFromIndex(int index, Object[] policyParameters) {
+        try {
+            this.cronScheduler = new Scheduler();
+            this.nodeAcquision = policyParameters[index++].toString();
+            this.nodeRemoval = policyParameters[index++].toString();
+            this.preemptive = Boolean.parseBoolean(policyParameters[index++].toString());
+            this.forceDeployment = Boolean.parseBoolean(policyParameters[index].toString());
         } catch (Throwable t) {
             throw new IllegalArgumentException(t);
         }
-        return new BooleanWrapper(true);
     }
 
     /**
      * Initializes stub to this active object
      */
     public void initActivity(Body body) {
-        thisStub = (CronPolicy) PAActiveObject.getStubOnThis();
+        this.thisStub = (CronPolicy) PAActiveObject.getStubOnThis();
     }
 
     /**
@@ -115,25 +125,25 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public BooleanWrapper activate() {
-        cronScheduler.schedule(nodeAcquision, new Runnable() {
-            public void run() {
-                logger.info("Acquiring nodes");
-                thisStub.acquireAllNodes();
-            }
-        });
-        cronScheduler.schedule(nodeRemoval, new Runnable() {
-            public void run() {
-                logger.info("Removing nodes");
-                thisStub.removeAllNodes(preemptive);
-            }
-        });
-        cronScheduler.start();
-
-        if (forceDeployment) {
-            logger.info("Acquiring nodes");
-            thisStub.acquireAllNodes();
-        }
+        scheduleAcquireAndReleaseCron();
         return new BooleanWrapper(true);
+    }
+
+    private void scheduleAcquireAndReleaseCron() {
+        this.cronScheduler.schedule(this.nodeAcquision, () -> {
+            logger.info("Acquire nodes");
+            this.thisStub.acquireAllNodes();
+        });
+        this.cronScheduler.schedule(this.nodeRemoval, () -> {
+            logger.info("Remove nodes");
+            this.thisStub.removeAllNodes(this.preemptive);
+        });
+        this.cronScheduler.start();
+
+        if (this.forceDeployment) {
+            logger.info("Force acquire nodes");
+            this.thisStub.acquireAllNodes();
+        }
     }
 
     /**
@@ -141,7 +151,7 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public void shutdown(Client initiator) {
-        cronScheduler.stop();
+        this.cronScheduler.stop();
         super.shutdown(initiator);
     }
 
@@ -151,7 +161,7 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public String getDescription() {
-        return "Acquires and releases nodes at specified time.";
+        return "Acquire and release nodes at specified time.";
     }
 
     /**
@@ -159,8 +169,9 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public String toString() {
-        return super.toString() + " acquisiotion at [" + nodeAcquision + "]" + ", removal at [" + nodeRemoval +
-               "], preemptive: " + preemptive;
+        return super.toString() + " acquisition at [" + this.nodeAcquision + "]" + ", removal at [" + this.nodeRemoval +
+               "], preemptive: " + this.preemptive;
 
     }
+
 }
