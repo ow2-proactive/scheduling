@@ -40,6 +40,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
+import org.apache.log4j.Logger;
 import org.ow2.proactive_grid_cloud_portal.scheduler.client.utils.Zipper;
 
 import com.google.common.io.ByteStreams;
@@ -47,6 +48,8 @@ import com.google.common.io.Closer;
 
 
 public class VFSZipper {
+
+    private static final Logger logger = Logger.getLogger(VFSZipper.class);
 
     private VFSZipper() {
     }
@@ -105,10 +108,14 @@ public class VFSZipper {
                     FileObject entryFile = outfileObj.resolveFile(zipEntry.getName());
 
                     if (zipEntry.isDirectory()) {
+                        logger.debug("Creating folder " + entryFile.getURL());
                         entryFile.createFolder();
                     } else {
                         if (!entryFile.exists()) {
+                            logger.debug("Creating file " + entryFile.getURL());
                             entryFile.createFile();
+                        } else {
+                            logger.debug("Overwriting file " + entryFile.getURL());
                         }
                         Zipper.ZIP.unzipEntry(zis, entryFile.getContent().getOutputStream());
                     }
