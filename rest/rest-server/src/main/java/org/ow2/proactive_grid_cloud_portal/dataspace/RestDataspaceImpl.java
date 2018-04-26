@@ -102,10 +102,13 @@ public class RestDataspaceImpl {
         Session session = checkSessionValidity(sessionId);
         try {
             checkPathParams(dataspace, pathname);
-            logger.debug(String.format("Storing %s in %s", pathname, dataspace));
+            logger.debug(String.format("Storing file(s) in %s/%s", dataspace.toUpperCase(), pathname));
             writeFile(is, resolveFile(session, dataspace, pathname), encoding);
         } catch (Throwable error) {
-            logger.error(String.format("Cannot save the requested file to %s in %s.", pathname, dataspace), error);
+            logger.error(String.format("Cannot save the requested file to %s in %s.",
+                                       pathname,
+                                       dataspace.toUpperCase()),
+                         error);
             rethrow(error);
         }
         return Response.status(Response.Status.CREATED).build();
@@ -171,29 +174,29 @@ public class RestDataspaceImpl {
             }
             if (fo.getType() == FileType.FILE) {
                 if (VFSZipper.isZipFile(fo)) {
-                    logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace));
+                    logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace.toUpperCase()));
                     return fileComponentResponse(fo);
                 } else if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") || encoding.contains("gzip")) {
-                    logger.debug(String.format("Retrieving file %s as gzip in %s", pathname, dataspace));
+                    logger.debug(String.format("Retrieving file %s as gzip in %s", pathname, dataspace.toUpperCase()));
                     return gzipComponentResponse(pathname, fo);
                 } else if (encoding.contains("zip")) {
-                    logger.debug(String.format("Retrieving file %s as zip in %s", pathname, dataspace));
+                    logger.debug(String.format("Retrieving file %s as zip in %s", pathname, dataspace.toUpperCase()));
                     return zipComponentResponse(fo, null, null);
                 } else {
-                    logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace));
+                    logger.debug(String.format("Retrieving file %s in %s", pathname, dataspace.toUpperCase()));
                     return fileComponentResponse(fo);
                 }
             } else {
                 // folder
                 if (Strings.isNullOrEmpty(encoding) || encoding.contains("*") || encoding.contains("zip")) {
-                    logger.debug(String.format("Retrieving folder %s as zip in %s", pathname, dataspace));
+                    logger.debug(String.format("Retrieving folder %s as zip in %s", pathname, dataspace.toUpperCase()));
                     return zipComponentResponse(fo, includes, excludes);
                 } else {
                     return badRequestRes("Folder retrieval only supported with zip encoding.");
                 }
             }
         } catch (Throwable error) {
-            logger.error(String.format("Cannot retrieve %s in %s.", pathname, dataspace), error);
+            logger.error(String.format("Cannot retrieve %s in %s.", pathname, dataspace.toUpperCase()), error);
             throw rethrow(error);
         }
     }
@@ -235,15 +238,15 @@ public class RestDataspaceImpl {
                 return Response.status(Response.Status.NO_CONTENT).build();
             }
             if (fo.getType() == FileType.FOLDER) {
-                logger.debug(String.format("Deleting directory %s in %s", pathname, dataspace));
+                logger.debug(String.format("Deleting directory %s in %s", pathname, dataspace.toUpperCase()));
                 return deleteDir(fo, includes, excludes);
             } else {
-                logger.debug(String.format("Deleting file %s in %s", pathname, dataspace));
+                logger.debug(String.format("Deleting file %s in %s", pathname, dataspace.toUpperCase()));
                 fo.close();
                 return fo.delete() ? noContentRes() : serverErrorRes("Cannot delete the file: %s", pathname);
             }
         } catch (Throwable error) {
-            logger.error(String.format("Cannot delete %s in %s.", pathname, dataspace), error);
+            logger.error(String.format("Cannot delete %s in %s.", pathname, dataspace.toUpperCase()), error);
             throw rethrow(error);
         }
     }
@@ -273,7 +276,8 @@ public class RestDataspaceImpl {
             MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>(FileSystem.metadata(fo));
             return Response.ok().replaceAll(headers).build();
         } catch (Throwable error) {
-            logger.error(String.format("Cannot retrieve metadata for %s in %s.", pathname, dataspacePath), error);
+            logger.error(String.format("Cannot retrieve metadata for %s in %s.", pathname, dataspacePath.toUpperCase()),
+                         error);
             throw rethrow(error);
         }
     }
@@ -290,10 +294,10 @@ public class RestDataspaceImpl {
             FileObject fileObject = resolveFile(session, dataspacePath, pathname);
 
             if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FOLDER.getMimeType())) {
-                logger.debug(String.format("Creating folder %s in %s", pathname, dataspacePath));
+                logger.debug(String.format("Creating folder %s in %s", pathname, dataspacePath.toUpperCase()));
                 fileObject.createFolder();
             } else if (mimeType.equals(org.ow2.proactive_grid_cloud_portal.common.FileType.FILE.getMimeType())) {
-                logger.debug(String.format("Creating file %s in %s", pathname, dataspacePath));
+                logger.debug(String.format("Creating file %s in %s", pathname, dataspacePath.toUpperCase()));
                 fileObject.createFile();
             } else {
                 return serverErrorRes("Cannot create specified file since mimetype is not specified");
@@ -301,10 +305,10 @@ public class RestDataspaceImpl {
 
             return Response.ok().build();
         } catch (FileSystemException e) {
-            logger.error(String.format("Cannot create %s in %s", pathname, dataspacePath), e);
+            logger.error(String.format("Cannot create %s in %s", pathname, dataspacePath.toUpperCase()), e);
             throw rethrow(e);
         } catch (Throwable e) {
-            logger.error(String.format("Cannot create %s in %s", pathname, dataspacePath), e);
+            logger.error(String.format("Cannot create %s in %s", pathname, dataspacePath.toUpperCase()), e);
             throw rethrow(e);
         }
     }
@@ -437,12 +441,16 @@ public class RestDataspaceImpl {
             }
             if (Strings.isNullOrEmpty(encoding)) {
                 outputFile.createFile();
+                logger.debug("Writing single file " + outputFile);
                 FileSystem.copy(inputStream, outputFile);
             } else if ("gzip".equals(encoding)) {
+                logger.debug("Expanding gzip archive into " + outputFile);
                 VFSZipper.GZIP.unzip(inputStream, outputFile);
             } else if ("zip".equals(encoding)) {
+                logger.debug("Expanding zip archive into " + outputFile);
                 VFSZipper.ZIP.unzip(inputStream, outputFile);
             } else {
+                logger.debug("Writing single file " + outputFile);
                 outputFile.createFile();
                 FileSystem.copy(inputStream, outputFile);
             }
