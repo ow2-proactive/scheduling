@@ -34,15 +34,6 @@ public class NodeSourceView {
 
     private String eventType;
 
-    /**
-     * @return true is node source was removed
-     *
-     * String constant should be aligned with {@link RMEventType} from rm-client
-     */
-    public boolean isRemoved() {
-        return "NODESOURCE_REMOVED".equalsIgnoreCase(this.eventType);
-    }
-
     public String getSourceName() {
         return sourceName;
     }

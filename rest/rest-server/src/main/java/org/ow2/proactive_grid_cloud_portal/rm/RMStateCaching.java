@@ -35,6 +35,7 @@ import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
@@ -110,6 +111,23 @@ public class RMStateCaching {
             return state;
         } catch (Exception e) {
             logger.error("Exception occurrend while updating RM state cache, connection reset", e);
+            throw e;
+        }
+    }
+
+    public static RMStateFull getRMStateFull() {
+        try {
+            long startTime = System.currentTimeMillis();
+
+            final RMStateFull state = PAFuture.getFutureValue(rm.getRMStateFull());
+
+            long time = System.currentTimeMillis() - startTime;
+
+            logger.debug(String.format("Retrieved RM full state in %d ms", time));
+
+            return state;
+        } catch (Exception e) {
+            logger.error("Exception occurrend while retrieving full RM state, connection reset", e);
             throw e;
         }
     }

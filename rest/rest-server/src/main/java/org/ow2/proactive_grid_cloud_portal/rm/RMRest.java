@@ -84,6 +84,7 @@ import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -270,11 +271,27 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    public RMStateDelta getInitialState(@HeaderParam("sessionid") String sessionId,
+    public RMStateDelta getRMStateDelta(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
         checkAccess(sessionId);
         long counter = Integer.valueOf(clientCounter);
         return RMStateCaching.getRMInitialState(counter);
+    }
+
+    /**
+     * Returns the state of the RM, which does not include REMOVED node/nodesources
+     * @param sessionId a valid session id
+     * @return the state of the RM, which does not include REMOVED node/nodesources
+     * @throws NotConnectedException
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("monitoring/full")
+    @Produces("application/json")
+    public RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+        checkAccess(sessionId);
+        return RMStateCaching.getRMStateFull();
     }
 
     /**

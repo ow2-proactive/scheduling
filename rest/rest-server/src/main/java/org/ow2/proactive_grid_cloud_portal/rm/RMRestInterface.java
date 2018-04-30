@@ -62,6 +62,7 @@ import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
@@ -128,9 +129,15 @@ public interface RMRestInterface {
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    RMStateDelta getInitialState(@HeaderParam("sessionid") String sessionId,
+    RMStateDelta getRMStateDelta(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("clientCounter") @DefaultValue("-1") String latestCounterClientAware)
             throws NotConnectedException;
+
+    @GET
+    @GZIP
+    @Path("monitoring")
+    @Produces("application/json")
+    RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
 
     @GET
     @Path("isactive")

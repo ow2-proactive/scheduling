@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMEventListener;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
@@ -51,11 +52,10 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
  * and get an initial state which is the snapshot of Resource Manager state, with its
  * nodes and NodeSources.
  *
+ * @author The ProActive Team
  * @see RMNodeEvent
  * @see RMNodeSourceEvent
  * @see RMMonitoring
- *
- * @author The ProActive Team
  * @since ProActive Scheduling 0.9
  */
 @PublicAPI
@@ -137,8 +137,9 @@ public class RMInitialState implements Serializable {
      * Clones current state events, but keep only those events which has counter bigger than provided 'filter'
      * Event counter can take values [0, +).
      * So if filter is '-1' then all events will returned.
+     *
      * @param filter
-     * @return rmInitialState where all the events bigger than 'filter'
+     * @return RMStateDelta where all the events bigger than 'filter'
      */
     public RMStateDelta cloneAndFilter(long filter) {
         long actualFilter = computeActualFilter(filter);
@@ -177,5 +178,24 @@ public class RMInitialState implements Serializable {
     private <T extends RMEvent> long findLargestCounter(Collection<T> events) {
         final Optional<T> max = events.stream().max(Comparator.comparing(RMEvent::getCounter));
         return max.map(RMEvent::getCounter).orElse(EMPTY_STATE);
+    }
+
+    /**
+     * Clones current state events, but keep only those events which was not removed.
+     * @return RMStateFull where all the events are correspond to existing node/nodesources
+     */
+    public RMStateFull cloneAndFilterOnlyExisting() {
+        final List<RMEvent> responseEvents = events.getSortedItems()
+                                                   .stream()
+                                                   .filter(event -> (event.getEventType() != RMEventType.NODE_REMOVED &&
+                                                                     event.getEventType() != RMEventType.NODESOURCE_REMOVED))
+                                                   .collect(Collectors.toList());
+
+        RMStateFull response = new RMStateFull();
+
+        response.setNodeSource(getNodeSourceEvents(responseEvents));
+        response.setNodesEvents(getNodeEvents(responseEvents));
+
+        return response;
     }
 }
