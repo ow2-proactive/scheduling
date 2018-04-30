@@ -63,7 +63,7 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
     /**
      * The way of nodes removing
      */
-    @Configurable(description = "the mode how nodes are removed", dynamic = true)
+    @Configurable(description = "How nodes are removed", dynamic = true)
     private boolean preemptive = false;
 
     @Configurable(description = "Start deployment immediately", dynamic = true)

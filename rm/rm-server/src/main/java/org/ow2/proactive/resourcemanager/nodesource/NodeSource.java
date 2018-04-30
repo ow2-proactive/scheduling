@@ -132,8 +132,6 @@ public class NodeSource implements InitActive, RunActive {
      */
     private NodeSourcePolicy activePolicy;
 
-    private final String description;
-
     private final RMCore rmcore;
 
     // The url used by spawn nodes to register themself
@@ -194,7 +192,6 @@ public class NodeSource implements InitActive, RunActive {
         name = null;
         infrastructureManager = null;
         policy = null;
-        description = null;
         rmcore = null;
         administrator = null;
         adminPermission = null;
@@ -221,7 +218,6 @@ public class NodeSource implements InitActive, RunActive {
         this.policy = policy;
         this.rmcore = rmcore;
         this.monitoring = monitor;
-        this.description = "Infrastructure: " + im + ", Policy: " + this.policy;
 
         this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
         this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
@@ -729,7 +725,7 @@ public class NodeSource implements InitActive, RunActive {
      */
     @ImmediateService
     public String getDescription() {
-        return description;
+        return "Infrastructure: " + this.infrastructureManager.toString() + ", Policy: " + this.policy.toString();
     }
 
     /**
@@ -975,7 +971,7 @@ public class NodeSource implements InitActive, RunActive {
 
     public RMNodeSourceEvent createNodeSourceEvent() {
         return new RMNodeSourceEvent(this.name,
-                                     this.description,
+                                     getDescription(),
                                      this.administrator.getName(),
                                      this.getStatus().toString());
     }

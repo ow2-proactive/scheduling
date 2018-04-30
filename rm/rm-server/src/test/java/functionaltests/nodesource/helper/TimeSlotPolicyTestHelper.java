@@ -37,8 +37,8 @@ public class TimeSlotPolicyTestHelper {
 
     public static Object[] getParameters() {
         return new Object[] { AccessType.ME.toString(), AccessType.ALL.toString(),
-                              TimeSlotPolicy.dateFormat.format(System.currentTimeMillis()),
-                              TimeSlotPolicy.dateFormat.format(System.currentTimeMillis() + TIME_SLOT_PERIOD),
+                              TimeSlotPolicy.DATE_FORMAT.format(System.currentTimeMillis()),
+                              TimeSlotPolicy.DATE_FORMAT.format(System.currentTimeMillis() + TIME_SLOT_PERIOD),
                               String.valueOf(TIME_SLOT_REPEATED_IN), "true" };
     }
 

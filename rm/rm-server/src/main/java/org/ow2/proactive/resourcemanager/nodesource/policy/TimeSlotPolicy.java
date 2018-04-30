@@ -28,6 +28,9 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -57,62 +60,37 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 @ActiveObject
 public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
 
-    /**
-     * Timer task acquired all node from infrastructure
-     */
-    private class AcquireTask extends TimerTask {
-        @Override
-        public void run() {
-            synchronized (timer) {
-                acquireAllNodes();
-            }
-        }
-    }
+    private static final String TIMER_NAME = "TimeSlotPolicy Timer";
 
-    /**
-     * Timer task released all node from infrastructure
-     */
-    private class ReleaseTask extends TimerTask {
-        @Override
-        public void run() {
-            synchronized (timer) {
-                // security trick
-                thisStub.removeAllNodes(preemptive);
-            }
-        }
-    }
-
-    /** Date formatter */
-    public static transient DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT,
-                                                                                         SimpleDateFormat.FULL,
-                                                                                         new Locale("en"));
+    public static final transient DateFormat DATE_FORMAT = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT,
+                                                                                                SimpleDateFormat.FULL,
+                                                                                                new Locale("en"));
 
     /** Timer used for tasks scheduling */
-    private transient Timer timer = new Timer("TimeSlotPolicy Timer", true);
+    private transient Timer timer;
 
     /**
      * Initial time for nodes acquisition
      */
-    @Configurable
-    private String acquireTime = dateFormat.format(getDate(System.currentTimeMillis()));
+    @Configurable(description = "Time of nodes acquisition", dynamic = true)
+    private String acquireTime = DATE_FORMAT.format(getDate(System.currentTimeMillis()));
 
     /**
      * Initial time for nodes releasing
      */
-    @Configurable
-    private String releaseTime = dateFormat.format(getDate(System.currentTimeMillis() +
-                                                           1 * 60 * 60 * 1000 /* 1 hour */));
+    @Configurable(description = "Time of nodes removal", dynamic = true)
+    private String releaseTime = DATE_FORMAT.format(getDate(System.currentTimeMillis() + 60 * 60 * 1000)); // 1 hour
 
     /**
      * Period in milliseconds between nodes acquisition/releasing iterations
      */
-    @Configurable(description = "ms (1 day by default)")
-    private Long period = new Long(24 * 60 * 60 * 1000);
+    @Configurable(description = "ms (1 day by default)", dynamic = true)
+    private Long period = (long) (24 * 60 * 60 * 1000);
 
     /**
      * The way of nodes removing
      */
-    @Configurable
+    @Configurable(description = "How nodes are removed", dynamic = true)
     private boolean preemptive = true;
 
     /**
@@ -133,39 +111,54 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     @Override
     public BooleanWrapper configure(Object... policyParameters) {
         super.configure(policyParameters);
-        try {
-            int index = 2;
+        configureTimeSlotParametersStartingFromIndex(2, policyParameters);
+        return new BooleanWrapper(true);
+    }
 
-            acquireTime = policyParameters[index++].toString();
-            releaseTime = policyParameters[index++].toString();
+    @Override
+    public void reconfigure(Object... updatedPolicyParameters) {
+        super.reconfigure(updatedPolicyParameters);
+        this.timer.cancel();
+        configureTimeSlotParametersStartingFromIndex(2, updatedPolicyParameters);
+        try {
+            scheduleAcquireAndReleaseTasks();
+        } catch (ParseException e) {
+            this.timer.cancel();
+            throw new IllegalArgumentException("Time cannot be parsed", e);
+        }
+    }
+
+    private void configureTimeSlotParametersStartingFromIndex(int index, Object[] policyParameters) {
+        try {
+            this.acquireTime = policyParameters[index++].toString();
+            this.releaseTime = policyParameters[index++].toString();
 
             // validation of date parameters
-            dateFormat.parse(acquireTime);
-            dateFormat.parse(releaseTime);
+            DATE_FORMAT.parse(this.acquireTime);
+            DATE_FORMAT.parse(this.releaseTime);
 
             if (policyParameters[index++].toString().length() > 0) {
-                period = Long.parseLong(policyParameters[index - 1].toString());
+                this.period = Long.parseLong(policyParameters[index - 1].toString());
 
-                if (period < 0) {
+                if (this.period < 0) {
                     throw new RMException("Period cannot be less than zero");
                 }
 
             } else {
-                period = new Long(0);
+                this.period = 0L;
             }
 
-            preemptive = Boolean.parseBoolean(policyParameters[index++].toString());
+            this.preemptive = Boolean.parseBoolean(policyParameters[index].toString());
         } catch (Throwable t) {
             throw new IllegalArgumentException(t);
         }
-        return new BooleanWrapper(true);
     }
 
     /**
      * Initializes stub to this active object
      */
     public void initActivity(Body body) {
-        thisStub = (TimeSlotPolicy) PAActiveObject.getStubOnThis();
+        this.thisStub = (TimeSlotPolicy) PAActiveObject.getStubOnThis();
     }
 
     /**
@@ -173,22 +166,45 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public BooleanWrapper activate() {
-
         try {
-            if (period > 0) {
-                info("Scheduling periodic nodes acquision");
-                timer.scheduleAtFixedRate(new AcquireTask(), dateFormat.parse(acquireTime), period);
-                timer.scheduleAtFixedRate(new ReleaseTask(), dateFormat.parse(releaseTime), period);
-            } else {
-                info("Scheduling non periodic nodes acquision");
-                timer.schedule(new AcquireTask(), dateFormat.parse(acquireTime));
-                timer.schedule(new ReleaseTask(), dateFormat.parse(releaseTime));
-            }
+            scheduleAcquireAndReleaseTasks();
         } catch (ParseException e) {
+            this.timer.cancel();
             return new BooleanWrapper(false);
         }
-
         return new BooleanWrapper(true);
+    }
+
+    private void scheduleAcquireAndReleaseTasks() throws ParseException {
+
+        this.timer = new Timer(TIMER_NAME, true);
+
+        Date dateOfAcquireTimerStart = getDateClosestToNow(this.acquireTime);
+        Date dateOfReleaseTimerStart = getDateClosestToNow(this.releaseTime);
+
+        if (this.period > 0) {
+            info("Scheduling periodic nodes acquisition");
+            this.timer.scheduleAtFixedRate(new AcquireTask(), dateOfAcquireTimerStart, this.period);
+            this.timer.scheduleAtFixedRate(new ReleaseTask(), dateOfReleaseTimerStart, this.period);
+        } else {
+            info("Scheduling non periodic nodes acquisition");
+            this.timer.schedule(new AcquireTask(), dateOfAcquireTimerStart);
+            this.timer.schedule(new ReleaseTask(), dateOfReleaseTimerStart);
+        }
+    }
+
+    private Date getDateClosestToNow(String unparsedDate) throws ParseException {
+
+        long timeNow = System.currentTimeMillis();
+
+        Date dateOfFirstAcquire = DATE_FORMAT.parse(unparsedDate);
+        long timeOfAcquireTimerStart = dateOfFirstAcquire.getTime();
+
+        while (timeOfAcquireTimerStart < timeNow) {
+            timeOfAcquireTimerStart += this.period;
+        }
+
+        return new Date(timeOfAcquireTimerStart);
     }
 
     /**
@@ -196,9 +212,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public void shutdown(Client initiator) {
-        synchronized (timer) {
-            timer.cancel();
-        }
+        this.timer.cancel();
         super.shutdown(initiator);
     }
 
@@ -225,7 +239,28 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      */
     @Override
     public String toString() {
-        return super.toString() + " [Acquire Time: " + acquireTime + " Release Time: " + releaseTime + " Period: " +
-               period + " ms]";
+        return super.toString() + " [Acquire Time: " + this.acquireTime + " Release Time: " + this.releaseTime +
+               " Period: " + this.period + " ms]";
     }
+
+    /**
+     * Timer task acquired all node from infrastructure
+     */
+    private class AcquireTask extends TimerTask {
+        @Override
+        public void run() {
+            acquireAllNodes();
+        }
+    }
+
+    /**
+     * Timer task released all node from infrastructure
+     */
+    private class ReleaseTask extends TimerTask {
+        @Override
+        public void run() {
+            removeAllNodes(TimeSlotPolicy.this.preemptive);
+        }
+    }
+
 }
