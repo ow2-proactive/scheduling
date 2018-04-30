@@ -83,9 +83,7 @@ public class TestNodeSourceAfterRestart extends RMFunctionalTest {
         log("Test 1 - starting the resource manager");
         startRMPreservingDB();
 
-        while (rmHelper.getResourceManager().getState().getFreeNodesNumber() != 1) {
-            Thread.sleep(500);
-        }
+        RMTHelper.waitForNodesToBeUp(1, rmHelper.getMonitorsHandler());
 
         log("Test 1 - passed");
 

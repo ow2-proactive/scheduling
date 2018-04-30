@@ -99,10 +99,10 @@ public class LocalInfrastructure extends InfrastructureManager {
     public void acquireAllNodes() {
         this.readLock.lock();
         try {
-            logger.info("Starting node acquisition. Acquired nodes=" + getLocalAcquiredNodesWithLock() +
-                        ", Handled nodes=" + getHandledNodesWithLock());
-            if (getLocalAcquiredNodesWithLock() < getHandledNodesWithLock()) {
-                int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenHandledAndAcquiredNodesWithLock();
+            logger.info("Starting node acquisition. Acquired nodes=" + getNumberOfAcquiredNodesWithLock() +
+                        ", Handled nodes=" + getNumberOfHandledNodesWithLock());
+            if (getNumberOfAcquiredNodesWithLock() < getNumberOfHandledNodesWithLock()) {
+                int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock();
                 logger.info("Starting " + differenceBetweenHandledAndAcquiredNodes + " nodes");
                 startNodes(differenceBetweenHandledAndAcquiredNodes);
             }
@@ -260,7 +260,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private void startNodeProcessOnTheFly(int numberOfNodes) {
-        addHandledNodesWithLockAndPersist(numberOfNodes);
+        increaseNumberOfHandledNodesWithLockAndPersist(numberOfNodes);
         startNodeProcess(numberOfNodes);
     }
 
@@ -291,11 +291,12 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private boolean allNodesAcquiredOrLost() {
-        return (getLocalAcquiredNodesWithLock() + getLocalLostNodesWithLock()) > getHandledNodesWithLock();
+        return (getNumberOfAcquiredNodesWithLock() +
+                getNumberOfLostNodesWithLock()) >= getNumberOfHandledNodesWithLock();
     }
 
     private boolean allNodesLost(int numberOfNodes) {
-        return getLocalLostNodesWithLock() == numberOfNodes;
+        return getNumberOfLostNodesWithLock() >= numberOfNodes;
     }
 
     private void cleanProcess(ProcessExecutor processExecutor) {
@@ -339,12 +340,12 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
-        incrementLostNodesWithLockAndPersist();
+        incrementNumberOfLostNodesWithLockAndPersist();
     }
 
     @Override
     protected void notifyAcquiredNode(Node arg0) throws RMException {
-        incrementAcquiredNodesWithLockAndPersist();
+        incrementNumberOfAcquiredNodesWithLockAndPersist();
     }
 
     @Override
@@ -362,7 +363,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void onDownNodeReconnection(Node node) {
-        incrementAcquiredNodesWithLockAndPersist();
+        incrementNumberOfAcquiredNodesWithLockAndPersist();
     }
 
     @Override
@@ -389,7 +390,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private void removeAcquiredNodesAndShutDownIfNeeded() {
-        int remainingNodesCount = decrementAndGetAcquiredNodesWithLockAndPersist();
+        int remainingNodesCount = decrementAndGetNumberOfAcquiredNodesWithLockAndPersist();
         // if there is no remaining node, kill the JVM process
         if (remainingNodesCount == 0) {
             shutDown();
@@ -398,15 +399,15 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     // Below are wrapper methods around the runtime variables map
 
-    private int getLocalAcquiredNodesWithLock() {
+    private int getNumberOfAcquiredNodesWithLock() {
         return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY));
     }
 
-    private int getLocalLostNodesWithLock() {
+    private int getNumberOfLostNodesWithLock() {
         return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_LOST_NODES_KEY));
     }
 
-    private void incrementAcquiredNodesWithLockAndPersist() {
+    private void incrementNumberOfAcquiredNodesWithLockAndPersist() {
         setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
             int updated = (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY) + 1;
             this.persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, updated);
@@ -414,7 +415,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         });
     }
 
-    private void incrementLostNodesWithLockAndPersist() {
+    private void incrementNumberOfLostNodesWithLockAndPersist() {
         setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
             int updated = (int) this.persistedInfraVariables.get(NB_LOST_NODES_KEY) + 1;
             this.persistedInfraVariables.put(NB_LOST_NODES_KEY, updated);
@@ -422,7 +423,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         });
     }
 
-    private int decrementAndGetAcquiredNodesWithLockAndPersist() {
+    private int decrementAndGetNumberOfAcquiredNodesWithLockAndPersist() {
         return setPersistedInfraVariable(() -> {
             int updated = (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY) - 1;
             this.persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, updated);
@@ -430,13 +431,13 @@ public class LocalInfrastructure extends InfrastructureManager {
         });
     }
 
-    private int getHandledNodesWithLock() {
+    private int getNumberOfHandledNodesWithLock() {
         return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY));
     }
 
-    private void addHandledNodesWithLockAndPersist(final int numberOfNodes) {
+    private void increaseNumberOfHandledNodesWithLockAndPersist(final int additionalNumberOfNodes) {
         setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
-            int updated = (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) + numberOfNodes;
+            int updated = (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) + additionalNumberOfNodes;
             this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, updated);
             return null;
         });
@@ -450,7 +451,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         });
     }
 
-    private int getDifferenceBetweenHandledAndAcquiredNodesWithLock() {
+    private int getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock() {
         return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) -
                                                (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY));
     }

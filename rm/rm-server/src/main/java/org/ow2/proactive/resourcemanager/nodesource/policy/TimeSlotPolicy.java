@@ -28,9 +28,6 @@ package org.ow2.proactive.resourcemanager.nodesource.policy;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -249,7 +246,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     private class AcquireTask extends TimerTask {
         @Override
         public void run() {
-            acquireAllNodes();
+            TimeSlotPolicy.this.thisStub.acquireAllNodes();
         }
     }
 
@@ -259,7 +256,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     private class ReleaseTask extends TimerTask {
         @Override
         public void run() {
-            removeAllNodes(TimeSlotPolicy.this.preemptive);
+            TimeSlotPolicy.this.thisStub.removeAllNodes(TimeSlotPolicy.this.preemptive);
         }
     }
 
