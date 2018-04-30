@@ -209,12 +209,12 @@ public class RMListenerProxy extends RMGroupEventListener {
         checkCounter(event);
     }
 
-    public RMStateDelta getRMInitialState(long filter) {
+    public RMStateDelta getRMStateDelta(long filter) {
         return rmInitialState.cloneAndFilter(filter);
     }
 
     public RMStateFull getRMStateFull() {
-        return rmInitialState.cloneAndFilterOnlyExisting();
+        return rmInitialState.cloneAndFilterNotRemovedOnly();
     }
 
     /**

@@ -54,7 +54,7 @@ public class RMStateCaching {
      * <p>
      * Thread frequency can be customized using {@link PortalConfiguration#RM_CACHE_REFRESHRATE}.
      * <p>
-     * Cached object can be retrieved using {@link #getRMInitialState(long)}
+     * Cached object can be retrieved using {@link #getRMStateDetla(long)}
      */
     public synchronized static void init() {
         init_();
@@ -96,13 +96,13 @@ public class RMStateCaching {
     }
 
     /**
-     * @return cached RM State as returned by {@link RMProxyUserInterface#getRMInitialState(long)}
+     * @return cached RM State as returned by {@link RMProxyUserInterface#getRMStateDelta(long)}
      */
-    public static RMStateDelta getRMInitialState(long counter) {
+    public static RMStateDelta getRMStateDetla(long counter) {
         try {
             long startTime = System.currentTimeMillis();
 
-            final RMStateDelta state = PAFuture.getFutureValue(rm.getRMInitialState(counter));
+            final RMStateDelta state = PAFuture.getFutureValue(rm.getRMStateDelta(counter));
 
             long time = System.currentTimeMillis() - startTime;
 

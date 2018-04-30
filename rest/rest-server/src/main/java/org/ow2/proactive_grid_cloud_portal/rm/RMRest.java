@@ -275,7 +275,7 @@ public class RMRest implements RMRestInterface {
             @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
         checkAccess(sessionId);
         long counter = Integer.valueOf(clientCounter);
-        return RMStateCaching.getRMInitialState(counter);
+        return RMStateCaching.getRMStateDetla(counter);
     }
 
     /**

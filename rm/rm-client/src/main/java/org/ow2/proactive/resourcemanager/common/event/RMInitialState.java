@@ -184,7 +184,7 @@ public class RMInitialState implements Serializable {
      * Clones current state events, but keep only those events which was not removed.
      * @return RMStateFull where all the events are correspond to existing node/nodesources
      */
-    public RMStateFull cloneAndFilterOnlyExisting() {
+    public RMStateFull cloneAndFilterNotRemovedOnly() {
         final List<RMEvent> responseEvents = events.getSortedItems()
                                                    .stream()
                                                    .filter(event -> (event.getEventType() != RMEventType.NODE_REMOVED &&
