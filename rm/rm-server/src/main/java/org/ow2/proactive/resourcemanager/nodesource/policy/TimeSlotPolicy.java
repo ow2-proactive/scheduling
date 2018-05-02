@@ -82,7 +82,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
      * Period in milliseconds between nodes acquisition/releasing iterations
      */
     @Configurable(description = "ms (1 day by default)", dynamic = true)
-    private Long period = (long) (24 * 60 * 60 * 1000);
+    private Long period = 24 * 60 * 60 * 1000L;
 
     /**
      * The way of nodes removing
@@ -134,7 +134,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
             DATE_FORMAT.parse(this.acquireTime);
             DATE_FORMAT.parse(this.releaseTime);
 
-            if (policyParameters[index++].toString().length() > 0) {
+            if (!policyParameters[index++].toString().isEmpty()) {
                 this.period = Long.parseLong(policyParameters[index - 1].toString());
 
                 if (this.period < 0) {

@@ -26,7 +26,7 @@
 package functionaltests.nodesource.helper;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -64,8 +64,7 @@ public class SSHInfrastructureV2TestHelper {
 
         sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
-        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
-        userAuthFactories.add(new UserAuthPassword.Factory());
+        List<NamedFactory<UserAuth>> userAuthFactories = Collections.singletonList(new UserAuthPassword.Factory());
         sshd.setUserAuthFactories(userAuthFactories);
 
         sshd.setPasswordAuthenticator((username, password, session) -> username != null && username.equals(password));
