@@ -1302,8 +1302,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws UnknownJobException
      *             if one of the job IDs wasn't found
      */
-    List<JobInfo> getJobsInfoList(List<String> jobsId)
-            throws PermissionException, NotConnectedException, UnknownJobException;
+    List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException;
 
     /**
      * Returns a list of connected users.
