@@ -58,6 +58,8 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
 
     private String taskNameValue = "TestTaskName";
 
+    private long previousTaskIdValue = 12L;
+
     private long taskIdValue = 20L;
 
     private long jobIdValue = 12L;
@@ -116,6 +118,9 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
         taskResultVariables.put(taskResultPropagatedVariables1Key,
                                 AllObjects2BytesConverterHandler.convertObject2Byte(taskResultPropagatedVariables1Key,
                                                                                     taskResultPropagatedVariables1Value));
+        taskResultVariables.put(SchedulerVars.PA_TASK_ID.name(),
+                                AllObjects2BytesConverterHandler.convertObject2Byte(SchedulerVars.PA_TASK_ID.name(),
+                                                                                    "" + previousTaskIdValue));
 
         TaskResultImpl taskResult = new TaskResultImpl(taskLauncherInitializer.getTaskId(), new Exception("Exception"));
         taskResult.setPropagatedVariables(taskResultVariables);
@@ -132,6 +137,15 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
 
         assertThat((String) contextVariables.get(taskResultPropagatedVariables1Key),
                    is(taskResultPropagatedVariables1Value));
+        // Makes sure the previous task id has been overwritten by the current task id
+        assertThat((String) contextVariables.get(SchedulerVars.PA_TASK_ID.name()), is("" + taskIdValue));
+
+        contextVariables = new TaskContextVariableExtractor().getAllNonTaskVariables(taskContext);
+
+        assertThat((String) contextVariables.get(taskResultPropagatedVariables1Key),
+                   is(taskResultPropagatedVariables1Value));
+        // Makes sure the previous task id has been overwritten by the current task id
+        assertThat((String) contextVariables.get(SchedulerVars.PA_TASK_ID.name()), is("" + taskIdValue));
     }
 
     @Test
