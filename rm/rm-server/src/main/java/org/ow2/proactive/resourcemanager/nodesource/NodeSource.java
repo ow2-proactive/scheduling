@@ -569,7 +569,7 @@ public class NodeSource implements InitActive, RunActive {
         return this.descriptor;
     }
 
-    public void reconfigure(Object[] updatedInfrastructureParams, Object[] updatedPolicyParams) {
+    public void reconfigure(Object[] updatedInfrastructureParams, Object[] updatedPolicyParams) throws Exception {
         this.infrastructureManager.reconfigure(updatedInfrastructureParams);
         this.activePolicy.reconfigure(updatedPolicyParams);
     }

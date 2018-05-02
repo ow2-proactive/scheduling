@@ -113,7 +113,7 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     }
 
     @Override
-    public void reconfigure(Object... updatedPolicyParameters) {
+    public void reconfigure(Object... updatedPolicyParameters) throws Exception {
         super.reconfigure(updatedPolicyParameters);
         this.timer.cancel();
         configureTimeSlotParametersStartingFromIndex(2, updatedPolicyParameters);

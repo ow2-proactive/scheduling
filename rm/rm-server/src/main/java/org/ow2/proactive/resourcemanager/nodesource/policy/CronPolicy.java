@@ -94,7 +94,7 @@ public class CronPolicy extends NodeSourcePolicy implements InitActive {
     }
 
     @Override
-    public void reconfigure(Object... updatedPolicyParameters) {
+    public void reconfigure(Object... updatedPolicyParameters) throws Exception {
         super.reconfigure(updatedPolicyParameters);
         this.cronScheduler.stop();
         configureCronParametersStartingFromIndex(2, updatedPolicyParameters);

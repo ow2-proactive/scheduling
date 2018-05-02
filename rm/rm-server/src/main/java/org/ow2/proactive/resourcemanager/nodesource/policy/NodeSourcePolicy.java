@@ -107,7 +107,7 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
      *
      * @throws IllegalArgumentException if parameters are incorrect
      */
-    public void reconfigure(Object... updatedPolicyParameters) {
+    public void reconfigure(Object... updatedPolicyParameters) throws Exception {
         // by default, reconfiguration does not overwrite any parameter
     }
 
