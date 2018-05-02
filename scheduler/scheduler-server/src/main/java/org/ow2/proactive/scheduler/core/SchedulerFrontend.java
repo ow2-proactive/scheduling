@@ -1278,14 +1278,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
-    public List<JobInfo> getJobsInfoList(List<String> jobsId)
-            throws PermissionException, NotConnectedException, UnknownJobException {
+    public List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException {
         List<JobInfo> jobsInfoList = new ArrayList<>();
         for (String jobId : jobsId) {
             try {
                 jobsInfoList.add(this.getJobInfo(jobId));
             } catch (UnknownJobException e) {
-                throw new UnknownJobException(e);
+                logger.warn("The job with job ID " + jobId + "couldn't be found", e);
             }
         }
         return jobsInfoList;
