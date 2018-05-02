@@ -348,14 +348,15 @@ public class StaxJobFactory extends JobFactory {
             int eventType;
             boolean shouldContinue = true;
 
-            commonPropertiesHolder.getVariables()
-                                  .putAll(replacementVariables.entrySet()
-                                                              .stream()
-                                                              .collect(Collectors.toMap(entry -> entry.getKey(),
-                                                                                        entry -> new JobVariable(entry.getKey(),
-                                                                                                                 entry.getValue(),
-                                                                                                                 null))));
-
+            if (replacementVariables != null) {
+                commonPropertiesHolder.getVariables()
+                        .putAll(replacementVariables.entrySet()
+                                .stream()
+                                .collect(Collectors.toMap(entry -> entry.getKey(),
+                                        entry -> new JobVariable(entry.getKey(),
+                                                entry.getValue(),
+                                                null))));
+            }
             while (shouldContinue && cursorJob.hasNext()) {
                 eventType = cursorJob.next();
                 switch (eventType) {
