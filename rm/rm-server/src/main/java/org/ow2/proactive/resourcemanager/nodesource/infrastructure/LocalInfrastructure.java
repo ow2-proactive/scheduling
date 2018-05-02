@@ -99,9 +99,11 @@ public class LocalInfrastructure extends InfrastructureManager {
     public void acquireAllNodes() {
         this.readLock.lock();
         try {
-            logger.info("Starting node acquisition. Acquired nodes=" + getNumberOfAcquiredNodesWithLock() +
-                        ", Handled nodes=" + getNumberOfHandledNodesWithLock());
-            if (getNumberOfAcquiredNodesWithLock() < getNumberOfHandledNodesWithLock()) {
+            int numberOfHandledNodes = getNumberOfHandledNodesWithLock();
+            int numberOfAcquiredNodes = getNumberOfAcquiredNodesWithLock();
+            logger.info("Starting node acquisition. Acquired nodes=" + numberOfAcquiredNodes + ", Handled nodes=" +
+                        numberOfHandledNodes);
+            if (numberOfAcquiredNodes < numberOfHandledNodes) {
                 int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock();
                 logger.info("Starting " + differenceBetweenHandledAndAcquiredNodes + " nodes");
                 startNodes(differenceBetweenHandledAndAcquiredNodes);

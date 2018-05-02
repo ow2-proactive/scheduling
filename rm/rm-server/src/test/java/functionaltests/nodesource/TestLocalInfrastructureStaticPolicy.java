@@ -27,6 +27,7 @@ package functionaltests.nodesource;
 
 import static functionaltests.utils.RMTHelper.log;
 import static org.junit.Assert.*;
+import static org.ow2.proactive.utils.Lambda.repeater;
 
 import java.io.File;
 
@@ -145,17 +146,13 @@ public class TestLocalInfrastructureStaticPolicy extends RMFunctionalTest {
 
         resourceManager.removeNodeSource(source1, true);
         //wait the n events of the n nodes removals of the node source
-        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        }
+        repeater.accept(defaultDescriptorNodesNb, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED));
 
         //wait for the event of the node source removal
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source1);
 
         resourceManager.removeNodeSource(source2, true);
-        for (int i = 0; i < defaultDescriptorNodesNb; i++) {
-            rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        }
+        repeater.accept(defaultDescriptorNodesNb, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED));
 
         //wait for the event of the node source removal
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, source2);

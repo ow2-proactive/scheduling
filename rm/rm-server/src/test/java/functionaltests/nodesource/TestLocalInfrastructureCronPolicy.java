@@ -26,6 +26,7 @@
 package functionaltests.nodesource;
 
 import static functionaltests.utils.RMTHelper.log;
+import static org.ow2.proactive.utils.Lambda.repeater;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -71,14 +72,10 @@ public class TestLocalInfrastructureCronPolicy extends RMFunctionalTest {
         createNodeSource(NODE_SOURCE_NAME);
 
         log("Waiting for the cron policy to remove the nodes");
-        for (int i = 0; i < NODES_NUMBER; i++) {
-            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
-        }
+        repeater.accept(NODES_NUMBER, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED));
 
         log("Waiting for the cron policy to add the nodes again");
-        for (int i = 0; i < NODES_NUMBER; i++) {
-            this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
-        }
+        repeater.accept(NODES_NUMBER, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED));
     }
 
     private void createEmptyNodeSource(String nodeSourceName) throws Exception {
@@ -102,7 +99,6 @@ public class TestLocalInfrastructureCronPolicy extends RMFunctionalTest {
                                               CronPolicyTestHelper.getParameters(),
                                               NODES_NOT_RECOVERABLE);
         this.resourceManager.deployNodeSource(nodeSourceName);
-
         RMTHelper.waitForNodeSourceCreation(nodeSourceName, NODES_NUMBER, this.rmHelper.getMonitorsHandler());
     }
 

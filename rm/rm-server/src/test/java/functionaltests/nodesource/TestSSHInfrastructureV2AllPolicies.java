@@ -196,7 +196,6 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
     }
 
     private void createNodeSourceWithStaticPolicy() throws Exception {
-
         this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
                                               SSHInfrastructureV2.class.getName(),
                                               SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
@@ -207,7 +206,6 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
     }
 
     private void createNodeSourceWithCronPolicy() throws Exception {
-
         this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
                                               SSHInfrastructureV2.class.getName(),
                                               SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
@@ -218,7 +216,6 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
     }
 
     private void createNodeSourceWithTimeSlotPolicy() throws Exception {
-
         this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
                                               SSHInfrastructureV2.class.getName(),
                                               SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
@@ -229,7 +226,6 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
     }
 
     private void createNodeSourceWithRestartDownNodesPolicy() {
-
         this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
                                               SSHInfrastructureV2.class.getName(),
                                               SSHInfrastructureV2TestHelper.getParameters(NB_NODES),
@@ -240,7 +236,6 @@ public class TestSSHInfrastructureV2AllPolicies extends RMFunctionalTest {
     }
 
     private void deployNodeSourceAndWait() {
-
         this.resourceManager.deployNodeSource(NODE_SOURCE_NAME);
         RMTHelper.waitForNodeSourceCreation(NODE_SOURCE_NAME, NB_NODES, this.rmHelper.getMonitorsHandler());
     }
