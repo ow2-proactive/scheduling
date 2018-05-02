@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -346,6 +347,15 @@ public class StaxJobFactory extends JobFactory {
         try {
             int eventType;
             boolean shouldContinue = true;
+
+            commonPropertiesHolder.getVariables()
+                                  .putAll(replacementVariables.entrySet()
+                                                              .stream()
+                                                              .collect(Collectors.toMap(entry -> entry.getKey(),
+                                                                                        entry -> new JobVariable(entry.getKey(),
+                                                                                                                 entry.getValue(),
+                                                                                                                 null))));
+
             while (shouldContinue && cursorJob.hasNext()) {
                 eventType = cursorJob.next();
                 switch (eventType) {
