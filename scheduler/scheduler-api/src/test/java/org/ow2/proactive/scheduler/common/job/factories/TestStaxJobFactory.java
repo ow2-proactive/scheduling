@@ -67,12 +67,16 @@ public class TestStaxJobFactory {
 
     private static URI jobDescriptorSysPropsUri;
 
+    private static URI jobDescriptorNoVariablesUri;
+
     private StaxJobFactory factory;
 
     @BeforeClass
     public static void setJobDescriptorcUri() throws Exception {
         jobDescriptorUri = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_update_variables.xml")
                                                    .toURI();
+        jobDescriptorNoVariablesUri = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_no_variables.xml")
+                                                              .toURI();
         jobDescriptorSysPropsUri = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_update_variables_using_system_properties.xml")
                                                            .toURI();
         BasicConfigurator.resetConfiguration();
@@ -135,6 +139,16 @@ public class TestStaxJobFactory {
         Job testJob = factory.createJob(jobDescriptorSysPropsUri);
 
         assertEquals("system_property_value", testJob.getVariables().get("system_property").getValue());
+    }
+
+    @Test
+    public void testCreateAndFillJobWithAJobVariableNotPresentInTheWorkflowXml() throws Exception {
+        Map<String, String> variablesMap = Maps.newHashMap();
+        String expectedPcaInstanceId = "42";
+        String variablePcaInstanceId = "PCA_INSTANCE_ID";
+        variablesMap.put(variablePcaInstanceId, expectedPcaInstanceId);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri, variablesMap);
+        assertEquals(expectedPcaInstanceId, testJob.getVariables().get(variablePcaInstanceId).getValue());
     }
 
     /**
