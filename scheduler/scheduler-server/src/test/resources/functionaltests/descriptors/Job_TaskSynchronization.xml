@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:proactive:jobdescriptor:3.10"
+     xsi:schemaLocation="urn:proactive:jobdescriptor:3.10 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.10/schedulerjob.xsd"
+    name="Job_TaskSynchronization"
+    priority="normal"
+    onTaskError="continueJobExecution"
+     maxNumberOfExecution="2"
+>
+  <taskFlow>
+    <task name="WaitForLock1UnblockLock2">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <depends>
+        <task ref="Init"/>
+      </depends>
+      <selection>
+        <script
+         type="dynamic" >
+          <code language="groovy">
+            <![CDATA[
+selected = synchronizationapi.containsKey(variables.get("PA_JOB_ID"), "lock1")
+]]>
+          </code>
+        </script>
+      </selection>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println "Lock1 unblocked"
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <cleaning>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+synchronizationapi.put(variables.get("PA_JOB_ID"), "lock2", true)
+]]>
+          </code>
+        </script>
+      </cleaning>
+    </task>
+    <task name="UnblockLock1">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <depends>
+        <task ref="Init"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+synchronizationapi.put(variables.get("PA_JOB_ID"), "lock1", true)
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="Init">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+synchronizationapi.createChannel(variables.get("PA_JOB_ID"), false)
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="WaitForLock2">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <depends>
+        <task ref="UnblockLock1"/>
+      </depends>
+      <selection>
+        <script
+         type="dynamic" >
+          <code language="groovy">
+            <![CDATA[
+selected = synchronizationapi.containsKey(variables.get("PA_JOB_ID"), "lock2")  
+]]>
+          </code>
+        </script>
+      </selection>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+println "Lock2 unblocked"
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+    <task name="End">
+      <description>
+        <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+      </description>
+      <depends>
+        <task ref="WaitForLock1UnblockLock2"/>
+        <task ref="WaitForLock2"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+synchronizationapi.deleteChannel(variables.get("PA_JOB_ID"))
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+    </task>
+  </taskFlow>
+</job>

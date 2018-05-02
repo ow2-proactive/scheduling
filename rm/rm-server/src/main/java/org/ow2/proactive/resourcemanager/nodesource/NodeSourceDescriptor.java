@@ -43,15 +43,15 @@ public class NodeSourceDescriptor implements Serializable {
 
     private final String infrastructureType;
 
-    private final List<Serializable> infrastructureParameters;
-
     private final String policyType;
-
-    private final List<Serializable> policyParameters;
 
     private final Client provider;
 
     private final boolean nodesRecoverable;
+
+    private List<Serializable> infrastructureParameters;
+
+    private List<Serializable> policyParameters;
 
     private NodeSourceStatus status;
 
@@ -124,6 +124,14 @@ public class NodeSourceDescriptor implements Serializable {
 
     public void setStatus(NodeSourceStatus status) {
         this.status = status;
+    }
+
+    public void setInfrastructureParameters(List<Serializable> infrastructureParameters) {
+        this.infrastructureParameters = infrastructureParameters;
+    }
+
+    public void setPolicyParameters(List<Serializable> policyParameters) {
+        this.policyParameters = policyParameters;
     }
 
     public static class Builder {

@@ -144,6 +144,14 @@ public class RMNodeStarter {
      */
     public static final String NODE_ACCESS_TOKEN = "proactive.node.access.token";
 
+    public static final String CONFIG_NETWORK_NODE_PATH_RELATIVE = "config/network/node.ini";
+
+    public static final String CONFIG_SECURITY_POLICY_PATH_RELATIVE = "config/security.java.policy-client";
+
+    public static final String CONFIG_LOG_NODE_PATH_RELATIVE = "config/log/node.properties";
+
+    public static final String CONFIG_RM_CRED_PATH_RELATIVE = "config/authentication/rm.cred";
+
     private static final int DEFAULT_NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY = 5000; // in ms
 
     private static final String NODE_AVAILABILITY_REPORT_TIMEOUT_DELAY_PROP_NAME = "proactive.node.availability.reporting.timeout";
@@ -677,10 +685,13 @@ public class RMNodeStarter {
     private void configureProActiveDefaultConfigurationFile() {
         if (System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName()) == null) {
             File defaultProActiveConfiguration = new File(System.getProperty(PAResourceManagerProperties.RM_HOME.getKey()),
-                                                          "config/network/node.ini");
+                                                          CONFIG_NETWORK_NODE_PATH_RELATIVE);
             if (defaultProActiveConfiguration.exists()) {
                 System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
                                    defaultProActiveConfiguration.getAbsolutePath());
+            } else {
+                System.setProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
+                                   RMNodeStarter.class.getResource("/" + CONFIG_NETWORK_NODE_PATH_RELATIVE).toString());
             }
         }
     }
@@ -697,7 +708,7 @@ public class RMNodeStarter {
     private void configureSecurityManager() {
         if (System.getProperty("java.security.policy") == null) {
             System.setProperty("java.security.policy",
-                               RMNodeStarter.class.getResource("/config/security.java.policy-client").toString());
+                               RMNodeStarter.class.getResource("/" + CONFIG_SECURITY_POLICY_PATH_RELATIVE).toString());
             Policy.getPolicy().refresh();
         }
     }
@@ -750,7 +761,7 @@ public class RMNodeStarter {
                 logger.info("Configured log4j using " + log4jConfig);
             } else {
                 // use log4j config from JAR
-                URL log4jConfigFromJar = RMNodeStarter.class.getResource("/config/log/node.properties");
+                URL log4jConfigFromJar = RMNodeStarter.class.getResource("/" + CONFIG_LOG_NODE_PATH_RELATIVE);
                 System.setProperty(CentralPAPropertyRepository.LOG4J.getName(), log4jConfigFromJar.toString());
                 PropertyConfigurator.configure(log4jConfigFromJar);
                 logger.info("Configured log4j using " + log4jConfigFromJar.toString());
@@ -1006,12 +1017,13 @@ public class RMNodeStarter {
         } catch (KeyException fromDiskKeyException) {
             try {
                 Credentials credentialsFromRMHome = Credentials.getCredentials(new File(PAResourceManagerProperties.RM_HOME.getValueAsStringOrNull(),
-                                                                                        "config/authentication/rm.cred").getAbsolutePath());
+                                                                                        CONFIG_RM_CRED_PATH_RELATIVE).getAbsolutePath());
                 logger.info("Using default credentials from ProActive home, authenticating as user rm");
                 return credentialsFromRMHome;
             } catch (KeyException fromRMHomeKeyException) {
                 try {
-                    Credentials credentialsFromJar = Credentials.getCredentials(RMNodeStarter.class.getResourceAsStream("/config/authentication/rm.cred"));
+                    Credentials credentialsFromJar = Credentials.getCredentials(RMNodeStarter.class.getResourceAsStream("/" +
+                                                                                                                        CONFIG_RM_CRED_PATH_RELATIVE));
                     logger.info("Using default credentials from ProActive jars, authenticating as user rm");
                     return credentialsFromJar;
                 } catch (Exception fromJarKeyException) {

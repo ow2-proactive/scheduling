@@ -63,6 +63,11 @@ public enum RMEventType {
      */
     NODESOURCE_CREATED("created"),
     /**
+     * The node source has been updated, i.e. its parameters have changed
+     * while the node source is deployed.
+     */
+    NODESOURCE_UPDATED("updated"),
+    /**
      * The node source has been shutdown, i.e. its nodes have been removed
      * and it does not try to acquire nodes anymore.
      */

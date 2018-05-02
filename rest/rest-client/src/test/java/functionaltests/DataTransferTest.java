@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -85,22 +86,58 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     @Test
     public void testUploadSingleFile() throws Exception {
 
+        String testFolderName = "testUploadSingleFile";
+        System.out.println(testFolderName);
+
         File tmpFile = tmpDir.newFile(TEMP_FILE_TMP_NAME);
         Files.write(randomFileContents(), tmpFile);
 
         // use standard client
         IDataSpaceClient client = clientInstance();
         LocalFileSource source = new LocalFileSource(tmpFile);
-        RemoteDestination dest = new RemoteDestination(USER, "testUploadSingleFile/" + TEMP_FILE_TMP_NAME);
+        RemoteDestination dest = new RemoteDestination(USER, testFolderName + "/" + TEMP_FILE_TMP_NAME);
 
         assertTrue(client.upload(source, dest));
         String destDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        File destFile = new File(destDirPath, "testUploadSingleFile/" + TEMP_FILE_TMP_NAME);
+        File destFile = new File(destDirPath, testFolderName + "/" + TEMP_FILE_TMP_NAME);
         assertTrue(Files.equal(tmpFile, destFile));
 
         // use RemoteSpace API
         FileUtils.deleteQuietly(destFile);
-        client.getUserSpace().pushFile(tmpFile, "testUploadSingleFile/" + TEMP_FILE_TMP_NAME);
+        client.getUserSpace().pushFile(tmpFile, testFolderName + "/" + TEMP_FILE_TMP_NAME);
+        assertTrue(Files.equal(tmpFile, destFile));
+    }
+
+    @Test
+    public void testUploadSingleFileInDir() throws Exception {
+
+        String testFolderName = "testUploadSingleFileInDir";
+        System.out.println(testFolderName);
+
+        String subFolderName = "subFolder";
+
+        File tmpFolder = tmpDir.newFolder(testFolderName);
+        File subFolder = new File(tmpFolder, subFolderName);
+        subFolder.mkdirs();
+        File tmpFile = new File(subFolder, TEMP_FILE_TMP_NAME);
+        Files.write(randomFileContents(), tmpFile);
+
+        // use standard client
+        IDataSpaceClient client = clientInstance();
+        LocalDirSource source = new LocalDirSource(tmpFolder);
+        source.setIncludes(subFolder.getName() + "/" + TEMP_FILE_TMP_NAME);
+        RemoteDestination dest = new RemoteDestination(USER, testFolderName);
+
+        assertTrue(client.upload(source, dest));
+        String destDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
+        File destFile = new File(destDirPath, testFolderName + "/" + subFolderName + "/" + TEMP_FILE_TMP_NAME);
+        assertTrue(destFile.exists());
+        assertTrue(Files.equal(tmpFile, destFile));
+
+        // use RemoteSpace API
+        FileUtils.deleteQuietly(destFile);
+        client.getUserSpace().pushFile(tmpFile, testFolderName + "/" + subFolderName + "/" + TEMP_FILE_TMP_NAME);
+        assertTrue(destFile.exists());
         assertTrue(Files.equal(tmpFile, destFile));
     }
 
@@ -137,6 +174,8 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testUploadAllFilesInDirectory() throws Exception {
+        String testFolderName = "testUploadAllFilesInDirectory";
+        System.out.println(testFolderName);
         // entire folder
         TestFilesToUploadCreator testFiles = new TestFilesToUploadCreator().invoke();
         File tempTextFile = testFiles.getTempTextFile();
@@ -145,27 +184,27 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         // use standard client
         IDataSpaceClient client = clientInstance();
         LocalDirSource source = new LocalDirSource(tmpDir.getRoot());
-        RemoteDestination dest = new RemoteDestination(USER, "testUploadAllFilesInDirectory");
+        RemoteDestination dest = new RemoteDestination(USER, testFolderName);
 
         assertTrue(client.upload(source, dest));
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        assertTrue(Files.equal(tempTextFile,
-                               new File(destRootUri, "testUploadAllFilesInDirectory/" + TEMP_FILE_TXT_NAME)));
-        assertTrue(Files.equal(tempFile, new File(destRootUri, "testUploadAllFilesInDirectory/" + TEMP_FILE_TMP_PATH)));
+        assertTrue(Files.equal(tempTextFile, new File(destRootUri, testFolderName + "/" + TEMP_FILE_TXT_NAME)));
+        assertTrue(Files.equal(tempFile, new File(destRootUri, testFolderName + "/" + TEMP_FILE_TMP_PATH)));
 
         // use RemoteSpace API
-        FileUtils.deleteDirectory(new File(destRootUri, "testUploadAllFilesInDirectory"));
+        FileUtils.deleteDirectory(new File(destRootUri, testFolderName));
 
-        client.getUserSpace().pushFile(tmpDir.getRoot(), "testUploadAllFilesInDirectory");
+        client.getUserSpace().pushFile(tmpDir.getRoot(), testFolderName);
 
-        assertTrue(Files.equal(tempTextFile,
-                               new File(destRootUri, "testUploadAllFilesInDirectory/" + TEMP_FILE_TXT_NAME)));
-        assertTrue(Files.equal(tempFile, new File(destRootUri, "testUploadAllFilesInDirectory/" + TEMP_FILE_TMP_PATH)));
+        assertTrue(Files.equal(tempTextFile, new File(destRootUri, testFolderName + "/" + TEMP_FILE_TXT_NAME)));
+        assertTrue(Files.equal(tempFile, new File(destRootUri, testFolderName + "/" + TEMP_FILE_TMP_PATH)));
 
     }
 
     @Test
     public void testUploadSelectedFilesUsingGlobPattern() throws Exception {
+        String testFolderName = "testUploadSelectedFilesUsingGlobPattern";
+        System.out.println(testFolderName);
         TestFilesToUploadCreator testFiles = new TestFilesToUploadCreator().invoke();
         File tempTextFile = testFiles.getTempTextFile();
         File tempFile = testFiles.getTempFile();
@@ -174,24 +213,27 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         IDataSpaceClient client = clientInstance();
         LocalDirSource source = new LocalDirSource(tmpDir.getRoot());
         source.setIncludes("*.txt");
-        RemoteDestination dest = new RemoteDestination(USER, "testUploadSelectedFilesUsingGlobPattern");
+        RemoteDestination dest = new RemoteDestination(USER, testFolderName);
         assertTrue(client.upload(source, dest));
 
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        File[] destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingGlobPattern").listFiles();
+        File[] destRootFiles = new File(destRootUri, testFolderName).listFiles();
         assertEquals(1, destRootFiles.length);
         assertTrue(Files.equal(tempTextFile, destRootFiles[0]));
 
         // use RemoteSpace API
-        FileUtils.deleteDirectory(new File(destRootUri, "testUploadSelectedFilesUsingGlobPattern"));
-        client.getUserSpace().pushFiles(tmpDir.getRoot(), "*.txt", "testUploadSelectedFilesUsingGlobPattern");
-        destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingGlobPattern").listFiles();
+        FileUtils.deleteDirectory(new File(destRootUri, testFolderName));
+        client.getUserSpace().pushFiles(tmpDir.getRoot(), "*.txt", testFolderName);
+        destRootFiles = new File(destRootUri, testFolderName).listFiles();
         assertEquals(1, destRootFiles.length);
         assertTrue(Files.equal(tempTextFile, destRootFiles[0]));
     }
 
     @Test
     public void testUploadSelectedFilesUsingFilenames() throws Exception {
+
+        String testFolderName = "testUploadSelectedFilesUsingFilenames";
+        System.out.println(testFolderName);
 
         TestFilesToUploadCreator testFiles = new TestFilesToUploadCreator().invoke();
         File tempTextFile = testFiles.getTempTextFile();
@@ -201,22 +243,23 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         IDataSpaceClient client = clientInstance();
         LocalDirSource source = new LocalDirSource(tmpDir.getRoot());
         source.setIncludes("**/" + TEMP_FILE_TMP_NAME);
-        RemoteDestination dest = new RemoteDestination(USER, "testUploadSelectedFilesUsingFilenames");
+        RemoteDestination dest = new RemoteDestination(USER, testFolderName);
         assertTrue(client.upload(source, dest));
 
         String destRootUri = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        File[] destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingFilenames").listFiles();
+        File[] destRootFiles = new File(destRootUri, testFolderName).listFiles();
+        System.out.println("Files in destination: " + Arrays.asList(destRootFiles));
         assertEquals(1, destRootFiles.length);
-        assertTrue(Files.equal(tempFile, destRootFiles[0]));
+        assertTrue(destRootFiles[0].isDirectory());
+        assertTrue(Files.equal(tempFile, new File(destRootFiles[0], TEMP_FILE_TMP_NAME)));
 
         // use RemoteSpace API
-        FileUtils.deleteDirectory(new File(destRootUri, "testUploadSelectedFilesUsingFilenames"));
-        client.getUserSpace().pushFiles(tmpDir.getRoot(),
-                                        "**/" + TEMP_FILE_TMP_NAME,
-                                        "testUploadSelectedFilesUsingFilenames");
-        destRootFiles = new File(destRootUri, "testUploadSelectedFilesUsingFilenames").listFiles();
+        FileUtils.deleteDirectory(new File(destRootUri, testFolderName));
+        client.getUserSpace().pushFiles(tmpDir.getRoot(), "**/" + TEMP_FILE_TMP_NAME, testFolderName);
+        destRootFiles = new File(destRootUri, testFolderName).listFiles();
         assertEquals(1, destRootFiles.length);
-        assertTrue(Files.equal(tempFile, destRootFiles[0]));
+        assertTrue(destRootFiles[0].isDirectory());
+        assertTrue(Files.equal(tempFile, new File(destRootFiles[0], TEMP_FILE_TMP_NAME)));
     }
 
     @Test
@@ -288,10 +331,11 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     @Test
     public void testDownloadAllFilesInDirectory() throws Exception {
         String srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
-        String dirName = "testDownloadAllFilesInDirectory";
+        String testFolderName = "testDownloadAllFilesInDirectory";
+        System.out.println(testFolderName);
 
         TestFilesToDownloadCreator testFilesToDownloadCreator = new TestFilesToDownloadCreator(srcDirPath,
-                                                                                               dirName).invoke();
+                                                                                               testFolderName).invoke();
         File srcTextFile = testFilesToDownloadCreator.getSrcTextFile();
         File srcTempFile = testFilesToDownloadCreator.getSrcTempFile();
 
@@ -299,7 +343,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         // use standard client
         IDataSpaceClient client = clientInstance();
-        RemoteSource source = new RemoteSource(USER, "testDownloadAllFilesInDirectory");
+        RemoteSource source = new RemoteSource(USER, testFolderName);
         LocalDestination dest = new LocalDestination(destTempDir);
 
         assertTrue(client.download(source, dest));
@@ -309,7 +353,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         // use RemoteSpace API
         File destTempDir2 = tmpDir.newFolder(TEMP_DIR2_NAME);
-        client.getUserSpace().pullFile("testDownloadAllFilesInDirectory", destTempDir2);
+        client.getUserSpace().pullFile(testFolderName, destTempDir2);
 
         assertTrue(Files.equal(srcTextFile, new File(destTempDir2, TEMP_FILE_TXT_NAME)));
         assertTrue(Files.equal(srcTempFile, new File(destTempDir2, TEMP_FILE_TMP_PATH)));
@@ -320,10 +364,11 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     public void testDownloadSelectedFilesUsingGlobPattern() throws Exception {
         String srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0)).getPath();
 
-        String dirName = "testDownloadSelectedFilesUsingGlobPattern";
+        String testFolderName = "testDownloadSelectedFilesUsingGlobPattern";
+        System.out.println(testFolderName);
 
         TestFilesToDownloadCreator testFilesToDownloadCreator = new TestFilesToDownloadCreator(srcDirPath,
-                                                                                               dirName).invoke();
+                                                                                               testFolderName).invoke();
         File srcTextFile = testFilesToDownloadCreator.getSrcTextFile();
         File srcTempFile = testFilesToDownloadCreator.getSrcTempFile();
 
@@ -331,7 +376,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         // use standard client
         IDataSpaceClient client = clientInstance();
-        RemoteSource source = new RemoteSource(USER, dirName);
+        RemoteSource source = new RemoteSource(USER, testFolderName);
         source.setIncludes("*.txt");
         LocalDestination dest = new LocalDestination(destTempDir);
 
@@ -344,7 +389,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
         // use RemoteSpace API
         File destTempDir2 = tmpDir.newFolder(TEMP_DIR2_NAME);
-        client.getUserSpace().pullFiles(dirName, "*.txt", destTempDir2);
+        client.getUserSpace().pullFiles(testFolderName, "*.txt", destTempDir2);
 
         listFiles = destTempDir2.listFiles();
 
@@ -354,12 +399,13 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testListFilesNonRecursive() throws Exception {
-        System.out.println("testListFilesNonRecursive");
-        createFilesInUserSpace("testListFilesNonRecursive");
+        String testFolderName = "testListFilesNonRecursive";
+        System.out.println(testFolderName);
+        createFilesInUserSpace(testFolderName);
 
         // use standard client
         IDataSpaceClient client = clientInstance();
-        RemoteSource source = new RemoteSource(USER, "testListFilesNonRecursive");
+        RemoteSource source = new RemoteSource(USER, testFolderName);
         source.setIncludes("*");
 
         ListFile listFile = client.list(source);
@@ -375,7 +421,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals(TEMP_FILE_TXT_NAME, files.get(0));
 
         // use RemoteSpace API
-        List<String> foundFiles = client.getUserSpace().listFiles("testListFilesNonRecursive", "*");
+        List<String> foundFiles = client.getUserSpace().listFiles(testFolderName, "*");
         System.out.println("Full : " + foundFiles);
         assertEquals(2, foundFiles.size());
         assertArrayEquals(new String[] { TEMP_DIR_NAME, TEMP_FILE_TXT_NAME }, foundFiles.toArray(new String[0]));
@@ -389,12 +435,13 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testListFilesRecursive() throws Exception {
-        System.out.println("testListFilesRecursive");
-        createFilesInUserSpace("testListFilesRecursive");
+        String testFolderName = "testListFilesRecursive";
+        System.out.println(testFolderName);
+        createFilesInUserSpace(testFolderName);
 
         // use standard client
         IDataSpaceClient client = clientInstance();
-        RemoteSource source = new RemoteSource(USER, "testListFilesRecursive");
+        RemoteSource source = new RemoteSource(USER, testFolderName);
         source.setIncludes("**");
 
         ListFile listFile = client.list(source);
@@ -411,7 +458,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals(TEMP_FILE_TXT_NAME, files.get(1));
 
         // use RemoteSpace API
-        List<String> foundFiles = client.getUserSpace().listFiles("testListFilesRecursive", "**");
+        List<String> foundFiles = client.getUserSpace().listFiles(testFolderName, "**");
         System.out.println("Full : " + foundFiles);
         assertEquals(3, foundFiles.size());
         assertArrayEquals(new String[] { TEMP_DIR_NAME, TEMP_FILE_TMP_PATH, TEMP_FILE_TXT_NAME },
@@ -420,12 +467,13 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     @Test
     public void testListFilesRecursiveWithPattern() throws Exception {
-        System.out.println("testListFilesRecursiveWithPattern");
-        createFilesInUserSpace("testListFilesRecursiveWithPattern");
+        String testFolderName = "testListFilesRecursiveWithPattern";
+        System.out.println(testFolderName);
+        createFilesInUserSpace(testFolderName);
 
         // use standard client
         IDataSpaceClient client = clientInstance();
-        RemoteSource source = new RemoteSource(USER, "testListFilesRecursiveWithPattern");
+        RemoteSource source = new RemoteSource(USER, testFolderName);
         source.setIncludes("**/*.tmp");
 
         ListFile listFile = client.list(source);
@@ -440,7 +488,7 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
         assertEquals(TEMP_FILE_TMP_PATH, files.get(0));
 
         // use RemoteSpace API
-        List<String> foundFiles = client.getUserSpace().listFiles("testListFilesRecursiveWithPattern", "**/*.tmp");
+        List<String> foundFiles = client.getUserSpace().listFiles(testFolderName, "**/*.tmp");
         System.out.println("Full : " + foundFiles);
         assertEquals(1, foundFiles.size());
         assertArrayEquals(new String[] { TEMP_FILE_TMP_PATH }, foundFiles.toArray(new String[0]));
@@ -489,15 +537,16 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
     public void testCreateFolder() throws Exception {
         URI srcDirPath = URI.create(getScheduler().getUserSpaceURIs().get(0));
 
-        String folderName = "testcreatefolder";
+        String testFolderName = "testcreatefolder";
+        System.out.println(testFolderName);
 
-        RemoteSource source = new RemoteSource(USER, folderName);
+        RemoteSource source = new RemoteSource(USER, testFolderName);
         source.setType(FileType.FOLDER);
 
         IDataSpaceClient client = clientInstance();
         assertTrue(client.create(source));
 
-        File expectedFile = new File(srcDirPath.getPath(), folderName);
+        File expectedFile = new File(srcDirPath.getPath(), testFolderName);
 
         assertTrue(expectedFile.exists());
         assertTrue(expectedFile.isDirectory());
@@ -505,9 +554,10 @@ public class DataTransferTest extends AbstractRestFuncTestCase {
 
     @Test(expected = Exception.class)
     public void testCreateFolderWithoutSpecifyingFileType() throws Exception {
-        String folderName = "testcreatefolder";
+        String testFolderName = "testCreateFolderWithoutSpecifyingFileType";
+        System.out.println(testFolderName);
 
-        RemoteSource source = new RemoteSource(USER, folderName);
+        RemoteSource source = new RemoteSource(USER, testFolderName);
         // file is not specified
 
         IDataSpaceClient client = clientInstance();

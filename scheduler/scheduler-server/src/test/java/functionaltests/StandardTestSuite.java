@@ -150,6 +150,7 @@ import functionaltests.service.SchedulingServiceTest6;
 import functionaltests.service.SchedulingServiceTest7;
 import functionaltests.service.SchedulingServiceTest8;
 import functionaltests.service.SchedulingServiceTest9;
+import functionaltests.synchronization.TestTaskSynchronization;
 import functionaltests.web.JettyStarterTest;
 import functionaltests.workflow.TestGenericInformation;
 import functionaltests.workflow.TestJobCoverage;
@@ -220,7 +221,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestTaskNotRestarted.class, TestTaskNotStarted.class, TestTaskScriptVariables.class,
                       TestThirdPartyCredentialsDefined.class, TestUserSpace.class, TestWorkflowDataspace.class,
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
-                      Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class,
+                      Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class, TestTaskSynchronization.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,

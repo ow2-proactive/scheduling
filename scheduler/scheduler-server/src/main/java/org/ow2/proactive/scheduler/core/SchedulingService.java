@@ -35,8 +35,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
@@ -56,7 +54,6 @@ import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -68,7 +65,8 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
-import org.ow2.proactive.scheduler.rest.data.JobStateImpl;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -115,14 +113,16 @@ public class SchedulingService {
 
     private Scheduler houseKeepingScheduler;
 
+    private SynchronizationInternal synchronizationAPI;
+
     /**
      * Url used to store the last url of the RM (used to try to reconnect to the rm when it is down)
      */
     private URI lastRmUrl;
 
     public SchedulingService(SchedulingInfrastructure infrastructure, SchedulerStateUpdate listener,
-            RecoveredSchedulerState recoveredState, String policyClassName, SchedulingMethod schedulingMethod)
-            throws Exception {
+            RecoveredSchedulerState recoveredState, String policyClassName, SchedulingMethod schedulingMethod,
+            SynchronizationInternal synchronizationAPI) throws Exception {
         this.infrastructure = infrastructure;
         this.listener = listener;
         this.jobs = new LiveJobs(infrastructure.getDBManager(), listener);
@@ -138,6 +138,8 @@ public class SchedulingService {
         logger.debug("Instantiated policy : " + policyClassName);
 
         lastRmUrl = infrastructure.getRMProxiesManager().getRmUrl();
+
+        this.synchronizationAPI = synchronizationAPI;
 
         if (schedulingMethod == null) {
             schedulingMethod = new SchedulingMethodImpl(this);
@@ -164,6 +166,10 @@ public class SchedulingService {
         }
         houseKeepingScheduler.schedule(cronExpr, new HousekeepingRunner());
         houseKeepingScheduler.start();
+    }
+
+    public SynchronizationInternal getSynchronizationAPI() {
+        return synchronizationAPI;
     }
 
     public Policy getPolicy() {

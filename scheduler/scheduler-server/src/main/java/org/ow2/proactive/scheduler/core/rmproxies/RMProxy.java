@@ -37,6 +37,7 @@ import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.Criteria;
@@ -122,15 +123,15 @@ public class RMProxy {
     }
 
     public void releaseNodes(NodeSet nodeSet) {
-        releaseNodes(nodeSet, null, null, null, null, null);
+        releaseNodes(nodeSet, null, null, null, null, null, null);
     }
 
     public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, Credentials creds) {
-        releaseNodes(nodeSet, cleaningScript, null, null, null, creds);
+        releaseNodes(nodeSet, cleaningScript, null, null, null, creds, null);
     }
 
     public void releaseNodes(NodeSet nodeSet, Script<?> cleaningScript, VariablesMap variables,
-            Map<String, String> genericInformation, TaskId taskId, Credentials creds) {
+            Map<String, String> genericInformation, TaskId taskId, Credentials creds, Synchronization store) {
 
         if (nodeSet.size() == 0) {
             if (nodeSet.getExtraNodes() == null || nodeSet.getExtraNodes().size() == 0) {
@@ -139,7 +140,13 @@ public class RMProxy {
         }
 
         if (proxyActiveObject != null) {
-            proxyActiveObject.releaseNodes(nodeSet, cleaningScript, variables, genericInformation, taskId, creds);
+            proxyActiveObject.releaseNodes(nodeSet,
+                                           cleaningScript,
+                                           variables,
+                                           genericInformation,
+                                           taskId,
+                                           creds,
+                                           store);
         } else {
             logger.warn("Didn't find RM to release NodeSet (RM is down or all NodeSet's Nodes are down)");
         }

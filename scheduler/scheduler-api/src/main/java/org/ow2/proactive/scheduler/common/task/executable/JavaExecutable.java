@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.internal.JavaStandaloneExecutableInitializer;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scripting.helper.progress.ProgressFile;
 
@@ -62,6 +63,8 @@ public abstract class JavaExecutable {
 
     private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
 
+    private Synchronization synchronizationAPI;
+
     /**
      * Initialize the executable using the given executable Initializer.
      *
@@ -82,6 +85,7 @@ public abstract class JavaExecutable {
         initDataSpaces(sc);
         init(arguments);
         initMetadata(sc);
+        initAPIs(sc);
     }
 
     /**
@@ -160,6 +164,10 @@ public abstract class JavaExecutable {
         this.globalSpace = (String) sc.getAttribute(SchedulerConstants.DS_GLOBAL_BINDING_NAME);
         this.userSpace = (String) sc.getAttribute(SchedulerConstants.DS_USER_BINDING_NAME);
         this.localSpace = (String) sc.getAttribute(SchedulerConstants.DS_SCRATCH_BINDING_NAME);
+    }
+
+    public void initAPIs(ScriptContext sc) {
+        this.synchronizationAPI = (Synchronization) sc.getAttribute(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME);
     }
 
     /**
@@ -319,5 +327,9 @@ public abstract class JavaExecutable {
 
     public String getUserSpace() {
         return this.userSpace;
+    }
+
+    public Synchronization getSynchronizationAPI() {
+        return this.synchronizationAPI;
     }
 }

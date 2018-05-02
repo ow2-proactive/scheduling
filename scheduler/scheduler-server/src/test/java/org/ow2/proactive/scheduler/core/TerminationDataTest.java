@@ -51,6 +51,8 @@ import org.ow2.proactive.scheduler.core.rmproxies.RMProxyCreationException;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.synchronization.Synchronization;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.ExecuterInformation;
@@ -197,17 +199,18 @@ public class TerminationDataTest extends ProActiveTestClean {
         internalTask.setName("task-name");
         internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
+        job.setSynchronizationAPI(Mockito.mock(SynchronizationInternal.class));
         RunningTaskData taskData = new RunningTaskData(internalTask, "user", null, launcher);
-        terminationData.addTaskData(null, taskData, TerminationData.TerminationStatus.NORMAL, null);
+        terminationData.addTaskData(job, taskData, TerminationData.TerminationStatus.NORMAL, null);
         terminationData.handleTermination(service);
         Mockito.verify(proxiesManager, Mockito.times(1)).getUserRMProxy("user", null);
-        Mockito.verify(rmProxy, Mockito.times(1))
-               .releaseNodes(org.mockito.Matchers.any(NodeSet.class),
-                             org.mockito.Matchers.any(org.ow2.proactive.scripting.Script.class),
-                             Mockito.any(VariablesMap.class),
-                             Mockito.any(HashMap.class),
-                             Mockito.any(TaskId.class),
-                             Mockito.any(Credentials.class));
+        Mockito.verify(rmProxy, Mockito.times(1)).releaseNodes(org.mockito.Matchers.any(NodeSet.class),
+                                                               org.mockito.Matchers.any(org.ow2.proactive.scripting.Script.class),
+                                                               Mockito.any(VariablesMap.class),
+                                                               Mockito.any(HashMap.class),
+                                                               Mockito.any(TaskId.class),
+                                                               Mockito.any(Credentials.class),
+                                                               Mockito.any(Synchronization.class));
     }
 
     @Test
