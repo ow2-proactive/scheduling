@@ -477,19 +477,27 @@ public abstract class TaskState extends Task implements Comparable<TaskState> {
      */
     public Map<String, String> getRuntimeGenericInformation() {
 
+        Map<String, String> runtimeGenericInformation = new HashMap<>();
+
         if (getTaskInfo() == null) {
             // task is not yet properly initialized
-            return new HashMap<>();
+            return runtimeGenericInformation;
+        }
+        Map<String, Serializable> runtimeVariables = getRuntimeVariables();
+
+        // Add job generic information
+        if (getTaskInfo().getJobInfo().getGenericInformation() != null) {
+            runtimeGenericInformation.putAll(applyReplacementsOnGenericInformation(getTaskInfo().getJobInfo()
+                                                                                                .getGenericInformation(),
+                                                                                   runtimeVariables));
         }
 
-        HashMap<String, String> gInfo = new HashMap<>();
-
+        // Add task generic information
         if (genericInformation != null) {
-            Map<String, String> updatedTaskGenericInfo = applyReplacementsOnGenericInformation(genericInformation,
-                                                                                               getRuntimeVariables());
-            gInfo.putAll(updatedTaskGenericInfo);
+            runtimeGenericInformation.putAll(applyReplacementsOnGenericInformation(genericInformation,
+                                                                                   runtimeVariables));
         }
 
-        return gInfo;
+        return runtimeGenericInformation;
     }
 }
