@@ -433,6 +433,44 @@ public class RMRest implements RMRestInterface {
         return nsState;
     }
 
+    @Override
+    @PUT
+    @Path("nodesource/parameter")
+    @Produces("application/json")
+    public NSState updateDynamicParameters(@HeaderParam("sessionid") String sessionId,
+            @FormParam("nodeSourceName") String nodeSourceName,
+            @FormParam("infrastructureType") String infrastructureType,
+            @FormParam("infrastructureParameters") String[] infrastructureParameters,
+            @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
+            @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
+            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException {
+
+        ResourceManager rm = checkAccess(sessionId);
+        NSState nsState = new NSState();
+
+        Object[] infraParams = this.getAllInfrastructureParameters(infrastructureType,
+                                                                   infrastructureParameters,
+                                                                   infrastructureFileParameters,
+                                                                   rm);
+
+        Object[] policyParams = this.getAllPolicyParameters(policyType, policyParameters, policyFileParameters, rm);
+
+        try {
+            nsState.setResult(rm.updateDynamicParameters(nodeSourceName,
+                                                         infrastructureType,
+                                                         infraParams,
+                                                         policyType,
+                                                         policyParams)
+                                .getBooleanValue());
+        } catch (RuntimeException ex) {
+            nsState.setResult(false);
+            nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
+            nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
+        }
+
+        return nsState;
+    }
+
     /**
      * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
      * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}

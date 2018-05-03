@@ -66,6 +66,7 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.policy.Policy;
+import org.ow2.proactive.scheduler.synchronization.SynchronizationWrapper;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
@@ -493,7 +494,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 criteria.setBlackList(internalTask0.getNodeExclusion());
                 criteria.setBestEffort(bestEffort);
                 criteria.setAcceptableNodesUrls(freeResources);
-                criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0));
+                criteria.setBindings(createBindingsForSelectionScripts(currentJob, internalTask0, schedulingService));
                 if (internalTask0.getRuntimeGenericInformation().containsKey(SchedulerConstants.NODE_ACCESS_TOKEN)) {
                     criteria.setNodeAccessToken(internalTask0.getRuntimeGenericInformation()
                                                              .get(SchedulerConstants.NODE_ACCESS_TOKEN));
@@ -550,8 +551,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     /**
      * Create bindings which will be used by selection scripts for the given tasks
      */
-    public static Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task)
-            throws IOException, ClassNotFoundException {
+    public static Map<String, Serializable> createBindingsForSelectionScripts(InternalJob job, InternalTask task,
+            SchedulingService service) throws IOException, ClassNotFoundException {
         Map<String, Serializable> bindings = new HashMap<>();
         Map<String, Serializable> variables = new HashMap<>();
         Map<String, Serializable> genericInfo = new HashMap<>();
@@ -566,6 +567,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         bindings.put(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) variables);
         bindings.put(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInfo);
+        if (service != null) {
+            bindings.put(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME,
+                         (Serializable) new SynchronizationWrapper(job.getOwner(),
+                                                                   task.getId(),
+                                                                   service.getSynchronizationAPI()));
+        }
         return bindings;
     }
 
@@ -626,6 +633,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 //start dataspace app for this job
                 DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure().getDataSpaceServiceStarter();
                 job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
+                job.setSynchronizationAPI(schedulingService.getSynchronizationAPI());
 
                 NodeSet nodes = new NodeSet();
                 try {

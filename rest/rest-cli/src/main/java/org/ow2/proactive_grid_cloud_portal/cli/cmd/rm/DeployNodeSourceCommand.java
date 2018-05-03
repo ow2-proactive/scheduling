@@ -25,36 +25,38 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.rm;
 
-import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 import static org.ow2.proactive_grid_cloud_portal.cli.HttpResponseStatus.OK;
 
-import org.apache.http.client.methods.HttpPut;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.json.NSStateView;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
-public class DeployNodeSourceCommand extends AbstractCommand implements Command {
+public class DeployNodeSourceCommand extends NodeSourceCommand {
 
     private static final String RM_REST_ENDPOINT = "nodesource/deploy";
 
-    private String nodeSourceName;
-
     public DeployNodeSourceCommand(String nodeSourceName) {
-        this.nodeSourceName = nodeSourceName;
+        super(nodeSourceName);
+    }
+
+    @Override
+    protected String getResourceUrlEndpoint() {
+        return RM_REST_ENDPOINT;
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpPut request = new HttpPut(currentContext.getResourceUrl(RM_REST_ENDPOINT));
+
         QueryStringBuilder queryStringBuilder = new QueryStringBuilder();
         queryStringBuilder.add("nodeSourceName", this.nodeSourceName);
-        request.setEntity(queryStringBuilder.buildEntity(APPLICATION_FORM_URLENCODED));
-        HttpResponseWrapper response = this.execute(request, currentContext);
+
+        HttpResponseWrapper response = executeRequestWithQuery(currentContext,
+                                                               queryStringBuilder,
+                                                               NodeSourceCommand.HttpVerb.PUT);
+
         if (this.statusCode(OK) == this.statusCode(response)) {
             NSStateView nsState = this.readValue(response, NSStateView.class, currentContext);
             boolean success = nsState.isResult();

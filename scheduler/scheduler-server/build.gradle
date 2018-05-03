@@ -15,6 +15,8 @@ dependencies {
     compile 'joda-time:joda-time:2.9.1'
     compile 'org.apache.commons:commons-lang3:3.4'
 
+    compile 'org.fusesource.jdbm:jdbm:2.0.1'
+
     compile "org.ow2.proactive:emailnotification-addons:${schedulingVersion}"
 
     compile 'org.eclipse.jetty:jetty-webapp:9.2.14.v20151106'
@@ -88,7 +90,8 @@ task stub(type: StubTask) {
             'org.ow2.proactive.scheduler.authentication.SchedulerAuthentication',
             'org.ow2.proactive.scheduler.core.rmproxies.RMProxyActiveObject',
             'org.ow2.proactive.scheduler.core.SchedulerFrontend',
-            'org.ow2.proactive.scheduler.core.TerminateNotification'
+            'org.ow2.proactive.scheduler.core.TerminateNotification',
+            'org.ow2.proactive.scheduler.synchronization.AOSynchronization'
     ]
 }
 serialver.dependsOn stub

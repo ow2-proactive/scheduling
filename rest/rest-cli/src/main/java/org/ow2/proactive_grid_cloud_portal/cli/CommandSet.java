@@ -74,6 +74,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UndeployNodeSourceCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UpdateDynamicParametersCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
@@ -121,6 +122,8 @@ import com.google.common.collect.Ordering;
  * Resource Manager CLIs.
  */
 public class CommandSet {
+
+    private static final String NODE_SOURCE_ARGUMENT_NAME = "node-source";
 
     public static final CommandSet.Entry URL = CommandSetEntryBuilder.newInstance()
                                                                      .opt("u")
@@ -707,6 +710,17 @@ public class CommandSet {
                                                                          .commandClass(EditNodeSourceCommand.class)
                                                                          .entry();
 
+    public static final CommandSet.Entry NS_UPDATE_PARAM = CommandSetEntryBuilder.newInstance()
+                                                                                 .opt("upns")
+                                                                                 .longOpt("updatensparam")
+                                                                                 .description("Update the dynamic parameters of a node source")
+                                                                                 .hasArgs(true)
+                                                                                 .numOfArgs(1)
+                                                                                 .argNames(NODE_SOURCE_ARGUMENT_NAME)
+                                                                                 .jsCommand("updatensparam(node-source)")
+                                                                                 .commandClass(UpdateDynamicParametersCommand.class)
+                                                                                 .entry();
+
     /**
      * @deprecated  As of version 8.1, replaced by
      * {@link CommandSet#NS_DEFINE} and {@link CommandSet#NS_DEPLOY}
@@ -829,7 +843,7 @@ public class CommandSet {
                                                                     .description("Specify node source name")
                                                                     .hasArgs(true)
                                                                     .numOfArgs(1)
-                                                                    .argNames("node-source")
+                                                                    .argNames(NODE_SOURCE_ARGUMENT_NAME)
                                                                     .commandClass(SetNodeSourceCommand.class)
                                                                     .entry();
 
@@ -839,7 +853,7 @@ public class CommandSet {
                                                                            .description("Remove specified node source")
                                                                            .hasArgs(true)
                                                                            .numOfArgs(1)
-                                                                           .argNames("node-source")
+                                                                           .argNames(NODE_SOURCE_ARGUMENT_NAME)
                                                                            .jsCommand("removens(node-source)")
                                                                            .commandClass(RemoveNodeSourceCommand.class)
                                                                            .entry();
@@ -979,11 +993,11 @@ public class CommandSet {
      */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] { LOGIN, NODE_ADD, NODE_LIST, NODE_INFO,
                                                                               NODE_LOCK, NODE_UNLOCK, NODE_REMOVE,
-                                                                              NS_DEFINE, NS_EDIT, NS_CREATE, NS_DEPLOY,
-                                                                              NS_UNDEPLOY, NS_LIST, NS_REMOVE, NS,
-                                                                              INFRASTRUCTURE, INFRASTRUCTURE_LIST,
-                                                                              POLICY, POLICY_LIST, TOPOLOGY, FORCE,
-                                                                              RM_STATS, RM_HELP };
+                                                                              NS_DEFINE, NS_EDIT, NS_UPDATE_PARAM,
+                                                                              NS_CREATE, NS_DEPLOY, NS_UNDEPLOY,
+                                                                              NS_LIST, NS_REMOVE, NS, INFRASTRUCTURE,
+                                                                              INFRASTRUCTURE_LIST, POLICY, POLICY_LIST,
+                                                                              TOPOLOGY, FORCE, RM_STATS, RM_HELP };
 
     public static final Entry[] INTERACTIVE_COMMANDS = { JS_LIST_ALL, JS_LIST_LATEST, JS_LIST_FROM, EXIT, RM_JS_HELP,
                                                          SCHED_JS_HELP, COMMON_JS_HELP, VERSION };

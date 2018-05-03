@@ -96,7 +96,7 @@ public class PerformanceTestBase extends SchedulerFunctionalTestWithCustomConfig
     }
 
     public static String makeCSVString(Object... strings) {
-        String result = new String();
+        String result = "";
         for (Object object : strings) {
             result += SEPARATOR + object.toString();
         }
@@ -122,19 +122,9 @@ public class PerformanceTestBase extends SchedulerFunctionalTestWithCustomConfig
     public static List<File> getTwoLastFiles() {
         File folder = new File(System.getProperty("pa.rm.home"));
         assertTrue("PathToStorage parameter does not lead to directory.", folder.isDirectory());
-        final File[] files = folder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File file, String s) {
-                return s.startsWith(FILE_PREFIX);
-            }
-        });
+        final File[] files = folder.listFiles((file, s) -> s.startsWith(FILE_PREFIX));
         assertNotEquals(0, files.length);
-        Arrays.sort(files, new Comparator<File>() {
-            @Override
-            public int compare(File fileA, File fileB) {
-                return Long.valueOf(fileA.lastModified()).compareTo(fileB.lastModified());
-            }
-        });
+        Arrays.sort(files, Comparator.comparingLong(File::lastModified));
 
         List<File> result = new ArrayList<>(2);
 

@@ -76,7 +76,9 @@ public class SchedulingTaskComparator {
         for (SelectionScript script : scriptList) {
             SelectionScript modifiedScript = script;
             try {
-                Map<String, Serializable> bindings = SchedulingMethodImpl.createBindingsForSelectionScripts(job, task);
+                Map<String, Serializable> bindings = SchedulingMethodImpl.createBindingsForSelectionScripts(job,
+                                                                                                            task,
+                                                                                                            null);
                 modifiedScript = SchedulingMethodImpl.replaceBindingsInsideScript(script, bindings);
 
             } catch (Exception e) {

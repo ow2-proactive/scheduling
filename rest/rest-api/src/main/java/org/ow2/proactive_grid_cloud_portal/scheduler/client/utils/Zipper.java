@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.zip.*;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 
 import com.google.common.base.Predicate;
@@ -44,6 +45,8 @@ import com.google.common.io.Files;
 
 
 public class Zipper {
+
+    private static final Logger logger = Logger.getLogger(Zipper.class);
 
     private static byte[] MAGIC = { 'P', 'K', 0x3, 0x4 };
 
@@ -123,17 +126,10 @@ public class Zipper {
             try {
                 ZipOutputStream zos = new ZipOutputStream(os);
                 closer.register(zos);
-                if (files.size() == 1) {
-                    File file = files.get(0);
+                for (File file : files) {
                     FileInputStream inputStream = new FileInputStream(file);
                     closer.register(inputStream);
-                    writeZipEntry(new ZipEntry(file.getName()), inputStream, zos);
-                } else {
-                    for (File file : files) {
-                        FileInputStream inputStream = new FileInputStream(file);
-                        closer.register(inputStream);
-                        writeZipEntry(zipEntry(basepath, file), inputStream, zos);
-                    }
+                    writeZipEntry(zipEntry(basepath, file), inputStream, zos);
                 }
             } catch (IOException ioe) {
                 throw closer.rethrow(ioe);
@@ -146,6 +142,7 @@ public class Zipper {
             Closer closer = Closer.create();
             closer.register(is);
             try {
+                logger.trace("Adding zip entry" + zipEntry.toString());
                 zos.putNextEntry(zipEntry);
                 ByteStreams.copy(is, zos);
                 zos.flush();
@@ -259,7 +256,13 @@ public class Zipper {
 
             FileSelector selector = new FileSelector(includes, excludes);
 
-            return !file.isDirectory() && selector.matches(pathRelativeToRoot);
+            boolean answer = !file.isDirectory() && selector.matches(pathRelativeToRoot);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Analysing file " + file + " for selector " + selector + " : " + answer);
+                logger.trace("Path relative to root : " + pathRelativeToRoot);
+            }
+
+            return answer;
         }
 
     }

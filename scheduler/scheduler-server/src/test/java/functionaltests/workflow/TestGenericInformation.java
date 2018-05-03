@@ -128,7 +128,7 @@ public class TestGenericInformation extends SchedulerFunctionalTestNoRestart {
         expected.put("PA_JOB_NAME", taskState.getJobId().getReadableName());
         expected.put("PA_JOB_ID", taskState.getJobId().toString());
         expected.put("PA_TASK_NAME", taskState.getName());
-        expected.put("PA_TASK_ID", taskState.getId().toString());
+        expected.put("PA_TASK_ID", taskState.getId().value().toString());
         expected.put("PA_TASK_ITERATION", String.valueOf(taskState.getIterationIndex()));
         expected.put("PA_TASK_REPLICATION", String.valueOf(taskState.getReplicationIndex()));
 

@@ -390,10 +390,17 @@ public enum PASchedulerProperties implements PACommonProperties {
             "example@username.com"),
 
     /* ***************************************************************** */
-    /* ***************** LICENSE SCHEDULING POLICY PROPERTIES ***************** */
+    /* ***************** LICENSE SCHEDULING POLICY PROPERTIES ********** */
     /* ***************************************************************** */
 
     LICENSE_SCHEDULING_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),
+
+    /* ***************************************************************** */
+    /* ***************** SYNCHRONIZATION STORE PROPERTIES ************** */
+    /* ***************************************************************** */
+
+    /** location of the jdbm database for persistent channels */
+    SCHEDULER_SYNCHRONIZATION_DATABASE("pa.scheduler.synchronization.db", PropertyType.STRING, "data/synchronization"),
 
     /* ***************************************************************** */
     /* ******************* PORTAL DISPLAY PROPERTIES ******************* */

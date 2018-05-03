@@ -29,7 +29,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -47,10 +46,12 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
 
     private static Logger logger = Logger.getLogger(RestartDownNodesPolicy.class);
 
-    private Timer timer = new Timer("RestartDownNodesPolicy node status check");
+    private static final String TIMER_NAME = "RestartDownNodesPolicy node status check";
 
-    @Configurable(description = "ms (30 mins by default)")
+    @Configurable(description = "ms (30 mins by default)", dynamic = true)
     private int checkNodeStateEach = 30 * 60 * 1000; // 30 mins by default;
+
+    private transient Timer timer;
 
     /**
      * Configure a policy with given parameters.
@@ -59,10 +60,22 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
     @Override
     public BooleanWrapper configure(Object... policyParameters) {
         BooleanWrapper parentConfigured = super.configure(policyParameters);
-        if (policyParameters != null && policyParameters.length > 2) {
-            checkNodeStateEach = Integer.parseInt(policyParameters[2].toString());
-        }
+        setCheckNodeStateEach(policyParameters);
         return parentConfigured;
+    }
+
+    @Override
+    public void reconfigure(Object... updatedPolicyParameters) throws Exception {
+        super.reconfigure(updatedPolicyParameters);
+        this.timer.cancel();
+        setCheckNodeStateEach(updatedPolicyParameters);
+        scheduleRestartTimer();
+    }
+
+    private void setCheckNodeStateEach(Object[] policyParameters) {
+        if (policyParameters != null && policyParameters.length > 2) {
+            this.checkNodeStateEach = Integer.parseInt(policyParameters[2].toString());
+        }
     }
 
     /**
@@ -70,50 +83,58 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
      */
     @Override
     public BooleanWrapper activate() {
+
         acquireAllNodes();
-
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                int numberOfNodesToDeploy = 0;
-                for (Node downNode : nodeSource.getDownNodes()) {
-                    String nodeUrl = downNode.getNodeInformation().getURL();
-
-                    logger.info("Removing down node " + nodeUrl);
-                    BooleanWrapper removed = nodeSource.getRMCore().removeNode(nodeUrl, true);
-                    if (removed.getBooleanValue()) {
-                        logger.info("Down node removed " + nodeUrl);
-                        numberOfNodesToDeploy++;
-                    }
-                }
-
-                for (RMDeployingNode lostNode : nodeSource.getDeployingAndLostNodes()) {
-                    if (!lostNode.isLost()) {
-                        continue;
-                    }
-                    String nodeUrl = lostNode.getNodeURL();
-
-                    logger.info("Removing lost node " + nodeUrl);
-                    BooleanWrapper removed = nodeSource.getRMCore().removeNode(nodeUrl, true);
-                    if (removed.getBooleanValue()) {
-                        logger.info("Lost node removed " + nodeUrl);
-                        numberOfNodesToDeploy++;
-                    }
-                }
-
-                if (numberOfNodesToDeploy > 0) {
-                    logger.info("Acquiring " + numberOfNodesToDeploy + " nodes");
-                    acquireNodes(numberOfNodesToDeploy);
-                }
-            }
-        }, checkNodeStateEach, checkNodeStateEach);
+        scheduleRestartTimer();
 
         return new BooleanWrapper(true);
     }
 
+    private void scheduleRestartTimer() {
+
+        this.timer = new Timer(TIMER_NAME);
+
+        this.timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                checkDownNodesAndReacquireNodesIfNeeded();
+            }
+
+        }, this.checkNodeStateEach, this.checkNodeStateEach);
+    }
+
+    private void checkDownNodesAndReacquireNodesIfNeeded() {
+
+        long numberOfNodesToDeploy = this.nodeSource.getDownNodes()
+                                                    .stream()
+                                                    .map(node -> node.getNodeInformation().getURL())
+                                                    .peek(nodeUrl -> logger.info("Removing down node " + nodeUrl))
+                                                    .map(nodeUrl -> this.nodeSource.getRMCore().removeNode(nodeUrl,
+                                                                                                           true))
+                                                    .filter(BooleanWrapper::getBooleanValue)
+                                                    .peek(x -> logger.info("Down node removed"))
+                                                    .count();
+
+        numberOfNodesToDeploy += this.nodeSource.getDeployingAndLostNodes()
+                                                .stream()
+                                                .filter(RMDeployingNode::isLost)
+                                                .map(RMDeployingNode::getNodeURL)
+                                                .peek(nodeUrl -> logger.info("Removing lost node " + nodeUrl))
+                                                .map(nodeUrl -> this.nodeSource.getRMCore().removeNode(nodeUrl, true))
+                                                .filter(BooleanWrapper::getBooleanValue)
+                                                .peek(x -> logger.info("Lost node removed"))
+                                                .count();
+
+        if (numberOfNodesToDeploy > 0) {
+            logger.info("Acquiring " + numberOfNodesToDeploy + " nodes");
+            acquireNodes((int) numberOfNodesToDeploy);
+        }
+    }
+
     @Override
     public void shutdown(Client initiator) {
-        timer.cancel();
+        this.timer.cancel();
         super.shutdown(initiator);
     }
 

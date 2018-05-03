@@ -42,6 +42,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
@@ -1147,34 +1148,50 @@ public class SchedulerTHelper {
     }
 
     public List<TestNode> createRMNodeStarterNodes(String nodeName, int number) throws Exception {
-        int pnpPort = RMTHelper.findFreePort();
-        List<String> nodeUrls = new ArrayList<>(number);
-        List<String> nodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, number);
-        for (int i = 0; i < number; i++) {
-            nodeUrls.add("pnp://localhost:" + pnpPort + "/" + nodeNames.get(i));
-        }
-        String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
-        Map<String, String> vmParameters = new HashMap<>();
-        vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
-        JVMProcessImpl nodeProcess = RMTHelper.createJvmProcess(RMNodeStarter.class.getName(),
-                                                                Arrays.asList("-n",
-                                                                              nodeName,
-                                                                              "-r",
-                                                                              getLocalUrl(),
-                                                                              "-w",
-                                                                              "" + number,
-                                                                              "-Dproactive.net.nolocal=false"),
-                                                                vmParameters,
-                                                                null);
-        ArrayList<TestNode> nodes = new ArrayList<>(number);
+        return createRMNodeStarterNodesWithRetry(nodeName, number, 1);
 
-        // lookup all subsequent nodes remotely
-        for (int i = 0; i < number; i++) {
-            TestNode node0 = RMTHelper.createNode(nodeNames.get(i), nodeUrls.get(i), nodeProcess);
-            nodes.add(node0);
-        }
-        return nodes;
+    }
 
+    private List<TestNode> createRMNodeStarterNodesWithRetry(String nodeName, int number, int attempts)
+            throws IOException, NodeException, InterruptedException {
+        JVMProcessImpl nodeProcess = null;
+        try {
+            int pnpPort = RMTHelper.findFreePort();
+            List<String> nodeUrls = new ArrayList<>(number);
+            List<String> nodeNames = RMNodeStarter.getWorkersNodeNames(nodeName, number);
+            for (int i = 0; i < number; i++) {
+                nodeUrls.add("pnp://localhost:" + pnpPort + "/" + nodeNames.get(i));
+            }
+            String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
+            Map<String, String> vmParameters = new HashMap<>();
+            vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
+            nodeProcess = RMTHelper.createJvmProcess(RMNodeStarter.class.getName(),
+                                                     Arrays.asList("-n",
+                                                                   nodeName,
+                                                                   "-r",
+                                                                   getLocalUrl(),
+                                                                   "-w",
+                                                                   "" + number,
+                                                                   "-Dproactive.net.nolocal=false"),
+                                                     vmParameters,
+                                                     null);
+            ArrayList<TestNode> nodes = new ArrayList<>(number);
+
+            // lookup all subsequent nodes remotely
+            for (int i = 0; i < number; i++) {
+                TestNode node0 = RMTHelper.createNode(nodeNames.get(i), nodeUrls.get(i), nodeProcess);
+                nodes.add(node0);
+            }
+            return nodes;
+        } catch (NodeException e) {
+            if (nodeProcess != null && nodeProcess.isStarted()) {
+                nodeProcess.stopProcess();
+            }
+            if (attempts <= 3) {
+                return createRMNodeStarterNodesWithRetry(nodeName, number, attempts + 1);
+            }
+            throw e;
+        }
     }
 
     public RMNodeEvent waitForAnyNodeEvent(RMEventType nodeStateChanged) throws Exception {

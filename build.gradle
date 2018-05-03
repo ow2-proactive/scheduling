@@ -472,6 +472,14 @@ task alljavadoc(type: org.gradle.api.tasks.javadoc.Javadoc) {
     source exportedProjects.collect { project(it).sourceSets.main.allJava }
     classpath = files(exportedProjects.collect { project(it).sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
+    configure(options) {
+        links = [
+                'https://docs.oracle.com/javase/8/docs/api/',
+                'https://docs.jboss.org/hibernate/orm/5.1/javadocs/',
+                'https://docs.jboss.org/hibernate/jpa/2.1/api/'
+                ]
+    }
+
 }
 
 task alljavadocZip(type: Zip, dependsOn: alljavadoc) {

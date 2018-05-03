@@ -33,10 +33,15 @@ import java.nio.file.attribute.FileTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.TimeLimiter;
 
 
 /**
@@ -136,17 +141,29 @@ public class ProgressFileReader {
     public void stop() {
         if (watchService != null) {
             try {
-                watchService.close();
-                watchServiceThread.join();
+                closeWatchService();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.info(e);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error(e);
             } finally {
                 removeProgressFileDir();
             }
         }
+    }
+
+    private void closeWatchService() throws Exception {
+        TimeLimiter timeLimiter = new SimpleTimeLimiter();
+        timeLimiter.callWithTimeout(new Callable<Boolean>() {
+
+            @Override
+            public Boolean call() throws Exception {
+                watchService.close();
+                watchServiceThread.join();
+                return true;
+            }
+        }, 2, TimeUnit.SECONDS, true);
     }
 
     private void removeProgressFileDir() {
@@ -204,7 +221,7 @@ public class ProgressFileReader {
                     watchKey.reset();
                 }
             } catch (InterruptedException e) {
-                logger.warn(e);
+                logger.debug("Watch service interrupted");
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
                 logger.warn(e);

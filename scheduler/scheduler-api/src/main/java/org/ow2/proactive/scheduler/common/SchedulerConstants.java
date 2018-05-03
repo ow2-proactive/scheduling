@@ -41,6 +41,9 @@ public class SchedulerConstants {
     /** Default scheduler node name */
     public static final String SCHEDULER_DEFAULT_NAME = "SCHEDULER";
 
+    /** Default name for store active object binding **/
+    public static final String SYNCHRONIZATION_DEFAULT_NAME = "SYNCHRONIZATION";
+
     /** Default job name */
     public static final String JOB_DEFAULT_NAME = "NOT SET";
 
@@ -93,6 +96,11 @@ public class SchedulerConstants {
      * The variable containing a proxy to the scheduler server
      */
     public static final String SCHEDULER_CLIENT_BINDING_NAME = "schedulerapi";
+
+    /**
+     * The variable containing a proxy to the key/value store
+     */
+    public static final String SYNCHRONIZATION_API_BINDING_NAME = "synchronizationapi";
 
     /**
      * Marker in the task output to locate the remote connection hint

@@ -108,14 +108,15 @@ public class HostTracker implements Serializable {
      * Compute the number of nodes that are needed by this host at that
      * moment. The needed number of nodes is defined by the initially
      * configured number of hosts (written in the host file), minus the number
-     * of alive nodes, and minus the number of removed nodes (since removed
-     * nodes are the result of a remove action by the user, we should not
-     * redeploy removed node).
+     * of alive nodes. Note that removed nodes are not taken into account, so
+     * nodes that have been removed manually might reappear in a subsequent
+     * deployment. If one wants to remove a node definitively across multiple
+     * deployments, he must edit the configured number of nodes.
      */
     protected int getNeededNodesNumber() {
         int neededNodesNumber = 0;
         if (needsNodesFlag.get()) {
-            int computedNeededNodeNumber = configuredNodeNumber - aliveNodesCounter.get() - removedNodesCounter.get();
+            int computedNeededNodeNumber = configuredNodeNumber - aliveNodesCounter.get();
             if (computedNeededNodeNumber > configuredNodeNumber) {
                 neededNodesNumber = configuredNodeNumber;
                 logger.warn("Computed needed node number " + computedNeededNodeNumber +
