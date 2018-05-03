@@ -84,6 +84,7 @@ import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMException;
@@ -139,15 +140,6 @@ public class RMRest implements RMRestInterface {
         return session.getRM();
     }
 
-    /**
-     * Log into the resource manager using an form containing 2 fields
-     * @return the sessionid of the user if succeed
-     * @throws RMException 
-     * @throws LoginException 
-     * @throws KeyException 
-     * @throws NodeException 
-     * @throws ActiveObjectCreationException 
-     */
     @Override
     @POST
     @Path("login")
@@ -161,14 +153,6 @@ public class RMRest implements RMRestInterface {
 
     }
 
-    /**
-     * Disconnects from resource manager and releases all the nodes taken by
-     * user for computations.
-     *
-     * @param sessionId
-     *            a valid session id
-     * @throws NotConnectedException
-     */
     @Override
     @POST
     @Path("disconnect")
@@ -239,12 +223,6 @@ public class RMRest implements RMRestInterface {
         }
     }
 
-    /**
-     * Returns the state of the Resource Manager
-     * @param sessionId a valid session id
-     * @return Returns the state of the scheduler
-     * @throws NotConnectedException 
-     */
     @Override
     @GET
     @Path("state")
@@ -254,37 +232,28 @@ public class RMRest implements RMRestInterface {
         return PAFuture.getFutureValue(rm.getState());
     }
 
-    /**
-     * Returns difference between current state of the resource manager
-     * and state that the client is aware of. Each event that changes state fo the RM
-     * has counter assosiacted to it. Thus client has to provide 'latestCounter',
-     * i.e. latest event he is aware of.
-     * @param sessionId a valid session id
-     * @param clientCounter (optional) is the latest counter client has, if parameter is not provided then
-     *                                 method returns all events
-     * @return the difference between current state and state that client knows
-     * @throws NotConnectedException 
-     */
     @Override
     @GET
     @GZIP
     @Path("monitoring")
     @Produces("application/json")
-    public RMStateDelta getInitialState(@HeaderParam("sessionid") String sessionId,
+    public RMStateDelta getRMStateDelta(@HeaderParam("sessionid") String sessionId,
             @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
         checkAccess(sessionId);
         long counter = Integer.valueOf(clientCounter);
-        return RMStateCaching.getRMInitialState(counter);
+        return RMStateCaching.getRMStateDelta(counter);
     }
 
-    /**
-     * Returns true if the resource manager is operational.
-     *
-     * @param sessionId
-     *            a valid session id
-     * @return true if the resource manager is operational.
-     * @throws NotConnectedException 
-     */
+    @Override
+    @GET
+    @GZIP
+    @Path("monitoring/full")
+    @Produces("application/json")
+    public RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+        checkAccess(sessionId);
+        return RMStateCaching.getRMStateFull();
+    }
+
     @Override
     @GET
     @Path("isactive")
@@ -294,19 +263,6 @@ public class RMRest implements RMRestInterface {
         return rm.isActive().getBooleanValue();
     }
 
-    /**
-     * Adds an existing node to the particular node source.
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param url
-     *            the url of the node
-     * @param nodesource
-     *            the node source, can be null
-     * @return true if new node is added successfully, runtime exception
-     *         otherwise
-     * @throws NotConnectedException
-     */
     @Override
     @POST
     @Path("node")
@@ -321,17 +277,6 @@ public class RMRest implements RMRestInterface {
         }
     }
 
-    /**
-     * Returns true if the node nodeUrl is registered (i.e. known by the RM) and
-     * not down.
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param url
-     *            the url of the node
-     * @return true if the node nodeUrl is registered and not down
-     * @throws NotConnectedException 
-     */
     @Override
     @GET
     @Path("node/isavailable")
@@ -342,10 +287,6 @@ public class RMRest implements RMRestInterface {
         return rm.nodeIsAvailable(url).getBooleanValue();
     }
 
-    /**
-     * Gives list of existing Node Sources
-     * @return list of existing Node Sources
-     */
     @Override
     @GET
     @GZIP
@@ -471,12 +412,6 @@ public class RMRest implements RMRestInterface {
         return nsState;
     }
 
-    /**
-     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
-     * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
-     *
-     * {@see #createNodeSource(String, String, String, String[], String[], String, String[], String[])}
-     */
     @Deprecated
     @Override
     @POST
@@ -500,36 +435,6 @@ public class RMRest implements RMRestInterface {
                                 Boolean.TRUE.toString());
     }
 
-    /**
-     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
-     * String, String[], String[], String)} and {@link #deployNodeSource(String, String)}
-     *
-     * Create a NodeSource
-     * <p>
-     *
-     * @param sessionId
-     *            current session id
-     * @param nodeSourceName
-     *            name of the node source to create
-     * @param infrastructureType
-     *            fully qualified class name of the infrastructure to create
-     * @param infrastructureParameters
-     *            String parameters of the infrastructure, without the
-     *            parameters containing files or credentials
-     * @param infrastructureFileParameters
-     *            File or credential parameters
-     * @param policyType
-     *            fully qualified class name of the policy to create
-     * @param policyParameters
-     *            String parameters of the policy, without the parameters
-     *            containing files or credentials
-     * @param policyFileParameters
-     *            File or credential parameters
-     * @param nodesRecoverable
-     *            Whether the nodes can be recovered after a crash of the RM
-     * @return true if a node source has been created
-     * @throws NotConnectedException 
-     */
     @Deprecated
     @Override
     @POST
@@ -583,14 +488,6 @@ public class RMRest implements RMRestInterface {
         return (errorMessage);
     }
 
-    /**
-     * Start the nodes acquisition of the node source
-     *
-     * @param sessionId a valid session id
-     * @param nodeSourceName the name of the node source to start
-     * @return the result of the action, possibly containing the error message
-     * @throws NotConnectedException
-     */
     @Override
     @PUT
     @Path("nodesource/deploy")
@@ -609,14 +506,6 @@ public class RMRest implements RMRestInterface {
         return nsState;
     }
 
-    /**
-     * Remove the nodes of the node source and keep the node source undeployed
-     *
-     * @param sessionId a valid session id
-     * @param nodeSourceName the name of the node source to undeploy
-     * @return the result of the action, possibly containing the error message
-     * @throws NotConnectedException
-     */
     @Override
     @PUT
     @Path("nodesource/undeploy")
@@ -636,14 +525,6 @@ public class RMRest implements RMRestInterface {
         return nsState;
     }
 
-    /**
-     * Returns the ping frequency of a node source
-     *
-     * @param sessionId a valid session id
-     * @param sourceName a node source
-     * @return the ping frequency
-     * @throws NotConnectedException 
-     */
     @Override
     @POST
     @Path("nodesource/pingfrequency")
@@ -654,15 +535,6 @@ public class RMRest implements RMRestInterface {
         return rm.getNodeSourcePingFrequency(sourceName).getIntValue();
     }
 
-    /**
-     * Release a node
-     *
-     * @param sessionId a valid session id
-     * @param url node's URL
-     * @return true of the node has been released
-     * @throws NodeException
-     * @throws NotConnectedException 
-     */
     @Override
     @POST
     @Path("node/release")
@@ -675,15 +547,6 @@ public class RMRest implements RMRestInterface {
         return rm.releaseNode(n).getBooleanValue();
     }
 
-    /**
-     * Delete a node
-     *
-     * @param sessionId a valid session id
-     * @param nodeUrl node's URL
-     * @param preempt if true remove node source immediatly whithout waiting for nodes to be freed
-     * @return true if the node is removed successfully, false or exception otherwise
-     * @throws NotConnectedException 
-     */
     @Override
     @POST
     @Path("node/remove")
@@ -694,15 +557,6 @@ public class RMRest implements RMRestInterface {
         return rm.removeNode(nodeUrl, preempt).getBooleanValue();
     }
 
-    /**
-     * Delete a nodesource
-     *
-     * @param sessionId a valid session id
-     * @param sourceName a node source
-     * @param preempt if true remove node source immediatly whithout waiting for nodes to be freed
-     * @return true if the node is removed successfully, false or exception otherwise
-     * @throws NotConnectedException 
-     */
     @Override
     @POST
     @Path("nodesource/remove")
@@ -713,16 +567,6 @@ public class RMRest implements RMRestInterface {
         return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
     }
 
-    /**
-     * prevent other users from using a set of locked nodes
-     *
-     * @param sessionId
-     *            current session
-     * @param nodeUrls
-     *            set of node urls to lock
-     * @return true when all nodes were free and have been locked
-     * @throws NotConnectedException 
-     */
     @Override
     @POST
     @Path("node/lock")
@@ -733,16 +577,6 @@ public class RMRest implements RMRestInterface {
         return rm.lockNodes(nodeUrls).getBooleanValue();
     }
 
-    /**
-     * allow other users to use a set of previously locked nodes
-     *
-     * @param sessionId
-     *            current session
-     * @param nodeUrls
-     *            set of node urls to unlock
-     * @return true when all nodes were locked and have been unlocked
-     * @throws NotConnectedException 
-     */
     @Override
     @POST
     @Path("node/unlock")
@@ -753,16 +587,6 @@ public class RMRest implements RMRestInterface {
         return rm.unlockNodes(nodeUrls).getBooleanValue();
     }
 
-    /**
-     * Retrieves attributes of the specified mbean.
-     * 
-     * @param sessionId current session
-     * @param nodeJmxUrl mbean server url
-     * @param objectName name of mbean
-     * @param attrs set of mbean attributes
-     * 
-     * @return mbean attributes values
-     */
     @Override
     @GET
     @GZIP
@@ -779,30 +603,6 @@ public class RMRest implements RMRestInterface {
         return rmProxy.getNodeMBeanInfo(nodeJmxUrl, objectName, attrs);
     }
 
-    /**
-     * Return the statistic history contained in the node RRD database,
-     * without redundancy, in a friendly JSON format.
-     *
-     * @param sessionId a valid session
-     * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
-     *      for each source. Each char can be:<ul>
-     *            <li>'a' 1 minute
-     *            <li>'m' 10 minutes
-     *            <li>'h' 1 hour
-     *            <li>'H' 8 hours
-     *            <li>'d' 1 day
-     *            <li>'w' 1 week
-     *            <li>'M' 1 month
-     *            <li>'y' 1 year</ul>
-     * @return a JSON object containing a key for each source
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws MalformedObjectNameException
-     * @throws NullPointerException
-     * @throws NotConnectedException
-     */
     @Override
     @GET
     @GZIP
@@ -819,16 +619,6 @@ public class RMRest implements RMRestInterface {
         return rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range);
     }
 
-    /**
-     * Retrieves attributes of the specified mbeans.
-     * 
-     * @param sessionId current session
-     * @param objectNames mbean names (@see ObjectName format)
-     * @param nodeJmxUrl mbean server url
-     * @param attrs set of mbean attributes
-     * 
-     * @return mbean attributes values
-     */
     @Override
     @GET
     @GZIP
@@ -861,16 +651,6 @@ public class RMRest implements RMRestInterface {
         return rmProxy.getNodeMBeansHistory(nodeJmxUrl, objectNames, attrs, range);
     }
 
-    /**
-     * Initiate the shutdowns the resource manager. During the shutdown resource
-     * manager removed all the nodes and kills them if necessary.
-     * RMEvent(SHUTDOWN) will be send when the shutdown is finished.
-     *
-     * @param sessionId a valid session
-     * @param preempt if true shutdown immediatly whithout waiting for nodes to be freed, default value is false
-     * @return true if the shutdown process is successfully triggered, runtime exception otherwise
-     * @throws NotConnectedException 
-     */
     @Override
     @GET
     @Path("shutdown")
@@ -890,13 +670,6 @@ public class RMRest implements RMRestInterface {
         return PAFuture.getFutureValue(rm.getTopology());
     }
 
-    /**
-     * Returns the list of supported node source infrastructures descriptors.
-     *
-     * @param sessionId a valid session
-     * @return the list of supported node source infrastructures descriptors
-     * @throws NotConnectedException 
-     */
     @Override
     @GET
     @GZIP
@@ -908,13 +681,6 @@ public class RMRest implements RMRestInterface {
         return rm.getSupportedNodeSourceInfrastructures();
     }
 
-    /**
-     * Returns the list of supported node source policies descriptors.
-     *
-     * @param sessionId a valid session
-     * @return the list of supported node source policies descriptors
-     * @throws NotConnectedException 
-     */
     @Override
     @GET
     @GZIP
@@ -937,19 +703,6 @@ public class RMRest implements RMRestInterface {
         return rm.getNodeSourceConfiguration(nodeSourceName);
     }
 
-    /**
-     * Returns the attributes <code>attr</code> of the mbean
-     * registered as <code>name</code>.
-     * @param sessionId a valid session
-     * @param name mbean's object name
-     * @param attrs attributes to enumerate
-     * @return returns the attributes of the mbean 
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws NotConnectedException 
-     */
     @Override
     @GET
     @GZIP
@@ -970,25 +723,6 @@ public class RMRest implements RMRestInterface {
         }
     }
 
-    /**
-     * Set a single JMX attribute of the MBean <code>name</code>.
-     * Only integer and string attributes are currently supported, see <code>type</code>.
-     *
-     * @param sessionId a valid session ID
-     * @param name      the object name of the MBean
-     * @param type      the type of the attribute to set ('integer' and 'string' are currently supported, see <code>RMProxyUserInterface</code>)
-     * @param attr      the name of the attribute to set
-     * @param value     the new value of the attribute (defined as a String, it is automatically converted according to <code>type</code>)
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws NotConnectedException
-     * @throws MBeanException
-     * @throws AttributeNotFoundException
-     * @throws InvalidAttributeValueException
-     * @throws IllegalArgumentException
-     */
     @Override
     @POST
     @GZIP
@@ -1005,39 +739,6 @@ public class RMRest implements RMRestInterface {
         }
     }
 
-    /**
-     * Return the statistic history contained in the RM's RRD database,
-     * without redundancy, in a friendly JSON format.
-     * 
-     * The following sources will be queried from the RRD DB :<pre>
-     * 	{ "BusyNodesCount",
-     *    "FreeNodesCount",
-     *    "DownNodesCount",
-     *    "AvailableNodesCount",
-     *    "AverageActivity" }</pre>
-     * 
-     * 
-     * @param sessionId a valid session
-     * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
-     *      for each source. Each char can be:<ul>
-     *            <li>'a' 1 minute
-     *            <li>'m' 10 minutes
-     *            <li>'h' 1 hour
-     *            <li>'H' 8 hours
-     *            <li>'d' 1 day
-     *            <li>'w' 1 week
-     *            <li>'M' 1 month
-     *            <li>'y' 1 year</ul>
-     * @return a JSON object containing a key for each source
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws MalformedObjectNameException
-     * @throws NullPointerException
-     * @throws InterruptedException
-     * @throws NotConnectedException 
-     */
     @Override
     @GET
     @GZIP
@@ -1158,10 +859,6 @@ public class RMRest implements RMRestInterface {
         return ret;
     }
 
-    /**
-     * Returns the version of the rest api
-     * @return returns the version of the rest api
-     */
     @Override
     @GET
     @Path("version")

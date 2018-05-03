@@ -53,7 +53,7 @@ public class ListNodeCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        HttpGet request = new HttpGet(currentContext.getResourceUrl("monitoring"));
+        HttpGet request = new HttpGet(currentContext.getResourceUrl("monitoring/full"));
         HttpResponseWrapper response = execute(request, currentContext);
         if (statusCode(OK) == statusCode(response)) {
             RmStateView state = readValue(response, RmStateView.class, currentContext);
@@ -75,20 +75,8 @@ public class ListNodeCommand extends AbstractCommand implements Command {
                     selectedNodeEvents = selectedList.toArray(new NodeEventView[selectedList.size()]);
                 }
             }
-
-            // filter out all node events that was removed
-            // so rm client does not display them
-            List<NodeEventView> filtered = new ArrayList<>();
-            for (NodeEventView nodeEvent : selectedNodeEvents) {
-                if (!nodeEvent.isRemoved()) {
-                    filtered.add(nodeEvent);
-                }
-            }
-
-            NodeEventView[] result = new NodeEventView[filtered.size()];
-            result = filtered.toArray(result);
-            resultStack(currentContext).push(result);
-            writeLine(currentContext, "%s", StringUtility.string(result));
+            resultStack(currentContext).push(selectedNodeEvents);
+            writeLine(currentContext, "%s", StringUtility.string(selectedNodeEvents));
 
         } else {
             handleError("An error occurred while retrieving nodes:", response, currentContext);
