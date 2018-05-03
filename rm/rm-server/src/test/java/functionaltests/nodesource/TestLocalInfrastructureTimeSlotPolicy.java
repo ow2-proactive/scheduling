@@ -73,7 +73,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
         repeater.accept(NODES_NUMBER, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED));
 
         log("Waiting for the time slot policy to add the nodes again");
-        repeater.accept(NODES_NUMBER, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED));
+        RMTHelper.waitForNodesToBeUp(NODES_NUMBER, this.rmHelper.getMonitorsHandler());
 
         log("Waiting for the time slot policy to remove the nodes again");
         repeater.accept(NODES_NUMBER, () -> this.rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED));
