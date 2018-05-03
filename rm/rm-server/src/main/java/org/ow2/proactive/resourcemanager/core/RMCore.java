@@ -1225,27 +1225,29 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             String policyType, Object[] policyParams, boolean nodesRecoverable) {
 
         logger.info("Edit node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
-
-        this.checkWhetherNodeSourceIsEditableOrFail(nodeSourceName);
-
+        NodeSource oldNodeSource = this.getEditableNodeSourceOrFail(nodeSourceName);
         NodeSourceData nodeSourceData = this.getNodeSourceToPersist(nodeSourceName,
                                                                     infrastructureType,
                                                                     infraParams,
                                                                     policyType,
                                                                     policyParams,
                                                                     nodesRecoverable);
-
         this.dbManager.updateNodeSource(nodeSourceData);
 
-        NodeSource nodeSource = this.createNodeSourceInstance(nodeSourceData.toNodeSourceDescriptor());
-
-        this.definedNodeSources.put(nodeSourceName, nodeSource);
-
-        this.emitNodeSourceEvent(nodeSource, RMEventType.NODESOURCE_DEFINED);
-
-        logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully edited");
-
-        return new BooleanWrapper(true);
+        try {
+            NodeSource newNodeSource = this.createNodeSourceInstance(nodeSourceData.toNodeSourceDescriptor());
+            this.definedNodeSources.put(nodeSourceName, newNodeSource);
+            this.emitNodeSourceEvent(newNodeSource, RMEventType.NODESOURCE_DEFINED);
+            logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully edited");
+            return new BooleanWrapper(true);
+        } catch (Exception e) {
+            this.dbManager.updateNodeSource(NodeSourceData.fromNodeSourceDescriptor(oldNodeSource.getDescriptor()));
+            this.definedNodeSources.put(nodeSourceName, oldNodeSource);
+            logger.warn(NODE_SOURCE_STRING + nodeSourceName + " failed to be edited. Infrastructure parameters: " +
+                        Arrays.toString(infraParams) + ". Policy parameters: " + Arrays.toString(policyParams) + ".",
+                        e);
+            throw e;
+        }
     }
 
     /**
@@ -1257,9 +1259,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         logger.info("Update dynamic parameters of node source " + nodeSourceName + REQUESTED_BY_STRING +
                     this.caller.getName());
+        NodeSource definedNodeSource = getDefinedNodeSourceOrFail(nodeSourceName);
 
+        // needed to rollback in case of an issue
+        List<Serializable> oldInfrastructureParameters = definedNodeSource.getDescriptor()
+                                                                          .getSerializableInfrastructureParameters();
+        List<Serializable> oldInfrastructureParametersCopy = new ArrayList<>(oldInfrastructureParameters.size());
+        oldInfrastructureParametersCopy.addAll(oldInfrastructureParameters);
+        List<Serializable> oldPolicyParameters = definedNodeSource.getDescriptor().getSerializablePolicyParameters();
+        List<Serializable> oldPolicyParametersCopy = new ArrayList<>(oldPolicyParameters.size());
+        oldPolicyParametersCopy.addAll(oldPolicyParameters);
+
+        // merge old not dynamic parameters and parameters to update
         NodeSource deployedNodeSource = getDeployedNodeSourceOrFail(nodeSourceName);
-
         NodeSourceDescriptor oldDescriptor = deployedNodeSource.getDescriptor();
         NodeSourceDescriptor newDescriptor = getUpdatedNodeSourceDescriptor(nodeSourceName,
                                                                             infraParams,
@@ -1268,15 +1280,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                             oldDescriptor);
         persistNodeSourceWithNewDescriptor(newDescriptor);
 
-        // reconfiguration happens asynchronously
-        deployedNodeSource.reconfigure(newDescriptor.getInfrastructureParameters(),
-                                       newDescriptor.getPolicyParameters());
-
-        this.emitNodeSourceEvent(deployedNodeSource, RMEventType.NODESOURCE_UPDATED);
-
-        logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully updated with dynamic parameters");
-
-        return new BooleanWrapper(true);
+        try {
+            deployedNodeSource.reconfigure(newDescriptor.getInfrastructureParameters(),
+                                           newDescriptor.getPolicyParameters());
+            this.emitNodeSourceEvent(deployedNodeSource, RMEventType.NODESOURCE_UPDATED);
+            logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully updated with dynamic parameters");
+            return new BooleanWrapper(true);
+        } catch (Exception e) {
+            updateNodeSourceDescriptor(nodeSourceName,
+                                       deployedNodeSource,
+                                       oldInfrastructureParametersCopy,
+                                       oldPolicyParametersCopy);
+            persistNodeSourceWithNewDescriptor(oldDescriptor);
+            logger.warn(NODE_SOURCE_STRING + nodeSourceName +
+                        " failed to be updated with dynamic parameters. Infrastructure parameters: " +
+                        Arrays.toString(newDescriptor.getInfrastructureParameters()) + ". Policy parameters: " +
+                        Arrays.toString(newDescriptor.getPolicyParameters()) + ".", e);
+            throw new RuntimeException(e);
+        }
     }
 
     private NodeSourceDescriptor getUpdatedNodeSourceDescriptor(String nodeSourceName,
@@ -1328,18 +1349,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         NodeSource definedNodeSource = getDefinedNodeSourceOrFail(nodeSourceName);
 
         return definedNodeSource.updateDynamicParameters(updatedInfrastructureParams, updatedPolicyParams);
-    }
-
-    private void checkWhetherNodeSourceIsEditableOrFail(String nodeSourceName) {
-
-        NodeSource editedNodeSource = this.definedNodeSources.get(nodeSourceName);
-
-        if (editedNodeSource == null) {
-            throw new IllegalArgumentException("Edited node source " + nodeSourceName + " does not exist");
-        }
-        if (!editedNodeSource.getStatus().equals(NodeSourceStatus.NODES_UNDEPLOYED)) {
-            throw new IllegalArgumentException("A node source must be undeployed to be edited");
-        }
     }
 
     private NodeSourceData getNodeSourceToPersist(String nodeSourceName, String infrastructureType,
@@ -1517,6 +1526,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         persistNodeSourceWithNewDescriptor(descriptor);
     }
 
+    private NodeSource getEditableNodeSourceOrFail(String nodeSourceName) {
+
+        NodeSource nodeSource = getDefinedNodeSourceOrFail(nodeSourceName);
+
+        if (!nodeSource.getStatus().equals(NodeSourceStatus.NODES_UNDEPLOYED)) {
+            throw new IllegalArgumentException("A node source must be undeployed to be edited");
+        }
+
+        return nodeSource;
+    }
+
     private NodeSourceDescriptor getDefinedNodeSourceDescriptorOrFail(String nodeSourceName) {
 
         NodeSource nodeSource = this.getDefinedNodeSourceOrFail(nodeSourceName);
@@ -1524,6 +1544,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return nodeSource.getDescriptor();
     }
 
+    // toto
     private NodeSource getDefinedNodeSourceOrFail(String nodeSourceName) {
 
         NodeSource nodeSource = this.definedNodeSources.get(nodeSourceName);

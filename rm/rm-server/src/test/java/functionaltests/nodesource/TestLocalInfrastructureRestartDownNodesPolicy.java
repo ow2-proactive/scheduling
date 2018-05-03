@@ -44,6 +44,8 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.FileToBytesConverter;
 import org.ow2.proactive.utils.NodeSet;
 
+import functionaltests.nodesource.helper.LocalInfrastructureTestHelper;
+import functionaltests.nodesource.helper.RestartDownNodesPolicyTestHelper;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
@@ -66,13 +68,12 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         // creating node source
         // first parameter of im is empty default rmHelper url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rmHelper.getResourceManager()
-                .createNodeSource(sourceName,
-                                  LocalInfrastructure.class.getName(),
-                                  new Object[] { creds, defaultDescriptorNodesNb, RMTHelper.DEFAULT_NODES_TIMEOUT, "" },
-                                  RestartDownNodesPolicy.class.getName(),
-                                  policyParameters,
-                                  NODES_NOT_RECOVERABLE);
+        rmHelper.getResourceManager().createNodeSource(sourceName,
+                                                       LocalInfrastructure.class.getName(),
+                                                       LocalInfrastructureTestHelper.getParameters(defaultDescriptorNodesNb),
+                                                       RestartDownNodesPolicy.class.getName(),
+                                                       policyParameters,
+                                                       NODES_NOT_RECOVERABLE);
 
         rmHelper.waitForNodeSourceCreation(sourceName, defaultDescriptorNodesNb);
     }
@@ -106,7 +107,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         nodeSourceName = "Node_source_1";
 
         RMTHelper.log("Test 1 - restart down nodes policy");
-        createNodeSourceWithNodes(nodeSourceName, new Object[] { "ALL", "ALL", "10000" });
+        createNodeSourceWithNodes(nodeSourceName, RestartDownNodesPolicyTestHelper.getParameters(10000));
 
         RMState stateTest1 = resourceManager.getState();
         assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
@@ -142,7 +143,7 @@ public class TestLocalInfrastructureRestartDownNodesPolicy extends RMFunctionalT
         nodeSourceName = "Node_source_2";
 
         RMTHelper.log("Test 2 - restart down nodes policy with a node removed");
-        createNodeSourceWithNodes(nodeSourceName, new Object[] { "ALL", "ALL", "10000" });
+        createNodeSourceWithNodes(nodeSourceName, RestartDownNodesPolicyTestHelper.getParameters(10000));
 
         RMState stateTest1 = resourceManager.getState();
         assertEquals(defaultDescriptorNodesNb, stateTest1.getTotalNodesNumber());
