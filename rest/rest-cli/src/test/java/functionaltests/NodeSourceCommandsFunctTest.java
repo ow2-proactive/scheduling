@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
+import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 
@@ -53,7 +54,9 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
     private static final String INFRASTRUCTURE_CLASS = LocalInfrastructure.class.getCanonicalName();
 
-    private static final String POLICY_CLASS = StaticPolicy.class.getCanonicalName();
+    private static final String STATIC_POLICY_CLASS = StaticPolicy.class.getCanonicalName();
+
+    private static final String RESTART_DOWN_NODES_POLICY_CLASS = RestartDownNodesPolicy.class.getCanonicalName();
 
     private static final int NUMBER_OF_NODES = 4;
 
@@ -69,7 +72,9 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
     private static String modifiedInfrastructureParametersString;
 
-    private static String policyParametersString;
+    private static String staticPolicyParametersString;
+
+    private static String restartDownNodesPolicyParametersString;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -83,7 +88,8 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         initialInfrastructureParametersString = getInfrastructureParametersString(NUMBER_OF_NODES);
         modifiedInfrastructureParametersString = getInfrastructureParametersString(MODIFIED_NUMBER_OF_NODES);
-        policyParametersString = getPolicyParametersString();
+        staticPolicyParametersString = getStaticPolicyParametersString();
+        restartDownNodesPolicyParametersString = getRestartDownNodesPolicyParametersString();
 
         System.out.println("Finished init class: " + NodeSourceCommandsFunctTest.class);
     }
@@ -110,10 +116,10 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
 
         if (nodesRecoverableParameter) {
             this.typeLine("createns( '" + nodeSourceName + "', " + initialInfrastructureParametersString + ", " +
-                          policyParametersString + ", 'tRuE')");
+                          staticPolicyParametersString + ", 'tRuE')");
         } else {
             this.typeLine("createns( '" + nodeSourceName + "', " + initialInfrastructureParametersString + ", " +
-                          policyParametersString + ")");
+                          staticPolicyParametersString + ")");
         }
 
         this.runCli();
@@ -129,27 +135,28 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
     }
 
     @Test
-    public void testDefineAndDeployNodeSourceRecoverableParam() throws Exception {
+    public void testDefineAndDeployNodeSourceRecoverableParamWithStaticPolicy() throws Exception {
         String nodeSourceName = "nsDefinedAndDeployedThroughCLIRecoverableParam";
-        this.defineNodeSourceAndCheckOutput(nodeSourceName, true, true);
+        this.defineNodeSourceAndCheckOutput(nodeSourceName, staticPolicyParametersString, true, true);
         this.deployNodeSourceAndCheckOutput(nodeSourceName, NUMBER_OF_NODES);
         this.undeployNodeSourceAndCheckOutput(nodeSourceName, true);
-        this.editNodeSourceAndCheckOutput(nodeSourceName);
+        this.editNodeSourceAndCheckOutput(nodeSourceName, staticPolicyParametersString);
         this.deployNodeSourceAndCheckOutput(nodeSourceName, MODIFIED_NUMBER_OF_NODES);
     }
 
     @Test
-    public void testDefineAndDeployNodeSourceNoRecoverableParam() throws Exception {
+    public void testDefineAndDeployNodeSourceNoRecoverableParamWithRestartDownNodesPolicy() throws Exception {
         String nodeSourceName = "nsDefinedAndDeployedThroughCLINoRecoverableParam";
-        this.defineNodeSourceAndCheckOutput(nodeSourceName, false, false);
+        this.defineNodeSourceAndCheckOutput(nodeSourceName, restartDownNodesPolicyParametersString, false, false);
         this.deployNodeSourceAndCheckOutput(nodeSourceName, NUMBER_OF_NODES);
         this.undeployNodeSourceAndCheckOutput(nodeSourceName, false);
-        this.editNodeSourceAndCheckOutput(nodeSourceName);
+        this.editNodeSourceAndCheckOutput(nodeSourceName, restartDownNodesPolicyParametersString);
         this.deployNodeSourceAndCheckOutput(nodeSourceName, MODIFIED_NUMBER_OF_NODES);
+        this.updateDynamicParametersAndCheckOutput(nodeSourceName);
     }
 
-    private void defineNodeSourceAndCheckOutput(String nodeSourceName, boolean nodesRecoverableParameter,
-            boolean preemptUndeploy) throws Exception {
+    private void defineNodeSourceAndCheckOutput(String nodeSourceName, String policyParametersString,
+            boolean nodesRecoverableParameter, boolean preemptUndeploy) throws Exception {
 
         System.out.println(LOG_HEADER + " Test definens command");
 
@@ -208,7 +215,7 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         this.checkNoOccurrenceOfNodeSourceInNodesList(nodeSourceName);
     }
 
-    private void editNodeSourceAndCheckOutput(String nodeSourceName) {
+    private void editNodeSourceAndCheckOutput(String nodeSourceName, String policyParametersString) {
 
         System.out.println(LOG_HEADER + " Test editns command");
 
@@ -222,6 +229,22 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
         System.out.println(out);
 
         assertThat(out).contains("Node source successfully edited.");
+    }
+
+    private void updateDynamicParametersAndCheckOutput(String nodeSourceName) {
+
+        System.out.println(LOG_HEADER + " Test updatensparam command");
+
+        this.clearAndTypeLine("updatensparam( '" + nodeSourceName + "', " + modifiedInfrastructureParametersString +
+                              ", " + restartDownNodesPolicyParametersString + ")");
+
+        this.runCli();
+
+        String out = this.capturedOutput.toString();
+        System.setOut(this.stdOut);
+        System.out.println(out);
+
+        assertThat(out).contains("Node source dynamic parameters successfully updated.");
     }
 
     private void checkOccurrencesOfNodeSourceInNodeSourceList(String nodeSourceName) {
@@ -299,8 +322,12 @@ public class NodeSourceCommandsFunctTest extends AbstractFunctCmdTest {
                              NODES_TIMEOUT);
     }
 
-    private static String getPolicyParametersString() {
-        return String.format("['%s', '%s', '%s']", POLICY_CLASS, "ALL", "ALL");
+    private static String getStaticPolicyParametersString() {
+        return String.format("['%s', '%s', '%s']", STATIC_POLICY_CLASS, "ALL", "ALL");
+    }
+
+    private static String getRestartDownNodesPolicyParametersString() {
+        return String.format("['%s', '%s', '%s', %s]", RESTART_DOWN_NODES_POLICY_CLASS, "ALL", "ALL", 5000);
     }
 
 }

@@ -98,7 +98,7 @@ public class VerifyChangeTest {
         Map<String, Double> result = new HashMap<>(previousReport.size());
 
         Set<String> intersectionOfKeys = new HashSet<>(previousReport.keySet());
-        intersectionOfKeys.removeAll(newReport.keySet());
+        intersectionOfKeys.retainAll(newReport.keySet());
 
         for (String key : intersectionOfKeys) {
             final double previousValue = previousReport.get(key);

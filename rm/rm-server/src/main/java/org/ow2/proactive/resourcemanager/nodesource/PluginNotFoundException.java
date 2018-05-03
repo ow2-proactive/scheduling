@@ -23,46 +23,24 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.cli.json;
+package org.ow2.proactive.resourcemanager.nodesource;
 
-public class NodeSourceView {
-    private String sourceName;
+/**
+ * Exception that can be thrown when trying to load a class representing the
+ * infrastructure or the policy of a node source.
+ */
+public class PluginNotFoundException extends Exception {
 
-    private String sourceDescription;
+    private final String notFoundPluginClassName;
 
-    private String nodeSourceAdmin;
-
-    private String eventType;
-
-    public String getSourceName() {
-        return sourceName;
+    public PluginNotFoundException(String notFoundPluginClassName, Exception e) {
+        super(e);
+        this.notFoundPluginClassName = notFoundPluginClassName;
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
+    public String getMessageWithContext(String nodeSourceName) {
+        return "Plugin class " + this.notFoundPluginClassName + " required for node source " + nodeSourceName +
+               " cannot be loaded";
     }
 
-    public String getSourceDescription() {
-        return sourceDescription;
-    }
-
-    public void setSourceDescription(String sourceDescription) {
-        this.sourceDescription = sourceDescription;
-    }
-
-    public String getNodeSourceAdmin() {
-        return nodeSourceAdmin;
-    }
-
-    public void setNodeSourceAdmin(String nodeSourceAdmin) {
-        this.nodeSourceAdmin = nodeSourceAdmin;
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
 }

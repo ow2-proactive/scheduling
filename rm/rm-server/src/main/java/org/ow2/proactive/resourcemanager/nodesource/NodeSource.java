@@ -25,10 +25,12 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource;
 
+import java.io.Serializable;
 import java.security.Permission;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -130,8 +132,6 @@ public class NodeSource implements InitActive, RunActive {
      */
     private NodeSourcePolicy activePolicy;
 
-    private final String description;
-
     private final RMCore rmcore;
 
     // The url used by spawn nodes to register themself
@@ -192,7 +192,6 @@ public class NodeSource implements InitActive, RunActive {
         name = null;
         infrastructureManager = null;
         policy = null;
-        description = null;
         rmcore = null;
         administrator = null;
         adminPermission = null;
@@ -219,7 +218,6 @@ public class NodeSource implements InitActive, RunActive {
         this.policy = policy;
         this.rmcore = rmcore;
         this.monitoring = monitor;
-        this.description = "Infrastructure: " + im + ", Policy: " + this.policy;
 
         this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
         this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
@@ -560,6 +558,22 @@ public class NodeSource implements InitActive, RunActive {
         this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
     }
 
+    public NodeSourceDescriptor updateDynamicParameters(List<Serializable> infrastructureParamsWithDynamicUpdated,
+            List<Serializable> policyParamsWithDynamicUpdated) {
+
+        this.descriptor.setInfrastructureParameters(infrastructureParamsWithDynamicUpdated);
+        this.descriptor.setPolicyParameters(policyParamsWithDynamicUpdated);
+
+        this.infrastructureManager.setPersistedNodeSourceData(NodeSourceData.fromNodeSourceDescriptor(this.descriptor));
+
+        return this.descriptor;
+    }
+
+    public void reconfigure(Object[] updatedInfrastructureParams, Object[] updatedPolicyParams) throws Exception {
+        this.infrastructureManager.reconfigure(updatedInfrastructureParams);
+        this.activePolicy.reconfigure(updatedPolicyParams);
+    }
+
     /**
      * Looks up the node
      */
@@ -711,7 +725,7 @@ public class NodeSource implements InitActive, RunActive {
      */
     @ImmediateService
     public String getDescription() {
-        return description;
+        return "Infrastructure: " + this.infrastructureManager.toString() + ", Policy: " + this.policy.toString();
     }
 
     /**
@@ -957,7 +971,7 @@ public class NodeSource implements InitActive, RunActive {
 
     public RMNodeSourceEvent createNodeSourceEvent() {
         return new RMNodeSourceEvent(this.name,
-                                     this.description,
+                                     getDescription(),
                                      this.administrator.getName(),
                                      this.getStatus().toString());
     }

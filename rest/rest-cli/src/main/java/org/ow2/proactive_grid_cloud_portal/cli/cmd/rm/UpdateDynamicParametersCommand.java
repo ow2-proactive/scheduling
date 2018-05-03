@@ -34,15 +34,12 @@ import org.ow2.proactive_grid_cloud_portal.cli.utils.HttpResponseWrapper;
 import org.ow2.proactive_grid_cloud_portal.cli.utils.QueryStringBuilder;
 
 
-public class EditNodeSourceCommand extends NodeSourceCommand {
+public class UpdateDynamicParametersCommand extends NodeSourceCommand {
 
-    private static final String RM_REST_ENDPOINT = "nodesource/edit";
+    private static final String RM_REST_ENDPOINT = "nodesource/parameter";
 
-    private String nodesRecoverable;
-
-    public EditNodeSourceCommand(String nodeSourceName, String nodesRecoverable) {
+    public UpdateDynamicParametersCommand(String nodeSourceName) {
         super(nodeSourceName);
-        this.nodesRecoverable = nodesRecoverable;
     }
 
     @Override
@@ -55,8 +52,6 @@ public class EditNodeSourceCommand extends NodeSourceCommand {
 
         QueryStringBuilder queryStringBuilder = getQuery(currentContext);
 
-        queryStringBuilder.add("nodesRecoverable", this.nodesRecoverable);
-
         HttpResponseWrapper response = executeRequestWithQuery(currentContext, queryStringBuilder, HttpVerb.PUT);
 
         if (this.statusCode(OK) == this.statusCode(response)) {
@@ -64,17 +59,19 @@ public class EditNodeSourceCommand extends NodeSourceCommand {
             boolean success = nsState.isResult();
             this.resultStack(currentContext).push(success);
             if (success) {
-                writeLine(currentContext, "Node source successfully edited.");
+                writeLine(currentContext, "Node source dynamic parameters successfully updated.");
             } else {
                 writeLine(currentContext,
                           "%s %s. %s",
-                          "Cannot edit node source",
+                          "Cannot update dynamic parameters of node source:",
                           this.nodeSourceName,
                           nsState.getErrorMessage());
                 writeLine(currentContext, nsState.getStackTrace().replace("\\n", "%n").replace("\\t", "    "));
             }
         } else {
-            this.handleError("An error occurred while editing node source:", response, currentContext);
+            this.handleError("An error occurred while updating dynamic parameters of node source:",
+                             response,
+                             currentContext);
 
         }
     }

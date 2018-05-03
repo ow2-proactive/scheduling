@@ -23,46 +23,31 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.cli.json;
+package functionaltests.nodesource.helper;
 
-public class NodeSourceView {
-    private String sourceName;
+import java.io.File;
+import java.io.IOException;
 
-    private String sourceDescription;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.utils.FileToBytesConverter;
 
-    private String nodeSourceAdmin;
+import functionaltests.utils.RMTHelper;
 
-    private String eventType;
 
-    public String getSourceName() {
-        return sourceName;
+public class LocalInfrastructureTestHelper {
+
+    public static byte[] getCredentialsBytes() throws IOException {
+        String credentialsPath = PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString());
+        return FileToBytesConverter.convertFileToByteArray(new File(credentialsPath));
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
+    public static Object[] getParameters(int numberOfNodes) {
+        try {
+            return new Object[] { getCredentialsBytes(), numberOfNodes, RMTHelper.DEFAULT_NODES_TIMEOUT, "" };
+        } catch (IOException e) {
+            RMTHelper.log("Could not get credentials to create local infrastructure: " + e.getMessage());
+            throw new IllegalStateException(e);
+        }
     }
 
-    public String getSourceDescription() {
-        return sourceDescription;
-    }
-
-    public void setSourceDescription(String sourceDescription) {
-        this.sourceDescription = sourceDescription;
-    }
-
-    public String getNodeSourceAdmin() {
-        return nodeSourceAdmin;
-    }
-
-    public void setNodeSourceAdmin(String nodeSourceAdmin) {
-        this.nodeSourceAdmin = nodeSourceAdmin;
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
 }

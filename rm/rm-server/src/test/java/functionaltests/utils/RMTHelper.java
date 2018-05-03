@@ -276,6 +276,11 @@ public class RMTHelper {
 
     public static void waitForNodeSourceCreation(String name, int nodeNumber, RMMonitorsHandler monitor) {
         waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, name, monitor);
+        waitForNodesToBeUp(nodeNumber, monitor);
+
+    }
+
+    public static void waitForNodesToBeUp(int nodeNumber, RMMonitorsHandler monitor) {
         // this sequence of events matches what's happening on the resource manager when a node source is created
         waitForAnyMultipleNodeEvent(RMEventType.NODE_ADDED, nodeNumber, monitor);
         for (int i = 0; i < nodeNumber; i++) {

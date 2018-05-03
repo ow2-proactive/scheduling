@@ -28,7 +28,8 @@ package functionaltests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import functionaltests.nodesource.TestSSHInfrastructureV2RestartDownNodesPolicy;
+import functionaltests.nodesource.TestLocalInfrastructureCronPolicy;
+import functionaltests.nodesource.TestSSHInfrastructureV2AllPolicies;
 import functionaltests.nodesrecovery.NodesRecoveryPropertyTest;
 import functionaltests.nodesrecovery.RecoverLocalInfrastructureTest;
 import functionaltests.nodesrecovery.RecoverSSHInfrastructureV2Test;
@@ -40,7 +41,8 @@ import functionaltests.selectionscript.SelectionScriptTimeOutTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ NonBlockingCoreTest.class, TestNSNodesPermissions.class, SelectionScriptTimeOutTest.class,
                       RecoverLocalInfrastructureTest.class, RecoverSSHInfrastructureV2Test.class,
-                      TestSSHInfrastructureV2RestartDownNodesPolicy.class, NodesRecoveryPropertyTest.class })
+                      TestLocalInfrastructureCronPolicy.class, TestSSHInfrastructureV2AllPolicies.class,
+                      NodesRecoveryPropertyTest.class })
 
 /**
  * @author ActiveEon Team

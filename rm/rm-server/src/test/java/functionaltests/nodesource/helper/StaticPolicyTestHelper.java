@@ -23,46 +23,15 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.cli.json;
+package functionaltests.nodesource.helper;
 
-public class NodeSourceView {
-    private String sourceName;
+import org.ow2.proactive.resourcemanager.nodesource.policy.AccessType;
 
-    private String sourceDescription;
 
-    private String nodeSourceAdmin;
+public class StaticPolicyTestHelper {
 
-    private String eventType;
-
-    public String getSourceName() {
-        return sourceName;
+    public static Object[] getParameters() {
+        return new Object[] { AccessType.ALL.toString(), AccessType.ALL.toString() };
     }
 
-    public void setSourceName(String sourceName) {
-        this.sourceName = sourceName;
-    }
-
-    public String getSourceDescription() {
-        return sourceDescription;
-    }
-
-    public void setSourceDescription(String sourceDescription) {
-        this.sourceDescription = sourceDescription;
-    }
-
-    public String getNodeSourceAdmin() {
-        return nodeSourceAdmin;
-    }
-
-    public void setNodeSourceAdmin(String nodeSourceAdmin) {
-        this.nodeSourceAdmin = nodeSourceAdmin;
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
 }
