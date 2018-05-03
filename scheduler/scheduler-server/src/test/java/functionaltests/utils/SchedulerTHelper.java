@@ -1154,6 +1154,7 @@ public class SchedulerTHelper {
 
     private List<TestNode> createRMNodeStarterNodesWithRetry(String nodeName, int number, int attempts)
             throws IOException, NodeException, InterruptedException {
+        JVMProcessImpl nodeProcess = null;
         try {
             int pnpPort = RMTHelper.findFreePort();
             List<String> nodeUrls = new ArrayList<>(number);
@@ -1164,16 +1165,16 @@ public class SchedulerTHelper {
             String nodeUrl = "pnp://localhost:" + pnpPort + "/" + nodeName;
             Map<String, String> vmParameters = new HashMap<>();
             vmParameters.put(PNPConfig.PA_PNP_PORT.getName(), Integer.toString(pnpPort));
-            JVMProcessImpl nodeProcess = RMTHelper.createJvmProcess(RMNodeStarter.class.getName(),
-                                                                    Arrays.asList("-n",
-                                                                                  nodeName,
-                                                                                  "-r",
-                                                                                  getLocalUrl(),
-                                                                                  "-w",
-                                                                                  "" + number,
-                                                                                  "-Dproactive.net.nolocal=false"),
-                                                                    vmParameters,
-                                                                    null);
+            nodeProcess = RMTHelper.createJvmProcess(RMNodeStarter.class.getName(),
+                                                     Arrays.asList("-n",
+                                                                   nodeName,
+                                                                   "-r",
+                                                                   getLocalUrl(),
+                                                                   "-w",
+                                                                   "" + number,
+                                                                   "-Dproactive.net.nolocal=false"),
+                                                     vmParameters,
+                                                     null);
             ArrayList<TestNode> nodes = new ArrayList<>(number);
 
             // lookup all subsequent nodes remotely
@@ -1183,6 +1184,9 @@ public class SchedulerTHelper {
             }
             return nodes;
         } catch (NodeException e) {
+            if (nodeProcess != null && nodeProcess.isStarted()) {
+                nodeProcess.stopProcess();
+            }
             if (attempts <= 3) {
                 return createRMNodeStarterNodesWithRetry(nodeName, number, attempts + 1);
             }
