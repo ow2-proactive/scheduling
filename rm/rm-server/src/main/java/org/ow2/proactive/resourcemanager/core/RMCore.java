@@ -2174,19 +2174,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         logger.info("Remove node source " + nodeSourceName + " with preempt=" + preempt + REQUESTED_BY_STRING +
                     this.caller.getName());
 
-        if (!this.definedNodeSources.containsKey(nodeSourceName)) {
+        NodeSource nodeSourceToRemove;
+        if (this.definedNodeSources.containsKey(nodeSourceName)) {
+            nodeSourceToRemove = this.definedNodeSources.get(nodeSourceName);
+        } else if (this.deployedNodeSources.containsKey(nodeSourceName)) {
+            nodeSourceToRemove = this.deployedNodeSources.get(nodeSourceName);
+        } else {
             throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
         }
-
-        NodeSource nodeSourceToRemove = this.definedNodeSources.get(nodeSourceName);
-
         this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
                                     this.caller + " is not authorized to remove " + nodeSourceName);
 
         this.shutDownNodeSourceIfDeployed(nodeSourceName, preempt);
-
         this.removeDefinedNodeSource(nodeSourceName, nodeSourceToRemove);
-
         return new BooleanWrapper(true);
     }
 
