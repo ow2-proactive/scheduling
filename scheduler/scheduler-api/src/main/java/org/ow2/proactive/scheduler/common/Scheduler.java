@@ -1299,8 +1299,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if you are not authenticated.
      * @throws PermissionException
      *             if you have not enough permission to access this method.
-     * @throws UnknownJobException
-     *             if one of the job IDs wasn't found
      */
     List<JobInfo> getJobsInfoList(List<String> jobsId) throws PermissionException, NotConnectedException;
 
