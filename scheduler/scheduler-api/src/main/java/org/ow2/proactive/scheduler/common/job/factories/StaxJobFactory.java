@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -306,6 +307,15 @@ public class StaxJobFactory extends JobFactory {
     }
 
     /**
+     * Convenience method to create a new JobVariable instance from a Map.Entry
+     * @param entry a valid Map.Entry with a variable name and a variable value
+     * @return the new JobVariable
+     */
+    private JobVariable newJobVariable(Map.Entry<String, String> entry) {
+        return new JobVariable(entry.getKey(), entry.getValue(), null);
+    }
+
+    /**
      * Create the real job and fill it with its property. Leave the method at
      * the first tag that define the real type of job.
      *
@@ -346,6 +356,14 @@ public class StaxJobFactory extends JobFactory {
         try {
             int eventType;
             boolean shouldContinue = true;
+
+            if (replacementVariables != null) {
+                commonPropertiesHolder.getVariables()
+                                      .putAll(replacementVariables.entrySet()
+                                                                  .stream()
+                                                                  .collect(Collectors.toMap(Map.Entry::getKey,
+                                                                                            this::newJobVariable)));
+            }
             while (shouldContinue && cursorJob.hasNext()) {
                 eventType = cursorJob.next();
                 switch (eventType) {
