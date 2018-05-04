@@ -769,7 +769,10 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             // This is due to deep copies made by ProActive Programming with method invocation on Active Objects.
             // As a consequence, the 'deployingNode' variable must be updated with the last value available
             // in the 'deployingNodes' collection
-            deployingNode = getDeployingOrLostNode(deployingNodeUrl);
+            RMDeployingNode statefulDeployingNode = getDeployingOrLostNode(deployingNodeUrl);
+            if (statefulDeployingNode != null) {
+                deployingNode = statefulDeployingNode;
+            }
         }
 
         if (logger.isTraceEnabled()) {
