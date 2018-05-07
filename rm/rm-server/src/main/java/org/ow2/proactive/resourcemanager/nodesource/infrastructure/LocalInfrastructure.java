@@ -77,7 +77,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private static final String NB_HANDLED_NODES_KEY = "nbHandledNodes";
 
     /**
-     * Index of deployment, if startNodesOnTheFly is called multiple times, each time a new process will be created.
+     * Index of deployment, if startNodes is called multiple times, each time a new process will be created.
      * The index is used to prevent conflicts in nodes urls
      */
     private static final String LAST_NODE_STARTED_INDEX_KEY = "lastNodeStartedIndex";
@@ -111,7 +111,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                                                            amountOfNewNodesToHandle;
             if (differenceBetweenHandledAndAcquiredNodes > 0) {
                 logger.info("Starting " + differenceBetweenHandledAndAcquiredNodes + " nodes");
-                startNodesOnTheFly(differenceBetweenHandledAndAcquiredNodes);
+                startNodes(differenceBetweenHandledAndAcquiredNodes);
             }
         } catch (RuntimeException e) {
             logger.error("Could not start nodes of local infrastructure " + this.nodeSource.getName(), e);
@@ -122,17 +122,17 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireNode() {
-        startNodesOnTheFly(1);
+        startNodes(1);
     }
 
     @Override
     public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
         if (n > 0) {
-            startNodesOnTheFly(n);
+            startNodes(n);
         }
     }
 
-    private void startNodesOnTheFly(final int n) {
+    private void startNodes(final int n) {
         increaseNumberOfHandledNodesWithLockAndPersist(n);
         this.nodeSource.executeInParallel(() -> LocalInfrastructure.this.startNodeProcess(n));
     }
