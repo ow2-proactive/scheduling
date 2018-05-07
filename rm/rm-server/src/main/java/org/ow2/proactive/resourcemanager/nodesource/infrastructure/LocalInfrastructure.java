@@ -126,7 +126,9 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
-        startNodesOnTheFly(n);
+        if (n > 0) {
+            startNodesOnTheFly(n);
+        }
     }
 
     private void startNodes(final int n) {
