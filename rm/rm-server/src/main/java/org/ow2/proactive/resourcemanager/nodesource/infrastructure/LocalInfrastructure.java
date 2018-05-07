@@ -99,18 +99,19 @@ public class LocalInfrastructure extends InfrastructureManager {
     public void acquireAllNodes() {
         this.readLock.lock();
         try {
-            // Ensure to handle at least the maximum amount of nodes
+            // Check if we need to handle more nodes (we want to reach the max)
+            int amountOfNewNodesToHandle = 0;
             int differenceBetweenHandledAndMaxNodes = maxNodes - getNumberOfHandledNodesWithLock();
             if (differenceBetweenHandledAndMaxNodes > 0) {
-                increaseNumberOfHandledNodesWithLockAndPersist(differenceBetweenHandledAndMaxNodes);
+                amountOfNewNodesToHandle = differenceBetweenHandledAndMaxNodes;
             }
 
-            // Check if some handled nodes are not acquired (lost or new) and acquire them
-            int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock();
+            // Check if some current *and future* handled nodes are not acquired (lost or new) and acquire them
+            int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock() +
+                                                           amountOfNewNodesToHandle;
             if (differenceBetweenHandledAndAcquiredNodes > 0) {
                 logger.info("Starting " + differenceBetweenHandledAndAcquiredNodes + " nodes");
-                increaseNumberOfHandledNodesWithLockAndPersist(differenceBetweenHandledAndAcquiredNodes);
-                startNodes(differenceBetweenHandledAndAcquiredNodes);
+                startNodesOnTheFly(differenceBetweenHandledAndAcquiredNodes);
             }
         } catch (RuntimeException e) {
             logger.error("Could not start nodes of local infrastructure " + this.nodeSource.getName(), e);
@@ -131,12 +132,9 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
     }
 
-    private void startNodes(final int n) {
-        this.nodeSource.executeInParallel(() -> LocalInfrastructure.this.startNodeProcess(n));
-    }
-
     private void startNodesOnTheFly(final int n) {
-        this.nodeSource.executeInParallel(() -> LocalInfrastructure.this.startNodeProcessOnTheFly(n));
+        increaseNumberOfHandledNodesWithLockAndPersist(n);
+        this.nodeSource.executeInParallel(() -> LocalInfrastructure.this.startNodeProcess(n));
     }
 
     private void startNodeProcess(int numberOfNodes) {
@@ -265,11 +263,6 @@ public class LocalInfrastructure extends InfrastructureManager {
             // clean up the process
             cleanProcess(processExecutor);
         }
-    }
-
-    private void startNodeProcessOnTheFly(int numberOfNodes) {
-        increaseNumberOfHandledNodesWithLockAndPersist(numberOfNodes);
-        startNodeProcess(numberOfNodes);
     }
 
     private void logNodeOutput(final String prefix, List<String> nodeOutputLines) {
