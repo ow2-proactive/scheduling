@@ -99,13 +99,17 @@ public class LocalInfrastructure extends InfrastructureManager {
     public void acquireAllNodes() {
         this.readLock.lock();
         try {
-            int numberOfHandledNodes = getNumberOfHandledNodesWithLock();
-            int numberOfAcquiredNodes = getNumberOfAcquiredNodesWithLock();
-            logger.info("Starting node acquisition. Acquired nodes=" + numberOfAcquiredNodes + ", Handled nodes=" +
-                        numberOfHandledNodes);
-            if (numberOfAcquiredNodes < numberOfHandledNodes) {
-                int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock();
+            // Ensure to handle at least the maximum amount of nodes
+            int differenceBetweenHandledAndMaxNodes = maxNodes - getNumberOfHandledNodesWithLock();
+            if (differenceBetweenHandledAndMaxNodes > 0) {
+                increaseNumberOfHandledNodesWithLockAndPersist(differenceBetweenHandledAndMaxNodes);
+            }
+
+            // Check if some handled nodes are not acquired (lost or new) and acquire them
+            int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock();
+            if (differenceBetweenHandledAndAcquiredNodes > 0) {
                 logger.info("Starting " + differenceBetweenHandledAndAcquiredNodes + " nodes");
+                increaseNumberOfHandledNodesWithLockAndPersist(differenceBetweenHandledAndAcquiredNodes);
                 startNodes(differenceBetweenHandledAndAcquiredNodes);
             }
         } catch (RuntimeException e) {
@@ -323,7 +327,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         try {
             this.maxNodes = Integer.parseInt(args[index++].toString());
-            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, this.maxNodes);
+            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, 0);
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot determine max node");
         }
