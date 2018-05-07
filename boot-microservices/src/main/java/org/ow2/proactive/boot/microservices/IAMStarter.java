@@ -27,11 +27,13 @@ package org.ow2.proactive.boot.microservices;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
+import org.apache.commons.configuration2.BaseConfiguration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.log4j.Logger;
+import org.ow2.proactive.boot.microservices.util.IAMConfiguration;
 
 
 public enum IAMStarter {
@@ -41,15 +43,9 @@ public enum IAMStarter {
 
     private static final Logger LOGGER = Logger.getLogger(IAMStarter.class);
 
+    private static Configuration config = new BaseConfiguration();
+
     private static final String SEPARATOR = File.separator;
-
-    private static final String MICROSERVICE_NAME = "iam.war";
-
-    private static final String READY_MARKER = "Ready to process requests";
-
-    private static final int TIMEOUT = 180;
-
-    private static final String[] JVM_ARGS = { "-Xmx2048M" };
 
     private static Process process;
 
@@ -60,18 +56,24 @@ public enum IAMStarter {
     /**
      *  Start IAM microservice
      */
-    public static Process start(String paHome, String microservicesPath)
+    public static Process start(String paHome, String bootMicroservicesPath, String bootConfigurationPath)
             throws InterruptedException, IOException, ExecutionException {
 
         if (!started) {
             LOGGER.info("Starting IAM microservice...");
 
-            buildJavaCommand(paHome);
-            buildMicroservicePath(paHome, microservicesPath);
+            // load IAM configuration
+            loadIAMConfiguration(paHome, bootConfigurationPath);
 
+            // build java command to launch IAM
+            buildJavaCommand(paHome);
+
+            // find IAM war archive path
+            buildMicroservicePath(paHome, bootMicroservicesPath);
+
+            // execute IAM as a separate JAva process
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
-
             process = processBuilder.start();
             LOGGER.info(streamOutput(process.getInputStream()));
 
@@ -93,7 +95,7 @@ public enum IAMStarter {
                 String line;
 
                 while ((line = br.readLine()) != null) {
-                    if (line.contains(READY_MARKER)) {
+                    if (line.contains(config.getString(IAMConfiguration.READY_MARKER))) {
                         break;
                     }
                 }
@@ -103,7 +105,7 @@ public enum IAMStarter {
 
         // Check for timeout
         try {
-            return future.get(TIMEOUT, TimeUnit.SECONDS);
+            return future.get(config.getInt(IAMConfiguration.STARTUP_TIMEOUT), TimeUnit.SECONDS);
         } catch (TimeoutException toe) {
             return "IAM Microservice timed out to start. See the logs for the details.";
         } finally {
@@ -125,22 +127,39 @@ public enum IAMStarter {
             command.add("java");
         }
 
+        command.add("-Dpa.scheduler.home=" + paHome);
+
         command.add("-jar");
-        command.addAll(Arrays.asList(JVM_ARGS));
+
+        command.addAll(config.getList(String.class, IAMConfiguration.JVM_ARGS));
     }
 
     /**
      * Check the microservice executable war
      */
-    private static void buildMicroservicePath(String paHome, String microservicesPath) {
+    private static void buildMicroservicePath(String paHome, String bootMicroservicesPath) {
 
-        String microserviceFile = paHome + SEPARATOR + microservicesPath + SEPARATOR + MICROSERVICE_NAME;
+        String microserviceFile = bootMicroservicesPath + SEPARATOR + config.getString(IAMConfiguration.ARCHIVE_NAME);
 
         if (new File(microserviceFile).exists()) {
             command.add(microserviceFile);
 
         } else {
-            throw new IAMStarterException("IAM microservice is not deployed in: " + microservicesPath);
+            throw new IAMStarterException("IAM microservice is not deployed in: " + bootMicroservicesPath);
+        }
+    }
+
+    /**
+     * Load IAM configuration
+     */
+    private static void loadIAMConfiguration(String paHome, String bootConfigurationPath) {
+
+        File configFile = new File(bootConfigurationPath + SEPARATOR + IAMConfiguration.PROPERTIES_FILE);
+
+        if (configFile.exists()) {
+            config = IAMConfiguration.loadConfig(configFile);
+        } else {
+            throw new IAMStarterException("IAM configuration not found in : " + configFile.getAbsolutePath());
         }
     }
 }

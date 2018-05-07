@@ -232,11 +232,13 @@ public class SchedulerStarter {
             return;
 
         // Acquire paths required to start IAM microservice
-        String paHome = PASchedulerProperties.getAbsolutePath(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()));
-        String microservicesPath = PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString();
+
+        String paHome = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
+        String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());
+        String bootConfigurationPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_CONFIGURATION_PATH.getValueAsString());
 
         // Start the IAM microservice and add the started process to the list of boot processes
-        Process iamProcess = IAMStarter.INSTANCE.start(paHome, microservicesPath);
+        Process iamProcess = IAMStarter.INSTANCE.start(paHome, bootMicroservicesPath, bootConfigurationPath);
         bootMicroservicesProcesses.add(iamProcess);
     }
 

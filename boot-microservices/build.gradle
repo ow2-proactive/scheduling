@@ -31,5 +31,10 @@ task downloadFile(type: Download) {
     onlyIfModified true
 }
 
+dependencies {
+
+    compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.2'
+}
+
 compileJava.dependsOn downloadFile
 defaultTasks 'downloadFile'
