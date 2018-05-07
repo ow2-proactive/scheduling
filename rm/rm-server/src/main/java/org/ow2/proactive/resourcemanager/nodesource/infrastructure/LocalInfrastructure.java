@@ -377,7 +377,9 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void shutDown() {
         for (ProcessExecutor processExecutor : this.processExecutors.keySet()) {
-            processExecutor.killProcess();
+            if (processExecutor != null && !processExecutor.isProcessFinished()) {
+                processExecutor.killProcess();
+            }
         }
         this.processExecutors.clear();
         // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
