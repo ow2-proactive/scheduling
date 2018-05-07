@@ -77,7 +77,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private static final String NB_HANDLED_NODES_KEY = "nbHandledNodes";
 
     /**
-     * Index of deployment, if startNodesOnTheFly is called multiple times, each time a new process will be created.
+     * Index of deployment, if startNodes is called multiple times, each time a new process will be created.
      * The index is used to prevent conflicts in nodes urls
      */
     private static final String LAST_NODE_STARTED_INDEX_KEY = "lastNodeStartedIndex";
@@ -86,9 +86,6 @@ public class LocalInfrastructure extends InfrastructureManager {
      * A map containing process executors, associated with their corresponding deployment node urls.
      */
     private transient Map<ProcessExecutor, List<String>> processExecutors = new ConcurrentHashMap<>();
-
-    public LocalInfrastructure() {
-    }
 
     @Override
     public String getDescription() {
@@ -99,12 +96,17 @@ public class LocalInfrastructure extends InfrastructureManager {
     public void acquireAllNodes() {
         this.readLock.lock();
         try {
-            int numberOfHandledNodes = getNumberOfHandledNodesWithLock();
-            int numberOfAcquiredNodes = getNumberOfAcquiredNodesWithLock();
-            logger.info("Starting node acquisition. Acquired nodes=" + numberOfAcquiredNodes + ", Handled nodes=" +
-                        numberOfHandledNodes);
-            if (numberOfAcquiredNodes < numberOfHandledNodes) {
-                int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock();
+            // Check if we need to handle more nodes (we want to reach the max)
+            int amountOfNewNodesToHandle = 0;
+            int differenceBetweenHandledAndMaxNodes = maxNodes - getNumberOfHandledNodesWithLock();
+            if (differenceBetweenHandledAndMaxNodes > 0) {
+                amountOfNewNodesToHandle = differenceBetweenHandledAndMaxNodes;
+            }
+
+            // Check if some current *and future* handled nodes are not acquired (lost or new) and acquire them
+            int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock() +
+                                                           amountOfNewNodesToHandle;
+            if (differenceBetweenHandledAndAcquiredNodes > 0) {
                 logger.info("Starting " + differenceBetweenHandledAndAcquiredNodes + " nodes");
                 startNodes(differenceBetweenHandledAndAcquiredNodes);
             }
@@ -117,20 +119,19 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireNode() {
-        startNodesOnTheFly(1);
+        startNodes(1);
     }
 
     @Override
     public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
-        startNodesOnTheFly(n);
+        if (n > 0) {
+            startNodes(n);
+        }
     }
 
     private void startNodes(final int n) {
+        increaseNumberOfHandledNodesWithLockAndPersist(n);
         this.nodeSource.executeInParallel(() -> LocalInfrastructure.this.startNodeProcess(n));
-    }
-
-    private void startNodesOnTheFly(final int n) {
-        this.nodeSource.executeInParallel(() -> LocalInfrastructure.this.startNodeProcessOnTheFly(n));
     }
 
     private void startNodeProcess(int numberOfNodes) {
@@ -261,11 +262,6 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
     }
 
-    private void startNodeProcessOnTheFly(int numberOfNodes) {
-        increaseNumberOfHandledNodesWithLockAndPersist(numberOfNodes);
-        startNodeProcess(numberOfNodes);
-    }
-
     private void logNodeOutput(final String prefix, List<String> nodeOutputLines) {
         if (nodeOutputLines != null) {
             for (String processOutputLine : nodeOutputLines) {
@@ -323,7 +319,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         try {
             this.maxNodes = Integer.parseInt(args[index++].toString());
-            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, this.maxNodes);
+            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, 0);
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot determine max node");
         }
@@ -371,7 +367,9 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void shutDown() {
         for (ProcessExecutor processExecutor : this.processExecutors.keySet()) {
-            processExecutor.killProcess();
+            if (processExecutor != null) {
+                processExecutor.killProcess();
+            }
         }
         this.processExecutors.clear();
         // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
