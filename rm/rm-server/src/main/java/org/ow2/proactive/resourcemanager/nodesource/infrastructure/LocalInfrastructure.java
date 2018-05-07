@@ -87,9 +87,6 @@ public class LocalInfrastructure extends InfrastructureManager {
      */
     private transient Map<ProcessExecutor, List<String>> processExecutors = new ConcurrentHashMap<>();
 
-    public LocalInfrastructure() {
-    }
-
     @Override
     public String getDescription() {
         return "Deploys nodes on Resource Manager's machine";
