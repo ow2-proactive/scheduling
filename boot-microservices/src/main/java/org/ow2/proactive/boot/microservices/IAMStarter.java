@@ -36,10 +36,7 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.boot.microservices.util.IAMConfiguration;
 
 
-public enum IAMStarter {
-
-    //singleton instance of IAMStarter
-    INSTANCE;
+public class IAMStarter {
 
     private static final Logger LOGGER = Logger.getLogger(IAMStarter.class);
 
@@ -53,6 +50,10 @@ public enum IAMStarter {
 
     private static boolean started = false;
 
+    private IAMStarter() {
+
+    }
+
     /**
      *  Start IAM microservice
      */
@@ -63,13 +64,13 @@ public enum IAMStarter {
             LOGGER.info("Starting IAM microservice...");
 
             // load IAM configuration
-            loadIAMConfiguration(paHome, bootConfigurationPath);
+            loadIAMConfiguration(bootConfigurationPath);
 
             // build java command to launch IAM
             buildJavaCommand(paHome);
 
             // find IAM war archive path
-            buildMicroservicePath(paHome, bootMicroservicesPath);
+            buildMicroservicePath(bootMicroservicesPath);
 
             // execute IAM as a separate JAva process
             ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -137,7 +138,7 @@ public enum IAMStarter {
     /**
      * Check the microservice executable war
      */
-    private static void buildMicroservicePath(String paHome, String bootMicroservicesPath) {
+    private static void buildMicroservicePath(String bootMicroservicesPath) {
 
         String microserviceFile = bootMicroservicesPath + SEPARATOR + config.getString(IAMConfiguration.ARCHIVE_NAME);
 
@@ -152,7 +153,7 @@ public enum IAMStarter {
     /**
      * Load IAM configuration
      */
-    private static void loadIAMConfiguration(String paHome, String bootConfigurationPath) {
+    private static void loadIAMConfiguration(String bootConfigurationPath) {
 
         File configFile = new File(bootConfigurationPath + SEPARATOR + IAMConfiguration.PROPERTIES_FILE);
 

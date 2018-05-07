@@ -35,6 +35,7 @@ import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
+import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
@@ -53,7 +54,7 @@ public class RMStateCaching {
      * <p>
      * Thread frequency can be customized using {@link PortalConfiguration#RM_CACHE_REFRESHRATE}.
      * <p>
-     * Cached object can be retrieved using {@link #getRMInitialState(long)}
+     * Cached object can be retrieved using {@link #getRMStateDelta(long)}
      */
     public synchronized static void init() {
         init_();
@@ -95,13 +96,13 @@ public class RMStateCaching {
     }
 
     /**
-     * @return cached RM State as returned by {@link RMProxyUserInterface#getRMInitialState(long)}
+     * @return cached RM State as returned by {@link RMProxyUserInterface#getRMStateDelta(long)}
      */
-    public static RMStateDelta getRMInitialState(long counter) {
+    public static RMStateDelta getRMStateDelta(long counter) {
         try {
             long startTime = System.currentTimeMillis();
 
-            final RMStateDelta state = PAFuture.getFutureValue(rm.getRMInitialState(counter));
+            final RMStateDelta state = PAFuture.getFutureValue(rm.getRMStateDelta(counter));
 
             long time = System.currentTimeMillis() - startTime;
 
@@ -110,6 +111,23 @@ public class RMStateCaching {
             return state;
         } catch (Exception e) {
             logger.error("Exception occurrend while updating RM state cache, connection reset", e);
+            throw e;
+        }
+    }
+
+    public static RMStateFull getRMStateFull() {
+        try {
+            long startTime = System.currentTimeMillis();
+
+            final RMStateFull state = PAFuture.getFutureValue(rm.getRMStateFull());
+
+            long time = System.currentTimeMillis() - startTime;
+
+            logger.debug(String.format("Retrieved RM full state in %d ms", time));
+
+            return state;
+        } catch (Exception e) {
+            logger.error("Exception occurrend while retrieving full RM state, connection reset", e);
             throw e;
         }
     }

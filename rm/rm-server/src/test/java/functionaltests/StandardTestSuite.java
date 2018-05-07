@@ -45,12 +45,12 @@ import functionaltests.jmx.account.AddGetRemoveTest;
 import functionaltests.jmx.account.AddGetTest;
 import functionaltests.monitor.TestRMMonitoring;
 import functionaltests.monitor.TestRMNodeMonitoring;
+import functionaltests.nodesource.LocalInfrastructureLifecycleTest;
+import functionaltests.nodesource.SSHInfrastructureV2LifecycleTest;
 import functionaltests.nodesource.TestLocalInfrastructureRestartDownNodesPolicy;
 import functionaltests.nodesource.TestLocalInfrastructureStaticPolicy;
-import functionaltests.nodesource.TestLocalInfrastructureTimeSlotPolicy;
-import functionaltests.nodesource.deployment.LocalInfrastructureLifecycleTest;
-import functionaltests.nodesource.deployment.SSHInfrastructureV2LifecycleTest;
-import functionaltests.nodesource.deployment.TestNodeSourceAfterRestart;
+import functionaltests.nodesource.TestNodeSourceAfterRestart;
+import functionaltests.nodesource.TestSSHInfrastructureV2;
 import functionaltests.nodestate.TestAddRemoveAll;
 import functionaltests.nodestate.TestAdminAddingNodes;
 import functionaltests.nodestate.TestConcurrentUsers;
@@ -77,14 +77,14 @@ import functionaltests.topology.SelectionTest;
                       AddGetTest.class, ResourceManagerJMXTest.class, RMProxyUserInterfaceTest.class,
                       TestRMMonitoring.class, TestRMNodeMonitoring.class,
                       TestLocalInfrastructureRestartDownNodesPolicy.class, TestLocalInfrastructureStaticPolicy.class,
-                      TestLocalInfrastructureTimeSlotPolicy.class, TestNodeSourceAfterRestart.class,
-                      TestAddRemoveAll.class, TestAdminAddingNodes.class, TestConcurrentUsers.class,
-                      TestNodeEncoding.class, TestNodeSourcesActions.class, TestNodesStates.class,
-                      TestNSAdminPermissions.class, TestNSProviderPermissions.class, DynamicSelectionScriptTest.class,
-                      SelectionWithNodesExclusionTest.class, SelectionWithSeveralScriptsTest.class,
-                      SelectionWithSeveralScriptsTest2.class, StaticSelectionScriptTest.class,
-                      UnauthorizedSelectionScriptTest.class, LocalSelectionTest.class, SelectionTest.class,
-                      SSHInfrastructureV2LifecycleTest.class, LocalInfrastructureLifecycleTest.class })
+                      TestNodeSourceAfterRestart.class, TestAddRemoveAll.class, TestAdminAddingNodes.class,
+                      TestConcurrentUsers.class, TestNodeEncoding.class, TestNodeSourcesActions.class,
+                      TestNodesStates.class, TestNSAdminPermissions.class, TestNSProviderPermissions.class,
+                      DynamicSelectionScriptTest.class, SelectionWithNodesExclusionTest.class,
+                      SelectionWithSeveralScriptsTest.class, SelectionWithSeveralScriptsTest2.class,
+                      StaticSelectionScriptTest.class, UnauthorizedSelectionScriptTest.class, LocalSelectionTest.class,
+                      SelectionTest.class, SSHInfrastructureV2LifecycleTest.class, TestSSHInfrastructureV2.class,
+                      LocalInfrastructureLifecycleTest.class })
 
 /**
  * @author ActiveEon Team

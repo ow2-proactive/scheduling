@@ -53,6 +53,10 @@ public class IAMConfiguration {
 
     private static final Logger LOGGER = Logger.getLogger(IAMConfiguration.class);
 
+    private IAMConfiguration() {
+
+    }
+
     public static Configuration loadConfig(File configFile) {
 
         Configuration config = new BaseConfiguration();
