@@ -370,7 +370,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void shutDown() {
         for (ProcessExecutor processExecutor : this.processExecutors.keySet()) {
-            if (processExecutor != null && !processExecutor.isProcessFinished()) {
+            if (processExecutor != null) {
                 processExecutor.killProcess();
             }
         }
