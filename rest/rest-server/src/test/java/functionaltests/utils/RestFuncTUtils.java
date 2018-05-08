@@ -49,11 +49,10 @@ public class RestFuncTUtils {
     }
 
     public static void destroy(Process process) throws Exception {
-        process.destroy();
         close(process.getOutputStream());
         close(process.getInputStream());
         close(process.getErrorStream());
-        process.waitFor();
+        process.destroyForcibly();
         System.out.println(String.format("Process ended with exit code %d. ", process.exitValue()));
     }
 
