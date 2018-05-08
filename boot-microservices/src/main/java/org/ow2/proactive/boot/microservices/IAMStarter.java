@@ -35,14 +35,18 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.boot.microservices.util.IAMConfiguration;
 
+import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
+
 
 public class IAMStarter {
 
     private static final Logger LOGGER = Logger.getLogger(IAMStarter.class);
 
-    private static Configuration config = new BaseConfiguration();
+    private static final String OS = System.getProperty("os.name");
 
     private static final String SEPARATOR = File.separator;
+
+    private static Configuration config = new BaseConfiguration();
 
     private static Process process;
 
@@ -120,12 +124,21 @@ public class IAMStarter {
      */
     private static void buildJavaCommand(String paHome) {
 
-        String javaCmd = paHome + SEPARATOR + "jre" + SEPARATOR + "bin" + SEPARATOR + "java";
+        String javaCmd = null;
 
-        if (new File(javaCmd).exists()) {
-            command.add(javaCmd);
+        if (OS.equals(OperatingSystem.UNIX)) {
+            javaCmd = "java";
+
+        } else if (OS.equals(OperatingSystem.WINDOWS)) {
+            javaCmd = "java.exe";
+        }
+
+        String javaPath = paHome + SEPARATOR + "jre" + SEPARATOR + "bin" + SEPARATOR + javaCmd;
+
+        if (new File(javaPath).exists()) {
+            command.add(javaPath);
         } else {
-            command.add("java");
+            command.add(javaCmd);
         }
 
         command.add("-Dpa.scheduler.home=" + paHome);
