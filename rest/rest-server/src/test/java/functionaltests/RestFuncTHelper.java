@@ -142,13 +142,13 @@ public class RestFuncTHelper {
 
         // Connect a scheduler client
         SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url,
-                                                                                     TimeUnit.SECONDS.toMillis(120));
+                                                                                     TimeUnit.SECONDS.toMillis(240));
         schedulerPublicKey = schedAuth.getPublicKey();
         Credentials schedCred = RestFuncTUtils.createCredentials("admin", "admin", schedulerPublicKey);
         scheduler = schedAuth.login(schedCred);
 
         // Connect a rm client
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(url, TimeUnit.SECONDS.toMillis(120));
+        RMAuthentication rmAuth = RMConnection.waitAndJoin(url, TimeUnit.SECONDS.toMillis(240));
         Credentials rmCredentials = getRmCredentials();
         rm = rmAuth.login(rmCredentials);
 

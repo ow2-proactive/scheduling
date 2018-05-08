@@ -39,7 +39,9 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.KeyException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.security.auth.login.LoginException;
 
@@ -63,6 +65,7 @@ import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.boot.microservices.IAMStarter;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -145,6 +148,8 @@ public class SchedulerStarter {
 
     protected static byte[] credentials;
 
+    private static List<Process> bootMicroservicesProcesses = new ArrayList<>();
+
     /**
      * Start the scheduler creation process.
      */
@@ -184,6 +189,8 @@ public class SchedulerStarter {
             startRouter();
         }
 
+        startBootMicroservices();
+
         hsqldbServer = new SchedulerHsqldbStarter();
         hsqldbServer.startIfNeeded();
 
@@ -211,6 +218,27 @@ public class SchedulerStarter {
         addShutdownMessageHook();
 
         executeStartScripts();
+    }
+
+    /**
+     *  Launch boot (i.e., early-starting) microservices (notably, IAM microservice)
+     *
+     */
+    private static void startBootMicroservices() throws IOException, InterruptedException, ExecutionException {
+
+        // Do nothing if PA_home or the boot microservices path is not specified
+        if (!(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.isSet() &&
+              PASchedulerProperties.SCHEDULER_HOME.isSet()))
+            return;
+
+        // Acquire paths required to start IAM microservice
+        String paHome = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
+        String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());
+        String bootConfigurationPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_CONFIGURATION_PATH.getValueAsString());
+
+        // Start the IAM microservice and add the started process to the list of boot processes
+        Process iamProcess = IAMStarter.start(paHome, bootMicroservicesPath, bootConfigurationPath);
+        bootMicroservicesProcesses.add(iamProcess);
     }
 
     public static void startJetty(String rmUrl, String scheduleUrl) {
@@ -383,6 +411,13 @@ public class SchedulerStarter {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
+
+                //Shutting down boot microservices (notably the IAM microservice)
+                LOGGER.info("Stopping boot microservices...");
+
+                for (Process process : bootMicroservicesProcesses)
+                    process.destroyForcibly();
+
                 LOGGER.info("Shutting down...");
 
                 if (discoveryService != null) {

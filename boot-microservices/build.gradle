@@ -1,0 +1,29 @@
+repositories {
+    maven {
+        url "http://repository.activeeon.com/content/groups/proactive/"
+    }
+
+    mavenCentral()
+}
+
+configurations {
+    iamWar
+}
+
+dependencies {
+    compile project(':rm:rm-node')
+
+    compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.2'
+
+    iamWar group: "org.ow2.proactive", name: "iam", version: "${schedulingVersion}", ext: "war"
+}
+
+task copyIamWar(type: Copy) {
+
+    from configurations.iamWar
+    into file("${project(':').projectDir}/dist/boot")
+
+    rename ('iam-(.*).war', 'iam.war')
+}
+
+compileJava.dependsOn copyIamWar
