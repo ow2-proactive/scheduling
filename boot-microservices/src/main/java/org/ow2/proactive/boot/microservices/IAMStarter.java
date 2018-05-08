@@ -36,6 +36,8 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.boot.microservices.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 
+import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
+
 
 public class IAMStarter {
 
