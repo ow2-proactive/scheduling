@@ -38,6 +38,8 @@ dependencies {
     testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0RC4'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0RC4'
 
+    testCompile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.1'
+
 }
 
 sourceSets {
