@@ -126,9 +126,9 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
-        if (n > 0 && (maxNodes - getNumberOfAcquiredNodesWithLock() - n) >= 0) {
-            startNodes(n);
+    public void acquireNodes(int numberOfNodes, Map<String, ?> nodeConfiguration) {
+        if (numberOfNodes > 0 && (maxNodes - getNumberOfAcquiredNodesWithLock() - numberOfNodes) >= 0) {
+            startNodes(numberOfNodes);
         }
     }
 
