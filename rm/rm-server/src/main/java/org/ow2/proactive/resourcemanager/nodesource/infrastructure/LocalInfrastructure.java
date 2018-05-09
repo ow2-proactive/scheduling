@@ -365,26 +365,26 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private void increaseNumberOfHandledNodesWithLockAndPersist(final int additionalNumberOfNodes) {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
+        setPersistedInfraVariable(() -> {
             int updated = (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) + additionalNumberOfNodes;
             this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, updated);
-            return null;
+            return updated;
         });
     }
 
     private void incrementNumberOfAcquiredNodesWithLockAndPersist() {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
+        setPersistedInfraVariable(() -> {
             int updated = (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY) + 1;
             this.persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, updated);
-            return null;
+            return updated;
         });
     }
 
     private void incrementNumberOfLostNodesWithLockAndPersist() {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
+        setPersistedInfraVariable(() -> {
             int updated = (int) this.persistedInfraVariables.get(NB_LOST_NODES_KEY) + 1;
             this.persistedInfraVariables.put(NB_LOST_NODES_KEY, updated);
-            return null;
+            return updated;
         });
     }
 
