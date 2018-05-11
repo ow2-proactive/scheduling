@@ -330,29 +330,42 @@ public class LocalInfrastructure extends InfrastructureManager {
         this.persistedInfraVariables.put(LAST_NODE_STARTED_INDEX_KEY, 0);
     }
 
-    private void removeNodeAndShutdownProcessIfNeeded(String nodeUrl) {
+    private void removeNodeAndShutdownProcessIfNeeded(String nodeUrlToRemove) {
 
         // Update handle & acquire/lost nodes persistent counters
         decrementNumberOfHandledNodesWithLockAndPersist();
-        if (nodeSource.getNodeInDeployingOrLostNodes(nodeUrl) == null) {
-            decrementNumberOfLostNodesWithLockAndPersist();
-        } else {
+        if (nodeSource.getNodeInDeployingOrLostNodes(nodeUrlToRemove) == null) {
             decrementNumberOfAcquiredNodesWithLockAndPersist();
+        } else {
+            decrementNumberOfLostNodesWithLockAndPersist();
         }
 
-        // Delete the process if it doesn't have remaining node
         Iterator<Map.Entry<ProcessExecutor, List<String>>> processIterator = processExecutors.entrySet().iterator();
         while (processIterator.hasNext()) {
             Map.Entry<ProcessExecutor, List<String>> processExecutor = processIterator.next();
-            if (processExecutor.getValue().contains(nodeUrl)) {
-                processExecutor.getValue().remove(nodeUrl);
-                // if there is no remaining node, kill the JVM process
+            // Remove the nodeUrl if present
+            Iterator<String> nodesIterator = processExecutor.getValue().iterator();
+            boolean nodeFound = false;
+            while (nodesIterator.hasNext()) {
+                String nodeUrl = nodesIterator.next();
+                String nodeName = nodeUrl.substring(nodeUrl.lastIndexOf("/"));
+                if (nodeUrlToRemove.endsWith(nodeName)) {
+                    nodeFound = true;
+                    nodesIterator.remove();
+                    break;
+                }
+            }
+            // Kill the associated JVM process if it doesn't have remaining node
+            if (nodeFound) {
                 if (processExecutor.getValue().isEmpty()) {
+                    logger.debug("No nodes remaining after deleting node " + nodeUrlToRemove +
+                                 ", killing process from " + this.getClass().getSimpleName());
                     if (processExecutor.getKey() != null) {
                         processExecutor.getKey().killProcess();
                     }
                     processIterator.remove();
                 }
+                break;
             }
         }
     }
