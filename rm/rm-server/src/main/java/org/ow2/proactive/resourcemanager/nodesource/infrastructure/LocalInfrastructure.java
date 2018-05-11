@@ -121,13 +121,15 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void acquireNode() {
         if (maxNodes - getNumberOfAcquiredNodesWithLock() > 0) {
+            logger.info("Starting a node from " + this.getClass().getSimpleName());
             startNodes(1);
         }
     }
 
     @Override
     public void acquireNodes(int numberOfNodes, Map<String, ?> nodeConfiguration) {
-        if (numberOfNodes > 0 && (maxNodes - getNumberOfAcquiredNodesWithLock() - numberOfNodes) >= 0) {
+        if (numberOfNodes > 0 && (maxNodes - (getNumberOfAcquiredNodesWithLock() + numberOfNodes)) >= 0) {
+            logger.info("Starting " + numberOfNodes + " nodes from " + this.getClass().getSimpleName());
             startNodes(numberOfNodes);
         }
     }
@@ -140,6 +142,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private void startNodeProcess(int numberOfNodes) {
+        logger.debug("Starting a new process to acquire " + numberOfNodes + " nodes");
         int currentIndex = getIndexAndIncrementWithLockAndPersist();
         String baseNodeName = "local-" + this.nodeSource.getName() + "-" + currentIndex;
         OperatingSystem os = OperatingSystem.UNIX;
@@ -217,7 +220,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                 }
             }));
 
-            logger.info("Local Nodes command started : " + obfuscatedCmd);
+            logger.debug("Local Nodes command started : " + obfuscatedCmd);
 
         } catch (IOException e) {
             String lf = System.lineSeparator();
@@ -292,8 +295,8 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void removeNode(Node node) throws RMException {
-        logger.debug("A node is removed " + node.getNodeInformation().getURL() + " from " +
-                     this.getClass().getSimpleName());
+        logger.info("The node " + node.getNodeInformation().getURL() + " is removed from " +
+                    this.getClass().getSimpleName());
         removeNodeAndShutdownProcessIfNeeded(node.getNodeInformation().getURL());
     }
 
@@ -311,7 +314,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         this.processExecutors.clear();
         // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
-        logger.info("Process associated with node source " + this.nodeSource.getName() + " destroyed");
+        logger.info("All process associated with node source '" + this.nodeSource.getName() + "' are being destroyed.");
     }
 
     @Override
