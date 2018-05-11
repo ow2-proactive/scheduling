@@ -121,13 +121,15 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void acquireNode() {
         if (maxNodes - getNumberOfAcquiredNodesWithLock() > 0) {
+            logger.info("Starting a node from " + this.getClass().getSimpleName());
             startNodes(1);
         }
     }
 
     @Override
     public void acquireNodes(int numberOfNodes, Map<String, ?> nodeConfiguration) {
-        if (numberOfNodes > 0 && (maxNodes - getNumberOfAcquiredNodesWithLock() - numberOfNodes) >= 0) {
+        if (numberOfNodes > 0 && (maxNodes - (getNumberOfAcquiredNodesWithLock() + numberOfNodes)) >= 0) {
+            logger.info("Starting " + numberOfNodes + " nodes from " + this.getClass().getSimpleName());
             startNodes(numberOfNodes);
         }
     }
@@ -140,6 +142,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     private void startNodeProcess(int numberOfNodes) {
+        logger.debug("Starting a new process to acquire " + numberOfNodes + " nodes");
         int currentIndex = getIndexAndIncrementWithLockAndPersist();
         String baseNodeName = "local-" + this.nodeSource.getName() + "-" + currentIndex;
         OperatingSystem os = OperatingSystem.UNIX;
@@ -217,7 +220,7 @@ public class LocalInfrastructure extends InfrastructureManager {
                 }
             }));
 
-            logger.info("Local Nodes command started : " + obfuscatedCmd);
+            logger.debug("Local Nodes command started : " + obfuscatedCmd);
 
         } catch (IOException e) {
             String lf = System.lineSeparator();
@@ -292,14 +295,20 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void removeNode(Node node) throws RMException {
-        logger.debug("A node is removed " + node.getNodeInformation().getURL() + " from " +
-                     this.getClass().getSimpleName());
+        logger.info("The node " + node.getNodeInformation().getURL() + " is removed from " +
+                    this.getClass().getSimpleName());
         removeNodeAndShutdownProcessIfNeeded(node.getNodeInformation().getURL());
     }
 
     @Override
     public void notifyDownNode(String nodeName, String nodeUrl, Node node) {
         logger.debug("A down node is detected: " + nodeUrl + " from " + this.getClass().getSimpleName());
+        decrementNumberOfAcquiredNodesWithLockAndPersist();
+    }
+
+    @Override
+    public void onDownNodeReconnection(Node node) {
+        incrementNumberOfAcquiredNodesWithLockAndPersist();
     }
 
     @Override
@@ -311,7 +320,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
         this.processExecutors.clear();
         // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
-        logger.info("Process associated with node source " + this.nodeSource.getName() + " destroyed");
+        logger.info("All process associated with node source '" + this.nodeSource.getName() + "' are being destroyed.");
     }
 
     @Override
@@ -327,29 +336,42 @@ public class LocalInfrastructure extends InfrastructureManager {
         this.persistedInfraVariables.put(LAST_NODE_STARTED_INDEX_KEY, 0);
     }
 
-    private void removeNodeAndShutdownProcessIfNeeded(String nodeUrl) {
+    private void removeNodeAndShutdownProcessIfNeeded(String nodeUrlToRemove) {
 
         // Update handle & acquire/lost nodes persistent counters
         decrementNumberOfHandledNodesWithLockAndPersist();
-        if (nodeSource.getNodeInDeployingOrLostNodes(nodeUrl) == null) {
-            decrementNumberOfLostNodesWithLockAndPersist();
-        } else {
+        if (nodeSource.getNodeInDeployingOrLostNodes(nodeUrlToRemove) == null) {
             decrementNumberOfAcquiredNodesWithLockAndPersist();
+        } else {
+            decrementNumberOfLostNodesWithLockAndPersist();
         }
 
-        // Delete the process if it doesn't have remaining node
         Iterator<Map.Entry<ProcessExecutor, List<String>>> processIterator = processExecutors.entrySet().iterator();
         while (processIterator.hasNext()) {
             Map.Entry<ProcessExecutor, List<String>> processExecutor = processIterator.next();
-            if (processExecutor.getValue().contains(nodeUrl)) {
-                processExecutor.getValue().remove(nodeUrl);
-                // if there is no remaining node, kill the JVM process
+            // Remove the nodeUrl if present
+            Iterator<String> nodesIterator = processExecutor.getValue().iterator();
+            boolean nodeFound = false;
+            while (nodesIterator.hasNext()) {
+                String nodeUrl = nodesIterator.next();
+                String nodeName = nodeUrl.substring(nodeUrl.lastIndexOf('/'));
+                if (nodeUrlToRemove.endsWith(nodeName)) {
+                    nodeFound = true;
+                    nodesIterator.remove();
+                    break;
+                }
+            }
+            // Kill the associated JVM process if it doesn't have remaining node
+            if (nodeFound) {
                 if (processExecutor.getValue().isEmpty()) {
+                    logger.debug("No nodes remaining after deleting node " + nodeUrlToRemove +
+                                 ", killing process from " + this.getClass().getSimpleName());
                     if (processExecutor.getKey() != null) {
                         processExecutor.getKey().killProcess();
                     }
                     processIterator.remove();
                 }
+                break;
             }
         }
     }
