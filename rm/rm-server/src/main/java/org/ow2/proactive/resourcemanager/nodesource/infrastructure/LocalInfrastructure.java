@@ -348,7 +348,7 @@ public class LocalInfrastructure extends InfrastructureManager {
             boolean nodeFound = false;
             while (nodesIterator.hasNext()) {
                 String nodeUrl = nodesIterator.next();
-                String nodeName = nodeUrl.substring(nodeUrl.lastIndexOf("/"));
+                String nodeName = nodeUrl.substring(nodeUrl.lastIndexOf('/'));
                 if (nodeUrlToRemove.endsWith(nodeName)) {
                     nodeFound = true;
                     nodesIterator.remove();
