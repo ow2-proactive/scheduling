@@ -303,6 +303,12 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void notifyDownNode(String nodeName, String nodeUrl, Node node) {
         logger.debug("A down node is detected: " + nodeUrl + " from " + this.getClass().getSimpleName());
+        decrementNumberOfAcquiredNodesWithLockAndPersist();
+    }
+
+    @Override
+    public void onDownNodeReconnection(Node node) {
+        incrementNumberOfAcquiredNodesWithLockAndPersist();
     }
 
     @Override
