@@ -29,19 +29,18 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
-import org.apache.sshd.SshServer;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.util.OsUtils;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.CommandFactory;
-import org.apache.sshd.server.PasswordAuthenticator;
-import org.apache.sshd.server.UserAuth;
-import org.apache.sshd.server.auth.UserAuthPassword;
-import org.apache.sshd.server.command.ScpCommandFactory;
+import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.UserAuth;
+import org.apache.sshd.server.auth.password.PasswordAuthenticator;
+import org.apache.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
+import org.apache.sshd.server.scp.ScpCommandFactory;
 import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.shell.ProcessShellFactory;
 import org.junit.After;
@@ -126,7 +125,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
         sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
-        userAuthFactories.add(new UserAuthPassword.Factory());
+        userAuthFactories.add(new UserAuthPasswordFactory());
         sshd.setUserAuthFactories(userAuthFactories);
 
         sshd.setPasswordAuthenticator(new PasswordAuthenticator() {
@@ -136,7 +135,7 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
             }
         });
 
-        sshd.setCommandFactory(new ScpCommandFactory(new CommandFactory() {
+        CommandFactory cf = new CommandFactory() {
             @Override
             public Command createCommand(String command) {
                 String[] splitCommand;
@@ -153,24 +152,17 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
                 }
                 rebuiltCommand.trimToSize();
 
-                EnumSet<ProcessShellFactory.TtyOptions> ttyOptions;
                 if (OsUtils.isUNIX()) {
-                    ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.ONlCr);
+                    return new ProcessShellFactory(new String[] { "/bin/sh", "-c",
+                                                                  rebuiltCommand.toString() }).create();
                 } else {
-                    ttyOptions = EnumSet.of(ProcessShellFactory.TtyOptions.Echo,
-                                            ProcessShellFactory.TtyOptions.ICrNl,
-                                            ProcessShellFactory.TtyOptions.ONlCr);
-                }
-
-                if (OsUtils.isUNIX()) {
-                    return new ProcessShellFactory(new String[] { "/bin/sh", "-c", rebuiltCommand.toString() },
-                                                   ttyOptions).create();
-                } else {
-                    return new ProcessShellFactory(new String[] { "cmd.exe", "/C", rebuiltCommand.toString() },
-                                                   ttyOptions).create();
+                    return new ProcessShellFactory(new String[] { "cmd.exe", "/C",
+                                                                  rebuiltCommand.toString() }).create();
                 }
             }
-        }));
+        };
+
+        sshd.setCommandFactory(cf);
 
         sshd.start();
 
