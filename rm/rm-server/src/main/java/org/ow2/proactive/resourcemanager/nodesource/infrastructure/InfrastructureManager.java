@@ -984,7 +984,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      *            The name of the deploying node
      * @return the URL of the deploying node
      */
-    private String buildDeployingNodeURL(String pnName) {
+    protected String buildDeployingNodeURL(String pnName) {
         return RMDeployingNode.PROTOCOL_ID + "://" + this.nodeSource.getName() + "/" + pnName;
     }
 
