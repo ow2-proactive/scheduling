@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,7 +78,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     private static final String NB_HANDLED_NODES_KEY = "nbHandledNodes";
 
     /**
-     * Index of deployment, if startNodesOnTheFly is called multiple times, each time a new process will be created.
+     * Index of deployment, if startNodes is called multiple times, each time a new process will be created.
      * The index is used to prevent conflicts in nodes urls
      */
     private static final String LAST_NODE_STARTED_INDEX_KEY = "lastNodeStartedIndex";
@@ -85,10 +86,7 @@ public class LocalInfrastructure extends InfrastructureManager {
     /**
      * A map containing process executors, associated with their corresponding deployment node urls.
      */
-    private transient Map<ProcessExecutor, List<String>> processExecutors = new ConcurrentHashMap<>();
-
-    public LocalInfrastructure() {
-    }
+    private transient ConcurrentHashMap<ProcessExecutor, List<String>> processExecutors = new ConcurrentHashMap<>();
 
     @Override
     public String getDescription() {
@@ -99,12 +97,17 @@ public class LocalInfrastructure extends InfrastructureManager {
     public void acquireAllNodes() {
         this.readLock.lock();
         try {
-            int numberOfHandledNodes = getNumberOfHandledNodesWithLock();
-            int numberOfAcquiredNodes = getNumberOfAcquiredNodesWithLock();
-            logger.info("Starting node acquisition. Acquired nodes=" + numberOfAcquiredNodes + ", Handled nodes=" +
-                        numberOfHandledNodes);
-            if (numberOfAcquiredNodes < numberOfHandledNodes) {
-                int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock();
+            // Check if we need to handle more nodes (we want to reach the max)
+            int amountOfNewNodesToHandle = 0;
+            int differenceBetweenHandledAndMaxNodes = maxNodes - getNumberOfHandledNodesWithLock();
+            if (differenceBetweenHandledAndMaxNodes > 0) {
+                amountOfNewNodesToHandle = differenceBetweenHandledAndMaxNodes;
+            }
+
+            // Check if some current *and future* handled nodes are not acquired (lost or new) and acquire them
+            int differenceBetweenHandledAndAcquiredNodes = getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock() +
+                                                           amountOfNewNodesToHandle;
+            if (differenceBetweenHandledAndAcquiredNodes > 0) {
                 logger.info("Starting " + differenceBetweenHandledAndAcquiredNodes + " nodes");
                 startNodes(differenceBetweenHandledAndAcquiredNodes);
             }
@@ -117,23 +120,29 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void acquireNode() {
-        startNodesOnTheFly(1);
+        if (maxNodes - getNumberOfAcquiredNodesWithLock() > 0) {
+            logger.info("Starting a node from " + this.getClass().getSimpleName());
+            startNodes(1);
+        }
     }
 
     @Override
-    public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
-        startNodesOnTheFly(n);
+    public void acquireNodes(int numberOfNodes, Map<String, ?> nodeConfiguration) {
+        if (numberOfNodes > 0 && (maxNodes - (getNumberOfAcquiredNodesWithLock() + numberOfNodes)) >= 0) {
+            logger.info("Starting " + numberOfNodes + " nodes from " + this.getClass().getSimpleName());
+            startNodes(numberOfNodes);
+        }
     }
 
-    private void startNodes(final int n) {
-        this.nodeSource.executeInParallel(() -> LocalInfrastructure.this.startNodeProcess(n));
-    }
-
-    private void startNodesOnTheFly(final int n) {
-        this.nodeSource.executeInParallel(() -> LocalInfrastructure.this.startNodeProcessOnTheFly(n));
+    private void startNodes(final int numberOfNodes) {
+        this.nodeSource.executeInParallel(() -> {
+            increaseNumberOfHandledNodesWithLockAndPersist(numberOfNodes);
+            LocalInfrastructure.this.startNodeProcess(numberOfNodes);
+        });
     }
 
     private void startNodeProcess(int numberOfNodes) {
+        logger.debug("Starting a new process to acquire " + numberOfNodes + " nodes");
         int currentIndex = getIndexAndIncrementWithLockAndPersist();
         String baseNodeName = "local-" + this.nodeSource.getName() + "-" + currentIndex;
         OperatingSystem os = OperatingSystem.UNIX;
@@ -211,65 +220,15 @@ public class LocalInfrastructure extends InfrastructureManager {
                 }
             }));
 
-            logger.info("Local Nodes command started : " + obfuscatedCmd);
+            logger.debug("Local Nodes command started : " + obfuscatedCmd);
 
         } catch (IOException e) {
             String lf = System.lineSeparator();
             String mess = "Cannot launch rm node " + baseNodeName + lf + Throwables.getStackTraceAsString(e);
             multipleDeclareDeployingNodeLost(depNodeURLs, mess);
             if (processExecutor != null) {
-                cleanProcess(processExecutor);
-            }
-            return;
-        }
-
-        // watching process
-        int threshold = 10;
-        while (!allNodesAcquiredOrLost()) {
-            if (processExecutor.isProcessFinished()) {
-                int exit = processExecutor.getExitCode();
-                if (exit != 0) {
-                    String lf = System.lineSeparator();
-                    String message = "RMNode exit code == " + exit + lf;
-                    message += "Command: " + obfuscatedCmd + lf;
-                    String out = Joiner.on('\n').join(processExecutor.getOutput());
-                    String err = Joiner.on('\n').join(processExecutor.getErrorOutput());
-                    message += "stdout: " + out + lf + "stderr: " + err;
-                    multipleDeclareDeployingNodeLost(depNodeURLs, message);
-                }
-            } else {
-                logger.debug("Waiting for nodes " + baseNodeName + " acquisition");
-            }
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                logger.warn("Interrupted while waiting for local process status", e);
-                threshold--;
-                if (threshold <= 0) {
-                    break;
-                }
-            }
-        }
-
-        logger.debug("Local Infrastructure manager exits watching loop for nodes " + baseNodeName);
-        logNodeOutput(baseNodeName + " stdout: ", processExecutor.getOutput());
-        logNodeOutput(baseNodeName + " stderr: ", processExecutor.getErrorOutput());
-
-        if (allNodesLost(numberOfNodes)) {
-            // clean up the process
-            cleanProcess(processExecutor);
-        }
-    }
-
-    private void startNodeProcessOnTheFly(int numberOfNodes) {
-        increaseNumberOfHandledNodesWithLockAndPersist(numberOfNodes);
-        startNodeProcess(numberOfNodes);
-    }
-
-    private void logNodeOutput(final String prefix, List<String> nodeOutputLines) {
-        if (nodeOutputLines != null) {
-            for (String processOutputLine : nodeOutputLines) {
-                logger.debug(prefix + processOutputLine);
+                processExecutor.killProcess();
+                this.processExecutors.remove(processExecutor);
             }
         }
     }
@@ -292,22 +251,6 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
     }
 
-    private boolean allNodesAcquiredOrLost() {
-        return (getNumberOfAcquiredNodesWithLock() +
-                getNumberOfLostNodesWithLock()) >= getNumberOfHandledNodesWithLock();
-    }
-
-    private boolean allNodesLost(int numberOfNodes) {
-        return getNumberOfLostNodesWithLock() >= numberOfNodes;
-    }
-
-    private void cleanProcess(ProcessExecutor processExecutor) {
-        if (processExecutor != null) {
-            processExecutor.killProcess();
-            this.processExecutors.remove(processExecutor);
-        }
-    }
-
     /**
      * args[0] = credentials args[1] = max nodes args[2] = timeout args[3] = pa
      * props
@@ -323,7 +266,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
         try {
             this.maxNodes = Integer.parseInt(args[index++].toString());
-            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, this.maxNodes);
+            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, 0);
         } catch (Exception e) {
             throw new IllegalArgumentException("Cannot determine max node");
         }
@@ -352,15 +295,15 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void removeNode(Node node) throws RMException {
-        logger.debug("A node is removed " + node.getNodeInformation().getURL() + " from " +
-                     this.getClass().getSimpleName());
-        removeAcquiredNodesAndShutDownIfNeeded();
+        logger.info("The node " + node.getNodeInformation().getURL() + " is removed from " +
+                    this.getClass().getSimpleName());
+        removeNodeAndShutdownProcessIfNeeded(node.getNodeInformation().getURL());
     }
 
     @Override
     public void notifyDownNode(String nodeName, String nodeUrl, Node node) {
-        logger.debug("A down node is removed: " + nodeUrl + " from " + this.getClass().getSimpleName());
-        removeAcquiredNodesAndShutDownIfNeeded();
+        logger.debug("A down node is detected: " + nodeUrl + " from " + this.getClass().getSimpleName());
+        decrementNumberOfAcquiredNodesWithLockAndPersist();
     }
 
     @Override
@@ -371,11 +314,13 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     public void shutDown() {
         for (ProcessExecutor processExecutor : this.processExecutors.keySet()) {
-            processExecutor.killProcess();
+            if (processExecutor != null) {
+                processExecutor.killProcess();
+            }
         }
         this.processExecutors.clear();
         // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
-        logger.info("Process associated with node source " + this.nodeSource.getName() + " destroyed");
+        logger.info("All process associated with node source '" + this.nodeSource.getName() + "' are being destroyed.");
     }
 
     @Override
@@ -391,57 +336,101 @@ public class LocalInfrastructure extends InfrastructureManager {
         this.persistedInfraVariables.put(LAST_NODE_STARTED_INDEX_KEY, 0);
     }
 
-    private void removeAcquiredNodesAndShutDownIfNeeded() {
-        int remainingNodesCount = decrementAndGetNumberOfAcquiredNodesWithLockAndPersist();
-        // if there is no remaining node, kill the JVM process
-        if (remainingNodesCount == 0) {
-            shutDown();
+    private void removeNodeAndShutdownProcessIfNeeded(String nodeUrlToRemove) {
+
+        // Update handle & acquire/lost nodes persistent counters
+        decrementNumberOfHandledNodesWithLockAndPersist();
+        if (nodeSource.getNodeInDeployingOrLostNodes(nodeUrlToRemove) == null) {
+            decrementNumberOfAcquiredNodesWithLockAndPersist();
+        } else {
+            decrementNumberOfLostNodesWithLockAndPersist();
+        }
+
+        Iterator<Map.Entry<ProcessExecutor, List<String>>> processIterator = processExecutors.entrySet().iterator();
+        while (processIterator.hasNext()) {
+            Map.Entry<ProcessExecutor, List<String>> processExecutor = processIterator.next();
+            // Remove the nodeUrl if present
+            Iterator<String> nodesIterator = processExecutor.getValue().iterator();
+            boolean nodeFound = false;
+            while (nodesIterator.hasNext()) {
+                String nodeUrl = nodesIterator.next();
+                String nodeName = nodeUrl.substring(nodeUrl.lastIndexOf('/'));
+                if (nodeUrlToRemove.endsWith(nodeName)) {
+                    nodeFound = true;
+                    nodesIterator.remove();
+                    break;
+                }
+            }
+            // Kill the associated JVM process if it doesn't have remaining node
+            if (nodeFound) {
+                if (processExecutor.getValue().isEmpty()) {
+                    logger.debug("No nodes remaining after deleting node " + nodeUrlToRemove +
+                                 ", killing process from " + this.getClass().getSimpleName());
+                    if (processExecutor.getKey() != null) {
+                        processExecutor.getKey().killProcess();
+                    }
+                    processIterator.remove();
+                }
+                break;
+            }
         }
     }
 
     // Below are wrapper methods around the runtime variables map
 
+    private int getNumberOfHandledNodesWithLock() {
+        return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY));
+    }
+
     private int getNumberOfAcquiredNodesWithLock() {
         return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY));
     }
 
-    private int getNumberOfLostNodesWithLock() {
-        return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_LOST_NODES_KEY));
+    private void increaseNumberOfHandledNodesWithLockAndPersist(final int additionalNumberOfNodes) {
+        setPersistedInfraVariable(() -> {
+            int updated = (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) + additionalNumberOfNodes;
+            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, updated);
+            return updated;
+        });
     }
 
     private void incrementNumberOfAcquiredNodesWithLockAndPersist() {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
+        setPersistedInfraVariable(() -> {
             int updated = (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY) + 1;
             this.persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, updated);
-            return null;
+            return updated;
         });
     }
 
     private void incrementNumberOfLostNodesWithLockAndPersist() {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
+        setPersistedInfraVariable(() -> {
             int updated = (int) this.persistedInfraVariables.get(NB_LOST_NODES_KEY) + 1;
             this.persistedInfraVariables.put(NB_LOST_NODES_KEY, updated);
-            return null;
+            return updated;
         });
     }
 
-    private int decrementAndGetNumberOfAcquiredNodesWithLockAndPersist() {
-        return setPersistedInfraVariable(() -> {
+    private void decrementNumberOfHandledNodesWithLockAndPersist() {
+        setPersistedInfraVariable(() -> {
+            int updated = (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) - 1;
+            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, updated);
+            return updated;
+        });
+    }
+
+    private void decrementNumberOfAcquiredNodesWithLockAndPersist() {
+        setPersistedInfraVariable(() -> {
             int updated = (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY) - 1;
             this.persistedInfraVariables.put(NB_ACQUIRED_NODES_KEY, updated);
             return updated;
         });
     }
 
-    private int getNumberOfHandledNodesWithLock() {
-        return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY));
-    }
-
-    private void increaseNumberOfHandledNodesWithLockAndPersist(final int additionalNumberOfNodes) {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
-            int updated = (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) + additionalNumberOfNodes;
-            this.persistedInfraVariables.put(NB_HANDLED_NODES_KEY, updated);
-            return null;
+    private void decrementNumberOfLostNodesWithLockAndPersist() {
+        setPersistedInfraVariable(() -> {
+            int updated = (int) this.persistedInfraVariables.get(NB_LOST_NODES_KEY) - 1;
+            this.persistedInfraVariables.put(NB_LOST_NODES_KEY, updated);
+            return updated;
         });
     }
 
@@ -457,5 +446,4 @@ public class LocalInfrastructure extends InfrastructureManager {
         return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) -
                                                (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY));
     }
-
 }
