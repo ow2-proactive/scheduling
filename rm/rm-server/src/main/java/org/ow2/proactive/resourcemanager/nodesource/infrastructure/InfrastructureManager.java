@@ -812,10 +812,10 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                                                    previousState,
                                                    pn.getProvider().getName());
             emitEvent(event);
-            logger.trace("DeployingNode " + toUpdateURL + " updated in IM");
+            logger.trace("Deploying node " + toUpdateURL + " updated in IM");
             return true;
         } else {
-            logger.trace("DeployingNode " + toUpdateURL + " no more managed by the IM, cannot update it");
+            logger.trace("Deploying node " + toUpdateURL + " no more managed by the IM, cannot update it");
             return false;
         }
     }
