@@ -67,7 +67,7 @@ public class TestLocalInfrastructureTimeSlotPolicy extends RMFunctionalTest {
     @Test
     public void action() throws Exception {
 
-        log("Create an remove an empty local node source with time slot policy");
+        log("Create then remove an empty local node source with time slot policy");
         createEmptyNodeSource(EMPTY_NODE_SOURCE_NAME);
         removeNodeSource(EMPTY_NODE_SOURCE_NAME);
 

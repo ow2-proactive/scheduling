@@ -68,7 +68,7 @@ public class TestLocalInfrastructureCronPolicy extends RMFunctionalTest {
     @Test
     public void action() throws Exception {
 
-        log("Create an remove an empty local node source with cron policy");
+        log("Create then remove an empty local node source with cron policy");
         createEmptyNodeSource(EMPTY_NODE_SOURCE_NAME);
         removeNodeSource(EMPTY_NODE_SOURCE_NAME);
 

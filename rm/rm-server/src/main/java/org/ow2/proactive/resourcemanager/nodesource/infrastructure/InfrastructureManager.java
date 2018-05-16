@@ -1173,7 +1173,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     }
 
     private void clearDeployingNodesWithLockAndPersist() {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
+        setPersistedInfraVariable(() -> {
             this.deployingNodesMap.clear();
             getPersistedDeployingNodesUrl().clear();
             return null;
@@ -1221,10 +1221,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     }
 
     private void addAcquiredNodeNameWithLockAndPersist(final String nodeName) {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
-            getAcquiredNodesName().add(nodeName);
-            return null;
-        });
+        setPersistedInfraVariable(() -> getAcquiredNodesName().add(nodeName));
     }
 
     private boolean containsAcquiredNodeNameWithLock(final String nodeName) {
@@ -1232,10 +1229,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     }
 
     private void removeAcquiredNodeNameWithLockAndPersist(final String nodeName) {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
-            getAcquiredNodesName().remove(nodeName);
-            return null;
-        });
+        setPersistedInfraVariable(() -> getAcquiredNodesName().remove(nodeName));
     }
 
     public boolean isUsingDeployingNode() {
@@ -1243,17 +1237,11 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     }
 
     private void setUsingDeployingNodesWithLockAndPersist() {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
-            this.persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, true);
-            return null;
-        });
+        setPersistedInfraVariable(() -> this.persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, true));
     }
 
     protected void setRmUrl(final String rmUrl) {
-        setPersistedInfraVariable((PersistedInfraVariablesHandler<Void>) () -> {
-            this.persistedInfraVariables.put(RM_URL_KEY, rmUrl);
-            return null;
-        });
+        setPersistedInfraVariable(() -> this.persistedInfraVariables.put(RM_URL_KEY, rmUrl));
     }
 
     protected String getRmUrl() {
