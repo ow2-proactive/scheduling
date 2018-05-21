@@ -30,26 +30,19 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.AmazonS3URI;
-import com.amazonaws.services.s3.internal.ServiceUtils;
 import com.amazonaws.services.s3.transfer.Download;
 import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.amazonaws.util.AwsHostNameUtils;
 
 
 /**
@@ -66,7 +59,7 @@ public class S3ConnectorDownloader extends JavaExecutable {
 
     private String bucketName = null;
 
-    private String keyName = null;
+    private String s3RemoteRelativePath = null;
 
     private String host = null;
 
@@ -75,8 +68,6 @@ public class S3ConnectorDownloader extends JavaExecutable {
     private String accessKey;
 
     private String secretKey;
-
-    private boolean pathStyle = true;
 
     private static final String S3_LOCAL_RELATIVE_PATH = "s3LocalRelativePath";
 
@@ -114,38 +105,22 @@ public class S3ConnectorDownloader extends JavaExecutable {
      */
     @Override
     public Serializable execute(TaskResult... results) throws IOException {
-        List<String> filesRelativePathName = new ArrayList<>();
 
-        boolean s3PathIsPrefix = (keyName.lastIndexOf('/') == keyName.length() - 1);
-
+        boolean s3PathIsPrefix = (s3RemoteRelativePath.lastIndexOf('/') == s3RemoteRelativePath.length() - 1);
         File f = new File(s3LocalRelativePath);
+        createDirIfNotExists(f, s3PathIsPrefix);
 
-        // If the path already exists, print a warning.
-        if (f.exists()) {
-            getOut().println("The local path already exists");
-            if (s3PathIsPrefix) {
-                try {
-                    f.mkdir();
-                } catch (Exception e) {
-                    getOut().println("Couldn't create destination directory!");
-                    System.exit(1);
-                }
-            }
-        }
-        AmazonS3 amazonS3 = getS3Client(host, scheme);
+        AmazonS3 amazonS3 = S3ConnectorUtils.getS3Client(accessKey, secretKey, scheme, host);
 
         // Assume that the path exists, do the download.
         if (s3PathIsPrefix) {
-            downloadDir(bucketName, keyName, s3LocalRelativePath, false, amazonS3);
-            filesRelativePathName = SchedulerExamplesUtils.listDirectoryContents(f, new ArrayList<>());
+            downloadDir(bucketName, s3RemoteRelativePath, s3LocalRelativePath, false, amazonS3);
+            return (Serializable) SchedulerExamplesUtils.listDirectoryContents(f, new ArrayList<>());
         } else {
             s3LocalRelativePath = Paths.get(s3LocalRelativePath, Paths.get(s3Url).getFileName().toString()).toString();
-            downloadFile(bucketName, keyName, s3LocalRelativePath, false, amazonS3);
-            filesRelativePathName.add(s3LocalRelativePath);
-
+            downloadFile(bucketName, s3RemoteRelativePath, s3LocalRelativePath, false, amazonS3);
+            return new ArrayList<>(Arrays.asList(s3LocalRelativePath));
         }
-
-        return (Serializable) filesRelativePathName;
     }
 
     /**
@@ -171,8 +146,9 @@ public class S3ConnectorDownloader extends JavaExecutable {
         } catch (AmazonServiceException e) {
             getErr().println(e.getMessage());
             System.exit(1);
+        } finally {
+            transferManager.shutdownNow();
         }
-        transferManager.shutdownNow();
     }
 
     /**
@@ -199,35 +175,14 @@ public class S3ConnectorDownloader extends JavaExecutable {
         } catch (AmazonServiceException e) {
             getErr().println(e.getMessage());
             System.exit(1);
+        } finally {
+            xferMgr.shutdownNow();
         }
-        xferMgr.shutdownNow();
     }
 
     /**
-     * Get or initialize the S3 client.
-     * Note: this method must be synchronized because we're accessing the
-     * field and we're calling this method from a worker thread.
+     * Parse an Amazon S3 Uri to extract four elements: scheme, host, bucket name and key name.
      *
-     * @return the S3 client
-     */
-    private synchronized AmazonS3 getS3Client(String host, String scheme) {
-
-        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-
-        AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard()
-                                                             .withCredentials(new AWSStaticCredentialsProvider(credentials));
-        String endpoint = scheme + "://" + host;
-        String clientRegion = null;
-        if (!ServiceUtils.isS3USStandardEndpoint(endpoint)) {
-            clientRegion = AwsHostNameUtils.parseRegion(host, AmazonS3Client.S3_SERVICE_NAME);
-        }
-        builder = builder.withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint, clientRegion));
-        builder = builder.withPathStyleAccessEnabled(pathStyle);
-        return builder.build();
-    }
-
-    /**
-     * Parse an Amazon S3 Uri to extact four elements: scheme, host, bucket name and key name.
      * @param s3Uri
      */
     private void parseAmazonS3URI(String s3Uri) {
@@ -241,10 +196,25 @@ public class S3ConnectorDownloader extends JavaExecutable {
         if ((bucketName = amazonS3URI.getBucket()) == null) {
             throw new IllegalArgumentException("You have to specify a valid bucket name in the provided s3 uri. Empty value is not allowed.");
         }
-        if ((keyName = amazonS3URI.getKey()) == null) {
+        if ((s3RemoteRelativePath = amazonS3URI.getKey()) == null) {
             throw new IllegalArgumentException("You have to specify a valid key name in the provided s3 uri. Empty value is not allowed.");
         }
 
+    }
+
+    private void createDirIfNotExists(File f, boolean s3PathIsPrefix) {
+        // If the path already exists, print a warning.
+        if (f.exists()) {
+            getOut().println("The local path already exists");
+            if (s3PathIsPrefix) {
+                try {
+                    f.mkdir();
+                } catch (Exception e) {
+                    getOut().println("Couldn't create destination directory!");
+                    System.exit(1);
+                }
+            }
+        }
     }
 
 }

@@ -39,11 +39,8 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.RegionUtils;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.transfer.MultipleFileUpload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
@@ -70,8 +67,6 @@ public class S3ConnectorUploader extends JavaExecutable {
 
     private String secretKey;
 
-    private boolean pathStyle = true;
-
     private static final String S3_LOCAL_RELATIVE_PATH = "s3LocalRelativePath";
 
     private static final String BUCKET_NAME_ARG = "bucketName";
@@ -94,10 +89,12 @@ public class S3ConnectorUploader extends JavaExecutable {
             throw new IllegalArgumentException("You have to specify a valid bucket name. Empty value is not allowed.");
         }
 
-        if (args.containsKey(REGION_ARG) && !args.get(REGION_ARG).toString().isEmpty()) {
+        if (args.containsKey(REGION_ARG) && !args.get(REGION_ARG).toString().isEmpty() &&
+            RegionUtils.getRegion(args.get(REGION_ARG).toString()) != null) {
             region = args.get(REGION_ARG).toString();
         } else {
-            throw new IllegalArgumentException("You have to specify a valid region. Empty value is not allowed.");
+            throw new IllegalArgumentException("You have to specify a valid region \"" +
+                                               args.get(REGION_ARG).toString() + "\" is not allowed.");
         }
 
         if (args.containsKey(REMOTE_PREFIX_ARG) && !args.get(REMOTE_PREFIX_ARG).toString().isEmpty()) {
@@ -143,10 +140,10 @@ public class S3ConnectorUploader extends JavaExecutable {
             throw new FileNotFoundException("The input file cannot be found at " + s3LocalRelativePath);
         }
 
-        AmazonS3 amazonS3 = getS3Client(region);
+        AmazonS3 amazonS3 = S3ConnectorUtils.getS3Client(accessKey, secretKey, region);
 
         // Create Bucket if it does not exist
-        createBucketIfNotExists(bucketName, amazonS3);
+        S3ConnectorUtils.createBucketIfNotExists(bucketName, amazonS3);
 
         // Upload any directories in the list.
         for (String dirPath : dirsToCopy) {
@@ -267,56 +264,4 @@ public class S3ConnectorUploader extends JavaExecutable {
         transferManager.shutdownNow();
     }
 
-    /**
-     * Get or initialize the S3 client.
-     * Note: this method must be synchronized because we're accessing the
-     * field and we're calling this method from a worker thread.
-     *
-     * @return the S3 client
-     */
-    private synchronized AmazonS3 getS3Client(String region) {
-
-        BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-
-        AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard()
-                                                             .withCredentials(new AWSStaticCredentialsProvider(credentials));
-        builder = builder.withRegion(region);
-        builder = builder.withPathStyleAccessEnabled(pathStyle);
-        return builder.build();
-    }
-
-    /**
-     * Check if an S3 bucket exists and returns its name if it does exist or null otherwise.
-     * @param bucketName
-     * @param s3
-     * @return bucket name if it exists or null otherwise
-     */
-    private Bucket getBucket(String bucketName, AmazonS3 s3) {
-        Bucket namedBucket = null;
-        List<Bucket> buckets = s3.listBuckets();
-        for (Bucket b : buckets) {
-            if (b.getName().equals(bucketName)) {
-                namedBucket = b;
-            }
-        }
-        return namedBucket;
-    }
-
-    /**
-     * Creates an S3 bucket if it does not exist and returns its name.
-     * @param bucketName
-     * @param s3
-     * @return
-     */
-    private Bucket createBucketIfNotExists(String bucketName, AmazonS3 s3) {
-        Bucket b;
-        if (s3.doesBucketExistV2(bucketName)) {
-            b = getBucket(bucketName, s3);
-        } else {
-            getOut().println("Bucket " + bucketName + " does not exist. Creating bucket ...");
-            b = s3.createBucket(bucketName);
-            getOut().println("Bucket " + bucketName + " created successfully!");
-        }
-        return b;
-    }
 }
