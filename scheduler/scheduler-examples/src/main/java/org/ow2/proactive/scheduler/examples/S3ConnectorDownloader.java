@@ -119,7 +119,7 @@ public class S3ConnectorDownloader extends JavaExecutable {
         } else {
             s3LocalRelativePath = Paths.get(s3LocalRelativePath, Paths.get(s3Url).getFileName().toString()).toString();
             downloadFile(bucketName, s3RemoteRelativePath, s3LocalRelativePath, false, amazonS3);
-            return new ArrayList<>(Arrays.asList(s3LocalRelativePath));
+            return (Serializable) Arrays.asList(s3LocalRelativePath);
         }
     }
 
