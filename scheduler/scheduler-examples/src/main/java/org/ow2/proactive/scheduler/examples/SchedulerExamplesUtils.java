@@ -127,7 +127,7 @@ public class SchedulerExamplesUtils {
     }
 
     /**
-     * List the contents of a directory
+     * List recursively the contents of a directory
      * @param dir
      * @param filesRelativePathName
      * @return List of Files' names of the given directory
@@ -136,6 +136,9 @@ public class SchedulerExamplesUtils {
     protected static List<String> listDirectoryContents(File dir, List<String> filesRelativePathName)
             throws IOException {
         File[] files = dir.listFiles();
+        if (files == null) {
+            throw new IOException("Downloading process failed. Please check the remote path (the key name) in the given S3 Url");
+        }
         for (File file : files) {
             if (file.isDirectory()) {
                 listDirectoryContents(file, filesRelativePathName);
