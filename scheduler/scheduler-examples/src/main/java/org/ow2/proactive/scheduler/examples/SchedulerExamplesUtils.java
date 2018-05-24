@@ -137,7 +137,7 @@ public class SchedulerExamplesUtils {
             throws IOException {
         File[] files = dir.listFiles();
         if (files == null) {
-            throw new IOException("Downloading process failed. Please check the remote path (the key name) in the given S3 Url");
+            throw new IOException("Download failed. The resource in the given S3 URL does not exist or is not accessible");
         }
         for (File file : files) {
             if (file.isDirectory()) {

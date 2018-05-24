@@ -96,7 +96,7 @@ public class S3ConnectorDownloader extends JavaExecutable {
         accessKey = getThirdPartyCredential("S3_ACCESS_KEY");
         secretKey = getThirdPartyCredential("S3_SECRET_KEY");
         if (accessKey == null || secretKey == null) {
-            throw new IllegalArgumentException("You first need to add your s3 username and password (S3_ACCESS_KEY, S3_SECRET_KEY) to the third party credentials");
+            throw new IllegalArgumentException("You first need to add your Access Key ID and Secret Access Key (S3_ACCESS_KEY, S3_SECRET_KEY) to the third party credentials");
         }
     }
 
@@ -108,6 +108,7 @@ public class S3ConnectorDownloader extends JavaExecutable {
 
         boolean s3PathIsPrefix = (s3RemoteRelativePath.lastIndexOf('/') == s3RemoteRelativePath.length() - 1);
         File f = new File(s3LocalRelativePath);
+
         createDirIfNotExists(f, s3PathIsPrefix);
 
         AmazonS3 amazonS3 = S3ConnectorUtils.getS3Client(accessKey, secretKey, scheme, host);
@@ -127,6 +128,7 @@ public class S3ConnectorDownloader extends JavaExecutable {
      * Download a list of files from S3. <br>
      * Requires a bucket name. <br>
      * Requires a key prefix. <br>
+     *
      * @param bucketName
      * @param keyPrefix
      * @param dirPath
@@ -155,6 +157,7 @@ public class S3ConnectorDownloader extends JavaExecutable {
      * Download a file from S3. <br>
      * Requires a bucket name. <br>
      * Requires a key prefix. <br>
+     *
      * @param bucketName
      * @param keyName
      * @param filePath
