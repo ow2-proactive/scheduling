@@ -47,6 +47,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Lists;
 
 
 public class LocalInfrastructure extends InfrastructureManager {
@@ -84,9 +85,19 @@ public class LocalInfrastructure extends InfrastructureManager {
     private static final String LAST_NODE_STARTED_INDEX_KEY = "lastNodeStartedIndex";
 
     /**
-     * A map containing process executors, associated with their corresponding deployment node urls.
+     * Maps containing process executors, associated with their corresponding deployment node urls.
      */
-    private transient ConcurrentHashMap<ProcessExecutor, List<String>> processExecutors = new ConcurrentHashMap<>();
+    private transient ConcurrentHashMap<ProcessExecutor, List<String>> processExecutorsToDeploying = new ConcurrentHashMap<>();
+
+    private transient ConcurrentHashMap<String, ProcessExecutor> deployingToProcessExecutors = new ConcurrentHashMap<>();
+
+    /**
+     * Maps containing process executors, associated with their corresponding acquired node urls.
+     */
+
+    private transient ConcurrentHashMap<ProcessExecutor, List<String>> processExecutorsToAcquired = new ConcurrentHashMap<>();
+
+    private transient ConcurrentHashMap<String, ProcessExecutor> acquiredToProcessExecutors = new ConcurrentHashMap<>();
 
     @Override
     public String getDescription() {
@@ -208,9 +219,13 @@ public class LocalInfrastructure extends InfrastructureManager {
             Collections.replaceAll(cmd, CommandLineBuilder.OBFUSC, clb.getCredentialsValue());
 
             processExecutor = new ProcessExecutor(baseNodeName, cmd, false, true);
-            processExecutor.start();
 
-            this.processExecutors.put(processExecutor, depNodeURLs);
+            this.processExecutorsToDeploying.put(processExecutor, depNodeURLs);
+            for (String deployingNodeUrl : depNodeURLs) {
+                this.deployingToProcessExecutors.put(deployingNodeUrl, processExecutor);
+            }
+
+            processExecutor.start();
 
             final ProcessExecutor tmpProcessExecutor = processExecutor;
 
@@ -228,7 +243,10 @@ public class LocalInfrastructure extends InfrastructureManager {
             multipleDeclareDeployingNodeLost(depNodeURLs, mess);
             if (processExecutor != null) {
                 processExecutor.killProcess();
-                this.processExecutors.remove(processExecutor);
+                this.processExecutorsToDeploying.remove(processExecutor);
+                for (String deployingNodeUrl : depNodeURLs) {
+                    this.deployingToProcessExecutors.remove(deployingNodeUrl);
+                }
             }
         }
     }
@@ -286,11 +304,40 @@ public class LocalInfrastructure extends InfrastructureManager {
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
         incrementNumberOfLostNodesWithLockAndPersist();
+        removeNodeAndMaybeKillProcessIfEmpty(deployingToProcessExecutors, processExecutorsToDeploying, pnURL, true);
+    }
+
+    private ProcessExecutor removeNodeAndMaybeKillProcessIfEmpty(Map<String, ProcessExecutor> urlToProcess,
+            Map<ProcessExecutor, List<String>> processToUrl, String url, boolean killProcessIfEmpty) {
+        ProcessExecutor executor = urlToProcess.remove(url);
+        if (executor != null) {
+            List<String> urlsAssociatedWithTheProcess = processToUrl.get(executor);
+            urlsAssociatedWithTheProcess.remove(url);
+            if (killProcessIfEmpty && urlsAssociatedWithTheProcess.isEmpty()) {
+                processToUrl.remove(executor);
+                executor.killProcess();
+            } else if (urlsAssociatedWithTheProcess.isEmpty()) {
+                processToUrl.remove(executor);
+            }
+        }
+        return executor;
     }
 
     @Override
-    protected void notifyAcquiredNode(Node arg0) throws RMException {
+    protected void notifyAcquiredNode(Node node) throws RMException {
         incrementNumberOfAcquiredNodesWithLockAndPersist();
+        String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
+        ProcessExecutor associatedProcess = removeNodeAndMaybeKillProcessIfEmpty(deployingToProcessExecutors,
+                                                                                 processExecutorsToDeploying,
+                                                                                 deployingNodeURL,
+                                                                                 false);
+        acquiredToProcessExecutors.put(node.getNodeInformation().getURL(), associatedProcess);
+        List<String> nodesUrls = processExecutorsToAcquired.putIfAbsent(associatedProcess,
+                                                                        Lists.newArrayList(node.getNodeInformation()
+                                                                                               .getURL()));
+        if (nodesUrls != null) {
+            nodesUrls.add(node.getNodeInformation().getURL());
+        }
     }
 
     @Override
@@ -313,12 +360,12 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public void shutDown() {
-        for (ProcessExecutor processExecutor : this.processExecutors.keySet()) {
+        for (ProcessExecutor processExecutor : this.processExecutorsToDeploying.keySet()) {
             if (processExecutor != null) {
                 processExecutor.killProcess();
             }
         }
-        this.processExecutors.clear();
+        this.processExecutorsToDeploying.clear();
         // do not set processExecutor to null here or NPE can appear in the startProcess method, running in a different thread.
         logger.info("All process associated with node source '" + this.nodeSource.getName() + "' are being destroyed.");
     }
@@ -346,34 +393,18 @@ public class LocalInfrastructure extends InfrastructureManager {
             decrementNumberOfLostNodesWithLockAndPersist();
         }
 
-        Iterator<Map.Entry<ProcessExecutor, List<String>>> processIterator = processExecutors.entrySet().iterator();
-        while (processIterator.hasNext()) {
-            Map.Entry<ProcessExecutor, List<String>> processExecutor = processIterator.next();
-            // Remove the nodeUrl if present
-            Iterator<String> nodesIterator = processExecutor.getValue().iterator();
-            boolean nodeFound = false;
-            while (nodesIterator.hasNext()) {
-                String nodeUrl = nodesIterator.next();
-                String nodeName = nodeUrl.substring(nodeUrl.lastIndexOf('/'));
-                if (nodeUrlToRemove.endsWith(nodeName)) {
-                    nodeFound = true;
-                    nodesIterator.remove();
-                    break;
-                }
-            }
-            // Kill the associated JVM process if it doesn't have remaining node
-            if (nodeFound) {
-                if (processExecutor.getValue().isEmpty()) {
-                    logger.debug("No nodes remaining after deleting node " + nodeUrlToRemove +
-                                 ", killing process from " + this.getClass().getSimpleName());
-                    if (processExecutor.getKey() != null) {
-                        processExecutor.getKey().killProcess();
-                    }
-                    processIterator.remove();
-                }
-                break;
-            }
+        if (acquiredToProcessExecutors.containsKey(nodeUrlToRemove)) {
+            removeNodeAndMaybeKillProcessIfEmpty(acquiredToProcessExecutors,
+                                                 processExecutorsToAcquired,
+                                                 nodeUrlToRemove,
+                                                 true);
+        } else if (deployingToProcessExecutors.containsKey(nodeUrlToRemove)) {
+            removeNodeAndMaybeKillProcessIfEmpty(deployingToProcessExecutors,
+                                                 processExecutorsToDeploying,
+                                                 nodeUrlToRemove,
+                                                 true);
         }
+
     }
 
     // Below are wrapper methods around the runtime variables map
