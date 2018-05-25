@@ -118,20 +118,6 @@ public class JettyStarter {
             HandlerList handlerList = new HandlerList();
 
             if (WebProperties.JETTY_LOG_FILE.isSet()) {
-                NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
-                requestLog.setAppend(true);
-                requestLog.setExtended(false);
-                requestLog.setLogTimeZone("GMT");
-                requestLog.setLogLatency(true);
-                requestLog.setRetainDays(90);
-
-                RequestLogHandler requestLogHandler = new RequestLogHandler();
-                requestLogHandler.setRequestLog(requestLog);
-                handlerList.addHandler(requestLogHandler);
-            }
-
-
-            if (WebProperties.JETTY_LOG_FILE.isSet()) {
                 File jettyLogFile = new File(WebProperties.JETTY_LOG_FILE.getValueAsString());
                 if (!jettyLogFile.getParentFile().exists() && !jettyLogFile.getParentFile().mkdirs()) {
                     logger.info("Could not cteate jetty log file in: " +
