@@ -115,6 +115,8 @@ public class JettyStarter {
 
             server.setStopAtShutdown(true);
 
+            HandlerList handlerList = new HandlerList();
+
             if (WebProperties.JETTY_LOG_FILE.isSet()) {
                 NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
                 requestLog.setAppend(true);
@@ -123,10 +125,11 @@ public class JettyStarter {
                 requestLog.setLogLatency(true);
                 requestLog.setRetainDays(90);
 
-                server.setRequestLog(requestLog);
+                RequestLogHandler requestLogHandler = new RequestLogHandler();
+                requestLogHandler.setRequestLog(requestLog);
+                handlerList.addHandler(requestLogHandler);
             }
 
-            HandlerList handlerList = new HandlerList();
 
             if (WebProperties.JETTY_LOG_FILE.isSet()) {
                 File jettyLogFile = new File(WebProperties.JETTY_LOG_FILE.getValueAsString());
