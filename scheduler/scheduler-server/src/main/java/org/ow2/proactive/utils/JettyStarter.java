@@ -46,6 +46,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -114,6 +115,8 @@ public class JettyStarter {
 
             server.setStopAtShutdown(true);
 
+            HandlerList handlerList = new HandlerList();
+
             if (WebProperties.JETTY_LOG_FILE.isSet()) {
                 NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
                 requestLog.setAppend(true);
@@ -122,10 +125,11 @@ public class JettyStarter {
                 requestLog.setLogLatency(true);
                 requestLog.setRetainDays(90);
 
-                server.setRequestLog(requestLog);
+                RequestLogHandler requestLogHandler = new RequestLogHandler();
+                requestLogHandler.setRequestLog(requestLog);
+                handlerList.addHandler(requestLogHandler);
             }
 
-            HandlerList handlerList = new HandlerList();
 
             if (httpsEnabled && redirectHttpToHttps) {
                 ContextHandler redirectHandler = new ContextHandler();
