@@ -88,7 +88,9 @@ public enum WebProperties implements PACommonProperties {
 
     WAR_WRAPPER_HTTPS_ENABLED("war.wrapper.https.enabled", PropertyType.BOOLEAN, "false"),
 
-    WAR_WRAPPER_CONTEXT_ROOT("war.wrapper.context.root", PropertyType.STRING, "/");
+    WAR_WRAPPER_CONTEXT_ROOT("war.wrapper.context.root", PropertyType.STRING, "/"),
+
+    JETTY_LOG_FILE("jetty.log.file", PropertyType.STRING);
 
     public static final String PA_WEB_PROPERTIES_FILEPATH_PROPERTY_NAME = "pa.portal.configuration.filepath";
 

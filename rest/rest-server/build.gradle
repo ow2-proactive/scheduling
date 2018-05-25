@@ -60,7 +60,7 @@ dependencies {
     testCompile project (':common:common-api').sourceSets.test.output
 
     runtime 'org.eclipse.jetty.websocket:websocket-server:9.2.14.v20151106'
-    runtime 'org.eclipse.jetty:jetty-webapp:9.2.14.v20151106'
+    runtime 'org.eclipse.jetty:jetty-webapp:9.3.23.v20180228'
 
     runtime "org.objectweb.proactive:programming-extension-pamr:${programmingVersion}"
 }
