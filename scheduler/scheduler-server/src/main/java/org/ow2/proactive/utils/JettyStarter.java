@@ -117,8 +117,6 @@ public class JettyStarter {
 
             HandlerList handlerList = new HandlerList();
 
-            
-
             if (httpsEnabled && redirectHttpToHttps) {
                 ContextHandler redirectHandler = new ContextHandler();
                 redirectHandler.setContextPath("/");
