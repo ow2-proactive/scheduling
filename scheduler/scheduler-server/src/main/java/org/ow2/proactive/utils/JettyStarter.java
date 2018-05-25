@@ -115,6 +115,17 @@ public class JettyStarter {
 
             server.setStopAtShutdown(true);
 
+            if(WebProperties.JETTY_LOG_FILE.isSet()){
+                NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
+                requestLog.setAppend(true);
+                requestLog.setExtended(false);
+                requestLog.setLogTimeZone("GMT");
+                requestLog.setLogLatency(true);
+                requestLog.setRetainDays(90);
+
+                server.setRequestLog(requestLog);
+            }
+
             HandlerList handlerList = new HandlerList();
 
             if (WebProperties.JETTY_LOG_FILE.isSet()) {

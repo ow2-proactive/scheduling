@@ -19,7 +19,7 @@ dependencies {
 
     compile "org.ow2.proactive:emailnotification-addons:${schedulingVersion}"
 
-    compile 'org.eclipse.jetty:jetty-webapp:9.2.14.v20151106'
+    compile 'org.eclipse.jetty:jetty-webapp:9.3.23.v20180228'
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
     compile project(':common:common-api')
