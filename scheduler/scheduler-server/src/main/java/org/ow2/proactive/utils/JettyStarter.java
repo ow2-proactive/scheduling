@@ -115,7 +115,7 @@ public class JettyStarter {
 
             server.setStopAtShutdown(true);
 
-            if(WebProperties.JETTY_LOG_FILE.isSet()){
+            if (WebProperties.JETTY_LOG_FILE.isSet()) {
                 NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
                 requestLog.setAppend(true);
                 requestLog.setExtended(false);
