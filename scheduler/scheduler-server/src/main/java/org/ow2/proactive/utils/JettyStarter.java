@@ -117,18 +117,7 @@ public class JettyStarter {
 
             HandlerList handlerList = new HandlerList();
 
-            if (WebProperties.JETTY_LOG_FILE.isSet()) {
-                NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
-                requestLog.setAppend(true);
-                requestLog.setExtended(false);
-                requestLog.setLogTimeZone("GMT");
-                requestLog.setLogLatency(true);
-                requestLog.setRetainDays(90);
-
-                RequestLogHandler requestLogHandler = new RequestLogHandler();
-                requestLogHandler.setRequestLog(requestLog);
-                handlerList.addHandler(requestLogHandler);
-            }
+            
 
             if (httpsEnabled && redirectHttpToHttps) {
                 ContextHandler redirectHandler = new ContextHandler();
