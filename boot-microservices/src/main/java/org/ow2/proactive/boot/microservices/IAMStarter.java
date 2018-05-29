@@ -32,11 +32,10 @@ import java.util.concurrent.*;
 
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.boot.microservices.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
-
-import org.apache.commons.configuration2.ex.ConfigurationException;
 
 
 public class IAMStarter {

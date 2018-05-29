@@ -27,7 +27,6 @@ package org.ow2.proactive.boot.microservices.util;
 
 import java.io.File;
 
-import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
@@ -59,7 +58,7 @@ public class IAMConfiguration {
 
     public static Configuration loadConfig(File configFile) throws ConfigurationException {
 
-        Configuration config = new BaseConfiguration();
+        Configuration config;
 
         ListDelimiterHandler delimiter = new DefaultListDelimiterHandler(',');
 
@@ -73,6 +72,8 @@ public class IAMConfiguration {
         builder.configure(propertyParameters);
 
         config = builder.getConfiguration();
+
+        LOGGER.debug("IAM configuration loaded");
 
         return config;
     }

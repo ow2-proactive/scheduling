@@ -150,7 +150,8 @@ public class RestFuncTHelper {
         scheduler = schedAuth.login(schedCred);
 
         // Connect a rm client
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(url, TimeUnit.SECONDS.toMillis(SCHEDULER_CONNECTION_TIMEOUT));
+        RMAuthentication rmAuth = RMConnection.waitAndJoin(url,
+                                                           TimeUnit.SECONDS.toMillis(SCHEDULER_CONNECTION_TIMEOUT));
         Credentials rmCredentials = getRmCredentials();
         rm = rmAuth.login(rmCredentials);
 

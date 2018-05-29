@@ -99,9 +99,9 @@ class LoadPackages {
             package_loader.createBucketIfNotExist(bucket)
         }
 
-        // Load each package
+        // Load all packages without loading each package dependencies
         examples_dir.eachDir { package_dir ->
-            package_loader.run(package_dir)
+            package_loader.run(package_dir, false)
         }
 
         writeToOutput(" ... proactive packages deployed!")
