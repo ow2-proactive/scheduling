@@ -36,6 +36,8 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.boot.microservices.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 
+import org.apache.commons.configuration2.ex.ConfigurationException;
+
 
 public class IAMStarter {
 
@@ -61,7 +63,7 @@ public class IAMStarter {
      *  Start IAM microservice
      */
     public static Process start(String paHome, String bootMicroservicesPath, String bootConfigurationPath)
-            throws InterruptedException, IOException, ExecutionException {
+            throws InterruptedException, IOException, ExecutionException, ConfigurationException {
 
         if (!started) {
             LOGGER.info("Starting IAM microservice...");
@@ -165,14 +167,15 @@ public class IAMStarter {
     /**
      * Load IAM configuration
      */
-    private static void loadIAMConfiguration(String bootConfigurationPath) {
+    private static void loadIAMConfiguration(String bootConfigurationPath) throws ConfigurationException {
 
         File configFile = new File(bootConfigurationPath + SEPARATOR + IAMConfiguration.PROPERTIES_FILE);
 
-        if (configFile.exists()) {
-            config = IAMConfiguration.loadConfig(configFile);
-        } else {
+        if (!configFile.exists()) {
             throw new IAMStarterException("IAM configuration not found in : " + configFile.getAbsolutePath());
         }
+
+        config = IAMConfiguration.loadConfig(configFile);
+
     }
 }

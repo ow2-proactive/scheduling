@@ -52,6 +52,8 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
@@ -224,7 +226,7 @@ public class SchedulerStarter {
      *  Launch boot (i.e., early-starting) microservices (notably, IAM microservice)
      *
      */
-    private static void startBootMicroservices() throws IOException, InterruptedException, ExecutionException {
+    private static void startBootMicroservices() throws IOException, InterruptedException, ExecutionException, ConfigurationException {
 
         // Do nothing if PA_home or the boot microservices path is not specified
         if (!(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.isSet() &&
@@ -415,8 +417,9 @@ public class SchedulerStarter {
                 //Shutting down boot microservices (notably the IAM microservice)
                 LOGGER.info("Stopping boot microservices...");
 
-                for (Process process : bootMicroservicesProcesses)
+                for (Process process : bootMicroservicesProcesses){
                     process.destroyForcibly();
+                }
 
                 LOGGER.info("Shutting down...");
 

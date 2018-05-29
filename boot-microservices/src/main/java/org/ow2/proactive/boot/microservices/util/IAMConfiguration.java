@@ -57,7 +57,7 @@ public class IAMConfiguration {
 
     }
 
-    public static Configuration loadConfig(File configFile) {
+    public static Configuration loadConfig(File configFile) throws ConfigurationException {
 
         Configuration config = new BaseConfiguration();
 
@@ -72,12 +72,7 @@ public class IAMConfiguration {
 
         builder.configure(propertyParameters);
 
-        try {
-            config = builder.getConfiguration();
-
-        } catch (ConfigurationException cex) {
-            LOGGER.error("loading of IAM configuration failed");
-        }
+        config = builder.getConfiguration();
 
         return config;
     }
