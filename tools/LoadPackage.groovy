@@ -115,24 +115,27 @@ class LoadPackage {
     }
 
 
-    void populateDataspace(metadata_file_map, package_dir) {
-        def dataspace_map = null
-        def target_dir_path = ""
-        if ((dataspace_map = metadata_file_map.get("dataspace")) != null) {
-            // Retrieve the targeted directory path
-            def target = dataspace_map.get("target")
-            if (target == "global")
-                target_dir_path = this.GLOBAL_SPACE_PATH
+    void populateDataspace(dataspace_map, package_dir) {
 
-            // Copy all files into the targeted directory
-            dataspace_map.get("files").each { file_relative_path ->
-                def file_src = new File(package_dir.absolutePath, file_relative_path)
-                def file_src_path = file_src.absolutePath
-                def file_name = file_src.getName()
-                def file_dest = new File(target_dir_path, file_name)
-                def file_dest_path = file_dest.absolutePath
-                Files.copy(Paths.get(file_src_path), Paths.get(file_dest_path), StandardCopyOption.REPLACE_EXISTING)
-            }
+        // Do nothing if there is nothing to copy into the dataspaces
+        if (dataspace_map == null)
+            return
+
+        // Retrieve the targeted directory path
+        def target_dir_path = ""
+        def target = dataspace_map.get("target")
+        if (target == "global")
+            target_dir_path = this.GLOBAL_SPACE_PATH
+
+        // Copy all files into the targeted directory
+        dataspace_map.get("files").each { file_relative_path ->
+            def file_src = new File(package_dir.absolutePath, file_relative_path)
+            def file_src_path = file_src.absolutePath
+            def file_name = file_src.getName()
+            def file_dest = new File(target_dir_path, file_name)
+            def file_dest_path = file_dest.absolutePath
+            Files.copy(Paths.get(file_src_path), Paths.get(file_dest_path), StandardCopyOption.REPLACE_EXISTING)
+            writeToOutput(file_src_path + " copied to " + file_dest_path + "!")
         }
     }
 
@@ -274,6 +277,11 @@ class LoadPackage {
 
 
     void populateBucket(catalog_map, package_dir) {
+
+        // Do nothing if there is no workflow to push
+        if (catalog_map == null)
+            return
+
         def buckets_list
         //Transform a String to a List of String
         if (catalog_map.get("bucket") instanceof String) {
@@ -306,7 +314,7 @@ class LoadPackage {
     }
 
 
-    void run(package_dir) {
+    void run(package_dir, load_dependencies) {
 
         // Connect to the scheduler
         loginAdminUserCredToSchedulerAndGetSessionId()
@@ -315,19 +323,35 @@ class LoadPackage {
         if (package_dir.getPath().endsWith(".zip")) {
             package_dir = unzipPackage(package_dir)
         }
+
         // Parse the metadata json file
         def metadata_file = new File(package_dir.absolutePath, "METADATA.json")
         writeToOutput(" Parsing " + metadata_file.absolutePath)
-        // From json to map
         def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
-        def catalog_map = metadata_file_map.get("catalog")
+
+        // LOAD PACKAGE DEPENDENCIES ////////////////////////////
+
+        if (load_dependencies) {
+            def dependencies_list = metadata_file_map.get("dependencies")
+
+            if (dependencies_list != null)
+            {
+                def examples_dir = package_dir.getAbsoluteFile().getParentFile()
+                dependencies_list.each { package_name ->
+
+                    this.run( new File(examples_dir, package_name), load_dependencies)
+                }
+            }
+        }
 
         // POPULATE DATASPACE ////////////////////////////
 
-        populateDataspace(metadata_file_map, package_dir)
+        def dataspace_map = metadata_file_map.get("dataspace")
+        populateDataspace(dataspace_map, package_dir)
 
         // POPULATE BUCKETS /////////////////////////////
 
+        def catalog_map = metadata_file_map.get("catalog")
         populateBucket(catalog_map, package_dir)
 
     }
