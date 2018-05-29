@@ -39,12 +39,14 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -114,6 +116,25 @@ public class JettyStarter {
             server.setStopAtShutdown(true);
 
             HandlerList handlerList = new HandlerList();
+
+            if (WebProperties.JETTY_LOG_FILE.isSet()) {
+                File jettyLogFile = new File(WebProperties.JETTY_LOG_FILE.getValueAsString());
+                if (!jettyLogFile.getParentFile().exists() && !jettyLogFile.getParentFile().mkdirs()) {
+                    logger.info("Could not cteate jetty log file in: " +
+                                WebProperties.JETTY_LOG_FILE.getValueAsString());
+                } else {
+                    NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
+                    requestLog.setAppend(true);
+                    requestLog.setExtended(false);
+                    requestLog.setLogTimeZone("GMT");
+                    requestLog.setLogLatency(true);
+                    requestLog.setRetainDays(90);
+
+                    RequestLogHandler requestLogHandler = new RequestLogHandler();
+                    requestLogHandler.setRequestLog(requestLog);
+                    handlerList.addHandler(requestLogHandler);
+                }
+            }
 
             if (httpsEnabled && redirectHttpToHttps) {
                 ContextHandler redirectHandler = new ContextHandler();
