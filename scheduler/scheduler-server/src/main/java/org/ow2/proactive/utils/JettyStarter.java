@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.web.WebProperties;
+import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFactory;
 
 
 public class JettyStarter {
@@ -118,9 +119,10 @@ public class JettyStarter {
             HandlerList handlerList = new HandlerList();
 
             if (WebProperties.JETTY_LOG_FILE.isSet()) {
-                File jettyLogFile = new File(WebProperties.JETTY_LOG_FILE.getValueAsString());
+                String pathToJettyLogFile = FileStorageSupportFactory.relativeToHomeIfNotAbsolute(WebProperties.JETTY_LOG_FILE.getValueAsString());
+                File jettyLogFile = new File(pathToJettyLogFile);
                 if (!jettyLogFile.getParentFile().exists() && !jettyLogFile.getParentFile().mkdirs()) {
-                    logger.info("Could not cteate jetty log file in: " +
+                    logger.error("Could not cteate jetty log file in: " +
                                 WebProperties.JETTY_LOG_FILE.getValueAsString());
                 } else {
                     NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
