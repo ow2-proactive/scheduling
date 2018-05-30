@@ -50,7 +50,7 @@ public class TaskSchedulingTimeTestProb extends TaskSchedulingTimeTest {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 2, 2000 } });
+        return Arrays.asList(new Object[][] { { 1, 2000 } });
     }
 
     public TaskSchedulingTimeTestProb(int taskNumber, long timeLimit) {
