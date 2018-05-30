@@ -123,7 +123,7 @@ public class JettyStarter {
                 File jettyLogFile = new File(pathToJettyLogFile);
                 if (!jettyLogFile.getParentFile().exists() && !jettyLogFile.getParentFile().mkdirs()) {
                     logger.error("Could not cteate jetty log file in: " +
-                                WebProperties.JETTY_LOG_FILE.getValueAsString());
+                                 WebProperties.JETTY_LOG_FILE.getValueAsString());
                 } else {
                     NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
                     requestLog.setAppend(true);
