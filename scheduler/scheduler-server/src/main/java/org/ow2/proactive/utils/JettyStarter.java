@@ -125,7 +125,7 @@ public class JettyStarter {
                     logger.error("Could not cteate jetty log file in: " +
                                  WebProperties.JETTY_LOG_FILE.getValueAsString());
                 } else {
-                    NCSARequestLog requestLog = new NCSARequestLog(WebProperties.JETTY_LOG_FILE.getValueAsString());
+                    NCSARequestLog requestLog = new NCSARequestLog(pathToJettyLogFile);
                     requestLog.setAppend(true);
                     requestLog.setExtended(false);
                     requestLog.setLogTimeZone("GMT");
