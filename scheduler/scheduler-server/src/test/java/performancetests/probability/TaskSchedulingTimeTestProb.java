@@ -34,9 +34,8 @@ import java.util.Collection;
 
 
 /**
- * The performance test calculates average time to scheduler (to dispatch) task, i.e. time to move
- * task from pending till running state.
- * Test repeats same experiment given number of times. In each experiment it submits job with a single task,
+ * The performance test calculates time to scheduler (to dispatch) task, i.e. time to move
+ * task from pending till running state. It submits job with a single task,
  * waits until job is finished, and then computes scheduling time, as difference between timestamp when job was submitted,
  * and timestamp when task was started.
  */
