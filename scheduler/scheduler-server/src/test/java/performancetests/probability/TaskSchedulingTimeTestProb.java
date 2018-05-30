@@ -58,7 +58,7 @@ public class TaskSchedulingTimeTestProb extends TaskSchedulingTimeTest {
     }
 
     @Override
-    public String name() {
-        return super.name() + "Prob";
+    public String getName() {
+        return super.getName() + "Prob";
     }
 }

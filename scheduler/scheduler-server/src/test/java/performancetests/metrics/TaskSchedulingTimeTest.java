@@ -101,14 +101,14 @@ public class TaskSchedulingTimeTest extends PerformanceTestBase {
             totalTime += timeToScheduleTask;
         }
         long averageTime = totalTime / numberOfExperiments;
-        LOGGER.info(makeCSVString(name(),
+        LOGGER.info(makeCSVString(getName(),
                                   numberOfExperiments,
                                   timeLimit,
                                   averageTime,
                                   ((averageTime < timeLimit) ? SUCCESS : FAILURE)));
     }
 
-    public String name() {
+    public String getName() {
         return "AverageTaskSchedulingTime";
     }
 
