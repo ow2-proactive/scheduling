@@ -1957,4 +1957,22 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
+
+    /**
+     * 
+     * Check if the user has the permission to execute the method passed as argument
+     * 
+     * @param sessionId
+     * @param jobId
+     * @param method
+     * @return true if the user has the permission to execute the java method
+     * @throws NotConnectedRestException
+     * @throws UnknownJobRestException
+     */
+    @GET
+    @Path("job/{jobid}/permission/{methodj}")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces("application/json")
+    boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedRestException, UnknownJobRestException;
 }

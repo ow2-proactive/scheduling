@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FREEZE_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
@@ -213,18 +214,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     private it.sauronsoftware.cron4j.Scheduler metricsMonitorScheduler;
 
     /*
-     * #########################################################################
-     * ##################
+     * ######################################################################### ##################
      */
     /*                                                                                             */
     /*
-     * ################################## SCHEDULER CONSTRUCTION
-     * #################################
+     * ################################## SCHEDULER CONSTRUCTION #################################
      */
     /*                                                                                             */
     /*
-     * #########################################################################
-     * ##################
+     * ######################################################################### ##################
      */
 
     /**
@@ -867,18 +865,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     /*
-     * #########################################################################
-     * ##################
+     * ######################################################################### ##################
      */
     /*                                                                                             */
     /*
-     * ##################################### SCHEDULER ORDERS
-     * ####################################
+     * ##################################### SCHEDULER ORDERS ####################################
      */
     /*                                                                                             */
     /*
-     * #########################################################################
-     * ##################
+     * ######################################################################### ##################
      */
 
     /**
@@ -1477,6 +1472,20 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public Map getSchedulerProperties() throws NotConnectedException {
         return frontendState.getSchedulerProperties();
+    }
+
+    @Override
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedException, UnknownJobException {
+        try {
+            JobId id = JobIdImpl.makeJobId(jobId);
+            frontendState.checkPermissions(method,
+                                           frontendState.getIdentifiedJob(id),
+                                           YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION);
+        } catch (PermissionException p) {
+            return false;
+        }
+        return true;
     }
 
 }

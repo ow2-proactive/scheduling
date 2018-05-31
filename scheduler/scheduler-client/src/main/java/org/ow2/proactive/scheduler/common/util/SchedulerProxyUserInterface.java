@@ -682,4 +682,10 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.getSchedulerProperties();
     }
 
+    @Override
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedException, UnknownJobException {
+        return uischeduler.checkJobPermissionMethod(sessionId, jobId, method);
+    }
+
 }
