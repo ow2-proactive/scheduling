@@ -1970,7 +1970,7 @@ public interface SchedulerRestInterface {
      * @throws UnknownJobRestException
      */
     @GET
-    @Path("job/{jobid}/permission/{methodj}")
+    @Path("job/{jobid}/permission/{method}")
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces("application/json")
     boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
