@@ -4,6 +4,9 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import org.apache.log4j.Logger
+import org.apache.http.conn.ssl.*
+import org.apache.http.impl.client.*
+import javax.net.ssl.*
 
 import java.util.zip.ZipFile
 
@@ -158,6 +161,15 @@ class LoadPackage {
         return template_dir_name
     }
 
+    def getHttpClientBuilder() {
+        SSLContextBuilder builder = new SSLContextBuilder();
+        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        return HttpClients.custom().setSSLSocketFactory(
+                sslsf);
+    }
+
 
     void populateTemplateDir(object, object_absolute_path) {
         // Start by finding the next template dir index
@@ -237,7 +249,7 @@ class LoadPackage {
             builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file))
             post.setEntity(builder.build())
 
-            def result = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
+            def result = getHttpClientBuilder().build().execute(post)
             writeToOutput(" " + object_file.getName() + " pushed!")
         }
         return object_file
@@ -248,8 +260,13 @@ class LoadPackage {
         // Does the bucket already exist? -------------
         // GET QUERY
         def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
-        def response = new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: this.sessionId])
-        def buckets = slurper.parseText(response.toString())
+        def get = new org.apache.http.client.methods.HttpGet(list_buckets_rest_query)
+        get.addHeader("sessionid", this.sessionId)
+        def response = getHttpClientBuilder().build().execute(get)
+        def bis = new BufferedInputStream(response.getEntity().getContent())
+        def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+        bis.close()
+        def buckets = slurper.parseText(result)
         def bucket_found = buckets.find { object -> object.name == bucket }
 
         writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
@@ -265,9 +282,9 @@ class LoadPackage {
             post.addHeader("Content-Type", "application/json")
             post.addHeader("sessionId", this.sessionId)
 
-            response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
-            def bis = new BufferedInputStream(response.getEntity().getContent())
-            def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+            response = getHttpClientBuilder().build().execute(post)
+            bis = new BufferedInputStream(response.getEntity().getContent())
+            result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
             def bucket_name = slurper.parseText(result.toString()).get("name")
             bis.close();
             writeToOutput(" " + bucket + " created!")
@@ -300,8 +317,13 @@ class LoadPackage {
 
             // GET QUERY
             def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources"
-            def response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: this.sessionId])
-            def bucket_resources_list = slurper.parseText(response.toString())
+            def get = new org.apache.http.client.methods.HttpGet(list_bucket_resources_rest_query)
+            get.addHeader("sessionid", this.sessionId)
+            def response = getHttpClientBuilder().build().execute(get)
+            def bis = new BufferedInputStream(response.getEntity().getContent())
+            def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+            bis.close()
+            def bucket_resources_list = slurper.parseText(result)
 
             catalog_map.get("objects").each { object ->
                 //push object in the catalog
