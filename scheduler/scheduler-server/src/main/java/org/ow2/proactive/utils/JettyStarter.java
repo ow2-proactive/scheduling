@@ -122,7 +122,7 @@ public class JettyStarter {
                 String pathToJettyLogFile = FileStorageSupportFactory.relativeToHomeIfNotAbsolute(WebProperties.JETTY_LOG_FILE.getValueAsString());
                 File jettyLogFile = new File(pathToJettyLogFile);
                 if (!jettyLogFile.getParentFile().exists() && !jettyLogFile.getParentFile().mkdirs()) {
-                    logger.error("Could not cteate jetty log file in: " +
+                    logger.error("Could not create jetty log file in: " +
                                  WebProperties.JETTY_LOG_FILE.getValueAsString());
                 } else {
                     NCSARequestLog requestLog = new NCSARequestLog(pathToJettyLogFile);
