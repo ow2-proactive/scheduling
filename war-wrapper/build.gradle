@@ -12,6 +12,7 @@ configurations {
 
 task deleteConfigFiles(type: Delete){
     delete 'build/classes/main/config'
+    delete 'build/classes/main/dist'
 }
 
 task copyConfigFiles(type: Copy) {
@@ -19,8 +20,13 @@ task copyConfigFiles(type: Copy) {
     into 'build/classes/main/config'
 }
 
+task copyDistFiles(type: Copy) {
+    from project(':').files('dist/boot')
+    into 'build/classes/main/dist/boot'
+}
+
 copyConfigFiles.dependsOn deleteConfigFiles
-test.dependsOn copyConfigFiles
+test.dependsOn copyConfigFiles, copyDistFiles
 
 dependencies {
 
@@ -31,6 +37,8 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.21'
     testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0RC4'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0RC4'
+
+    testCompile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.1'
 
 }
 
@@ -51,6 +59,10 @@ war {
 
         into('WEB-INF/classes/dist/lib') {
             from { configurations.providedCompile}
+        }
+
+        into('WEB-INF/classes/dist/boot') {
+            from project(':').files('dist/boot', '*')
         }
 
         manifest {

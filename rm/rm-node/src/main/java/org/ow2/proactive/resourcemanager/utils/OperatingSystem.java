@@ -55,7 +55,7 @@ public enum OperatingSystem {
         if ("LINUX".equals(desc) || "UNIX".equals(desc)) {
             return OperatingSystem.UNIX;
         }
-        if ("WINDOWS".equals(desc)) {
+        if (desc.contains("WINDOWS")) {
             return OperatingSystem.WINDOWS;
         }
         if ("CYGWIN".equals(desc)) {

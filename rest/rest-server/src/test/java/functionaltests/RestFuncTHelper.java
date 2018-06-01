@@ -80,6 +80,8 @@ public class RestFuncTHelper {
     public static final String RM_CRED_RELATIVE_PATH = "config" + File.separator + "authentication" + File.separator +
                                                        "rm.cred";
 
+    private static final int SCHEDULER_CONNECTION_TIMEOUT = 240;
+
     private static String restServerUrl;
 
     private static String restfulSchedulerUrl;
@@ -142,13 +144,14 @@ public class RestFuncTHelper {
 
         // Connect a scheduler client
         SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url,
-                                                                                     TimeUnit.SECONDS.toMillis(120));
+                                                                                     TimeUnit.SECONDS.toMillis(SCHEDULER_CONNECTION_TIMEOUT));
         schedulerPublicKey = schedAuth.getPublicKey();
         Credentials schedCred = RestFuncTUtils.createCredentials("admin", "admin", schedulerPublicKey);
         scheduler = schedAuth.login(schedCred);
 
         // Connect a rm client
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(url, TimeUnit.SECONDS.toMillis(120));
+        RMAuthentication rmAuth = RMConnection.waitAndJoin(url,
+                                                           TimeUnit.SECONDS.toMillis(SCHEDULER_CONNECTION_TIMEOUT));
         Credentials rmCredentials = getRmCredentials();
         rm = rmAuth.login(rmCredentials);
 
