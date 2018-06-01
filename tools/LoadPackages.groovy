@@ -2,6 +2,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipFile
 import org.apache.log4j.Logger
+import org.codehaus.groovy.runtime.StackTraceUtils
 
 class LoadPackages {
 
@@ -59,8 +60,12 @@ class LoadPackages {
         }
     }
 
-    void writeToOutput(output) {
+    public void writeToOutput(output) {
         logger.info("[" + this.SCRIPT_NAME + "] " + output)
+    }
+
+    public void writeError(output, exception) {
+        logger.error("[" + this.SCRIPT_NAME + "] " + output, exception)
     }
 
 
@@ -108,9 +113,12 @@ class LoadPackages {
         writeToOutput(" Terminated.")
     }
 }
-
+instance = null;
 try {
-    new LoadPackages(this.binding).run()
+    instance = new LoadPackages(this.binding)
+    instance.run()
 } catch (Exception e) {
-    throw new Exception("Failed to load examples into the catalog." + e.getMessage())
+    StackTraceUtils.deepSanitize(e)
+    instance.writeError("Failed to load examples into the catalog", e)
+    throw new Exception("Failed to load examples into the catalog " + e.getMessage())
 }
