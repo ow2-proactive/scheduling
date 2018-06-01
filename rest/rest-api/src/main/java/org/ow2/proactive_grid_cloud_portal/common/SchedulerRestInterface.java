@@ -84,8 +84,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestEx
 @Path("/scheduler/")
 public interface SchedulerRestInterface {
 
-    String ENCODING = "utf-8";
-
     /**
      * Returns the ids of the current jobs under a list of string.
      * 
@@ -530,7 +528,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/html")
-    @Produces("application/json;charset=" + ENCODING)
+    @Produces("application/json;charset=utf-8")
     String getJobHtml(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws IOException, NotConnectedRestException;
 

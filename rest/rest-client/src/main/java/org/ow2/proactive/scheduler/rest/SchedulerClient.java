@@ -62,6 +62,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -987,26 +989,28 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public void renewSession() throws NotConnectedException {
         Closer closer = Closer.create();
-        try {
-            LoginForm loginForm = new LoginForm();
-            loginForm.setUsername(connectionInfo.getLogin());
-            loginForm.setPassword(connectionInfo.getPassword());
-            if (connectionInfo.getCredentialFile() != null) {
-                FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile());
+
+        LoginForm loginForm = new LoginForm();
+        loginForm.setUsername(connectionInfo.getLogin());
+        loginForm.setPassword(connectionInfo.getPassword());
+
+        if (connectionInfo.getCredentialFile() != null) {
+            try (FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile())) {
+
                 closer.register(inputStream);
                 loginForm.setCredential(inputStream);
-            }
-            sid = restApi().loginOrRenewSession(sid, loginForm);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                closer.close();
-            } catch (IOException e) {
-                // ignore
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
+
+        try {
+            sid = restApi().loginOrRenewSession(sid, loginForm);
+        } catch (KeyException | SchedulerRestException | LoginException | NotConnectedRestException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
