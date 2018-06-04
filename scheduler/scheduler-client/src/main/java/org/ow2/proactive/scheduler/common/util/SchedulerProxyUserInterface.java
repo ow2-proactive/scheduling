@@ -104,7 +104,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * @deprecated
      */
     public SchedulerProxyUserInterface() {
-
+        //Default constructor demanded by ProActive.
     }
 
     /**

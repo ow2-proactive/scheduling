@@ -1000,7 +1000,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                 closer.register(inputStream);
                 loginForm.setCredential(inputStream);
 
-            } catch (Exception e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }

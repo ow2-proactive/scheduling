@@ -657,14 +657,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                               new TaskSkippedException(),
                                               new SimpleTaskLogs("", "The task was skipped in the workflow"),
                                               0);
+                default:
+                    if (result == null) {
+                        // otherwise the task is not finished
+                        jlogger.info(jobId, taskName + " is not finished");
+                    }
+                    break;
             }
-            if (result == null) {
-                // otherwise the task is not finished
-                jlogger.info(jobId, taskName + " is not finished");
-                return null;
-            } else {
-                return result;
-            }
+            return result;
+
         } catch (DatabaseManagerException e) {
             throw new UnknownTaskException("Unknown task " + taskName + ", job: " + jobId);
         }
