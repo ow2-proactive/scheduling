@@ -988,14 +988,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public void renewSession() throws NotConnectedException {
-        Closer closer = Closer.create();
 
         LoginForm loginForm = new LoginForm();
         loginForm.setUsername(connectionInfo.getLogin());
         loginForm.setPassword(connectionInfo.getPassword());
 
         if (connectionInfo.getCredentialFile() != null) {
-            try (FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile())) {
+            try (Closer closer = Closer.create();
+                    FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile())) {
 
                 closer.register(inputStream);
                 loginForm.setCredential(inputStream);
