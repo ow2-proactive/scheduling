@@ -42,7 +42,6 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobUsages;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toSchedulerUserInfos;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -62,6 +61,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import javax.security.auth.login.LoginException;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -987,27 +988,29 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public void renewSession() throws NotConnectedException {
-        Closer closer = Closer.create();
-        try {
-            LoginForm loginForm = new LoginForm();
-            loginForm.setUsername(connectionInfo.getLogin());
-            loginForm.setPassword(connectionInfo.getPassword());
-            if (connectionInfo.getCredentialFile() != null) {
-                FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile());
+
+        LoginForm loginForm = new LoginForm();
+        loginForm.setUsername(connectionInfo.getLogin());
+        loginForm.setPassword(connectionInfo.getPassword());
+
+        if (connectionInfo.getCredentialFile() != null) {
+            try (Closer closer = Closer.create();
+                    FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile())) {
+
                 closer.register(inputStream);
                 loginForm.setCredential(inputStream);
-            }
-            sid = restApi().loginOrRenewSession(sid, loginForm);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                closer.close();
             } catch (IOException e) {
-                // ignore
+                throw new RuntimeException(e);
             }
         }
+
+        try {
+            sid = restApi().loginOrRenewSession(sid, loginForm);
+        } catch (KeyException | SchedulerRestException | LoginException | NotConnectedRestException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -1261,6 +1264,18 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throw new NotConnectedException("Session " + sid + " is not connected");
         } catch (PermissionRestException e) {
             throw new PermissionException("Session " + sid + " doesnt have permission");
+        }
+    }
+
+    @Override
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedException, UnknownJobException {
+        try {
+            return restApi().checkJobPermissionMethod(sessionId, jobId, method);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException("Session " + sid + " is not connected");
+        } catch (UnknownJobRestException e) {
+            throw new UnknownJobException("Job id " + jobId + " not found");
         }
     }
 }

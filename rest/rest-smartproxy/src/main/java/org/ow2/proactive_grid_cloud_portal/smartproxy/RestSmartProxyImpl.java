@@ -676,4 +676,10 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
         }
     }
 
+    @Override
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedException, UnknownJobException {
+        return ((ISchedulerClient) _getScheduler()).checkJobPermissionMethod(sessionId, jobId, method);
+    }
+
 }
