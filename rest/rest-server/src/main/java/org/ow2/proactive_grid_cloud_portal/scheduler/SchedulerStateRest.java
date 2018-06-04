@@ -269,6 +269,37 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * 
+     * Check if the user has the permission to execute the method passed as argument
+     * 
+     * @param sessionId
+     * @param jobId
+     * @param method
+     * @return true if the user has the permission to execute the java method
+     * @throws NotConnectedRestException
+     * @throws UnknownJobRestException
+     */
+    @Override
+    @GET
+    @Path("job/{jobid}/permission/{method}")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces("application/json")
+    public boolean checkJobPermissionMethod(@HeaderParam("sessionid") String sessionId,
+            @PathParam("method") String method, @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, UnknownJobRestException {
+        boolean userHasPermission = false;
+        try {
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
+            userHasPermission = s.checkJobPermissionMethod(sessionId, jobId, method);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        }
+        return userHasPermission;
+    }
+
+    /**
      * Returns a subset of the scheduler state, including pending, running,
      * finished jobs (in this particular order). each jobs is described using -
      * its id - its owner - the JobInfo class
