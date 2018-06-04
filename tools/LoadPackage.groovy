@@ -4,6 +4,9 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import org.apache.log4j.Logger
+import org.apache.http.conn.ssl.*
+import org.apache.http.impl.client.*
+import javax.net.ssl.*
 
 import java.util.zip.ZipFile
 
@@ -115,24 +118,27 @@ class LoadPackage {
     }
 
 
-    void populateDataspace(metadata_file_map, package_dir) {
-        def dataspace_map = null
-        def target_dir_path = ""
-        if ((dataspace_map = metadata_file_map.get("dataspace")) != null) {
-            // Retrieve the targeted directory path
-            def target = dataspace_map.get("target")
-            if (target == "global")
-                target_dir_path = this.GLOBAL_SPACE_PATH
+    void populateDataspace(dataspace_map, package_dir) {
 
-            // Copy all files into the targeted directory
-            dataspace_map.get("files").each { file_relative_path ->
-                def file_src = new File(package_dir.absolutePath, file_relative_path)
-                def file_src_path = file_src.absolutePath
-                def file_name = file_src.getName()
-                def file_dest = new File(target_dir_path, file_name)
-                def file_dest_path = file_dest.absolutePath
-                Files.copy(Paths.get(file_src_path), Paths.get(file_dest_path), StandardCopyOption.REPLACE_EXISTING)
-            }
+        // Do nothing if there is nothing to copy into the dataspaces
+        if (dataspace_map == null)
+            return
+
+        // Retrieve the targeted directory path
+        def target_dir_path = ""
+        def target = dataspace_map.get("target")
+        if (target == "global")
+            target_dir_path = this.GLOBAL_SPACE_PATH
+
+        // Copy all files into the targeted directory
+        dataspace_map.get("files").each { file_relative_path ->
+            def file_src = new File(package_dir.absolutePath, file_relative_path)
+            def file_src_path = file_src.absolutePath
+            def file_name = file_src.getName()
+            def file_dest = new File(target_dir_path, file_name)
+            def file_dest_path = file_dest.absolutePath
+            Files.copy(Paths.get(file_src_path), Paths.get(file_dest_path), StandardCopyOption.REPLACE_EXISTING)
+            writeToOutput(file_src_path + " copied to " + file_dest_path + "!")
         }
     }
 
@@ -153,6 +159,15 @@ class LoadPackage {
         }
         writeToOutput(" Next template dir name " + template_dir_name)
         return template_dir_name
+    }
+
+    def getHttpClientBuilder() {
+        SSLContextBuilder builder = new SSLContextBuilder();
+        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
+                builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        return HttpClients.custom().setSSLSocketFactory(
+                sslsf);
     }
 
 
@@ -234,7 +249,7 @@ class LoadPackage {
             builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file))
             post.setEntity(builder.build())
 
-            def result = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
+            def result = getHttpClientBuilder().build().execute(post)
             writeToOutput(" " + object_file.getName() + " pushed!")
         }
         return object_file
@@ -245,8 +260,13 @@ class LoadPackage {
         // Does the bucket already exist? -------------
         // GET QUERY
         def list_buckets_rest_query = this.CATALOG_URL + "/buckets?owner=" + this.BUCKET_OWNER
-        def response = new URL(list_buckets_rest_query).getText(requestProperties: [sessionId: this.sessionId])
-        def buckets = slurper.parseText(response.toString())
+        def get = new org.apache.http.client.methods.HttpGet(list_buckets_rest_query)
+        get.addHeader("sessionid", this.sessionId)
+        def response = getHttpClientBuilder().build().execute(get)
+        def bis = new BufferedInputStream(response.getEntity().getContent())
+        def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+        bis.close()
+        def buckets = slurper.parseText(result)
         def bucket_found = buckets.find { object -> object.name == bucket }
 
         writeToOutput(" bucket " + bucket + " found? " + (bucket_found != null))
@@ -262,9 +282,9 @@ class LoadPackage {
             post.addHeader("Content-Type", "application/json")
             post.addHeader("sessionId", this.sessionId)
 
-            response = org.apache.http.impl.client.HttpClientBuilder.create().build().execute(post)
-            def bis = new BufferedInputStream(response.getEntity().getContent())
-            def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+            response = getHttpClientBuilder().build().execute(post)
+            bis = new BufferedInputStream(response.getEntity().getContent())
+            result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
             def bucket_name = slurper.parseText(result.toString()).get("name")
             bis.close();
             writeToOutput(" " + bucket + " created!")
@@ -274,6 +294,11 @@ class LoadPackage {
 
 
     void populateBucket(catalog_map, package_dir) {
+
+        // Do nothing if there is no workflow to push
+        if (catalog_map == null)
+            return
+
         def buckets_list
         //Transform a String to a List of String
         if (catalog_map.get("bucket") instanceof String) {
@@ -292,8 +317,13 @@ class LoadPackage {
 
             // GET QUERY
             def list_bucket_resources_rest_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources"
-            def response = new URL(list_bucket_resources_rest_query).getText(requestProperties: [sessionId: this.sessionId])
-            def bucket_resources_list = slurper.parseText(response.toString())
+            def get = new org.apache.http.client.methods.HttpGet(list_bucket_resources_rest_query)
+            get.addHeader("sessionid", this.sessionId)
+            def response = getHttpClientBuilder().build().execute(get)
+            def bis = new BufferedInputStream(response.getEntity().getContent())
+            def result = org.apache.commons.io.IOUtils.toString(bis, "UTF-8")
+            bis.close()
+            def bucket_resources_list = slurper.parseText(result)
 
             catalog_map.get("objects").each { object ->
                 //push object in the catalog
@@ -306,7 +336,7 @@ class LoadPackage {
     }
 
 
-    void run(package_dir) {
+    void run(package_dir, load_dependencies) {
 
         // Connect to the scheduler
         loginAdminUserCredToSchedulerAndGetSessionId()
@@ -315,19 +345,35 @@ class LoadPackage {
         if (package_dir.getPath().endsWith(".zip")) {
             package_dir = unzipPackage(package_dir)
         }
+
         // Parse the metadata json file
         def metadata_file = new File(package_dir.absolutePath, "METADATA.json")
         writeToOutput(" Parsing " + metadata_file.absolutePath)
-        // From json to map
         def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
-        def catalog_map = metadata_file_map.get("catalog")
+
+        // LOAD PACKAGE DEPENDENCIES ////////////////////////////
+
+        if (load_dependencies) {
+            def dependencies_list = metadata_file_map.get("dependencies")
+
+            if (dependencies_list != null)
+            {
+                def examples_dir = package_dir.getAbsoluteFile().getParentFile()
+                dependencies_list.each { package_name ->
+
+                    this.run( new File(examples_dir, package_name), load_dependencies)
+                }
+            }
+        }
 
         // POPULATE DATASPACE ////////////////////////////
 
-        populateDataspace(metadata_file_map, package_dir)
+        def dataspace_map = metadata_file_map.get("dataspace")
+        populateDataspace(dataspace_map, package_dir)
 
         // POPULATE BUCKETS /////////////////////////////
 
+        def catalog_map = metadata_file_map.get("catalog")
         populateBucket(catalog_map, package_dir)
 
     }
