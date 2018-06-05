@@ -62,8 +62,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.security.auth.login.LoginException;
-
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -134,6 +132,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestE
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+
+import com.google.common.io.Closer;
 
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
@@ -986,18 +986,25 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public void renewSession() throws NotConnectedException {
-
-        LoginForm loginForm = new LoginForm();
-        loginForm.setUsername(connectionInfo.getLogin());
-        loginForm.setPassword(connectionInfo.getPassword());
-
-        if (connectionInfo.getCredentialFile() != null) {
-            try (FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile())) {
+        Closer closer = Closer.create();
+        try {
+            LoginForm loginForm = new LoginForm();
+            loginForm.setUsername(connectionInfo.getLogin());
+            loginForm.setPassword(connectionInfo.getPassword());
+            if (connectionInfo.getCredentialFile() != null) {
+                FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile());
+                closer.register(inputStream);
                 loginForm.setCredential(inputStream);
-                sid = restApi().loginOrRenewSession(sid, loginForm);
-            } catch (IOException | KeyException | SchedulerRestException | LoginException
-                    | NotConnectedRestException e) {
-                throw new RuntimeException(e);
+            }
+            sid = restApi().loginOrRenewSession(sid, loginForm);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                closer.close();
+            } catch (IOException e) {
+                // ignore
             }
         }
     }
