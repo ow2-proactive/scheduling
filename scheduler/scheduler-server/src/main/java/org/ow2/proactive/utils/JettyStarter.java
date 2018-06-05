@@ -309,12 +309,7 @@ public class JettyStarter {
 
     private void addWarsToHandlerList(HandlerList handlerList, String[] virtualHost) {
         File warFolder = new File(getSchedulerHome() + FOLDER_TO_DEPLOY);
-        File[] warFolderContent = warFolder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return !"getstarted".equals(name);
-            }
-        });
+        File[] warFolderContent = warFolder.listFiles((dir, name) -> !"getstarted".equals(name));
 
         if (warFolderContent != null) {
             for (File fileToDeploy : warFolderContent) {
