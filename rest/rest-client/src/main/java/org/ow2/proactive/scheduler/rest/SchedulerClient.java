@@ -135,8 +135,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestExc
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
 
-import com.google.common.io.Closer;
-
 
 public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
@@ -994,23 +992,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         loginForm.setPassword(connectionInfo.getPassword());
 
         if (connectionInfo.getCredentialFile() != null) {
-            try (Closer closer = Closer.create();
-                    FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile())) {
-
-                closer.register(inputStream);
+            try (FileInputStream inputStream = new FileInputStream(connectionInfo.getCredentialFile())) {
                 loginForm.setCredential(inputStream);
-
-            } catch (IOException e) {
+                sid = restApi().loginOrRenewSession(sid, loginForm);
+            } catch (IOException | KeyException | SchedulerRestException | LoginException
+                    | NotConnectedRestException e) {
                 throw new RuntimeException(e);
             }
         }
-
-        try {
-            sid = restApi().loginOrRenewSession(sid, loginForm);
-        } catch (KeyException | SchedulerRestException | LoginException | NotConnectedRestException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     @Override
