@@ -193,7 +193,7 @@ public enum WarWrapper {
             rmStopped = booleanWrapper.getBooleanValue();
 
         } catch (Exception e) {
-            logger.error("ERROR while stopping RM on " + SchedulerStarter.rmURL + ": " + e);
+            logger.error("ERROR while stopping RM on " + SchedulerStarter.rmURL, e);
         }
 
         return rmStopped;

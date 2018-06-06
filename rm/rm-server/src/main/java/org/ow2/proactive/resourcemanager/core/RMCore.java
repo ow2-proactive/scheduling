@@ -55,6 +55,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PARuntime;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -1676,7 +1677,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     logger.warn("", e);
                 }
                 for (Entry<String, NodeSource> entry : this.deployedNodeSources.entrySet()) {
-                    atLeastOneAlive = atLeastOneAlive || PAActiveObject.pingActiveObject(entry.getValue());
+                    try {
+                        atLeastOneAlive = atLeastOneAlive || PAActiveObject.pingActiveObject(entry.getValue());
+                    } catch (Exception e) {
+                        logger.warn("", e);
+                    }
                 }
             } while (atLeastOneAlive &&
                      millisBeforeHardShutdown < PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt());
