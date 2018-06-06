@@ -423,17 +423,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     if (!toShutDown) {
                         rmcoreStub.shutdown(true);
                     }
-
-                    synchronized (nodeRM) {
-                        if (!shutedDown) {
-                            try {
-                                // wait for rmcore shutdown (5 min at most)
-                                nodeRM.wait(5 * 60 * 60 * 1000);
-                            } catch (InterruptedException e) {
-                                logger.warn("shutdown hook interrupted", e);
-                            }
-                        }
-                    }
                 }
             });
 
@@ -1634,14 +1623,21 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             this.removeAllNodes(nodeSourceName, preempt);
 
-            // delegate the removal process to the node source that will
-            // eventually call back the RMCore to unregister the deployed node
-            // source
-            nodeSourceToRemove.shutdown(this.caller);
-
             this.updateNodeSourceDescriptorWithStatusAndPersist(this.definedNodeSources.get(nodeSourceName)
                                                                                        .getDescriptor(),
                                                                 NodeSourceStatus.NODES_UNDEPLOYED);
+
+            this.nodeSourceUnregister(nodeSourceName,
+                                      NodeSourceStatus.NODES_UNDEPLOYED,
+                                      new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
+                                                            this.caller.getName(),
+                                                            nodeSourceName,
+                                                            nodeSourceToRemove.getDescription(),
+                                                            nodeSourceToRemove.getAdministrator().getName(),
+                                                            NodeSourceStatus.NODES_UNDEPLOYED.toString()));
+
+            // asynchronously delegate the removal process to the node source
+            nodeSourceToRemove.shutdown(this.caller);
 
             logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully undeployed");
         }
@@ -1669,6 +1665,22 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 removeAllNodes(entry.getKey(), preempt, true);
                 entry.getValue().shutdown(caller);
             }
+
+            boolean atLeastOneAlive = false;
+            int millisBeforeHardShutdown = 0;
+            do {
+                millisBeforeHardShutdown++;
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    logger.warn("", e);
+                }
+                for (Entry<String, NodeSource> entry : this.deployedNodeSources.entrySet()) {
+                    atLeastOneAlive = atLeastOneAlive || PAActiveObject.pingActiveObject(entry.getValue());
+                }
+            } while (atLeastOneAlive &&
+                     millisBeforeHardShutdown < PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt());
+            finalizeShutdown();
         }
         return new BooleanWrapper(true);
     }
@@ -1967,10 +1979,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.emitRemovedEventIfNodeSourceWasNotUndeployed(nodeSource, nodeSourceStatus);
 
-        if ((this.deployedNodeSources.isEmpty()) && this.toShutDown) {
-            this.finalizeShutdown();
-        }
-
         return new BooleanWrapper(true);
     }
 
@@ -2016,12 +2024,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         try {
             Thread.sleep(2000);
-
-            synchronized (this.nodeRM) {
-                this.nodeRM.notifyAll();
-                this.shutedDown = true;
-            }
-
             if (PAResourceManagerProperties.RM_SHUTDOWN_KILL_RUNTIME.getValueAsBoolean()) {
                 this.nodeRM.getProActiveRuntime().killRT(true);
             }
@@ -2219,9 +2221,18 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             this.removeAllNodes(nodeSourceName, preempt);
 
-            // delegate the removal process to the node source that will
-            // eventually do a call back to remove the node source from the
-            // deployed node sources map
+            NodeSourceStatus status = nodeSourceToRemove.getStatus();
+
+            this.nodeSourceUnregister(nodeSourceName,
+                                      nodeSourceToRemove.getStatus(),
+                                      new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
+                                                            this.caller.getName(),
+                                                            nodeSourceName,
+                                                            nodeSourceToRemove.getDescription(),
+                                                            nodeSourceToRemove.getAdministrator().getName(),
+                                                            status.toString()));
+
+            // asynchronously delegate the removal process to the node source
             nodeSourceToRemove.shutdown(this.caller);
         }
     }
