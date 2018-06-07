@@ -70,7 +70,7 @@ public class FileStorageSupportFactory {
         return new FileStorageSupport(new File(userWorkflowsDir), new File(templateWorkflowsDir));
     }
 
-    private static String relativeToHomeIfNotAbsolute(String path) {
+    public static String relativeToHomeIfNotAbsolute(String path) {
         if (!new File(path).isAbsolute()) {
             path = getSchedulerHome() + "/" + path;
         }

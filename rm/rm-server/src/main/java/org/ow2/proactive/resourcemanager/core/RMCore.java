@@ -254,7 +254,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private boolean shutedDown = false;
 
-    private Client caller = null;
+    private Client caller = localClient;
 
     /**
      * Any local active object (including a half body) will act as the same single client
