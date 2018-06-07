@@ -253,8 +253,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private boolean toShutDown = false;
 
-    private boolean shutedDown = false;
-
     private Client caller = localClient;
 
     /**
@@ -273,7 +271,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Nodes topology
      */
-    public static TopologyManager topologyManager;
+    public TopologyManager topologyManager;
 
     /**
      * Client pinger

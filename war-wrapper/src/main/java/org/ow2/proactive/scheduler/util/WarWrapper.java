@@ -67,9 +67,9 @@ public enum WarWrapper {
 
     private static final Logger logger = Logger.getLogger(WarWrapper.class);
 
-    private static String schedulerUri;
+    private String schedulerUri;
 
-    private static CommandLine cmd = null;
+    private CommandLine cmd = null;
 
     /**
      * The main method called when ProActive is deployed as a web or enterprise application (WAR/EAR)
