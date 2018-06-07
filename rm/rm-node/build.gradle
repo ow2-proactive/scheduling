@@ -30,5 +30,5 @@ dependencies {
     runtime 'jsr223:jsr223-powershell:0.2.1'
     runtime 'jsr223:jsr223-cpython:0.1.2'
     runtime 'jsr223:jsr223-scala:0.1.4'
-    runtime 'jsr223:jsr223-kubernetes:0.1.2'
+    runtime 'jsr223:jsr223-kubernetes:0.1.3'
 }
