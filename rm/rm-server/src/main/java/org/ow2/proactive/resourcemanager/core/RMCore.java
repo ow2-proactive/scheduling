@@ -270,7 +270,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * Nodes topology
      */
-    public TopologyManager topologyManager;
+    public static TopologyManager topologyManager;
 
     /**
      * Client pinger
