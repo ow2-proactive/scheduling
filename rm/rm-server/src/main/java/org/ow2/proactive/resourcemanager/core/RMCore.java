@@ -1686,6 +1686,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             } while (atLeastOneAlive &&
                      millisBeforeHardShutdown < PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt() * 10);
         } catch (InterruptedException e) {
+            Thread.interrupted();
             logger.warn("", e);
         }
     }
