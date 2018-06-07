@@ -55,7 +55,6 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.api.PARuntime;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -1664,16 +1663,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 removeAllNodes(entry.getKey(), preempt, true);
                 entry.getValue().shutdown(caller);
             }
+            waitForAllNodeSourcesToBeShutdown();
+            finalizeShutdown();
+        }
+        return new BooleanWrapper(true);
+    }
 
-            boolean atLeastOneAlive = false;
-            int millisBeforeHardShutdown = 0;
+    private void waitForAllNodeSourcesToBeShutdown() {
+        boolean atLeastOneAlive = false;
+        int millisBeforeHardShutdown = 0;
+        try {
             do {
                 millisBeforeHardShutdown++;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    logger.warn("", e);
-                }
+                Thread.sleep(100);
                 for (Entry<String, NodeSource> entry : this.deployedNodeSources.entrySet()) {
                     try {
                         atLeastOneAlive = atLeastOneAlive || PAActiveObject.pingActiveObject(entry.getValue());
@@ -1682,10 +1684,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     }
                 }
             } while (atLeastOneAlive &&
-                     millisBeforeHardShutdown < PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt());
-            finalizeShutdown();
+                     millisBeforeHardShutdown < PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt() * 10);
+        } catch (InterruptedException e) {
+            logger.warn("", e);
         }
-        return new BooleanWrapper(true);
     }
 
     private void emitNodeSourceEvent(NodeSource nodeSource, RMEventType eventType) {
@@ -2227,7 +2229,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             NodeSourceStatus status = nodeSourceToRemove.getStatus();
 
             this.nodeSourceUnregister(nodeSourceName,
-                                      nodeSourceToRemove.getStatus(),
+                                      status,
                                       new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
                                                             this.caller.getName(),
                                                             nodeSourceName,

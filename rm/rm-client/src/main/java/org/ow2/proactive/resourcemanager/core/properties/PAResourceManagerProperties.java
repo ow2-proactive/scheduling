@@ -238,8 +238,8 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * */
     RM_SHUTDOWN_KILL_RUNTIME("pa.rm.shutdown.kill.rt", PropertyType.BOOLEAN, "true"),
 
-    /** Maximum number of iterations trying to shutdown the resource manager properly */
-    RM_SHUTDOWN_TIMEOUT("pa.rm.shutdown.timeout", PropertyType.INTEGER, "3000"),
+    /** Timeout in seconds for trying to shutdown the resource manager properly */
+    RM_SHUTDOWN_TIMEOUT("pa.rm.shutdown.timeout", PropertyType.INTEGER, "300"),
 
     /**
      * Defines if the lock restoration feature is enabled on RM startup.
