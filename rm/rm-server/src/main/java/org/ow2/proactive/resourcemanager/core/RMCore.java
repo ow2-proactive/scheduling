@@ -1677,17 +1677,22 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 millisBeforeHardShutdown++;
                 Thread.sleep(100);
                 for (Entry<String, NodeSource> entry : this.deployedNodeSources.entrySet()) {
-                    try {
-                        atLeastOneAlive = atLeastOneAlive || PAActiveObject.pingActiveObject(entry.getValue());
-                    } catch (Exception e) {
-                        logger.warn("", e);
-                    }
+                    atLeastOneAlive = atLeastOneAlive || isNodeSourceAlive(entry);
                 }
             } while (atLeastOneAlive &&
                      millisBeforeHardShutdown < PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt() * 10);
         } catch (InterruptedException e) {
             Thread.interrupted();
             logger.warn("", e);
+        }
+    }
+
+    private boolean isNodeSourceAlive(Entry<String, NodeSource> entry) {
+        try {
+            return PAActiveObject.pingActiveObject(entry.getValue());
+        } catch (Exception e) {
+            logger.warn("", e);
+            return false;
         }
     }
 
