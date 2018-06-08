@@ -19,7 +19,7 @@ dependencies {
 
     compile "org.ow2.proactive:emailnotification-addons:${schedulingVersion}"
 
-    compile 'org.eclipse.jetty:jetty-webapp:9.2.14.v20151106'
+    compile 'org.eclipse.jetty:jetty-webapp:9.2.24.v20180105'
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
     compile project(':common:common-api')
@@ -31,6 +31,7 @@ dependencies {
     compile project(':scheduler:scheduler-node')
     compile project(':rm:rm-server')
     compile project(':rm:rm-client')
+    compile project(':rest:rest-server')
 
 
 

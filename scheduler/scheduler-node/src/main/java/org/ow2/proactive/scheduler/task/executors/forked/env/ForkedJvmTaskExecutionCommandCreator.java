@@ -36,6 +36,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.config.PAProperty;
+import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
@@ -98,6 +100,16 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
             jvmArguments.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
                              CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
         }
+        // The following code forwards the PAMR configuration the forked JVM. Though the general use-case involves to
+        // write a custom fork environment script to configure properly the properties, this avoids a common misconfiguration issues.
+        forwardProActiveProperties(jvmArguments,
+                                   PAMRConfig.PA_NET_ROUTER_ADDRESS,
+                                   PAMRConfig.PA_NET_ROUTER_PORT,
+                                   PAMRConfig.PA_PAMR_SOCKET_FACTORY,
+                                   PAMRConfig.PA_PAMRSSH_KEY_DIR,
+                                   PAMRConfig.PA_PAMRSSH_REMOTE_ADDRESS,
+                                   PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME,
+                                   PAMRConfig.PA_PAMRSSH_REMOTE_PORT);
 
         configureLogging(jvmArguments, variables);
 
@@ -140,6 +152,14 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         javaCommand.add(serializedContextAbsolutePath);
 
         return javaCommand;
+    }
+
+    private void forwardProActiveProperties(ArrayList<String> jvmArguments, PAProperty... propertiesToForward) {
+        for (PAProperty property : propertiesToForward) {
+            if (property.isSet()) {
+                jvmArguments.add(property.getCmdLine() + property.getValueAsString());
+            }
+        }
     }
 
     private void configureLogging(ArrayList<String> jvmArguments, Map<String, Serializable> variables) {

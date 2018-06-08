@@ -74,6 +74,18 @@ import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
 public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
+     * Check if the user has the permission to execute the method passed as argument
+     * @param sessionId
+     * @param jobId
+     * @param method
+     * @return true if the user has the permission to execute the java method
+     * @throws NotConnectedException
+     * @throws UnknownJobException
+     */
+    boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedException, UnknownJobException;
+
+    /**
      * Returns the USER DataSpace URIs associated with the current user
      * 
      * @return USER Space URIs (one element for each available protocol)
