@@ -302,7 +302,10 @@ public class ProbablisticSelectionManager extends SelectionManager {
 
     private String replaceBindingKeysByTheirValue(String scriptContent, Map<String, Serializable> binding) {
         for (Map.Entry<String, Serializable> variableMapping : binding.entrySet()) {
-            scriptContent = scriptContent.replace(variableMapping.getKey(), variableMapping.getValue().toString());
+            Serializable bindingValue = variableMapping.getValue();
+            if (bindingValue != null) {
+                scriptContent = scriptContent.replace(variableMapping.getKey(), bindingValue.toString());
+            }
         }
         return scriptContent;
     }
