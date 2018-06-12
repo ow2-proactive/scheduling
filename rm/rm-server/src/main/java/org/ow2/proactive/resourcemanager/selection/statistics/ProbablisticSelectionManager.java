@@ -282,7 +282,9 @@ public class ProbablisticSelectionManager extends SelectionManager {
                 if (binding instanceof Map) {
                     scriptContent = replaceBindingKeysByTheirValue(scriptContent, (Map<String, Serializable>) binding);
                 } else {
-                    scriptContent = scriptContent.replace(reservedKeyword, binding.toString());
+                    if (binding != null) {
+                        scriptContent = scriptContent.replace(reservedKeyword, binding.toString());
+                    }
                 }
             }
         }
