@@ -252,12 +252,11 @@ public class ProbabilisticSelectionManagerTest {
         ManagerObjects managerObjects = new ManagerObjects(1).invoke();
         SelectionManager selectionManager = managerObjects.getSelectionManager();
         ArrayList<RMNode> freeNodes = managerObjects.getFreeNodes();
-        Map<String, Serializable> bindings = Collections.singletonMap("TOTO", (Serializable) "value");
+
         selectionManager.processScriptResult(script,
                                              Collections.singletonMap("TOTO", (Serializable) "value"),
                                              new ScriptResult<>(true),
                                              freeNodes.get(0));
-
         Assert.assertTrue(selectionManager.isPassed(script,
                                                     Collections.singletonMap("TOTO", (Serializable) "value"),
                                                     freeNodes.get(0)));

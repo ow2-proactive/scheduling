@@ -277,7 +277,13 @@ public class ProbablisticSelectionManager extends SelectionManager {
         String scriptContent = script.getScript();
         if (bindings != null) {
             for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
-                scriptContent = scriptContent.replace(entry.getKey(), entry.getValue().toString());
+                String reservedKeyword = entry.getKey();
+                Serializable binding = entry.getValue();
+                if (binding instanceof Map) {
+                    scriptContent = replaceBindingKeysByTheirValue(scriptContent, (Map<String, Serializable>) binding);
+                } else {
+                    scriptContent = scriptContent.replace(reservedKeyword, binding.toString());
+                }
             }
         }
         try {
@@ -290,6 +296,13 @@ public class ProbablisticSelectionManager extends SelectionManager {
                         System.lineSeparator() + script.toString(), e);
             return script;
         }
+    }
+
+    private String replaceBindingKeysByTheirValue(String scriptContent, Map<String, Serializable> binding) {
+        for (Map.Entry<String, Serializable> variableMapping : binding.entrySet()) {
+            scriptContent = scriptContent.replace(variableMapping.getKey(), variableMapping.getValue().toString());
+        }
+        return scriptContent;
     }
 
 }
