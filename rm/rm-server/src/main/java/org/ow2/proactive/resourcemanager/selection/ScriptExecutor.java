@@ -90,8 +90,8 @@ public class ScriptExecutor implements Callable<Node> {
 
                 logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " executing");
                 try {
-                    ScriptResult<Boolean> scriptResult = rmnode.executeScript(script, criteria.getBindings());
                     atLeastOneScriptExecuted = true;
+                    ScriptResult<Boolean> scriptResult = rmnode.executeScript(script, criteria.getBindings());
 
                     // processing the results
                     if (!MOP.isReifiedObject(scriptResult) && scriptResult.getException() != null) {
