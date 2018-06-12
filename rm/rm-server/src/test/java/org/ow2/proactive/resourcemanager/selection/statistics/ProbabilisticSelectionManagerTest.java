@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -252,31 +253,56 @@ public class ProbabilisticSelectionManagerTest {
         ManagerObjects managerObjects = new ManagerObjects(1).invoke();
         SelectionManager selectionManager = managerObjects.getSelectionManager();
         ArrayList<RMNode> freeNodes = managerObjects.getFreeNodes();
-
         selectionManager.processScriptResult(script,
-                                             Collections.singletonMap("TOTO", (Serializable) "value"),
+                                             Collections.singletonMap("TOTO", "value"),
                                              new ScriptResult<>(true),
                                              freeNodes.get(0));
         Assert.assertTrue(selectionManager.isPassed(script,
-                                                    Collections.singletonMap("TOTO", (Serializable) "value"),
+                                                    Collections.singletonMap("TOTO", "value"),
                                                     freeNodes.get(0)));
         Assert.assertFalse(selectionManager.isPassed(script,
-                                                     Collections.singletonMap("TOTO", (Serializable) "differentValue"),
+                                                     Collections.singletonMap("TOTO", "differentValue"),
                                                      freeNodes.get(0)));
         Assert.assertFalse(selectionManager.isPassed(script,
                                                      Collections.<String, Serializable> emptyMap(),
                                                      freeNodes.get(0)));
 
         selectionManager.processScriptResult(script,
-                                             Collections.singletonMap("TOTO", (Serializable) "differentValue"),
+                                             Collections.singletonMap("TOTO", "differentValue"),
                                              new ScriptResult<>(true),
                                              freeNodes.get(0));
         Assert.assertTrue(selectionManager.isPassed(script,
-                                                    Collections.singletonMap("TOTO", (Serializable) "differentValue"),
+                                                    Collections.singletonMap("TOTO", "differentValue"),
                                                     freeNodes.get(0)));
         Assert.assertTrue(selectionManager.isPassed(script,
-                                                    Collections.singletonMap("TOTO", (Serializable) "value"),
+                                                    Collections.singletonMap("TOTO", "value"),
                                                     freeNodes.get(0)));
+    }
+
+    @Test
+    public void testOneVariableScriptPassWhenAnotherVariableIsChangedInBindings() throws Exception {
+        SelectionScript script = new SelectionScript("variables.get(\"keyInScript\")", "groovy", false);
+        ManagerObjects managerObjects = new ManagerObjects(1).invoke();
+        SelectionManager selectionManager = managerObjects.getSelectionManager();
+        ArrayList<RMNode> freeNodes = managerObjects.getFreeNodes();
+
+        Map<String, Serializable> bindings = new HashMap<>();
+        Map<String, Serializable> variablesBindings = new HashMap<>();
+        variablesBindings.put("keyInScript", "value");
+        variablesBindings.put("keyNotInScript", "value");
+        bindings.put("variables", (Serializable) variablesBindings);
+
+        selectionManager.processScriptResult(script, bindings, new ScriptResult<>(true), freeNodes.get(0));
+        Assert.assertTrue(selectionManager.isPassed(script, bindings, freeNodes.get(0)));
+
+        variablesBindings.put("keyNotInScript", "differentValue");
+        Assert.assertTrue(selectionManager.isPassed(script, bindings, freeNodes.get(0)));
+
+        variablesBindings.put("anotherKeyNotInScript", "value");
+        Assert.assertTrue(selectionManager.isPassed(script, bindings, freeNodes.get(0)));
+
+        variablesBindings.put("keyInScript", "differentValue");
+        Assert.assertFalse(selectionManager.isPassed(script, bindings, freeNodes.get(0)));
     }
 
     private class ManagerObjects {
