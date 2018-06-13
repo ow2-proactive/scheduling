@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.core;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.ow2.proactive.utils.Tools;
 import org.ow2.tests.ProActiveTestClean;
 
 
@@ -40,20 +41,19 @@ public class TestDataSpaceConfigurationProperty extends ProActiveTestClean {
 
     @Test
     public void testPropertyParsing() throws Throwable {
-        assertArrayEquals(new String[0], DataSpaceServiceStarter.dsConfigPropertyToUrls("  \"\"  "));
-        assertArrayEquals(new String[0], DataSpaceServiceStarter.dsConfigPropertyToUrls("  "));
-        assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a\"  "));
-        assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("a"));
-        assertArrayEquals(new String[] { "a" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" a  "));
-        assertArrayEquals(new String[] { "a b" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b\"  "));
-        assertArrayEquals(new String[] { "a", "b" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" a b  " + ""));
-        assertArrayEquals(new String[] { "a b c" }, DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b c\"  "));
-        assertArrayEquals(new String[] { "a", "b", "c" }, DataSpaceServiceStarter.dsConfigPropertyToUrls("  a b c  "));
+        assertArrayEquals(new String[0], Tools.dataSpaceConfigPropertyToUrls("  \"\"  "));
+        assertArrayEquals(new String[0], Tools.dataSpaceConfigPropertyToUrls("  "));
+        assertArrayEquals(new String[] { "a" }, Tools.dataSpaceConfigPropertyToUrls(" \"a\"  "));
+        assertArrayEquals(new String[] { "a" }, Tools.dataSpaceConfigPropertyToUrls("a"));
+        assertArrayEquals(new String[] { "a" }, Tools.dataSpaceConfigPropertyToUrls(" a  "));
+        assertArrayEquals(new String[] { "a b" }, Tools.dataSpaceConfigPropertyToUrls(" \"a b\"  "));
+        assertArrayEquals(new String[] { "a", "b" }, Tools.dataSpaceConfigPropertyToUrls(" a b  " + ""));
+        assertArrayEquals(new String[] { "a b c" }, Tools.dataSpaceConfigPropertyToUrls(" \"a b c\"  "));
+        assertArrayEquals(new String[] { "a", "b", "c" }, Tools.dataSpaceConfigPropertyToUrls("  a b c  "));
         assertArrayEquals(new String[] { "a b c", "d e f" },
-                          DataSpaceServiceStarter.dsConfigPropertyToUrls(" \"a b c\"    \"d e f\"   "));
-        assertArrayEquals(new String[] { "a b c d e f" },
-                          DataSpaceServiceStarter.dsConfigPropertyToUrls("   \"a b c d e f\"   "));
+                          Tools.dataSpaceConfigPropertyToUrls(" \"a b c\"    \"d e f\"   "));
+        assertArrayEquals(new String[] { "a b c d e f" }, Tools.dataSpaceConfigPropertyToUrls("   \"a b c d e f\"   "));
         assertArrayEquals(new String[] { "a", "b", "c", "d", "e", "f" },
-                          DataSpaceServiceStarter.dsConfigPropertyToUrls("   a b c   d e    f "));
+                          Tools.dataSpaceConfigPropertyToUrls("   a b c   d e    f "));
     }
 }

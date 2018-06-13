@@ -166,7 +166,7 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
         for (int i = 0; i < NB_TASKS; i++) {
             JavaTask testTask = new JavaTask();
             testTask.setName(TASK_NAME + i);
-            testTask.setExecutableClassName(SimpleJavaExecutable.class.getName());
+            testTask.setExecutableClassName(CopyFileExecutable.class.getName());
             testTask.setForkEnvironment(forkEnvironment);
             // testTask.
             // ------------- create an input File ------------
@@ -243,9 +243,6 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
 
     @Test
     public void testSmartProxy() throws Throwable {
-        if (true) {
-            return;
-        }
 
         functionaltests.utils.SchedulerTHelper.log("***************************************************************************************************");
         functionaltests.utils.SchedulerTHelper.log("********************** Testing isolateTaskOutputs = false automaticTransfer = false " +
@@ -311,7 +308,6 @@ public class TestSmartProxy extends SchedulerFunctionalTestNoRestart {
         eventListener.setJobID(id);
 
         Thread.sleep(1000);
-        schedProxy.disconnect();
         schedProxy.reconnect();
         waitWithMonitor(em, TIMEOUT);
         if (!automaticTransfer) {
