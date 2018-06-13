@@ -95,6 +95,9 @@ public class RMCoreTest {
     private NodeSource mockedNodeSource;
 
     @Mock
+    private Client mockedAdministrator;
+
+    @Mock
     private RMMonitoringImpl mockedMonitoring;
 
     @Mock
@@ -136,6 +139,8 @@ public class RMCoreTest {
         when(mockedNodeSource.getDescriptor()).thenReturn(nodeSourceDescriptor);
         when(nodeSourceDescriptor.getStatus()).thenReturn(NodeSourceStatus.NODES_DEPLOYED);
         when(mockedNodeSource.getStatus()).thenReturn(NodeSourceStatus.NODES_DEPLOYED);
+        when(mockedNodeSource.getAdministrator()).thenReturn(mockedAdministrator);
+        when(mockedAdministrator.getName()).thenReturn("user");
         populateRMCore();
     }
 

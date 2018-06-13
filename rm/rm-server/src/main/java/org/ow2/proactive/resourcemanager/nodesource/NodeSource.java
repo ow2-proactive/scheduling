@@ -44,7 +44,6 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -772,18 +771,6 @@ public class NodeSource implements InitActive, RunActive {
      * Terminates a node source active object when the policy is shutdown. 
      */
     public void finishNodeSourceShutdown(Client initiator) {
-
-        NodeSourceStatus status = this.descriptor.getStatus();
-
-        PAFuture.waitFor(this.rmcore.nodeSourceUnregister(this.name,
-                                                          status,
-                                                          new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
-                                                                                initiator.getName(),
-                                                                                this.getName(),
-                                                                                this.getDescription(),
-                                                                                this.getAdministrator().getName(),
-                                                                                status.toString())));
-
         PAActiveObject.terminateActiveObject(false);
     }
 

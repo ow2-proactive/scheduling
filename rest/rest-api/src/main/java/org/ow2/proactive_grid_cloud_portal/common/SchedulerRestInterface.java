@@ -84,8 +84,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownTaskRestEx
 @Path("/scheduler/")
 public interface SchedulerRestInterface {
 
-    String ENCODING = "utf-8";
-
     /**
      * Returns the ids of the current jobs under a list of string.
      * 
@@ -530,7 +528,7 @@ public interface SchedulerRestInterface {
      */
     @GET
     @Path("jobs/{jobid}/html")
-    @Produces("application/json;charset=" + ENCODING)
+    @Produces("application/json;charset=utf-8")
     String getJobHtml(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws IOException, NotConnectedRestException;
 
@@ -1957,4 +1955,22 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
+
+    /**
+     * 
+     * Check if the user has the permission to execute the method passed as argument
+     * 
+     * @param sessionId
+     * @param jobId
+     * @param method
+     * @return true if the user has the permission to execute the java method
+     * @throws NotConnectedRestException
+     * @throws UnknownJobRestException
+     */
+    @GET
+    @Path("job/{jobid}/permission/{method}")
+    @Consumes(value = MediaType.APPLICATION_JSON)
+    @Produces("application/json")
+    boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedRestException, UnknownJobRestException;
 }
