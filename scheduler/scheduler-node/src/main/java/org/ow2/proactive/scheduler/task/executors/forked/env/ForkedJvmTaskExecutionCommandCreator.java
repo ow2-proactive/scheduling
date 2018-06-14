@@ -51,10 +51,11 @@ import com.google.common.base.Strings;
 
 
 public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
-    private final static String javaHomePostfixJavaExecutable = File.separatorChar + "bin" + File.separatorChar +
-                                                                "java";
 
     private static final Logger logger = Logger.getLogger(ForkedJvmTaskExecutionCommandCreator.class);
+
+    private static final String JAVA_HOME_POSTFIX_JAVA_EXECUTABLE = File.separatorChar + "bin" + File.separatorChar +
+                                                                    "java";
 
     private static final String JAVA_SECURITY_POLICY_FILE = "security.java.policy-client";
 
@@ -142,7 +143,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
 
         List<String> javaCommand = new ArrayList<>(prefixes.size() + 3 + jvmArguments.size() + 2);
         javaCommand.addAll(prefixes);
-        javaCommand.add(javaHome + javaHomePostfixJavaExecutable);
+        javaCommand.add(javaHome + JAVA_HOME_POSTFIX_JAVA_EXECUTABLE);
 
         javaCommand.add("-cp");
         javaCommand.add(classpath.toString());
