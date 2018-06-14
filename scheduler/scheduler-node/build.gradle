@@ -52,6 +52,15 @@ ext.oneJarManifest = manifest {
     attributes 'One-Jar-Expand': 'lib,binlib,main' // expand jars for subprocesses (forked tasks)
 }
 
+task cleanPolicy(type: Delete) {
+    delete 'src/main/resources/security.java.policy-client'
+}
+
+task copyPolicy(type: Copy){
+    from '../../config/security.java.policy-client'
+    into 'src/main/resources'
+}
+
 task standaloneJar(type: OneJar) {
     logging.captureStandardOutput LogLevel.INFO
     mainClass = 'org.ow2.proactive.resourcemanager.utils.RMNodeStarter'
@@ -59,7 +68,13 @@ task standaloneJar(type: OneJar) {
     additionalDir = file('src/main/resources')
     manifest = oneJarManifest
 }
+
+copyPolicy.dependsOn cleanPolicy
+
+standaloneJar.dependsOn copyPolicy
+
 build.dependsOn standaloneJar
+
 artifacts {
     archives standaloneJar
 }

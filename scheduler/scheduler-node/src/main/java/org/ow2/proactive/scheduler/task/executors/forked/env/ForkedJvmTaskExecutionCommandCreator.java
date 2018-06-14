@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.task.executors.forked.env;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +55,8 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                                                                 "java";
 
     private static final Logger logger = Logger.getLogger(ForkedJvmTaskExecutionCommandCreator.class);
+
+    private static final String SECURITY_POLICY_FILE_NAME = "security.java.policy-client";
 
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
@@ -96,9 +97,11 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
             jvmArguments.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() +
                              CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getValue());
         }
+
         if (CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
-            jvmArguments.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-                             CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue());
+            jvmArguments.add("-Djava.security.policy=" +
+                             ForkedJvmTaskExecutionCommandCreator.class.getResource("/" + SECURITY_POLICY_FILE_NAME)
+                                                                       .toString());
         }
         // The following code forwards the PAMR configuration the forked JVM. Though the general use-case involves to
         // write a custom fork environment script to configure properly the properties, this avoids a common misconfiguration issues.
