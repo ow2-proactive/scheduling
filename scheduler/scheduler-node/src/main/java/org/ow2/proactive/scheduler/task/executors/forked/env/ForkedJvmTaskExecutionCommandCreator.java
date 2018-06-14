@@ -56,7 +56,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
 
     private static final Logger logger = Logger.getLogger(ForkedJvmTaskExecutionCommandCreator.class);
 
-    private static final String SECURITY_POLICY_FILE_NAME = "security.java.policy-client";
+    private static final String JAVA_SECURITY_POLICY_FILE = "security.java.policy-client";
 
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
@@ -93,14 +93,9 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         // if they are running in a forked task or not
         jvmArguments.add(PASchedulerProperties.TASK_FORK.getCmdLine() + "true");
 
-        if (CentralPAPropertyRepository.PA_CONFIGURATION_FILE.isSet()) {
-            jvmArguments.add(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getCmdLine() +
-                             CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getValue());
-        }
-
         if (CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
-            jvmArguments.add("-Djava.security.policy=" +
-                             ForkedJvmTaskExecutionCommandCreator.class.getResource("/" + SECURITY_POLICY_FILE_NAME)
+            jvmArguments.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
+                             ForkedJvmTaskExecutionCommandCreator.class.getResource("/" + JAVA_SECURITY_POLICY_FILE)
                                                                        .toString());
         }
         // The following code forwards the PAMR configuration the forked JVM. Though the general use-case involves to
@@ -112,7 +107,8 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
                                    PAMRConfig.PA_PAMRSSH_KEY_DIR,
                                    PAMRConfig.PA_PAMRSSH_REMOTE_ADDRESS,
                                    PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME,
-                                   PAMRConfig.PA_PAMRSSH_REMOTE_PORT);
+                                   PAMRConfig.PA_PAMRSSH_REMOTE_PORT,
+                                   CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL);
 
         configureLogging(jvmArguments, variables);
 
