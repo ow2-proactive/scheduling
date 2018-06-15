@@ -94,16 +94,6 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         // if they are running in a forked task or not
         jvmArguments.add(PASchedulerProperties.TASK_FORK.getCmdLine() + "true");
 
-        if (CentralPAPropertyRepository.JAVA_SECURITY_POLICY.isSet()) {
-            if (ForkedJvmTaskExecutionCommandCreator.class.getResource("/" + JAVA_SECURITY_POLICY_FILE) != null) {
-                jvmArguments.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-                                 ForkedJvmTaskExecutionCommandCreator.class.getResource("/" + JAVA_SECURITY_POLICY_FILE)
-                                                                           .toString());
-            } else {
-                jvmArguments.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() +
-                                 jvmArguments.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getValue()));
-            }
-        }
         // The following code forwards the PAMR configuration the forked JVM. Though the general use-case involves to
         // write a custom fork environment script to configure properly the properties, this avoids a common misconfiguration issues.
         forwardProActiveProperties(jvmArguments,

@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
 import java.io.*;
+import java.security.Policy;
 
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -34,6 +35,8 @@ import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 
 
 public class ExecuteForkedTaskInsideNewJvm {
+
+    private static final String JAVA_SECURITY_POLICY_FILE = "security.java.policy-client";
 
     public static final int MAX_CONTEXT_WAIT = 6000;
 
@@ -99,6 +102,10 @@ public class ExecuteForkedTaskInsideNewJvm {
             System.err.println("Path to serialized task context is expected");
             System.exit(-1);
         }
+
+        System.setProperty("java.security.policy",
+                           ExecuteForkedTaskInsideNewJvm.class.getResource("/" + JAVA_SECURITY_POLICY_FILE).toString());
+        Policy.getPolicy().refresh();
 
         ExecuteForkedTaskInsideNewJvm instance = ExecuteForkedTaskInsideNewJvm.getInstance();
 
