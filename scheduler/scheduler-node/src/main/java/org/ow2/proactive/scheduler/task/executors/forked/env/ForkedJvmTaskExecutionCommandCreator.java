@@ -57,8 +57,6 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     private static final String JAVA_HOME_POSTFIX_JAVA_EXECUTABLE = File.separatorChar + "bin" + File.separatorChar +
                                                                     "java";
 
-    private static final String JAVA_SECURITY_POLICY_FILE = "security.java.policy-client";
-
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
     private final JavaPrefixCommandExtractor javaPrefixCommandExtractor = new JavaPrefixCommandExtractor();

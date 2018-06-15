@@ -103,9 +103,7 @@ public class ExecuteForkedTaskInsideNewJvm {
             System.exit(-1);
         }
 
-        System.setProperty("java.security.policy",
-                           ExecuteForkedTaskInsideNewJvm.class.getResource("/" + JAVA_SECURITY_POLICY_FILE).toString());
-        Policy.getPolicy().refresh();
+        setSecurityPolicy();
 
         ExecuteForkedTaskInsideNewJvm instance = ExecuteForkedTaskInsideNewJvm.getInstance();
 
@@ -113,6 +111,12 @@ public class ExecuteForkedTaskInsideNewJvm {
 
         // Call to System.exit is necessary at this point (when the task is finished normally) as the forked JVM can keep alive non-daemon threads
         System.exit(0);
+    }
+
+    private static void setSecurityPolicy() {
+        System.setProperty("java.security.policy",
+                           ExecuteForkedTaskInsideNewJvm.class.getResource("/" + JAVA_SECURITY_POLICY_FILE).toString());
+        Policy.getPolicy().refresh();
     }
 
     private void fromForkedJVM(String contextPath) {

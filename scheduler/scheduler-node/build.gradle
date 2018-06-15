@@ -59,9 +59,7 @@ task standaloneJar(type: OneJar) {
     additionalDir = file('src/main/resources')
     manifest = oneJarManifest
 }
-
 build.dependsOn standaloneJar
-
 artifacts {
     archives standaloneJar
 }
