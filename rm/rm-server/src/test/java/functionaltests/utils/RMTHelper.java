@@ -80,6 +80,8 @@ public class RMTHelper {
      */
     public static final int DEFAULT_NODES_TIMEOUT = 180 * 1000; //3minutes
 
+    public static final int DEFAULT_WAIT_MONITOR_TIMEOUT = 500 * 1000; //8 minutes
+
     /**
      * Number of nodes deployed with default deployment descriptor
      */
@@ -651,11 +653,9 @@ public class RMTHelper {
 
     public static RMNodeEvent waitForAnyNodeEvent(RMEventType eventType, RMMonitorsHandler monitorsHandler) {
         try {
-            return waitForAnyNodeEvent(eventType, 0, monitorsHandler);
+            return waitForAnyNodeEvent(eventType, DEFAULT_WAIT_MONITOR_TIMEOUT, monitorsHandler);
         } catch (ProActiveTimeoutException e) {
-            //unreachable block, 0 means infinite, no timeout
-            //log sthing ?
-            return null;
+            throw new IllegalStateException("Timeout of " + DEFAULT_WAIT_MONITOR_TIMEOUT + " ms, occurred", e);
         }
     }
 
@@ -664,13 +664,11 @@ public class RMTHelper {
         try {
             List<RMNodeEvent> answer = new ArrayList<>(nbTimes);
             for (int i = 0; i < nbTimes; i++) {
-                answer.add(waitForAnyNodeEvent(eventType, 0, monitorsHandler));
+                answer.add(waitForAnyNodeEvent(eventType, DEFAULT_WAIT_MONITOR_TIMEOUT, monitorsHandler));
             }
             return answer;
         } catch (ProActiveTimeoutException e) {
-            //unreachable block, 0 means infinite, no timeout
-            //log sthing ?
-            return null;
+            throw new IllegalStateException("Timeout of " + DEFAULT_WAIT_MONITOR_TIMEOUT + " ms, occurred", e);
         }
     }
 

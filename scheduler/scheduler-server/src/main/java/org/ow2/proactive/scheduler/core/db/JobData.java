@@ -370,7 +370,9 @@ public class JobData implements Serializable {
         this.jobName = jobName;
     }
 
-    @Column(name = "INPUT_SPACE", updatable = false)
+    @Lob
+    @Column(name = "INPUT_SPACE", length = Integer.MAX_VALUE, updatable = false)
+    @Type(type = "org.hibernate.type.TextType")
     public String getInputSpace() {
         return inputSpace;
     }
@@ -379,7 +381,9 @@ public class JobData implements Serializable {
         this.inputSpace = inputSpace;
     }
 
-    @Column(name = "OUT_SPACE", updatable = false)
+    @Lob
+    @Column(name = "OUT_SPACE", length = Integer.MAX_VALUE, updatable = false)
+    @Type(type = "org.hibernate.type.TextType")
     public String getOutputSpace() {
         return outputSpace;
     }
@@ -388,7 +392,9 @@ public class JobData implements Serializable {
         this.outputSpace = outputSpace;
     }
 
-    @Column(name = "GLOBAL_SPACE", updatable = false)
+    @Lob
+    @Column(name = "GLOBAL_SPACE", length = Integer.MAX_VALUE, updatable = false)
+    @Type(type = "org.hibernate.type.TextType")
     public String getGlobalSpace() {
         return globalSpace;
     }
@@ -397,7 +403,9 @@ public class JobData implements Serializable {
         this.globalSpace = globalSpace;
     }
 
-    @Column(name = "USER_SPACE", updatable = false)
+    @Lob
+    @Column(name = "USER_SPACE", length = Integer.MAX_VALUE, updatable = false)
+    @Type(type = "org.hibernate.type.TextType")
     public String getUserSpace() {
         return userSpace;
     }

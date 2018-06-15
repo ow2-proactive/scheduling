@@ -39,12 +39,14 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.server.handler.SecuredRedirectHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -53,6 +55,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.web.WebProperties;
+import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFactory;
 
 
 public class JettyStarter {
@@ -114,6 +117,26 @@ public class JettyStarter {
             server.setStopAtShutdown(true);
 
             HandlerList handlerList = new HandlerList();
+
+            if (WebProperties.JETTY_LOG_FILE.isSet()) {
+                String pathToJettyLogFile = FileStorageSupportFactory.relativeToHomeIfNotAbsolute(WebProperties.JETTY_LOG_FILE.getValueAsString());
+                File jettyLogFile = new File(pathToJettyLogFile);
+                if (!jettyLogFile.getParentFile().exists() && !jettyLogFile.getParentFile().mkdirs()) {
+                    logger.error("Could not create jetty log file in: " +
+                                 WebProperties.JETTY_LOG_FILE.getValueAsString());
+                } else {
+                    NCSARequestLog requestLog = new NCSARequestLog(pathToJettyLogFile);
+                    requestLog.setAppend(true);
+                    requestLog.setExtended(false);
+                    requestLog.setLogTimeZone("GMT");
+                    requestLog.setLogLatency(true);
+                    requestLog.setRetainDays(90);
+
+                    RequestLogHandler requestLogHandler = new RequestLogHandler();
+                    requestLogHandler.setRequestLog(requestLog);
+                    handlerList.addHandler(requestLogHandler);
+                }
+            }
 
             if (httpsEnabled && redirectHttpToHttps) {
                 ContextHandler redirectHandler = new ContextHandler();
@@ -286,12 +309,7 @@ public class JettyStarter {
 
     private void addWarsToHandlerList(HandlerList handlerList, String[] virtualHost) {
         File warFolder = new File(getSchedulerHome() + FOLDER_TO_DEPLOY);
-        File[] warFolderContent = warFolder.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return !"getstarted".equals(name);
-            }
-        });
+        File[] warFolderContent = warFolder.listFiles((dir, name) -> !"getstarted".equals(name));
 
         if (warFolderContent != null) {
             for (File fileToDeploy : warFolderContent) {

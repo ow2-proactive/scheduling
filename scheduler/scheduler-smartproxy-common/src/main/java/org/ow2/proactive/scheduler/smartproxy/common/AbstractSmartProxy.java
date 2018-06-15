@@ -32,14 +32,7 @@ import static com.google.common.base.Throwables.propagateIfInstanceOf;
 import java.io.File;
 import java.security.KeyException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -87,6 +80,7 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
+import org.ow2.proactive.utils.Tools;
 
 import com.google.common.net.UrlEscapers;
 
@@ -313,17 +307,31 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             throws Exception, SubmissionClosedException, JobCreationException {
         checkInitialized();
 
+        List<String> pushUrls;
+        List<String> pullUrls;
         if (isNullOrEmpty(pushUrl)) {
-            pushUrl = getLocalUserSpace();
+            pushUrls = getUserSpaceURIs();
+        } else {
+            pushUrls = Arrays.asList(Tools.dataSpaceConfigPropertyToUrls(pushUrl));
         }
         if (isNullOrEmpty(pullUrl)) {
-            pullUrl = getLocalUserSpace();
+            pullUrls = getUserSpaceURIs();
+        } else {
+            pullUrls = Arrays.asList(Tools.dataSpaceConfigPropertyToUrls(pullUrl));
         }
         String newFolderName = createNewFolderName();
-        String pushUrlUpdate = prepareJobInput(job, localInputFolderPath, pushUrl, newFolderName);
-        String pullUrlUpdate = prepareJobOutput(job, localOutputFolderPath, pullUrl, newFolderName, isolateTaskOutputs);
+        String pushUrlUpdate = prepareJobInput(job, localInputFolderPath, pushUrls, newFolderName);
+        String pullUrlUpdate = prepareJobOutput(job,
+                                                localOutputFolderPath,
+                                                pullUrls,
+                                                newFolderName,
+                                                isolateTaskOutputs);
         uploadInputfiles(job, localInputFolderPath);
         JobId id = null;
+        if (log.isTraceEnabled()) {
+            log.trace("Job Contents before submission:");
+            log.trace(job.display());
+        }
         try {
             id = submit(job);
         } catch (Exception e) {
@@ -491,18 +499,6 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         }
     }
 
-    protected String getLocalUserSpace() throws NotConnectedException, PermissionException {
-        List<String> userSpaceURIS = getUserSpaceURIs();
-
-        for (String userSpaceURI : userSpaceURIS) {
-            if (userSpaceURI.startsWith("file:")) {
-                return userSpaceURI;
-            }
-        }
-
-        return null;
-    }
-
     /**
      * This method will create a remote folder for output of this job and update
      * the outputSpace job property. If the localOutputFolder parameter is null,
@@ -536,28 +532,25 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * @param job
      * @param localOutputFolder  path to the output folder on local machine if null, no actions
      *                           will be performed concerning the output data for this job
-     * @param pull_url           - the url where the data is to be retrieved after the job is
+     * @param pull_urls          the urls where the data is to be retrieved after the job is
      *                           finished
      * @param newFolderName      name of the folder to be used for pushing the output
      * @param isolateTaskOutputs task output isolation (see method submit)
      * @return a String representing the updated value of the pull_url
      */
-    protected String prepareJobOutput(TaskFlowJob job, String localOutputFolder, String pull_url, String newFolderName,
-            boolean isolateTaskOutputs) throws NotConnectedException, PermissionException {
-        // if the job defines an output space
-        // and the localOutputFolder is not null
+    protected String prepareJobOutput(TaskFlowJob job, String localOutputFolder, List<String> pull_urls,
+            String newFolderName, boolean isolateTaskOutputs) throws NotConnectedException, PermissionException {
         // create a remote folder for the output data
         // and update the OutputSpace property of the job to reference that
         // folder
-        String outputSpace_url = job.getOutputSpace();
+
         String pull_url_updated = "";
 
         // the output folder, on the remote output space, relative to the root
         // url
         String outputFolder = "";
 
-        if ((localOutputFolder != null) && (outputSpace_url != null) && (!outputSpace_url.equals("")) &&
-            (pull_url != null)) {
+        if ((localOutputFolder != null) && (pull_urls != null) && (pull_urls.size() > 0)) {
             if (isolateTaskOutputs) {
                 // at the end we add the [TASKID] pattern without creating the
                 // folder
@@ -566,13 +559,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                 outputFolder = newFolderName + "/output";
             }
 
-            pull_url_updated = pull_url + "/" + outputFolder;
-            String outputSpace_url_updated = outputSpace_url + "/" + outputFolder;
-            log.debug("Output space of job " + job.getName() + " will be " + outputSpace_url_updated);
-
+            pull_url_updated = appendSlashIfNeeded(pull_urls.get(0)) + outputFolder;
             createFolder(pull_url_updated);
 
-            job.setOutputSpace(outputSpace_url_updated);
+            updateOutputSpace(job, outputFolder);
+
             job.addGenericInformation(GENERIC_INFO_OUTPUT_FOLDER_PROPERTY_NAME,
                                       new File(localOutputFolder).getAbsolutePath());
             job.addGenericInformation(GENERIC_INFO_PULL_URL_PROPERTY_NAME, pull_url_updated);
@@ -611,31 +602,27 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
      * @param job
      * @param localInputFolder path to the input folder on local machine if null, no actions
      *                         will be performed concerning the input data for this job
-     * @param pushURL          the url where input data is to be pushed before the job
+     * @param pushURLs         the urls where input data is to be pushed before the job
      *                         submission
      * @param newFolderName    name of the new folder to be created
      * @return String representing the updated value of the push_url
      */
-    protected String prepareJobInput(Job job, String localInputFolder, String pushURL, String newFolderName)
+    protected String prepareJobInput(Job job, String localInputFolder, List<String> pushURLs, String newFolderName)
             throws NotConnectedException, PermissionException {
-        // if the job defines an input space
-        // and the localInputFolder is not null
         // create a remote folder for the input data
         // and update the InputSpace property of the job to reference that
         // folder
-
-        String inputSpace_url = job.getInputSpace();
         String push_url_updated = "";
 
         // the input folder, on the remote input space, relative to the root url
         String inputFolder = "";
-        if ((localInputFolder != null) && (inputSpace_url != null) && (!inputSpace_url.equals("")) &&
-            (pushURL != null)) {
+        if ((localInputFolder != null) && (pushURLs != null) && (pushURLs.size() > 0)) {
             inputFolder = newFolderName + "/input";
-            push_url_updated = pushURL + "/" + inputFolder;
-            String inputSpace_url_updated = inputSpace_url + "/" + inputFolder;
+            push_url_updated = appendSlashIfNeeded(pushURLs.get(0)) + inputFolder;
             createFolder(push_url_updated);
-            job.setInputSpace(inputSpace_url_updated);
+
+            updateInputSpace(job, inputFolder);
+
             job.addGenericInformation(GENERIC_INFO_INPUT_FOLDER_PROPERTY_NAME,
                                       new File(localInputFolder).getAbsolutePath());
 
@@ -649,6 +636,52 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
         // folder
 
         return push_url_updated;
+    }
+
+    private String appendSlashIfNeeded(String url) {
+        if (url.endsWith("/")) {
+            return url;
+        }
+        return url + "/";
+    }
+
+    private void updateInputSpace(Job job, String inputFolder) throws NotConnectedException, PermissionException {
+        List<String> inputSpaces;
+        if (job.getInputSpace() != null) {
+            inputSpaces = Arrays.asList(Tools.dataSpaceConfigPropertyToUrls(job.getInputSpace()));
+        } else {
+            inputSpaces = getUserSpaceURIs();
+        }
+        StringBuilder inputSpace_url_updated = buildUpdatedSpaceConfiguration(inputFolder, inputSpaces);
+
+        job.setInputSpace(inputSpace_url_updated.toString());
+        log.debug("Input space of job " + job.getName() + " will be " + inputSpace_url_updated);
+    }
+
+    private StringBuilder buildUpdatedSpaceConfiguration(String folder, List<String> spaceUrls) {
+        StringBuilder inputSpace_url_updated = new StringBuilder();
+
+        for (String inputSpace : spaceUrls) {
+            if (inputSpace_url_updated.length() > 0) {
+                inputSpace_url_updated.append(" ");
+            }
+            inputSpace_url_updated.append(appendSlashIfNeeded(inputSpace));
+            inputSpace_url_updated.append(folder);
+        }
+        return inputSpace_url_updated;
+    }
+
+    private void updateOutputSpace(Job job, String outputFolder) throws NotConnectedException, PermissionException {
+        List<String> outputSpaces;
+        if (job.getOutputSpace() != null) {
+            outputSpaces = Arrays.asList(Tools.dataSpaceConfigPropertyToUrls(job.getOutputSpace()));
+        } else {
+            outputSpaces = getUserSpaceURIs();
+        }
+        StringBuilder outputSpace_url_updated = buildUpdatedSpaceConfiguration(outputFolder, outputSpaces);
+
+        job.setOutputSpace(outputSpace_url_updated.toString());
+        log.debug("Output space of job " + job.getName() + " will be " + outputSpace_url_updated);
     }
 
     protected String createNewFolderName() {
@@ -800,8 +833,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
             }
             case FAILED: {
                 log.debug("The job " + id + " is failed.");
-                // removeAwaitedJob(id.toString());
+                jobTracker.removeAwaitedJob(id.toString());
                 break;
+            }
+            default: {
+                log.trace("The job " + id + " is in state " + status);
             }
         }
     }
@@ -862,6 +898,9 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                 log.debug("The task " + tname + " from job " + id + " is faulty.");
                 jobTracker.removeAwaitedTask(id.toString(), tname);
                 break;
+            }
+            default: {
+                log.trace("The task " + tname + " from job " + id + " is in status : " + status);
             }
         }
     }

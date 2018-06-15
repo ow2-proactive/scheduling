@@ -44,7 +44,6 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -429,16 +428,11 @@ public class NodeSource implements InitActive, RunActive {
             ((AbstractRMNode) rmNode).copyLockStatusFrom(deployingNode);
         }
 
-        boolean isNodeAdded = rmcore.registerAvailableNode(rmNode).getBooleanValue();
+        BooleanWrapper nodeAdded = rmcore.registerAvailableNode(rmNode);
 
-        if (isNodeAdded) {
-            // if the node is successfully added we can let it configure
-            // asynchronously. It will then be seen as "configuring"
-            rmcore.internalRegisterConfiguringNode(rmNode);
-            return new BooleanWrapper(true);
-        } else {
-            return new BooleanWrapper(false);
-        }
+        rmcore.internalRegisterConfiguringNode(rmNode);
+
+        return nodeAdded;
     }
 
     /**
@@ -777,18 +771,6 @@ public class NodeSource implements InitActive, RunActive {
      * Terminates a node source active object when the policy is shutdown. 
      */
     public void finishNodeSourceShutdown(Client initiator) {
-
-        NodeSourceStatus status = this.descriptor.getStatus();
-
-        PAFuture.waitFor(this.rmcore.nodeSourceUnregister(this.name,
-                                                          status,
-                                                          new RMNodeSourceEvent(RMEventType.NODESOURCE_SHUTDOWN,
-                                                                                initiator.getName(),
-                                                                                this.getName(),
-                                                                                this.getDescription(),
-                                                                                this.getAdministrator().getName(),
-                                                                                status.toString())));
-
         PAActiveObject.terminateActiveObject(false);
     }
 
