@@ -778,4 +778,11 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         return client.getSchedulerProperties();
     }
 
+    @Override
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedException, UnknownJobException {
+        renewSession();
+        return client.checkJobPermissionMethod(sessionId, jobId, method);
+    }
+
 }

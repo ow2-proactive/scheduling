@@ -43,6 +43,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
@@ -56,6 +57,7 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.extensions.vfsprovider.util.URIHelper;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.utils.Tools;
 
 
 public class DataSpaceServiceStarter implements Serializable {
@@ -78,18 +80,18 @@ public class DataSpaceServiceStarter implements Serializable {
 
     private static final String DEFAULT_LOCAL_SCRATCH = DEFAULT_LOCAL + File.separator + "scratch";
 
-    private static Map<String, HashSet<String>> spacesConfigurations = new ConcurrentHashMap<>();
+    private Map<String, HashSet<String>> spacesConfigurations = new ConcurrentHashMap<>();
 
     /**
      * Naming service
      */
-    private static String namingServiceURL;
+    private String namingServiceURL;
 
-    private static NamingServiceDeployer namingServiceDeployer;
+    private transient NamingServiceDeployer namingServiceDeployer;
 
-    private static NamingService namingService;
+    private transient NamingService namingService;
 
-    private static String localhostname = null;
+    private String localhostname = null;
 
     /**
      * static instance
@@ -99,14 +101,14 @@ public class DataSpaceServiceStarter implements Serializable {
     /**
      * Local node (should be the one of the scheduler)
      */
-    private Node schedulerNode = null;
+    private NodeImpl schedulerNode = null;
 
     private boolean serviceStarted = false;
 
     /**
      * Application ID last used to configure the local node, null if none
      */
-    private static String appidConfigured = null;
+    private String appidConfigured = null;
 
     /**
      * Dataspace servers
@@ -130,7 +132,7 @@ public class DataSpaceServiceStarter implements Serializable {
      */
     public void startNamingService() throws Exception {
 
-        schedulerNode = PAActiveObject.getNode();
+        schedulerNode = (NodeImpl) PAActiveObject.getNode();
 
         localhostname = java.net.InetAddress.getLocalHost().getHostName();
 
@@ -289,7 +291,7 @@ public class DataSpaceServiceStarter implements Serializable {
         InputOutputSpaceConfiguration spaceConf = null;
 
         // Converts the property to an ArrayList
-        ArrayList<String> finalurls = new ArrayList<>(Arrays.asList(dsConfigPropertyToUrls(urlsproperty)));
+        ArrayList<String> finalurls = new ArrayList<>(Arrays.asList(Tools.dataSpaceConfigPropertyToUrls(urlsproperty)));
 
         if (inputConfiguration) {
             spaceConf = InputOutputSpaceConfiguration.createInputSpaceConfiguration(finalurls,
@@ -358,7 +360,7 @@ public class DataSpaceServiceStarter implements Serializable {
         }
 
         // updates the urls with the username
-        String[] urlarray = dsConfigPropertyToUrls(urls);
+        String[] urlarray = Tools.dataSpaceConfigPropertyToUrls(urls);
 
         String[] updatedArray = urlsWithUserDir(urlarray, username);
 
@@ -389,35 +391,6 @@ public class DataSpaceServiceStarter implements Serializable {
         // remove the last two characters
         urlProperty.delete(urlProperty.length() - 2, urlProperty.length() - 2);
         return urlProperty.toString();
-    }
-
-    /**
-     * Parses the given dataspace configuration property to an array of strings
-     * The parsing handles double quotes and space separators
-     * @param property dataspace configuration property
-     * @return an array of string urls
-     */
-    public static String[] dsConfigPropertyToUrls(String property) {
-        if (property.trim().length() == 0) {
-            return new String[0];
-        }
-        if (property.contains("\"")) {
-            // if the input contains quote, split it along space delimiters and quotes "A" "B" etc...
-            // the pattern uses positive look-behind and look-ahead
-            final String[] outputWithQuotes = property.trim().split("(?<=\") +(?=\")");
-            // removing quotes
-            ArrayList<String> output = new ArrayList<>();
-            for (String outputWithQuote : outputWithQuotes) {
-                int len = outputWithQuote.length();
-                if (outputWithQuote.length() > 2) {
-                    output.add(outputWithQuote.substring(1, len - 1));
-                }
-            }
-            return output.toArray(new String[0]);
-        } else {
-            // if the input contains no quote, split it along space delimiters
-            return property.trim().split(" +");
-        }
     }
 
     /**
