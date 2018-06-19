@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,6 +86,8 @@ import org.ow2.proactive.scheduler.util.TaskLogger;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
+
+    public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_DO_THIS_OPERATION = "You do not have permission to do this operation !";
 
     public static final String YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS = "You do not have permission to get the status !";
 
@@ -525,7 +526,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         try {
             ident.getUser().checkPermission(methodCallPermission, permissionMsg);
         } catch (PermissionException ex) {
-            logger.warn(permissionMsg);
+            logger.debug(permissionMsg);
             throw ex;
         }
         return ident;

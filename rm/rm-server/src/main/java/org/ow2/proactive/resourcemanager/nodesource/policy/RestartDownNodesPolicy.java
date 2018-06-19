@@ -92,7 +92,7 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
 
     private void scheduleRestartTimer() {
 
-        this.timer = new Timer(TIMER_NAME);
+        this.timer = new Timer(TIMER_NAME, true);
 
         this.timer.schedule(new TimerTask() {
 
@@ -105,37 +105,45 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
     }
 
     private void checkDownNodesAndReacquireNodesIfNeeded() {
+        try {
+            long numberOfNodesToDeploy = this.nodeSource.getDownNodes()
+                                                        .stream()
+                                                        .map(node -> node.getNodeInformation().getURL())
+                                                        .peek(nodeUrl -> logger.info("Removing down node " + nodeUrl))
+                                                        .map(nodeUrl -> this.nodeSource.getRMCore().removeNode(nodeUrl,
+                                                                                                               true))
+                                                        .filter(BooleanWrapper::getBooleanValue)
+                                                        .peek(x -> logger.info("Down node removed"))
+                                                        .count();
 
-        long numberOfNodesToDeploy = this.nodeSource.getDownNodes()
+            numberOfNodesToDeploy += this.nodeSource.getDeployingAndLostNodes()
                                                     .stream()
-                                                    .map(node -> node.getNodeInformation().getURL())
-                                                    .peek(nodeUrl -> logger.info("Removing down node " + nodeUrl))
+                                                    .filter(RMDeployingNode::isLost)
+                                                    .map(RMDeployingNode::getNodeURL)
+                                                    .peek(nodeUrl -> logger.info("Removing lost node " + nodeUrl))
                                                     .map(nodeUrl -> this.nodeSource.getRMCore().removeNode(nodeUrl,
                                                                                                            true))
                                                     .filter(BooleanWrapper::getBooleanValue)
-                                                    .peek(x -> logger.info("Down node removed"))
+                                                    .peek(x -> logger.info("Lost node removed"))
                                                     .count();
 
-        numberOfNodesToDeploy += this.nodeSource.getDeployingAndLostNodes()
-                                                .stream()
-                                                .filter(RMDeployingNode::isLost)
-                                                .map(RMDeployingNode::getNodeURL)
-                                                .peek(nodeUrl -> logger.info("Removing lost node " + nodeUrl))
-                                                .map(nodeUrl -> this.nodeSource.getRMCore().removeNode(nodeUrl, true))
-                                                .filter(BooleanWrapper::getBooleanValue)
-                                                .peek(x -> logger.info("Lost node removed"))
-                                                .count();
-
-        if (numberOfNodesToDeploy > 0) {
-            logger.info("Acquiring " + numberOfNodesToDeploy + " nodes");
-            acquireNodes((int) numberOfNodesToDeploy);
+            if (numberOfNodesToDeploy > 0) {
+                logger.info("Acquiring " + numberOfNodesToDeploy + " nodes");
+                acquireNodes((int) numberOfNodesToDeploy);
+            }
+        } catch (Exception e) {
+            logger.error("Error occurred during node state retrieval, cannot restart nodes", e);
         }
     }
 
     @Override
     public void shutdown(Client initiator) {
-        this.timer.cancel();
-        super.shutdown(initiator);
+        try {
+            this.timer.cancel();
+            super.shutdown(initiator);
+        } catch (Exception e) {
+            logger.error("Restart down nodes policy shutdown failed", e);
+        }
     }
 
     /**

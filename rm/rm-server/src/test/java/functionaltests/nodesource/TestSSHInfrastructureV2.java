@@ -122,7 +122,9 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
         sshd = SshServer.setUpDefaultServer();
 
-        sshd.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
+        SimpleGeneratorHostKeyProvider keyProvider = new SimpleGeneratorHostKeyProvider();
+        keyProvider.setAlgorithm("RSA");
+        sshd.setKeyPairProvider(keyProvider);
 
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>(1);
         userAuthFactories.add(new UserAuthPasswordFactory());
