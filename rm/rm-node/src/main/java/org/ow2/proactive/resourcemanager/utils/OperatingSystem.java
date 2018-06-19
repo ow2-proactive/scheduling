@@ -29,7 +29,8 @@ public enum OperatingSystem {
 
     WINDOWS(";", "\\"),
     UNIX(":", "/"),
-    CYGWIN(";", "/");
+    CYGWIN(";", "/"),
+    MACOS(":", "/");
 
     /** the path separator, ie. ";" on windows systems and ":" on unix systems */
     public final String ps;
@@ -57,6 +58,9 @@ public enum OperatingSystem {
         }
         if (desc.contains("WINDOWS")) {
             return OperatingSystem.WINDOWS;
+        }
+        if (desc.startsWith("Mac OS")) {
+            return OperatingSystem.MACOS;
         }
         if ("CYGWIN".equals(desc)) {
             return OperatingSystem.CYGWIN;
