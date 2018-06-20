@@ -230,8 +230,7 @@ public class IAMLoginModule implements LoginModule {
             assertion = ticketValidator.validate(getServiceToken(username, password), service);
 
             CommonUtils.assertNotNull(assertion,
-                                      "Assertion returned by ticket validator " + this.ticketValidatorClass +
-                                                 " is null");
+                                      "Empty assertion returned by ticket validator " + this.ticketValidatorClass);
 
             String authenticator = assertion.getPrincipal().getName();
             String role = (String) assertion.getPrincipal().getAttributes().get(roleAttributeName);
