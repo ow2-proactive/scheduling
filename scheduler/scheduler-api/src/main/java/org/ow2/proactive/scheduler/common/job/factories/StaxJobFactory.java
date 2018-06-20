@@ -375,7 +375,7 @@ public class StaxJobFactory extends JobFactory {
                             // the final value of the variable can either be overwritten by a value of the replacement map or
                             // use in a pattern such value
                             commonPropertiesHolder.getVariables()
-                                                  .putAll(createJobVariables(cursorJob, replacementVariables));
+                                                  .putAll(createJobVariables(cursorJob));
 
                         } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                             commonPropertiesHolder.setGenericInformation(getGenericInformation(cursorJob,
@@ -406,6 +406,9 @@ public class StaxJobFactory extends JobFactory {
                         break;
                 }
             }
+
+            //replace variables
+            commonPropertiesHolder.getVariables().putAll(replaceVariablesInJobVariablesMap(commonPropertiesHolder.getVariables(),replacementVariables));
 
             handleJobAttributes(commonPropertiesHolder, delayedJobAttributes);
 
@@ -486,12 +489,11 @@ public class StaxJobFactory extends JobFactory {
      * Leave the method with the cursor at the end of 'ELEMENT_VARIABLES' tag
      *
      * @param cursorVariables the streamReader with the cursor on the 'ELEMENT_VARIABLES' tag.
-     * @param replacementVariables variables which have precedence over the one defined in the job
+     //* @param replacementVariables variables which have precedence over the one defined in the job
      * @return the map in which the variables were added.
      * @throws JobCreationException
      */
-    private Map<String, JobVariable> createJobVariables(XMLStreamReader cursorVariables,
-            Map<String, String> replacementVariables) throws JobCreationException {
+    private Map<String, JobVariable> createJobVariables(XMLStreamReader cursorVariables) throws JobCreationException {
         HashMap<String, JobVariable> variablesMap = new LinkedHashMap<>();
         try {
             int eventType;
@@ -510,7 +512,7 @@ public class StaxJobFactory extends JobFactory {
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (XMLTags.VARIABLES.matches(cursorVariables.getLocalName())) {
-                            return replaceVariablesInJobVariablesMap(variablesMap, replacementVariables);
+                            return variablesMap;
                         }
                         break;
                 }
