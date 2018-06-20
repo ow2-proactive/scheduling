@@ -270,6 +270,35 @@ public class Tools {
     }
 
     /**
+     * Parses the given dataspace configuration property to an array of strings
+     * The parsing handles double quotes and space separators
+     * @param property dataspace configuration property
+     * @return an array of string urls
+     */
+    public static String[] dataSpaceConfigPropertyToUrls(String property) {
+        if (property.trim().length() == 0) {
+            return new String[0];
+        }
+        if (property.contains("\"")) {
+            // if the input contains quote, split it along space delimiters and quotes "A" "B" etc...
+            // the pattern uses positive look-behind and look-ahead
+            final String[] outputWithQuotes = property.trim().split("(?<=\") +(?=\")");
+            // removing quotes
+            ArrayList<String> output = new ArrayList<>();
+            for (String outputWithQuote : outputWithQuotes) {
+                int len = outputWithQuote.length();
+                if (outputWithQuote.length() > 2) {
+                    output.add(outputWithQuote.substring(1, len - 1));
+                }
+            }
+            return output.toArray(new String[0]);
+        } else {
+            // if the input contains no quote, split it along space delimiters
+            return property.trim().split(" +");
+        }
+    }
+
+    /**
      * Get the columned string according to the given ObjectArrayFormatter descriptor.
      *
      * @param oaf the ObjectArrayFormatter describing how to print the array.

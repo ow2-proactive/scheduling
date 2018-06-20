@@ -295,6 +295,12 @@ public class IAMLoginModule implements LoginModule {
         return true;
     }
 
+    /**
+     * Creates a ServiceToken given a valid user credentials.
+     * @param username login name of the authenticator.
+     * @param password password of the authenticator.
+     * @return Service token including authentication information.
+     */
     private String getServiceToken(String username, String password) {
 
         String serviceToken = null;

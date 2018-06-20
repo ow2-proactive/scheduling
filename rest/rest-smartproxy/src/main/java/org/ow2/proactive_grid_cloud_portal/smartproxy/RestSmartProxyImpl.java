@@ -29,6 +29,7 @@ import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USE
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,7 @@ import org.ow2.proactive.scheduler.smartproxy.common.AbstractSmartProxy;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
+import org.ow2.proactive.utils.Tools;
 import org.ow2.proactive_grid_cloud_portal.common.FileType;
 
 import com.google.common.base.Throwables;
@@ -202,17 +204,6 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     @Override
     public JobId submit(Job job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        checkInitialized();
-        String inputSpace = job.getInputSpace();
-        if (inputSpace == null) {
-            throw new IllegalArgumentException("'InputSpace' is NULL. The InputSpace must be set in order to transfer inputfiles by the" +
-                                               " SmartProxy. As a default, you may use the 'UserSpace' value.");
-        }
-        String outputSpace = job.getOutputSpace();
-        if (outputSpace == null) {
-            throw new IllegalArgumentException("'OutputSpace' is NULL. The OutputSpace must be set in order to retrieve outputfiles by" +
-                                               " the SmartProxy. As a default, you may use the 'UserSpace' value.");
-        }
         return _getScheduler().submit(job);
     }
 
@@ -312,42 +303,69 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     @Override
     public boolean uploadInputfiles(TaskFlowJob job, String localInputFolderPath)
             throws NotConnectedException, PermissionException {
+        try {
+            List<String> userSpaces = getUserSpaceURIs();
+            List<String> inputSpaces = Arrays.asList(Tools.dataSpaceConfigPropertyToUrls(job.getInputSpace()));
 
-        String userSpace = getLocalUserSpace();
-        String inputSpace = job.getInputSpace();
+            String remotePath = extractRelativePath(userSpaces, inputSpaces);
 
-        if (!inputSpace.startsWith(userSpace)) {
-            // NOTE: only works for USERSPACE urls
-            logger.warn("RestSmartProxy does not support data transfers outside USERSPACE.");
-            return false;
-        }
-        String remotePath = inputSpace.substring(userSpace.length() + (userSpace.endsWith("/") ? 0 : 1));
-        String jname = job.getName();
-        logger.debug("Pushing files for job " + jname + " from " + localInputFolderPath + " to " + remotePath);
-        TaskFlowJob tfj = job;
-        for (Task t : tfj.getTasks()) {
-            logger.debug("Pushing files for task " + t.getName());
-            List<String> includes = Lists.newArrayList();
-            List<String> excludes = Lists.newArrayList();
-
-            List<InputSelector> inputFilesList = t.getInputFilesList();
-
-            if (inputFilesList != null) {
-                for (InputSelector is : inputFilesList) {
-                    addfileSelection(is.getInputFiles(), includes, excludes);
-                }
+            if (remotePath == null) {
+                // NOTE: only works for USERSPACE urls
+                throw new IllegalArgumentException("Could not extract remote path using inputSpace=" + inputSpaces +
+                                                   " and userSpace=" + userSpaces);
             }
+            String jname = job.getName();
+            logger.debug("Pushing files for job " + jname + " from " + localInputFolderPath + " to " + remotePath);
+            TaskFlowJob tfj = job;
+            for (Task task : tfj.getTasks()) {
+                uploadInputFilesForTask(localInputFolderPath, remotePath, task);
+            }
+            logger.debug("Finished push operation from " + localInputFolderPath + " to " + remotePath);
 
-            LocalDirSource source = new LocalDirSource(localInputFolderPath);
-            source.setIncludes(includes);
-            source.setExcludes(excludes);
-
-            RemoteDestination dest = new RemoteDestination(USER, remotePath);
-            restDataSpaceClient.upload(source, dest);
+        } catch (Exception error) {
+            throw Throwables.propagate(error);
         }
-        logger.debug("Finished push operation from " + localInputFolderPath + " to " + remotePath);
 
         return true;
+    }
+
+    private void uploadInputFilesForTask(String localInputFolderPath, String remotePath, Task task)
+            throws NotConnectedException, PermissionException {
+        logger.debug("Pushing files for task " + task.getName());
+        List<String> includes = Lists.newArrayList();
+        List<String> excludes = Lists.newArrayList();
+
+        List<InputSelector> inputFilesList = task.getInputFilesList();
+
+        if (inputFilesList != null) {
+            for (InputSelector is : inputFilesList) {
+                addfileSelection(is.getInputFiles(), includes, excludes);
+            }
+        }
+
+        LocalDirSource source = new LocalDirSource(localInputFolderPath);
+        source.setIncludes(includes);
+        source.setExcludes(excludes);
+
+        RemoteDestination dest = new RemoteDestination(USER, remotePath);
+        restDataSpaceClient.upload(source, dest);
+    }
+
+    private String extractRelativePath(List<String> userSpaces, List<String> urls) {
+        String remotePath = null;
+        for (int i = 0; i < urls.size(); i++) {
+            if (i >= userSpaces.size()) {
+                break;
+            }
+            String url = urls.get(i);
+            String userSpace = userSpaces.get(i);
+
+            if (url.startsWith(userSpace)) {
+                remotePath = url.substring(userSpace.length() + (userSpace.endsWith("/") ? 0 : 1));
+                break;
+            }
+        }
+        return remotePath;
     }
 
     @Override
@@ -363,14 +381,23 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
             return;
         }
 
-        String outputSpace = awaitedjob.getOutputSpaceURL();
         String sourceFile;
         try {
-            String userSpace = getLocalUserSpace();
-            if (!outputSpace.startsWith(userSpace)) {
-                logger.warn("RestSmartProxy does not support data transfers outside USERSPACE.");
+            List<String> userSpaces = getUserSpaceURIs();
+
+            List<String> outputSpaces = Arrays.asList(Tools.dataSpaceConfigPropertyToUrls(awaitedjob.getOutputSpaceURL()));
+
+            sourceFile = extractRelativePath(userSpaces, outputSpaces);
+
+            if (sourceFile == null) {
+                if (awaitedjob.isAutomaticTransfer()) {
+                    logger.error("Could not extract remote path using inputSpace=" + outputSpaces + " and userSpace=" +
+                                 userSpaces);
+                } else {
+                    throw new IllegalArgumentException("Could not extract remote path using outputSpace=" +
+                                                       outputSpaces + " and userSpace=" + userSpaces);
+                }
             }
-            sourceFile = outputSpace.substring(userSpace.length() + 1);
         } catch (Throwable error) {
             throw Throwables.propagate(error);
         }
@@ -674,6 +701,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
                 logger.error("Error while reconnecting", e);
             }
         }
+    }
+
+    @Override
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
+            throws NotConnectedException, UnknownJobException {
+        return ((ISchedulerClient) _getScheduler()).checkJobPermissionMethod(sessionId, jobId, method);
     }
 
 }

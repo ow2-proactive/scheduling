@@ -769,7 +769,10 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             // This is due to deep copies made by ProActive Programming with method invocation on Active Objects.
             // As a consequence, the 'deployingNode' variable must be updated with the last value available
             // in the 'deployingNodes' collection
-            deployingNode = getDeployingOrLostNode(deployingNodeUrl);
+            RMDeployingNode statefulDeployingNode = getDeployingOrLostNode(deployingNodeUrl);
+            if (statefulDeployingNode != null) {
+                deployingNode = statefulDeployingNode;
+            }
         }
 
         if (logger.isTraceEnabled()) {
@@ -809,10 +812,10 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                                                    previousState,
                                                    pn.getProvider().getName());
             emitEvent(event);
-            logger.trace("DeployingNode " + toUpdateURL + " updated in IM");
+            logger.trace("Deploying node " + toUpdateURL + " updated in IM");
             return true;
         } else {
-            logger.trace("DeployingNode " + toUpdateURL + " no more managed by the IM, cannot update it");
+            logger.trace("Deploying node " + toUpdateURL + " no more managed by the IM, cannot update it");
             return false;
         }
     }
@@ -1141,192 +1144,108 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     // Below are wrapper methods around the runtime variables map
 
     protected Set<String> getPersistedDeployingNodesUrl() {
-        return (Set<String>) persistedInfraVariables.get(DEPLOYING_NODES_URL_KEY);
+        return (Set<String>) this.persistedInfraVariables.get(DEPLOYING_NODES_URL_KEY);
     }
 
     private RMDeployingNode getDeployingNodeWithLock(final String nodeUrl) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
-            @Override
-            public RMDeployingNode handle() {
-                return deployingNodesMap.get(nodeUrl);
-            }
-        });
+        return getPersistedInfraVariable(() -> this.deployingNodesMap.get(nodeUrl));
     }
 
     protected RMDeployingNode addDeployingNodeWithLockAndPersist(final String nodeUrl,
             final RMDeployingNode deployingNode) {
-        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
-            @Override
-            public RMDeployingNode handle() {
-                RMDeployingNode previousDeployingNode = deployingNodesMap.put(nodeUrl, deployingNode);
-                getPersistedDeployingNodesUrl().add(nodeUrl);
-                return previousDeployingNode;
-            }
+        return setPersistedInfraVariable(() -> {
+            RMDeployingNode previousDeployingNode = this.deployingNodesMap.put(nodeUrl, deployingNode);
+            getPersistedDeployingNodesUrl().add(nodeUrl);
+            return previousDeployingNode;
         });
     }
 
     private RMDeployingNode removeDeployingNodeWithLockAndPersist(final String nodeUrl) {
-        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
-            @Override
-            public RMDeployingNode handle() {
-                RMDeployingNode removedDeployingNode = deployingNodesMap.remove(nodeUrl);
-                getPersistedDeployingNodesUrl().remove(nodeUrl);
-                return removedDeployingNode;
-            }
+        return setPersistedInfraVariable(() -> {
+            RMDeployingNode removedDeployingNode = this.deployingNodesMap.remove(nodeUrl);
+            getPersistedDeployingNodesUrl().remove(nodeUrl);
+            return removedDeployingNode;
         });
     }
 
     private boolean containsDeployingNodeWithLock(final String nodeUrl) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return getPersistedDeployingNodesUrl().contains(nodeUrl);
-            }
-        });
+        return getPersistedInfraVariable(() -> getPersistedDeployingNodesUrl().contains(nodeUrl));
     }
 
     private void clearDeployingNodesWithLockAndPersist() {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                deployingNodesMap.clear();
-                getPersistedDeployingNodesUrl().clear();
-                return null;
-            }
+        setPersistedInfraVariable(() -> {
+            this.deployingNodesMap.clear();
+            getPersistedDeployingNodesUrl().clear();
+            return null;
         });
     }
 
     protected Collection<RMDeployingNode> getDeployingNodesWithLock() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Collection<RMDeployingNode>>() {
-            @Override
-            public Collection<RMDeployingNode> handle() {
-                return deployingNodesMap.values();
-            }
-        });
+        return getPersistedInfraVariable(this.deployingNodesMap::values);
     }
 
     protected Set<String> getPersistedLostNodesUrl() {
-        return (Set<String>) persistedInfraVariables.get(LOST_NODES_URL_KEY);
+        return (Set<String>) this.persistedInfraVariables.get(LOST_NODES_URL_KEY);
     }
 
     private RMDeployingNode getLostNodeWithLock(final String nodeUrl) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
-            @Override
-            public RMDeployingNode handle() {
-                return lostNodesMap.get(nodeUrl);
-            }
-        });
+        return getPersistedInfraVariable(() -> this.lostNodesMap.get(nodeUrl));
     }
 
     protected RMDeployingNode addLostNodeWithLockAndPersist(final String nodeUrl, final RMDeployingNode lostNode) {
-        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
-            @Override
-            public RMDeployingNode handle() {
-                RMDeployingNode previousLostNode = lostNodesMap.put(nodeUrl, lostNode);
-                getPersistedLostNodesUrl().add(nodeUrl);
-                return previousLostNode;
-            }
+        return setPersistedInfraVariable(() -> {
+            RMDeployingNode previousLostNode = this.lostNodesMap.put(nodeUrl, lostNode);
+            getPersistedLostNodesUrl().add(nodeUrl);
+            return previousLostNode;
         });
     }
 
     private RMDeployingNode removeLostNodeWithLockAndPersist(final String nodeUrl) {
-        return setPersistedInfraVariable(new PersistedInfraVariablesHandler<RMDeployingNode>() {
-            @Override
-            public RMDeployingNode handle() {
-                RMDeployingNode removedLostNode = lostNodesMap.remove(nodeUrl);
-                getPersistedLostNodesUrl().remove(nodeUrl);
-                return removedLostNode;
-            }
+        return setPersistedInfraVariable(() -> {
+            RMDeployingNode removedLostNode = this.lostNodesMap.remove(nodeUrl);
+            getPersistedLostNodesUrl().remove(nodeUrl);
+            return removedLostNode;
         });
     }
 
     private boolean containsLostNodeWithLock(final String nodeUrl) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return getPersistedLostNodesUrl().contains(nodeUrl);
-            }
-        });
+        return getPersistedInfraVariable(() -> getPersistedLostNodesUrl().contains(nodeUrl));
     }
 
     protected Collection<RMDeployingNode> getLostNodesWithLock() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Collection<RMDeployingNode>>() {
-            @Override
-            public Collection<RMDeployingNode> handle() {
-                return lostNodesMap.values();
-            }
-        });
+        return getPersistedInfraVariable(this.lostNodesMap::values);
     }
 
     private Set<String> getAcquiredNodesName() {
-        return (Set<String>) persistedInfraVariables.get(ACQUIRED_NODES_NAME_KEY);
+        return (Set<String>) this.persistedInfraVariables.get(ACQUIRED_NODES_NAME_KEY);
     }
 
     private void addAcquiredNodeNameWithLockAndPersist(final String nodeName) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                getAcquiredNodesName().add(nodeName);
-                return null;
-            }
-        });
+        setPersistedInfraVariable(() -> getAcquiredNodesName().add(nodeName));
     }
 
     private boolean containsAcquiredNodeNameWithLock(final String nodeName) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return getAcquiredNodesName().contains(nodeName);
-            }
-        });
+        return getPersistedInfraVariable(() -> getAcquiredNodesName().contains(nodeName));
     }
 
     private void removeAcquiredNodeNameWithLockAndPersist(final String nodeName) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                getAcquiredNodesName().remove(nodeName);
-                return null;
-            }
-        });
+        setPersistedInfraVariable(() -> getAcquiredNodesName().remove(nodeName));
     }
 
     public boolean isUsingDeployingNode() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return (boolean) persistedInfraVariables.get(USING_DEPLOYING_NODES_KEY);
-            }
-        });
+        return getPersistedInfraVariable(() -> (boolean) this.persistedInfraVariables.get(USING_DEPLOYING_NODES_KEY));
     }
 
     private void setUsingDeployingNodesWithLockAndPersist() {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, true);
-                return null;
-            }
-        });
+        setPersistedInfraVariable(() -> this.persistedInfraVariables.put(USING_DEPLOYING_NODES_KEY, true));
     }
 
     protected void setRmUrl(final String rmUrl) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                persistedInfraVariables.put(RM_URL_KEY, rmUrl);
-                return null;
-            }
-        });
+        setPersistedInfraVariable(() -> this.persistedInfraVariables.put(RM_URL_KEY, rmUrl));
     }
 
     protected String getRmUrl() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<String>() {
-            @Override
-            public String handle() {
-                return (String) persistedInfraVariables.get(RM_URL_KEY);
-            }
-        });
+        return getPersistedInfraVariable(() -> (String) this.persistedInfraVariables.get(RM_URL_KEY));
     }
 
 }

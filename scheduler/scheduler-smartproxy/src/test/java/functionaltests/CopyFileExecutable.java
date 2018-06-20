@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
  * For all files in the localspace (non recursive into folders) creates an
  * output file with the same content and the .out extension.
  */
-public class SimpleJavaExecutable extends JavaExecutable {
+public class CopyFileExecutable extends JavaExecutable {
 
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {

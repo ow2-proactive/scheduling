@@ -29,7 +29,8 @@ public enum OperatingSystem {
 
     WINDOWS(";", "\\"),
     UNIX(":", "/"),
-    CYGWIN(";", "/");
+    CYGWIN(";", "/"),
+    MACOS(":", "/");
 
     /** the path separator, ie. ";" on windows systems and ":" on unix systems */
     public final String ps;
@@ -43,8 +44,8 @@ public enum OperatingSystem {
     }
 
     /**
-     * Returns the operating system corresponding to the provided String parameter: 'LINUX', 'WINDOWS' or 'CYGWIN'
-     * @param desc one of 'LINUX', 'WINDOWS' or 'CYGWIN'
+     * Returns the operating system corresponding to the provided String parameter: 'LINUX', 'WINDOWS', 'MAC OS' or 'CYGWIN'
+     * @param desc one of 'LINUX', 'WINDOWS', 'MAC OS' or 'CYGWIN'
      * @return the appropriate Operating System of null if no system is found
      */
     public static OperatingSystem getOperatingSystem(String desc) {
@@ -57,6 +58,9 @@ public enum OperatingSystem {
         }
         if (desc.contains("WINDOWS")) {
             return OperatingSystem.WINDOWS;
+        }
+        if (desc.startsWith("MAC OS")) {
+            return OperatingSystem.MACOS;
         }
         if ("CYGWIN".equals(desc)) {
             return OperatingSystem.CYGWIN;

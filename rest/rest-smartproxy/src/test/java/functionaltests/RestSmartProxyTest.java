@@ -71,6 +71,7 @@ import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
+import org.ow2.proactive.scheduler.smartproxy.common.AbstractSmartProxy;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
@@ -91,12 +92,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     protected File inputLocalFolder;
 
     protected File outputLocalFolder;
-
-    protected String userspace;
-
-    protected String pushUrl;
-
-    protected String pullUrl;
 
     protected static final String TASK_NAME = "TestJavaTask";
 
@@ -134,14 +129,11 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
     }
 
     private void initializeRestSmartProxyInstance() throws Exception {
+        org.apache.log4j.Logger.getLogger(AbstractSmartProxy.class).setLevel(org.apache.log4j.Level.TRACE);
         restSmartProxy = new RestSmartProxyImpl();
         restSmartProxy.cleanDatabase();
         restSmartProxy.setSessionName(uniqueSessionId());
         restSmartProxy.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
-
-        userspace = restSmartProxy.getUserSpaceURIs().get(0);
-        pushUrl = userspace;
-        pullUrl = userspace;
 
         // we add special characters and space to the folders to make sure
         // transfer occurs normally
@@ -238,9 +230,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         JobId jobId = restSmartProxy.submit(job,
                                             inputLocalFolder.getAbsolutePath(),
-                                            pushUrl,
                                             outputLocalFolder.getAbsolutePath(),
-                                            pullUrl,
                                             false,
                                             false);
 
@@ -295,8 +285,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
         scriptTask.setOnTaskError(OnTaskError.PAUSE_TASK);
         scriptTask.setMaxNumberOfExecution(2);
         job.addTask(scriptTask);
-        job.setInputSpace(userspace);
-        job.setOutputSpace(userspace);
         return job;
     }
 
@@ -341,9 +329,7 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
 
         JobId id = restSmartProxy.submit(job,
                                          inputLocalFolder.getAbsolutePath(),
-                                         pushUrl,
                                          outputLocalFolder.getAbsolutePath(),
-                                         pullUrl,
                                          isolateTaskOutput,
                                          automaticTransfer);
 
@@ -409,9 +395,6 @@ public final class RestSmartProxyTest extends AbstractRestFuncTestCase {
             }
             job.addTask(testTask);
         }
-
-        job.setInputSpace(userspace);
-        job.setOutputSpace(userspace);
 
         return job;
     }

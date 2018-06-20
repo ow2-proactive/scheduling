@@ -77,6 +77,7 @@ public class ScriptExecutor implements Callable<Node> {
         boolean selectionScriptSpecified = selectionScriptList != null && selectionScriptList.size() > 0;
         boolean nodeMatch = true;
         ScriptException exception = null;
+        boolean atLeastOneScriptExecuted = false;
 
         if (selectionScriptSpecified) {
             // initializing parallel script execution
@@ -89,6 +90,7 @@ public class ScriptExecutor implements Callable<Node> {
 
                 logger.info(rmnode.getNodeURL() + " : " + script.hashCode() + " executing");
                 try {
+                    atLeastOneScriptExecuted = true;
                     ScriptResult<Boolean> scriptResult = rmnode.executeScript(script, criteria.getBindings());
 
                     // processing the results
@@ -159,20 +161,21 @@ public class ScriptExecutor implements Callable<Node> {
             }
         }
 
-        // cleaning the node
-        try {
-            rmnode.clean();
-        } catch (Throwable t) {
-            logger.warn(rmnode.getNodeURL() + " : exception in cleaning", t);
-            logger.warn(rmnode.getNodeURL() + " : pinging the node");
+        if (atLeastOneScriptExecuted) {
             try {
-                // 'pingNode' call can fail with exception if NodeSource was destroyed
-                rmnode.getNodeSource().pingNode(rmnode.getNode());
-            } catch (Throwable pingError) {
-                logger.warn(rmnode.getNodeURL() + " : nodeSource " + rmnode.getNodeSourceName() +
-                            " seems to be removed ", pingError);
+                rmnode.clean();
+            } catch (Throwable t) {
+                logger.warn(rmnode.getNodeURL() + " : exception in cleaning", t);
+                logger.warn(rmnode.getNodeURL() + " : pinging the node");
+                try {
+                    // 'pingNode' call can fail with exception if NodeSource was destroyed
+                    rmnode.getNodeSource().pingNode(rmnode.getNode());
+                } catch (Throwable pingError) {
+                    logger.warn(rmnode.getNodeURL() + " : nodeSource " + rmnode.getNodeSourceName() +
+                                " seems to be removed ", pingError);
+                }
+                return null;
             }
-            return null;
         }
 
         if (exception != null) {
