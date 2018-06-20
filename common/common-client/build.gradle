@@ -7,6 +7,10 @@ dependencies {
     compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
 
     compile project(':common:common-api')
+
+    compile group: 'org.jasig.cas.client', name: 'cas-client-core', version: "${project.'version.cas.client'}"
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
+    compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
 }
 
 task stub(type: StubTask) {
