@@ -131,6 +131,9 @@ public class IAMStarter {
 
         } else if (OperatingSystem.getOperatingSystem(OS).equals(OperatingSystem.WINDOWS)) {
             javaCmd = "java.exe";
+
+        } else if (OperatingSystem.getOperatingSystem(OS).equals(OperatingSystem.MACOS)) {
+            javaCmd = "java";
         }
 
         String javaPath = paHome + SEPARATOR + "jre" + SEPARATOR + "bin" + SEPARATOR + javaCmd;
