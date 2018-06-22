@@ -419,7 +419,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 @Override
                 public void run() {
                     if (!toShutDown) {
-                        rmcoreStub.shutdown(true);
+                        PAFuture.waitFor(rmcoreStub.shutdown(true),
+                                         PAResourceManagerProperties.RM_SHUTDOWN_TIMEOUT.getValueAsInt() * 1000);
                     }
                 }
             });
@@ -1691,7 +1692,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             return PAActiveObject.pingActiveObject(entry.getValue());
         } catch (Exception e) {
-            logger.warn("", e);
             return false;
         }
     }
