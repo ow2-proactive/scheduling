@@ -96,7 +96,7 @@ public class IAMRestClient {
 
     public static String getServiceToken(String url, String service) throws IOException {
 
-        CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build();
+        httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build();
 
         HttpPost httpPost = new HttpPost(url);
 
