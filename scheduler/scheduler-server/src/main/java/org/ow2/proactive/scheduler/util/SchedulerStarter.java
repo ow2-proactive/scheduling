@@ -190,6 +190,8 @@ public class SchedulerStarter {
             startRouter();
         }
 
+        LOGGER.info("Scheduler version is " + getSchedulerVersion());
+
         startBootMicroservices();
 
         hsqldbServer = new SchedulerHsqldbStarter();
@@ -230,7 +232,7 @@ public class SchedulerStarter {
 
         // Do nothing if PA_home or the boot microservices path is not specified
         if (!(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.isSet() &&
-              PASchedulerProperties.SCHEDULER_HOME.isSet()))
+                PASchedulerProperties.SCHEDULER_HOME.isSet()))
             return;
 
         // Acquire paths required to start IAM microservice
@@ -264,7 +266,7 @@ public class SchedulerStarter {
             config.setPort(routerPort);
             config.setNbWorkerThreads(Runtime.getRuntime().availableProcessors());
             config.setReservedAgentConfigFile(new File(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                                                       PAMRRouterStarter.PATH_TO_ROUTER_CONFIG_FILE));
+                    PAMRRouterStarter.PATH_TO_ROUTER_CONFIG_FILE));
             Router.createAndStart(config);
             LOGGER.info("The router created on " + ProActiveInet.getInstance().getHostname() + ":" + routerPort);
         }
@@ -297,14 +299,14 @@ public class SchedulerStarter {
 
     private static boolean isPamrProtocolUsed() {
         return CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().contains("pamr") ||
-               CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().contains("pamr");
+                CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().contains("pamr");
     }
 
     private static SchedulerAuthenticationInterface startScheduler(CommandLine commandLine, String rmUrl)
             throws URISyntaxException, InternalSchedulerException, ParseException, SocketException,
             UnknownHostException, IllegalArgumentException {
         String policyFullName = getPolicyFullName(commandLine);
-        LOGGER.info("Scheduler version is " + getSchedulerVersion());
+
         LOGGER.info("Starting the scheduler...");
         SchedulerAuthenticationInterface sai = null;
         try {
@@ -457,92 +459,92 @@ public class SchedulerStarter {
         Options options = new Options();
 
         options.addOption(Option.builder("h")
-                                .longOpt(OPTION_HELP)
-                                .hasArg(false)
-                                .argName(OPTION_HELP)
-                                .required(false)
-                                .desc("to display this help")
-                                .build());
+                .longOpt(OPTION_HELP)
+                .hasArg(false)
+                .argName(OPTION_HELP)
+                .required(false)
+                .desc("to display this help")
+                .build());
 
         options.addOption(Option.builder("u")
-                                .longOpt(OPTION_RMURL)
-                                .hasArg(true)
-                                .argName(OPTION_RMURL)
-                                .required(false)
-                                .desc("bind to a given resource manager URL (default: localhost)")
-                                .build());
+                .longOpt(OPTION_RMURL)
+                .hasArg(true)
+                .argName(OPTION_RMURL)
+                .required(false)
+                .desc("bind to a given resource manager URL (default: localhost)")
+                .build());
 
         options.addOption(Option.builder("s")
-                                .longOpt(OPTION_SCHEDULER_URL)
-                                .hasArg(true)
-                                .argName(OPTION_SCHEDULER_URL)
-                                .required(false)
-                                .desc("bind to a given scheduler URL. Must be combined with " + OPTION_RMURL +
-                                      " (default: localhost)")
-                                .build());
+                .longOpt(OPTION_SCHEDULER_URL)
+                .hasArg(true)
+                .argName(OPTION_SCHEDULER_URL)
+                .required(false)
+                .desc("bind to a given scheduler URL. Must be combined with " + OPTION_RMURL +
+                        " (default: localhost)")
+                .build());
 
         options.addOption(Option.builder("p")
-                                .longOpt(OPTION_POLICY)
-                                .hasArg(true)
-                                .argName(OPTION_POLICY)
-                                .required(false)
-                                .desc("the complete name of the scheduling policy to use (default: org.ow2.proactive.scheduler.policy.DefaultPolicy)")
-                                .build());
+                .longOpt(OPTION_POLICY)
+                .hasArg(true)
+                .argName(OPTION_POLICY)
+                .required(false)
+                .desc("the complete name of the scheduling policy to use (default: org.ow2.proactive.scheduler.policy.DefaultPolicy)")
+                .build());
 
         options.addOption(Option.builder("ln")
-                                .longOpt(OPTION_LOCALNODES)
-                                .hasArg(true)
-                                .argName(OPTION_LOCALNODES)
-                                .required(false)
-                                .desc("the number of local nodes to start (can be 0; default: " +
-                                      RMStarter.DEFAULT_NODES_NUMBER + ")")
-                                .build());
+                .longOpt(OPTION_LOCALNODES)
+                .hasArg(true)
+                .argName(OPTION_LOCALNODES)
+                .required(false)
+                .desc("the number of local nodes to start (can be 0; default: " +
+                        RMStarter.DEFAULT_NODES_NUMBER + ")")
+                .build());
 
         options.addOption(Option.builder("t")
-                                .longOpt(OPTION_TIMEOUT)
-                                .hasArg(true)
-                                .argName(OPTION_TIMEOUT)
-                                .required(false)
-                                .desc("timeout used to start the nodes (only useful with local nodes; default: " +
-                                      DEFAULT_NODES_TIMEOUT + "ms)")
-                                .build());
+                .longOpt(OPTION_TIMEOUT)
+                .hasArg(true)
+                .argName(OPTION_TIMEOUT)
+                .required(false)
+                .desc("timeout used to start the nodes (only useful with local nodes; default: " +
+                        DEFAULT_NODES_TIMEOUT + "ms)")
+                .build());
 
         options.addOption(Option.builder("c")
-                                .longOpt(OPTION_CLEAN)
-                                .hasArg(false)
-                                .desc("clean scheduler and resource manager databases (default: false)")
-                                .build());
+                .longOpt(OPTION_CLEAN)
+                .hasArg(false)
+                .desc("clean scheduler and resource manager databases (default: false)")
+                .build());
 
         options.addOption(Option.builder()
-                                .longOpt(OPTION_CLEAN_NODESOURCES)
-                                .desc("drop all previously created nodesources from resource manager database (default: false)")
-                                .build());
+                .longOpt(OPTION_CLEAN_NODESOURCES)
+                .desc("drop all previously created nodesources from resource manager database (default: false)")
+                .build());
 
         options.addOption(Option.builder()
-                                .longOpt(OPTION_RM_ONLY)
-                                .desc("start only resource manager (implies " + OPTION_NO_REST + "; default: false)")
-                                .build());
+                .longOpt(OPTION_RM_ONLY)
+                .desc("start only resource manager (implies " + OPTION_NO_REST + "; default: false)")
+                .build());
 
         options.addOption(Option.builder()
-                                .longOpt(OPTION_NO_REST)
-                                .desc("do not deploy REST server and wars from dist/war (default: false)")
-                                .build());
+                .longOpt(OPTION_NO_REST)
+                .desc("do not deploy REST server and wars from dist/war (default: false)")
+                .build());
 
         options.addOption(Option.builder()
-                                .longOpt(OPTION_NO_ROUTER)
-                                .desc("do not deploy PAMR Router (default: false)")
-                                .build());
+                .longOpt(OPTION_NO_ROUTER)
+                .desc("do not deploy PAMR Router (default: false)")
+                .build());
 
         options.addOption(Option.builder()
-                                .longOpt(OPTION_NO_DISCOVERY)
-                                .desc("do not run discovery service for nodes (default: false)")
-                                .build());
+                .longOpt(OPTION_NO_DISCOVERY)
+                .desc("do not run discovery service for nodes (default: false)")
+                .build());
         options.addOption(Option.builder("dp")
-                                .longOpt(OPTION_DISCOVERY_PORT)
-                                .desc("discovery service port for nodes (default: " + DISCOVERY_DEFAULT_PORT + ")")
-                                .hasArg()
-                                .argName("port")
-                                .build());
+                .longOpt(OPTION_DISCOVERY_PORT)
+                .desc("discovery service port for nodes (default: " + DISCOVERY_DEFAULT_PORT + ")")
+                .hasArg()
+                .argName("port")
+                .build());
 
         return options;
     }
@@ -573,7 +575,7 @@ public class SchedulerStarter {
                     }
 
                     LOGGER.info("The resource manager with " + numberLocalNodes + " local nodes created on " +
-                                rmAuth.getHostURL());
+                            rmAuth.getHostURL());
                 } catch (AlreadyBoundException abe) {
                     LOGGER.error("The resource manager already exists on local host", abe);
                     System.exit(4);
@@ -594,11 +596,11 @@ public class SchedulerStarter {
         //first im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME,
-                              LocalInfrastructure.class.getName(),
-                              new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
-                              RestartDownNodesPolicy.class.getName(),
-                              new Object[] { "ALL", "ALL", "10000" },
-                              NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE);
+                LocalInfrastructure.class.getName(),
+                new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
+                RestartDownNodesPolicy.class.getName(),
+                new Object[] { "ALL", "ALL", "10000" },
+                NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE);
 
         credentials = creds;
     }
@@ -614,13 +616,13 @@ public class SchedulerStarter {
         setPropIfNotAlreadySet(PAResourceManagerProperties.RM_HOME.getKey(), schedHome);
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
-                               schedHome + "/config/network/server.ini");
+                schedHome + "/config/network/server.ini");
     }
 
     protected static void configureSecurityManager() {
         SecurityPolicyLoader.configureSecurityManager(System.getProperty(PASchedulerProperties.SCHEDULER_HOME.getKey()) +
-                                                      "/config/security.java.policy-server",
-                                                      PASchedulerProperties.POLICY_RELOAD_FREQUENCY_IN_SECONDS.getValueAsLong());
+                        "/config/security.java.policy-server",
+                PASchedulerProperties.POLICY_RELOAD_FREQUENCY_IN_SECONDS.getValueAsLong());
 
     }
 
@@ -677,8 +679,8 @@ public class SchedulerStarter {
                     os.close();
                     ps.close();
                     throw new InvalidScriptException("Failed to execute script: " +
-                                                     scriptResult.getException().getMessage(),
-                                                     scriptResult.getException());
+                            scriptResult.getException().getMessage(),
+                            scriptResult.getException());
                 }
                 LOGGER.info(os.toString());
 

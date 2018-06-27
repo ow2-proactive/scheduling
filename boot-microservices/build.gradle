@@ -6,16 +6,21 @@ repositories {
     mavenCentral()
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 configurations {
     iamWar
 }
 
 dependencies {
+
     compile project(':rm:rm-node')
 
     compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.2'
 
-    iamWar group: "org.ow2.proactive", name: "iam", version: "${schedulingVersion}", ext: "war"
+    iamWar group: "org.ow2.proactive", name: "iam", version: "${schedulingVersion}", ext: "war", changing: true
 }
 
 task copyIamWar(type: Copy) {
