@@ -190,6 +190,8 @@ public class SchedulerStarter {
             startRouter();
         }
 
+        LOGGER.info("Scheduler version is " + getSchedulerVersion());
+
         startBootMicroservices();
 
         hsqldbServer = new SchedulerHsqldbStarter();
@@ -304,7 +306,7 @@ public class SchedulerStarter {
             throws URISyntaxException, InternalSchedulerException, ParseException, SocketException,
             UnknownHostException, IllegalArgumentException {
         String policyFullName = getPolicyFullName(commandLine);
-        LOGGER.info("Scheduler version is " + getSchedulerVersion());
+
         LOGGER.info("Starting the scheduler...");
         SchedulerAuthenticationInterface sai = null;
         try {
