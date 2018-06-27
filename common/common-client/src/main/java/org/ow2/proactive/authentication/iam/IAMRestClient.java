@@ -47,6 +47,8 @@ public class IAMRestClient {
 
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());
 
+    private static CloseableHttpClient httpClient;
+
     private IAMRestClient() {
 
     }
@@ -56,7 +58,7 @@ public class IAMRestClient {
 
         String ticket = null;
 
-        CloseableHttpClient httpClient = new CommonHttpClientBuilder().build();
+        httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build();
 
         HttpPost httpPost = new HttpPost(url);
 
@@ -94,7 +96,7 @@ public class IAMRestClient {
 
     public static String getServiceToken(String url, String service) throws IOException {
 
-        CloseableHttpClient httpClient = new CommonHttpClientBuilder().build();
+        CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build();
 
         HttpPost httpPost = new HttpPost(url);
 
