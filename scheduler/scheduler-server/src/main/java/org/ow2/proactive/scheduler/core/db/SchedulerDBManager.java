@@ -1533,6 +1533,40 @@ public class SchedulerDBManager {
         });
     }
 
+    /**
+     * Load all task results associated with the given job id and task name
+     * When a task is executed several times (several attempts), all attempts are stored in the database.
+     * @param jobId job id
+     * @param taskName task name
+     * @return a list of task results
+     */
+    public List<TaskResult> loadTaskResultAllAttempts(final JobId jobId, final String taskName) {
+        return executeReadOnlyTransaction(new SessionWork<List<TaskResult>>() {
+
+            @Override
+            public List<TaskResult> doInTransaction(Session session) {
+                long id = jobId(jobId);
+
+                Object[] taskSearchResult = (Object[]) session.getNamedQuery("loadTasksResultByJobAndTaskName")
+                                                              .setParameter("taskName", taskName)
+                                                              .setParameter("job", session.load(JobData.class, id))
+                                                              .uniqueResult();
+
+                if (taskSearchResult == null) {
+                    throw new DatabaseManagerException("Failed to load result for task '" + taskName + ", job: " +
+                                                       jobId);
+                }
+
+                DBTaskId dbTaskId = (DBTaskId) taskSearchResult[0];
+                String taskName = (String) taskSearchResult[1];
+                TaskId taskId = TaskIdImpl.createTaskId(jobId, taskName, dbTaskId.getTaskId());
+
+                return loadTaskResultAllAttempts(session, taskId);
+            }
+
+        });
+    }
+
     public TaskResult loadTaskResult(final TaskId taskId, final int index) {
         return executeReadOnlyTransaction(new SessionWork<TaskResult>() {
             @Override
@@ -1540,6 +1574,21 @@ public class SchedulerDBManager {
                 return loadTaskResult(session, taskId, index);
             }
 
+        });
+    }
+
+    /**
+     * Load all task results associated with the given task id
+     * When a task is executed several times (several attempts), all attempts are stored in the database.
+     * @param taskId task id
+     * @return a list of task results
+     */
+    public List<TaskResult> loadTaskResultAllAttempts(final TaskId taskId) {
+        return executeReadOnlyTransaction(new SessionWork<List<TaskResult>>() {
+            @Override
+            public List<TaskResult> doInTransaction(Session session) {
+                return loadTaskResultAllAttempts(session, taskId);
+            }
         });
     }
 
@@ -1558,6 +1607,21 @@ public class SchedulerDBManager {
         } else {
             return results.get(0).toTaskResult(taskId);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<TaskResult> loadTaskResultAllAttempts(Session session, TaskId taskId) {
+        DBTaskId dbTaskId = taskId(taskId);
+
+        TaskData task = session.load(TaskData.class, dbTaskId);
+        Query query = session.getNamedQuery("loadTasksResultByTaskAsc").setParameter("task", task);
+
+        List<TaskResultData> resultsData = (List<TaskResultData>) query.list();
+        List<TaskResult> results = new ArrayList<>(resultsData.size());
+        for (TaskResultData resultData : resultsData) {
+            results.add(resultData.toTaskResult(taskId));
+        }
+        return results;
     }
 
     public void newJobSubmitted(final InternalJob job) {
