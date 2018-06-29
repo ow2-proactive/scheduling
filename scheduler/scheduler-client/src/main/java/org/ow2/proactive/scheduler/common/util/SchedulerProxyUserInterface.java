@@ -320,6 +320,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return uischeduler.getTaskResultAllIncarnations(jobId, taskName);
+    }
+
+    @Override
+    public List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return uischeduler.getTaskResultAllIncarnations(jobId, taskName);
+    }
+
+    @Override
     public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return uischeduler.getTaskResultFromIncarnation(jobId, taskName, inc);
