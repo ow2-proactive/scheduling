@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -1616,12 +1617,9 @@ public class SchedulerDBManager {
         TaskData task = session.load(TaskData.class, dbTaskId);
         Query query = session.getNamedQuery("loadTasksResultByTaskAsc").setParameter("task", task);
 
-        List<TaskResultData> resultsData = (List<TaskResultData>) query.list();
-        List<TaskResult> results = new ArrayList<>(resultsData.size());
-        for (TaskResultData resultData : resultsData) {
-            results.add(resultData.toTaskResult(taskId));
-        }
-        return results;
+        return ((List<TaskResultData>) query.list()).stream()
+                                                    .map(resultData -> resultData.toTaskResult(taskId))
+                                                    .collect(Collectors.toList());
     }
 
     public void newJobSubmitted(final InternalJob job) {

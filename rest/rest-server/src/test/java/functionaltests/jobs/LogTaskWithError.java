@@ -31,7 +31,7 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
-public class LogTask extends JavaExecutable {
+public class LogTaskWithError extends JavaExecutable {
 
     public static final String HELLO_WORLD = "HelloWorld";
 
@@ -41,6 +41,8 @@ public class LogTask extends JavaExecutable {
     public Serializable execute(TaskResult... results) throws Throwable {
         getOut().println(HELLO_WORLD);
         getErr().println(ERROR_MESSAGE);
-        return true;
+        getOut().flush();
+        getErr().flush();
+        throw new RuntimeException("Wanted exception");
     }
 }

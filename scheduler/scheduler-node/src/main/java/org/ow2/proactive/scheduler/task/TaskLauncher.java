@@ -366,19 +366,6 @@ public class TaskLauncher implements InitActive {
         return taskContextVariableExtractor.getAllVariables(taskContext);
     }
 
-    //    private void addPreviousTaskLogsFromUserSpace(File taskLogFile) {
-    //        if (initializer.isPreciousLogs()) {
-    //            try {
-    //                FileSelector taskLogFileSelector = new FileSelector(taskLogFile.getName());
-    //                taskLogFileSelector.setIncludes(new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
-    //                initializer.getTaskInputFiles().add(new InputSelector(taskLogFileSelector,
-    //                        InputAccessMode.TransferFromUserSpace));
-    //            } catch (Exception e) {
-    //                logger.warn("Cannot copy logs of previous task execution from user data space", e);
-    //            }
-    //        }
-    //    }
-
     private void copyTaskLogsFromUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
         if (initializer.isPreciousLogs()) {
             try {
