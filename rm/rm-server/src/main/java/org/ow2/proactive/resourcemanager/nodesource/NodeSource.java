@@ -761,6 +761,7 @@ public class NodeSource implements InitActive, RunActive {
 
         this.activePolicy.shutdown(initiator);
         this.infrastructureManager.internalShutDown();
+        this.rmcore.disconnect(Client.getId(PAActiveObject.getStubOnThis()));
         this.finishNodeSourceShutdown(initiator);
     }
 
