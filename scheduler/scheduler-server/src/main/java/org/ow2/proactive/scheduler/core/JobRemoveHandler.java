@@ -61,55 +61,62 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
-        long start = 0;
+        try {
+            long start = 0;
 
-        if (logger.isInfoEnabled()) {
-            start = System.currentTimeMillis();
-            logger.info("Removing job " + jobId);
-        }
+            if (logger.isInfoEnabled()) {
+                start = System.currentTimeMillis();
+                logger.info("Removing job " + jobId);
+            }
 
-        SchedulerDBManager dbManager = service.getInfrastructure().getDBManager();
+            SchedulerDBManager dbManager = service.getInfrastructure().getDBManager();
 
-        List<InternalJob> jobs = dbManager.loadJobWithTasksIfNotRemoved(jobId);
-        TerminationData terminationData;
+            List<InternalJob> jobs = dbManager.loadJobWithTasksIfNotRemoved(jobId);
+            TerminationData terminationData;
 
-        // if the context is not in sync with the database
-        if (jobs.size() != 1) {
-            terminationData = service.getJobs().removeJob(jobId);
-        } else {
-            // if the job was already finished we just remove it from the context
-            if (isInFinishedState(jobs.get(0))) {
+            // if the context is not in sync with the database
+            if (jobs.size() != 1) {
                 terminationData = service.getJobs().removeJob(jobId);
             } else {
-                terminationData = service.getJobs().killJob(jobId);
+                // if the job was already finished we just remove it from the context
+                if (isInFinishedState(jobs.get(0))) {
+                    terminationData = service.getJobs().removeJob(jobId);
+                } else {
+                    terminationData = service.getJobs().killJob(jobId);
+                }
             }
+            service.submitTerminationDataHandler(terminationData);
+
+            // if the job doesn't exist in the DB anymore we can stop here
+            if (jobs.size() != 1) {
+                return false;
+            }
+
+            InternalJob job = jobs.get(0);
+
+            job.setRemovedTime(System.currentTimeMillis());
+
+            boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
+
+            dbManager.removeJob(jobId, jobs.get(0).getRemovedTime(), removeFromDb);
+
+            ServerJobAndTaskLogs.getInstance().remove(jobId, job.getOwner());
+
+            if (logger.isInfoEnabled()) {
+                logger.info("Job " + jobId + " removed in " + (System.currentTimeMillis() - start) + "ms");
+            }
+
+            // send event to front-end
+            service.getListener()
+                   .jobStateUpdated(job.getOwner(),
+                                    new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
+                                                                  new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
+
+            service.wakeUpSchedulingThread();
+        } catch (Exception e) {
+            logger.error("Error while removing job " + jobId, e);
+            throw e;
         }
-        service.submitTerminationDataHandler(terminationData);
-
-        // if the job doesn't exist in the DB anymore we can stop here
-        if (jobs.size() != 1) {
-            return false;
-        }
-
-        jobs.get(0).setRemovedTime(System.currentTimeMillis());
-
-        boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
-
-        dbManager.removeJob(jobId, jobs.get(0).getRemovedTime(), removeFromDb);
-
-        ServerJobAndTaskLogs.remove(jobId);
-
-        if (logger.isInfoEnabled()) {
-            logger.info("Job " + jobId + " removed in " + (System.currentTimeMillis() - start) + "ms");
-        }
-
-        // send event to front-end
-        service.getListener()
-               .jobStateUpdated(jobs.get(0).getOwner(),
-                                new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
-                                                              new JobInfoImpl((JobInfoImpl) jobs.get(0).getJobInfo())));
-
-        service.wakeUpSchedulingThread();
 
         return true;
     }
