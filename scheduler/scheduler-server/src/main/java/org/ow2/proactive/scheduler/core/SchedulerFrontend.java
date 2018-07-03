@@ -676,6 +676,38 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      */
     @Override
     @ImmediateService
+    public List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return this.getTaskResultAllIncarnations(JobIdImpl.makeJobId(jobId), taskName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
+    public List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        // checking permissions
+        frontendState.checkPermissions("getTaskResultFromIncarnation",
+                                       frontendState.getIdentifiedJob(jobId),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+
+        jlogger.debug(jobId, "trying to get all task results associated with task " + taskName + " from job " + jobId);
+
+        try {
+            return dbManager.loadTaskResultAllAttempts(jobId, taskName);
+
+        } catch (DatabaseManagerException e) {
+            throw new UnknownTaskException("Unknown task " + taskName + ", job: " + jobId);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
     public boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions

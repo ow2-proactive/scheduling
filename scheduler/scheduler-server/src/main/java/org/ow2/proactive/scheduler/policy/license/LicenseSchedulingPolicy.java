@@ -122,7 +122,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         while (iter.hasNext()) {
             current_task = (EligibleTaskDescriptorImpl) iter.next();
 
-            if (current_task.getInternal().getStatus().equals(TaskStatus.FINISHED)) {
+            if (!current_task.getInternal().isTaskAlive()) {
                 iter.remove();
             }
         }

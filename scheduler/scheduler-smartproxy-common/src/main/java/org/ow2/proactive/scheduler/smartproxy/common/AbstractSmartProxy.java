@@ -1092,6 +1092,18 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
+    public List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().getTaskResultAllIncarnations(jobId, taskName);
+    }
+
+    @Override
+    public List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return getScheduler().getTaskResultAllIncarnations(jobId, taskName);
+    }
+
+    @Override
     public boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return getScheduler().killTask(jobId, taskName);

@@ -561,6 +561,16 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
         return schedulerProxy.getTaskResultFromIncarnation(jobId, taskName, inc);
     }
 
+    public List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return schedulerProxy.getTaskResultAllIncarnations(jobId, taskName);
+    }
+
+    public List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return schedulerProxy.getTaskResultAllIncarnations(jobId, taskName);
+    }
+
     public TaskResult getTaskResultFromIncarnation(String jobId, String taskName, int inc)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return schedulerProxy.getTaskResultFromIncarnation(jobId, taskName, inc);

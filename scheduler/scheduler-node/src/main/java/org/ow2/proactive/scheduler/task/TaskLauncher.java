@@ -51,6 +51,8 @@ import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.WalltimeExceededException;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputAccessMode;
+import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputAccessMode;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -184,6 +186,8 @@ public class TaskLauncher implements InitActive {
             dataspaces = factory.createTaskDataspaces(taskId,
                                                       initializer.getNamingService(),
                                                       executableContainer.isRunAsUser());
+
+            copyTaskLogsFromUserSpace(taskLogger.createLogFilePath(dataspaces.getScratchFolder()), dataspaces);
 
             File taskLogFile = taskLogger.createFileAppender(dataspaces.getScratchFolder());
 
@@ -360,6 +364,19 @@ public class TaskLauncher implements InitActive {
 
     private Map<String, Serializable> fileSelectorsFilters(TaskContext taskContext) throws Exception {
         return taskContextVariableExtractor.getAllVariables(taskContext);
+    }
+
+    private void copyTaskLogsFromUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
+        if (initializer.isPreciousLogs()) {
+            try {
+                FileSelector taskLogFileSelector = new FileSelector(taskLogFile.getName());
+                taskLogFileSelector.setIncludes(new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
+                dataspaces.copyInputDataToScratch(Collections.singletonList(new InputSelector(taskLogFileSelector,
+                                                                                              InputAccessMode.TransferFromUserSpace)));
+            } catch (Exception e) {
+                logger.warn("Cannot copy logs of task to user data spaces", e);
+            }
+        }
     }
 
     private void copyTaskLogsToUserSpace(File taskLogFile, TaskDataspaces dataspaces) {
