@@ -83,7 +83,7 @@ public class TestJobServerLogs extends SchedulerFunctionalTestNoRestart {
 
     private final String SCRIPT_OUTPUT = "SCRIPT_OUTPUT_" + Math.random();
 
-    private String logsLocation = ServerJobAndTaskLogs.getLogsLocation();
+    private String logsLocation = ServerJobAndTaskLogs.getInstance().getLogsLocation();
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("kk:mm:ss:SSS");
 
