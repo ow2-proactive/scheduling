@@ -761,7 +761,6 @@ public class NodeSource implements InitActive, RunActive {
 
         this.activePolicy.shutdown(initiator);
         this.infrastructureManager.internalShutDown();
-        this.rmcore.disconnect(Client.getId(PAActiveObject.getStubOnThis()));
         this.finishNodeSourceShutdown(initiator);
     }
 
@@ -769,6 +768,7 @@ public class NodeSource implements InitActive, RunActive {
      * Terminates a node source active object when the policy is shutdown. 
      */
     public void finishNodeSourceShutdown(Client initiator) {
+        this.rmcore.disconnect(Client.getId(PAActiveObject.getStubOnThis()));
         PAActiveObject.terminateActiveObject(false);
     }
 
