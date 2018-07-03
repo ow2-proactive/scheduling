@@ -98,7 +98,7 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
             boolean removeFromDb = PASchedulerProperties.JOB_REMOVE_FROM_DB.getValueAsBoolean();
 
-            dbManager.removeJob(jobId, jobs.get(0).getRemovedTime(), removeFromDb);
+            dbManager.removeJob(jobId, job.getRemovedTime(), removeFromDb);
 
             ServerJobAndTaskLogs.getInstance().remove(jobId, job.getOwner());
 

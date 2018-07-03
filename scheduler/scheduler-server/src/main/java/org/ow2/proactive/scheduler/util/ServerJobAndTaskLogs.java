@@ -27,7 +27,6 @@ package org.ow2.proactive.scheduler.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
@@ -229,7 +228,7 @@ public class ServerJobAndTaskLogs {
     }
 
     private static class LazyHolder {
-        static final ServerJobAndTaskLogs INSTANCE = new ServerJobAndTaskLogs();
+        private static final ServerJobAndTaskLogs INSTANCE = new ServerJobAndTaskLogs();
     }
 
 }
