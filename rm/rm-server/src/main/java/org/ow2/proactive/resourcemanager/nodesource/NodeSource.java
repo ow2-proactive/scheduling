@@ -659,10 +659,6 @@ public class NodeSource implements InitActive, RunActive {
             }
         }
 
-        if (this.toShutdown && this.nodes.size() == 0) {
-            this.shutdownNodeSourceServices(initiator);
-        }
-
         return new BooleanWrapper(true);
     }
 
@@ -765,12 +761,14 @@ public class NodeSource implements InitActive, RunActive {
 
         this.activePolicy.shutdown(initiator);
         this.infrastructureManager.internalShutDown();
+        this.finishNodeSourceShutdown(initiator);
     }
 
     /**
      * Terminates a node source active object when the policy is shutdown. 
      */
     public void finishNodeSourceShutdown(Client initiator) {
+        this.rmcore.disconnect(Client.getId(PAActiveObject.getStubOnThis()));
         PAActiveObject.terminateActiveObject(false);
     }
 

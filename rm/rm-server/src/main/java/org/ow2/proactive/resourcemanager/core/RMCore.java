@@ -1660,10 +1660,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.deployedNodeSources.size() == 0) {
             finalizeShutdown();
         } else {
-            for (Entry<String, NodeSource> entry : this.deployedNodeSources.entrySet()) {
-                removeAllNodes(entry.getKey(), preempt, true);
-                entry.getValue().shutdown(caller);
-            }
+            this.deployedNodeSources.forEach((nodeSourceName, nodeSource) -> {
+                removeAllNodes(nodeSourceName, preempt, true);
+                nodeSource.shutdown(this.caller);
+            });
             waitForAllNodeSourcesToBeShutdown();
             finalizeShutdown();
         }
