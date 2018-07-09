@@ -34,9 +34,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -47,12 +50,10 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobType;
-import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
-import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
@@ -131,12 +132,30 @@ public class JobDescriptorImpl implements JobDescriptor {
      */
     private void makeTree(InternalJob job) {
 
+        // task's name which cannot be entry point
+        // (because other tasks reference them in on of the if actions)
+        final Set<String> taskNames = job.getITasks()
+                                         .stream()
+                                         .filter(internalTask -> internalTask.getFlowScript() != null)
+                                         .filter(internalTask -> FlowActionType.parse(internalTask.getFlowScript()
+                                                                                                  .getActionType())
+                                                                               .equals(FlowActionType.IF))
+                                         .flatMap(internalTask -> Stream.of(internalTask.getFlowScript()
+                                                                                        .getActionTarget(),
+                                                                            internalTask.getFlowScript()
+                                                                                        .getActionTargetElse(),
+                                                                            internalTask.getFlowScript()
+                                                                                        .getActionContinuation())
+                                                                        .filter(Objects::nonNull)
+                                                                        .filter(action -> !action.equals(internalTask.getName())))
+                                         .collect(Collectors.toSet());
+
         //create task descriptor list
         for (InternalTask td : job.getITasks()) {
             //if this task is a first task, put it in eligible tasks list
             EligibleTaskDescriptor lt = new EligibleTaskDescriptorImpl(td);
 
-            if (isEntryPoint(td, job.getITasks())) {
+            if (isEntryPoint(td, taskNames)) {
                 eligibleTasks.put(td.getId(), lt);
             }
 
@@ -169,45 +188,19 @@ public class JobDescriptorImpl implements JobDescriptor {
      * a startable task : has no dependency, and is not target of an if control flow action
      *
      * @param t a Task
-     * @param otherTasks the other tasks contained in the job containing task t
+     * @param taskNames set of task names which cannot be entry point
      * @return true if t is an entry point among all tasks in otherTasks, or false
      */
-    private boolean isEntryPoint(InternalTask t, List<InternalTask> otherTasks) {
+    private boolean isEntryPoint(InternalTask t, Set<String> taskNames) {
         List<TaskState> deps = t.getDependences();
         boolean entryPoint = false;
 
         // an entry point has no dependency
-        if (deps == null || deps.size() == 0) {
-            entryPoint = true;
-        } else {
+        if (deps != null && !deps.isEmpty()) {
             return false;
         }
 
-        // a entry point is not target of an if
-        for (Task t2 : otherTasks) {
-            if (t.equals(t2)) {
-                continue;
-            }
-            FlowScript sc = t2.getFlowScript();
-            if (sc != null) {
-                String actionType = sc.getActionType();
-                if (FlowActionType.parse(actionType).equals(FlowActionType.IF)) {
-                    String tIf = sc.getActionTarget();
-                    String tElse = sc.getActionTargetElse();
-                    String tJoin = sc.getActionContinuation();
-                    if (tIf != null && tIf.equals(t.getName())) {
-                        return false;
-                    }
-                    if (tElse != null && tElse.equals(t.getName())) {
-                        return false;
-                    }
-                    if (tJoin != null && tJoin.equals(t.getName())) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return entryPoint;
+        return !taskNames.contains(t.getName());
     }
 
     /**
