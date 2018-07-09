@@ -134,6 +134,7 @@ public class JobDescriptorImpl implements JobDescriptor {
 
         // task's name which cannot be entry point
         // (because other tasks reference them in on of the if actions)
+<<<<<<< HEAD
         final Set<String> nonEligibleTaskNames = job.getITasks()
                                                     .stream()
                                                     .filter(internalTask -> internalTask.getFlowScript() != null)
