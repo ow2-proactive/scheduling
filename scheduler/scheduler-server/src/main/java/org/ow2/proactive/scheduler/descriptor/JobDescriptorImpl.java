@@ -187,20 +187,14 @@ public class JobDescriptorImpl implements JobDescriptor {
      * Tags all startable tasks as entry point
      * a startable task : has no dependency, and is not target of an if control flow action
      *
-     * @param t a Task
+     * @param internalTask a Task
      * @param taskNames set of task names which cannot be entry point
      * @return true if t is an entry point among all tasks in otherTasks, or false
      */
-    private boolean isEntryPoint(InternalTask t, Set<String> taskNames) {
-        List<TaskState> deps = t.getDependences();
-        boolean entryPoint = false;
+    private boolean isEntryPoint(InternalTask internalTask, Set<String> taskNames) {
+        List<TaskState> dependences = internalTask.getDependences();
 
-        // an entry point has no dependency
-        if (deps != null && !deps.isEmpty()) {
-            return false;
-        }
-
-        return !taskNames.contains(t.getName());
+        return (dependences == null || dependences.isEmpty()) && !taskNames.contains(internalTask.getName());
     }
 
     /**
