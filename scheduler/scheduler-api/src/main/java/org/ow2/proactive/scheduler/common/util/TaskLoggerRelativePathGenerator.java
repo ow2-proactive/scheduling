@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.util;
 
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 
 
@@ -40,6 +41,24 @@ public class TaskLoggerRelativePathGenerator {
     public TaskLoggerRelativePathGenerator(TaskId taskId) {
         this.fileName = LOG_FILE_PREFIX + "-" + taskId.getJobId() + "-" + taskId.value() + ".log";
         this.relativePath = taskId.getJobId().toString() + "/" + fileName;
+    }
+
+    /**
+     * Return an include pattern to find all log files associated with the given job id
+     * @param jobId id of a job
+     * @return an include pattern;
+     */
+    public static String getIncludePatternForAllLogFiles(JobId jobId) {
+        return jobId.toString() + "/" + LOG_FILE_PREFIX + "-" + jobId.toString() + "-*.log";
+    }
+
+    /**
+     * Return the containing folder of log files for a given job id
+     * @param jobId id of the job associated with logs
+     * @return a containing folder relative path
+     */
+    public static String getContainingFolderForLogFiles(JobId jobId) {
+        return jobId.toString();
     }
 
     public String getRelativePath() {

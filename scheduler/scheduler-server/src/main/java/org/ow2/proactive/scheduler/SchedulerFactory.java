@@ -228,11 +228,11 @@ public class SchedulerFactory {
             // creating the scheduler
             // if this fails then it will not continue.
             logger.debug("Creating scheduler frontend...");
-            PAActiveObject.newActive(SchedulerFrontend.class.getName(), new Object[] { rmURL, policyFullClassName });
+            PAActiveObject.newActive(SchedulerFrontend.class, new Object[] { rmURL, policyFullClassName });
 
             //ready
             logger.debug("Scheduler is now ready to be started!");
-            ServerJobAndTaskLogs.configure();
+            ServerJobAndTaskLogs.getInstance().configure();
         } catch (Exception e) {
             logger.error(e);
             e.printStackTrace();

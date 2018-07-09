@@ -168,12 +168,14 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
 
         JobResult jobResult = scheduler.getJobResult(jobId);
         Map<String, TaskResult> results = jobResult.getAllResults();
+        List<File> logFiles = new ArrayList<>();
         for (String taskName : expectedOutput.keySet()) {
 
             File taskLog = new File(userFile.toString() + "/" + jobId.value(),
                                     String.format("TaskLogs-%s-%s.log",
                                                   jobId.value(),
                                                   results.get(taskName).getTaskId().value()));
+            logFiles.add(taskLog);
             if (!taskLog.exists()) {
                 Assert.fail("Task log file " + taskLog.getAbsolutePath() + " doesn't exist");
             }
@@ -188,6 +190,32 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
                                     expectedLine, expectedOccurrences, StringUtils.countMatches(output, expectedLine));
             }
         }
+
+        // Test log removal
+        schedulerHelper.removeJob(jobId);
+
+        waitUntilAllLogsWereRemoved(jobId, logFiles);
+    }
+
+    private void waitUntilAllLogsWereRemoved(JobId jobId, List<File> logFiles) throws InterruptedException {
+        int cpt = 0;
+        while (!allLogFilesRemoved(logFiles) && cpt < 200) {
+            Thread.sleep(100);
+            cpt++;
+        }
+        if (cpt == 200) {
+            Assert.fail("Log file removal failed. Log files for job " + jobId +
+                        " were not removed, 20 seconds after job removal.");
+        }
+    }
+
+    private boolean allLogFilesRemoved(List<File> logFiles) {
+        for (File logFile : logFiles) {
+            if (logFile.exists()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Test

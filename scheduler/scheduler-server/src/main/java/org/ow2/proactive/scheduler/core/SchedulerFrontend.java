@@ -332,6 +332,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             this.spacesSupport = infrastructure.getSpacesSupport();
 
+            ServerJobAndTaskLogs.getInstance().setSpacesSupport(this.spacesSupport);
+
             this.corePublicKey = Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
             this.schedulingService = new SchedulingService(infrastructure,
                                                            frontendState,
@@ -1235,7 +1237,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                        frontendState.getIdentifiedJob(id),
                                        YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB);
 
-        return ServerJobAndTaskLogs.getJobLog(JobIdImpl.makeJobId(jobId), frontendState.getJobTasks(id));
+        return ServerJobAndTaskLogs.getInstance().getJobLog(JobIdImpl.makeJobId(jobId), frontendState.getJobTasks(id));
     }
 
     @Override
@@ -1250,7 +1252,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
         for (TaskId taskId : frontendState.getJobTasks(id)) {
             if (taskId.getReadableName().equals(taskName)) {
-                return ServerJobAndTaskLogs.getTaskLog(taskId);
+                return ServerJobAndTaskLogs.getInstance().getTaskLog(taskId);
             }
         }
 
@@ -1271,7 +1273,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             tasksIds.add(taskState.getId());
         }
 
-        return ServerJobAndTaskLogs.getJobLog(id, tasksIds);
+        return ServerJobAndTaskLogs.getInstance().getJobLog(id, tasksIds);
     }
 
     /**
