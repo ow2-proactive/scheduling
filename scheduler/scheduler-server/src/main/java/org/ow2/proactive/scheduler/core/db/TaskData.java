@@ -116,19 +116,13 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                 @NamedQuery(name = "findTaskDataById", query = "from TaskData td where td.id = :taskId"),
                 @NamedQuery(name = "getTotalNumberOfHostsUsed", query = "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id"),
                 @NamedQuery(name = "getTotalTasksCount", query = "select count(*) from TaskData task where task.jobData.removedTime = -1"),
-
-
-
                 @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task " +
-                        "left outer join fetch task.dependentTasks " +
-                        "left outer join fetch task.variables " +
-                        "left outer join fetch task.selectionScripts  " +
-                        "left outer join fetch task.dataspaceSelectors  " +
-                        "left outer join fetch task.envModifiers  " +
-                        "where task.id.jobId in (:ids)"),
-
-
-
+                                                            "left outer join fetch task.dependentTasks " +
+                                                            "left outer join fetch task.variables " +
+                                                            "left outer join fetch task.selectionScripts  " +
+                                                            "left outer join fetch task.dataspaceSelectors  " +
+                                                            "left outer join fetch task.envModifiers  " +
+                                                            "where task.id.jobId in (:ids)"),
                 @NamedQuery(name = "readAccountTasks", query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
                                                                "where task.finishedTime > 0 and task.jobData.owner = :username"),
                 @NamedQuery(name = "updateTaskData", query = "update TaskData task set task.taskStatus = :taskStatus, " +
@@ -785,9 +779,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-//    @Fetch(FetchMode.SELECT)
-    @OrderColumn(name="id")
-//    @LazyCollection(LazyCollectionOption.FALSE)
+    @OrderColumn(name = "id")
     public List<SelectionScriptData> getSelectionScripts() {
         return selectionScripts;
     }
@@ -799,7 +791,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @OrderColumn(name="id")
+    @OrderColumn(name = "id")
     public List<SelectorData> getDataspaceSelectors() {
         return dataspaceSelectors;
     }
