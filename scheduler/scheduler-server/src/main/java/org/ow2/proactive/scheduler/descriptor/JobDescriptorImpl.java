@@ -134,28 +134,28 @@ public class JobDescriptorImpl implements JobDescriptor {
 
         // task's name which cannot be entry point
         // (because other tasks reference them in on of the if actions)
-        final Set<String> taskNames = job.getITasks()
-                                         .stream()
-                                         .filter(internalTask -> internalTask.getFlowScript() != null)
-                                         .filter(internalTask -> FlowActionType.parse(internalTask.getFlowScript()
-                                                                                                  .getActionType())
-                                                                               .equals(FlowActionType.IF))
-                                         .flatMap(internalTask -> Stream.of(internalTask.getFlowScript()
-                                                                                        .getActionTarget(),
-                                                                            internalTask.getFlowScript()
-                                                                                        .getActionTargetElse(),
-                                                                            internalTask.getFlowScript()
-                                                                                        .getActionContinuation())
-                                                                        .filter(Objects::nonNull)
-                                                                        .filter(action -> !action.equals(internalTask.getName())))
-                                         .collect(Collectors.toSet());
+        final Set<String> nonEligibleTaskNames = job.getITasks()
+                                                    .stream()
+                                                    .filter(internalTask -> internalTask.getFlowScript() != null)
+                                                    .filter(internalTask -> FlowActionType.parse(internalTask.getFlowScript()
+                                                                                                             .getActionType())
+                                                                                          .equals(FlowActionType.IF))
+                                                    .flatMap(internalTask -> Stream.of(internalTask.getFlowScript()
+                                                                                                   .getActionTarget(),
+                                                                                       internalTask.getFlowScript()
+                                                                                                   .getActionTargetElse(),
+                                                                                       internalTask.getFlowScript()
+                                                                                                   .getActionContinuation())
+                                                                                   .filter(Objects::nonNull)
+                                                                                   .filter(action -> !action.equals(internalTask.getName())))
+                                                    .collect(Collectors.toSet());
 
         //create task descriptor list
         for (InternalTask td : job.getITasks()) {
             //if this task is a first task, put it in eligible tasks list
             EligibleTaskDescriptor lt = new EligibleTaskDescriptorImpl(td);
 
-            if (isEntryPoint(td, taskNames)) {
+            if (isEntryPoint(td, nonEligibleTaskNames)) {
                 eligibleTasks.put(td.getId(), lt);
             }
 
@@ -188,13 +188,13 @@ public class JobDescriptorImpl implements JobDescriptor {
      * a startable task : has no dependency, and is not target of an if control flow action
      *
      * @param internalTask a Task
-     * @param taskNames set of task names which cannot be entry point
+     * @param nonEligibleTaskNames set of task names which cannot be entry point
      * @return true if t is an entry point among all tasks in otherTasks, or false
      */
-    private boolean isEntryPoint(InternalTask internalTask, Set<String> taskNames) {
+    private boolean isEntryPoint(InternalTask internalTask, Set<String> nonEligibleTaskNames) {
         List<TaskState> dependences = internalTask.getDependences();
 
-        return (dependences == null || dependences.isEmpty()) && !taskNames.contains(internalTask.getName());
+        return (dependences == null || dependences.isEmpty()) && !nonEligibleTaskNames.contains(internalTask.getName());
     }
 
     /**
