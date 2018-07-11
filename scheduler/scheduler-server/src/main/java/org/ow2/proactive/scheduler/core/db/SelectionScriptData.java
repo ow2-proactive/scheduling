@@ -65,6 +65,8 @@ public class SelectionScriptData {
 
     private TaskData taskData;
 
+    private long order;
+
     static SelectionScriptData createForSelectionScript(SelectionScript script, TaskData taskData) {
         SelectionScriptData scriptData = new SelectionScriptData();
         initCommonAttributes(scriptData, script);
@@ -175,4 +177,12 @@ public class SelectionScriptData {
         this.selectionScriptDynamic = selectionScriptDynamic;
     }
 
+    @Column(name = "ORDER")
+    public long getOrder() {
+        return order;
+    }
+
+    public void setOrder(long order) {
+        this.order = order;
+    }
 }

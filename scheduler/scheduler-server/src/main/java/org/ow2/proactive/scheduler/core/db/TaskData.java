@@ -533,9 +533,14 @@ public class TaskData {
 
         if (task.getSelectionScripts() != null) {
             List<SelectionScriptData> scripts = new ArrayList<>(task.getSelectionScripts().size());
+            long order = 0;
             for (SelectionScript selectionScript : task.getSelectionScripts()) {
-                scripts.add(SelectionScriptData.createForSelectionScript(selectionScript, taskData));
+                final SelectionScriptData aSelectionScript = SelectionScriptData.createForSelectionScript(selectionScript,
+                                                                                                          taskData);
+                aSelectionScript.setOrder(order++);
+                scripts.add(aSelectionScript);
             }
+
             taskData.setSelectionScripts(scripts);
         }
         if (task.getExecutableContainer() != null) {
@@ -773,7 +778,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @OrderColumn(name = "id")
+    @OrderColumn(name = "ORDER")
     public List<SelectionScriptData> getSelectionScripts() {
         return selectionScripts;
     }
