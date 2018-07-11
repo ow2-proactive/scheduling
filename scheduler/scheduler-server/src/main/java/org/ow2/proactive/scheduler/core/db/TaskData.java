@@ -778,7 +778,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @OrderColumn(name = "ORDER")
+    @OrderColumn(name = "SCRIPT_ORDER")
     public List<SelectionScriptData> getSelectionScripts() {
         return selectionScripts;
     }

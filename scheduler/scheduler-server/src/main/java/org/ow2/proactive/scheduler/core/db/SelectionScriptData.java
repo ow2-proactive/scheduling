@@ -177,7 +177,7 @@ public class SelectionScriptData {
         this.selectionScriptDynamic = selectionScriptDynamic;
     }
 
-    @Column(name = "ORDER")
+    @Column(name = "SCRIPT_ORDER")
     public long getOrder() {
         return order;
     }
