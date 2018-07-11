@@ -189,7 +189,7 @@ public class TaskData {
 
     private List<SelectionScriptData> selectionScripts;
 
-    private List<SelectorData> dataspaceSelectors;
+    private Set<SelectorData> dataspaceSelectors;
 
     private ScriptData preScript;
 
@@ -268,7 +268,7 @@ public class TaskData {
 
     private ScriptData envScript;
 
-    private List<EnvironmentModifierData> envModifiers;
+    private Set<EnvironmentModifierData> envModifiers;
 
     private String workingDir;
 
@@ -331,12 +331,11 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @OrderColumn(name = "id")
-    public List<EnvironmentModifierData> getEnvModifiers() {
+    public Set<EnvironmentModifierData> getEnvModifiers() {
         return envModifiers;
     }
 
-    public void setEnvModifiers(List<EnvironmentModifierData> envModifiers) {
+    public void setEnvModifiers(Set<EnvironmentModifierData> envModifiers) {
         this.envModifiers = envModifiers;
     }
 
@@ -369,7 +368,7 @@ public class TaskData {
             }
         }
 
-        List<EnvironmentModifierData> envModifiers = getEnvModifiers();
+        Set<EnvironmentModifierData> envModifiers = getEnvModifiers();
 
         if (envModifiers != null) {
             for (EnvironmentModifierData envModifier : envModifiers) {
@@ -572,7 +571,7 @@ public class TaskData {
                 selectorsData.add(SelectorData.createForOutputSelector(selector, taskData));
             }
         }
-        taskData.setDataspaceSelectors(selectorsData);
+        taskData.setDataspaceSelectors(new HashSet<>(selectorsData));
 
         ForkEnvironment forkEnvironment = task.getForkEnvironment();
         if (forkEnvironment != null) {
@@ -596,7 +595,7 @@ public class TaskData {
                                                                     taskData));
                 }
 
-                taskData.setEnvModifiers(envModifiers);
+                taskData.setEnvModifiers(new HashSet<>(envModifiers));
             }
         }
 
@@ -791,12 +790,11 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @OrderColumn(name = "id")
-    public List<SelectorData> getDataspaceSelectors() {
+    public Set<SelectorData> getDataspaceSelectors() {
         return dataspaceSelectors;
     }
 
-    public void setDataspaceSelectors(List<SelectorData> dataspaceSelectors) {
+    public void setDataspaceSelectors(Set<SelectorData> dataspaceSelectors) {
         this.dataspaceSelectors = dataspaceSelectors;
     }
 
