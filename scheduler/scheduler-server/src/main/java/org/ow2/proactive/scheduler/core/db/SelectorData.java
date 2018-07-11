@@ -63,6 +63,8 @@ public class SelectorData {
 
     private String type;
 
+    private long order;
+
     static SelectorData createForInputSelector(InputSelector selector, TaskData task) {
         SelectorData selectorData = new SelectorData();
         selectorData.setAccessMode(selector.getMode().name());
@@ -176,4 +178,12 @@ public class SelectorData {
         this.excludes = excludes;
     }
 
+    @Column(name = "DS_SELECTOR_ORDER")
+    public long getOrder() {
+        return order;
+    }
+
+    public void setOrder(long order) {
+        this.order = order;
+    }
 }

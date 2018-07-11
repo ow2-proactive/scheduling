@@ -184,7 +184,7 @@ public class TaskData {
 
     private List<SelectionScriptData> selectionScripts;
 
-    private Set<SelectorData> dataspaceSelectors;
+    private List<SelectorData> dataspaceSelectors;
 
     private ScriptData preScript;
 
@@ -571,7 +571,13 @@ public class TaskData {
                 selectorsData.add(SelectorData.createForOutputSelector(selector, taskData));
             }
         }
-        taskData.setDataspaceSelectors(new HashSet<>(selectorsData));
+
+        long order = 0;
+        for (SelectorData selectorData : selectorsData) {
+            selectorData.setOrder(order++);
+        }
+
+        taskData.setDataspaceSelectors(selectorsData);
 
         ForkEnvironment forkEnvironment = task.getForkEnvironment();
         if (forkEnvironment != null) {
@@ -790,11 +796,12 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    public Set<SelectorData> getDataspaceSelectors() {
+    @OrderColumn(name = "DS_SELECTOR_ORDER")
+    public List<SelectorData> getDataspaceSelectors() {
         return dataspaceSelectors;
     }
 
-    public void setDataspaceSelectors(Set<SelectorData> dataspaceSelectors) {
+    public void setDataspaceSelectors(List<SelectorData> dataspaceSelectors) {
         this.dataspaceSelectors = dataspaceSelectors;
     }
 
