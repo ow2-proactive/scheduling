@@ -77,6 +77,18 @@ public abstract class ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public List<TaskResult> getTaskResultAllIncarnations(JobId arg0, String arg1)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        throw newUnsupportedOperationException();
+    }
+
+    @Override
+    public List<TaskResult> getTaskResultAllIncarnations(String arg0, String arg1)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        throw newUnsupportedOperationException();
+    }
+
+    @Override
     public TaskResult getTaskResultFromIncarnation(String arg0, String arg1, int arg2)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         throw newUnsupportedOperationException();

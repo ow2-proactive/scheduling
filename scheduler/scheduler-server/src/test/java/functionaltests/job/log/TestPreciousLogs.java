@@ -33,7 +33,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -56,6 +59,8 @@ import functionaltests.utils.SchedulerFunctionalTestNoRestart;
  * was copied into user data space ant log file contains task output and output
  * of pre- and post- scripts (and fork environment script for forked java task).
  *
+ * Test checks as well that log file contain all executions of a task in case of error
+ *
  * @author ProActive team
  */
 public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
@@ -65,14 +70,28 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
         @Override
         public Serializable execute(TaskResult... results) throws Throwable {
             getOut().println(TASK_OUTPUT);
+            getOut().flush();
             return TASK_OUTPUT;
         }
 
     }
 
-    static final String TASK_OUTPUT = "TestTaskOutput";
+    public static class TestJavaTaskWithError extends JavaExecutable {
 
-    private void testPreciousLogs(boolean createJavaTask, boolean forkEnv) throws Exception {
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            getOut().println(TASK_OUTPUT);
+            getOut().flush();
+            throw new RuntimeException("wanted error");
+        }
+
+    }
+
+    private static final int NB_EXECUTIONS = 2;
+
+    private static final String TASK_OUTPUT = "TestTaskOutput";
+
+    private void testPreciousLogs(boolean createJavaTask, boolean forkEnv, boolean generateError) throws Exception {
         TaskFlowJob job = new TaskFlowJob();
         job.setName(this.getClass().getSimpleName());
 
@@ -86,12 +105,18 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
             List<String> expectedTaskOutput = new ArrayList<>();
             expectedTaskOutput.add(TASK_OUTPUT);
             expectedTaskOutput.add(preOutput);
-            expectedTaskOutput.add(postOutput);
+            if (!generateError) {
+                expectedTaskOutput.add(postOutput);
+            }
 
             Task task;
             if (createJavaTask) {
                 JavaTask javaTask = new JavaTask();
-                javaTask.setExecutableClassName(TestJavaTask.class.getName());
+                if (generateError) {
+                    javaTask.setExecutableClassName(TestJavaTaskWithError.class.getName());
+                } else {
+                    javaTask.setExecutableClassName(TestJavaTask.class.getName());
+                }
 
                 if (forkEnv) {
                     ForkEnvironment env = new ForkEnvironment();
@@ -113,8 +138,12 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
                 task = nativeTask;
             }
 
-            task.setMaxNumberOfExecution(1);
-            task.setOnTaskError(OnTaskError.CANCEL_JOB);
+            if (generateError) {
+                task.setMaxNumberOfExecution(NB_EXECUTIONS);
+            } else {
+                task.setMaxNumberOfExecution(1);
+                task.setOnTaskError(OnTaskError.CANCEL_JOB);
+            }
             task.setPreciousLogs(true);
             task.setName("Task-" + i);
             task.setPreScript(createScript(preOutput));
@@ -125,21 +154,28 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
             job.addTask(task);
         }
 
-        JobId jobId = schedulerHelper.testJobSubmission(job);
-
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
 
         String userURI = scheduler.getUserSpaceURIs().get(0);
-        String userPath = new File(new URI(userURI)).getAbsolutePath();
+        File userFile = new File(new URI(userURI));
+
+        // Clean all log files in user space
+        for (File logFile : FileUtils.listFiles(userFile, new String[] { "log" }, true)) {
+            FileUtils.deleteQuietly(logFile);
+        }
+
+        JobId jobId = schedulerHelper.testJobSubmission(job, true, false);
 
         JobResult jobResult = scheduler.getJobResult(jobId);
         Map<String, TaskResult> results = jobResult.getAllResults();
+        List<File> logFiles = new ArrayList<>();
         for (String taskName : expectedOutput.keySet()) {
 
-            File taskLog = new File(userPath + "/" + jobId.value(),
+            File taskLog = new File(userFile.toString() + "/" + jobId.value(),
                                     String.format("TaskLogs-%s-%s.log",
                                                   jobId.value(),
                                                   results.get(taskName).getTaskId().value()));
+            logFiles.add(taskLog);
             if (!taskLog.exists()) {
                 Assert.fail("Task log file " + taskLog.getAbsolutePath() + " doesn't exist");
             }
@@ -149,22 +185,63 @@ public class TestPreciousLogs extends SchedulerFunctionalTestNoRestart {
 
             for (String expectedLine : expectedOutput.get(taskName)) {
                 Assert.assertTrue("Output doesn't contain line " + expectedLine, output.contains(expectedLine));
+                int expectedOccurrences = (generateError ? NB_EXECUTIONS : 1);
+                Assert.assertEquals("Output doesn't contain " + expectedOccurrences + " occurrences of line " +
+                                    expectedLine, expectedOccurrences, StringUtils.countMatches(output, expectedLine));
             }
+        }
+
+        // Test log removal
+        schedulerHelper.removeJob(jobId);
+
+        waitUntilAllLogsWereRemoved(jobId, logFiles);
+    }
+
+    private void waitUntilAllLogsWereRemoved(JobId jobId, List<File> logFiles) throws InterruptedException {
+        int cpt = 0;
+        while (!allLogFilesRemoved(logFiles) && cpt < 200) {
+            Thread.sleep(100);
+            cpt++;
+        }
+        if (cpt == 200) {
+            Assert.fail("Log file removal failed. Log files for job " + jobId +
+                        " were not removed, 20 seconds after job removal.");
         }
     }
 
-    @Test
-    public void testPreciousLogsTransfer() throws Exception {
-        if (OperatingSystem.getOperatingSystem() == OperatingSystem.unix) {
-            System.out.println("Test native task");
-            testPreciousLogs(false, false);
+    private boolean allLogFilesRemoved(List<File> logFiles) {
+        for (File logFile : logFiles) {
+            if (logFile.exists()) {
+                return false;
+            }
         }
+        return true;
+    }
 
-        System.out.println("Test script task");
-        testPreciousLogs(true, false);
+    @Test
+    public void testPreciousLogsTransferNativeTask() throws Exception {
+        Assume.assumeTrue(OperatingSystem.getOperatingSystem() == OperatingSystem.unix);
 
+        System.out.println("Test native task");
+        testPreciousLogs(false, false, false);
+    }
+
+    @Test
+    public void testPreciousLogsTransferJavaTask() throws Exception {
+        System.out.println("Test java task");
+        testPreciousLogs(true, false, false);
+    }
+
+    @Test
+    public void testPreciousLogsTransferForkedJavaTask() throws Exception {
         System.out.println("Test forked java task");
-        testPreciousLogs(true, true);
+        testPreciousLogs(true, true, false);
+    }
+
+    @Test
+    public void testPreciousLogsTransferForkedJavaTaskWithError() throws Exception {
+        System.out.println("Test forked java task with error");
+        testPreciousLogs(true, true, true);
     }
 
     static SimpleScript createScript(String scriptOutput) throws Exception {

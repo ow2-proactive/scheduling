@@ -152,6 +152,20 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        renewSession();
+        return client.getTaskResultAllIncarnations(jobId, taskName);
+    }
+
+    @Override
+    public List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        renewSession();
+        return client.getTaskResultAllIncarnations(jobId, taskName);
+    }
+
+    @Override
     public boolean killTask(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();

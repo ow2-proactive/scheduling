@@ -46,6 +46,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
                                                             "task.preciousResult from TaskResultData as taskResult left outer join taskResult.taskRuntimeData as task " + "where task.jobData = :job order by task.id, taskResult.resultTime desc"),
                 @NamedQuery(name = "loadTasksResultByJobAndTaskName", query = "select id, taskName from TaskData where taskName = :taskName and jobData = :job"),
                 @NamedQuery(name = "loadTasksResultByTask", query = "from TaskResultData result where result.taskRuntimeData = :task order by result.resultTime desc"),
+                @NamedQuery(name = "loadTasksResultByTaskAsc", query = "from TaskResultData result where result.taskRuntimeData = :task order by result.resultTime"),
                 @NamedQuery(name = "loadTasksResults", query = "select taskResult, " + "task.id, " + "task.taskName, " +
                                                                "task.preciousResult from TaskResultData as taskResult join taskResult.taskRuntimeData as task " + "where task.id in (:tasksIds) order by task.id, taskResult.resultTime desc"),
                 @NamedQuery(name = "countTaskResultData", query = "select count (*) from TaskResultData") })

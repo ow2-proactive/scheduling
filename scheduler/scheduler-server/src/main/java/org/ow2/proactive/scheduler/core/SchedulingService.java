@@ -1117,7 +1117,6 @@ public class SchedulingService {
             List<Long> longList = new ArrayList<>(jobIdList.size());
             for (JobId jobId : jobIdList) {
                 TerminationData terminationData = jobs.removeJob(jobId);
-                ServerJobAndTaskLogs.remove(jobId);
                 submitTerminationDataHandler(terminationData);
             }
             List<InternalJob> jobsFromDB;
@@ -1136,6 +1135,7 @@ public class SchedulingService {
                                                                                 new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
                     getListener().jobUpdatedFullData(job);
                     longList.add(job.getId().longValue());
+                    ServerJobAndTaskLogs.getInstance().remove(job.getId(), job.getOwner());
                     logger.info("HOUSEKEEPING sent JOB_REMOVE_FINISHED notification for job " + job.getId());
                 }
             }

@@ -332,6 +332,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
             this.spacesSupport = infrastructure.getSpacesSupport();
 
+            ServerJobAndTaskLogs.getInstance().setSpacesSupport(this.spacesSupport);
+
             this.corePublicKey = Credentials.getPublicKey(PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PUBKEY_PATH.getValueAsString()));
             this.schedulingService = new SchedulingService(infrastructure,
                                                            frontendState,
@@ -665,6 +667,38 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                     break;
             }
             return result;
+
+        } catch (DatabaseManagerException e) {
+            throw new UnknownTaskException("Unknown task " + taskName + ", job: " + jobId);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
+    public List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        return this.getTaskResultAllIncarnations(JobIdImpl.makeJobId(jobId), taskName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @ImmediateService
+    public List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
+        // checking permissions
+        frontendState.checkPermissions("getTaskResultFromIncarnation",
+                                       frontendState.getIdentifiedJob(jobId),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+
+        jlogger.debug(jobId, "trying to get all task results associated with task " + taskName + " from job " + jobId);
+
+        try {
+            return dbManager.loadTaskResultAllAttempts(jobId, taskName);
 
         } catch (DatabaseManagerException e) {
             throw new UnknownTaskException("Unknown task " + taskName + ", job: " + jobId);
@@ -1203,7 +1237,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                        frontendState.getIdentifiedJob(id),
                                        YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB);
 
-        return ServerJobAndTaskLogs.getJobLog(JobIdImpl.makeJobId(jobId), frontendState.getJobTasks(id));
+        return ServerJobAndTaskLogs.getInstance().getJobLog(JobIdImpl.makeJobId(jobId), frontendState.getJobTasks(id));
     }
 
     @Override
@@ -1218,7 +1252,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
         for (TaskId taskId : frontendState.getJobTasks(id)) {
             if (taskId.getReadableName().equals(taskName)) {
-                return ServerJobAndTaskLogs.getTaskLog(taskId);
+                return ServerJobAndTaskLogs.getInstance().getTaskLog(taskId);
             }
         }
 
@@ -1239,7 +1273,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             tasksIds.add(taskState.getId());
         }
 
-        return ServerJobAndTaskLogs.getJobLog(id, tasksIds);
+        return ServerJobAndTaskLogs.getInstance().getJobLog(id, tasksIds);
     }
 
     /**

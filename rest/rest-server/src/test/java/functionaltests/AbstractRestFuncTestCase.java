@@ -192,12 +192,16 @@ public abstract class AbstractRestFuncTestCase {
         return getScheduler().submit(job);
     }
 
-    protected String submitFinishedJob() throws Exception {
+    protected String submitFinishedJob(Class<?> clazz, int executionAttempts) throws Exception {
         Scheduler scheduler = getScheduler();
-        Job job = defaultJob();
+        Job job = createJob(clazz, executionAttempts);
         JobId jobId = scheduler.submit(job);
         waitJobState(jobId, JobStatus.FINISHED, 120000);
         return jobId.value();
+    }
+
+    protected String submitFinishedJob() throws Exception {
+        return submitFinishedJob(SimpleJob.class, 1);
     }
 
     public void waitJobState(JobId jobId, JobStatus expected, long timeout) throws Exception {
@@ -245,18 +249,24 @@ public abstract class AbstractRestFuncTestCase {
     }
 
     protected Job createJob(Class<?> clazz) throws Exception {
+        return createJob(clazz, 1);
+    }
+
+    protected Job createJob(Class<?> clazz, int executionAttempts) throws Exception {
+        OnTaskError errorPolicy = (executionAttempts == 1 ? OnTaskError.CANCEL_JOB
+                                                          : OnTaskError.CONTINUE_JOB_EXECUTION);
         TaskFlowJob job = new TaskFlowJob();
         job.setName(clazz.getSimpleName());
         job.setPriority(JobPriority.NORMAL);
-        job.setOnTaskError(OnTaskError.CANCEL_JOB);
+        job.setOnTaskError(errorPolicy);
         job.setDescription("Test " + clazz.getSimpleName());
-        job.setMaxNumberOfExecution(1);
+        job.setMaxNumberOfExecution(executionAttempts);
 
         JavaTask task = new JavaTask();
         task.setName(getTaskNameForClass(clazz));
         task.setExecutableClassName(clazz.getName());
-        task.setMaxNumberOfExecution(1);
-        task.setOnTaskError(OnTaskError.CANCEL_JOB);
+        task.setMaxNumberOfExecution(executionAttempts);
+        task.setOnTaskError(errorPolicy);
 
         String classpath = RestFuncTUtils.getClassPath(clazz);
         ForkEnvironment forkEnvironment = new ForkEnvironment();

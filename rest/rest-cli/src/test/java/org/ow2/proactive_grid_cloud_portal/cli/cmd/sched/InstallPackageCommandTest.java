@@ -181,24 +181,9 @@ public class InstallPackageCommandTest {
     }
 
     @Test(expected = CLIException.class)
-    public void testInvalidPackageWebbUrlProvided() throws Exception {
-
-        packagePath = "http://www.lamsade.dauphine.fr/~cornaz/Enseignement/ALGO-JAVA/";
-
-        InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
-        installPackageCommand.execute(currentContextMock);
-        assertThat(stack.get(0).getMessage(),
-                   is("'" + packagePath +
-                      "' is not a valid URL of a proactive package as it does not contain the METADATA.json and the resources folder required for installation."));
-
-        throw stack.get(0);
-
-    }
-
-    @Test(expected = CLIException.class)
     public void testInvalidGithubUrlProvided() throws Exception {
 
-        packagePath = "https://github.com/Aminelouati/wrong_github_url/archive/master.zip";
+        packagePath = "https://github.com/ow2-proactive/wrong_github_url/archive/master.zip";
 
         InstallPackageCommand installPackageCommand = new InstallPackageCommand(packagePath);
         installPackageCommand.execute(currentContextMock);

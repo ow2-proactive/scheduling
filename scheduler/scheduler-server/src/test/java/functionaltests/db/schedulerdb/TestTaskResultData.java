@@ -82,6 +82,37 @@ public class TestTaskResultData extends BaseSchedulerDBTest {
     }
 
     @Test
+    public void testTaskResultMultipleAttempts() throws Throwable {
+        TaskFlowJob jobDef = new TaskFlowJob();
+        jobDef.addTask(createDefaultTask("testTask"));
+        InternalJob internalJob = defaultSubmitJobAndLoadInternal(true, jobDef);
+        InternalTask task = internalJob.getTask("testTask");
+
+        dbManager.updateAfterTaskFinished(internalJob,
+                                          task,
+                                          new TaskResultImpl(null, new TestResult(0, "1_1"), null, 0));
+
+        dbManager.updateAfterTaskFinished(internalJob,
+                                          task,
+                                          new TaskResultImpl(null, new TestResult(0, "1_2"), null, 0));
+
+        TaskResult result1 = dbManager.loadTaskResult(jobDef.getId(), "testTask", 0);
+        TaskResult result2 = dbManager.loadTaskResult(jobDef.getId(), "testTask", 0);
+
+        // try to load individual task result attempts
+        Assert.assertNotNull(result1);
+        Assert.assertNotNull(result2);
+        Assert.assertNull(dbManager.loadTaskResult(jobDef.getId(), "testTask", 2));
+
+        List<TaskResult> results = dbManager.loadTaskResultAllAttempts(jobDef.getId(), "testTask");
+
+        Assert.assertEquals(2, results.size());
+        // list of results returned by loadTaskResultAllAttempts are in reverse order from individual index (list preserve the execution order, index starts from last execution)
+        Assert.assertEquals(results.get(0), result2);
+        Assert.assertEquals(results.get(1), result1);
+    }
+
+    @Test
     public void testMultipleResults() throws Throwable {
         TaskFlowJob job = new TaskFlowJob();
         job.addTask(createDefaultTask("task1"));
