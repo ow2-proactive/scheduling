@@ -42,6 +42,10 @@ public class SchedulerFunctionalTestNonForkModeWithRestart extends SchedulerFunc
 
     @BeforeClass
     public static void startSchedulerInAnyCase() throws Exception {
+
+        //Check if IAM microservice is required for authentication
+        prepareIAM();
+
         schedulerHelper.log("Start Scheduler in non-fork mode.");
         schedulerHelper = new SchedulerTHelper(false,
                                                new File(SchedulerFunctionalTest.class.getResource("/functionaltests/config/scheduler-nonforkedscripttasks.ini")

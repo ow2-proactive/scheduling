@@ -15,6 +15,11 @@ dependencies {
             project(':rm:rm-node'),
     )
 
+    //needed to start IAM for tests
+    testCompile project(':boot-microservices')
+    testCompile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.1'
+
+
     compile 'com.google.guava:guava:19.0'
 
     testCompile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"

@@ -27,6 +27,8 @@ package functionaltests.utils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 /**
@@ -40,6 +42,10 @@ public class SchedulerFunctionalTestWithRestart extends SchedulerFunctionalTest 
 
     @BeforeClass
     public static void startSchedulerInAnyCase() throws Exception {
+
+        //Check if IAM microservice is required for authentication
+        prepareIAM();
+
         schedulerHelper.log("Starting a clean scheduler.");
         schedulerHelper = new SchedulerTHelper(true);
     }

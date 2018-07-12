@@ -38,6 +38,8 @@ public class SchedulerTestConfiguration {
 
     public static final SchedulerTestConfiguration NOT_STARTED = new SchedulerTestConfiguration();
 
+    public static final int TEST_TIMEOUT = 2100000;
+
     private String schedulerConfigFile;
 
     private String rmConfigFile;

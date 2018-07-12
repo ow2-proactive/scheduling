@@ -64,54 +64,57 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 public class IAMLoginModule implements LoginModule {
 
     /** Logger instance */
-    private Logger logger = Logger.getLogger(IAMLoginModule.class.getName());
+    private static final Logger LOG = Logger.getLogger(IAMLoginModule.class.getName());
 
     private static final String IAM_URL_KEY = "iamServerUrlPrefix";
 
     /** JAAS authentication subject */
-    protected Subject subject;
+    private Subject subject;
 
     /** JAAS callback handler */
-    protected CallbackHandler callbackHandler;
+    private CallbackHandler callbackHandler;
 
     /** IAM Server URL */
-    protected String iamServerUrlPrefix;
+    private String iamServerUrlPrefix;
 
     /** IAM REST request for tickets */
-    protected String iamTicketRequest;
+    private String iamTicketRequest;
 
     /** IAM Ticket/Token validator */
-    protected String ticketValidatorClass;
+    private String ticketValidatorClass;
 
     /** IAM Ticket/Token validator extracted from ticketValidatorClass*/
-    protected TicketValidator ticketValidator;
+    private TicketValidator ticketValidator;
 
     /** IAM client service */
-    protected String service;
+    private String service;
 
     /** IAM assertion */
-    protected Assertion assertion;
+    private Assertion assertion;
 
     /** Name of the attribute in the CAS assertion that should be used for the username */
-    protected String userAttributeName;
+    private String userAttributeName;
+
+    /** character used to separate many roles assigned to the user */
+    private String roleSeparator;
 
     /** Name of the attribute in the CAS assertion that should be used for user role data */
-    protected String roleAttributeName;
+    private String roleAttributeName;
 
     /** IAM response header used to get the SSO ticket */
-    protected String ssoTicketHeader;
+    private String ssoTicketHeader;
 
     /** Boolean mentioning whether the JWT is signed */
-    protected boolean jsonWebTokenSigned;
+    private boolean jsonWebTokenSigned;
 
     /** Boolean mentioning whether the JWT encrypted */
-    protected boolean jsonWebTokenEncrypted;
+    private boolean jsonWebTokenEncrypted;
 
     /** JWT signature key */
-    protected String jsonWebTokenSignatureKey;
+    private String jsonWebTokenSignatureKey;
 
     /** JWT encryption key */
-    protected String jsonWebTokenEncryptionKey;
+    private String jsonWebTokenEncryptionKey;
 
     /** login status */
     private boolean succeeded = false;
@@ -144,40 +147,43 @@ public class IAMLoginModule implements LoginModule {
         this.ticketValidatorClass = null;
 
         for (final Map.Entry entry : options.entrySet()) {
-            logger.trace("Processing option " + entry.getKey());
+            LOG.trace("Processing option " + entry.getKey());
             if (IAM_URL_KEY.equals(entry.getKey())) {
                 this.iamServerUrlPrefix = (String) entry.getValue();
-                logger.debug("Set " + IAM_URL_KEY + "=" + this.iamServerUrlPrefix);
+                LOG.debug("Set " + IAM_URL_KEY + "=" + this.iamServerUrlPrefix);
             } else if ("iamTicketRequest".equals(entry.getKey())) {
                 this.iamTicketRequest = (String) entry.getValue();
-                logger.debug("Set iamTicketRequest=" + this.iamTicketRequest);
+                LOG.debug("Set iamTicketRequest=" + this.iamTicketRequest);
             } else if ("service".equals(entry.getKey())) {
                 this.service = (String) entry.getValue();
-                logger.debug("Set service=" + this.service);
+                LOG.debug("Set service=" + this.service);
             } else if ("ticketValidatorClass".equals(entry.getKey())) {
                 this.ticketValidatorClass = (String) entry.getValue();
-                logger.debug("Set ticketValidatorClass=" + ticketValidatorClass);
+                LOG.debug("Set ticketValidatorClass=" + ticketValidatorClass);
             } else if ("userAttributeName".equals(entry.getKey())) {
                 this.userAttributeName = (String) entry.getValue();
-                logger.trace("Got userAttributeName value" + userAttributeName);
+                LOG.trace("Got userAttributeName value" + userAttributeName);
             } else if ("roleAttributeName".equals(entry.getKey())) {
                 this.roleAttributeName = (String) entry.getValue();
-                logger.trace("Got roleAttributeName value" + roleAttributeName);
+                LOG.trace("Got roleAttributeName value" + roleAttributeName);
+            } else if ("roleSeparator".equals(entry.getKey())) {
+                this.roleSeparator = (String) entry.getValue();
+                LOG.trace("Got roleSeparator value" + roleSeparator);
             } else if ("ssoTicketHeader".equals(entry.getKey())) {
                 this.ssoTicketHeader = (String) entry.getValue();
-                logger.debug("Set ssoTicketHeader=" + ssoTicketHeader);
+                LOG.debug("Set ssoTicketHeader=" + ssoTicketHeader);
             } else if ("jsonWebTokenSigned".equals(entry.getKey())) {
                 this.jsonWebTokenSigned = Boolean.parseBoolean((String) entry.getValue());
-                logger.debug("Set jsonWebTokenSigned=" + jsonWebTokenSigned);
+                LOG.debug("Set jsonWebTokenSigned=" + jsonWebTokenSigned);
             } else if ("jsonWebTokenEncrypted".equals(entry.getKey())) {
                 this.jsonWebTokenEncrypted = Boolean.parseBoolean((String) entry.getValue());
-                logger.debug("Set jsonWebTokenEncrypted=" + jsonWebTokenEncrypted);
+                LOG.debug("Set jsonWebTokenEncrypted=" + jsonWebTokenEncrypted);
             } else if ("jsonWebTokenSignatureKey".equals(entry.getKey())) {
                 this.jsonWebTokenSignatureKey = (String) entry.getValue();
-                logger.debug("Set jsonWebTokenSignatureKey=" + jsonWebTokenSignatureKey);
+                LOG.debug("Set jsonWebTokenSignatureKey=" + jsonWebTokenSignatureKey);
             } else if ("jsonWebTokenEncryptionKey".equals(entry.getKey())) {
                 this.jsonWebTokenEncryptionKey = (String) entry.getValue();
-                logger.debug("Set jsonWebTokenEncryptionKey=" + jsonWebTokenEncryptionKey);
+                LOG.debug("Set jsonWebTokenEncryptionKey=" + jsonWebTokenEncryptionKey);
             }
 
         }
@@ -242,22 +248,25 @@ public class IAMLoginModule implements LoginModule {
                                       "User role returned by ticket validator " + this.ticketValidatorClass +
                                             " is null");
 
-            logger.debug("adding principal '" + authenticator + "' with group '" + role + "'");
-
             //Authentication
             subject.getPrincipals().add(new UserNamePrincipal(authenticator));
+            LOG.debug("adding principal '" + authenticator);
 
             //Authorization
-            subject.getPrincipals().add(new GroupNamePrincipal(role));
+            String[] groups = role.split(roleSeparator);
+            for (String group : groups) {
+                subject.getPrincipals().add(new GroupNamePrincipal(group.trim()));
+                LOG.debug("adding group '" + group + "' to principal '" + authenticator + "'");
+            }
 
             //Successful login
             succeeded = true;
-            logger.debug("authentication succeeded for user '" + authenticator + "'");
+            LOG.debug("authentication succeeded for user '" + authenticator + "'");
 
             return succeeded;
 
         } catch (IOException | UnsupportedCallbackException | TicketValidationException e) {
-            logger.error("", e);
+            LOG.error("", e);
             throw new LoginException(e.toString());
         }
     }
@@ -302,21 +311,14 @@ public class IAMLoginModule implements LoginModule {
      */
     private String getServiceToken(String username, String password) {
 
-        String serviceToken = null;
-
-        try {
-            // Acquire SSO ticket from IAM
-            String ssoTicket = IAMRestClient.getSSOTicket(iamServerUrlPrefix + iamTicketRequest,
-                                                          username,
-                                                          password,
-                                                          ssoTicketHeader);
-            // Acquire JWT based on SSO ticket
-            serviceToken = IAMRestClient.getServiceToken(iamServerUrlPrefix + iamTicketRequest + "/" + ssoTicket,
-                                                         service);
-
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+        // Acquire SSO ticket from IAM
+        String ssoTicket = IAMRestClient.getSSOTicket(iamServerUrlPrefix + iamTicketRequest,
+                                                      username,
+                                                      password,
+                                                      ssoTicketHeader);
+        // Acquire JWT based on SSO ticket
+        String serviceToken = IAMRestClient.getServiceToken(iamServerUrlPrefix + iamTicketRequest + "/" + ssoTicket,
+                                                            service);
 
         CommonUtils.assertNotNull(serviceToken, "no service token produced by IAM");
 
@@ -345,19 +347,19 @@ public class IAMLoginModule implements LoginModule {
                     final String property = (String) entry.getKey();
                     final String value = (String) entry.getValue();
 
-                    logger.debug("Attempting to set TicketValidator property " + property);
+                    LOG.debug("Attempting to set TicketValidator property " + property);
                     final PropertyDescriptor pd = ReflectUtils.getPropertyDescriptor(info, property);
                     if (pd != null) {
                         ReflectUtils.setProperty(property, convertIfNecessary(pd, value), validator, info);
-                        logger.debug("Set " + property + " = " + value);
+                        LOG.debug("Set " + property + " = " + value);
                     } else {
-                        logger.debug("Cannot find property " + property + " on " + className);
+                        LOG.debug("Cannot find property " + property + " on " + className);
                     }
                 }
             }
 
         } catch (final IntrospectionException e) {
-            logger.error("Error getting bean info for " + validatorClass + e.getMessage());
+            LOG.error("Error getting bean info for " + validatorClass + e.getMessage());
             return null;
         }
 

@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.authentication.iam;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -45,75 +44,79 @@ import org.ow2.proactive.http.CommonHttpClientBuilder;
 
 public class IAMRestClient {
 
-    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());
-
-    private static CloseableHttpClient httpClient;
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());
 
     private IAMRestClient() {
 
     }
 
-    public static String getSSOTicket(String url, String username, String password, String ticketHeader)
-            throws IOException {
+    public static synchronized String getSSOTicket(String url, String username, String password, String ticketHeader) {
 
         String ticket = null;
 
-        httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build();
+        try (CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build()) {
 
-        HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost(url);
 
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("username", username));
-        params.add(new BasicNameValuePair("password", password));
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("username", username));
+            params.add(new BasicNameValuePair("password", password));
 
-        httpPost.setEntity(new UrlEncodedFormEntity(params));
+            httpPost.setEntity(new UrlEncodedFormEntity(params));
 
-        HttpResponse httpResponse = httpClient.execute(httpPost);
+            HttpResponse httpResponse = httpClient.execute(httpPost);
 
-        if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) ||
-            (null == httpResponse.getEntity()))
-            throw new IAMException("Authentication failed");
+            if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) ||
+                (null == httpResponse.getEntity()))
+                throw new IAMException("Authentication failed");
 
-        Header[] headers = httpResponse.getHeaders(ticketHeader);
+            Header[] headers = httpResponse.getHeaders(ticketHeader);
 
-        if (headers[0] != null) {
+            if (headers[0] != null) {
 
-            Pattern pattern = Pattern.compile("(TGT-\\d+-\\S+)");
-            Matcher matcher = pattern.matcher(headers[0].toString());
+                Pattern pattern = Pattern.compile("(TGT-\\d+-\\S+)");
+                Matcher matcher = pattern.matcher(headers[0].toString());
 
-            if (matcher.find()) {
-                ticket = matcher.group(1);
-            } else
-                throw new IAMException("TGT not found in IAM response");
+                if (matcher.find()) {
+                    ticket = matcher.group(1);
+                } else
+                    throw new IAMException("TGT not found in IAM response");
+            }
+
+            LOG.debug("SSO ticket successfully generated for user " + username + "\n Token: " + ticket);
+
+        } catch (Exception e) {
+            throw new IAMException(e.getMessage());
         }
-
-        logger.debug("Token successfully generated for user " + username + "\n Token: " + ticket);
-
-        httpClient.close();
 
         return ticket;
     }
 
-    public static String getServiceToken(String url, String service) throws IOException {
+    public static synchronized String getServiceToken(String url, String service) {
 
-        httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build();
+        String token;
 
-        HttpPost httpPost = new HttpPost(url);
+        try (CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build()) {
 
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("service", service));
-        httpPost.setEntity(new UrlEncodedFormEntity(params));
+            HttpPost httpPost = new HttpPost(url);
 
-        HttpResponse httpResponse = httpClient.execute(httpPost);
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("service", service));
+            httpPost.setEntity(new UrlEncodedFormEntity(params));
 
-        if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) || (null == httpResponse.getEntity()))
-            throw new IAMException("Authentication failed");
+            HttpResponse httpResponse = httpClient.execute(httpPost);
 
-        String token = EntityUtils.toString(httpResponse.getEntity());
+            if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) ||
+                (null == httpResponse.getEntity()))
+                throw new IAMException("Authentication failed");
 
-        logger.debug("Token successfully generated for service " + service + "\n Token: " + token);
+            token = EntityUtils.toString(httpResponse.getEntity());
 
-        httpClient.close();
+            LOG.debug("Token successfully generated for service " + service + "\n Token: " + token);
+
+        } catch (Exception e) {
+            throw new IAMException(e.getMessage());
+        }
 
         return token;
     }

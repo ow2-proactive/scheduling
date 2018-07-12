@@ -41,6 +41,10 @@ public class SchedulerFunctionalTestWithCustomConfigAndRestart extends Scheduler
 
     @BeforeClass
     public static void letTheSubclassStartTheScheduler() throws Exception {
+
+        //Check if IAM microservice is required for authentication
+        prepareIAM();
+
         schedulerHelper.log("Scheduler has been started with a custom configuration.");
     }
 

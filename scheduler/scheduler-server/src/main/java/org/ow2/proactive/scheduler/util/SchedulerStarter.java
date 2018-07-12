@@ -137,6 +137,8 @@ public class SchedulerStarter {
 
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
 
+    private static final String IAM_LOGIN_METHOD = "RMIAMLoginMethod";
+
     private static BroadcastDiscovery discoveryService;
 
     private static SchedulerHsqldbStarter hsqldbServer;
@@ -230,19 +232,22 @@ public class SchedulerStarter {
     private static void startBootMicroservices()
             throws IOException, InterruptedException, ExecutionException, ConfigurationException {
 
-        // Do nothing if PA_home or the boot microservices path is not specified
-        if (!(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.isSet() &&
-              PASchedulerProperties.SCHEDULER_HOME.isSet()))
-            return;
+        if (PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().equals(IAM_LOGIN_METHOD)) {
 
-        // Acquire paths required to start IAM microservice
-        String paHome = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
-        String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());
-        String bootConfigurationPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_CONFIGURATION_PATH.getValueAsString());
+            // Do nothing if PA_home or the boot microservices path is not specified
+            if (!(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.isSet() &&
+                  PASchedulerProperties.SCHEDULER_HOME.isSet()))
+                return;
 
-        // Start the IAM microservice and add the started process to the list of boot processes
-        Process iamProcess = IAMStarter.start(paHome, bootMicroservicesPath, bootConfigurationPath);
-        bootMicroservicesProcesses.add(iamProcess);
+            // Acquire paths required to start IAM microservice
+            String paHome = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
+            String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());
+            String bootConfigurationPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_CONFIGURATION_PATH.getValueAsString());
+
+            // Start the IAM microservice and add the started process to the list of boot processes
+            Process iamProcess = IAMStarter.start(paHome, bootMicroservicesPath, bootConfigurationPath);
+            bootMicroservicesProcesses.add(iamProcess);
+        }
     }
 
     public static void startJetty(String rmUrl, String scheduleUrl) {

@@ -96,6 +96,10 @@ public class TestRMProxyRebind extends MultipleRMTBase {
             SchedulerTHelper.log("Killing previous scheduler.");
             TestScheduler.kill();
         }
+
+        //Check if IAM microservice is required for authentication
+        prepareIAM();
+
         initConfigs();
     }
 

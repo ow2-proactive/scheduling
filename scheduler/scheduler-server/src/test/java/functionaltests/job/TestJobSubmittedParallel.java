@@ -38,6 +38,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -65,15 +66,17 @@ public class TestJobSubmittedParallel extends SchedulerFunctionalTestNoRestart {
 
         List<Future<List<JobId>>> futures = new ArrayList<>();
 
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+
         // submit all jobs
         repeater.accept(THREAD_POOL_SIZE, () -> futures.add(executorService.submit(() -> {
             List<JobId> result = new ArrayList<>();
             repeater.accept(NUMBER_OF_JOBS_PER_THREAD, () -> {
                 final JobId jobId = schedulerHelper.submitJob(simpleJob.getPath());
-                final JobState jobState = schedulerHelper.getSchedulerInterface().getJobState(jobId);
+                final JobState jobState = scheduler.getJobState(jobId);
                 jobState.getId().equals(jobId);
-                jobState.getSubmittedTime(); // call to chech there is no exception thrown
-                jobState.isFinished(); // call to chech there is no exception thrown
+                jobState.getSubmittedTime(); // call to check there is no exception thrown
+                jobState.isFinished(); // call to check there is no exception thrown
                 result.add(jobId);
             });
             return result;

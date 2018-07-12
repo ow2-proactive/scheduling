@@ -69,7 +69,7 @@ public class SchedulerDbManagerConcurrencyTest extends BaseSchedulerDBTest {
         this.scenario = scenario;
     }
 
-    @Test(timeout = 80000)
+    @Test(timeout = 160000)
     public void test() throws Exception {
         scenario.doTest(this);
     }

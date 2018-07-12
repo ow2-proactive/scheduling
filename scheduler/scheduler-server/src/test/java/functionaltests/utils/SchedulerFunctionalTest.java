@@ -27,10 +27,13 @@ package functionaltests.utils;
 
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
@@ -40,6 +43,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.tests.ProActiveTest;
 
 
@@ -58,6 +62,8 @@ public class SchedulerFunctionalTest extends ProActiveTest {
 
     protected static final Logger logger = Logger.getLogger("SchedulerTests");
 
+    private static final String IAM_LOGIN_METHOD = "SchedulerIAMLoginMethod";
+
     protected static SchedulerTHelper schedulerHelper;
 
     protected TestNode testNode;
@@ -65,8 +71,7 @@ public class SchedulerFunctionalTest extends ProActiveTest {
     protected List<TestNode> testNodes = new ArrayList<>();
 
     @Rule
-    public Timeout testTimeout = new Timeout(CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue(),
-                                             TimeUnit.MILLISECONDS);
+    public Timeout testTimeout = new Timeout(SchedulerTestConfiguration.TEST_TIMEOUT, TimeUnit.MILLISECONDS);
 
     protected Job parseXml(String workflowFile) throws JobCreationException {
         return Jobs.parseXml(getClass().getResource(workflowFile).getPath());
@@ -112,6 +117,28 @@ public class SchedulerFunctionalTest extends ProActiveTest {
                 schedulerHelper.killScheduler();
                 fail("Unexpected number of nodes after test : " + numberOfNodesAfterTest);
             }
+        }
+    }
+
+    /**
+     * Start IAM microservice if it is required for authentication
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws ConfigurationException
+     */
+    public static void prepareIAM()
+            throws IOException, InterruptedException, ExecutionException, ConfigurationException {
+
+        //Check if PA is configured to use IAM microservice for authentication
+        if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().equals(IAM_LOGIN_METHOD)) {
+
+            String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
+            String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());
+            String bootConfigurationPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_CONFIGURATION_PATH.getValueAsString());
+
+            IAMTHelper.startIAM(proactiveHome, bootMicroservicesPath, bootConfigurationPath);
         }
     }
 
