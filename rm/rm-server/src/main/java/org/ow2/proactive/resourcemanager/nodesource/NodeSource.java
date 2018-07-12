@@ -641,16 +641,15 @@ public class NodeSource implements InitActive, RunActive {
         //verifying if node is already in the list,
         //node could have fallen between remove request and the confirm
         if (this.nodes.containsKey(nodeUrl)) {
-            logger.info("Remove node " + nodeUrl + " from node source " + this.name);
+            logger.info("[" + this.name + "] removing node: " + nodeUrl);
             node = this.nodes.remove(nodeUrl);
         } else if (this.downNodes.containsKey(nodeUrl)) {
-            logger.info("Remove down node " + nodeUrl + " from node source " + this.name);
+            logger.info("[" + this.name + "] removing down node: " + nodeUrl);
             node = this.downNodes.remove(nodeUrl);
         }
 
         if (node == null) {
-            logger.error("Node " + nodeUrl + " cannot be removed from node source " + this.name +
-                         " because it is not known");
+            logger.error("[" + this.name + "] cannot remove node: " + nodeUrl + " because it is unknown");
             return new BooleanWrapper(false);
         } else {
             RMCore.topologyManager.removeNode(node);
