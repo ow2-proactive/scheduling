@@ -363,10 +363,10 @@ public class TaskData {
             }
         }
 
-        Set<EnvironmentModifierData> envModifiers = getEnvModifiers();
+        Set<EnvironmentModifierData> fetchedEnvModifiers = getEnvModifiers();
 
-        if (envModifiers != null) {
-            for (EnvironmentModifierData envModifier : envModifiers) {
+        if (fetchedEnvModifiers != null) {
+            for (EnvironmentModifierData envModifier : fetchedEnvModifiers) {
                 forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue());
             }
         }
