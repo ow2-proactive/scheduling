@@ -68,7 +68,7 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         // set a very small limit so that only 1 line would fit
         PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.updateProperty("10");
 
-        ServerJobAndTaskLogs.configure();
+        ServerJobAndTaskLogs.getInstance().configure();
 
         jobLogger = JobLogger.getInstance();
         Logger.getLogger(JobLogger.class).setLevel(Level.INFO);
@@ -100,19 +100,20 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(), JobLogger.getJobLogRelativePath(jobId)).exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(),
+        assertTrue(new File(ServerJobAndTaskLogs.getInstance().getLogsLocation(),
+                            JobLogger.getJobLogRelativePath(jobId)).exists());
+        assertTrue(new File(ServerJobAndTaskLogs.getInstance().getLogsLocation(),
                             JobLogger.getJobLogRelativePath(jobId) + ".1").exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(),
+        assertTrue(new File(ServerJobAndTaskLogs.getInstance().getLogsLocation(),
                             TaskLogger.getTaskLogRelativePath(taskId)).exists());
-        assertTrue(new File(ServerJobAndTaskLogs.getLogsLocation(),
+        assertTrue(new File(ServerJobAndTaskLogs.getInstance().getLogsLocation(),
                             TaskLogger.getTaskLogRelativePath(taskId) + ".1").exists());
 
-        assertEquals(4, new File(ServerJobAndTaskLogs.getLogsLocation() + "/" + jobId).list().length);
+        assertEquals(4, new File(ServerJobAndTaskLogs.getInstance().getLogsLocation() + "/" + jobId).list().length);
 
-        ServerJobAndTaskLogs.remove(jobId);
+        ServerJobAndTaskLogs.getInstance().remove(jobId, "test");
 
-        assertEquals(0, new File(ServerJobAndTaskLogs.getLogsLocation()).list().length);
+        assertEquals(0, new File(ServerJobAndTaskLogs.getInstance().getLogsLocation()).list().length);
     }
 
     @Test
@@ -124,25 +125,25 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
 
         assertEquals(1, fakeSchedulerHome.getRoot().list().length);
 
-        ServerJobAndTaskLogs.removeLogsDirectory();
+        ServerJobAndTaskLogs.getInstance().removeLogsDirectory();
 
         assertEquals(0, fakeSchedulerHome.getRoot().list().length);
     }
 
     private void checkContains(JobId jobId, TaskId taskId, String word) {
-        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
+        assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    containsString(word + " job log"));
-        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
+        assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    containsString(word + " task log"));
-        assertThat(ServerJobAndTaskLogs.getTaskLog(taskId), containsString(word + " task log"));
+        assertThat(ServerJobAndTaskLogs.getInstance().getTaskLog(taskId), containsString(word + " task log"));
     }
 
     private void checkDoesNotContain(JobId jobId, TaskId taskId, String word) {
-        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
+        assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    not(containsString(word + " job log")));
-        assertThat(ServerJobAndTaskLogs.getJobLog(jobId, Collections.singleton(taskId)),
+        assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    not(containsString(word + " task log")));
-        assertThat(ServerJobAndTaskLogs.getTaskLog(taskId), not(containsString(word + " task log")));
+        assertThat(ServerJobAndTaskLogs.getInstance().getTaskLog(taskId), not(containsString(word + " task log")));
     }
 
 }

@@ -63,6 +63,8 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
 
     private AtomicInteger handledNodes;
 
+    private RMCore rmCore;
+
     /** Node source of the policy */
     protected NodeSource nodeSource;
 
@@ -122,9 +124,7 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
      * Shutdown the policy
      */
     public void shutdown(Client initiator) {
-        RMCore rmCoreStub = this.nodeSource.getRMCore();
-        this.nodeSource.finishNodeSourceShutdown(initiator);
-        rmCoreStub.disconnect(Client.getId(PAActiveObject.getStubOnThis()));
+        this.rmCore.disconnect(Client.getId(PAActiveObject.getStubOnThis()));
         PAActiveObject.terminateActiveObject(false);
     }
 
@@ -140,6 +140,7 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
      */
     public void setNodeSource(NodeSource nodeSource) {
         this.nodeSource = nodeSource;
+        this.rmCore = this.nodeSource.getRMCore();
         Thread.currentThread().setName("Node Source Policy \"" + nodeSource.getName() + "\"");
     }
 

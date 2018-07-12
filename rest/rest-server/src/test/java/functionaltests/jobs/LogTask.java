@@ -35,9 +35,12 @@ public class LogTask extends JavaExecutable {
 
     public static final String HELLO_WORLD = "HelloWorld";
 
+    public static final String ERROR_MESSAGE = "ErrorMessage";
+
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
         getOut().println(HELLO_WORLD);
+        getErr().println(ERROR_MESSAGE);
         return true;
     }
 }

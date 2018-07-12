@@ -130,20 +130,27 @@ public class TaskLogger {
         return new Log4JTaskLogs(taskLogAppender.getStorage(), this.taskId.getJobId().value());
     }
 
+    public File createLogFilePath(File pathToFolder) throws IOException {
+        return new File(pathToFolder, new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
+    }
+
     public File createFileAppender(File pathToFolder) throws IOException {
         if (taskLogAppender.getAppender(FILE_APPENDER_NAME) != null) {
             throw new IllegalStateException("Only one file appender can be created");
         }
 
         File logFile = new File(pathToFolder, new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
+        boolean append = true;
+        if (!logFile.exists()) {
+            append = false;
+            logFile.getParentFile().mkdirs();
 
-        logFile.getParentFile().mkdirs();
-
-        FileUtils.touch(logFile);
+            FileUtils.touch(logFile);
+        }
 
         logFile.setWritable(true, false);
 
-        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), logFile.getAbsolutePath(), false);
+        FileAppender fap = new FileAppender(Log4JTaskLogs.getTaskLogLayout(), logFile.getAbsolutePath(), append);
         fap.setName(FILE_APPENDER_NAME);
         taskLogAppender.addAppender(fap);
 

@@ -169,6 +169,66 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
 
     /**
+     * Get the result for the given task name and all result incarnations in the
+     * given jobId.
+     * <p>
+     * This method returns a list of task result attempts. If the task
+     * has failed 3 times and then has worked, then the list will contain a list of 4 task results.
+     * 0 represents the first failed result attempt, 1 the next one, ..., and 3 represents the result of the last execution.
+     * In that sense the id order is reversed comparing to individual calls to getTaskResultFromIncarnation
+     *
+     * @param jobId
+     *            the job in which the task result is.
+     * @param taskName
+     *            the name of the task in which the result is.
+     * @return a list of Task Results containing information about the result. If the returned list is empty,
+     *         this task is not yet terminated or not available.
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws UnknownJobException
+     *             if the job does not exist.
+     * @throws UnknownTaskException
+     *             if this task does not exist in the job.
+     * @throws PermissionException
+     *             if you can't access to this particular job.
+     * @throws IllegalArgumentException
+     *             if the incarnation argument is lower than 0 or greater than
+     *             the number of terminated execution.
+     */
+    List<TaskResult> getTaskResultAllIncarnations(JobId jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
+
+    /**
+     * Get the result for the given task name and all result incarnations in the
+     * given jobId.
+     * <p>
+     * This method returns a list of task result attempts. If the task
+     * has failed 3 times and then has worked, then the list will contain a list of 4 task results.
+     * 0 represents the first failed result attempt, 1 the next one, ..., and 3 represents the result of the last execution.
+     * In that sense the id order is reversed comparing to individual calls to
+     *
+     * @param jobId
+     *            the job in which the task result is.
+     * @param taskName
+     *            the name of the task in which the result is.
+     * @return a list of Task Results containing information about the result. If the returned list is empty,
+     *         this task is not yet terminated or not available.
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws UnknownJobException
+     *             if the job does not exist.
+     * @throws UnknownTaskException
+     *             if this task does not exist in the job.
+     * @throws PermissionException
+     *             if you can't access to this particular job.
+     * @throws IllegalArgumentException
+     *             if the incarnation argument is lower than 0 or greater than
+     *             the number of terminated execution.
+     */
+    List<TaskResult> getTaskResultAllIncarnations(String jobId, String taskName)
+            throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException;
+
+    /**
      * Try to kill the task with the given task name in the given jobId. A user
      * can only kill HIS task.
      * <p>

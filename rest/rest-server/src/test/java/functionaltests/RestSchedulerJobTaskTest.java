@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -58,6 +59,8 @@ import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 import com.google.common.collect.Iterables;
 
+import functionaltests.jobs.LogTask;
+import functionaltests.jobs.LogTaskWithError;
 import functionaltests.utils.RestFuncTUtils;
 
 
@@ -274,6 +277,110 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         JSONObject jsonObject = toJsonObject(response);
         JSONArray jsonArray = (JSONArray) jsonObject.get("list");
         assertTrue(jsonArray.size() > 0);
+    }
+
+    @Test
+    public void testJobAndTaskLogs() throws Exception {
+        String jobId = submitFinishedJob(LogTask.class, 1);
+        String logs = getResourceAsString("jobs/" + jobId + "/result/log/all");
+        System.out.println("job testJobAndTaskLogs all logs:");
+        System.out.println(logs);
+        Assert.assertTrue("Logs should contain stdout of the task", logs.contains(LogTask.HELLO_WORLD));
+        Assert.assertTrue("Logs should contain stderr of the task", logs.contains(LogTask.ERROR_MESSAGE));
+
+        logs = getResourceAsString("jobs/" + jobId + "/tasks/" + getTaskNameForClass(LogTask.class) +
+                                   "/result/log/all");
+        System.out.println("task testJobAndTaskLogs all logs:");
+        System.out.println(logs);
+        Assert.assertTrue("Logs should contain stdout of the task", logs.contains(LogTask.HELLO_WORLD));
+        Assert.assertTrue("Logs should contain stderr of the task", logs.contains(LogTask.ERROR_MESSAGE));
+
+        logs = getResourceAsString("jobs/" + jobId + "/tasks/" + getTaskNameForClass(LogTask.class) +
+                                   "/result/log/out");
+        System.out.println("task testJobAndTaskLogs out logs:");
+        System.out.println(logs);
+        Assert.assertTrue("Logs should contain stdout of the task", logs.contains(LogTask.HELLO_WORLD));
+        Assert.assertFalse("Logs should not contain stderr of the task", logs.contains(LogTask.ERROR_MESSAGE));
+
+        logs = getResourceAsString("jobs/" + jobId + "/tasks/" + getTaskNameForClass(LogTask.class) +
+                                   "/result/log/err");
+        System.out.println("task testJobAndTaskLogs err logs:");
+        System.out.println(logs);
+        Assert.assertFalse("Logs should not contain stdout of the task", logs.contains(LogTask.HELLO_WORLD));
+        Assert.assertTrue("Logs should contain stderr of the task", logs.contains(LogTask.ERROR_MESSAGE));
+    }
+
+    private String getResourceAsString(String resourcePath) throws Exception {
+        String resource = getResourceUrl(resourcePath);
+        HttpGet httpGet = new HttpGet(resource);
+        setSessionHeader(httpGet);
+        HttpResponse response = executeUriRequest(httpGet);
+        assertHttpStatusOK(response);
+        return getContent(response);
+    }
+
+    @Test
+    public void testJobLogsWithError() throws Exception {
+        int executionAttempts = 2;
+        String jobId = submitFinishedJob(LogTaskWithError.class, executionAttempts);
+        String logs = getResourceAsString("jobs/" + jobId + "/result/log/all");
+        System.out.println("job testJobLogsWithError all logs:");
+        System.out.println(logs);
+        Assert.assertTrue("Logs should contain stdout of the task", logs.contains(LogTask.HELLO_WORLD));
+        Assert.assertTrue("Logs should contain stderr of the task", logs.contains(LogTask.ERROR_MESSAGE));
+
+        Assert.assertEquals("Job standard logs should contain " + 1 + " occurrence.",
+                            1,
+                            StringUtils.countMatches(logs, LogTask.HELLO_WORLD));
+        Assert.assertEquals("Job standard logs should contain " + 1 + " occurrence.",
+                            1,
+                            StringUtils.countMatches(logs, LogTask.ERROR_MESSAGE));
+
+        logs = getResourceAsString("jobs/" + jobId + "/log/full");
+        System.out.println("job testJobLogsWithError full logs:");
+        System.out.println(logs);
+        Assert.assertTrue("Logs should contain output of the task", logs.contains(LogTask.HELLO_WORLD));
+        Assert.assertTrue("Logs should contain stderr of the task", logs.contains(LogTask.ERROR_MESSAGE));
+
+        Assert.assertEquals("Job full logs should contain " + executionAttempts + " occurrence.",
+                            executionAttempts,
+                            StringUtils.countMatches(logs, LogTask.HELLO_WORLD));
+        Assert.assertEquals("Job full logs should contain " + executionAttempts + " occurrence.",
+                            executionAttempts,
+                            StringUtils.countMatches(logs, LogTask.ERROR_MESSAGE));
+
+        logs = getResourceAsString("jobs/" + jobId + "/tasks/" + getTaskNameForClass(LogTaskWithError.class) +
+                                   "/result/log/all");
+        System.out.println("task testJobLogsWithError all logs:");
+        System.out.println(logs);
+        Assert.assertEquals("Task logs should contain " + executionAttempts + " occurrence.",
+                            executionAttempts,
+                            StringUtils.countMatches(logs, LogTask.HELLO_WORLD));
+        Assert.assertEquals("Task logs should contain " + executionAttempts + " occurrence.",
+                            executionAttempts,
+                            StringUtils.countMatches(logs, LogTask.ERROR_MESSAGE));
+
+        logs = getResourceAsString("jobs/" + jobId + "/tasks/" + getTaskNameForClass(LogTaskWithError.class) +
+                                   "/result/log/out");
+        System.out.println("task testJobLogsWithError out logs:");
+        System.out.println(logs);
+        Assert.assertEquals("Task stdout logs should contain " + executionAttempts + " occurrence.",
+                            executionAttempts,
+                            StringUtils.countMatches(logs, LogTask.HELLO_WORLD));
+        Assert.assertEquals("Task stdout logs should contain " + 0 + " occurrence.",
+                            0,
+                            StringUtils.countMatches(logs, LogTask.ERROR_MESSAGE));
+
+        logs = getResourceAsString("jobs/" + jobId + "/tasks/" + getTaskNameForClass(LogTaskWithError.class) +
+                                   "/result/log/err");
+        System.out.println("task testJobLogsWithError err logs:");
+        System.out.println(logs);
+        Assert.assertEquals("Task stderr logs should contain " + 0 + " occurrence.",
+                            0,
+                            StringUtils.countMatches(logs, LogTask.HELLO_WORLD));
+        Assert.assertEquals("Task stderr logs should contain " + executionAttempts + " occurrence.",
+                            executionAttempts,
+                            StringUtils.countMatches(logs, LogTask.ERROR_MESSAGE));
     }
 
     private void assertJobId(String expected, JSONObject job) {

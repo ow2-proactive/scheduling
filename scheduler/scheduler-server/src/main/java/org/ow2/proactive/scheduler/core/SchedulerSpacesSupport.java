@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
@@ -65,7 +66,7 @@ public class SchedulerSpacesSupport {
      * @return the list of uris of the userspace
      */
     public List<String> getUserSpaceURIs(String username) {
-        DataSpacesFileObject o = this.userGlobalSpaces.get(username);
+        DataSpacesFileObject o = getUserSpace(username);
         if (o != null) {
             return o.getAllRealURIs();
         }
@@ -84,6 +85,8 @@ public class SchedulerSpacesSupport {
      * @return the default userspace of an identified user
      */
     public DataSpacesFileObject getUserSpace(String username) {
+        Validate.notBlank(username);
+        registerUserSpace(username);
         return this.userGlobalSpaces.get(username);
     }
 

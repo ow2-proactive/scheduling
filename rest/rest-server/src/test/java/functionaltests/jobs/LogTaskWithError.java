@@ -23,31 +23,26 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.common.util;
+package functionaltests.jobs;
 
-import org.ow2.proactive.scheduler.common.task.TaskId;
+import java.io.Serializable;
+
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
 
 
-public class TaskLoggerRelativePathGenerator {
+public class LogTaskWithError extends JavaExecutable {
 
-    // the prefix for log file produced in localspace
-    private static final String LOG_FILE_PREFIX = "TaskLogs";
+    public static final String HELLO_WORLD = "HelloWorld";
 
-    private final String relativePath;
+    public static final String ERROR_MESSAGE = "ErrorMessage";
 
-    private final String fileName;
-
-    public TaskLoggerRelativePathGenerator(TaskId taskId) {
-        this.fileName = LOG_FILE_PREFIX + "-" + taskId.getJobId() + "-" + taskId.value() + ".log";
-        this.relativePath = taskId.getJobId().toString() + "/" + fileName;
+    @Override
+    public Serializable execute(TaskResult... results) throws Throwable {
+        getOut().println(HELLO_WORLD);
+        getErr().println(ERROR_MESSAGE);
+        getOut().flush();
+        getErr().flush();
+        throw new RuntimeException("Wanted exception");
     }
-
-    public String getRelativePath() {
-        return this.relativePath;
-    }
-
-    public String getFileName() {
-        return this.fileName;
-    }
-
 }
