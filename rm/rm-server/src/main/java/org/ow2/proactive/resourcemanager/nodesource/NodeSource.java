@@ -637,29 +637,29 @@ public class NodeSource implements InitActive, RunActive {
      * @param nodeUrl the url of the node to be released
      */
     public BooleanWrapper removeNode(String nodeUrl, Client initiator) {
-
+        Node node = null;
         //verifying if node is already in the list,
         //node could have fallen between remove request and the confirm
         if (this.nodes.containsKey(nodeUrl)) {
-            logger.info("[" + name + "] removing node : " + nodeUrl);
-            Node node = nodes.remove(nodeUrl);
+            logger.info("[" + this.name + "] removing node: " + nodeUrl);
+            node = this.nodes.remove(nodeUrl);
+        } else if (this.downNodes.containsKey(nodeUrl)) {
+            logger.info("[" + this.name + "] removing down node: " + nodeUrl);
+            node = this.downNodes.remove(nodeUrl);
+        }
+
+        if (node == null) {
+            logger.error("[" + this.name + "] cannot remove node: " + nodeUrl + " because it is unknown");
+            return new BooleanWrapper(false);
+        } else {
             RMCore.topologyManager.removeNode(node);
             try {
-                infrastructureManager.internalRemoveNode(node);
+                this.infrastructureManager.internalRemoveNode(node);
             } catch (RMException e) {
                 logger.error(e.getCause().getMessage(), e);
             }
-        } else {
-            Node downNode = downNodes.remove(nodeUrl);
-            if (downNode != null) {
-                logger.info("[" + name + "] removing down node : " + nodeUrl);
-            } else {
-                logger.error("[" + name + "] removing node : " + nodeUrl + " which not belongs to this node source");
-                return new BooleanWrapper(false);
-            }
+            return new BooleanWrapper(true);
         }
-
-        return new BooleanWrapper(true);
     }
 
     /**
