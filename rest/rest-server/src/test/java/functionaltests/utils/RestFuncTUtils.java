@@ -35,6 +35,7 @@ import java.net.URI;
 import java.net.URL;
 import java.security.PublicKey;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -53,16 +54,13 @@ public class RestFuncTUtils {
     private RestFuncTUtils() {
     }
 
-    public static void destroy(Process process) {
-        process.destroy();
+    public static void destroy(Process process) throws InterruptedException {
+
         close(process.getOutputStream());
         close(process.getInputStream());
         close(process.getErrorStream());
 
-        if (process.isAlive()) {
-            process.destroyForcibly();
-        }
-        await().atMost(Duration.FIVE_MINUTES).until(processIsNotAlive(process));
+        process.destroyForcibly();
 
         System.out.println(String.format("Process ended with exit code %d. ", process.exitValue()));
     }
