@@ -60,7 +60,12 @@ public class RestFuncTUtils {
         close(process.getInputStream());
         close(process.getErrorStream());
 
-        process.destroyForcibly();
+        process.destroy();
+
+        if (!process.waitFor(1, TimeUnit.MINUTES)) {
+            process.destroyForcibly();
+            process.waitFor(1, TimeUnit.MINUTES);
+        }
 
         System.out.println(String.format("Process ended with exit code %d. ", process.exitValue()));
     }
