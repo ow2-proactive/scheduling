@@ -45,6 +45,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -110,7 +111,13 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                 @NamedQuery(name = "findTaskDataById", query = "from TaskData td where td.id = :taskId"),
                 @NamedQuery(name = "getTotalNumberOfHostsUsed", query = "select count(distinct executionHostName) from TaskData task where task.jobData.id = :id"),
                 @NamedQuery(name = "getTotalTasksCount", query = "select count(*) from TaskData task where task.jobData.removedTime = -1"),
-                @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task left outer join fetch task.dependentTasks where task.id.jobId in (:ids)"),
+                @NamedQuery(name = "loadJobsTasks", query = "from TaskData as task " +
+                                                            "left outer join fetch task.dependentTasks " +
+                                                            "left outer join fetch task.variables " +
+                                                            "left outer join fetch task.selectionScripts  " +
+                                                            "left outer join fetch task.dataspaceSelectors  " +
+                                                            "left outer join fetch task.envModifiers  " +
+                                                            "where task.id.jobId in (:ids)"),
                 @NamedQuery(name = "readAccountTasks", query = "select count(*), sum(task.finishedTime) - sum(task.startTime) from TaskData task " +
                                                                "where task.finishedTime > 0 and task.jobData.owner = :username"),
                 @NamedQuery(name = "updateTaskData", query = "update TaskData task set task.taskStatus = :taskStatus, " +
@@ -256,7 +263,7 @@ public class TaskData {
 
     private ScriptData envScript;
 
-    private List<EnvironmentModifierData> envModifiers;
+    private Set<EnvironmentModifierData> envModifiers;
 
     private String workingDir;
 
@@ -319,11 +326,11 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    public List<EnvironmentModifierData> getEnvModifiers() {
+    public Set<EnvironmentModifierData> getEnvModifiers() {
         return envModifiers;
     }
 
-    public void setEnvModifiers(List<EnvironmentModifierData> envModifiers) {
+    public void setEnvModifiers(Set<EnvironmentModifierData> envModifiers) {
         this.envModifiers = envModifiers;
     }
 
@@ -356,10 +363,10 @@ public class TaskData {
             }
         }
 
-        List<EnvironmentModifierData> envModifiers = getEnvModifiers();
+        Set<EnvironmentModifierData> fetchedEnvModifiers = getEnvModifiers();
 
-        if (envModifiers != null) {
-            for (EnvironmentModifierData envModifier : envModifiers) {
+        if (fetchedEnvModifiers != null) {
+            for (EnvironmentModifierData envModifier : fetchedEnvModifiers) {
                 forkEnv.addSystemEnvironmentVariable(envModifier.getName(), envModifier.getValue());
             }
         }
@@ -526,9 +533,14 @@ public class TaskData {
 
         if (task.getSelectionScripts() != null) {
             List<SelectionScriptData> scripts = new ArrayList<>(task.getSelectionScripts().size());
+            long order = 0;
             for (SelectionScript selectionScript : task.getSelectionScripts()) {
-                scripts.add(SelectionScriptData.createForSelectionScript(selectionScript, taskData));
+                final SelectionScriptData aSelectionScript = SelectionScriptData.createForSelectionScript(selectionScript,
+                                                                                                          taskData);
+                aSelectionScript.setOrder(order++);
+                scripts.add(aSelectionScript);
             }
+
             taskData.setSelectionScripts(scripts);
         }
         if (task.getExecutableContainer() != null) {
@@ -559,6 +571,12 @@ public class TaskData {
                 selectorsData.add(SelectorData.createForOutputSelector(selector, taskData));
             }
         }
+
+        long order = 0;
+        for (SelectorData selectorData : selectorsData) {
+            selectorData.setOrder(order++);
+        }
+
         taskData.setDataspaceSelectors(selectorsData);
 
         ForkEnvironment forkEnvironment = task.getForkEnvironment();
@@ -583,7 +601,7 @@ public class TaskData {
                                                                     taskData));
                 }
 
-                taskData.setEnvModifiers(envModifiers);
+                taskData.setEnvModifiers(new HashSet<>(envModifiers));
             }
         }
 
@@ -766,6 +784,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @OrderColumn(name = "SCRIPT_ORDER")
     public List<SelectionScriptData> getSelectionScripts() {
         return selectionScripts;
     }
@@ -777,6 +796,7 @@ public class TaskData {
     @Cascade(CascadeType.ALL)
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "taskData")
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @OrderColumn(name = "DS_SELECTOR_ORDER")
     public List<SelectorData> getDataspaceSelectors() {
         return dataspaceSelectors;
     }
