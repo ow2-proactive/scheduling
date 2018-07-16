@@ -44,8 +44,7 @@ public class SchedulerFunctionalTestNoRestart extends SchedulerFunctionalTest {
     @BeforeClass
     public static void doNotStartSchedulerIfNotNeeded() throws Exception {
 
-        //Check if IAM microservice is required for authentication
-        prepareIAM();
+        startIAMIfNeeded();
 
         SchedulerTHelper.log("Start the scheduler only if needed");
         schedulerHelper = new SchedulerTHelper(false);

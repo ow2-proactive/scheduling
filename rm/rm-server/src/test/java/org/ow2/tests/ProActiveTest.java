@@ -87,7 +87,7 @@ public class ProActiveTest {
      * @throws ExecutionException
      * @throws ConfigurationException
      */
-    public static void prepareIAM()
+    public static void startIAMIfNeeded()
             throws IOException, InterruptedException, ExecutionException, ConfigurationException {
 
         //Check if PA is configured to use IAM microservice for authentication

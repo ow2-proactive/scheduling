@@ -43,8 +43,7 @@ public class SchedulerFunctionalTestNonForkedModeNoRestart extends SchedulerFunc
     @BeforeClass
     public static void startDedicatedScheduler() throws Exception {
 
-        //Check if IAM microservice is required for authentication
-        prepareIAM();
+        startIAMIfNeeded();
 
         schedulerHelper.log("Start Scheduler in non-fork mode.");
         schedulerHelper = new SchedulerTHelper(false,

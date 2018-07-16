@@ -92,9 +92,6 @@ public class IAMLoginModule implements LoginModule {
     /** IAM assertion */
     private Assertion assertion;
 
-    /** Name of the attribute in the CAS assertion that should be used for the username */
-    private String userAttributeName;
-
     /** character used to separate many roles assigned to the user */
     private String roleSeparator;
 
@@ -104,39 +101,26 @@ public class IAMLoginModule implements LoginModule {
     /** IAM response header used to get the SSO ticket */
     private String ssoTicketHeader;
 
-    /** Boolean mentioning whether the JWT is signed */
-    private boolean jsonWebTokenSigned;
-
-    /** Boolean mentioning whether the JWT encrypted */
-    private boolean jsonWebTokenEncrypted;
-
-    /** JWT signature key */
-    private String jsonWebTokenSignatureKey;
-
-    /** JWT encryption key */
-    private String jsonWebTokenEncryptionKey;
-
     /** login status */
     private boolean succeeded = false;
 
     /**
-     * Initialize this <code>IAMLoginModule</code>.
+     * Initialize this IAMLoginModule.
      *
-     * <p>
      *
      * @param subject
-     *            the <code>Subject</code> not to be authenticated.
-     *            <p>
+     *            the Subject not to be authenticated.
+     *
      *
      * @param callbackHandler
-     *            a <code>CallbackHandler</code> to get the credentials of the
-     *            user, must work with <code>NoCallback</code> callbacks.
-     *            <p>
-     * @param sharedState state shared with other configured LoginModules. <p>
+     *            a CallbackHandler to get the credentials of the
+     *            user, must work with NoCallback callbacks.
+     *
+     * @param sharedState state shared with other configured LoginModules.
      *
      * @param options options specified in the login
-     *			<code>Configuration</code> for this particular
-     *			<code>IAMLoginModule</code>.
+     *			Configuration for this particular
+     *			IAMLoginModule.
      */
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
@@ -146,45 +130,42 @@ public class IAMLoginModule implements LoginModule {
         this.assertion = null;
         this.ticketValidatorClass = null;
 
+        CommonUtils.assertNotNull(options, "Options of IAMLoginModule cannot be null");
+        CommonUtils.assertNotEmpty(options.entrySet(), "Options of IAMLoginModule cannot be empty");
+
         for (final Map.Entry entry : options.entrySet()) {
-            LOG.trace("Processing option " + entry.getKey());
-            if (IAM_URL_KEY.equals(entry.getKey())) {
-                this.iamServerUrlPrefix = (String) entry.getValue();
-                LOG.debug("Set " + IAM_URL_KEY + "=" + this.iamServerUrlPrefix);
-            } else if ("iamTicketRequest".equals(entry.getKey())) {
-                this.iamTicketRequest = (String) entry.getValue();
-                LOG.debug("Set iamTicketRequest=" + this.iamTicketRequest);
-            } else if ("service".equals(entry.getKey())) {
-                this.service = (String) entry.getValue();
-                LOG.debug("Set service=" + this.service);
-            } else if ("ticketValidatorClass".equals(entry.getKey())) {
-                this.ticketValidatorClass = (String) entry.getValue();
-                LOG.debug("Set ticketValidatorClass=" + ticketValidatorClass);
-            } else if ("userAttributeName".equals(entry.getKey())) {
-                this.userAttributeName = (String) entry.getValue();
-                LOG.trace("Got userAttributeName value" + userAttributeName);
-            } else if ("roleAttributeName".equals(entry.getKey())) {
-                this.roleAttributeName = (String) entry.getValue();
-                LOG.trace("Got roleAttributeName value" + roleAttributeName);
-            } else if ("roleSeparator".equals(entry.getKey())) {
-                this.roleSeparator = (String) entry.getValue();
-                LOG.trace("Got roleSeparator value" + roleSeparator);
-            } else if ("ssoTicketHeader".equals(entry.getKey())) {
-                this.ssoTicketHeader = (String) entry.getValue();
-                LOG.debug("Set ssoTicketHeader=" + ssoTicketHeader);
-            } else if ("jsonWebTokenSigned".equals(entry.getKey())) {
-                this.jsonWebTokenSigned = Boolean.parseBoolean((String) entry.getValue());
-                LOG.debug("Set jsonWebTokenSigned=" + jsonWebTokenSigned);
-            } else if ("jsonWebTokenEncrypted".equals(entry.getKey())) {
-                this.jsonWebTokenEncrypted = Boolean.parseBoolean((String) entry.getValue());
-                LOG.debug("Set jsonWebTokenEncrypted=" + jsonWebTokenEncrypted);
-            } else if ("jsonWebTokenSignatureKey".equals(entry.getKey())) {
-                this.jsonWebTokenSignatureKey = (String) entry.getValue();
-                LOG.debug("Set jsonWebTokenSignatureKey=" + jsonWebTokenSignatureKey);
-            } else if ("jsonWebTokenEncryptionKey".equals(entry.getKey())) {
-                this.jsonWebTokenEncryptionKey = (String) entry.getValue();
-                LOG.debug("Set jsonWebTokenEncryptionKey=" + jsonWebTokenEncryptionKey);
+
+            String entryKey = (String) entry.getKey();
+            LOG.trace("Processing option " + entryKey);
+
+            switch (entryKey) {
+                case IAM_URL_KEY:
+                    this.iamServerUrlPrefix = (String) entry.getValue();
+                    break;
+                case "iamTicketRequest":
+                    this.iamTicketRequest = (String) entry.getValue();
+                    break;
+                case "service":
+                    this.service = (String) entry.getValue();
+                    break;
+                case "ticketValidatorClass":
+                    this.ticketValidatorClass = (String) entry.getValue();
+                    break;
+                case "roleAttributeName":
+                    this.roleAttributeName = (String) entry.getValue();
+                    break;
+                case "roleSeparator":
+                    this.roleSeparator = (String) entry.getValue();
+                    break;
+                case "ssoTicketHeader":
+                    this.ssoTicketHeader = (String) entry.getValue();
+                    break;
+                default:
+                    break;
+
             }
+
+            LOG.debug("Set " + entryKey + "=" + entry.getValue());
 
         }
 
@@ -196,17 +177,17 @@ public class IAMLoginModule implements LoginModule {
      * Authenticate the user by getting the user name and password from the
      * CallbackHandler.
      *
-     * <p>
      *
-     * @return true in all cases since this <code>IAMLoginModule</code>
+     *
+     * @return true in all cases since this IAMLoginModule
      *         should not be ignored.
      *
      * @exception FailedLoginException
      *                if the authentication fails.
-     *                <p>
+     *
      *
      * @exception LoginException
-     *                if this <code>IAMLoginModule</code> is unable to
+     *                if this IAMLoginModule is unable to
      *                perform the authentication.
      */
     @Override
@@ -272,21 +253,10 @@ public class IAMLoginModule implements LoginModule {
     }
 
     /**
-     * <p>
-     * This method is called if the LoginContext's overall authentication
-     * succeeded (the relevant REQUIRED, REQUISITE, SUFFICIENT and OPTIONAL
-     * LoginModules succeeded).
-     * <p>
-     *
-     * @exception LoginException
-     *                if the commit fails.
-     *
-     * @return true if this IAMLoginModule's own login and commit attempts
-     *         succeeded, or false otherwise.
+     * @see javax.security.auth.spi.LoginModule#commit()
      */
     @Override
     public boolean commit() throws LoginException {
-
         return succeeded;
     }
 
@@ -312,13 +282,13 @@ public class IAMLoginModule implements LoginModule {
     private String getServiceToken(String username, String password) {
 
         // Acquire SSO ticket from IAM
-        String ssoTicket = IAMRestClient.getSSOTicket(iamServerUrlPrefix + iamTicketRequest,
-                                                      username,
-                                                      password,
-                                                      ssoTicketHeader);
-        // Acquire JWT based on SSO ticket
-        String serviceToken = IAMRestClient.getServiceToken(iamServerUrlPrefix + iamTicketRequest + "/" + ssoTicket,
-                                                            service);
+        String ssoTicket = new IAMRestClient().getSSOTicket(iamServerUrlPrefix + iamTicketRequest,
+                                                            username,
+                                                            password,
+                                                            ssoTicketHeader);
+        // Acquire Service Token (i.e., JWT or CAS ST) based on SSO ticket
+        String serviceToken = new IAMRestClient().getServiceToken(iamServerUrlPrefix + iamTicketRequest + "/" +
+                                                                  ssoTicket, service);
 
         CommonUtils.assertNotNull(serviceToken, "no service token produced by IAM");
 
@@ -327,30 +297,33 @@ public class IAMLoginModule implements LoginModule {
     }
 
     /**
-     * Creates a {@link TicketValidator} instance from a class name and map of property name/value pairs.
-     * @param className Fully-qualified name of {@link TicketValidator} concrete class.
+     * Creates a TicketValidator instance from a class name and map of property name/value pairs.
+     * @param className Fully-qualified name of TicketValidator concrete class.
      * @param propertyMap Map of property name/value pairs to set on validator instance.
      * @return Ticket validator with properties set.
      */
-    private TicketValidator createTicketValidator(final String className, final Map<String, ?> propertyMap) {
+    private TicketValidator createTicketValidator(String className, Map<String, ?> propertyMap) {
         CommonUtils.assertTrue(propertyMap.containsKey(IAM_URL_KEY),
                                "Required property " + IAM_URL_KEY + " not found.");
 
-        final Class<TicketValidator> validatorClass = ReflectUtils.loadClass(className);
-        final TicketValidator validator = ReflectUtils.newInstance(validatorClass, propertyMap.get(IAM_URL_KEY));
+        Class<TicketValidator> validatorClass = ReflectUtils.loadClass(className);
+        TicketValidator validator = ReflectUtils.newInstance(validatorClass, propertyMap.get(IAM_URL_KEY));
 
         try {
-            final BeanInfo info = Introspector.getBeanInfo(validatorClass);
+            BeanInfo info = Introspector.getBeanInfo(validatorClass);
 
-            for (final Map.Entry entry : propertyMap.entrySet()) {
+            for (Map.Entry entry : propertyMap.entrySet()) {
                 if (!IAM_URL_KEY.equals(entry.getKey())) {
-                    final String property = (String) entry.getKey();
-                    final String value = (String) entry.getValue();
+                    String property = (String) entry.getKey();
+                    String value = (String) entry.getValue();
 
                     LOG.debug("Attempting to set TicketValidator property " + property);
-                    final PropertyDescriptor pd = ReflectUtils.getPropertyDescriptor(info, property);
-                    if (pd != null) {
-                        ReflectUtils.setProperty(property, convertIfNecessary(pd, value), validator, info);
+                    PropertyDescriptor propertyDescriptor = ReflectUtils.getPropertyDescriptor(info, property);
+                    if (propertyDescriptor != null) {
+                        ReflectUtils.setProperty(property,
+                                                 convertIfNecessary(propertyDescriptor, value),
+                                                 validator,
+                                                 info);
                         LOG.debug("Set " + property + " = " + value);
                     } else {
                         LOG.debug("Cannot find property " + property + " on " + className);
@@ -358,7 +331,7 @@ public class IAMLoginModule implements LoginModule {
                 }
             }
 
-        } catch (final IntrospectionException e) {
+        } catch (IntrospectionException e) {
             LOG.error("Error getting bean info for " + validatorClass + e.getMessage());
             return null;
         }
@@ -372,22 +345,23 @@ public class IAMLoginModule implements LoginModule {
      *
      * Currently only conversion to int, long, and boolean are supported.
      *
-     * @param pd Property descriptor of target property to set.
+     * @param propertyDescriptor Property descriptor of target property to set.
      * @param value Property value as a string.
      * @return Value converted to type expected by property if a conversion strategy exists.
      */
-    private static Object convertIfNecessary(final PropertyDescriptor pd, final String value) {
-        if (String.class.equals(pd.getPropertyType())) {
+    private static Object convertIfNecessary(final PropertyDescriptor propertyDescriptor, final String value) {
+        if (String.class.equals(propertyDescriptor.getPropertyType())) {
             return value;
-        } else if (boolean.class.equals(pd.getPropertyType())) {
+        } else if (boolean.class.equals(propertyDescriptor.getPropertyType())) {
             return Boolean.valueOf(value);
-        } else if (int.class.equals(pd.getPropertyType())) {
+        } else if (int.class.equals(propertyDescriptor.getPropertyType())) {
             return new Integer(value);
-        } else if (long.class.equals(pd.getPropertyType())) {
+        } else if (long.class.equals(propertyDescriptor.getPropertyType())) {
             return new Long(value);
         } else {
-            throw new IllegalArgumentException("No conversion strategy exists for property " + pd.getName() +
-                                               " of type " + pd.getPropertyType());
+            throw new IllegalArgumentException("No conversion strategy exists for property " +
+                                               propertyDescriptor.getName() + " of type " +
+                                               propertyDescriptor.getPropertyType());
         }
     }
 }

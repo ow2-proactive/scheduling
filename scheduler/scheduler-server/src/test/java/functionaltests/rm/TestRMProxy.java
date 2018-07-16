@@ -77,8 +77,7 @@ public class TestRMProxy extends ProActiveTest {
             TestScheduler.kill();
         }
 
-        //Check if IAM microservice is required for authentication
-        prepareIAM();
+        startIAMIfNeeded();
 
         rmHelper = new RMTHelper();
         rmHelper.getResourceManager();

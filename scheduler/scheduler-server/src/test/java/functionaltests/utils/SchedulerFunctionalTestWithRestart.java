@@ -43,8 +43,7 @@ public class SchedulerFunctionalTestWithRestart extends SchedulerFunctionalTest 
     @BeforeClass
     public static void startSchedulerInAnyCase() throws Exception {
 
-        //Check if IAM microservice is required for authentication
-        prepareIAM();
+        startIAMIfNeeded();
 
         schedulerHelper.log("Starting a clean scheduler.");
         schedulerHelper = new SchedulerTHelper(true);

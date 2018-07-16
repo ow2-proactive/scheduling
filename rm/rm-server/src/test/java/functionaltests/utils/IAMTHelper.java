@@ -60,7 +60,12 @@ public class IAMTHelper {
         if (iamProcess != null) {
             System.out.println("Stopping IAM microservice...");
             iamProcess.destroy();
-            iamProcess.waitFor();
+
+            if (!iamProcess.waitFor(1, TimeUnit.MINUTES)) {
+                iamProcess.destroyForcibly();
+                iamProcess.waitFor(1, TimeUnit.MINUTES);
+            }
+
             iamProcess = null;
         }
 

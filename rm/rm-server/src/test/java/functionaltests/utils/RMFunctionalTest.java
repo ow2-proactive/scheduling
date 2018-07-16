@@ -78,8 +78,7 @@ public class RMFunctionalTest extends ProActiveTest {
         CentralPAPropertyRepository.PA_TEST.setValue(true);
         CentralPAPropertyRepository.PA_RUNTIME_PING.setValue(false);
 
-        //Check if IAM microservice is required for authentication
-        prepareIAM();
+        startIAMIfNeeded();
 
         rmHelper = new RMTHelper();
         try {

@@ -46,11 +46,7 @@ public class IAMRestClient {
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());
 
-    private IAMRestClient() {
-
-    }
-
-    public static synchronized String getSSOTicket(String url, String username, String password, String ticketHeader) {
+    public String getSSOTicket(String url, String username, String password, String ticketHeader) {
 
         String ticket = null;
 
@@ -67,8 +63,9 @@ public class IAMRestClient {
             HttpResponse httpResponse = httpClient.execute(httpPost);
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) ||
-                (null == httpResponse.getEntity()))
-                throw new IAMException("Authentication failed");
+                (null == httpResponse.getEntity())) {
+                throw new IAMException("Failed to acquire SSO ticket for the user" + username);
+            }
 
             Header[] headers = httpResponse.getHeaders(ticketHeader);
 
@@ -79,20 +76,22 @@ public class IAMRestClient {
 
                 if (matcher.find()) {
                     ticket = matcher.group(1);
-                } else
+                } else {
                     throw new IAMException("TGT not found in IAM response");
+                }
             }
 
             LOG.debug("SSO ticket successfully generated for user " + username + "\n Token: " + ticket);
 
         } catch (Exception e) {
-            throw new IAMException(e.getMessage());
+            throw new IAMException("Authentication failed: Error occurred while acquiring SSO ticket for the user " +
+                                   username, e);
         }
 
         return ticket;
     }
 
-    public static synchronized String getServiceToken(String url, String service) {
+    public String getServiceToken(String url, String service) {
 
         String token;
 
@@ -108,14 +107,15 @@ public class IAMRestClient {
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) ||
                 (null == httpResponse.getEntity()))
-                throw new IAMException("Authentication failed");
+                throw new IAMException("Failed to acquire authentication token for the service" + service);
 
             token = EntityUtils.toString(httpResponse.getEntity());
 
-            LOG.debug("Token successfully generated for service " + service + "\n Token: " + token);
+            LOG.debug("Service token successfully generated for service " + service + "\n Token: " + token);
 
         } catch (Exception e) {
-            throw new IAMException(e.getMessage());
+            throw new IAMException("Authentication failed: Error occurred while acquiring authentication token for the service" +
+                                   service, e);
         }
 
         return token;
