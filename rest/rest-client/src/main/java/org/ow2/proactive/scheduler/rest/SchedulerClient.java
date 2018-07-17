@@ -1273,7 +1273,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             List<TaskState> taskStates = restApi().getJobTaskStatesPaginated(sid, jobId, offset, limit)
                                                   .getList()
                                                   .stream()
-                                                  .map(taskStateData -> taskState(taskStateData))
+                                                  .map(DataUtility::taskState)
                                                   .collect(Collectors.toList());
             taskStatesPage = new TaskStatesPage();
             taskStatesPage.setSize(limit);
