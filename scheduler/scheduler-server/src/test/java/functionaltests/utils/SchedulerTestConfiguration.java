@@ -38,6 +38,14 @@ public class SchedulerTestConfiguration {
 
     public static final SchedulerTestConfiguration NOT_STARTED = new SchedulerTestConfiguration();
 
+    /*
+     * Timeout variable that replaces CentralPAPropertyRepository.PA_TEST_TIMEOUT.getValue()
+     * It avoids using a variable in a separate project (i.e., programming) to configure the timeout
+     * of scheduler tests
+     *
+     */
+    public static final int TEST_TIMEOUT = 2100000;
+
     private String schedulerConfigFile;
 
     private String rmConfigFile;

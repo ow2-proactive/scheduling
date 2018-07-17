@@ -23,35 +23,15 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.utils;
+package org.ow2.proactive.authentication.iam;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+public class IAMException extends RuntimeException {
 
-
-/**
- * Test which starts a new scheduler with a custom configuration, and kill it after the test.
- * The scheduler start is delegated to the subclass.
- *
- * Every concrete subclass should be added to one of functionaltests.StandardTestSuite or functionaltests.RegressionTestSuite
- * @see functionaltests.StandardTestSuite
- * @see functionaltests.RegressionTestSuite
- */
-public class SchedulerFunctionalTestWithCustomConfigAndRestart extends SchedulerFunctionalTest {
-
-    @BeforeClass
-    public static void letTheSubclassStartTheScheduler() throws Exception {
-
-        startIAMIfNeeded();
-
-        schedulerHelper.log("Scheduler has been started with a custom configuration.");
+    public IAMException(String message) {
+        super(message);
     }
 
-    @AfterClass
-    public static void cleanupScheduler() throws Exception {
-        if (schedulerHelper != null) {
-            schedulerHelper.log("Kill Scheduler after test.");
-            schedulerHelper.killScheduler();
-        }
+    public IAMException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

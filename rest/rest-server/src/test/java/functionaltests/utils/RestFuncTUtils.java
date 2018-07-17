@@ -25,6 +25,8 @@
  */
 package functionaltests.utils;
 
+import static com.jayway.awaitility.Awaitility.await;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +34,8 @@ import java.net.ServerSocket;
 import java.net.URI;
 import java.net.URL;
 import java.security.PublicKey;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -42,17 +46,27 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
+import com.jayway.awaitility.Duration;
+
 
 public class RestFuncTUtils {
 
     private RestFuncTUtils() {
     }
 
-    public static void destroy(Process process) throws Exception {
+    public static void destroy(Process process) throws InterruptedException {
+
         close(process.getOutputStream());
         close(process.getInputStream());
         close(process.getErrorStream());
-        process.destroyForcibly();
+
+        process.destroy();
+
+        if (!process.waitFor(1, TimeUnit.MINUTES)) {
+            process.destroyForcibly();
+            process.waitFor(1, TimeUnit.MINUTES);
+        }
+
         System.out.println(String.format("Process ended with exit code %d. ", process.exitValue()));
     }
 
@@ -128,6 +142,10 @@ public class RestFuncTUtils {
         s.close();
         return s.getLocalPort();
 
+    }
+
+    private static Callable<Boolean> processIsNotAlive(Process process) {
+        return () -> !process.isAlive();
     }
 
 }

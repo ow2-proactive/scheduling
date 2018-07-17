@@ -23,35 +23,31 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.utils;
+package org.ow2.proactive.authentication.iam;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Jwts;
 
 
-/**
- * Test which starts a new scheduler with the default configuration, and kill it after the test
- *
- * Every concrete subclass should be added to one of functionaltests.StandardTestSuite or functionaltests.RegressionTestSuite
- * @see functionaltests.StandardTestSuite
- * @see functionaltests.RegressionTestSuite
- */
-public class SchedulerFunctionalTestWithRestart extends SchedulerFunctionalTest {
+public class JWTUtils {
 
-    @BeforeClass
-    public static void startSchedulerInAnyCase() throws Exception {
+    private JWTUtils() {
 
-        startIAMIfNeeded();
-
-        schedulerHelper.log("Starting a clean scheduler.");
-        schedulerHelper = new SchedulerTHelper(true);
     }
 
-    @AfterClass
-    public static void cleanupScheduler() throws Exception {
-        schedulerHelper.log("Kill Scheduler after test.");
-        schedulerHelper.killScheduler();
+    /**
+     * Tries to parse specified String as a JWT token. If successful, returns the set of claims (extracted from the token body).
+     * If unsuccessful (token is invalid or not containing all required properties), simply returns null.
+     *
+     * @param token the JWT token to parse
+     * @return the User object extracted from specified token or null if a token is invalid.
+     */
+    public static Claims parseToken(String token) {
+
+        Jwt<Header, Claims> jwt = Jwts.parser().parseClaimsJwt(token);
+
+        return jwt.getBody();
     }
 }
