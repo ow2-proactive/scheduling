@@ -1234,7 +1234,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     synchronized TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
             throws UnknownJobException, NotConnectedException, PermissionException {
-        checkPermissions("getTaskPaginated",
+        checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
         ClientJobState jobState = jobsMap.get(jobId);
