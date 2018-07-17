@@ -1270,13 +1270,14 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException, UnknownJobException, PermissionException {
         TaskStatesPage taskStatesPage = null;
         try {
+            final int size = restApi().getJobTaskStates(sid, jobId).getList().size();
             List<TaskState> taskStates = restApi().getJobTaskStatesPaginated(sid, jobId, offset, limit)
                                                   .getList()
                                                   .stream()
                                                   .map(DataUtility::taskState)
                                                   .collect(Collectors.toList());
             taskStatesPage = new TaskStatesPage();
-            taskStatesPage.setSize(limit);
+            taskStatesPage.setSize(size);
             taskStatesPage.setTaskStates(taskStates);
         } catch (Exception e) {
             throwUJEOrNCEOrPE(e);
