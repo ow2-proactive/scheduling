@@ -1,5 +1,5 @@
-default namespace = "urn:proactive:jobdescriptor:dev"
-namespace jd = "urn:proactive:jobdescriptor:dev"
+default namespace = "urn:proactive:jobdescriptor:3.11"
+namespace jd = "urn:proactive:jobdescriptor:3.11"
 namespace xsi = "http://www.w3.org/2001/XMLSchema-instance"
 namespace doc = "http://relaxng.org/ns/compatibility/annotations/1.0"
 start = job
@@ -20,7 +20,7 @@ job = ## Definition of a job for the scheduler
         globalSpace?, 
         userSpace?, 
         projectName?,
-        attribute xsi:schemaLocation {xsd:anyURI}?,( taskFlow, metadata )
+        attribute xsi:schemaLocation {xsd:anyURI}?,( taskFlow ) 
     }
 
 jobName = ## Identification of this job
