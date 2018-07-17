@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -36,7 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * 
  */
 @XmlRootElement
-public class TaskStatesPage {
+public class TaskStatesPage implements Serializable {
 
     private int size;
 

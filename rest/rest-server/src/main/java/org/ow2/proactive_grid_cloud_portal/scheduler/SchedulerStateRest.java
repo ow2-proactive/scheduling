@@ -1199,11 +1199,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/paginated");
-            JobState jobState = s.getJobState(jobId);
-            TaskStatesPage page = jobState.getTasksPaginated(offset, limit);
+            Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/paginated");
+            TaskStatesPage page = scheduler.getTaskPaginated(jobId, offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage<TaskStateData>(tasks, page.getSize());
+            return new RestPage<>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {

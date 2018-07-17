@@ -68,6 +68,7 @@ import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ClientJobState;
@@ -1229,5 +1230,23 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         UserIdentificationImpl ident = identifications.get(id).getUser();
         renewUserSession(id, ident);
         return PASchedulerProperties.getPropertiesAsHashMap();
+    }
+
+    synchronized TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        checkPermissions("getTaskPaginated",
+                         getIdentifiedJob(jobId),
+                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
+        ClientJobState jobState = jobsMap.get(jobId);
+        synchronized (jobState) {
+            try {
+                final TaskStatesPage tasksPaginated = jobState.getTasksPaginated(offset, limit);
+                final List<TaskState> taskStatesCopy = (List<TaskState>) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(new ArrayList<>(tasksPaginated.getTaskStates()));
+                return new TaskStatesPage(taskStatesCopy, tasksPaginated.getSize());
+            } catch (Exception e) {
+                logger.error("Error when copying tasks page", e);
+                throw new IllegalStateException(e);
+            }
+        }
     }
 }
