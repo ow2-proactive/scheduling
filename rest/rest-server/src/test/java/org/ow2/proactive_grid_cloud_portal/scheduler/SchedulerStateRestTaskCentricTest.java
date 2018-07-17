@@ -280,7 +280,7 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
         int nbTasks = 50;
         String jobIdStr = "1";
         JobState job = RestTestUtils.newMockedJob(jobIdStr, null, nbTasks);
-        when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
+        when(mockOfScheduler.getTaskPaginated(jobIdStr, 0, nbTasks)).thenReturn(job.getTasksPaginated(0, nbTasks));
 
         List<TaskStateData> res = restInterface.getJobTaskStatesPaginated(sessionId, jobIdStr, 0, nbTasks).getList();
 

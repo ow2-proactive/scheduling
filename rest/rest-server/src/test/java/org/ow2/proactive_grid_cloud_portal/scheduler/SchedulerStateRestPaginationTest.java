@@ -102,7 +102,7 @@ public class SchedulerStateRestPaginationTest extends RestTestServer {
     public void testGetJobTaskStatesPaginated() throws Throwable {
 
         JobState job = newMockedJob(jobIdStr, nbTasks);
-        when(mockOfScheduler.getJobState(jobIdStr)).thenReturn(job);
+        when(mockOfScheduler.getTaskPaginated(jobIdStr, 0, nbTasks)).thenReturn(job.getTasksPaginated(0, nbTasks));
 
         List<TaskStateData> res = restInterface.getJobTaskStatesPaginated(sessionId, jobIdStr, 0, nbTasks).getList();
 
