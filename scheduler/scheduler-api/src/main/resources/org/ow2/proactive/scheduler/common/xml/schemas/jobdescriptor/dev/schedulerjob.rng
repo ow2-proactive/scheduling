@@ -48,10 +48,10 @@
           <data type="anyURI"/>
         </attribute>
       </optional>
-      <group>
-        <ref name="taskFlow"/>
+      <ref name="taskFlow"/>
+      <optional>
         <ref name="metadata"/>
-      </group>
+      </optional>
     </element>
   </define>
   <define name="jobName">

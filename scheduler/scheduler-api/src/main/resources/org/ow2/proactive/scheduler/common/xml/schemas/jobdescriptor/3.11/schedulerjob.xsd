@@ -15,6 +15,7 @@
         <xs:element minOccurs="0" ref="jd:globalSpace"/>
         <xs:element minOccurs="0" ref="jd:userSpace"/>
         <xs:element ref="jd:taskFlow"/>
+        <xs:element minOccurs="0" ref="jd:metadata"/>
       </xs:sequence>
       <xs:attributeGroup ref="jd:jobName"/>
       <xs:attribute name="priority">

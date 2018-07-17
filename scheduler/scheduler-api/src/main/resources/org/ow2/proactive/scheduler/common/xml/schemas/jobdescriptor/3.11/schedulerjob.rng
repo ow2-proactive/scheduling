@@ -49,6 +49,9 @@
         </attribute>
       </optional>
       <ref name="taskFlow"/>
+      <optional>
+        <ref name="metadata"/>
+      </optional>
     </element>
   </define>
   <define name="jobName">

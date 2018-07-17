@@ -20,7 +20,8 @@ job = ## Definition of a job for the scheduler
         globalSpace?, 
         userSpace?, 
         projectName?,
-        attribute xsi:schemaLocation {xsd:anyURI}?,( taskFlow ) 
+        attribute xsi:schemaLocation {xsd:anyURI}?,( taskFlow ),
+        metadata?
     }
 
 jobName = ## Identification of this job
