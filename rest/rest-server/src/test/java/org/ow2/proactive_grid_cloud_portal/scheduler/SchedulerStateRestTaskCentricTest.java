@@ -30,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.ow2.proactive_grid_cloud_portal.scheduler.RestTestUtils.newTaskState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +43,7 @@ import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
@@ -280,7 +282,13 @@ public class SchedulerStateRestTaskCentricTest extends RestTestServer {
         int nbTasks = 50;
         String jobIdStr = "1";
         JobState job = RestTestUtils.newMockedJob(jobIdStr, null, nbTasks);
-        when(mockOfScheduler.getTaskPaginated(jobIdStr, 0, nbTasks)).thenReturn(job.getTasksPaginated(0, nbTasks));
+
+        List<TaskState> dumbList = new ArrayList<TaskState>(nbTasks);
+        for (int i = 0; i < nbTasks; i++) {
+            dumbList.add(newTaskState(jobIdStr, null, i, nbTasks));
+        }
+
+        when(mockOfScheduler.getTaskPaginated(jobIdStr, 0, nbTasks)).thenReturn(new TaskStatesPage(dumbList, nbTasks));
 
         List<TaskStateData> res = restInterface.getJobTaskStatesPaginated(sessionId, jobIdStr, 0, nbTasks).getList();
 
