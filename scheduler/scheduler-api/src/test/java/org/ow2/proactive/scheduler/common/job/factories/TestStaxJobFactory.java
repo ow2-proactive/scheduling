@@ -69,6 +69,10 @@ public class TestStaxJobFactory {
 
     private static URI jobDescriptorNoVariablesUri;
 
+    private static URI jobDescriptorWithMetadata;
+
+    private static URI jobDescriptorWithEmptyMetadata;
+
     private StaxJobFactory factory;
 
     @BeforeClass
@@ -79,6 +83,12 @@ public class TestStaxJobFactory {
                                                               .toURI();
         jobDescriptorSysPropsUri = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_update_variables_using_system_properties.xml")
                                                            .toURI();
+
+        jobDescriptorWithMetadata = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_metadata.xml")
+                                                            .toURI();
+
+        jobDescriptorWithEmptyMetadata = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_empty_metadata.xml")
+                                                                 .toURI();
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
     }
@@ -92,6 +102,16 @@ public class TestStaxJobFactory {
     public void testCreateJobShouldUseJobVariablesToReplaceJobNameVariable() throws Exception {
         Job testScriptJob = factory.createJob(jobDescriptorUri);
         assertEquals("updated_job_name", testScriptJob.getName());
+    }
+
+    @Test
+    public void testCreateJobShouldNotFailWhenParsingMetadata() throws Exception {
+        factory.createJob(jobDescriptorWithMetadata);
+    }
+
+    @Test
+    public void testCreateJobShouldNotFailWhenParsingEmptyMetadata() throws Exception {
+        factory.createJob(jobDescriptorWithEmptyMetadata);
     }
 
     @Test
