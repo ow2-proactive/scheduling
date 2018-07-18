@@ -320,7 +320,7 @@ public class NodeSource implements InitActive, RunActive {
      */
     public RMNode internalAddNodeAfterRecovery(Node node, RMNodeData rmNodeData) {
         RMNode recoveredRmNode;
-        String nodeUrl = node.getNodeInformation().getURL();
+        String nodeUrl = rmNodeData.getNodeUrl();
         // the infrastructure manager is up to date already because it was
         // saved in database, contrarily to the node source internal data structures
         RMNode rmNode = infrastructureManager.searchForNotAcquiredRmNode(nodeUrl);
@@ -333,7 +333,11 @@ public class NodeSource implements InitActive, RunActive {
             recoveredRmNode = buildRMNodeAfterRecovery(node, rmNodeData);
         }
         // we finally put back the node in the data structure of the node source
-        nodes.put(nodeUrl, node);
+        if (rmNodeData.getState().equals(NodeState.DOWN)) {
+            downNodes.put(nodeUrl, node);
+        } else {
+            nodes.put(nodeUrl, node);
+        }
         return recoveredRmNode;
     }
 
