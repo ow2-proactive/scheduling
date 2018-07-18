@@ -48,6 +48,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.usage.SchedulerUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingService;
@@ -1521,5 +1522,22 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @return scheduler properties
      */
     Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException;
+
+    /**
+     * Return the page of tasks of the given job.<br>
+     *
+     * @param jobId the job on which to get the state.
+     * @param offset the starting index of the sublist of tasks to get
+     * @param limit the last index (non inclusive) of the sublist of tasks to get
+     * @return the current state of the given job
+     * @throws NotConnectedException
+     *             if you are not authenticated.
+     * @throws UnknownJobException
+     *             if the job does not exist.
+     * @throws PermissionException
+     *             if you can't access to this particular job.
+     */
+    TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException;;
 
 }
