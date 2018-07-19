@@ -1225,27 +1225,23 @@ public class SchedulerDBManager {
     }
 
     public void updateJobAndTasksStatuses(final InternalJob job, final Set<TaskId> taskIds, TaskStatus taskStatus) {
-        executeReadWriteTransaction(new SessionWork<Void>() {
-            @Override
-            public Void doInTransaction(Session session) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
 
-                updateTasksStatuses(taskIds, taskStatus, session);
+            updateTasksStatuses(taskIds, taskStatus, session);
 
-                JobInfo jobInfo = job.getJobInfo();
+            JobInfo jobInfo = job.getJobInfo();
 
-                session.getNamedQuery("updateJobAndTasksState")
-                       .setParameter("status", jobInfo.getStatus())
-                       .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
-                       .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
-                       .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
-                       .setParameter("inErrorTime", jobInfo.getInErrorTime())
-                       .setParameter("lastUpdatedTime", new Date().getTime())
-                       .setParameter("jobId", jobId(job))
-                       .executeUpdate();
+            session.getNamedQuery("updateJobAndTasksState")
+                   .setParameter("status", jobInfo.getStatus())
+                   .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                   .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                   .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                   .setParameter("inErrorTime", jobInfo.getInErrorTime())
+                   .setParameter("lastUpdatedTime", new Date().getTime())
+                   .setParameter("jobId", jobId(job))
+                   .executeUpdate();
 
-                return null;
-            }
-
+            return null;
         });
     }
 
