@@ -1278,8 +1278,9 @@ public class SchedulerDBManager {
 
     private int updateTasksStatuses(final Set<TaskId> taskIds, final TaskStatus taskStatus, Session session) {
         return session.getNamedQuery("updateTaskStatus")
-                      .setParameterList("taskIds", taskIds)
                       .setParameter("taskStatus", taskStatus)
+                      .setParameterList("taskIds",
+                                        taskIds.stream().map(SchedulerDBManager::taskId).collect(Collectors.toList()))
                       .executeUpdate();
     }
 
