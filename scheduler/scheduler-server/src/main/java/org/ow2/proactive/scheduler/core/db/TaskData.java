@@ -125,6 +125,8 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                              "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
                                                              "task.inErrorTime = :inErrorTime " +
                                                              "where task.id = :taskId"),
+                @NamedQuery(name = "updateTaskStatus", query = "update TaskData task set task.taskStatus = :taskStatus " +
+                                                               "where task.id in (:taskIds)"),
                 @NamedQuery(name = "updateTaskDataAfterJobFinished", query = "update TaskData task set task.taskStatus = :taskStatus, " +
                                                                              "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
                                                                              "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +

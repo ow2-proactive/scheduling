@@ -264,7 +264,7 @@ class LiveJobs {
 
             if (!updatedTasks.isEmpty()) {
                 jlogger.info(jobId, "has just been paused.");
-                dbManager.updateJobAndTasksState(job);
+                dbManager.updateJobAndTasksStatuses(job, updatedTasks, TaskStatus.PAUSED);
                 updateTasksInSchedulerState(job, updatedTasks);
             }
 
