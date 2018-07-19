@@ -37,6 +37,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -564,6 +565,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * 
      * @throws RuntimeException if mbean cannot access or connect the service
      */
+    @ImmediateService
     public Map<String, String> getMappedInfo(final String mbeanNameAsString) throws RuntimeException {
         return mbeaninfoviewer.getMappedInfo(mbeanNameAsString);
     }

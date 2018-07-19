@@ -78,7 +78,7 @@ public final class MBeanInfoViewer {
         this.env.put(JMXConnector.CREDENTIALS, new Object[] { (user == null ? "" : user), creds });
     }
 
-    private void lazyConnect() {
+    private synchronized void lazyConnect() {
         if (this.connection == null) {
             // By default try the connector over RMI
             final JMXConnector jmxConnector = JMXClientHelper.tryJMXoverRMI(this.auth, this.env);
