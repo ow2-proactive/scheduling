@@ -1224,6 +1224,27 @@ public class SchedulerDBManager {
         });
     }
 
+    public void updateJobAndTasksStatuses(final InternalJob job, final Set<TaskId> taskIds, TaskStatus taskStatus) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+
+            updateTasksStatuses(taskIds, taskStatus, session);
+
+            JobInfo jobInfo = job.getJobInfo();
+
+            session.getNamedQuery("updateJobAndTasksState")
+                   .setParameter("status", jobInfo.getStatus())
+                   .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                   .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                   .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                   .setParameter("inErrorTime", jobInfo.getInErrorTime())
+                   .setParameter("lastUpdatedTime", new Date().getTime())
+                   .setParameter("jobId", jobId(job))
+                   .executeUpdate();
+
+            return null;
+        });
+    }
+
     public void updateTaskSchedulingTime(final InternalJob job, final long scheduledTime) {
         executeReadWriteTransaction(new SessionWork<Void>() {
             @Override
@@ -1249,6 +1270,14 @@ public class SchedulerDBManager {
             }
 
         });
+    }
+
+    private int updateTasksStatuses(final Set<TaskId> taskIds, final TaskStatus taskStatus, Session session) {
+        return session.getNamedQuery("updateTaskStatus")
+                      .setParameter("taskStatus", taskStatus)
+                      .setParameterList("taskIds",
+                                        taskIds.stream().map(SchedulerDBManager::taskId).collect(Collectors.toList()))
+                      .executeUpdate();
     }
 
     private int updateTaskData(final TaskState task, Session session) {
