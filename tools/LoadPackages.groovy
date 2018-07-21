@@ -70,6 +70,7 @@ class LoadPackages {
 
 
     def run() {
+        println "Executing " + this.SCRIPT_NAME + " ..."
         writeToOutput(" Automatic deployment of proactive packages ...")
 
         writeToOutput(" Variables : ")
@@ -111,6 +112,7 @@ class LoadPackages {
 
         writeToOutput(" ... proactive packages deployed!")
         writeToOutput(" Terminated.")
+        println "... " + this.SCRIPT_NAME + " done"
     }
 }
 instance = null;
