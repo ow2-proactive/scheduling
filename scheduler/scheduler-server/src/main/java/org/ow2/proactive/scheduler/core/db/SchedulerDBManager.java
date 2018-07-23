@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -268,24 +269,17 @@ public class SchedulerDBManager {
                             sortOrder = new GroupByStatusSortOrder(param.getSortOrder(), "status");
                             break;
                         default:
-                            throw new IllegalArgumentException("Unsupported sort parameter: " +
-                                                               param.getParameter());
+                            throw new IllegalArgumentException("Unsupported sort parameter: " + param.getParameter());
                     }
                     criteria.addOrder(sortOrder);
                 }
             }
 
             List<JobData> jobsList = criteria.list();
-            List<JobInfo> result = new ArrayList<>(jobsList.size());
-            for (JobData jobData : jobsList) {
-                JobInfo jobInfo = jobData.toJobInfo();
-                result.add(jobInfo);
-            }
-
-            return result;
+            return jobsList.stream().map(JobData::toJobInfo).collect(Collectors.toList());
         });
 
-        return new Page<JobInfo>(lJobs, totalNbJobs);
+        return new Page<>(lJobs, totalNbJobs);
     }
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag, final int offset,
@@ -391,12 +385,7 @@ public class SchedulerDBManager {
 
             List<JobData> jobsList = criteria.list();
 
-            List<JobUsage> result = new ArrayList<>(jobsList.size());
-            for (JobData jobData : jobsList) {
-                JobUsage jobUsage = jobData.toJobUsage();
-                result.add(jobUsage);
-            }
-            return result;
+            return jobsList.stream().map(JobData::toJobUsage).collect(Collectors.toList());
         });
     }
 
@@ -445,8 +434,7 @@ public class SchedulerDBManager {
     public long getFinishedTasksCount() {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getFinishedTasksCount")
-                                 .setParameterList("taskStatus",
-                                                   Arrays.asList(TaskStatus.FINISHED, TaskStatus.FAULTY));
+                                 .setParameterList("taskStatus", Arrays.asList(TaskStatus.FINISHED, TaskStatus.FAULTY));
 
             return (Long) query.uniqueResult();
         });
@@ -756,10 +744,7 @@ public class SchedulerDBManager {
         return executeReadOnlyTransaction(session -> {
             Query jobQuery = session.getNamedQuery("loadJobDataIfNotRemoved").setReadOnly(true);
 
-            List<Long> ids = new ArrayList<>(jobIds.length);
-            for (JobId jobId : jobIds) {
-                ids.add(jobId(jobId));
-            }
+            List<Long> ids = Arrays.stream(jobIds).map(SchedulerDBManager::jobId).collect(Collectors.toList());
 
             List<InternalJob> result = new ArrayList<>(jobIds.length);
             batchLoadJobs(session, false, jobQuery, ids, result);
@@ -769,10 +754,7 @@ public class SchedulerDBManager {
 
     public List<InternalJob> loadJobs(final boolean fullState, final JobId... jobIds) {
         return executeReadOnlyTransaction(session -> {
-            List<Long> ids = new ArrayList<>(jobIds.length);
-            for (JobId jobId : jobIds) {
-                ids.add(jobId(jobId));
-            }
+            final List<Long> ids = Stream.of(jobIds).map(SchedulerDBManager::jobId).collect(Collectors.toList());
             return loadInternalJobs(fullState, session, ids);
         });
     }
@@ -783,18 +765,8 @@ public class SchedulerDBManager {
                                   .setParameterList("ids", jobIds)
                                   .setReadOnly(true)
                                   .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
-
-        Map<Long, List<TaskData>> tasksMap = new HashMap<>(jobIds.size(), 1f);
-        for (Long id : jobIds) {
-            tasksMap.put(id, new ArrayList<TaskData>());
-        }
-
         List<TaskData> tasks = tasksQuery.list();
-        for (TaskData task : tasks) {
-            tasksMap.get(task.getJobData().getId()).add(task);
-        }
-
-        return tasksMap;
+        return tasks.stream().collect(Collectors.groupingBy(taskData -> taskData.getJobData().getId()));
     }
 
     // Executed in a transaction from the caller
@@ -896,10 +868,10 @@ public class SchedulerDBManager {
                     internalTask.setIfBranch(tasks.get(taskData.getIfBranch().getId()));
                 }
                 if (!taskData.getJoinedBranches().isEmpty()) {
-                    List<InternalTask> branches = new ArrayList<>(taskData.getJoinedBranches().size());
-                    for (DBTaskId joinedBranch : taskData.getJoinedBranches()) {
-                        branches.add(tasks.get(joinedBranch));
-                    }
+                    List<InternalTask> branches = taskData.getJoinedBranches()
+                                                          .stream()
+                                                          .map(tasks::get)
+                                                          .collect(Collectors.toList());
                     internalTask.setJoinedBranches(branches);
                 }
                 internalTask.setName(internalTask.getName());
@@ -1327,17 +1299,14 @@ public class SchedulerDBManager {
                 throw new DatabaseManagerException("Invalid job id: " + jobId);
             }
 
-            List<DBTaskId> dbTaskIds = new ArrayList<>(taskIds.size());
-            for (TaskId taskId : taskIds) {
-                dbTaskIds.add(taskId(taskId));
-            }
+            List<DBTaskId> dbTaskIds = taskIds.stream().map(SchedulerDBManager::taskId).collect(Collectors.toList());
 
             Query query = session.getNamedQuery("loadTasksResults").setParameterList("tasksIds", dbTaskIds);
 
             JobResultImpl jobResult = loadJobResult(session, query, job, jobId);
             if (jobResult == null) {
-                throw new DatabaseManagerException("Failed to load result for tasks " + taskIds + " (job: " +
-                                                   jobId + ")");
+                throw new DatabaseManagerException("Failed to load result for tasks " + taskIds + " (job: " + jobId +
+                                                   ")");
             }
 
             Map<TaskId, TaskResult> resultsMap = new HashMap<>(taskIds.size());
@@ -1350,8 +1319,8 @@ public class SchedulerDBManager {
                     }
                 }
                 if (taskResult == null) {
-                    throw new DatabaseManagerException("Failed to load result for task " + taskId + " (job: " +
-                                                       jobId + ")");
+                    throw new DatabaseManagerException("Failed to load result for task " + taskId + " (job: " + jobId +
+                                                       ")");
                 } else {
                     resultsMap.put(taskId, taskResult);
                 }
@@ -1432,8 +1401,7 @@ public class SchedulerDBManager {
                                                           .uniqueResult();
 
             if (taskSearchResult == null) {
-                throw new DatabaseManagerException("Failed to load result for task '" + taskName + ", job: " +
-                                                   jobId);
+                throw new DatabaseManagerException("Failed to load result for task '" + taskName + ", job: " + jobId);
             }
 
             DBTaskId dbTaskId = (DBTaskId) taskSearchResult[0];
@@ -1461,8 +1429,7 @@ public class SchedulerDBManager {
                                                           .uniqueResult();
 
             if (taskSearchResult == null) {
-                throw new DatabaseManagerException("Failed to load result for task '" + taskName + ", job: " +
-                                                   jobId);
+                throw new DatabaseManagerException("Failed to load result for task '" + taskName + ", job: " + jobId);
             }
 
             DBTaskId dbTaskId = (DBTaskId) taskSearchResult[0];
@@ -1528,9 +1495,7 @@ public class SchedulerDBManager {
 
             for (int i = 0; i < iTasks.size(); i++) {
                 InternalTask task = iTasks.get(i);
-                task.setId(TaskIdImpl.createTaskId(job.getId(),
-                                                   task.getTaskInfo().getTaskId().getReadableName(),
-                                                   i));
+                task.setId(TaskIdImpl.createTaskId(job.getId(), task.getTaskInfo().getTaskId().getReadableName(), i));
 
                 tasksWithNewIds.add(task);
             }
@@ -1566,10 +1531,11 @@ public class SchedulerDBManager {
 
     private void saveSingleTaskDependencies(Session session, InternalTask task, TaskData taskRuntimeData) {
         if (task.hasDependences()) {
-            List<DBTaskId> dependencies = new ArrayList<>(task.getDependences().size());
-            for (Task dependency : task.getDependences()) {
-                dependencies.add(taskId((InternalTask) dependency));
-            }
+            List<DBTaskId> dependencies = task.getDependences()
+                                              .stream()
+                                              .map(taskState -> taskId((InternalTask) taskState))
+                                              .collect(Collectors.toList());
+
             taskRuntimeData.setDependentTasks(dependencies);
         } else {
             taskRuntimeData.setDependentTasks(Collections.<DBTaskId> emptyList());
@@ -1581,10 +1547,10 @@ public class SchedulerDBManager {
             taskRuntimeData.setIfBranch(null);
         }
         if (task.getJoinedBranches() != null && !task.getJoinedBranches().isEmpty()) {
-            List<DBTaskId> joinedBranches = new ArrayList<>(task.getJoinedBranches().size());
-            for (InternalTask joinedBranch : task.getJoinedBranches()) {
-                joinedBranches.add(taskId(joinedBranch));
-            }
+            List<DBTaskId> joinedBranches = task.getJoinedBranches()
+                                                .stream()
+                                                .map(SchedulerDBManager::taskId)
+                                                .collect(Collectors.toList());
             taskRuntimeData.setJoinedBranches(joinedBranches);
         } else {
             taskRuntimeData.setJoinedBranches(Collections.<DBTaskId> emptyList());
@@ -1736,8 +1702,8 @@ public class SchedulerDBManager {
 
     public Set<String> thirdPartyCredentialsKeySet(final String username) {
         return executeReadOnlyTransaction((SessionWork<Set<String>>) session -> {
-            Query query = session.getNamedQuery("findThirdPartyCredentialsKeySetByUsername")
-                                 .setParameter("username", username);
+            Query query = session.getNamedQuery("findThirdPartyCredentialsKeySetByUsername").setParameter("username",
+                                                                                                          username);
             List<String> keys = query.list();
             return new HashSet<>(keys);
 
