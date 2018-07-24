@@ -459,7 +459,7 @@ public class SchedulerDBManager {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getRunningTasksCount")
                                  .setParameterList("jobStatus", NOT_FINISHED_JOB_STATUSES)
-                                 .setParameterList("taskStatus", Arrays.asList(TaskStatus.RUNNING));
+                                 .setParameterList("taskStatus", Collections.singletonList(TaskStatus.RUNNING));
 
             return (Long) query.uniqueResult();
         });
@@ -665,11 +665,10 @@ public class SchedulerDBManager {
                                                  "SCHEDULED_TIME_FOR_REMOVAL <> 0 and " +
                                                  "SCHEDULED_TIME_FOR_REMOVAL < :timeLimit")
                                  .setParameter("timeLimit", time);
-            return ((List<Long>) query.list())
-                    .stream()
-                    .map(Object::toString)
-                    .map(JobIdImpl::makeJobId)
-                    .collect(Collectors.toList());
+            return ((List<Long>) query.list()).stream()
+                                              .map(Object::toString)
+                                              .map(JobIdImpl::makeJobId)
+                                              .collect(Collectors.toList());
         });
     }
 
