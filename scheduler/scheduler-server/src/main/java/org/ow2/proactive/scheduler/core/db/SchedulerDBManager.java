@@ -477,7 +477,7 @@ public class SchedulerDBManager {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getMeanJobPendingTime");
             Double result = (Double) query.uniqueResult();
-            return result == null ? 0 : result;
+            return result == null ? 0.0d : result;
         });
     }
 
@@ -485,7 +485,7 @@ public class SchedulerDBManager {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getMeanJobExecutionTime");
             Double result = (Double) query.uniqueResult();
-            return result == null ? 0 : result;
+            return result == null ? 0.0d : result;
         });
     }
 
@@ -497,7 +497,7 @@ public class SchedulerDBManager {
             Long minSubmittedTime = (Long) result[1];
             Long maxSubmittedTime = (Long) result[2];
             if (count < 2) {
-                return 0d;
+                return 0.0d;
             } else {
                 return (maxSubmittedTime - minSubmittedTime) / (double) (count - 1);
             }
@@ -512,7 +512,7 @@ public class SchedulerDBManager {
             if (jobData == null) {
                 return null;
             }
-            if (jobData.getFinishedTime() > 0) {
+            if (jobData.getFinishedTime() > 0L) {
                 return jobData.getFinishedTime() - jobData.getStartTime();
             } else {
                 return null;
@@ -529,7 +529,7 @@ public class SchedulerDBManager {
             if (jobData == null) {
                 return null;
             }
-            if (jobData.getStartTime() > 0) {
+            if (jobData.getStartTime() > 0L) {
                 return jobData.getStartTime() - jobData.getSubmittedTime();
             } else {
                 return null;
@@ -552,7 +552,7 @@ public class SchedulerDBManager {
                                  .setParameter("jobSubmittedTime", jobSubmittedTime);
 
             Double result1 = (Double) query.uniqueResult();
-            return result1 == null ? 0 : result1;
+            return result1 == null ? 0.0d : result1;
         });
 
         return checkResult(id, result);
@@ -577,7 +577,7 @@ public class SchedulerDBManager {
             Query query = session.getNamedQuery("getMeanTaskRunningTime").setParameter("id", id);
 
             Double result1 = (Double) query.uniqueResult();
-            return result1 == null ? 0 : result1;
+            return result1 == null ? 0.0d : result1;
         });
 
         return checkResult(id, result);
@@ -611,7 +611,7 @@ public class SchedulerDBManager {
             if (taskResult[1] != null) {
                 taskDuration = ((Number) taskResult[1]).longValue();
             } else {
-                taskDuration = 0;
+                taskDuration = 0L;
             }
 
             int jobCount;
@@ -624,7 +624,7 @@ public class SchedulerDBManager {
             if (jobResult[1] != null) {
                 jobDuration = ((Number) jobResult[1]).longValue();
             } else {
-                jobDuration = 0;
+                jobDuration = 0L;
             }
 
             return new SchedulerAccount(username, taskCount, taskDuration, jobCount, jobDuration);
@@ -723,7 +723,7 @@ public class SchedulerDBManager {
             logger.info("Loading Jobs from database");
 
             Query query;
-            if (period > 0) {
+            if (period > 0L) {
                 query = session.getNamedQuery("loadJobsWithPeriod")
                                .setParameter("minSubmittedTime", System.currentTimeMillis() - period)
                                .setParameterList("status", status)
