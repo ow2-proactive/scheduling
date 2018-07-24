@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.HostsPinger;
+import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
 import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
 import org.ow2.proactive.utils.NodeSet;
@@ -109,7 +110,7 @@ public class topologyConcurrencyTest {
                             manager.addNode(node);
                         } else {
                             // more remove than add, to try to reproduce empty list problems
-                            manager.removeNode(node);
+                            manager.removeNode(new RMNodeImpl(node, null, null, null));
                         }
                         // launch some selections on the node just added or removed to trigger ConcurrentModficationExceptions if any
                         NodeSet set = manager.getHandler(TopologyDescriptor.SINGLE_HOST)
@@ -139,7 +140,7 @@ public class topologyConcurrencyTest {
                     try {
                         int index = j;
                         Node node = new NodeImpl(runtime, baseUrl + index);
-                        manager.removeNode(node);
+                        manager.removeNode(new RMNodeImpl(node, null, null, null));
                         NodeSet set = manager.getHandler(TopologyDescriptor.SINGLE_HOST)
                                              .select(1, Collections.singletonList(node));
                         System.out.println(set);

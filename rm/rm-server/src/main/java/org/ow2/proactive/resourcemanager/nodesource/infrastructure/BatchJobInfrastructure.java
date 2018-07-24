@@ -46,6 +46,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 
 
@@ -235,7 +236,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * Builds the command line to execute on the PBS frontend and wait for every
      * launched nodes to register. If the node doesn't register (ie. runs
-     * {@link #internalRegisterAcquiredNode(Node)} isn't called) before the
+     * {@link #internalRegisterAcquiredNode(RMNode)} isn't called) before the
      * timeout (configurable) value, an exception is raised. If the qSub command
      * submitted to the PBS frontend fails, the node supposed to be launched is
      * not expected anymore and will be discarded at registration time.
@@ -548,8 +549,8 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void notifyAcquiredNode(Node node) throws RMException {
-        String nodeName = node.getNodeInformation().getName();
+    public void notifyAcquiredNode(RMNode node) throws RMException {
+        String nodeName = node.getNodeName();
         logger.debug("New expected node registered: " + nodeName);
     }
 
@@ -564,7 +565,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    public void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
+    public void notifyDownNode(String nodeName, String nodeUrl, RMNode node) throws RMException {
         removeNode(node);
     }
 
@@ -572,10 +573,10 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(Node node) throws RMException {
+    public void removeNode(RMNode node) throws RMException {
         String deleteCmd = getDeleteJobCommand();
         String jobID = null;
-        String nodeName = node.getNodeInformation().getName();
+        String nodeName = node.getNodeName();
         if ((jobID = getCurrentNode(nodeName)) != null) {
             try {
                 deleteJob(jobID);

@@ -17,3 +17,5 @@ org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.CLIInfrastructure
 
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.AutoUpdateInfrastructure
+
+org.ow2.proactive.resourcemanager.nodesource.infrastructure.AzureVMScaleSetInfrastructure

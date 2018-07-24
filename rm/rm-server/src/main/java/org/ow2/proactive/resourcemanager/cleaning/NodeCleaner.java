@@ -61,7 +61,7 @@ public class NodeCleaner implements Callable<Boolean> {
         } catch (Throwable t) {
             logger.warn("Exception while cleaning the node " + rmnode.getNodeURL() + ": " + t.getMessage(), t);
             logger.warn("Checking if the node " + rmnode.getNodeURL() + " is alive");
-            rmnode.getNodeSource().pingNode(rmnode.getNode());
+            rmnode.getNodeSource().pingNode(rmnode);
             return false;
         }
 

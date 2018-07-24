@@ -71,7 +71,7 @@ import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
  *
  * Acquisition requests are supposed to be asynchronous. When new new node is
  * available it should register itself into the resource manager by calling
- * {@link InfrastructureManager#internalRegisterAcquiredNode(Node)}<br>
+ * {@link InfrastructureManager#internalRegisterAcquiredNode(RMNode)}<br>
  *
  * To define a new infrastructure manager - define a way to add information
  * about further node acquisition implementing
@@ -81,7 +81,7 @@ import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
  * available nodes from the infrastructure in the method
  * {@link InfrastructureManager#acquireAllNodes()} - register available nodes in
  * the resource manager using
- * {@link InfrastructureManager#internalRegisterAcquiredNode(Node)}, so they
+ * {@link InfrastructureManager#internalRegisterAcquiredNode(RMNode)}, so they
  * till be taken into account. - add the name of new class to the resource
  * manager configuration file (config/rm/nodesource/infrastructures).
  *
@@ -320,10 +320,10 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      *            the node to be removed
      * @throws RMException
      */
-    public final void internalRemoveNode(Node node) throws RMException {
+    public final void internalRemoveNode(RMNode node) throws RMException {
         writeLock.lock();
         try {
-            getAcquiredNodesName().remove(node.getNodeInformation().getName());
+            getAcquiredNodesName().remove(node.getNodeName());
             this.removeNode(node);
         } catch (Exception e) {
             logger.warn("Exception occurred while removing node " + node);
@@ -342,7 +342,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      *
      * @throws RMException if any problems occurred.
      */
-    public void internalNotifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
+    public void internalNotifyDownNode(String nodeName, String nodeUrl, RMNode node) throws RMException {
         writeLock.lock();
         try {
             removeDownNodePriorToNotify(nodeName);
@@ -372,7 +372,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      *
      * @throws RMException if any problems occurred.
      */
-    public abstract void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException;
+    public abstract void notifyDownNode(String nodeName, String nodeUrl, RMNode node) throws RMException;
 
     /**
      * This method is called by the RMCore to notify the InfrastructureManager
@@ -383,14 +383,14 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      * {@link InfrastructureManager#addDeployingNode(String, String, String, long)}
      * was made (means that implementor uses deploying nodes features), this
      * method ensures that the implementation method (see
-     * {@link InfrastructureManager#notifyAcquiredNode(Node)} is only called if
+     * {@link InfrastructureManager#notifyAcquiredNode(RMNode)} is only called if
      * no timeout has occurred for the associated deploying node.
      *
      * @param node
      *            the newly added node
      * @throws RMException
      */
-    public final RMDeployingNode internalRegisterAcquiredNode(Node node) throws RMException {
+    public final RMDeployingNode internalRegisterAcquiredNode(RMNode node) throws RMException {
         // if implementation doesn't use deploying nodes, we just execute
         // factory method and return
 
@@ -401,7 +401,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         // here we use deploying nodes and timeout
         RMDeployingNode pn;
         // we build the url of the associated deploying node
-        String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
+        String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeName());
 
         writeLock.lock();
         try {
@@ -415,9 +415,9 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
                 emitEvent(event);
                 this.notifyAcquiredNode(node);
                 // if everything went well with the new node, caching it
-                addAcquiredNodeNameWithLockAndPersist(node.getNodeInformation().getName());
+                addAcquiredNodeNameWithLockAndPersist(node.getNodeName());
             } else {
-                String url = node.getNodeInformation().getURL();
+                String url = node.getNodeURL();
                 logger.warn("Not expected node registered, discarding it: " + url);
                 throw new RMException("Not expected node registered, discarding it: " + url);
             }
@@ -552,7 +552,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     /**
      * Asynchronous node acquisition request. Proactive node should be
      * registered by calling
-     * {@link InfrastructureManager#internalRegisterAcquiredNode(Node)}
+     * {@link InfrastructureManager#internalRegisterAcquiredNode(RMNode)}
      */
     public abstract void acquireNode();
 
@@ -563,7 +563,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     /**
      * Asynchronous request of all nodes acquisition. Proactive nodes should be
      * registered by calling
-     * {@link InfrastructureManager#internalRegisterAcquiredNode(Node)}
+     * {@link InfrastructureManager#internalRegisterAcquiredNode(RMNode)}
      */
     public abstract void acquireAllNodes();
 
@@ -579,7 +579,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      * @throws RMException
      *             if any problems occurred.
      */
-    public abstract void removeNode(Node node) throws RMException;
+    public abstract void removeNode(RMNode node) throws RMException;
 
     /**
      * Notifies the user that the deploying node was lost or removed (because of
@@ -609,7 +609,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      *             if the implementation does not approve the node acquisition
      *             request
      */
-    protected abstract void notifyAcquiredNode(Node node) throws RMException;
+    protected abstract void notifyAcquiredNode(RMNode node) throws RMException;
 
     /**
      * Notify this infrastructure it is going to be shut down along with its
@@ -1016,7 +1016,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      *
      * @param node the node that has reconnected.
      */
-    public void onDownNodeReconnection(Node node) {
+    public void onDownNodeReconnection(RMNode node) {
         // to be overridden by children
     }
 

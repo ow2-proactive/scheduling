@@ -55,7 +55,6 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -80,7 +79,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * Abstract class designed to manage a NodeSource. A NodeSource active object is
  * designed to manage acquisition, monitoring and removing of a set of
- * {@link Node} objects in the Resource Manager. Each node source consists
+ * {@link RMNode} objects in the Resource Manager. Each node source consists
  * of two entities {@link InfrastructureManager} and {@link NodeSourcePolicy}. <BR>
  *
  * Each particular {@link InfrastructureManager} defines a specific infrastructure and ways
@@ -139,9 +138,9 @@ public class NodeSource implements InitActive, RunActive {
     private boolean toShutdown = false;
 
     // all nodes except down
-    private Map<String, Node> nodes;
+    private Map<String, RMNode> nodes;
 
-    private Map<String, Node> downNodes;
+    private Map<String, RMNode> downNodes;
 
     private static ThreadPoolHolder threadPoolHolder;
 
@@ -218,8 +217,8 @@ public class NodeSource implements InitActive, RunActive {
         this.rmcore = rmcore;
         this.monitoring = monitor;
 
-        this.nodes = Collections.synchronizedMap(new HashMap<String, Node>());
-        this.downNodes = Collections.synchronizedMap(new HashMap<String, Node>());
+        this.nodes = Collections.synchronizedMap(new HashMap<>());
+        this.downNodes = Collections.synchronizedMap(new HashMap<>());
 
         // node source admin permission
         // it's the PrincipalPermission of the user who created the node source
@@ -286,7 +285,7 @@ public class NodeSource implements InitActive, RunActive {
 
                 if (delta > pingFrequency) {
                     logger.info("[" + name + "] Pinging alive nodes : " + getAliveNodes().size());
-                    for (Node node : getAliveNodes()) {
+                    for (RMNode node : getAliveNodes()) {
                         pingNode(node);
                     }
                     delta = 0;
@@ -301,13 +300,13 @@ public class NodeSource implements InitActive, RunActive {
      * Updates internal node source structures.
      */
     @VisibleForTesting
-    RMDeployingNode internalAddNode(Node node) throws RMException {
-        String nodeUrl = node.getNodeInformation().getURL();
+    RMDeployingNode internalAddNode(RMNode node) throws RMException {
+        String nodeUrl = node.getNodeURL();
         if (this.nodes.containsKey(nodeUrl)) {
             throw new RMException("The node " + nodeUrl + " already added to the node source " + name);
         }
 
-        logger.info("[" + name + "] new node available : " + node.getNodeInformation().getURL());
+        logger.info("[" + name + "] new node available : " + node.getNodeURL());
         RMDeployingNode rmDeployingNode = infrastructureManager.internalRegisterAcquiredNode(node);
         nodes.put(nodeUrl, node);
         return rmDeployingNode;
@@ -334,9 +333,9 @@ public class NodeSource implements InitActive, RunActive {
         }
         // we finally put back the node in the data structure of the node source
         if (rmNodeData.getState().equals(NodeState.DOWN)) {
-            downNodes.put(nodeUrl, node);
+            downNodes.put(nodeUrl, recoveredRmNode);
         } else {
-            nodes.put(nodeUrl, node);
+            nodes.put(nodeUrl, recoveredRmNode);
         }
         return recoveredRmNode;
     }
@@ -394,9 +393,9 @@ public class NodeSource implements InitActive, RunActive {
         } else if (nodes.containsKey(nodeUrl)) {
             // adding a node which exists in node source
 
-            Node existingNode = nodes.get(nodeUrl);
+            RMNode existingNode = nodes.get(nodeUrl);
 
-            if (nodeToAdd.equals(existingNode)) {
+            if (RMNodeData.createRMNodeData(existingNode).equalsToNode(nodeToAdd)) {
                 // adding the same node twice
                 // don't do anything
                 if (logger.isDebugEnabled())
@@ -417,16 +416,13 @@ public class NodeSource implements InitActive, RunActive {
             }
         }
 
-        // if any exception occurs in internalAddNode(node) do not add the node to the core
+        RMNode rmNode = buildRMNode(nodeToAdd, provider);
         RMDeployingNode deployingNode;
         try {
-            deployingNode = internalAddNode(nodeToAdd);
+            deployingNode = internalAddNode(rmNode);
         } catch (RMException e) {
             throw new AddingNodesException(e);
         }
-        //we build the rmnode
-        RMNode rmNode = buildRMNode(nodeToAdd, provider);
-
         if (deployingNode != null) {
             // inherit locking status from associated deploying node created before
             ((AbstractRMNode) rmNode).copyLockStatusFrom(deployingNode);
@@ -511,18 +507,17 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     public boolean setNodeAvailable(RMNode node) {
-        Node proactiveProgrammingNode = node.getNode();
-        String proactiveProgrammingNodeUrl = proactiveProgrammingNode.getNodeInformation().getURL();
-        Node downNode = downNodes.remove(proactiveProgrammingNodeUrl);
+        String nodeUrl = node.getNodeURL();
+        RMNode downNode = downNodes.remove(nodeUrl);
 
         if (downNode != null) {
-            logger.info("Setting node as available: " + proactiveProgrammingNodeUrl);
-            nodes.put(proactiveProgrammingNodeUrl, proactiveProgrammingNode);
-            infrastructureManager.onDownNodeReconnection(proactiveProgrammingNode);
+            logger.info("Setting node as available: " + nodeUrl);
+            nodes.put(nodeUrl, node);
+            infrastructureManager.onDownNodeReconnection(node);
 
             return true;
         } else {
-            logger.info("Node state not changed since it is unknown: " + proactiveProgrammingNodeUrl);
+            logger.info("Node state not changed since it is unknown: " + nodeUrl);
             return false;
         }
     }
@@ -641,7 +636,7 @@ public class NodeSource implements InitActive, RunActive {
      * @param nodeUrl the url of the node to be released
      */
     public BooleanWrapper removeNode(String nodeUrl, Client initiator) {
-        Node node = null;
+        RMNode node = null;
         //verifying if node is already in the list,
         //node could have fallen between remove request and the confirm
         if (this.nodes.containsKey(nodeUrl)) {
@@ -781,8 +776,8 @@ public class NodeSource implements InitActive, RunActive {
      * @return a list of alive nodes
      */
     @ImmediateService
-    public LinkedList<Node> getAliveNodes() {
-        LinkedList<Node> nodes = new LinkedList<>();
+    public LinkedList<RMNode> getAliveNodes() {
+        LinkedList<RMNode> nodes = new LinkedList<>();
         nodes.addAll(this.nodes.values());
         return nodes;
     }
@@ -792,8 +787,8 @@ public class NodeSource implements InitActive, RunActive {
      * @return a list of down nodes
      */
     @ImmediateService
-    public LinkedList<Node> getDownNodes() {
-        LinkedList<Node> downNodes = new LinkedList<>();
+    public LinkedList<RMNode> getDownNodes() {
+        LinkedList<RMNode> downNodes = new LinkedList<>();
         downNodes.addAll(this.downNodes.values());
         return downNodes;
     }
@@ -842,7 +837,7 @@ public class NodeSource implements InitActive, RunActive {
         }
 
         logger.warn("[" + name + "] Detected down node: " + nodeUrl);
-        Node downNode = nodes.remove(nodeUrl);
+        RMNode downNode = nodes.remove(nodeUrl);
         if (downNode != null) {
             downNodes.put(nodeUrl, downNode);
             try {
@@ -887,14 +882,14 @@ public class NodeSource implements InitActive, RunActive {
      * Pings the node with specified url.
      * If the node is dead sends the request to the node source.
      */
-    public void pingNode(final Node node) {
+    public void pingNode(RMNode node) {
         executeInParallel(new Runnable() {
             public void run() {
-                String nodeName = node.getNodeInformation().getName();
-                String nodeUrl = node.getNodeInformation().getURL();
+                String nodeName = node.getNodeName();
+                String nodeUrl = node.getNodeURL();
 
                 try {
-                    node.getNumberOfActiveObjects();
+                    node.getNode().getNumberOfActiveObjects();
                     if (logger.isDebugEnabled()) {
                         logger.debug("Node " + nodeUrl + " is alive");
                     }

@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.utils.FileToBytesConverter;
 
 
@@ -236,10 +237,10 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * Parent IM notifies about a new node registration
      */
     @Override
-    protected void notifyAcquiredNode(Node node) throws RMException {
-        String nodeName = node.getNodeInformation().getName();
-        String nodeUrl = node.getNodeInformation().getURL();
-        InetAddress nodeHost = node.getVMInformation().getInetAddress();
+    protected void notifyAcquiredNode(RMNode node) throws RMException {
+        String nodeName = node.getNodeName();
+        String nodeUrl = node.getNodeURL();
+        InetAddress nodeHost = node.getNode().getVMInformation().getInetAddress();
 
         String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
         putAliveNodeUrlWithLockAndPersist(parsedHost, nodeUrl);
@@ -250,19 +251,25 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(Node node) {
-        String nodeName = node.getNodeInformation().getName();
-        String nodeUrl = node.getNodeInformation().getURL();
-        InetAddress nodeHost = node.getVMInformation().getInetAddress();
+    public void removeNode(RMNode node) {
+        String nodeName = node.getNodeName();
+        String nodeUrl = node.getNodeURL();
 
         String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
-        putRemovedNodeUrlWithLockAndPersist(parsedHost, node.getNodeInformation().getURL());
-        logger.info("Removed node " + nodeUrl + " on host " + nodeHost);
+        putRemovedNodeUrlWithLockAndPersist(parsedHost, node.getNodeURL());
+
+        Node proactiveProgrammingNode = node.getNode();
+        if (proactiveProgrammingNode != null) {
+            logger.info("Removed node " + nodeUrl + " on host " + proactiveProgrammingNode.getVMInformation().getInetAddress());
+        }
 
         if (!hasAliveNodes(parsedHost)) {
-            killNodeProcess(node, nodeHost);
             setNeedsNodesWithLockAndPersist(parsedHost, true);
-            logger.info("Host " + nodeHost + " has no more alive nodes. Need nodes flag is set.");
+            if (proactiveProgrammingNode != null) {
+                InetAddress nodeHost = proactiveProgrammingNode.getVMInformation().getInetAddress();
+                killNodeProcess(proactiveProgrammingNode, nodeHost);
+                logger.info("Host " + nodeHost + " has no more alive nodes. Need nodes flag is set.");
+            }
         }
     }
 
@@ -270,18 +277,18 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      * {@inheritDoc}
      */
     @Override
-    public void notifyDownNode(final String nodeName, final String nodeUrl, final Node node) {
+    public void notifyDownNode(final String nodeName, final String nodeUrl, final RMNode node) {
         InetAddress nodeHost = null;
-        if (node != null) {
-            nodeHost = node.getVMInformation().getInetAddress();
+        if (node.getNode() != null) {
+            nodeHost = node.getNode().getVMInformation().getInetAddress();
         }
         String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
         putDownNodeUrlWithLockAndPersist(parsedHost, nodeUrl);
         logger.info("Down node " + nodeUrl + " on host " + nodeHost);
 
         if (!hasAliveNodes(parsedHost)) {
-            if (node != null) { // the node object can be null in case of a recovery
-                killNodeProcess(node, nodeHost);
+            if (node.getNode() != null) { // the node object can be null in case of a recovery
+                killNodeProcess(node.getNode(), nodeHost);
             }
             setNeedsNodesWithLockAndPersist(parsedHost, true);
             logger.info("Host " + parsedHost + " has no more alive nodes. Need nodes flag is set.");
@@ -289,14 +296,17 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     @Override
-    public void onDownNodeReconnection(Node node) {
-        String nodeName = node.getNodeInformation().getName();
-        String nodeUrl = node.getNodeInformation().getURL();
-        InetAddress nodeHost = node.getVMInformation().getInetAddress();
+    public void onDownNodeReconnection(RMNode node) {
+        String nodeName = node.getNodeName();
+        String nodeUrl = node.getNodeURL();
 
         String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
-        putAliveNodeUrlWithLockAndPersist(parsedHost, node.getNodeInformation().getURL());
-        logger.info("Reconnected node " + nodeUrl + " on host " + nodeHost);
+        putAliveNodeUrlWithLockAndPersist(parsedHost, node.getNodeURL());
+
+        if (node.getNode() != null) {
+            InetAddress nodeHost = node.getNode().getVMInformation().getInetAddress();
+            logger.info("Reconnected node " + nodeUrl + " on host " + nodeHost);
+        }
     }
 
     protected void startNodeImplWithRetries(final HostTracker hostTracker, final int nbNodes, int retries)
@@ -406,11 +416,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     /**
      * Kills the node passed as parameter
-     * @param node The node to kill
+     * @param proactiveProgrammingNode The node to kill
      * @param host The host of the node
      * @throws RMException if a problem occurred while removing
      */
-    protected abstract void killNodeImpl(Node node, InetAddress host) throws RMException;
+    protected abstract void killNodeImpl(Node proactiveProgrammingNode, InetAddress host) throws RMException;
 
     // Below are wrapper methods around the map that holds all the persisted
     // infrastructure variables. Some of them acquire a read or write lock
