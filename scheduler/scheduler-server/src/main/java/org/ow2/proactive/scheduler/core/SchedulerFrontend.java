@@ -125,6 +125,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -1094,6 +1095,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @ImmediateService
     public JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return frontendState.getJobState(jobId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), offset, limit);
     }
 
     /**

@@ -37,6 +37,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
@@ -74,6 +75,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -563,6 +565,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
      * 
      * @throws RuntimeException if mbean cannot access or connect the service
      */
+    @ImmediateService
     public Map<String, String> getMappedInfo(final String mbeanNameAsString) throws RuntimeException {
         return mbeaninfoviewer.getMappedInfo(mbeanNameAsString);
     }
@@ -692,6 +695,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @Override
     public Map getSchedulerProperties() throws NotConnectedException, PermissionException {
         return uischeduler.getSchedulerProperties();
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return uischeduler.getTaskPaginated(jobId, offset, limit);
     }
 
     @Override

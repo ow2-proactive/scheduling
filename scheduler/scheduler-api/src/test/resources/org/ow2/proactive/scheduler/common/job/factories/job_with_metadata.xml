@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job xmlns="urn:proactive:jobdescriptor:dev" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:dev ../../../src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd"
+    name="JobWithMetadata" onTaskError="continueJobExecution" priority="normal">
+    <description>TestJobWithMetadata</description>
+    <taskFlow>
+        <task name="Linux_Bash_Task">
+            <description>
+                <![CDATA[ The simplest task, ran by a bash engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="bash">
+                        <![CDATA[
+ls -la
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <metadata>
+                <positionTop>145</positionTop>
+                <positionLeft>145</positionLeft>
+                <test>145</test>
+            </metadata>
+        </task>
+    </taskFlow>
+    <metadata>
+        <anything>145</anything>
+        <test>145</test>
+    </metadata>
+</job>

@@ -65,6 +65,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -790,6 +791,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
         renewSession();
         return client.getSchedulerProperties();
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        renewSession();
+        return client.getTaskPaginated(jobId, offset, limit);
     }
 
     @Override

@@ -79,6 +79,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.smartproxy.common.AbstractSmartProxy;
@@ -858,6 +859,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     @Override
     public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
         return schedulerProxy.getSchedulerProperties();
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return schedulerProxy.getTaskPaginated(jobId, offset, limit);
     }
 
     @Override
