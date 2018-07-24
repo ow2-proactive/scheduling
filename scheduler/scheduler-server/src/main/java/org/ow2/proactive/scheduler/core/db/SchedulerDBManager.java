@@ -1198,29 +1198,87 @@ public class SchedulerDBManager {
     }
 
     public void updateJobAndTasksState(final InternalJob job) {
-        executeReadWriteTransaction(new SessionWork<Void>() {
-            @Override
-            public Void doInTransaction(Session session) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
 
-                for (TaskState task : job.getTasks()) {
-                    updateTaskData(task, session);
-                }
-
-                JobInfo jobInfo = job.getJobInfo();
-
-                session.getNamedQuery("updateJobAndTasksState")
-                       .setParameter("status", jobInfo.getStatus())
-                       .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
-                       .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
-                       .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
-                       .setParameter("inErrorTime", jobInfo.getInErrorTime())
-                       .setParameter("lastUpdatedTime", new Date().getTime())
-                       .setParameter("jobId", jobId(job))
-                       .executeUpdate();
-
-                return null;
+            for (TaskState task : job.getTasks()) {
+                updateTaskData(task, session);
             }
 
+            updateJobState(job, session);
+
+            return null;
+        });
+    }
+
+    public void pauseJobAndTasks(final InternalJob job) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            pauseTasks(job, session);
+
+            updateJobState(job, session);
+
+            return null;
+        });
+    }
+
+    public void updateJobAndRestartAllInErrorTasks(InternalJob job) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            restartAllInErrorTasks(job, session);
+
+            updateJobState(job, session);
+
+            return null;
+        });
+    }
+
+    private void restartAllInErrorTasks(InternalJob job, Session session) {
+        session.getNamedQuery("restartAllInErrorTasks").setParameter("jobId", jobId(job)).executeUpdate();
+    }
+
+    private void pauseTasks(InternalJob job, Session session) {
+        session.getNamedQuery("pauseTasks").setParameter("jobId", jobId(job)).executeUpdate();
+    }
+
+    public void unpauseJobAndTasks(final InternalJob job) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            unpauseTasks(job, session);
+
+            updateJobState(job, session);
+
+            return null;
+        });
+    }
+
+    private void unpauseTasks(InternalJob job, Session session) {
+        if (job.getJobInfo().getStatus() == JobStatus.PENDING) {
+            session.getNamedQuery("unpausePendingTasks").setParameter("jobId", jobId(job)).executeUpdate();
+        } else if (job.getJobInfo().getStatus() == JobStatus.RUNNING ||
+                   job.getJobInfo().getStatus() == JobStatus.STALLED) {
+            session.getNamedQuery("unpausedTasks").setParameter("jobId", jobId(job)).executeUpdate();
+        }
+    }
+
+    private void updateJobState(InternalJob job, Session session) {
+        JobInfo jobInfo = job.getJobInfo();
+
+        session.getNamedQuery("updateJobAndTasksState")
+               .setParameter("status", jobInfo.getStatus())
+               .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+               .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+               .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+               .setParameter("inErrorTime", jobInfo.getInErrorTime())
+               .setParameter("lastUpdatedTime", new Date().getTime())
+               .setParameter("jobId", jobId(job))
+               .executeUpdate();
+    }
+
+    public void updateJobAndTaskState(final InternalJob job, final InternalTask task) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+
+            updateTaskData(task, session);
+
+            updateJobState(job, session);
+
+            return null;
         });
     }
 
