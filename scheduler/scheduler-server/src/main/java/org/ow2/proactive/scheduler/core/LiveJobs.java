@@ -773,7 +773,6 @@ class LiveJobs {
             InternalTask task = jobData.job.getTask(taskName);
             tlogger.info(task.getId(), "restarting in-error task " + task.getId());
             jobData.job.restartInErrorTask(task);
-            updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
         } finally {
             jobData.unlock();
         }
