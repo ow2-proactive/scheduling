@@ -341,8 +341,10 @@ class LoadPackage {
         writeToOutput(" Loading " + package_dir)
         def package_dir_ext = FilenameUtils.getExtension(package_dir.name)
         def unzipped_package_dir
-        if (package_dir_ext == "zip")
+        if (package_dir_ext == "zip"){
             unzipped_package_dir = unzipPackage(package_dir)
+            package_dir_ext = "." + package_dir_ext
+        }
         else if (package_dir_ext.isEmpty())
             unzipped_package_dir = package_dir
         else {
@@ -365,7 +367,7 @@ class LoadPackage {
                 def parent_package_dir = package_dir.getAbsoluteFile().getParentFile()
                 dependencies_list.each { package_name ->
 
-                    this.run( new File(parent_package_dir, package_name + "." + package_dir_ext), load_dependencies)
+                    this.run( new File(parent_package_dir, package_name + package_dir_ext), load_dependencies)
                 }
             }
         }
