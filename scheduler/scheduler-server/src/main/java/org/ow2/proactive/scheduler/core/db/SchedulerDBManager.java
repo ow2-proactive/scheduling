@@ -467,9 +467,7 @@ public class SchedulerDBManager {
 
     public long getTotalTasksCount() {
         return executeReadOnlyTransaction(session -> {
-            Query query = session.getNamedQuery("getTotalTasksCount");
-            Long count = (Long) query.uniqueResult();
-            return count;
+            return (Long) session.getNamedQuery("getTotalTasksCount").uniqueResult();
         });
     }
 
@@ -576,8 +574,8 @@ public class SchedulerDBManager {
 
             Query query = session.getNamedQuery("getMeanTaskRunningTime").setParameter("id", id);
 
-            Double result1 = (Double) query.uniqueResult();
-            return result1 == null ? 0.0d : result1;
+            Double uniqueResult = (Double) query.uniqueResult();
+            return uniqueResult == null ? 0.0d : uniqueResult;
         });
 
         return checkResult(id, result);
@@ -662,7 +660,7 @@ public class SchedulerDBManager {
     }
 
     public List<JobId> getJobsToRemove(final long time) {
-        List<JobId> jobIdsList = executeReadOnlyTransaction(session -> {
+        return executeReadOnlyTransaction(session -> {
             List<JobId> jobsToRemove = new ArrayList<JobId>();
             Query query = session.createSQLQuery("select ID from JOB_DATA where " +
                                                  "SCHEDULED_TIME_FOR_REMOVAL <> 0 and " +
@@ -674,7 +672,6 @@ public class SchedulerDBManager {
             }
             return jobsToRemove;
         });
-        return jobIdsList;
     }
 
     public void executeHousekeepingInDB(final List<Long> jobIdList, final boolean shouldRemoveFromDb) {
