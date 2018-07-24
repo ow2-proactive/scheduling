@@ -661,16 +661,15 @@ public class SchedulerDBManager {
 
     public List<JobId> getJobsToRemove(final long time) {
         return executeReadOnlyTransaction(session -> {
-            List<JobId> jobsToRemove = new ArrayList<JobId>();
             Query query = session.createSQLQuery("select ID from JOB_DATA where " +
                                                  "SCHEDULED_TIME_FOR_REMOVAL <> 0 and " +
                                                  "SCHEDULED_TIME_FOR_REMOVAL < :timeLimit")
                                  .setParameter("timeLimit", time);
-            Iterator jobIdIterator = query.list().iterator();
-            while (jobIdIterator.hasNext()) {
-                jobsToRemove.add(JobIdImpl.makeJobId((jobIdIterator.next()).toString()));
-            }
-            return jobsToRemove;
+            return ((List<Long>) query.list())
+                    .stream()
+                    .map(Object::toString)
+                    .map(JobIdImpl::makeJobId)
+                    .collect(Collectors.toList());
         });
     }
 
