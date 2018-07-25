@@ -12,6 +12,18 @@
 			<a>tasks</a>
 			<b>hMTasks</b>
 		</field>
+		
+	</mapping>
+	
+	<mapping>
+		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData</class-a>
+		<class-b>org.ow2.proactive.scheduler.common.task.TaskState</class-b>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateDataDependencesCustomConverter">
+			<a>dependences</a>
+			<b>dependences</b>
+		</field>
+		
 	</mapping>
 
 	<mapping>
