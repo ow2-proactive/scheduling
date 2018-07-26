@@ -761,34 +761,19 @@ public class SchedulerTHelper {
                                    JobStatus.FINISHED,
                                    SchedulerEvent.JOB_RUNNING_TO_FINISHED);
         } catch (ProActiveTimeoutException e) {
-            /**
-             * Print diagnostic messages in order to figure out
-             * why we did not catch Running-to-Finished event.
-             */
-            JobState jobState = null;
             try {
-                jobState = userInterface.getJobState(id);
+                JobState jobState = userInterface.getJobState(id);
+                if (jobState != null) {
+                    System.err.println("jobState: " + jobState);
+                    for (JobEventMonitor event : getSchedulerMonitorsHandler().getJobEvents(id)) {
+                        System.err.println("event: " + event);
+                    }
+                }
             } catch (UnknownJobException un) {
                 System.err.println(un);
             }
 
-            if (jobState != null) {
-                System.err.println("jobState.getId = " + jobState.getId());
-                System.err.println("jobState.getJobInfo = " + jobState.getJobInfo());
-                System.err.println("jobState.getStatus = " + jobState.getStatus());
-                System.err.println("jobState.isFinished " + jobState.isFinished());
-                for (JobEventMonitor event : getSchedulerMonitorsHandler().getJobEvents(id)) {
-                    System.err.println("event.getJobInfo().getJobId = " + event.getJobInfo());
-                    System.err.println("event.getJobInfo = " + event.getJobInfo());
-                    System.err.println("monitorRTF.eventOccured = " + event.eventOccured());
-                    System.err.println("monitorRTF.isTimeouted = " + event.isTimeouted());
-                    System.err.println("monitorRTF.getJobId = " + event.getJobId());
-                }
-            }
-
-            //unreachable block, 0 means infinite, no timeout
-            //log sthing ?
-            return null;
+            throw e;
         }
     }
 
