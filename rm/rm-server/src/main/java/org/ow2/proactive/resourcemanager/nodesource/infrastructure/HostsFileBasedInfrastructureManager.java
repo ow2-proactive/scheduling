@@ -260,7 +260,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
         Node proactiveProgrammingNode = node.getNode();
         if (proactiveProgrammingNode != null) {
-            logger.info("Removed node " + nodeUrl + " on host " + proactiveProgrammingNode.getVMInformation().getInetAddress());
+            logger.info("Removed node " + nodeUrl + " on host " +
+                        proactiveProgrammingNode.getVMInformation().getInetAddress());
         }
 
         if (!hasAliveNodes(parsedHost)) {

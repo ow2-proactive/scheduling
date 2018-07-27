@@ -148,7 +148,12 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
 
         // the nodes should have been recovered too, and should be alive
         Set<String> allNodes = resourceManagerMonitor.getState().getAllNodes();
-        assertThat(allNodes.size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
+        if (nodesShouldBeRecreated) {
+            // there should be down nodes and new nodes now
+            assertThat(allNodes.size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES * 2);
+        } else {
+            assertThat(allNodes.size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
+        }
         Set<String> nodeSourceNames = new HashSet<>();
         nodeSourceNames.add(NODE_SOURCE_NAME);
         Set<String> aliveNodeUrls = resourceManager.listAliveNodeUrls(nodeSourceNames);

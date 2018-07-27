@@ -880,7 +880,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      * runnable is the node has been found amoung acquired nodes and executes
      * the second runnable if the node has not been found. Note that this method
      * is in mutual exclusion with
-     * {@link InfrastructureManager#internalRegisterAcquiredNode(Node)} to avoid
+     * {@link InfrastructureManager#internalRegisterAcquiredNode(RMNode)} to avoid
      * races.
      *
      * @param nodeName

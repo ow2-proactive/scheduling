@@ -385,18 +385,14 @@ public class RMRest implements RMRestInterface {
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
             @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException {
-
-        ResourceManager rm = checkAccess(sessionId);
         NSState nsState = new NSState();
-
-        Object[] infraParams = this.getAllInfrastructureParameters(infrastructureType,
-                                                                   infrastructureParameters,
-                                                                   infrastructureFileParameters,
-                                                                   rm);
-
-        Object[] policyParams = this.getAllPolicyParameters(policyType, policyParameters, policyFileParameters, rm);
-
         try {
+            ResourceManager rm = checkAccess(sessionId);
+            Object[] infraParams = this.getAllInfrastructureParameters(infrastructureType,
+                                                                       infrastructureParameters,
+                                                                       infrastructureFileParameters,
+                                                                       rm);
+            Object[] policyParams = this.getAllPolicyParameters(policyType, policyParameters, policyFileParameters, rm);
             nsState.setResult(rm.updateDynamicParameters(nodeSourceName,
                                                          infrastructureType,
                                                          infraParams,
@@ -408,7 +404,6 @@ public class RMRest implements RMRestInterface {
             nsState.setErrorMessage(cleanDisplayedErrorMessage(ex.getMessage()));
             nsState.setStackTrace(StringEscapeUtils.escapeJson(getStackTrace(ex)));
         }
-
         return nsState;
     }
 

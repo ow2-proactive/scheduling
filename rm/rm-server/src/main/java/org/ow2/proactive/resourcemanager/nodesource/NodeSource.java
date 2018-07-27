@@ -847,11 +847,10 @@ public class NodeSource implements InitActive, RunActive {
                 logger.error("Error while removing down node: " + nodeUrl, e);
             }
         } else {
-            // the node could not be found in the nodes map so we are trying
-            // here to restore the nodes after a recovery of the RM: we have
-            // almost no information about the node apart from its name and url
+            // the node can already be in down nodes list when we are recovering
+            RMNode rmNode = downNodes.get(nodeUrl);
             try {
-                infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl, null);
+                infrastructureManager.internalNotifyDownNode(nodeName, nodeUrl, rmNode);
             } catch (RMException e) {
                 logger.error("New empty node " + nodeUrl + " could not be created to handle down node", e);
             }

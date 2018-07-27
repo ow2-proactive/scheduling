@@ -147,7 +147,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
             for (RMNode otherNode : nodesList) {
                 if (otherNode.getNode() != null) {
                     if (!otherNode.getNodeURL().equals(nodeToTestUrl) &&
-                            otherNode.getNode().getVMInformation().getVMID().equals(nodeID)) {
+                        otherNode.getNode().getVMInformation().getVMID().equals(nodeID)) {
                         return true;
                     }
                 }

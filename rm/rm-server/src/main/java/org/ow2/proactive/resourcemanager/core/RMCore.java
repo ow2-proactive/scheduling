@@ -1000,9 +1000,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
         });
 
-        removeAllNodes(nodeSourceName, "alive nodes", new RemoveAllNodes(NodeSource::getAliveNodes, preemptive, isTriggeredFromShutdownHook));
+        removeAllNodes(nodeSourceName,
+                       "alive nodes",
+                       new RemoveAllNodes(NodeSource::getAliveNodes, preemptive, isTriggeredFromShutdownHook));
 
-        removeAllNodes(nodeSourceName, "down nodes", new RemoveAllNodes(NodeSource::getDownNodes, preemptive, isTriggeredFromShutdownHook));
+        removeAllNodes(nodeSourceName,
+                       "down nodes",
+                       new RemoveAllNodes(NodeSource::getDownNodes, preemptive, isTriggeredFromShutdownHook));
     }
 
     protected void setEligibleNodesToRecover(List<RMNode> eligibleNodes) {
