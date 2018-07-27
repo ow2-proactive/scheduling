@@ -4,6 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import org.apache.log4j.Logger
+import org.apache.commons.io.FilenameUtils
 import org.apache.http.conn.ssl.*
 import org.apache.http.impl.client.*
 import javax.net.ssl.*
@@ -14,10 +15,9 @@ import java.util.zip.ZipFile
 class LoadPackage {
 
     private final String PATH_TO_SCHEDULER_CREDENTIALS_FILE = "config/authentication/scheduler.cred"
-
     private final String LOAD_PACKAGE_SCRIPT_NAME = "LoadPackage.groovy"
-
     private final String BUCKET_OWNER = "GROUP:public-objects"
+    private final String TMP_DIR_PREFIX = "package_temp_dir"
 
     private final String GLOBAL_SPACE_PATH
     private final String SCHEDULER_REST_URL
@@ -102,19 +102,15 @@ class LoadPackage {
     }
 
     def unzipPackage(package_dir) {
-        if (!package_dir.exists()) {
-            writeToOutput("] " + packager_dir + " not found!")
-            return
-        } else {
-            def package_temp_dir = Files.createTempDirectory("package_temp_dir").toFile()
-            unzipFile(package_dir, package_temp_dir.getPath())
-            writeToOutput(" " + package_dir + " extracted!")
-            package_dir = new File(package_temp_dir.getPath() + "/" + package_dir.getName().substring(0, package_dir.getName().length() - 4))
-            package_temp_dir.deleteOnExit()
-
-        }
-        return package_dir
-
+      // Create a temporary dir
+      def package_temp_dir = Files.createTempDirectory(TMP_DIR_PREFIX).toFile()
+      package_temp_dir.deleteOnExit()
+      // Unzip the package into it
+      unzipFile(package_dir, package_temp_dir.getPath())
+      writeToOutput(" " + package_dir + " extracted!")
+      // Return the unzipped package
+      def package_dir_name_no_ext = FilenameUtils.removeExtension(package_dir.name)
+      return new File(package_temp_dir, package_dir_name_no_ext)
     }
 
 
@@ -342,26 +338,36 @@ class LoadPackage {
         loginAdminUserCredToSchedulerAndGetSessionId()
 
         // If the package dir is a zip file, create a temporary directory that contains the unzipped package dir
-        if (package_dir.getPath().endsWith(".zip")) {
-            package_dir = unzipPackage(package_dir)
+        writeToOutput(" Loading " + package_dir)
+        def package_dir_ext = FilenameUtils.getExtension(package_dir.name)
+        def unzipped_package_dir
+        if (package_dir_ext == "zip"){
+            unzipped_package_dir = unzipPackage(package_dir)
+            package_dir_ext = "." + package_dir_ext
+        }
+        else if (package_dir_ext.isEmpty())
+            unzipped_package_dir = package_dir
+        else {
+            writeToOutput(" package dir extension not supported")
+            throw new Exception(" package dir extension not supported")
         }
 
         // Parse the metadata json file
-        def metadata_file = new File(package_dir.absolutePath, "METADATA.json")
+        def metadata_file = new File(unzipped_package_dir, "METADATA.json")
         writeToOutput(" Parsing " + metadata_file.absolutePath)
         def metadata_file_map = (Map) slurper.parseText(metadata_file.text)
 
-        // LOAD PACKAGE DEPENDENCIES ////////////////////////////
+        // LOAD PACKAGE DEPENDENCIES RECURSIVELY ////////////////////////////
 
         if (load_dependencies) {
             def dependencies_list = metadata_file_map.get("dependencies")
 
             if (dependencies_list != null)
             {
-                def examples_dir = package_dir.getAbsoluteFile().getParentFile()
+                def parent_package_dir = package_dir.getAbsoluteFile().getParentFile()
                 dependencies_list.each { package_name ->
 
-                    this.run( new File(examples_dir, package_name), load_dependencies)
+                    this.run( new File(parent_package_dir, package_name + package_dir_ext), load_dependencies)
                 }
             }
         }
@@ -369,12 +375,12 @@ class LoadPackage {
         // POPULATE DATASPACE ////////////////////////////
 
         def dataspace_map = metadata_file_map.get("dataspace")
-        populateDataspace(dataspace_map, package_dir)
+        populateDataspace(dataspace_map, unzipped_package_dir)
 
         // POPULATE BUCKETS /////////////////////////////
 
         def catalog_map = metadata_file_map.get("catalog")
-        populateBucket(catalog_map, package_dir)
+        populateBucket(catalog_map, unzipped_package_dir)
 
     }
 }
