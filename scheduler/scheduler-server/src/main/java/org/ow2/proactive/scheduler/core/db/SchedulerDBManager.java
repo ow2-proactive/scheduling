@@ -1533,14 +1533,15 @@ public class SchedulerDBManager {
 
             taskRuntimeData.setDependentTasks(dependencies);
         } else {
-            taskRuntimeData.setDependentTasks(Collections.<DBTaskId> emptyList());
+            taskRuntimeData.setDependentTasks(Collections.emptyList());
         }
+
         if (task.getIfBranch() != null) {
-            InternalTask ifBranch = task.getIfBranch();
-            taskRuntimeData.setIfBranch(getTaskReference(session, ifBranch));
+            taskRuntimeData.setIfBranch(getTaskReference(session, task.getIfBranch()));
         } else {
             taskRuntimeData.setIfBranch(null);
         }
+
         if (task.getJoinedBranches() != null && !task.getJoinedBranches().isEmpty()) {
             List<DBTaskId> joinedBranches = task.getJoinedBranches()
                                                 .stream()
@@ -1548,7 +1549,7 @@ public class SchedulerDBManager {
                                                 .collect(Collectors.toList());
             taskRuntimeData.setJoinedBranches(joinedBranches);
         } else {
-            taskRuntimeData.setJoinedBranches(Collections.<DBTaskId> emptyList());
+            taskRuntimeData.setJoinedBranches(Collections.emptyList());
         }
     }
 
@@ -1604,17 +1605,15 @@ public class SchedulerDBManager {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("findUsersWithJobs");
 
-            List list = query.list();
-            List<SchedulerUserInfo> users = new ArrayList<>(list.size());
-            for (Object obj : list) {
-                Object[] nameAndCount = (Object[]) obj;
-                users.add(new SchedulerUserInfo(null,
-                                                nameAndCount[0].toString(),
-                                                0,
-                                                Long.parseLong(nameAndCount[2].toString()),
-                                                Integer.parseInt(nameAndCount[1].toString())));
-            }
-            return users;
+            List<Object[]> list = query.list();
+
+            return list.stream()
+                       .map(nameAndCount -> new SchedulerUserInfo(null,
+                                                                  nameAndCount[0].toString(),
+                                                                  0,
+                                                                  Long.parseLong(nameAndCount[2].toString()),
+                                                                  Integer.parseInt(nameAndCount[1].toString())))
+                       .collect(Collectors.toList());
         });
     }
 
@@ -1747,12 +1746,13 @@ public class SchedulerDBManager {
             long id = jobId(jobId);
 
             Query query = session.getNamedQuery("loadJobContent").setLong("id", id);
-            JobContent result = (JobContent) query.uniqueResult();
-            return result.getInitJobContent();
+            JobContent jobContent = (JobContent) query.uniqueResult();
+            return jobContent.getInitJobContent();
         });
     }
 
     public TransactionHelper getTransactionHelper() {
         return transactionHelper;
     }
+
 }
