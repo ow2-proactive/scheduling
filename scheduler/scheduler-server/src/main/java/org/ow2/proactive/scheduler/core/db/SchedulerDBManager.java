@@ -1105,7 +1105,7 @@ public class SchedulerDBManager {
             session.getNamedQuery("unpausePendingTasks").setParameter("jobId", jobId(job)).executeUpdate();
         } else if (job.getJobInfo().getStatus() == JobStatus.RUNNING ||
                    job.getJobInfo().getStatus() == JobStatus.STALLED) {
-            session.getNamedQuery("unpausedTasks").setParameter("jobId", jobId(job)).executeUpdate();
+            session.getNamedQuery("unpauseTasks").setParameter("jobId", jobId(job)).executeUpdate();
         }
     }
 
