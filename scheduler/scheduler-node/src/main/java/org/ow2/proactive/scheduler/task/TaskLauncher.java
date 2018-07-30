@@ -130,12 +130,7 @@ public class TaskLauncher implements InitActive {
         this.taskLogger = new TaskLogger(taskId, getHostname());
         this.progressFileReader = new ProgressFileReader();
         this.taskKiller = new TaskKiller(Thread.currentThread(), new CleanupTimeoutGetter());
-        nodeShutdownHook = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                kill();
-            }
-        });
+        nodeShutdownHook = new Thread(this::kill);
     }
 
     /**
@@ -312,7 +307,7 @@ public class TaskLauncher implements InitActive {
     }
 
     private TaskKiller replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(boolean isRunAsUser) {
-        if (isRunAsUser == true) {
+        if (isRunAsUser) {
             return new TaskKiller(Thread.currentThread(), new CleanupTimeoutGetterDoubleValue());
         } else {
             return this.taskKiller;
