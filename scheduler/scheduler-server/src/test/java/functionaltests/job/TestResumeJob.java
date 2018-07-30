@@ -29,14 +29,9 @@ import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -48,7 +43,6 @@ import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
-import org.ow2.proactive.scheduler.util.FileLock;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 
