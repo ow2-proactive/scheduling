@@ -142,11 +142,11 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                                   "where task.id.jobId = :jobId"),
                 @NamedQuery(name = "unpauseTasks", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.PENDING " +
                                                            "where task.id.jobId = :jobId " +
-                                                           "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.FINISHED " +
-                                                           "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                                                           "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.SKIPPED " +
-                                                           "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.FAULTY " +
-                                                           "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.IN_ERROR "),
+                                                           "and task.taskStatus <> org.ow2.proactive.scheduler.common.task.TaskStatus.FINISHED " +
+                                                           "and task.taskStatus <> org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                           "and task.taskStatus <> org.ow2.proactive.scheduler.common.task.TaskStatus.SKIPPED " +
+                                                           "and task.taskStatus <> org.ow2.proactive.scheduler.common.task.TaskStatus.FAULTY " +
+                                                           "and task.taskStatus <> org.ow2.proactive.scheduler.common.task.TaskStatus.IN_ERROR "),
                 @NamedQuery(name = "restartAllInErrorTasks", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.PENDING " +
                                                                      "where task.id.jobId = :jobId " +
                                                                      "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.IN_ERROR "),

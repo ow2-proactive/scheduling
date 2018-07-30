@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.core.db;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -46,79 +47,56 @@ import org.ow2.proactive.scheduler.common.task.TaskStatus;
 public class TaskDBUtils {
 
     public static SessionWork<Integer> getTotalNumberOfTasks(final DBTaskDataParameters params) {
-        return new SessionWork<Integer>() {
+        return session -> {
+            Set<TaskStatus> taskStatuses = params.getStatuses();
 
-            @Override
-            public Integer doInTransaction(Session session) {
-                Set<TaskStatus> taskStatuses = params.getStatuses();
-
-                if (taskStatuses.isEmpty()) {
-                    return 0;
-                }
-
-                boolean hasUser = params.hasUser();
-                boolean hasTag = params.hasTag();
-                boolean hasDateFrom = params.hasDateFrom();
-                boolean hasDateTo = params.hasDateTo();
-
-                String queryPrefix = "select count(*) from TaskData T where ";
-
-                Query query = getQuery(session,
-                                       params,
-                                       taskStatuses,
-                                       hasUser,
-                                       hasTag,
-                                       hasDateFrom,
-                                       hasDateTo,
-                                       SortSpecifierContainer.EMPTY_CONTAINER,
-                                       queryPrefix);
-
-                Long count = (Long) query.uniqueResult();
-
-                return count.intValue();
+            if (taskStatuses.isEmpty()) {
+                return 0;
             }
+
+            boolean hasUser = params.hasUser();
+            boolean hasTag = params.hasTag();
+            boolean hasDateFrom = params.hasDateFrom();
+            boolean hasDateTo = params.hasDateTo();
+
+            String queryPrefix = "select count(*) from TaskData T where ";
+
+            Query query = getQuery(session,
+                                   params,
+                                   taskStatuses,
+                                   hasUser,
+                                   hasTag,
+                                   hasDateFrom,
+                                   hasDateTo,
+                                   SortSpecifierContainer.EMPTY_CONTAINER,
+                                   queryPrefix);
+
+            return ((Long) query.uniqueResult()).intValue();
         };
     }
 
     public static SessionWork<List<TaskState>> taskStateSessionWork(final DBTaskDataParameters params) {
-        return new SessionWork<List<TaskState>>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public List<TaskState> doInTransaction(Session session) {
-                if (params.getStatuses().isEmpty()) {
-                    return new ArrayList<TaskState>(0);
-                }
-
-                List<TaskData> tasksList = fetchTaskData(session, params);
-                List<TaskState> result = new ArrayList<TaskState>(tasksList.size());
-
-                for (TaskData taskData : tasksList) {
-                    result.add(taskData.toTaskState());
-                }
-
-                return result;
+        return session -> {
+            if (params.getStatuses().isEmpty()) {
+                return new ArrayList<>(0);
             }
+
+            List<TaskData> tasksList = fetchTaskData(session, params);
+
+            return tasksList.stream().map(TaskData::toTaskState).collect(Collectors.toList());
         };
     }
 
     public static SessionWork<List<TaskInfo>> taskInfoSessionWork(final DBTaskDataParameters params) {
-        return new SessionWork<List<TaskInfo>>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public List<TaskInfo> doInTransaction(Session session) {
-                if (params.getStatuses().isEmpty()) {
-                    return new ArrayList<TaskInfo>(0);
-                }
-
-                List<TaskData> tasksList = fetchTaskData(session, params);
-                List<TaskInfo> result = new ArrayList<TaskInfo>(tasksList.size());
-
-                for (TaskData taskData : tasksList) {
-                    result.add(taskData.toTaskInfo());
-                }
-
-                return result;
+        return session -> {
+            if (params.getStatuses().isEmpty()) {
+                return new ArrayList<>(0);
             }
+
+            List<TaskData> tasksList = fetchTaskData(session, params);
+
+            return tasksList.stream().map(TaskData::toTaskInfo).collect(Collectors.toList());
+
         };
     }
 
