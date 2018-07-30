@@ -44,11 +44,11 @@ class RunningTaskData {
 
     private final NodeSet nodes;
 
-    private volatile int pingAttempts = 0;
+    private int pingAttempts = 0;
 
-    private volatile boolean isRestarting = false;
+    private boolean restarting = false;
 
-    private volatile long firstFailedPingAttemptTime = -1;
+    private long firstFailedPingAttemptTime = -1;
 
     RunningTaskData(InternalTask task, String user, Credentials credentials, TaskLauncher launcher) {
         this.task = task;
@@ -82,32 +82,48 @@ class RunningTaskData {
         return credentials;
     }
 
-    public int increaseAndGetPingAttempts() {
+    public synchronized int increaseAndGetPingAttempts() {
         return ++pingAttempts;
     }
 
-    public void setFirstTaskLauncherFailureTime(long time) {
-        this.firstFailedPingAttemptTime = time;
+    /**
+     * Declare a task launcher failure, if not declared previously
+     */
+    public synchronized void setTaskLauncherFailure() {
+        if (this.firstFailedPingAttemptTime < 0) {
+            this.firstFailedPingAttemptTime = System.currentTimeMillis();
+        }
     }
 
-    public void resetFirstTaskLauncherFailureTime() {
+    /**
+     * Resets the task launcher failure time (launcher has been pinged successfully)
+     */
+    public synchronized void resetTaskLauncherFailure() {
         this.firstFailedPingAttemptTime = -1;
     }
 
-    public long getFirstTaskLauncherFailureTime() {
-        return this.firstFailedPingAttemptTime;
+    /**
+     * Returns the time since the task launcher is not pingable, 0 if the launcher is pingable
+     * @return
+     */
+    public synchronized long getTaskLauncherFailurePeriod() {
+        if (firstFailedPingAttemptTime >= 0) {
+            return System.currentTimeMillis() - this.firstFailedPingAttemptTime;
+        } else {
+            return 0;
+        }
     }
 
-    public int getPingAttempts() {
+    public synchronized int getPingAttempts() {
         return pingAttempts;
     }
 
-    public boolean isRestarting() {
-        return isRestarting;
+    public synchronized boolean isRestarting() {
+        return restarting;
     }
 
-    public void setRestarting(boolean restarting) {
-        isRestarting = restarting;
+    public synchronized void setRestarting() {
+        this.restarting = true;
     }
 
     /**

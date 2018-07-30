@@ -32,7 +32,6 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,6 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.core.db.RecoveredSchedulerState;
@@ -66,7 +64,6 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
-import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -1058,7 +1055,7 @@ public class SchedulingService {
         InternalTask task = taskData.getTask();
         try {
             int progress = taskData.getLauncher().getProgress();//(2)
-            taskData.resetFirstTaskLauncherFailureTime();
+            taskData.resetTaskLauncherFailure();
             //get previous inside td
             if (progress != task.getProgress()) {
                 task.setProgress(progress);//(1)
@@ -1068,14 +1065,12 @@ public class SchedulingService {
                                                                  new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             }
         } catch (Throwable t) {
-            if (taskData.getFirstTaskLauncherFailureTime() < 0) {
-                taskData.setFirstTaskLauncherFailureTime(System.currentTimeMillis());
-            }
+            taskData.setTaskLauncherFailure();
+
             if (tlogger.isDebugEnabled()) {
                 tlogger.debug(task.getId(),
-                              "TaskLauncher is not accessible since " +
-                                            new Date(taskData.getFirstTaskLauncherFailureTime()) +
-                                            ", checking if the node can be reached.",
+                              "TaskLauncher is not accessible for " + taskData.getTaskLauncherFailurePeriod() +
+                                            " ms, checking if the node can be reached.",
                               t);
             }
             pingTaskNodeAndInitiateRestart(task);
@@ -1096,13 +1091,12 @@ public class SchedulingService {
                 nodeUsedToExecuteTask.getNumberOfActiveObjects();
 
                 // If the failure is not due to a node failure, but a TaskLauncher failure and the configured timeout exceeded, we initiate a restart.
-                long taskLauncherFailureTime = System.currentTimeMillis() -
-                                               runningTask.getFirstTaskLauncherFailureTime();
+                long taskLauncherFailureTime = runningTask.getTaskLauncherFailurePeriod();
                 if (taskLauncherFailureTime > PASchedulerProperties.SCHEDULER_TASKLAUNCHER_PING_TIMEOUT.getValueAsLong()) {
                     tlogger.error(task.getId(),
                                   "task launcher failed and was not accessible after " + taskLauncherFailureTime +
                                                 " ms, initiate task restart.");
-                    runningTask.setRestarting(true);
+                    runningTask.setRestarting();
                     restartTaskOnNodeFailure(task);
                 }
 
@@ -1111,7 +1105,7 @@ public class SchedulingService {
                 String nodeUrl = nodeUsedToExecuteTask.getNodeInformation().getURL();
                 if (attempts > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
                     tlogger.error(task.getId(), "node failed " + nodeUrl + ", initiate task restart.", e);
-                    runningTask.setRestarting(true);
+                    runningTask.setRestarting();
                     restartTaskOnNodeFailure(task);
                 } else {
                     tlogger.warn(task.getId(),
