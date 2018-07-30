@@ -32,6 +32,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1049,7 +1050,7 @@ public class SchedulingService {
     }
 
     void getProgressAndPingTaskNode(RunningTaskData taskData) {
-        if (!jobs.canPingTask(taskData) ||
+        if (!jobs.canPingTask(taskData) || taskData.isRestarting() ||
             taskData.getPingAttempts() > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
             return;
         }
@@ -1057,16 +1058,26 @@ public class SchedulingService {
         InternalTask task = taskData.getTask();
         try {
             int progress = taskData.getLauncher().getProgress();//(2)
+            taskData.resetFirstTaskLauncherFailureTime();
             //get previous inside td
             if (progress != task.getProgress()) {
                 task.setProgress(progress);//(1)
                 //if progress != previously set progress (0 by default) -> update
                 listener.taskStateUpdated(taskData.getUser(),
-                                          new NotificationData<TaskInfo>(SchedulerEvent.TASK_PROGRESS,
-                                                                         new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
+                                          new NotificationData<>(SchedulerEvent.TASK_PROGRESS,
+                                                                 new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
             }
         } catch (Throwable t) {
-            tlogger.debug(task.getId(), "TaskLauncher is not accessible, checking if the node can be reached.", t);
+            if (taskData.getFirstTaskLauncherFailureTime() < 0) {
+                taskData.setFirstTaskLauncherFailureTime(System.currentTimeMillis());
+            }
+            if (tlogger.isDebugEnabled()) {
+                tlogger.debug(task.getId(),
+                              "TaskLauncher is not accessible since " +
+                                            new Date(taskData.getFirstTaskLauncherFailureTime()) +
+                                            ", checking if the node can be reached.",
+                              t);
+            }
             pingTaskNodeAndInitiateRestart(task);
         }
     }
@@ -1078,17 +1089,29 @@ public class SchedulingService {
             // We try to ping the node where the task is running to make sure the exception raised is due to a node failure.
             // We don't consider here other nodes reserved for the task,
             // as it is the responsibility of the task itself to manage extra nodes lifecycle
-            // in case of complex multinodes task deployment.
+            // in case of complex multi-nodes task deployment.
             Node nodeUsedToExecuteTask = runningTask.getNodeExecutor();
 
             try {
                 nodeUsedToExecuteTask.getNumberOfActiveObjects();
+
+                // If the failure is not due to a node failure, but a TaskLauncher failure and the configured timeout exceeded, we initiate a restart.
+                long taskLauncherFailureTime = System.currentTimeMillis() -
+                                               runningTask.getFirstTaskLauncherFailureTime();
+                if (taskLauncherFailureTime > PASchedulerProperties.SCHEDULER_TASKLAUNCHER_PING_TIMEOUT.getValueAsLong()) {
+                    tlogger.error(task.getId(),
+                                  "task launcher failed and was not accessible after " + taskLauncherFailureTime +
+                                                " ms, initiate task restart.");
+                    runningTask.setRestarting(true);
+                    restartTaskOnNodeFailure(task);
+                }
 
             } catch (Exception e) {
                 int attempts = runningTask.increaseAndGetPingAttempts();
                 String nodeUrl = nodeUsedToExecuteTask.getNodeInformation().getURL();
                 if (attempts > PASchedulerProperties.SCHEDULER_NODE_PING_ATTEMPTS.getValueAsInt()) {
                     tlogger.error(task.getId(), "node failed " + nodeUrl + ", initiate task restart.", e);
+                    runningTask.setRestarting(true);
                     restartTaskOnNodeFailure(task);
                 } else {
                     tlogger.warn(task.getId(),

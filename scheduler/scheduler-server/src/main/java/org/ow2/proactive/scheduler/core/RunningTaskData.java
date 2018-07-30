@@ -44,7 +44,11 @@ class RunningTaskData {
 
     private final NodeSet nodes;
 
-    private int pingAttempts = 0;
+    private volatile int pingAttempts = 0;
+
+    private volatile boolean isRestarting = false;
+
+    private volatile long firstFailedPingAttemptTime = -1;
 
     RunningTaskData(InternalTask task, String user, Credentials credentials, TaskLauncher launcher) {
         this.task = task;
@@ -82,8 +86,28 @@ class RunningTaskData {
         return ++pingAttempts;
     }
 
+    public void setFirstTaskLauncherFailureTime(long time) {
+        this.firstFailedPingAttemptTime = time;
+    }
+
+    public void resetFirstTaskLauncherFailureTime() {
+        this.firstFailedPingAttemptTime = -1;
+    }
+
+    public long getFirstTaskLauncherFailureTime() {
+        return this.firstFailedPingAttemptTime;
+    }
+
     public int getPingAttempts() {
         return pingAttempts;
+    }
+
+    public boolean isRestarting() {
+        return isRestarting;
+    }
+
+    public void setRestarting(boolean restarting) {
+        isRestarting = restarting;
     }
 
     /**

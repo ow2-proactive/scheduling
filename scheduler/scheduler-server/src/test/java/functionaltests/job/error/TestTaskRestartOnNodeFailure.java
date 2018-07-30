@@ -55,13 +55,15 @@ import functionaltests.utils.TestNode;
 /**
  * Test checks that scheduler restarts task if Node executing
  * task was killed during task execution.
+ *
+ * It tests also the task restart in case the TaskLauncher executing the task is killed, but the Node is still alive.
  * 
  * @author ProActive team
  *
  */
 public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
-    private static final long TIMEOUT = 60000;
+    private static final long TIMEOUT = 120000;
 
     public static class TestJavaTask extends JavaExecutable {
 
@@ -84,17 +86,23 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
     @BeforeClass
     public static void startDedicatedScheduler() throws Exception {
         schedulerHelper = new SchedulerTHelper(false,
-                                               new File(SchedulerTHelper.class.getResource("/functionaltests/config/scheduler-nonforkedscripttasks.ini")
+                                               new File(SchedulerTHelper.class.getResource("/functionaltests/config/scheduler-nonforked-nodefailure.ini")
                                                                               .toURI()).getAbsolutePath(),
                                                null,
                                                null);
     }
 
     @Test
-    public void testRestart() throws Exception {
+    public void testRestartOnNodeFailure() throws Exception {
         FileLock fileLock = new FileLock();
         testTaskKillNode(fileLock, false);
         testTaskKillNode(fileLock, true);
+    }
+
+    @Test
+    public void testRestartOnTaskLaucherFailure() throws Exception {
+        FileLock fileLock = new FileLock();
+        testTaskKillTaskLauncher(fileLock);
     }
 
     private void testTaskKillNode(FileLock fileLock, boolean waitBeforeKill) throws Exception {
@@ -134,14 +142,7 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
         log("Wait when job finish");
         schedulerHelper.waitForEventJobFinished(jobId, TIMEOUT);
 
-        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                                                 newNode.getNode().getNodeInformation().getURL(),
-                                                 TIMEOUT);
-        assertEquals(NodeState.BUSY, event.getNodeState());
-        event = schedulerHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
-                                                 newNode.getNode().getNodeInformation().getURL(),
-                                                 TIMEOUT);
-        assertEquals(NodeState.FREE, event.getNodeState());
+        schedulerHelper.waitUntilState(newNode.getNode().getNodeInformation().getURL(), NodeState.FREE, TIMEOUT);
 
         log("Check job result");
         checkJobResult(schedulerHelper.getSchedulerInterface(), jobId);
@@ -149,6 +150,48 @@ public class TestTaskRestartOnNodeFailure extends SchedulerFunctionalTestWithCus
         schedulerHelper.getResourceManager().removeNode(newNode.getNodeURL(), true);
 
         newNode.kill();
+    }
+
+    private void testTaskKillTaskLauncher(FileLock fileLock) throws Exception {
+        Path fileLockPath = fileLock.lock();
+        TestNode nodeToDeploy = startNode();
+
+        log("Submit job");
+        final JobId jobId = schedulerHelper.submitJob(createJob(fileLockPath.toString()));
+
+        log("Wait when node becomes busy");
+        RMNodeEvent event;
+        do {
+            event = schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED, TIMEOUT);
+        } while (!event.getNodeState().equals(NodeState.BUSY));
+
+        log("Wait when task starts");
+        schedulerHelper.waitForEventTaskRunning(jobId, "Test task");
+
+        /*
+         * Wait some time to make sure the TaskLauncher is deployed
+         */
+
+        log("Wait some time");
+        Thread.sleep(5000);
+
+        log("Kill the task launcher from (node " + nodeToDeploy.getNode().getNodeInformation().getURL() + ")");
+        nodeToDeploy.getNode().killAllActiveObjects();
+
+        log("Let task finish");
+        fileLock.unlock();
+
+        log("Wait when job finish");
+        schedulerHelper.waitForEventJobFinished(jobId, TIMEOUT);
+
+        log("Check job result");
+        checkJobResult(schedulerHelper.getSchedulerInterface(), jobId);
+
+        schedulerHelper.waitUntilState(nodeToDeploy.getNode().getNodeInformation().getURL(), NodeState.FREE, TIMEOUT);
+
+        schedulerHelper.getResourceManager().removeNode(nodeToDeploy.getNodeURL(), true);
+
+        nodeToDeploy.kill();
     }
 
     private static int startedNodesCounter;

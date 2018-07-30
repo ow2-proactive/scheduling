@@ -82,6 +82,10 @@ public enum PASchedulerProperties implements PACommonProperties {
      * tolerated failed attempts to ping a node, before the scheduler decides to restart the task running on it */
     SCHEDULER_NODE_PING_ATTEMPTS("pa.scheduler.core.node.ping.attempts", PropertyType.INTEGER, "1"),
 
+    /** Timeout between a TaskLauncher ping failure and an actual task restart. If a TaskLauncher fails to respond to a ping but the node is still available,
+     * this timeout will make sure the task will not remain forever in running state */
+    SCHEDULER_TASKLAUNCHER_PING_TIMEOUT("pa.scheduler.core.tasklauncher.ping.timeout", PropertyType.INTEGER, "300000"),
+
     /** Number of threads used to execute client requests  */
     SCHEDULER_CLIENT_POOL_NBTHREAD("pa.scheduler.core.clientpoolnbthreads", PropertyType.INTEGER, "5"),
 
