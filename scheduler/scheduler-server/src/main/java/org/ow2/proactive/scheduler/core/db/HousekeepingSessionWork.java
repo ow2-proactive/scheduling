@@ -45,8 +45,8 @@ public class HousekeepingSessionWork implements SessionWork<Void> {
     private static boolean shouldRemoveFromDb;
 
     public HousekeepingSessionWork(List<Long> jobIdList, boolean shouldRemoveFromDb) {
-        this.jobIdList = jobIdList;
-        this.shouldRemoveFromDb = shouldRemoveFromDb;
+        HousekeepingSessionWork.jobIdList = jobIdList;
+        HousekeepingSessionWork.shouldRemoveFromDb = shouldRemoveFromDb;
     }
 
     private void deleteInconsistentData(Session session) {
