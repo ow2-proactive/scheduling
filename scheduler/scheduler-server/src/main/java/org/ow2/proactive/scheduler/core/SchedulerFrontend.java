@@ -1118,6 +1118,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.pauseJob(JobIdImpl.makeJobId(jobId));
     }
@@ -1144,6 +1145,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.resumeJob(JobIdImpl.makeJobId(jobId));
     }
