@@ -28,7 +28,7 @@ To start a node:
 
 ## Building from sources
 
-You can build a distribution that contains all binaries with `gradle build`.
+You can build a distribution that contains all binaries with `./gradlew build` (linux/mac) or `gradlew build` (windows).
 
 This will produce the following archives:
 
