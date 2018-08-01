@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -1109,6 +1110,17 @@ public class SchedulerTHelper {
 
     public RMNodeEvent waitForNodeEvent(RMEventType nodeAdded, String nodeUrl, long timeout) throws Exception {
         return RMTHelper.waitForNodeEvent(nodeAdded, nodeUrl, timeout, getRMMonitorsHandler());
+    }
+
+    public RMNodeEvent waitUntilState(String nodeUrl, NodeState expectedState, long timeout) throws Exception {
+        RMNodeEvent event;
+        do {
+            event = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                               nodeUrl,
+                                               timeout,
+                                               getRMMonitorsHandler());
+        } while (!event.getNodeState().equals(expectedState));
+        return event;
     }
 
     public RMNodeEvent waitForAnyNodeEvent(RMEventType nodeStateChanged, long timeout) throws Exception {

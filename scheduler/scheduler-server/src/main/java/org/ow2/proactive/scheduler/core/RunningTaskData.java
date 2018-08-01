@@ -46,6 +46,10 @@ class RunningTaskData {
 
     private int pingAttempts = 0;
 
+    private boolean restarting = false;
+
+    private long firstFailedPingAttemptTime = -1;
+
     RunningTaskData(InternalTask task, String user, Credentials credentials, TaskLauncher launcher) {
         this.task = task;
         // keep track of nodes that executed the task, can change in case of restarts
@@ -78,12 +82,48 @@ class RunningTaskData {
         return credentials;
     }
 
-    public int increaseAndGetPingAttempts() {
+    public synchronized int increaseAndGetPingAttempts() {
         return ++pingAttempts;
     }
 
-    public int getPingAttempts() {
+    /**
+     * Declare a task launcher failure, if not declared previously
+     */
+    public synchronized void setTaskLauncherFailure() {
+        if (this.firstFailedPingAttemptTime < 0) {
+            this.firstFailedPingAttemptTime = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * Resets the task launcher failure time (launcher has been pinged successfully)
+     */
+    public synchronized void resetTaskLauncherFailure() {
+        this.firstFailedPingAttemptTime = -1;
+    }
+
+    /**
+     * Returns the time since the task launcher is not pingable, 0 if the launcher is pingable
+     * @return
+     */
+    public synchronized long getTaskLauncherFailurePeriod() {
+        if (firstFailedPingAttemptTime >= 0) {
+            return System.currentTimeMillis() - this.firstFailedPingAttemptTime;
+        } else {
+            return 0;
+        }
+    }
+
+    public synchronized int getPingAttempts() {
         return pingAttempts;
+    }
+
+    public synchronized boolean isRestarting() {
+        return restarting;
+    }
+
+    public synchronized void setRestarting() {
+        this.restarting = true;
     }
 
     /**
