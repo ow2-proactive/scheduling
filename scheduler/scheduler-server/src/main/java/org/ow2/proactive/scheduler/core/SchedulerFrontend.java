@@ -1048,6 +1048,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         frontendState.checkPermissions("pauseJob",
                                        frontendState.getIdentifiedJob(jobId),
@@ -1059,6 +1060,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         frontendState.checkPermissions("resumeJob",
                                        frontendState.getIdentifiedJob(jobId),
