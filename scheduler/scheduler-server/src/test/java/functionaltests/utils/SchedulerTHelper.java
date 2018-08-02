@@ -765,6 +765,10 @@ public class SchedulerTHelper {
                 JobState jobState = userInterface.getJobState(id);
                 if (jobState != null) {
                     System.err.println("jobState: " + jobState);
+                    System.err.println("jobState.getJobInfo(): " + jobState.getJobInfo());
+                    System.err.println("jobState.getJobInfo().getStatus(): " + jobState.getJobInfo().getStatus());
+                    System.err.println("There are " + getSchedulerMonitorsHandler().getJobEvents(id).size() +
+                                       " events. ");
                     for (JobEventMonitor event : getSchedulerMonitorsHandler().getJobEvents(id)) {
                         System.err.println("event: " + event);
                     }

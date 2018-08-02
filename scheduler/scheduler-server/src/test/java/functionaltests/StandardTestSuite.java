@@ -88,6 +88,7 @@ import functionaltests.job.TestJobWalltime;
 import functionaltests.job.TestPauseJob;
 import functionaltests.job.TestPreemptRestartKillTask;
 import functionaltests.job.TestPreemptRestartKillTaskSchema33;
+import functionaltests.job.TestResumeJob;
 import functionaltests.job.TestTaskNotRestarted;
 import functionaltests.job.TestTaskNotStarted;
 import functionaltests.job.TestVariablesPropagation;
@@ -215,9 +216,10 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestKilledJobResult.class, TestLoadJobs.class, TestLoggers.class,
                       TestVariablesPatternLateBindings.class, TestModifyPropagatedVariables.class,
                       TestMultipleHostsRequest.class, TestNativeTaskPaths.class, TestPauseJob.class,
-                      TestPreciousLogs.class, TestPropagatedVariables.class, TestPropagatedVariablesWalltime.class,
-                      TestSchedulerMiscEvents.class, TestScriptEngines.class, TestScriptForkEnvironment.class,
-                      TestScriptTask.class, TestTaskIdOrderSameAsDeclarationOrder.class, TestTaskNotExecuted.class,
+                      TestResumeJob.class, TestPreciousLogs.class, TestPropagatedVariables.class,
+                      TestPropagatedVariablesWalltime.class, TestSchedulerMiscEvents.class, TestScriptEngines.class,
+                      TestScriptForkEnvironment.class, TestScriptTask.class,
+                      TestTaskIdOrderSameAsDeclarationOrder.class, TestTaskNotExecuted.class,
                       TestTaskNotRestarted.class, TestTaskNotStarted.class, TestTaskScriptVariables.class,
                       TestThirdPartyCredentialsDefined.class, TestUserSpace.class, TestWorkflowDataspace.class,
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
