@@ -416,10 +416,10 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return busyNodesWithTask;
     }
 
-    /**
+    /*
      * *******************************
      *
-     *  SCHEDULING MANAGEMENT
+     * SCHEDULING MANAGEMENT
      *
      * *******************************
      */
@@ -568,7 +568,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         frontendState.checkPermission("getTaskResultByTag",
                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         List<TaskState> taskStates = getJobState(jobId).getTasksByTag(taskTag);
-        ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
+        ArrayList<TaskResult> results = new ArrayList<>(taskStates.size());
         for (TaskState currentState : taskStates) {
             String taskName = currentState.getTaskInfo().getName();
             try {
@@ -618,10 +618,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         }
 
         jlogger.debug(jobId, "trying to get the task result, incarnation " + inc);
-
-        if (inc < 0) {
-            throw new IllegalArgumentException("Incarnation must be 0 or greater.");
-        }
 
         try {
             TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
@@ -1440,11 +1436,11 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                        params.isPending(),
                                        params.isRunning(),
                                        params.isFinished());
-        List<TaskId> lTaskId = new ArrayList<TaskId>(pTaskInfo.getList().size());
+        List<TaskId> lTaskId = new ArrayList<>(pTaskInfo.getList().size());
         for (TaskInfo taskInfo : pTaskInfo.getList()) {
             lTaskId.add(taskInfo.getTaskId());
         }
-        return new Page<TaskId>(lTaskId, pTaskInfo.getSize());
+        return new Page<>(lTaskId, pTaskInfo.getSize());
     }
 
     @Override
