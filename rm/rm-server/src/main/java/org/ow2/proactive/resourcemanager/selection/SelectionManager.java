@@ -57,6 +57,7 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyNodesFilter;
@@ -564,18 +565,12 @@ public abstract class SelectionManager {
                     // and always async-unlock the node, exceptions will be
                     // treated as ExecutionException
                     try {
+                        logger.info("Executing node script on " + node.getNodeURL());
                         ScriptResult<T> res = node.executeScript(script, bindings);
                         PAFuture.waitFor(res, timeout);
+                        logger.info("Node script execution on " + node.getNodeURL() + " terminated");
                         return res;
-                        // return PAFuture.getFutureValue(res, timeout);
                     } finally {
-                        // cleaning the node
-                        try {
-                            node.clean();
-                        } catch (Throwable ex) {
-                            logger.error("Cannot clean the node " + node.getNodeURL(), ex);
-                        }
-
                         SelectionManager.this.rmcore.unlockNodes(Collections.singleton(node.getNodeURL()));
                     }
                 }
