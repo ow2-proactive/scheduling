@@ -96,6 +96,9 @@ public class TestRMProxyRebind extends MultipleRMTBase {
             SchedulerTHelper.log("Killing previous scheduler.");
             TestScheduler.kill();
         }
+
+        startIAMIfNeeded();
+
         initConfigs();
     }
 

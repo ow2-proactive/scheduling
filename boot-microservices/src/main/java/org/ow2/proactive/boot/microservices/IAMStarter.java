@@ -80,10 +80,12 @@ public class IAMStarter {
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
             process = processBuilder.start();
+
             LOGGER.info(streamOutput(process.getInputStream()));
 
             started = true;
         }
+
         return process;
     }
 
@@ -94,6 +96,7 @@ public class IAMStarter {
 
         // Stream microservice output
         ExecutorService executor = Executors.newSingleThreadExecutor();
+
         Future<String> future = executor.submit((Callable) () -> {
 
             try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
