@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
 
 public class IAMConfiguration {
 
-    public static final String PROPERTIES_FILE = "iam.properties";
+    public static final String PROPERTIES_FILE = "application-proactive.properties";
 
     public static final String ARCHIVE_NAME = "iam.archive.name";
 
@@ -49,6 +49,8 @@ public class IAMConfiguration {
     public static final String READY_MARKER = "iam.ready.marker";
 
     public static final String JVM_ARGS = "iam.jvm.args";
+
+    public static final String SPRING_PROACTIVE_ENV_PROFILE = "proactive";
 
     private static final Logger LOGGER = Logger.getLogger(IAMConfiguration.class);
 

@@ -61,20 +61,25 @@ public class IAMStarter {
     /**
      *  Start IAM microservice
      */
-    public static Process start(String paHome, String bootMicroservicesPath, String bootConfigurationPath)
+    public static Process start(String paHome, String iamMicroservicesPath, String iamConfigurationPath)
             throws InterruptedException, IOException, ExecutionException, ConfigurationException {
 
         if (!started) {
             LOGGER.info("Starting IAM microservice...");
 
             // load IAM configuration
-            loadIAMConfiguration(bootConfigurationPath);
+            loadIAMConfiguration(iamConfigurationPath);
 
             // build java command to launch IAM
             buildJavaCommand(paHome);
 
             // find IAM war archive path
-            buildMicroservicePath(bootMicroservicesPath);
+            buildMicroservicePath(iamMicroservicesPath);
+
+            // add SpringBoot parameters for IAM
+            buildSpringBootParams(iamConfigurationPath);
+
+            LOGGER.debug("Starting IAM microservice using command: " + command.toString());
 
             // execute IAM as a separate JAva process
             ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -152,29 +157,41 @@ public class IAMStarter {
         command.add("-jar");
 
         command.addAll(config.getList(String.class, IAMConfiguration.JVM_ARGS));
+
     }
 
     /**
-     * Check the microservice executable war
+     * Check IAM microservice executable war
      */
-    private static void buildMicroservicePath(String bootMicroservicesPath) {
+    private static void buildMicroservicePath(String iamMicroservicesPath) {
 
-        String microserviceFile = bootMicroservicesPath + SEPARATOR + config.getString(IAMConfiguration.ARCHIVE_NAME);
+        String microserviceFile = iamMicroservicesPath + SEPARATOR + config.getString(IAMConfiguration.ARCHIVE_NAME);
 
         if (new File(microserviceFile).exists()) {
             command.add(microserviceFile);
 
         } else {
-            throw new IAMStarterException("IAM microservice is not deployed in: " + bootMicroservicesPath);
+            throw new IAMStarterException("IAM microservice is not deployed in: " + iamMicroservicesPath);
         }
+    }
+
+    /**
+     * Add parameters needed by Spring Boot to start IAM in ProActive environment, instead oif using the default environment.
+     */
+    private static void buildSpringBootParams(String iamConfigurationPath) {
+
+        command.add("--spring.profiles.active=" + IAMConfiguration.SPRING_PROACTIVE_ENV_PROFILE);
+
+        command.add("--spring.config.location=" + iamConfigurationPath + SEPARATOR + IAMConfiguration.PROPERTIES_FILE);
+
     }
 
     /**
      * Load IAM configuration
      */
-    private static void loadIAMConfiguration(String bootConfigurationPath) throws ConfigurationException {
+    private static void loadIAMConfiguration(String iamConfigurationPath) throws ConfigurationException {
 
-        File configFile = new File(bootConfigurationPath + SEPARATOR + IAMConfiguration.PROPERTIES_FILE);
+        File configFile = new File(iamConfigurationPath + SEPARATOR + IAMConfiguration.PROPERTIES_FILE);
 
         if (!configFile.exists()) {
             throw new IAMStarterException("IAM configuration not found in : " + configFile.getAbsolutePath());

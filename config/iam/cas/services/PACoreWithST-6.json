@@ -1,0 +1,17 @@
+{
+  "@class": "org.apereo.cas.services.RegexRegisteredService",
+  "serviceId": "PACoreWithST",
+  "name": "PA Core services (Scheduler and RM)",
+  "id": 6,
+  "description": "PA scheduler and RM client for IAM",
+  "evaluationOrder": 2,
+  "attributeReleasePolicy" : {
+    "@class" : "org.apereo.cas.services.ReturnMappedAttributeReleasePolicy",
+    "allowedAttributes" : {
+      "@class" : "java.util.TreeMap",
+      "uid" : "uid",
+      "role" : "role"
+    }
+  }
+}
+
