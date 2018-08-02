@@ -147,7 +147,7 @@ class LiveJobs {
                     InternalJob job = jobData.job;
                     if (job.getStatus() == JobStatus.PAUSED) {
                         job.setUnPause();
-                        dbManager.updateJobAndTasksState(job);
+                        dbManager.unpauseJobAndTasks(job);
                         updateJobInSchedulerState(job, SchedulerEvent.JOB_RESUMED);
                     }
                 } finally {
@@ -219,7 +219,7 @@ class LiveJobs {
 
             setJobStatusToInErrorIfNotPaused(job);
 
-            dbManager.updateJobAndTasksState(job);
+            dbManager.updateJobAndRestartAllInErrorTasks(job);
             updateJobInSchedulerState(job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
 
             return Boolean.TRUE;
@@ -239,7 +239,7 @@ class LiveJobs {
 
             if (!updatedTasks.isEmpty()) {
                 jlogger.info(jobId, "has just been resumed.");
-                dbManager.updateJobAndTasksState(job);
+                dbManager.unpauseJobAndTasks(job);
                 updateTasksInSchedulerState(job, updatedTasks);
             }
 
@@ -264,7 +264,7 @@ class LiveJobs {
 
             if (!updatedTasks.isEmpty()) {
                 jlogger.info(jobId, "has just been paused.");
-                dbManager.updateJobAndTasksState(job);
+                dbManager.pauseJobAndTasks(job);
                 updateTasksInSchedulerState(job, updatedTasks);
             }
 
@@ -681,7 +681,7 @@ class LiveJobs {
 
         task.setInErrorTime(task.getStartTime() + taskDuration);
 
-        dbManager.updateJobAndTasksState(job);
+        dbManager.updateJobAndTaskState(job, task);
 
         updateTaskPausedOnerrorState(job, task.getId());
         updateJobInSchedulerState(job, SchedulerEvent.JOB_IN_ERROR);
@@ -773,8 +773,6 @@ class LiveJobs {
             InternalTask task = jobData.job.getTask(taskName);
             tlogger.info(task.getId(), "restarting in-error task " + task.getId());
             jobData.job.restartInErrorTask(task);
-            dbManager.updateJobAndTasksState(jobData.job);
-            updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
         } finally {
             jobData.unlock();
         }

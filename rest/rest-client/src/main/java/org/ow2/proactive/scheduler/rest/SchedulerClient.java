@@ -61,6 +61,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -101,6 +102,7 @@ import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.job.SchedulerUserInfo;
@@ -1261,6 +1263,26 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         } catch (PermissionRestException e) {
             throw new PermissionException("Session " + sid + " doesnt have permission");
         }
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        TaskStatesPage taskStatesPage = null;
+        try {
+            final int size = restApi().getJobTaskStates(sid, jobId).getList().size();
+            List<TaskState> taskStates = restApi().getJobTaskStatesPaginated(sid, jobId, offset, limit)
+                                                  .getList()
+                                                  .stream()
+                                                  .map(DataUtility::taskState)
+                                                  .collect(Collectors.toList());
+            taskStatesPage = new TaskStatesPage();
+            taskStatesPage.setSize(size);
+            taskStatesPage.setTaskStates(taskStates);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return taskStatesPage;
     }
 
     @Override

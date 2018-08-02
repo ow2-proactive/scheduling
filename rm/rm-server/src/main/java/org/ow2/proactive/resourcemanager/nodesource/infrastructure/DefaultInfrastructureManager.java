@@ -27,6 +27,8 @@ package org.ow2.proactive.resourcemanager.nodesource.infrastructure;
 
 import java.rmi.dgc.VMID;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
@@ -47,6 +49,12 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
 
     /** registered nodes number */
     private static final String NODES_COUNT_KEY = "nodesCount";
+
+    /**
+     * key to retrieve the set of URL of node that are down in the
+     * {@link InfrastructureManager#persistedInfraVariables} map
+     */
+    private static final String DOWN_NODES_URL_KEY = "downNodesUrl";
 
     /**
      * Proactive default constructor.
@@ -84,18 +92,17 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     public void removeNode(Node node) throws RMException {
         try {
             logger.info("Terminating the node " + node.getNodeInformation().getName());
-
-            if (!isThereNodesInSameJVM(node)) {
-                final Node n = node;
-                nodeSource.executeInParallel(new Runnable() {
-                    public void run() {
-                        try {
-                            logger.info("Terminating the runtime " + n.getProActiveRuntime().getURL());
-                            n.getProActiveRuntime().killRT(false);
-                        } catch (Exception e) {
-                            // do nothing, no exception treatment for node just
-                            // killed before
-                        }
+            String nodeUrl = node.getNodeInformation().getURL();
+            if (containsDownNodeUrl(nodeUrl)) {
+                removeDownNodeUrl(nodeUrl);
+            } else if (!isThereNodesInSameJVM(node)) {
+                this.nodeSource.executeInParallel(() -> {
+                    try {
+                        logger.info("Terminating the runtime " + node.getProActiveRuntime().getURL());
+                        node.getProActiveRuntime().killRT(false);
+                    } catch (Exception e) {
+                        // do nothing, no exception treatment for node just
+                        // killed before
                     }
                 });
             }
@@ -150,6 +157,7 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
     @Override
     public void notifyAcquiredNode(Node node) throws RMException {
         incrementNodesCount();
+        removeDownNodeUrl(node.getNodeInformation().getURL());
     }
 
     /**
@@ -157,7 +165,12 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      */
     @Override
     public void notifyDownNode(String nodeName, String nodeUrl, Node proactiveProgrammingNode) throws RMException {
-        // nothing to do
+        addDownNodeUrl(nodeUrl);
+    }
+
+    @Override
+    public void onDownNodeReconnection(Node node) {
+        removeDownNodeUrl(node.getNodeInformation().getURL());
     }
 
     @Override
@@ -174,30 +187,43 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
 
     @Override
     protected void initializePersistedInfraVariables() {
-        persistedInfraVariables.put(NODES_COUNT_KEY, 0);
+        this.persistedInfraVariables.put(NODES_COUNT_KEY, 0);
+        this.persistedInfraVariables.put(DOWN_NODES_URL_KEY, new HashSet<>());
     }
 
     // Below are wrapper methods around the runtime variables map
 
     private void incrementNodesCount() {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                int updated = (int) persistedInfraVariables.get(NODES_COUNT_KEY) + 1;
-                persistedInfraVariables.put(NODES_COUNT_KEY, updated);
-                return null;
-            }
+        setPersistedInfraVariable(() -> {
+            int updated = (int) this.persistedInfraVariables.get(NODES_COUNT_KEY) + 1;
+            this.persistedInfraVariables.put(NODES_COUNT_KEY, updated);
+            return null;
         });
     }
 
     private void decrementNodesCount() {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                int updated = (int) persistedInfraVariables.get(NODES_COUNT_KEY) - 1;
-                persistedInfraVariables.put(NODES_COUNT_KEY, updated);
-                return null;
-            }
+        setPersistedInfraVariable(() -> {
+            int updated = (int) this.persistedInfraVariables.get(NODES_COUNT_KEY) - 1;
+            this.persistedInfraVariables.put(NODES_COUNT_KEY, updated);
+            return null;
+        });
+    }
+
+    private void addDownNodeUrl(String downNodeUrl) {
+        setPersistedInfraVariable(() -> {
+            ((Set<String>) this.persistedInfraVariables.get(DOWN_NODES_URL_KEY)).add(downNodeUrl);
+            return null;
+        });
+    }
+
+    private boolean containsDownNodeUrl(String downNodeUrl) {
+        return getPersistedInfraVariable(() -> ((Set<String>) this.persistedInfraVariables.get(DOWN_NODES_URL_KEY)).contains(downNodeUrl));
+    }
+
+    private void removeDownNodeUrl(String notDownNodeUrl) {
+        setPersistedInfraVariable(() -> {
+            ((Set<String>) this.persistedInfraVariables.get(DOWN_NODES_URL_KEY)).remove(notDownNodeUrl);
+            return null;
         });
     }
 
