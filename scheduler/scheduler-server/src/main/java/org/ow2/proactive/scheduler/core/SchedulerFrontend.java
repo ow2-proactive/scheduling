@@ -125,6 +125,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
@@ -1047,6 +1048,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean pauseJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         frontendState.checkPermissions("pauseJob",
                                        frontendState.getIdentifiedJob(jobId),
@@ -1058,6 +1060,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean resumeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         frontendState.checkPermissions("resumeJob",
                                        frontendState.getIdentifiedJob(jobId),
@@ -1100,6 +1103,15 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), offset, limit);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.killJob(JobIdImpl.makeJobId(jobId));
     }
@@ -1108,6 +1120,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.pauseJob(JobIdImpl.makeJobId(jobId));
     }
@@ -1134,6 +1147,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean resumeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.resumeJob(JobIdImpl.makeJobId(jobId));
     }

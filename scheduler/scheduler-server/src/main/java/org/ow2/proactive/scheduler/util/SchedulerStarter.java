@@ -677,7 +677,6 @@ public class SchedulerStarter {
 
             scriptFile = new File(PASchedulerProperties.getAbsolutePath(scriptPath));
             if (scriptFile.exists()) {
-                LOGGER.info("Executing " + scriptPath);
                 scriptResult = scriptHandler.handle(new SimpleScript(scriptFile, new String[0]), ps, ps);
                 if (scriptResult.errorOccured()) {
 

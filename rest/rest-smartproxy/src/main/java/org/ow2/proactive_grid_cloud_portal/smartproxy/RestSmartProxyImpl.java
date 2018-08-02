@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
 import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.rest.DisconnectionAwareSchedulerEventListener;
@@ -680,6 +681,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     @Override
     public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
         return ((ISchedulerClient) _getScheduler()).getSchedulerProperties();
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return _getScheduler().getTaskPaginated(jobId, offset, limit);
     }
 
     /**
