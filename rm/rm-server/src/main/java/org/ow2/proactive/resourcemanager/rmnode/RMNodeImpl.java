@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -297,7 +298,7 @@ public class RMNodeImpl extends AbstractRMNode {
      * Returns the ProActive stub on the remote script handler.
      * @return the ProActive stub on the script handler.
      */
-    public ScriptHandler getHandler() throws NodeException {
+    public synchronized ScriptHandler getHandler() throws NodeException {
         this.initHandler();
         return this.handler;
     }
@@ -310,18 +311,25 @@ public class RMNodeImpl extends AbstractRMNode {
      * @return Result of the test.
      */
     @Override
-    public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
+    public synchronized <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
         try {
             this.initHandler();
+            if (bindings != null) {
+                for (String key : bindings.keySet()) {
+                    this.handler.addBinding(key, bindings.get(key));
+                }
+            }
+            return this.handler.handle(script);
         } catch (NodeException e) {
             return new ScriptResult<>(e);
-        }
-        if (bindings != null) {
-            for (String key : bindings.keySet()) {
-                this.handler.addBinding(key, bindings.get(key));
+        } finally {
+            try {
+                PAActiveObject.terminateActiveObject(this.handler, false);
+            } catch (Exception e) {
+                logger.warn("Error while terminating script handler", e);
             }
+            this.handler = null;
         }
-        return this.handler.handle(script);
     }
 
     /**
