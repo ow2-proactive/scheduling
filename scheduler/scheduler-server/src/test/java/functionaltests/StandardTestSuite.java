@@ -81,6 +81,7 @@ import functionaltests.db.schedulerdb.TestUsageData;
 import functionaltests.jmx.SchedulerJMXTest;
 import functionaltests.jmx.SchedulerRuntimeDataMBeanTest;
 import functionaltests.job.TagTest;
+import functionaltests.job.TestExecuteScriptsOnBusyNode;
 import functionaltests.job.TestJobRemoved;
 import functionaltests.job.TestJobSchedulerHome;
 import functionaltests.job.TestJobSubmittedParallel;
@@ -235,11 +236,12 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
 
                       // Tests with different configurations (and restart)
                       TestCacheSpaceCleaning.class, TestChildProcessOfNodeKilled.class, TestDisabledListenJobLogs.class,
-                      TestJobKilled.class, TestJobScriptVariables.class, TestKillPendingTask.class,
-                      TestLicensePolicy.class, TestListenJobLogs.class, TestNodeDiesAtSchedulerRestart.class,
-                      TestPreemptRestartKillTask.class, TestPreemptRestartKillTaskSchema33.class, TestRamPolicy.class,
-                      TestRunAsMeLinuxKey.class, TestRunAsMeLinuxNone.class, TestRunAsMeLinuxPwd.class,
-                      TestRunAsMeWindows.class, TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
+                      TestExecuteScriptsOnBusyNode.class, TestJobKilled.class, TestJobScriptVariables.class,
+                      TestKillPendingTask.class, TestLicensePolicy.class, TestListenJobLogs.class,
+                      TestNodeDiesAtSchedulerRestart.class, TestPreemptRestartKillTask.class,
+                      TestPreemptRestartKillTaskSchema33.class, TestRamPolicy.class, TestRunAsMeLinuxKey.class,
+                      TestRunAsMeLinuxNone.class, TestRunAsMeLinuxPwd.class, TestRunAsMeWindows.class,
+                      TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
                       TestSubmitJobWithUnaccessibleDataSpaces.class, TestTaskRestartOnNodeFailure.class,
                       TestTasksCompleteAfterSelectiontimeout.class, TestUnauthorizedScripts.class,
                       TestVariablesPropagation.class })
