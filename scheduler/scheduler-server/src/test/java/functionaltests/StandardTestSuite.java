@@ -112,6 +112,7 @@ import functionaltests.job.taskkill.TestKillPendingTask;
 import functionaltests.job.taskkill.TestKillTaskWhileExecutingScripts;
 import functionaltests.job.taskkill.TestKillWhenInStoppedState;
 import functionaltests.job.taskkill.TestKilledJobResult;
+import functionaltests.job.taskkill.TestMarkedAsFinished;
 import functionaltests.job.workingdir.TestForkedTaskWorkingDir;
 import functionaltests.job.workingdir.TestWorkingDirStaticCommand;
 import functionaltests.policy.license.TestLicensePolicy;
@@ -224,6 +225,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestThirdPartyCredentialsDefined.class, TestUserSpace.class, TestWorkflowDataspace.class,
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
                       Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class, TestTaskSynchronization.class,
+                      TestMarkedAsFinished.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,
