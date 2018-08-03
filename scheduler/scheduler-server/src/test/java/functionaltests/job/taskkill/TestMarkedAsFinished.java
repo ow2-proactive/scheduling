@@ -34,6 +34,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.junit.Test;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -59,7 +60,7 @@ public class TestMarkedAsFinished extends SchedulerFunctionalTestNoRestart {
         // so we look all nodes except one
         // we need to have only one node available to run
         final ResourceManager resourceManager = schedulerHelper.getResourceManager();
-        final ArrayList<String> allUrls = new ArrayList<>(resourceManager.listAliveNodeUrls());
+        final List<String> allUrls = new ArrayList<>(resourceManager.listAliveNodeUrls());
         allUrls.remove(0);
         resourceManager.lockNodes(new HashSet<>(allUrls));
 
