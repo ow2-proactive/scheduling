@@ -31,47 +31,60 @@ import static org.junit.Assert.assertEquals;
 import static org.ow2.proactive.utils.Lambda.silent;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
+import com.jayway.awaitility.Duration;
+import functionaltests.job.error.TestTaskRestartOnNodeFailure;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
-import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.task.JavaTask;
+import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.util.FileLock;
 
 
 /**
  * This test checks that when we mark failed task as finished,
  * Scheduler does not release node, which is busy with other task.
  */
-public class TestMarkedAsFinished extends SchedulerFunctionalTestNoRestart {
+public class TestMarkedAsFinished extends SchedulerFunctionalTestWithCustomConfigAndRestart {
 
     private static final URL failingJob = TestMarkedAsFinished.class.getResource("/functionaltests/descriptors/Job_failing.xml");
 
-    private static final URL normalJob = TestMarkedAsFinished.class.getResource("/functionaltests/descriptors/Job_endless.xml");
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper = new SchedulerTHelper(false,
+                new File(SchedulerTHelper.class.getResource("/functionaltests/config/scheduler-nonforkedscripttasks.ini")
+                        .toURI()).getAbsolutePath(),
+                null,
+                null);
+        schedulerHelper.createNodeSource("local", 1);
+    }
 
     @Test
     public void test() throws Throwable {
 
-        // so we look all nodes except one
-        // we need to have only one node available to run
-        final ResourceManager resourceManager = schedulerHelper.getResourceManager();
-        final List<String> allUrls = new ArrayList<>(resourceManager.listAliveNodeUrls());
-        allUrls.remove(0);
-        resourceManager.lockNodes(new HashSet<>(allUrls));
-
         JobId failingJobId = schedulerHelper.submitJob(new File(failingJob.toURI()).getAbsolutePath());
 
         // task failure will make whole job paused. Because onTaskError="pauseJob"
-        await().until(silent(() -> schedulerHelper.getSchedulerInterface().getJobState(failingJobId).getStatus()),
-                      equalTo(JobStatus.PAUSED));
+        await().timeout(Duration.ONE_MINUTE)
+               .until(silent(() -> schedulerHelper.getSchedulerInterface().getJobState(failingJobId).getStatus()),
+                equalTo(JobStatus.PAUSED));
+
+        final FileLock fileLock = new FileLock();
+        fileLock.lock();
 
         // submit normal job which should execute for a quite long time
-        JobId normalJobId = schedulerHelper.submitJob(new File(normalJob.toURI()).getAbsolutePath());
+        JobId normalJobId = schedulerHelper.submitJob(createJob(fileLock.toString()));
 
         // wait until normal job is running
         schedulerHelper.waitForEventJobRunning(normalJobId);
@@ -81,11 +94,50 @@ public class TestMarkedAsFinished extends SchedulerFunctionalTestNoRestart {
 
         // after we mark as finished failed task, failing job should become FINISHED
         // however, even more important, that other job is continue to run
-        schedulerHelper.getSchedulerInterface().finishInErrorTask(failingJobId.value(), "Error_Task");
+//        schedulerHelper.getSchedulerInterface().finishInErrorTask(failingJobId.value(), "Error_Task");
         Thread.sleep(10000);
 
+        assertEquals(TaskStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(failingJobId.value()).getTasks().get(0).getStatus());
+
+        fileLock.unlock();
+
+        schedulerHelper.waitForEventJobFinished(failingJobId);
+        schedulerHelper.waitForEventJobFinished(normalJobId);
+
         assertEquals(JobStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(failingJobId).getStatus());
-        assertEquals(JobStatus.RUNNING, schedulerHelper.getSchedulerInterface().getJobState(normalJobId).getStatus());
+        assertEquals(JobStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(normalJobId).getStatus());
 
     }
+
+
+    public static class TestJavaTask extends JavaExecutable {
+
+        private String fileLockPath;
+
+        @Override
+        public Serializable execute(TaskResult... results) throws Throwable {
+            getOut().println("OK");
+            FileLock.waitUntilUnlocked(fileLockPath);
+            return "OK";
+        }
+
+    }
+
+    private TaskFlowJob createJob(String communicationObjectUrl) throws Exception {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setName(this.getClass().getSimpleName());
+        job.setOnTaskError(OnTaskError.CANCEL_JOB);
+        job.setMaxNumberOfExecution(1);
+
+        JavaTask javaTask = new JavaTask();
+        javaTask.setExecutableClassName(TestTaskRestartOnNodeFailure.TestJavaTask.class.getName());
+        javaTask.setMaxNumberOfExecution(1);
+        javaTask.setOnTaskError(OnTaskError.CANCEL_JOB);
+        javaTask.setName("Test task");
+        javaTask.addArgument("fileLockPath", communicationObjectUrl);
+        job.addTask(javaTask);
+
+        return job;
+    }
+
 }
