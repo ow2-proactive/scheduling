@@ -57,9 +57,20 @@ public class IAMStarter {
     private IAMStarter() {
 
     }
-
+git
     /**
-     *  Start IAM microservice
+     * The method starts IAM microservice as separate java process,
+     * given the executable war file and configuration directory of IAM.
+     *
+     * @param paHome ProActive environment home
+     * @param iamMicroservicesPath path to the executable war folder of IAM (in ProActive environment)
+     * @param iamConfigurationPath path to the configuration directory of IAM (in ProActive environment)
+     * @return the started java process
+     * @throws ConfigurationException If a problem occurs when loading IAM configuration
+     * @throws ExecutionException if a problem occurs during the process execution
+     * @throws IOException if a problem occurs when redirecting the process output
+     * @throws InterruptedException if a problem occurs when getting the process result
+     * @since version 8.3.0
      */
     public static Process start(String paHome, String iamMicroservicesPath, String iamConfigurationPath)
             throws InterruptedException, IOException, ExecutionException, ConfigurationException {
@@ -73,10 +84,10 @@ public class IAMStarter {
             // build java command to launch IAM
             buildJavaCommand(paHome);
 
-            // find IAM war archive path
+            // add IAM war archive path
             buildMicroservicePath(iamMicroservicesPath);
 
-            // add SpringBoot parameters for IAM
+            // add SpringBoot parameters for IAM to execute in ProActive environment
             buildSpringBootParams(iamConfigurationPath);
 
             LOGGER.debug("Starting IAM microservice using command: " + command.toString());
@@ -86,7 +97,7 @@ public class IAMStarter {
             processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
             process = processBuilder.start();
 
-            LOGGER.info(streamOutput(process.getInputStream()));
+            LOGGER.debug(streamOutput(process.getInputStream()));
 
             started = true;
         }
@@ -97,7 +108,7 @@ public class IAMStarter {
     /**
      * Stream microservice output (using an executor) to check that it starts properly
      */
-    private static String streamOutput(InputStream inputStream) throws InterruptedException, ExecutionException {
+    private static String streamOutput(InputStream inputStream) throws ExecutionException, InterruptedException {
 
         // Stream microservice output
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -113,7 +124,7 @@ public class IAMStarter {
                     }
                 }
             }
-            return "IAM Microservice started";
+            return "IAM Microservice started at: " + config.getString(IAMConfiguration.IAM_URL);
         });
 
         // Check for timeout
@@ -176,7 +187,7 @@ public class IAMStarter {
     }
 
     /**
-     * Add parameters needed by Spring Boot to start IAM in ProActive environment, instead oif using the default environment.
+     * Add parameters needed by SpringBoot to start IAM in ProActive environment, instead oif using the default environment.
      */
     private static void buildSpringBootParams(String iamConfigurationPath) {
 

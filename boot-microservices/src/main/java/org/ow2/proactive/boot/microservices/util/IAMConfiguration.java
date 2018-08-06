@@ -50,6 +50,8 @@ public class IAMConfiguration {
 
     public static final String JVM_ARGS = "iam.jvm.args";
 
+    public static final String IAM_URL = "cas.server.prefix";
+
     public static final String SPRING_PROACTIVE_ENV_PROFILE = "proactive";
 
     private static final Logger LOGGER = Logger.getLogger(IAMConfiguration.class);

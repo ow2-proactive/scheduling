@@ -14,14 +14,14 @@
       "values" : [ "java.util.HashSet", [ "true" ] ]
     }
   },
-  "publicKey" : {
-    "@class" : "org.apereo.cas.services.RegisteredServicePublicKeyImpl",
-    "location" : "classpath:/config/cas/activeeon-public.key",
-    "algorithm" : "RSA"
-  },
   "attributeReleasePolicy" : {
     "@class" : "org.jasig.cas.services.ReturnAllAttributeReleasePolicy",
     "authorizedToReleaseCredentialPassword" : true
+  },
+  "publicKey" : {
+    "@class" : "org.apereo.cas.services.RegisteredServicePublicKeyImpl",
+    "location" : "classpath:/config/iam/cas/activeeon-public.key",
+    "algorithm" : "RSA"
   }
 }
 

@@ -7,11 +7,6 @@
   "evaluationOrder" : 2,
   "logoutType" : "FRONT_CHANNEL",
   "logoutUrl" : "https://localhost:8446/iam-client-2/logout.jsp",
-  "publicKey" : {
-    "@class" : "org.apereo.cas.services.RegisteredServicePublicKeyImpl",
-    "location" : "classpath:/config/iam/cas/activeeon-public.key",
-    "algorithm" : "RSA"
-  },
   "attributeReleasePolicy" : {
     "@class" : "org.apereo.cas.services.ReturnMappedAttributeReleasePolicy",
     "authorizedToReleaseCredentialPassword" : true,
@@ -20,11 +15,17 @@
       "sn" : "surname",
       "cn" : "commonName",
       "role" : "role",
+      "credential" : "credential",
       "Group" : "role",
       "FirstName" : "FirstName",
       "LastName" : "LastName",
       "Email" : "Email"
     }
+  },
+  "publicKey" : {
+  "@class" : "org.apereo.cas.services.RegisteredServicePublicKeyImpl",
+  "location" : "classpath:/config/iam/cas/activeeon-public.key",
+  "algorithm" : "RSA"
   },
   "accessStrategy" : {
     "@class" : "org.apereo.cas.services.DefaultRegisteredServiceAccessStrategy",
