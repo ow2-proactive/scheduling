@@ -689,10 +689,7 @@ class LiveJobs {
 
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, job, task);
 
-            RunningTaskData data = new RunningTaskData(task,
-                                                       job.getOwner(),
-                                                       job.getCredentials(),
-                                                       task.getExecuterInformation().getLauncher());
+            RunningTaskData data = new RunningTaskData(task, job.getOwner(), job.getCredentials(), null);
 
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(job, data, TerminationData.TerminationStatus.ABORTED, taskResult);
