@@ -298,7 +298,7 @@ class LiveJobs {
         listener.jobSubmitted(clientJobState);
     }
 
-    Map<JobId, JobDescriptor> lockJobsToSchedule() {
+    Map<JobId, JobDescriptor> lockJobsToSchedule(boolean isSchedulerPaused) {
 
         TreeSet<JobPriority> prioritiesScheduled = new TreeSet<>();
         TreeSet<JobPriority> prioritiesNotScheduled = new TreeSet<>();
@@ -307,18 +307,20 @@ class LiveJobs {
         for (Map.Entry<JobId, JobData> entry : jobs.entrySet()) {
             JobData value = entry.getValue();
 
+            // If the scheduler is paused, schedule only running jobs
+            if (isSchedulerPaused && value.job.getStatus() != JobStatus.RUNNING) {
+                continue;
+            }
+
             if (value.jobLock.tryLock()) {
                 InternalJob job = entry.getValue().job;
                 result.put(job.getId(), job.getJobDescriptor());
                 prioritiesScheduled.add(job.getPriority());
-
-                if (unlockIfConflict(prioritiesScheduled, prioritiesNotScheduled, result))
-                    return new HashMap<>(0);
             } else {
                 prioritiesNotScheduled.add(value.job.getPriority());
-                if (unlockIfConflict(prioritiesScheduled, prioritiesNotScheduled, result))
-                    return new HashMap<>(0);
             }
+            if (unlockIfConflict(prioritiesScheduled, prioritiesNotScheduled, result))
+                return new HashMap<>(0);
         }
         return result;
     }
