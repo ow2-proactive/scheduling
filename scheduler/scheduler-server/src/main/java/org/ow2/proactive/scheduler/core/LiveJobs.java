@@ -716,7 +716,7 @@ class LiveJobs {
             RunningTaskData data = new RunningTaskData(task,
                                                        job.getOwner(),
                                                        job.getCredentials(),
-                                                       task.getExecuterInformation().getLauncher());
+                                                       null);
 
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(job, data, TerminationData.TerminationStatus.ABORTED, taskResult);
