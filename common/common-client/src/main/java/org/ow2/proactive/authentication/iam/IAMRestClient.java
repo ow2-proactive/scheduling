@@ -49,7 +49,7 @@ public class IAMRestClient {
 
     public String getSSOTicket(String url, String username, String password, String ticketMarker) {
 
-        String ticket = null;
+        String ssoTicket = null;
 
         try (CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build()) {
 
@@ -70,26 +70,26 @@ public class IAMRestClient {
 
             String htmlResponse = EntityUtils.toString(httpResponse.getEntity());
             Document doc = Jsoup.parse(htmlResponse);
-            String tgtAttribute = doc.getElementsByAttribute(ticketMarker).first().attributes().get(ticketMarker);
+            String htmlSsoTicket = doc.getElementsByAttribute(ticketMarker).first().attributes().get(ticketMarker);
 
-            if (tgtAttribute != null) {
+            if (htmlSsoTicket != null) {
 
                 Pattern pattern = Pattern.compile("(TGT-\\d+-\\S+)");
-                Matcher matcher = pattern.matcher(tgtAttribute);
+                Matcher matcher = pattern.matcher(htmlSsoTicket);
 
                 if (matcher.find()) {
-                    ticket = matcher.group(1);
+                    ssoTicket = matcher.group(1);
                 }
             }
 
-            LOG.debug("SSO ticket successfully generated for user " + username + "\n Token: " + ticket);
+            LOG.debug("SSO ticket successfully generated for user " + username + "\n Token: " + ssoTicket);
 
         } catch (Exception e) {
             throw new IAMException("Authentication failed: Error occurred while acquiring SSO ticket for the user " +
                                    username, e);
         }
 
-        return ticket;
+        return ssoTicket;
     }
 
     public String getServiceToken(String url, String service) {
