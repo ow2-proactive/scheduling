@@ -98,8 +98,8 @@ public class IAMLoginModule implements LoginModule {
     /** Name of the attribute in the CAS assertion that should be used for user role data */
     private String roleAttributeName;
 
-    /** IAM response header used to get the SSO ticket */
-    private String ssoTicketHeader;
+    /** IAM response marker used to get the SSO ticket */
+    private String ssoTicketMarker;
 
     /** login status */
     private boolean succeeded = false;
@@ -157,8 +157,8 @@ public class IAMLoginModule implements LoginModule {
                 case "roleSeparator":
                     this.roleSeparator = (String) entry.getValue();
                     break;
-                case "ssoTicketHeader":
-                    this.ssoTicketHeader = (String) entry.getValue();
+                case "ssoTicketMarker":
+                    this.ssoTicketMarker = (String) entry.getValue();
                     break;
                 default:
                     break;
@@ -285,7 +285,7 @@ public class IAMLoginModule implements LoginModule {
         String ssoTicket = new IAMRestClient().getSSOTicket(iamServerUrlPrefix + iamTicketRequest,
                                                             username,
                                                             password,
-                                                            ssoTicketHeader);
+                                                            ssoTicketMarker);
         // Acquire Service Token (i.e., JWT or CAS ST) based on SSO ticket
         String serviceToken = new IAMRestClient().getServiceToken(iamServerUrlPrefix + iamTicketRequest + "/" +
                                                                   ssoTicket, service);

@@ -25,10 +25,14 @@
  */
 package org.ow2.proactive.authentication.iam;
 
+import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.impl.DefaultClaims;
 
 
 public class JWTUtils {
@@ -46,8 +50,30 @@ public class JWTUtils {
      */
     public static Claims parseToken(String token) {
 
-        Jwt<Header, Claims> jwt = Jwts.parser().parseClaimsJwt(token);
+        Claims claims = new DefaultClaims();
 
-        return jwt.getBody();
+        JsonFactory factory = new JsonFactory();
+        try (JsonParser parser = factory.createParser(token)) {
+
+            while (!parser.isClosed()) {
+
+                JsonToken jsonToken = parser.nextToken();
+
+                if (JsonToken.FIELD_NAME.equals(jsonToken)) {
+                    String key = parser.getCurrentName();
+
+                    parser.nextToken();
+                    String value = parser.getValueAsString();
+
+                    claims.put(key, value);
+                }
+
+            }
+
+        } catch (IOException ioe) {
+            throw new IAMException("Failed to parse JWT acquired from IAM: " + token, ioe);
+        }
+
+        return claims;
     }
 }

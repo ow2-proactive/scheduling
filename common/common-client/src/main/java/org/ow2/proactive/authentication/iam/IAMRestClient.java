@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -39,6 +38,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.ow2.proactive.http.CommonHttpClientBuilder;
 
 
@@ -46,9 +47,9 @@ public class IAMRestClient {
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());
 
-    public String getSSOTicket(String url, String username, String password, String ticketHeader) {
+    public String getSSOTicket(String url, String username, String password, String ticketMarker) {
 
-        String ticket = null;
+        String ssoTicket = null;
 
         try (CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build()) {
 
@@ -67,28 +68,28 @@ public class IAMRestClient {
                 throw new IAMException("Failed to acquire SSO ticket for the user" + username);
             }
 
-            Header[] headers = httpResponse.getHeaders(ticketHeader);
+            String htmlResponse = EntityUtils.toString(httpResponse.getEntity());
+            Document doc = Jsoup.parse(htmlResponse);
+            String htmlSsoTicket = doc.getElementsByAttribute(ticketMarker).first().attributes().get(ticketMarker);
 
-            if (headers[0] != null) {
+            if (htmlSsoTicket != null) {
 
                 Pattern pattern = Pattern.compile("(TGT-\\d+-\\S+)");
-                Matcher matcher = pattern.matcher(headers[0].toString());
+                Matcher matcher = pattern.matcher(htmlSsoTicket);
 
                 if (matcher.find()) {
-                    ticket = matcher.group(1);
-                } else {
-                    throw new IAMException("TGT not found in IAM response");
+                    ssoTicket = matcher.group(1);
                 }
             }
 
-            LOG.debug("SSO ticket successfully generated for user " + username + "\n Token: " + ticket);
+            LOG.debug("SSO ticket successfully generated for user " + username + "\n Token: " + ssoTicket);
 
         } catch (Exception e) {
             throw new IAMException("Authentication failed: Error occurred while acquiring SSO ticket for the user " +
                                    username, e);
         }
 
-        return ticket;
+        return ssoTicket;
     }
 
     public String getServiceToken(String url, String service) {
@@ -107,14 +108,14 @@ public class IAMRestClient {
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) ||
                 (null == httpResponse.getEntity()))
-                throw new IAMException("Failed to acquire authentication token for the service" + service);
+                throw new IAMException("Failed to acquire authentication token for the service " + service);
 
             token = EntityUtils.toString(httpResponse.getEntity());
 
             LOG.debug("Service token successfully generated for service " + service + "\n Token: " + token);
 
         } catch (Exception e) {
-            throw new IAMException("Authentication failed: Error occurred while acquiring authentication token for the service" +
+            throw new IAMException("Authentication failed: Error occurred while acquiring authentication token for the service " +
                                    service, e);
         }
 
