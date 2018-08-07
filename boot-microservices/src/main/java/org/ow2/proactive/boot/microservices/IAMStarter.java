@@ -57,7 +57,7 @@ public class IAMStarter {
     private IAMStarter() {
 
     }
-git
+
     /**
      * The method starts IAM microservice as separate java process,
      * given the executable war file and configuration directory of IAM.
@@ -97,7 +97,7 @@ git
             processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
             process = processBuilder.start();
 
-            LOGGER.debug(streamOutput(process.getInputStream()));
+            LOGGER.info(streamOutput(process.getInputStream()));
 
             started = true;
         }
