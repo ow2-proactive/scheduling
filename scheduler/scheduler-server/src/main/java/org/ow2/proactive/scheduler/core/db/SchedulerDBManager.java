@@ -1227,21 +1227,59 @@ public class SchedulerDBManager {
                 tasksToUpdate.add(finishedTask.getId());
             }
 
-            for (TaskId id : tasksToUpdate) {
-                InternalTask task = job.getIHMTasks().get(id);
-                DBTaskId taskId = taskId(task.getId());
+            TaskId tId = null;
 
-                TaskInfo taskInfo = task.getTaskInfo();
-
-                taskUpdateQuery.setParameter("taskStatus", taskInfo.getStatus())
-                               .setParameter("numberOfExecutionLeft", taskInfo.getNumberOfExecutionLeft())
-                               .setParameter("numberOfExecutionOnFailureLeft",
-                                             taskInfo.getNumberOfExecutionOnFailureLeft())
-                               .setParameter("finishedTime", taskInfo.getFinishedTime())
-                               .setParameter("executionDuration", taskInfo.getExecutionDuration())
-                               .setParameter("taskId", taskId)
-                               .executeUpdate();
+            if (tId == null) {
+                session.getNamedQuery("updateTaskDataAfterJobFinishedToNotRestarted")
+                       .setParameter("jobId", jobId)
+                       .executeUpdate();
+                session.getNamedQuery("updateTaskDataAfterJobFinishedToNotStarted")
+                       .setParameter("jobId", jobId)
+                       .executeUpdate();
+                session.getNamedQuery("updateTaskDataAfterJobFinishedToAborted")
+                       .setParameter("jobId", jobId)
+                       .setParameter("finishedTime", System.currentTimeMillis())
+                       .executeUpdate();
+                session.getNamedQuery("updateTaskDataAfterJobFinishedToAbortedAndExecutionTime")
+                       .setParameter("jobId", jobId)
+                       .setParameter("finishedTime", System.currentTimeMillis())
+                       .executeUpdate();
+            } else {
+                session.getNamedQuery("updateTaskDataAfterJobFinishedToNotRestartedExceptOneTask")
+                       .setParameter("jobId", jobId)
+                       .setParameter("taskd", tId)
+                       .executeUpdate();
+                session.getNamedQuery("updateTaskDataAfterJobFinishedToNotStartedExceptOneTask")
+                       .setParameter("jobId", jobId)
+                       .setParameter("taskd", tId)
+                       .executeUpdate();
+                session.getNamedQuery("updateTaskDataAfterJobFinishedToAbortedExceptOneTask")
+                       .setParameter("jobId", jobId)
+                       .setParameter("finishedTime", System.currentTimeMillis())
+                       .setParameter("taskd", tId)
+                       .executeUpdate();
+                session.getNamedQuery("updateTaskDataAfterJobFinishedToAbortedAndExecutionTimeExceptOneTask")
+                       .setParameter("jobId", jobId)
+                       .setParameter("finishedTime", System.currentTimeMillis())
+                       .setParameter("taskd", tId)
+                       .executeUpdate();
             }
+
+            //            for (TaskId id : tasksToUpdate) {
+            //                InternalTask task = job.getIHMTasks().get(id);
+            //                DBTaskId taskId = taskId(task.getId());
+            //
+            //                TaskInfo taskInfo = task.getTaskInfo();
+            //
+            //                taskUpdateQuery.setParameter("taskStatus", taskInfo.getStatus())
+            //                               .setParameter("numberOfExecutionLeft", taskInfo.getNumberOfExecutionLeft())
+            //                               .setParameter("numberOfExecutionOnFailureLeft",
+            //                                             taskInfo.getNumberOfExecutionOnFailureLeft())
+            //                               .setParameter("finishedTime", taskInfo.getFinishedTime())
+            //                               .setParameter("executionDuration", taskInfo.getExecutionDuration())
+            //                               .setParameter("taskId", taskId)
+            //                               .executeUpdate();
+            //            }
 
             if (result != null) {
                 DBTaskId taskId = taskId(finishedTask.getId());
