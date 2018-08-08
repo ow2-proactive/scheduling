@@ -81,6 +81,7 @@ import functionaltests.db.schedulerdb.TestUsageData;
 import functionaltests.jmx.SchedulerJMXTest;
 import functionaltests.jmx.SchedulerRuntimeDataMBeanTest;
 import functionaltests.job.TagTest;
+import functionaltests.job.TestExecuteScriptsOnBusyNode;
 import functionaltests.job.TestJobRemoved;
 import functionaltests.job.TestJobSchedulerHome;
 import functionaltests.job.TestJobSubmittedParallel;
@@ -88,6 +89,7 @@ import functionaltests.job.TestJobWalltime;
 import functionaltests.job.TestPauseJob;
 import functionaltests.job.TestPreemptRestartKillTask;
 import functionaltests.job.TestPreemptRestartKillTaskSchema33;
+import functionaltests.job.TestResumeJob;
 import functionaltests.job.TestTaskNotRestarted;
 import functionaltests.job.TestTaskNotStarted;
 import functionaltests.job.TestVariablesPropagation;
@@ -111,6 +113,7 @@ import functionaltests.job.taskkill.TestKillPendingTask;
 import functionaltests.job.taskkill.TestKillTaskWhileExecutingScripts;
 import functionaltests.job.taskkill.TestKillWhenInStoppedState;
 import functionaltests.job.taskkill.TestKilledJobResult;
+import functionaltests.job.taskkill.TestMarkedAsFinished;
 import functionaltests.job.workingdir.TestForkedTaskWorkingDir;
 import functionaltests.job.workingdir.TestWorkingDirStaticCommand;
 import functionaltests.policy.license.TestLicensePolicy;
@@ -215,13 +218,15 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestKilledJobResult.class, TestLoadJobs.class, TestLoggers.class,
                       TestVariablesPatternLateBindings.class, TestModifyPropagatedVariables.class,
                       TestMultipleHostsRequest.class, TestNativeTaskPaths.class, TestPauseJob.class,
-                      TestPreciousLogs.class, TestPropagatedVariables.class, TestPropagatedVariablesWalltime.class,
-                      TestSchedulerMiscEvents.class, TestScriptEngines.class, TestScriptForkEnvironment.class,
-                      TestScriptTask.class, TestTaskIdOrderSameAsDeclarationOrder.class, TestTaskNotExecuted.class,
+                      TestResumeJob.class, TestPreciousLogs.class, TestPropagatedVariables.class,
+                      TestPropagatedVariablesWalltime.class, TestSchedulerMiscEvents.class, TestScriptEngines.class,
+                      TestScriptForkEnvironment.class, TestScriptTask.class,
+                      TestTaskIdOrderSameAsDeclarationOrder.class, TestTaskNotExecuted.class,
                       TestTaskNotRestarted.class, TestTaskNotStarted.class, TestTaskScriptVariables.class,
                       TestThirdPartyCredentialsDefined.class, TestUserSpace.class, TestWorkflowDataspace.class,
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
                       Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class, TestTaskSynchronization.class,
+                      TestMarkedAsFinished.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,
@@ -233,11 +238,12 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
 
                       // Tests with different configurations (and restart)
                       TestCacheSpaceCleaning.class, TestChildProcessOfNodeKilled.class, TestDisabledListenJobLogs.class,
-                      TestJobKilled.class, TestJobScriptVariables.class, TestKillPendingTask.class,
-                      TestLicensePolicy.class, TestListenJobLogs.class, TestNodeDiesAtSchedulerRestart.class,
-                      TestPreemptRestartKillTask.class, TestPreemptRestartKillTaskSchema33.class, TestRamPolicy.class,
-                      TestRunAsMeLinuxKey.class, TestRunAsMeLinuxNone.class, TestRunAsMeLinuxPwd.class,
-                      TestRunAsMeWindows.class, TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
+                      TestExecuteScriptsOnBusyNode.class, TestJobKilled.class, TestJobScriptVariables.class,
+                      TestKillPendingTask.class, TestLicensePolicy.class, TestListenJobLogs.class,
+                      TestNodeDiesAtSchedulerRestart.class, TestPreemptRestartKillTask.class,
+                      TestPreemptRestartKillTaskSchema33.class, TestRamPolicy.class, TestRunAsMeLinuxKey.class,
+                      TestRunAsMeLinuxNone.class, TestRunAsMeLinuxPwd.class, TestRunAsMeWindows.class,
+                      TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
                       TestSubmitJobWithUnaccessibleDataSpaces.class, TestTaskRestartOnNodeFailure.class,
                       TestTasksCompleteAfterSelectiontimeout.class, TestUnauthorizedScripts.class,
                       TestVariablesPropagation.class })

@@ -713,10 +713,7 @@ class LiveJobs {
 
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager, job, task);
 
-            RunningTaskData data = new RunningTaskData(task,
-                                                       job.getOwner(),
-                                                       job.getCredentials(),
-                                                       task.getExecuterInformation().getLauncher());
+            RunningTaskData data = new RunningTaskData(task, job.getOwner(), job.getCredentials(), null);
 
             TerminationData terminationData = TerminationData.newTerminationData();
             terminationData.addTaskData(job, data, TerminationData.TerminationStatus.ABORTED, taskResult);
@@ -773,7 +770,6 @@ class LiveJobs {
             InternalTask task = jobData.job.getTask(taskName);
             tlogger.info(task.getId(), "restarting in-error task " + task.getId());
             jobData.job.restartInErrorTask(task);
-            updateJobInSchedulerState(jobData.job, SchedulerEvent.JOB_RESTARTED_FROM_ERROR);
         } finally {
             jobData.unlock();
         }
