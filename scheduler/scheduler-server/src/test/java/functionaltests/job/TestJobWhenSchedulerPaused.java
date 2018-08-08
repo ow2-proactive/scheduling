@@ -75,7 +75,7 @@ public class TestJobWhenSchedulerPaused extends SchedulerFunctionalTestNoRestart
 
         // Without sleeping, we could could test if jobs are blocked in pending state ..
         // .. without waiting long enough that they run
-        Thread.sleep(5000);
+        Thread.sleep(10000);
 
         JobState js1 = schedulerHelper.getSchedulerInterface().getJobState(jobId1);
         assertEquals(JobStatus.PENDING, js1.getStatus());
