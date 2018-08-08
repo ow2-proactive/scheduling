@@ -1083,17 +1083,19 @@ public class SchedulerDBManager {
                    .setParameter("jobId", jobId)
                    .setParameter("taskId", dbTaskId)
                    .setParameterList("taskStatuses",
-                                     Arrays.asList(TaskStatus.SUBMITTED,
-                                                   TaskStatus.PENDING,
-                                                   TaskStatus.PAUSED,
-                                                   TaskStatus.ABORTED,
-                                                   TaskStatus.IN_ERROR))
+                                     TaskStatus.allExceptThese(TaskStatus.RUNNING,
+                                                               TaskStatus.WAITING_ON_ERROR,
+                                                               TaskStatus.WAITING_ON_FAILURE,
+                                                               TaskStatus.FAILED,
+                                                               TaskStatus.NOT_STARTED,
+                                                               TaskStatus.FAULTY,
+                                                               TaskStatus.FINISHED,
+                                                               TaskStatus.SKIPPED))
                    .executeUpdate();
 
             session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                " task.finishedTime = :finishedTime " + " where task.jobData.id = :jobId " +
-                                " and task.id <> :taskId " +
-                                " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                " task.finishedTime = :finishedTime where task.jobData.id = :jobId " +
+                                " and task.id <> :taskId and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
                                 " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
                    .setParameter("finishedTime", System.currentTimeMillis())
                    .setParameter("jobId", jobId)
