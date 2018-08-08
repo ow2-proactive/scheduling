@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -73,8 +72,6 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -1049,6 +1046,87 @@ public class SchedulerDBManager {
         updateAfterTaskFinished(job, finishedTask, result, tasksToUpdate);
     }
 
+    public void killJob(InternalJob job, InternalTask finishedTask, TaskResultImpl result) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            long jobId = jobId(job);
+
+            JobInfo jobInfo = job.getJobInfo();
+
+            session.getNamedQuery("updateJobDataAfterTaskFinished")
+                   .setParameter("status", jobInfo.getStatus())
+                   .setParameter("finishedTime", jobInfo.getFinishedTime())
+                   .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
+                   .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
+                   .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                   .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                   .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                   .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                   .setParameter("lastUpdatedTime", new Date().getTime())
+                   .setParameter("jobId", jobId)
+                   .executeUpdate();
+
+            DBTaskId dbTaskId = null;
+            if (finishedTask != null) {
+                dbTaskId = taskId(finishedTask.getId());
+            }
+
+            session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
+                                " where task.jobData.id = :jobId and task.id <> :taskId and task.taskStatus in :taskStatuses ")
+                   .setParameter("jobId", jobId)
+                   .setParameter("taskId", dbTaskId)
+                   .setParameterList("taskStatuses",
+                                     Arrays.asList(TaskStatus.WAITING_ON_ERROR, TaskStatus.WAITING_ON_FAILURE))
+                   .executeUpdate();
+
+            session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
+                                " where task.jobData.id = :jobId and task.id <> :taskId and task.taskStatus in :taskStatuses ")
+                   .setParameter("jobId", jobId)
+                   .setParameter("taskId", dbTaskId)
+                   .setParameterList("taskStatuses",
+                                     Arrays.asList(TaskStatus.SUBMITTED,
+                                                   TaskStatus.PENDING,
+                                                   TaskStatus.PAUSED,
+                                                   TaskStatus.ABORTED,
+                                                   TaskStatus.IN_ERROR))
+                   .executeUpdate();
+
+            session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
+                                " task.finishedTime = :finishedTime " + " where task.jobData.id = :jobId " +
+                                " and task.id <> :taskId " +
+                                " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
+                   .setParameter("finishedTime", System.currentTimeMillis())
+                   .setParameter("jobId", jobId)
+                   .setParameter("taskId", dbTaskId)
+                   .executeUpdate();
+
+            session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
+                                " task.finishedTime = :finishedTime, " +
+                                " task.executionDuration = task.finishedTime - task.startTime " +
+                                " where task.jobData.id = :jobId and task.id <> :taskId " +
+                                " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                " and task.startTime > 0 and task.executionDuration < 0 ")
+                   .setParameter("jobId", jobId)
+                   .setParameter("finishedTime", System.currentTimeMillis())
+                   .setParameter("taskId", dbTaskId)
+                   .executeUpdate();
+
+            if (result != null) {
+                DBTaskId taskId = taskId(finishedTask.getId());
+                saveTaskResult(taskId, result, session);
+            }
+
+            if (FINISHED_JOB_STATUSES.contains(job.getStatus())) {
+                session.flush();
+                session.clear();
+
+                removeJobRuntimeData(session, jobId);
+            }
+
+            return null;
+        });
+    }
+
     public void updateJobAndTasksState(final InternalJob job) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
 
@@ -1227,59 +1305,21 @@ public class SchedulerDBManager {
                 tasksToUpdate.add(finishedTask.getId());
             }
 
-            TaskId tId = null;
+            for (TaskId id : tasksToUpdate) {
+                InternalTask task = job.getIHMTasks().get(id);
+                DBTaskId taskId = taskId(task.getId());
 
-            if (tId == null) {
-                session.getNamedQuery("updateTaskDataAfterJobFinishedToNotRestarted")
-                       .setParameter("jobId", jobId)
-                       .executeUpdate();
-                session.getNamedQuery("updateTaskDataAfterJobFinishedToNotStarted")
-                       .setParameter("jobId", jobId)
-                       .executeUpdate();
-                session.getNamedQuery("updateTaskDataAfterJobFinishedToAborted")
-                       .setParameter("jobId", jobId)
-                       .setParameter("finishedTime", System.currentTimeMillis())
-                       .executeUpdate();
-                session.getNamedQuery("updateTaskDataAfterJobFinishedToAbortedAndExecutionTime")
-                       .setParameter("jobId", jobId)
-                       .setParameter("finishedTime", System.currentTimeMillis())
-                       .executeUpdate();
-            } else {
-                session.getNamedQuery("updateTaskDataAfterJobFinishedToNotRestartedExceptOneTask")
-                       .setParameter("jobId", jobId)
-                       .setParameter("taskd", tId)
-                       .executeUpdate();
-                session.getNamedQuery("updateTaskDataAfterJobFinishedToNotStartedExceptOneTask")
-                       .setParameter("jobId", jobId)
-                       .setParameter("taskd", tId)
-                       .executeUpdate();
-                session.getNamedQuery("updateTaskDataAfterJobFinishedToAbortedExceptOneTask")
-                       .setParameter("jobId", jobId)
-                       .setParameter("finishedTime", System.currentTimeMillis())
-                       .setParameter("taskd", tId)
-                       .executeUpdate();
-                session.getNamedQuery("updateTaskDataAfterJobFinishedToAbortedAndExecutionTimeExceptOneTask")
-                       .setParameter("jobId", jobId)
-                       .setParameter("finishedTime", System.currentTimeMillis())
-                       .setParameter("taskd", tId)
-                       .executeUpdate();
+                TaskInfo taskInfo = task.getTaskInfo();
+
+                taskUpdateQuery.setParameter("taskStatus", taskInfo.getStatus())
+                               .setParameter("numberOfExecutionLeft", taskInfo.getNumberOfExecutionLeft())
+                               .setParameter("numberOfExecutionOnFailureLeft",
+                                             taskInfo.getNumberOfExecutionOnFailureLeft())
+                               .setParameter("finishedTime", taskInfo.getFinishedTime())
+                               .setParameter("executionDuration", taskInfo.getExecutionDuration())
+                               .setParameter("taskId", taskId)
+                               .executeUpdate();
             }
-
-            //            for (TaskId id : tasksToUpdate) {
-            //                InternalTask task = job.getIHMTasks().get(id);
-            //                DBTaskId taskId = taskId(task.getId());
-            //
-            //                TaskInfo taskInfo = task.getTaskInfo();
-            //
-            //                taskUpdateQuery.setParameter("taskStatus", taskInfo.getStatus())
-            //                               .setParameter("numberOfExecutionLeft", taskInfo.getNumberOfExecutionLeft())
-            //                               .setParameter("numberOfExecutionOnFailureLeft",
-            //                                             taskInfo.getNumberOfExecutionOnFailureLeft())
-            //                               .setParameter("finishedTime", taskInfo.getFinishedTime())
-            //                               .setParameter("executionDuration", taskInfo.getExecutionDuration())
-            //                               .setParameter("taskId", taskId)
-            //                               .executeUpdate();
-            //            }
 
             if (result != null) {
                 DBTaskId taskId = taskId(finishedTask.getId());
@@ -1448,7 +1488,7 @@ public class SchedulerDBManager {
     /**
      * Load all task results associated with the given job id and task name
      * When a task is executed several times (several attempts), all attempts are stored in the database.
-     * @param jobId job id
+     * @param jobId    job id
      * @param taskName task name
      * @return a list of task results
      */

@@ -126,70 +126,11 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                              "task.inErrorTime = :inErrorTime " +
                                                              "where task.id = :taskId"),
                 @NamedQuery(name = "updateTaskDataAfterJobFinished", query = "update TaskData task set task.taskStatus = :taskStatus, " +
-                                                                             " task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
-                                                                             " task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
-                                                                             " task.finishedTime = :finishedTime, " +
-                                                                             " task.executionDuration = :executionDuration " +
-                                                                             " where task.id = :taskId"),
-
-                @NamedQuery(name = "updateTaskDataAfterJobFinishedToNotRestarted", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
-                                                                                           " where task.jobData.id = :jobId " +
-                                                                                           " and (task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.WAITING_ON_ERROR " +
-                                                                                           " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.WAITING_ON_FAILURE )"),
-
-                @NamedQuery(name = "updateTaskDataAfterJobFinishedToNotRestartedExceptOneTask", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
-                                                                                                        " where task.jobData.id = :jobId " +
-                                                                                                        " and task.id <> :taskId " +
-                                                                                                        " and (task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.WAITING_ON_ERROR " +
-                                                                                                        " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.WAITING_ON_FAILURE )"),
-
-                @NamedQuery(name = "updateTaskDataAfterJobFinishedToNotStarted", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
-                                                                                         " where task.jobData.id = :jobId " +
-                                                                                         " and (task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.SUBMITTED " +
-                                                                                         " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.PENDING " +
-                                                                                         " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.PAUSED " +
-                                                                                         " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED " +
-                                                                                         " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.IN_ERROR )"),
-
-                @NamedQuery(name = "updateTaskDataAfterJobFinishedToNotStartedExceptOneTask", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
-                                                                                                      " where task.jobData.id = :jobId " +
-                                                                                                      " and task.id <> :taskId " +
-                                                                                                      " and (task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.SUBMITTED " +
-                                                                                                      " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.PENDING " +
-                                                                                                      " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.PAUSED " +
-                                                                                                      " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED " +
-                                                                                                      " or task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.IN_ERROR )"),
-                //                if (td.getStartTime() > 0 && td.getExecutionDuration() < 0) {
-
-                @NamedQuery(name = "updateTaskDataAfterJobFinishedToAborted", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                                                                      " task.finishedTime = :finishedTime " +
-                                                                                      " where task.jobData.id = :jobId " +
-                                                                                      " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                                                                                      " and ( task.startTime <= 0 or task.executionDuration >= 0 )"),
-                @NamedQuery(name = "updateTaskDataAfterJobFinishedToAbortedExceptOneTask", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                                                                                   " task.finishedTime = :finishedTime " +
-                                                                                                   " where task.jobData.id = :jobId " +
-                                                                                                   " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                                                                                                   " and task.id <> :taskid " +
-                                                                                                   " and ( task.startTime <= 0 or task.executionDuration >= 0 )"),
-
-                @NamedQuery(name = "updateTaskDataAfterJobFinishedToAbortedAndExecutionTime", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                                                                                      " task.finishedTime = :finishedTime, " +
-                                                                                                      " task.executionDuration = task.finishedTime - task.startTime " +
-                                                                                                      " where task.jobData.id = :jobId " +
-                                                                                                      " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                                                                                                      " and task.startTime > 0 " +
-                                                                                                      " and task.executionDuration < 0 "),
-
-                @NamedQuery(name = "updateTaskDataAfterJobFinishedToAbortedAndExecutionTimeExceptOneTask", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                                                                                                                   " task.finishedTime = :finishedTime, " +
-                                                                                                                   " task.executionDuration = task.finishedTime - task.startTime " +
-                                                                                                                   " where task.jobData.id = :jobId " +
-                                                                                                                   " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                                                                                                                   " and task.id <> :taskid " +
-                                                                                                                   " and task.startTime > 0 " +
-                                                                                                                   " and task.executionDuration < 0 "),
-
+                                                                             "task.numberOfExecutionLeft = :numberOfExecutionLeft, " +
+                                                                             "task.numberOfExecutionOnFailureLeft = :numberOfExecutionOnFailureLeft, " +
+                                                                             "task.finishedTime = :finishedTime, " +
+                                                                             "task.executionDuration = :executionDuration " +
+                                                                             "where task.id = :taskId"),
                 @NamedQuery(name = "pauseTasks", query = "update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.PAUSED " +
                                                          "where task.id.jobId = :jobId " +
                                                          "and task.taskStatus <> org.ow2.proactive.scheduler.common.task.TaskStatus.FINISHED " +
@@ -1257,8 +1198,7 @@ public class TaskData {
 
     public TaskInfo toTaskInfo() {
         JobIdImpl jobId = new JobIdImpl(getJobData().getId(), getJobData().getJobName());
-        TaskInfoImpl taskInfo = createTaskInfo(jobId);
-        return taskInfo;
+        return createTaskInfo(jobId);
     }
 
     public TaskState toTaskState() {
