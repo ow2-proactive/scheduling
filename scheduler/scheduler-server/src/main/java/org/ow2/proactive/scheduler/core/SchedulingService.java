@@ -187,8 +187,8 @@ public class SchedulingService {
         return status.isSubmittable();
     }
 
-    public boolean isPaused() {
-        return status == SchedulerStatus.PAUSED;
+    public boolean isPausedOrStopped() {
+        return status == SchedulerStatus.PAUSED || status == SchedulerStatus.STOPPED;
     }
 
     public boolean start() {
@@ -419,7 +419,7 @@ public class SchedulingService {
      * Should be called only by scheduling method impl when job scheduling starts
      */
     public Map<JobId, JobDescriptor> lockJobsToSchedule() {
-        return jobs.lockJobsToSchedule(isPaused());
+        return jobs.lockJobsToSchedule(isPausedOrStopped());
     }
 
     /*
