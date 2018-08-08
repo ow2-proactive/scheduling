@@ -298,7 +298,7 @@ class LiveJobs {
         listener.jobSubmitted(clientJobState);
     }
 
-    Map<JobId, JobDescriptor> lockJobsToSchedule(boolean isSchedulerPaused) {
+    Map<JobId, JobDescriptor> lockJobsToSchedule(boolean isSchedulerPausedOrStopped) {
 
         TreeSet<JobPriority> prioritiesScheduled = new TreeSet<>();
         TreeSet<JobPriority> prioritiesNotScheduled = new TreeSet<>();
@@ -308,7 +308,8 @@ class LiveJobs {
             JobData value = entry.getValue();
 
             // If the scheduler is paused, schedule only running jobs
-            if (isSchedulerPaused && value.job.getStatus() != JobStatus.RUNNING) {
+            if (isSchedulerPausedOrStopped &&
+                (value.job.getStatus() != JobStatus.RUNNING || value.job.getStatus() != JobStatus.STALLED)) {
                 continue;
             }
 
