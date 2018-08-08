@@ -298,7 +298,13 @@ class LiveJobs {
         listener.jobSubmitted(clientJobState);
     }
 
-    Map<JobId, JobDescriptor> lockJobsToSchedule() {
+    /**
+     * Return a map of jobs to consider for scheduling
+     *
+     * @param isSchedulerPausedOrStopped a boolean to specify is the scheduler is "PAUSED or STOPPED" or not.
+     * @return Map of jobs to schedule. If isSchedulerPaused is true, only consider RUNNING and STALLED jobs.
+     */
+    Map<JobId, JobDescriptor> lockJobsToSchedule(boolean isSchedulerPausedOrStopped) {
 
         TreeSet<JobPriority> prioritiesScheduled = new TreeSet<>();
         TreeSet<JobPriority> prioritiesNotScheduled = new TreeSet<>();
@@ -307,18 +313,21 @@ class LiveJobs {
         for (Map.Entry<JobId, JobData> entry : jobs.entrySet()) {
             JobData value = entry.getValue();
 
+            // If the scheduler is paused, schedule only running jobs
+            if (isSchedulerPausedOrStopped &&
+                (value.job.getStatus() != JobStatus.RUNNING || value.job.getStatus() != JobStatus.STALLED)) {
+                continue;
+            }
+
             if (value.jobLock.tryLock()) {
                 InternalJob job = entry.getValue().job;
                 result.put(job.getId(), job.getJobDescriptor());
                 prioritiesScheduled.add(job.getPriority());
-
-                if (unlockIfConflict(prioritiesScheduled, prioritiesNotScheduled, result))
-                    return new HashMap<>(0);
             } else {
                 prioritiesNotScheduled.add(value.job.getPriority());
-                if (unlockIfConflict(prioritiesScheduled, prioritiesNotScheduled, result))
-                    return new HashMap<>(0);
             }
+            if (unlockIfConflict(prioritiesScheduled, prioritiesNotScheduled, result))
+                return new HashMap<>(0);
         }
         return result;
     }
