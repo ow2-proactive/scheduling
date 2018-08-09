@@ -1018,16 +1018,16 @@ class LiveJobs {
             }
         }
 
-        Set<TaskId> tasksToUpdate = null;
         // if job has been killed
         if (jobStatus == JobStatus.KILLED) {
-            tasksToUpdate = job.failed(null, jobStatus);
-
+            Set<TaskId> tasksToUpdate = job.failed(null, jobStatus);
+            dbManager.killJob(job, null, null);
+            updateTasksInSchedulerState(job, tasksToUpdate);
         } else {
             // don't tamper the original job status if it's already in a
             // finished state (failed/canceled)
             if (jobStatus != JobStatus.FINISHED) {
-                tasksToUpdate = job.failed(task.getId(), jobStatus);
+                Set<TaskId> tasksToUpdate = job.failed(task.getId(), jobStatus);
 
                 // store the exception into jobResult / To prevent from empty
                 // task result (when job canceled), create one
@@ -1038,12 +1038,10 @@ class LiveJobs {
                                                     new SimpleTaskLogs("", errorMsg),
                                                     -1);
                 }
-
+                dbManager.updateAfterJobFailed(job, task, taskResult, tasksToUpdate);
+                updateTasksInSchedulerState(job, tasksToUpdate);
             }
         }
-
-        dbManager.killJob(job, task, taskResult);
-        updateTasksInSchedulerState(job, tasksToUpdate);
 
         // update job and tasks events list and send it to front-end
         updateJobInSchedulerState(job, event);
