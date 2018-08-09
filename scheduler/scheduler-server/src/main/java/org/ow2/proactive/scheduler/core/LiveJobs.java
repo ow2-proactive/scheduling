@@ -1021,9 +1021,8 @@ class LiveJobs {
         // if job has been killed
         if (jobStatus == JobStatus.KILLED) {
             Set<TaskId> tasksToUpdate = job.failed(null, jobStatus);
-            dbManager.updateAfterJobKilled(job, tasksToUpdate);
+            dbManager.killJob(job, null, null);
             updateTasksInSchedulerState(job, tasksToUpdate);
-
         } else {
             // don't tamper the original job status if it's already in a
             // finished state (failed/canceled)
