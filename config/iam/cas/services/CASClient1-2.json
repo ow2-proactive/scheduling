@@ -1,0 +1,27 @@
+{
+  "@class": "org.apereo.cas.services.RegexRegisteredService",
+  "serviceId": "^https://localhost:8445/iam-client-1(\\z|/.*)",
+  "name": "CAS WebApp Client 1",
+  "id": 2,
+  "description": "CAS java webapp client",
+  "evaluationOrder": 2,
+  "logoutType": "FRONT_CHANNEL",
+  "logoutUrl": "https://localhost:8445/iam-client-1/logout.jsp",
+  "properties" : {
+    "@class" : "java.util.HashMap",
+    "jwtAsServiceTicket" : {
+      "@class" : "org.apereo.cas.services.DefaultRegisteredServiceProperty",
+      "values" : [ "java.util.HashSet", [ "true" ] ]
+    }
+  },
+  "attributeReleasePolicy" : {
+    "@class" : "org.jasig.cas.services.ReturnAllAttributeReleasePolicy",
+    "authorizedToReleaseCredentialPassword" : true
+  },
+  "publicKey" : {
+    "@class" : "org.apereo.cas.services.RegisteredServicePublicKeyImpl",
+    "location" : "classpath:/config/iam/cas/activeeon-public.key",
+    "algorithm" : "RSA"
+  }
+}
+

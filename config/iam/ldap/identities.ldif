@@ -1,0 +1,262 @@
+##########################ORGANIZATION##########################
+
+dn: dc=activeeon,dc=com
+dc: activeeon
+objectClass: dcObject
+objectClass: organization
+o: activeeon
+
+###############################GROUPS############################
+# users' group
+
+dn: ou=users,dc=activeeon,dc=com
+ou: users
+description: All users in Activeeon
+objectclass: organizationalunit
+
+# roles' group
+
+dn: ou=roles,dc=activeeon,dc=com
+ou: roles
+description: All roles in Activeeon
+objectclass:organizationalunit
+
+#######################PROACTIVE END USERS######################
+# Tobias
+
+dn: uid=tobias,ou=users,dc=activeeon,dc=com
+cn: Tobias Wiens
+givenName: Tobias
+sn: Wiens
+uid: tobias
+#pwd: tobias
+userpassword: {SHA}BZuLiA+EQVCeyKZbULTGrnTr6nY=
+role: user
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# User
+
+dn: uid=user,ou=users,dc=activeeon,dc=com
+cn: user
+givenName: user
+sn: user
+uid: user
+#pwd: pwd
+userpassword: {SHA}N/omUzCtg+qoee+x4ttjgIls9jk=
+role: user
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+#######################PROACTIVE SYSTEM USERS######################
+# Admin   
+
+dn: uid=admin,ou=users,dc=activeeon,dc=com
+cn: admin           
+sn: Admin
+uid: admin
+#pwd: admin
+userpassword: {SHA}0DPiKuNIrrVmD8IUCuw1hQxNqZc=
+role: admin, nsadmins
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# RM
+
+dn: uid=rm,ou=users,dc=activeeon,dc=com
+cn: rm
+sn: rm
+uid: rm
+#pwd: rm_pwd
+userpassword: {SHA}Dkru1UG0cZwT8kTzYTpo1JdNzjY=
+role: admin, nsadmins
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# Scheduler    
+
+dn: uid=scheduler,ou=users,dc=activeeon,dc=com
+cn: scheduler           
+sn: scheduler
+uid: scheduler
+#pwd: scheduler_pwd
+userpassword: {SHA}IytUJHJqWza3bH8OAvdf7DARauc=
+role: user
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# radmin    
+
+dn: uid=radmin,ou=users,dc=activeeon,dc=com
+cn: radmin           
+sn: radmin
+uid: radmin
+#pwd: pwd
+userpassword: {SHA}N/omUzCtg+qoee+x4ttjgIls9jk=
+role: rmcoreadmins
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# nsadmin    
+
+dn: uid=nsadmin,ou=users,dc=activeeon,dc=com
+cn: nsadmin           
+sn: nsadmin
+uid: nsadmin
+#pwd: pwd
+userpassword: {SHA}N/omUzCtg+qoee+x4ttjgIls9jk=
+role: nsadmins
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# demo
+
+dn: uid=demo,ou=users,dc=activeeon,dc=com
+cn: demo
+sn: demo
+uid: demo
+#pwd: demo
+userpassword: {SHA}ieSV55Qc+eQOaYDRSha/AjzNTJE=
+role: admin
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# guest
+
+dn: uid=guest,ou=users,dc=activeeon,dc=com
+cn: guest
+sn: guest
+uid: guest
+#pwd: pwd
+userpassword: {SHA}N/omUzCtg+qoee+x4ttjgIls9jk=
+role: guests
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# test_executor
+
+dn: uid=test_executor,ou=users,dc=activeeon,dc=com
+cn: test_executor
+sn: test_executor
+uid: test_executor
+#pwd: pwd
+userpassword: {SHA}N/omUzCtg+qoee+x4ttjgIls9jk=
+role: admin
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# test
+
+dn: uid=test,ou=users,dc=activeeon,dc=com
+cn: test
+sn: test
+uid: test
+#pwd: pwd
+userpassword: {SHA}N/omUzCtg+qoee+x4ttjgIls9jk=
+#role:
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# watcher   
+
+dn: uid=watcher,ou=users,dc=activeeon,dc=com
+cn: watcher           
+sn: watcher
+uid: watcher
+#pwd: watcher_pwd
+#userpassword: {SHA}0bDfjtFTW6MtWL0WRMtwu+s0lZc=
+userpassword: {SHA}zJJkLCnLFCT1MOlCVuwt/LRqxaA=
+role: watchers
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+# provider   
+
+dn: uid=provider,ou=users,dc=activeeon,dc=com
+cn: provider           
+sn: provider
+uid: provider
+#pwd: pwd
+userpassword: {SHA}N/omUzCtg+qoee+x4ttjgIls9jk=
+role: providers
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: extensibleObject
+
+###############################GROUPS############################
+# proactive end-user role
+
+dn: cn=user,ou=roles,dc=activeeon,dc=com
+cn: user
+description: ProActive end-user role
+objectclass: groupofnames
+member: uid=tobias,ou=users,dc=activeeon,dc=com
+member: uid=user,ou=users,dc=activeeon,dc=com
+member: uid=scheduler,ou=users,dc=activeeon,dc=com
+
+# proactive system-user role
+
+dn: cn=admin,ou=roles,dc=activeeon,dc=com
+cn: admin
+description: ProActive user role
+objectclass: groupofnames
+member: uid=rm,ou=users,dc=activeeon,dc=com
+member: uid=radmin,ou=users,dc=activeeon,dc=com
+member: uid=admin,ou=users,dc=activeeon,dc=com
+member: uid=demo,ou=users,dc=activeeon,dc=com
+
+# proactive nsadmins role
+
+dn: cn=nsadmins,ou=roles,dc=activeeon,dc=com
+cn: nsadmins
+description: ProActive system-nsadmins role
+objectclass: groupofnames
+member: uid=admin,ou=users,dc=activeeon,dc=com
+member: uid=rm,ou=users,dc=activeeon,dc=com
+member: uid=nsadmin,ou=users,dc=activeeon,dc=com
+
+# proactive guests role
+
+dn: cn=guests,ou=roles,dc=activeeon,dc=com
+cn: guests
+description: ProActive system-guests role
+objectclass: groupofnames
+member: uid=guest,ou=users,dc=activeeon,dc=com
+
+# proactive providers role
+
+dn: cn=providers,ou=roles,dc=activeeon,dc=com
+cn: providers
+description: ProActive system-providers role
+objectclass: groupofnames
+member: uid=provider,ou=users,dc=activeeon,dc=com
+
+# proactive rmcoreadmins role
+
+dn: cn=rmcoreadmins,ou=roles,dc=activeeon,dc=com
+cn: rmcoreadmins
+description: ProActive system-rmcoreadmins role
+objectclass: groupofnames
+member: uid=radmin,ou=users,dc=activeeon,dc=com
+
+# proactive watchers role
+
+dn: cn=watchers,ou=roles,dc=activeeon,dc=com
+cn: watchers
+description: ProActive system-watcher role
+objectclass: groupofnames
+member: uid=watcher,ou=users,dc=activeeon,dc=com
+
+##################################################################
