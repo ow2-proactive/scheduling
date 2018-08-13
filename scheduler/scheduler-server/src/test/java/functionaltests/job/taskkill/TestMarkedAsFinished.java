@@ -51,7 +51,7 @@ public class TestMarkedAsFinished extends SchedulerFunctionalTestNoRestart {
 
     private static final URL failingJob = TestMarkedAsFinished.class.getResource("/functionaltests/descriptors/Job_failing.xml");
 
-    private static final URL normalJob = TestMarkedAsFinished.class.getResource("/functionaltests/descriptors/Job_1m.xml");
+    private static final URL normalJob = TestMarkedAsFinished.class.getResource("/functionaltests/descriptors/Job_30s.xml");
 
     @Test
     public void test() throws Throwable {

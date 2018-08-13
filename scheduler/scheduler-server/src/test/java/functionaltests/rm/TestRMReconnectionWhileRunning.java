@@ -54,11 +54,11 @@ public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
 
     private SchedulerTHelper schedulerHelper;
 
-    private static URL runningJob = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s.xml");
+    private static URL runningJob = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_30s.xml");
 
-    private static URL runningJob1 = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-1.xml");
+    private static URL runningJob1 = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_30s-1.xml");
 
-    private static URL runningJob2 = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_20s-2.xml");
+    private static URL runningJob2 = TestRMReconnectionWhileRunning.class.getResource("/functionaltests/descriptors/Job_30s-2.xml");
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -84,7 +84,7 @@ public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
         JobId jobId2 = schedulerHelper.submitJob(new File(runningJob1.toURI()).getAbsolutePath());
         JobId jobId3 = schedulerHelper.submitJob(new File(runningJob2.toURI()).getAbsolutePath());
 
-        schedulerHelper.waitForEventTaskRunning(jobId, "running_task_for20s");
+        schedulerHelper.waitForEventTaskRunning(jobId, "running_task_for30s");
         schedulerHelper.waitForEventJobFinished(jobId2);
         schedulerHelper.waitForEventJobFinished(jobId3);
 
@@ -108,7 +108,7 @@ public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
         JobId jobId2 = schedulerHelper.submitJob(new File(runningJob1.toURI()).getAbsolutePath());
         JobId jobId3 = schedulerHelper.submitJob(new File(runningJob2.toURI()).getAbsolutePath());
 
-        schedulerHelper.waitForEventTaskRunning(jobId, "running_task_for20s");
+        schedulerHelper.waitForEventTaskRunning(jobId, "running_task_for30s");
         schedulerHelper.waitForEventJobFinished(jobId2);
         schedulerHelper.waitForEventJobFinished(jobId3);
 
