@@ -1198,8 +1198,7 @@ public class TaskData {
 
     public TaskInfo toTaskInfo() {
         JobIdImpl jobId = new JobIdImpl(getJobData().getId(), getJobData().getJobName());
-        TaskInfoImpl taskInfo = createTaskInfo(jobId);
-        return taskInfo;
+        return createTaskInfo(jobId);
     }
 
     public TaskState toTaskState() {
