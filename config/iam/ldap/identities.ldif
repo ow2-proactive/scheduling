@@ -174,8 +174,7 @@ dn: uid=watcher,ou=users,dc=activeeon,dc=com
 cn: watcher           
 sn: watcher
 uid: watcher
-#pwd: watcher_pwd
-#userpassword: {SHA}0bDfjtFTW6MtWL0WRMtwu+s0lZc=
+#pwd: w_pwd
 userpassword: {SHA}zJJkLCnLFCT1MOlCVuwt/LRqxaA=
 role: watchers
 objectClass: inetOrgPerson
