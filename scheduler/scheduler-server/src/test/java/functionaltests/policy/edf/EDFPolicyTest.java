@@ -76,19 +76,19 @@ public class EDFPolicyTest extends SchedulerFunctionalTestEDFPolicy {
     @Test
     public void jobsHaveSamePriorityTest() throws Exception {
 
-        JobId jobPlus10HoursHighest = schedulerHelper.submitJob(new File(highest.toURI()).getAbsolutePath(),
-                                                                variablesWithDeadline(new DateTime().plusHours(10)));
+        JobId jobPlus10HoursHighest = schedulerHelper.submitJobWithGI(new File(highest.toURI()).getAbsolutePath(),
+                                                                      generalInformation(new DateTime().plusHours(10)));
 
-        JobId jobPlus2HoursHighest = schedulerHelper.submitJob(new File(highest.toURI()).getAbsolutePath(),
-                                                               variablesWithDeadline(new DateTime().plusHours(2)));
+        JobId jobPlus2HoursHighest = schedulerHelper.submitJobWithGI(new File(highest.toURI()).getAbsolutePath(),
+                                                                     generalInformation(new DateTime().plusHours(2)));
 
-        JobId jobPlus5HoursHighest = schedulerHelper.submitJob(new File(highest.toURI()).getAbsolutePath(),
-                                                               variablesWithDeadline(new DateTime().plusHours(5)));
+        JobId jobPlus5HoursHighest = schedulerHelper.submitJobWithGI(new File(highest.toURI()).getAbsolutePath(),
+                                                                     generalInformation(new DateTime().plusHours(5)));
 
         JobId jobEmptyDeadlineHighest = schedulerHelper.submitJob(new File(highest.toURI()).getAbsolutePath());
 
-        JobId jobMinus2HoursHighest = schedulerHelper.submitJob(new File(highest.toURI()).getAbsolutePath(),
-                                                                variablesWithDeadline(new DateTime().minusHours(2)));
+        JobId jobMinus2HoursHighest = schedulerHelper.submitJobWithGI(new File(highest.toURI()).getAbsolutePath(),
+                                                                      generalInformation(new DateTime().minusHours(2)));
 
         schedulerHelper.createNodeSource("local", 1);
 
@@ -128,19 +128,19 @@ public class EDFPolicyTest extends SchedulerFunctionalTestEDFPolicy {
     @Test
     public void jobsHaveDifferentPrioritiesTest() throws Exception {
 
-        JobId jobPlus10HoursHighest = schedulerHelper.submitJob(new File(highest.toURI()).getAbsolutePath(),
-                                                                variablesWithDeadline(new DateTime().plusHours(10)));
+        JobId jobPlus10HoursHighest = schedulerHelper.submitJobWithGI(new File(highest.toURI()).getAbsolutePath(),
+                                                                      generalInformation(new DateTime().plusHours(10)));
 
-        JobId jobPlus2HoursLowest = schedulerHelper.submitJob(new File(lowest.toURI()).getAbsolutePath(),
-                                                              variablesWithDeadline(new DateTime().plusHours(2)));
+        JobId jobPlus2HoursLowest = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                    generalInformation(new DateTime().plusHours(2)));
 
-        JobId jobPlus5HoursHighest = schedulerHelper.submitJob(new File(highest.toURI()).getAbsolutePath(),
-                                                               variablesWithDeadline(new DateTime().plusHours(5)));
+        JobId jobPlus5HoursHighest = schedulerHelper.submitJobWithGI(new File(highest.toURI()).getAbsolutePath(),
+                                                                     generalInformation(new DateTime().plusHours(5)));
 
         JobId jobEmptyDeadlineLowest = schedulerHelper.submitJob(new File(lowest.toURI()).getAbsolutePath());
 
-        JobId jobMinus2HoursHighest = schedulerHelper.submitJob(new File(highest.toURI()).getAbsolutePath(),
-                                                                variablesWithDeadline(new DateTime().minusHours(2)));
+        JobId jobMinus2HoursHighest = schedulerHelper.submitJobWithGI(new File(highest.toURI()).getAbsolutePath(),
+                                                                      generalInformation(new DateTime().minusHours(2)));
 
         schedulerHelper.createNodeSource("local", 1);
 
@@ -177,7 +177,7 @@ public class EDFPolicyTest extends SchedulerFunctionalTestEDFPolicy {
         schedulerHelper.removeNodeSource("local");
     }
 
-    public static Map<String, String> variablesWithDeadline(DateTime dateTime) {
+    public static Map<String, String> generalInformation(DateTime dateTime) {
         Map<String, String> variables = new HashMap<>();
         variables.put("JOB_DDL", EDFPolicyTest.dateToISOString(dateTime));
         return variables;

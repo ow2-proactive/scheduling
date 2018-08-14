@@ -409,6 +409,13 @@ public class SchedulerTHelper {
         return userInt.submit(jobToSubmit);
     }
 
+    public JobId submitJobWithGI(String jobDescPath, Map<String, String> generalInformation) throws Exception {
+        Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath);
+        jobToSubmit.setGenericInformation(generalInformation);
+        Scheduler userInt = getSchedulerInterface();
+        return userInt.submit(jobToSubmit);
+    }
+
     /**
      * Kills a job
      * @return success or failure at killing the job

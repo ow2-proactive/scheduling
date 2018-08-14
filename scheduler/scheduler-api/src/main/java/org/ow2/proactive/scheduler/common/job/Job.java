@@ -322,13 +322,13 @@ public abstract class Job extends CommonAttribute {
      * (currently deadline can be set as job GI vairable in ISO8601 date format)
      */
     public Optional<Date> getJobDeadline() {
-        if (variables.containsKey(JOB_DDL)) {
+        if (genericInformation.containsKey(JOB_DDL)) {
             try {
                 return Optional.of(ISODateTimeFormat.dateTimeNoMillis()
-                                                    .parseDateTime(variables.get(JOB_DDL).getValue())
+                                                    .parseDateTime(genericInformation.get(JOB_DDL))
                                                     .toDate());
             } catch (Exception e) {
-                LOGGER.info("Imposible to parse JOB_DDL GI variable as ISO8601 date", e);
+                LOGGER.warn("Imposible to parse JOB_DDL GI variable as ISO8601 date", e);
                 return Optional.empty();
             }
         } else {

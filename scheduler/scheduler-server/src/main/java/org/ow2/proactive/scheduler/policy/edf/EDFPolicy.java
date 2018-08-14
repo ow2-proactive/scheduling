@@ -82,8 +82,6 @@ public class EDFPolicy extends ExtendedSchedulerPolicy {
      * (this is how this policy treats absence of deadline)
      */
     private static Date getDeadLineFromJob(InternalJob internalJob) {
-        final Date maxDate = new Date();
-        maxDate.setTime(Long.MAX_VALUE);
-        return internalJob.getJobDeadline().orElse(maxDate);
+        return internalJob.getJobDeadline().orElse(new Date(Long.MAX_VALUE));
     }
 }
