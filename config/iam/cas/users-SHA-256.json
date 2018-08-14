@@ -13,7 +13,7 @@
   },
   "user" : {
     "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
-    "password" : "1cb4bc3a41744bf0c3cdf22b99f6d240d9d28a959678cd8f63c6fdf3f9747f92",
+    "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
       "cn" : "user",
