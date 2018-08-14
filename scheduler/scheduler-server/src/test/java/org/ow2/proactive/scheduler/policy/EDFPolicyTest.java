@@ -99,11 +99,7 @@ public class EDFPolicyTest extends ProActiveTestClean {
         final JobDescriptorImpl job = mock(JobDescriptorImpl.class);
 
         final JobId jobId = mock(JobId.class);
-        if (deadline.isPresent()) {
-            when(jobId.value()).thenReturn("id " + jobPriority + deadline.get());
-        } else {
-            when(jobId.value()).thenReturn("id " + jobPriority + " no date");
-        }
+        when(jobId.value()).thenReturn("id " + jobPriority + deadline.map(Date::toString).orElse(" no deadline"));
         when(job.getJobId()).thenReturn(jobId);
         final InternalJob internalJob = mock(InternalJob.class);
         when(job.getInternal()).thenReturn(internalJob);

@@ -33,11 +33,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
-import org.joda.time.format.ISODateTimeFormat;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 
 import com.google.common.base.Joiner;
 
@@ -324,15 +324,11 @@ public abstract class Job extends CommonAttribute {
     public Optional<Date> getJobDeadline() {
         if (genericInformation.containsKey(JOB_DDL)) {
             try {
-                return Optional.of(ISODateTimeFormat.dateTimeNoMillis()
-                                                    .parseDateTime(genericInformation.get(JOB_DDL))
-                                                    .toDate());
+                return Optional.of(ISO8601DateUtil.toDate(genericInformation.get(JOB_DDL)));
             } catch (Exception e) {
                 LOGGER.warn("Imposible to parse JOB_DDL GI variable as ISO8601 date", e);
-                return Optional.empty();
             }
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 }

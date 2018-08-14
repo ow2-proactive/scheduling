@@ -34,10 +34,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 
 import functionaltests.job.TestJobWhenSchedulerPaused;
 import functionaltests.utils.SchedulerFunctionalTestEDFPolicy;
@@ -184,7 +184,7 @@ public class EDFPolicyTest extends SchedulerFunctionalTestEDFPolicy {
     }
 
     public static String dateToISOString(DateTime dateTime) {
-        return ISODateTimeFormat.dateTimeNoMillis().print(dateTime);
+        return ISO8601DateUtil.parse(dateTime.toDate());
     }
 
 }
