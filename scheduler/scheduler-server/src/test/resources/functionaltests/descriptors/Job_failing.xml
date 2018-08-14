@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.11"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd"
+        name="Job_With_Error"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="1"
+        restartTaskOnError="elsewhere"
+>
+    <description>
+        <![CDATA[ A workflow that executes groovy in JVM. ]]>
+    </description>
+    <taskFlow>
+        <task name="Error_Task"
+              onTaskError="pauseJob">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+            </description>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+throw new Exception("Error")
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <cleaning>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println "Hello"
+]]>
+                    </code>
+                </script>
+            </cleaning>
+            <metadata>
+                <positionTop>
+                    338.59375
+                </positionTop>
+                <positionLeft>
+                    670.15625
+                </positionLeft>
+            </metadata>
+        </task>
+        <task name="TaskLauncherKiller">
+            <description>
+                <![CDATA[ The simplest task, ran by a groovy engine. ]]>
+            </description>
+            <depends>
+                <task ref="Error_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+println "uname -a".execute().text
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <metadata>
+                <positionTop>
+                    470.59375
+                </positionTop>
+                <positionLeft>
+                    660.15625
+                </positionLeft>
+            </metadata>
+        </task>
+    </taskFlow>
+</job>

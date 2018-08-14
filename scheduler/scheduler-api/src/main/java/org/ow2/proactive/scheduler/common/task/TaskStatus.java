@@ -25,6 +25,12 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -128,4 +134,10 @@ public enum TaskStatus implements java.io.Serializable {
         return name;
     }
 
+    public static List<TaskStatus> allExceptThese(TaskStatus... taskStatuses) {
+        final Set<TaskStatus> statusesToAvoid = new HashSet<>(Arrays.asList(taskStatuses));
+        return Arrays.stream(TaskStatus.values())
+                     .filter(taskStatus -> !statusesToAvoid.contains(taskStatus))
+                     .collect(Collectors.toList());
+    }
 }

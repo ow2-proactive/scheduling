@@ -462,89 +462,89 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
 
     @Override
     public void setSession(String sid) {
-        ((ISchedulerClient) _getScheduler()).setSession(sid);
+        _getScheduler().setSession(sid);
     }
 
     @Override
     public String getSession() {
-        return ((ISchedulerClient) _getScheduler()).getSession();
+        return _getScheduler().getSession();
     }
 
     @Override
     public boolean isJobFinished(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
-        return ((ISchedulerClient) _getScheduler()).isJobFinished(jobId);
+        return _getScheduler().isJobFinished(jobId);
     }
 
     @Override
     public boolean isJobFinished(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
-        return ((ISchedulerClient) _getScheduler()).isJobFinished(jobId);
+        return _getScheduler().isJobFinished(jobId);
     }
 
     @Override
     public JobResult waitForJob(JobId jobId, long timeout)
             throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
-        return ((ISchedulerClient) _getScheduler()).waitForJob(jobId, timeout);
+        return _getScheduler().waitForJob(jobId, timeout);
     }
 
     @Override
     public JobResult waitForJob(String jobId, long timeout)
             throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
-        return ((ISchedulerClient) _getScheduler()).waitForJob(jobId, timeout);
+        return _getScheduler().waitForJob(jobId, timeout);
     }
 
     @Override
     public boolean isTaskFinished(String jobId, String taskName)
             throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException {
-        return ((ISchedulerClient) _getScheduler()).isTaskFinished(jobId, taskName);
+        return _getScheduler().isTaskFinished(jobId, taskName);
     }
 
     @Override
     public TaskResult waitForTask(String jobId, String taskName, long timeout) throws UnknownJobException,
             NotConnectedException, PermissionException, UnknownTaskException, TimeoutException {
-        return ((ISchedulerClient) _getScheduler()).waitForTask(jobId, taskName, timeout);
+        return _getScheduler().waitForTask(jobId, taskName, timeout);
     }
 
     @Override
     public List<JobResult> waitForAllJobs(List<String> jobIds, long timeout)
             throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
-        return ((ISchedulerClient) _getScheduler()).waitForAllJobs(jobIds, timeout);
+        return _getScheduler().waitForAllJobs(jobIds, timeout);
     }
 
     @Override
     public Map.Entry<String, JobResult> waitForAnyJob(List<String> jobIds, long timeout)
             throws NotConnectedException, UnknownJobException, PermissionException, TimeoutException {
-        return ((ISchedulerClient) _getScheduler()).waitForAnyJob(jobIds, timeout);
+        return _getScheduler().waitForAnyJob(jobIds, timeout);
     }
 
     @Override
     public Map.Entry<String, TaskResult> waitForAnyTask(String jobId, List<String> taskNames, long timeout)
             throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
             TimeoutException {
-        return ((ISchedulerClient) _getScheduler()).waitForAnyTask(jobId, taskNames, timeout);
+        return _getScheduler().waitForAnyTask(jobId, taskNames, timeout);
     }
 
     @Override
     public List<Map.Entry<String, TaskResult>> waitForAllTasks(String jobId, List<String> taskNames, long timeout)
             throws UnknownJobException, NotConnectedException, PermissionException, UnknownTaskException,
             TimeoutException {
-        return ((ISchedulerClient) _getScheduler()).waitForAllTasks(jobId, taskNames, timeout);
+        return _getScheduler().waitForAllTasks(jobId, taskNames, timeout);
     }
 
     @Override
     public boolean pushFile(String spacename, String pathname, String filename, String file)
             throws NotConnectedException, PermissionException {
-        return ((ISchedulerClient) _getScheduler()).pushFile(spacename, pathname, filename, file);
+        return _getScheduler().pushFile(spacename, pathname, filename, file);
     }
 
     @Override
     public void pullFile(String space, String pathname, String outputFile)
             throws NotConnectedException, PermissionException {
-        ((ISchedulerClient) _getScheduler()).pullFile(space, pathname, outputFile);
+        _getScheduler().pullFile(space, pathname, outputFile);
     }
 
     @Override
     public boolean deleteFile(String space, String pathname) throws NotConnectedException, PermissionException {
-        return ((ISchedulerClient) _getScheduler()).deleteFile(space, pathname);
+        return _getScheduler().deleteFile(space, pathname);
     }
 
     private class DownloadHandler implements Runnable {
@@ -653,14 +653,14 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     @Override
     public boolean changeStartAt(JobId jobId, String startAt)
             throws NotConnectedException, UnknownJobException, PermissionException {
-        return ((ISchedulerClient) _getScheduler()).changeStartAt(jobId, startAt);
+        return _getScheduler().changeStartAt(jobId, startAt);
     }
 
     @Override
     public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
             throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
             JobCreationException {
-        return ((ISchedulerClient) _getScheduler()).copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+        return _getScheduler().copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
     }
 
     @Override
@@ -670,17 +670,17 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
 
     @Override
     public String getCurrentUser() throws NotConnectedException {
-        return ((ISchedulerClient) _getScheduler()).getCurrentUser();
+        return _getScheduler().getCurrentUser();
     }
 
     @Override
     public UserData getCurrentUserData() throws NotConnectedException {
-        return ((ISchedulerClient) _getScheduler()).getCurrentUserData();
+        return _getScheduler().getCurrentUserData();
     }
 
     @Override
     public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
-        return ((ISchedulerClient) _getScheduler()).getSchedulerProperties();
+        return _getScheduler().getSchedulerProperties();
     }
 
     @Override

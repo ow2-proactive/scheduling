@@ -4,7 +4,7 @@
 	name="Job_running" priority="normal">
 	<description>Running Job</description>
 	<taskFlow>
-		<task name="running_task_for20s">
+		<task name="running_task_for30s">
 			<description>Running Task</description>
 			<javaExecutable class="org.ow2.proactive.scheduler.examples.WaitAndPrint">
 				<parameters>
