@@ -1,0 +1,146 @@
+{
+  "@class" : "java.util.LinkedHashMap",  
+  "tobias" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "e0374e589a7c697dabef1493a04808fdad59fcb9580988d8523f43bc2cbc9481",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "Tobias Wiens",
+      "role" : "user"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "user" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "user",
+      "role" : "user"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "admin" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "998ed4d621742d0c2d85ed84173db569afa194d4597686cae947324aa58ab4bb",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "administrator",
+      "role" : "admin, nsadmins"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "rm" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "ae5e45864de387d1c80696592a8eb66825e4a84f47b2088b1fb32d1df6c275a9",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "rm",
+      "role" : "admin, nsadmins"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "scheduler" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "10553b998e1f360567789e3209a6782db4a549813e2e8d76e78faac6f9b1db79",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "scheduler",
+      "role" : "user"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "radmin" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "radmin",
+      "role" : "rmcoreadmins"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "nsadmin" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "nsadmin",
+      "role" : "nsadmins"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "demo" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "b14ebc2510c9b27ec843ae98686260cc691338edf2db0a2d625fa50a1f4ebba7",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "demo",
+      "role" : "admin"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "guest" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "guest",
+      "role" : "guests"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "test_executor" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "test_executor",
+      "role" : "admin"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "test" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "test",
+      "role" : ""
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "watcher" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "7b3a14bbc93a55cef6d46833d1fd88b530ec8275886c1b9aa5aec16f83614513",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "watcher",
+      "role" : "watchers"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  },
+  "provider" : {
+    "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
+    "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
+    "attributes" : {
+      "@class" : "java.util.LinkedHashMap",
+      "cn" : "provider",
+      "role" : "providers"
+    },
+    "status" : "OK",
+    "expirationDate" : "2019-12-31"
+  }
+}

@@ -97,7 +97,7 @@ public class IAMStarter {
             processBuilder.redirectError(ProcessBuilder.Redirect.INHERIT);
             process = processBuilder.start();
 
-            LOGGER.info(streamOutput(process.getInputStream()));
+            LOGGER.debug(streamOutput(process.getInputStream()));
 
             started = true;
         }

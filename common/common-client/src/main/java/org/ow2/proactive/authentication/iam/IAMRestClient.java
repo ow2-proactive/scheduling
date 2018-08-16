@@ -65,7 +65,7 @@ public class IAMRestClient {
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) ||
                 (null == httpResponse.getEntity())) {
-                throw new IAMException("Failed to acquire SSO ticket for the user" + username);
+                throw new IAMException("Failed to acquire SSO ticket for the user " + username);
             }
 
             String htmlResponse = EntityUtils.toString(httpResponse.getEntity());
