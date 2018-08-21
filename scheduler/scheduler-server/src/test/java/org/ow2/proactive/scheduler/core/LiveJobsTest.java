@@ -194,7 +194,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask(tid.getReadableName()), null);
     }
 
@@ -349,7 +349,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
         liveJobs.pauseJob(id);
-        assertThat(liveJobs.lockJobsToSchedule().size(), is(1));
+        assertThat(liveJobs.lockJobsToSchedule(false).size(), is(1));
     }
 
     @Test(expected = IllegalStateException.class, timeout = 60000)
@@ -390,7 +390,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         assertThat(internalTask.getMaxNumberOfExecutionOnFailure(), is(5));
@@ -424,7 +424,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         assertThat(internalTask.getMaxNumberOfExecutionOnFailure(), is(0));
@@ -454,7 +454,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
         assertThat(liveJobs.canPingTask(liveJobs.getRunningTasks().iterator().next()), is(true));
     }
@@ -482,7 +482,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception(), null, 330);
@@ -520,7 +520,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception(), null, 330);
@@ -570,7 +570,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask2);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception());
@@ -611,7 +611,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception());
@@ -648,7 +648,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         tasksList.add(internalTask);
         job.setTasks(tasksList);
         liveJobs.jobSubmitted(job);
-        liveJobs.lockJobsToSchedule();
+        liveJobs.lockJobsToSchedule(false);
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception());
