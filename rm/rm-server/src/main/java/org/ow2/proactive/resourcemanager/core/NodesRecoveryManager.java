@@ -36,6 +36,8 @@ import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -115,12 +117,14 @@ public class NodesRecoveryManager {
         if (existPersistedNodes) {
             InfrastructureManager im = InfrastructureManagerFactory.recover(descriptor);
             if (!im.getDeployingAndLostNodes().isEmpty()) {
-                // if there are deploying nodes, we will not recover
+                logRecoveryAbortedReason(nodeSourceName, "There were deploying or lost nodes");
                 this.rmCore.getDbManager().removeAllNodesFromNodeSource(nodeSourceName);
             } else {
                 recoverNodes = true;
                 nodeSourceToDeploy.setInfrastructureManager(im);
             }
+        } else {
+            logRecoveryAbortedReason(nodeSourceName, "This node source has no associated nodes in database");
         }
         return recoverNodes;
     }
@@ -143,6 +147,10 @@ public class NodesRecoveryManager {
         }
         this.rmCore.setEligibleNodesToRecover(recoveredEligibleNodes);
         this.logNodeRecoverySummary(nodeSourceName, recoveredNodeStatesCounter, recoveredEligibleNodes.size());
+    }
+
+    protected void logRecoveryAbortedReason(String nodeSourceName, String reason) {
+        logger.info("Not recovering node source " + nodeSourceName + ": " + reason);
     }
 
     private boolean existPersistedNodes(String nodeSourceName) {
@@ -223,12 +231,10 @@ public class NodesRecoveryManager {
         String nodeUrl = rmNodeData.getNodeUrl();
         NodeState previousState = rmNodeData.getState();
         try {
-            logger.info("Trying to lookup node to recover: " + nodeUrl);
             node = nodeSource.lookupNode(nodeUrl, PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt());
+            logger.info("Node " + nodeUrl + " was looked up successfully");
         } catch (Exception e) {
-            // do not log exception message here: not being able to look up a
-            // node to recover is not an exceptional behavior
-            logger.warn("Node to recover could not be looked up");
+            logger.info("Node " + nodeUrl + " could not be looked up");
             rmNodeData.setState(NodeState.DOWN);
         }
         return this.addRMNodeToCoreAndSource(nodeSource,

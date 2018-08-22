@@ -1580,6 +1580,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 recoverNodes = this.nodesRecoveryManager.recoverFullyDeployedInfrastructureOrReset(nodeSourceName,
                                                                                                    nodeSourceToDeploy,
                                                                                                    nodeSourceDescriptor);
+            } else {
+                this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName,
+                                                                   "Recovery is not enabled for this node source");
             }
 
             NodeSourcePolicy nodeSourcePolicyStub = this.createNodeSourcePolicyActivity(nodeSourceDescriptor,
@@ -1596,6 +1599,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                              nodeSourcePolicyStub);
 
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
+        } else {
+            this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName, "This node source is undeployed");
         }
     }
 
