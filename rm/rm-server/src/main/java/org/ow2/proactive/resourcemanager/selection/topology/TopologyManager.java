@@ -50,6 +50,7 @@ import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.HAC;
 import org.ow2.proactive.resourcemanager.frontend.topology.pinging.Pinger;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.topology.descriptor.ArbitraryTopologyDescriptor;
 import org.ow2.proactive.topology.descriptor.BestProximityDescriptor;
 import org.ow2.proactive.topology.descriptor.DifferentHostsExclusiveDescriptor;
@@ -194,7 +195,8 @@ public class TopologyManager {
     /**
      * Node is removed or down. Method removes corresponding topology information.
      */
-    public void removeNode(Node node) {
+    public void removeNode(RMNode rmNode) {
+        Node node = rmNode.getNode();
         try {
             rwLock.writeLock().lock();
             if (!PAResourceManagerProperties.RM_TOPOLOGY_ENABLED.getValueAsBoolean()) {

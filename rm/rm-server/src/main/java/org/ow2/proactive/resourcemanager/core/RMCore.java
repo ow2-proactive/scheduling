@@ -1000,19 +1000,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             }
         });
 
-        removeAllNodes(nodeSourceName, "alive nodes", new RemoveAllNodes(new Function<NodeSource, LinkedList<Node>>() {
-            @Override
-            public LinkedList<Node> apply(NodeSource nodeSource) {
-                return nodeSource.getAliveNodes();
-            }
-        }, preemptive, isTriggeredFromShutdownHook));
+        removeAllNodes(nodeSourceName,
+                       "alive nodes",
+                       new RemoveAllNodes(NodeSource::getAliveNodes, preemptive, isTriggeredFromShutdownHook));
 
-        removeAllNodes(nodeSourceName, "down nodes", new RemoveAllNodes(new Function<NodeSource, LinkedList<Node>>() {
-            @Override
-            public LinkedList<Node> apply(NodeSource nodeSource) {
-                return nodeSource.getDownNodes();
-            }
-        }, preemptive, isTriggeredFromShutdownHook));
+        removeAllNodes(nodeSourceName,
+                       "down nodes",
+                       new RemoveAllNodes(NodeSource::getDownNodes, preemptive, isTriggeredFromShutdownHook));
     }
 
     protected void setEligibleNodesToRecover(List<RMNode> eligibleNodes) {
@@ -1021,13 +1015,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private final class RemoveAllNodes implements Function<NodeSource, Void> {
 
-        private final Function<NodeSource, LinkedList<Node>> nodeExtractorFunction;
+        private final Function<NodeSource, List<RMNode>> nodeExtractorFunction;
 
         private final boolean preemptive;
 
         private final boolean isTriggeredFromShutdownHook;
 
-        private RemoveAllNodes(Function<NodeSource, LinkedList<Node>> nodeExtractorFunction, boolean preemptive,
+        private RemoveAllNodes(Function<NodeSource, List<RMNode>> nodeExtractorFunction, boolean preemptive,
                 boolean isTriggeredFromShutdownHook) {
             this.nodeExtractorFunction = nodeExtractorFunction;
             this.preemptive = preemptive;
@@ -1036,11 +1030,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         @Override
         public Void apply(NodeSource nodeSource) {
-            LinkedList<Node> nodes = nodeExtractorFunction.apply(nodeSource);
+            List<RMNode> nodes = nodeExtractorFunction.apply(nodeSource);
 
             if (nodes != null) {
-                for (Node node : nodes) {
-                    removeNode(node.getNodeInformation().getURL(), preemptive, isTriggeredFromShutdownHook);
+                for (RMNode node : nodes) {
+                    removeNode(node.getNodeURL(), preemptive, isTriggeredFromShutdownHook);
                 }
             }
 
@@ -1580,6 +1574,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 recoverNodes = this.nodesRecoveryManager.recoverFullyDeployedInfrastructureOrReset(nodeSourceName,
                                                                                                    nodeSourceToDeploy,
                                                                                                    nodeSourceDescriptor);
+            } else {
+                this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName,
+                                                                   "Recovery is not enabled for this node source");
             }
 
             NodeSourcePolicy nodeSourcePolicyStub = this.createNodeSourcePolicyActivity(nodeSourceDescriptor,
@@ -1596,6 +1593,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                              nodeSourcePolicyStub);
 
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
+        } else {
+            this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName, "This node source is undeployed");
         }
     }
 
@@ -1960,8 +1959,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         HashSet<String> aliveNodes = new HashSet<>();
         for (String nodeSource : nodeSourceNames) {
             if (this.deployedNodeSources.containsKey(nodeSource)) {
-                for (Node node : this.deployedNodeSources.get(nodeSource).getAliveNodes()) {
-                    aliveNodes.add(node.getNodeInformation().getURL());
+                for (RMNode node : this.deployedNodeSources.get(nodeSource).getAliveNodes()) {
+                    aliveNodes.add(node.getNodeURL());
                 }
             }
         }

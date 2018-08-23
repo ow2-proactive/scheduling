@@ -51,6 +51,7 @@ import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 
 /**
@@ -332,12 +333,12 @@ public class InfrastructureManagerTest {
         }
 
         @Override
-        public void removeNode(Node node) throws RMException {
+        public void removeNode(RMNode node) throws RMException {
 
         }
 
         @Override
-        protected void notifyAcquiredNode(Node node) throws RMException {
+        protected void notifyAcquiredNode(RMNode node) throws RMException {
 
         }
 
@@ -347,7 +348,7 @@ public class InfrastructureManagerTest {
         }
 
         @Override
-        public void notifyDownNode(String nodeName, String nodeUrl, Node node) throws RMException {
+        public void notifyDownNode(String nodeName, String nodeUrl, RMNode node) throws RMException {
 
         }
 

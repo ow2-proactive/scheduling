@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.utils.NamesConvertor;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
 
 /**
@@ -89,17 +90,17 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void removeNode(Node node) throws RMException {
+    public void removeNode(RMNode node) throws RMException {
         try {
-            logger.info("Terminating the node " + node.getNodeInformation().getName());
-            String nodeUrl = node.getNodeInformation().getURL();
+            logger.info("Terminating the node " + node.getNodeName());
+            String nodeUrl = node.getNodeURL();
             if (containsDownNodeUrl(nodeUrl)) {
                 removeDownNodeUrl(nodeUrl);
-            } else if (!isThereNodesInSameJVM(node)) {
+            } else if (node.getNode() != null && !isThereNodesInSameJVM(node)) {
                 this.nodeSource.executeInParallel(() -> {
                     try {
-                        logger.info("Terminating the runtime " + node.getProActiveRuntime().getURL());
-                        node.getProActiveRuntime().killRT(false);
+                        logger.info("Terminating the runtime " + node.getNodeURL());
+                        node.getNode().getProActiveRuntime().killRT(false);
                     } catch (Exception e) {
                         // do nothing, no exception treatment for node just
                         // killed before
@@ -138,14 +139,18 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * @return true there is another node in the node's JVM handled by the
      *         nodeSource, false otherwise.
      */
-    public boolean isThereNodesInSameJVM(Node node) {
-        VMID nodeID = node.getVMInformation().getVMID();
-        String nodeToTestUrl = node.getNodeInformation().getURL();
-        Collection<Node> nodesList = nodeSource.getAliveNodes();
-        for (Node n : nodesList) {
-            if (!n.getNodeInformation().getURL().equals(nodeToTestUrl) &&
-                n.getVMInformation().getVMID().equals(nodeID)) {
-                return true;
+    public boolean isThereNodesInSameJVM(RMNode node) {
+        if (node.getNode() != null) {
+            VMID nodeID = node.getNode().getVMInformation().getVMID();
+            String nodeToTestUrl = node.getNodeURL();
+            Collection<RMNode> nodesList = nodeSource.getAliveNodes();
+            for (RMNode otherNode : nodesList) {
+                if (otherNode.getNode() != null) {
+                    if (!otherNode.getNodeURL().equals(nodeToTestUrl) &&
+                        otherNode.getNode().getVMInformation().getVMID().equals(nodeID)) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -155,22 +160,22 @@ public class DefaultInfrastructureManager extends InfrastructureManager {
      * {@inheritDoc}
      */
     @Override
-    public void notifyAcquiredNode(Node node) throws RMException {
+    public void notifyAcquiredNode(RMNode node) throws RMException {
         incrementNodesCount();
-        removeDownNodeUrl(node.getNodeInformation().getURL());
+        removeDownNodeUrl(node.getNodeURL());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void notifyDownNode(String nodeName, String nodeUrl, Node proactiveProgrammingNode) throws RMException {
+    public void notifyDownNode(String nodeName, String nodeUrl, RMNode node) throws RMException {
         addDownNodeUrl(nodeUrl);
     }
 
     @Override
-    public void onDownNodeReconnection(Node node) {
-        removeDownNodeUrl(node.getNodeInformation().getURL());
+    public void onDownNodeReconnection(RMNode node) {
+        removeDownNodeUrl(node.getNodeURL());
     }
 
     @Override

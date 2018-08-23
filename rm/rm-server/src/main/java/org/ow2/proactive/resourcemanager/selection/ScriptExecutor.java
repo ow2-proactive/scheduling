@@ -100,7 +100,7 @@ public class ScriptExecutor implements Callable<Node> {
                         logger.warn(rmnode.getNodeURL() + " : " + script.hashCode() + " exception",
                                     scriptResult.getException());
                         logger.warn(rmnode.getNodeURL() + " : pinging the node");
-                        rmnode.getNodeSource().pingNode(rmnode.getNode());
+                        rmnode.getNodeSource().pingNode(rmnode);
 
                         nodeMatch = false;
                         break;
@@ -168,7 +168,7 @@ public class ScriptExecutor implements Callable<Node> {
                 logger.warn(rmnode.getNodeURL() + " : pinging the node");
                 try {
                     // 'pingNode' call can fail with exception if NodeSource was destroyed
-                    rmnode.getNodeSource().pingNode(rmnode.getNode());
+                    rmnode.getNodeSource().pingNode(rmnode);
                 } catch (Throwable pingError) {
                     logger.warn(rmnode.getNodeURL() + " : nodeSource " + rmnode.getNodeSourceName() +
                                 " seems to be removed ", pingError);

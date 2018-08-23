@@ -99,11 +99,11 @@ public class NodeSourceTest {
 
         Node node = createNode(PROACTIVE_PROGRAMMING_NODE_URL);
 
-        nodeSource.internalAddNode(node);
+        nodeSource.internalAddNode(new RMNodeImpl(node, null, null, null));
 
         nodeSource.detectedPingedDownNode(node.getNodeInformation().getName(), node.getNodeInformation().getURL());
 
-        verify(infrastructureManager).internalNotifyDownNode(anyString(), anyString(), any(Node.class));
+        verify(infrastructureManager).internalNotifyDownNode(anyString(), anyString(), any(RMNode.class));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class NodeSourceTest {
 
         RMNode rmNode = new RMNodeImpl(node, nodeSource, client, mock(Permission.class));
 
-        nodeSource.internalAddNode(node);
+        nodeSource.internalAddNode(rmNode);
         nodeSource.detectedPingedDownNode(node.getNodeInformation().getName(), node.getNodeInformation().getURL());
 
         assertThat(nodeSource.getDownNodes()).hasSize(1);
@@ -129,7 +129,7 @@ public class NodeSourceTest {
 
         RMNode rmNode = new RMNodeImpl(node, nodeSource, client, mock(Permission.class));
 
-        nodeSource.internalAddNode(node);
+        nodeSource.internalAddNode(rmNode);
 
         assertThat(nodeSource.getDownNodes()).hasSize(0);
 

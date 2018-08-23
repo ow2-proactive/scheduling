@@ -108,7 +108,7 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
         try {
             long numberOfNodesToDeploy = this.nodeSource.getDownNodes()
                                                         .stream()
-                                                        .map(node -> node.getNodeInformation().getURL())
+                                                        .map(node -> node.getNodeURL())
                                                         .peek(nodeUrl -> logger.info("Removing down node " + nodeUrl))
                                                         .map(nodeUrl -> this.nodeSource.getRMCore().removeNode(nodeUrl,
                                                                                                                true))

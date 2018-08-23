@@ -41,6 +41,7 @@ import org.ow2.proactive.process.ProcessExecutor;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 import org.ow2.proactive.resourcemanager.utils.CommandLineBuilder;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
@@ -324,37 +325,35 @@ public class LocalInfrastructure extends InfrastructureManager {
     }
 
     @Override
-    protected void notifyAcquiredNode(Node node) throws RMException {
+    protected void notifyAcquiredNode(RMNode node) throws RMException {
         incrementNumberOfAcquiredNodesWithLockAndPersist();
-        String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeInformation().getName());
+        String deployingNodeURL = this.buildDeployingNodeURL(node.getNodeName());
         ProcessExecutor associatedProcess = removeNodeAndMaybeKillProcessIfEmpty(deployingToProcessExecutors,
                                                                                  processExecutorsToDeploying,
                                                                                  deployingNodeURL,
                                                                                  false);
-        acquiredToProcessExecutors.put(node.getNodeInformation().getURL(), associatedProcess);
+        acquiredToProcessExecutors.put(node.getNodeURL(), associatedProcess);
         List<String> nodesUrls = processExecutorsToAcquired.putIfAbsent(associatedProcess,
-                                                                        Lists.newArrayList(node.getNodeInformation()
-                                                                                               .getURL()));
+                                                                        Lists.newArrayList(node.getNodeURL()));
         if (nodesUrls != null) {
-            nodesUrls.add(node.getNodeInformation().getURL());
+            nodesUrls.add(node.getNodeURL());
         }
     }
 
     @Override
-    public void removeNode(Node node) throws RMException {
-        logger.info("The node " + node.getNodeInformation().getURL() + " is removed from " +
-                    this.getClass().getSimpleName());
-        removeNodeAndShutdownProcessIfNeeded(node.getNodeInformation().getURL());
+    public void removeNode(RMNode node) throws RMException {
+        logger.info("The node " + node.getNodeURL() + " is removed from " + this.getClass().getSimpleName());
+        removeNodeAndShutdownProcessIfNeeded(node.getNodeURL());
     }
 
     @Override
-    public void notifyDownNode(String nodeName, String nodeUrl, Node node) {
+    public void notifyDownNode(String nodeName, String nodeUrl, RMNode node) {
         logger.debug("A down node is detected: " + nodeUrl + " from " + this.getClass().getSimpleName());
         decrementNumberOfAcquiredNodesWithLockAndPersist();
     }
 
     @Override
-    public void onDownNodeReconnection(Node node) {
+    public void onDownNodeReconnection(RMNode node) {
         incrementNumberOfAcquiredNodesWithLockAndPersist();
     }
 

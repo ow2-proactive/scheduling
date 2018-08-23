@@ -36,7 +36,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -88,7 +90,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
         this.restartRmAndCheckFinalState(false);
 
-        this.checkNodesStateAfterRecovery(NODE_NUMBER);
+        this.checkNodesStateAfterRecovery(NODE_NUMBER, 0);
     }
 
     @Test
@@ -100,7 +102,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
         this.restartRmAndCheckFinalState(true);
 
-        this.checkNodesStateAfterRecovery(NODE_NUMBER);
+        this.checkNodesStateAfterRecovery(NODE_NUMBER, NODE_NUMBER);
     }
 
     @Test
@@ -110,7 +112,7 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
 
         this.restartRmAndCheckFinalState(false);
 
-        this.checkNodesStateAfterRecovery(0);
+        this.checkNodesStateAfterRecovery(0, 0);
     }
 
     private void startRmWithConfig(String configurationFilePath) throws Exception {
@@ -174,17 +176,30 @@ public class RecoverLocalInfrastructureTest extends RMFunctionalTest {
         }
     }
 
-    private void checkNodesStateAfterRecovery(int expectedNumberOfNodes) {
+    private void checkNodesStateAfterRecovery(int expectedNbAliveNodes, int expectedNbDownNodes) {
         RMMonitorEventReceiver resourceManagerMonitor = (RMMonitorEventReceiver) this.resourceManager;
-        // the nodes should have been recovered too, and should be alive
+
         Set<String> allNodes = resourceManagerMonitor.getState().getAllNodes();
-        assertThat(allNodes.size()).isEqualTo(expectedNumberOfNodes);
+        assertThat(allNodes.size()).isEqualTo(expectedNbAliveNodes + expectedNbDownNodes);
+
         Set<String> nodeSourceNames = new HashSet<>();
         nodeSourceNames.add(NODE_SOURCE_NAME);
         Set<String> aliveNodeUrls = this.resourceManager.listAliveNodeUrls(nodeSourceNames);
-        assertThat(aliveNodeUrls.size()).isEqualTo(expectedNumberOfNodes);
 
-        if (expectedNumberOfNodes > 0) {
+        assertThat(aliveNodeUrls.size()).isEqualTo(expectedNbAliveNodes);
+
+        List<RMNodeEvent> nodeEvents = resourceManagerMonitor.getInitialState().getNodeEvents();
+        assertThat(nodeEvents.size()).isEqualTo(expectedNbAliveNodes + expectedNbDownNodes);
+        long nbFreeNodes = nodeEvents.stream()
+                                     .filter(nodeEvent -> nodeEvent.getNodeState().equals(NodeState.FREE))
+                                     .count();
+        assertThat(nbFreeNodes).isEqualTo(expectedNbAliveNodes);
+        long nbDownNodes = nodeEvents.stream()
+                                     .filter(nodeEvent -> nodeEvent.getNodeState().equals(NodeState.DOWN))
+                                     .count();
+        assertThat(nbDownNodes).isEqualTo(expectedNbDownNodes);
+
+        if (expectedNbAliveNodes > 0) {
             // the recovered nodes should be usable, try to lock/unlock them to see
             BooleanWrapper lockSucceeded = this.resourceManager.lockNodes(allNodes);
             assertThat(lockSucceeded).isEqualTo(new BooleanWrapper(true));
