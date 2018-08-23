@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -47,6 +48,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.common.util.LogFormatter;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -725,39 +727,44 @@ public abstract class Task extends CommonAttribute {
     public String display() {
         String nl = System.lineSeparator();
 
-        return "Task \'" + name + "\' : " + nl + "\tDescription = '" + description + "'" + nl +
-               (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl
-                                           : "") +
-               (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
-               (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
-                                               maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl
-                                             : "") +
-               "\ttag = " + tag + nl + "\tvariables = {" + nl +
-               Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}" + nl + "\tgenericInformation = {" +
-               nl + Joiner.on('\n').withKeyValueSeparator("=").join(genericInformation) + nl + "}" + nl +
-               "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
-               "\tParallelEnvironment = " + parallelEnvironment + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
-               "\tSelectionScripts = " + displaySelectionScripts() + nl + "\tForkEnvironment = " + forkEnvironment +
-               nl + "\tPreScript = " + ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
-               ((postScript != null) ? postScript.display() : null) + nl + "\tCleanScript = " +
-               ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
-               ((flowScript != null) ? flowScript.display() : null) + nl + "\tPreciousResult = " + preciousResult + nl +
-               "\tPreciousLogs = " + preciousLogs + nl + "\tRunAsMe = " + runAsMe + nl + "\tWallTime = " + wallTime +
-               nl + "\tDependences = " + dependences;
+        return "Task \'" + name + "\' : " +
+               nl + LogFormatter.addIndent("Description = '" + description + "'" +
+                                           nl + (restartTaskOnError.isSet()
+                                                                            ? "restartTaskOnError = '" +
+                                                                              restartTaskOnError.getValue() + '\'' + nl
+                                                                            : "") +
+                                           (onTaskError.isSet() ? "onTaskError = '" + onTaskError.getValue() + '\'' + nl
+                                                                : "") +
+                                           (maxNumberOfExecution.isSet() ? "maxNumberOfExecution = '" +
+                                                                           maxNumberOfExecution.getValue()
+                                                                                               .getIntegerValue() +
+                                                                           '\'' + nl
+                                                                         : "") +
+                                           "tag = " + tag + nl + LogFormatter.displayMap("variables", variables) + nl +
+                                           LogFormatter.displayMap("genericInformation", genericInformation) + nl +
+                                           "InputFiles = " + inputFiles + nl + "OutputFiles = " + outputFiles + nl +
+                                           "ParallelEnvironment = " + parallelEnvironment + nl + "FlowBlock = '" +
+                                           flowBlock + "'" + nl + "SelectionScripts = " + displaySelectionScripts() +
+                                           nl + "ForkEnvironment = " + forkEnvironment + nl + "PreScript = " +
+                                           ((preScript != null) ? preScript.display() : null) + nl + "PostScript = " +
+                                           ((postScript != null) ? postScript.display() : null) + nl +
+                                           "CleanScript = " + ((cScript != null) ? cScript.display() : null) + nl +
+                                           "FlowScript = " + ((flowScript != null) ? flowScript.display() : null) + nl +
+                                           "PreciousResult = " + preciousResult + nl + "PreciousLogs = " +
+                                           preciousLogs + nl + "RunAsMe = " + runAsMe + nl + "WallTime = " + wallTime +
+                                           nl + "Dependences = " + dependences);
     }
 
     private String displaySelectionScripts() {
-        if (sScripts == null)
-            return null;
-        String answer = "{ ";
-        for (int i = 0; i < sScripts.size(); i++) {
-            SelectionScript ss = sScripts.get(i);
-            if (ss != null) {
-                answer += ss.display() + ((i < sScripts.size() - 1) ? " , " : "");
-            }
+        StringBuilder answer = new StringBuilder("[");
+        if (sScripts != null && !sScripts.isEmpty()) {
+            answer.append(System.lineSeparator());
+            answer.append(LogFormatter.addIndent(sScripts.stream()
+                                                         .map(Script::display)
+                                                         .collect(Collectors.joining("," + System.lineSeparator()))));
         }
-        answer += " }";
-        return answer;
+        answer.append("]");
+        return answer.toString();
     }
 
     public ForkEnvironment getForkEnvironment() {

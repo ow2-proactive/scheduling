@@ -34,6 +34,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.common.util.LogFormatter;
 
 
 /**
@@ -139,17 +140,16 @@ public class TaskFlowJob extends Job {
     @Override
     public String display() {
         String nl = System.lineSeparator();
-        String answer = super.display();
-        return answer + nl + "\tTasks = " + displayAllTasks();
+        return super.display() + nl + LogFormatter.addIndent(displayAllTasks());
     }
 
     private String displayAllTasks() {
         String nl = System.lineSeparator();
-        String answer = "{" + nl;
+        StringBuilder answer = new StringBuilder("Tasks = {" + nl);
         for (String tid : tasks.keySet()) {
-            answer += tasks.get(tid).display() + nl + nl;
+            answer.append(LogFormatter.addIndent(tasks.get(tid).display())).append(nl).append(nl);
         }
-        answer += "}";
-        return answer;
+        answer.append("}");
+        return answer.toString();
     }
 }
