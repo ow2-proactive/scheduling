@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,9 +36,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeImpl;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeInformation;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.VMInformation;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -235,6 +240,7 @@ public class NodesRecoveryManager {
             logger.info("Node " + nodeUrl + " was looked up successfully");
         } catch (Exception e) {
             logger.info("Node " + nodeUrl + " could not be looked up");
+            node = new RecoveryNode(rmNodeData.getName(), rmNodeData.getNodeUrl());
             rmNodeData.setState(NodeState.DOWN);
         }
         return this.addRMNodeToCoreAndSource(nodeSource,
@@ -259,6 +265,83 @@ public class NodesRecoveryManager {
 
     private boolean isEligible(RMNode node) {
         return node != null && node.isFree() && !node.isLocked();
+    }
+
+    private class RecoveryNode implements Node {
+
+        private String name;
+
+        private String url;
+
+        private RecoveryNode(String name, String url) {
+            this.name = name;
+            this.url = url;
+        }
+
+        @Override
+        public NodeInformation getNodeInformation() {
+            return new NodeInformation() {
+                @Override
+                public String getName() {
+                    return RecoveryNode.this.name;
+                }
+
+                @Override
+                public String getURL() {
+                    return RecoveryNode.this.url;
+                }
+
+                @Override
+                public VMInformation getVMInformation() {
+                    return null;
+                }
+            };
+        }
+
+        @Override
+        public VMInformation getVMInformation() {
+            return null;
+        }
+
+        @Override
+        public ProActiveRuntime getProActiveRuntime() {
+            return null;
+        }
+
+        @Override
+        public Object[] getActiveObjects() throws NodeException, ActiveObjectCreationException {
+            return new Object[0];
+        }
+
+        @Override
+        public Object[] getActiveObjects(String s) throws NodeException, ActiveObjectCreationException {
+            return new Object[0];
+        }
+
+        @Override
+        public int getNumberOfActiveObjects() throws NodeException {
+            return 0;
+        }
+
+        @Override
+        public void killAllActiveObjects() throws NodeException, IOException {
+
+        }
+
+        @Override
+        public Object setProperty(String s, String s1) throws ProActiveException {
+            return null;
+        }
+
+        @Override
+        public String getProperty(String s) throws ProActiveException {
+            return "";
+        }
+
+        @Override
+        public String getThreadDump() throws ProActiveException {
+            return "";
+        }
     }
 
 }
