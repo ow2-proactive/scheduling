@@ -27,13 +27,19 @@ package org.ow2.proactive.scheduler.common.util;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.ow2.proactive.scheduler.common.task.UpdatableProperties;
 
 
 public class LogFormatter {
 
-    public static String displayMap(String name, Map<?, ?> content) {
+    private LogFormatter() {
+    }
+
+    public static String line(String name, Map<?, ?> content) {
         if (content.isEmpty()) {
             return name + " = {}";
         } else {
@@ -55,11 +61,43 @@ public class LogFormatter {
         if (numberOfIndents <= 0) {
             return content;
         } else {
-            final String lineIndent = IntStream.range(0, numberOfIndents).mapToObj(i -> "\t").reduce("",
-                                                                                                     String::concat);
+            String lineIndent = IntStream.range(0, numberOfIndents).mapToObj(i -> "\t").reduce("", String::concat);
             return Arrays.stream(content.split(System.lineSeparator()))
                          .map(s -> lineIndent + s)
                          .collect(Collectors.joining(System.lineSeparator()));
+        }
+    }
+
+    public static String lineWithQuotes(String name, Object value) {
+        return String.format("%s = '%s'", name, value);
+    }
+
+    public static String line(String name, Object value) {
+        if (value instanceof UpdatableProperties) {
+            UpdatableProperties prop = (UpdatableProperties) value;
+            return displayKeyValueIfSet(name, prop, prop::getValue);
+        } else {
+            return displayKeyValue(name, value);
+        }
+    }
+
+    private static String displayKeyValue(String name, Object value) {
+        return String.format("%s = %s", name, value);
+    }
+
+    private static String displayKeyValueIfSet(String name, UpdatableProperties prop, Supplier<?> supplier) {
+        if (prop.isSet()) {
+            return String.format("%s = '%s'", name, supplier.get());
+        } else {
+            return "";
+        }
+    }
+
+    public static String line(String name, Object value, Supplier<?> supplier) {
+        if (value != null) {
+            return String.format("%s = %s", name, supplier.get());
+        } else {
+            return String.format("%s = null", name);
         }
     }
 

@@ -25,12 +25,17 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.addIndent;
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.line;
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.lineWithQuotes;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -48,11 +53,8 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
-import org.ow2.proactive.scheduler.common.util.LogFormatter;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import com.google.common.base.Joiner;
 
 
 /**
@@ -725,43 +727,44 @@ public abstract class Task extends CommonAttribute {
     }
 
     public String display() {
-        String nl = System.lineSeparator();
+        return "Task '" + name + "' : " + System.lineSeparator() +
+               addIndent(Stream.of(lineWithQuotes("Description", description),
+                                   line("restartTaskOnError", restartTaskOnError),
+                                   line("onTaskError", onTaskError),
+                                   line("maxNumberOfExecution",
+                                        maxNumberOfExecution,
+                                        () -> maxNumberOfExecution.getValue().getIntegerValue()),
+                                   line("tag", tag),
+                                   line("variables", variables),
+                                   line("genericInformation", genericInformation),
+                                   line("InputFiles", inputFiles),
+                                   line("OutputFiles", outputFiles),
+                                   line("ParallelEnvironment", parallelEnvironment),
+                                   lineWithQuotes("FlowBlock", flowBlock),
+                                   line("SelectionScripts", displaySelectionScripts()),
+                                   line("ForkEnvironment", forkEnvironment),
 
-        return "Task \'" + name + "\' : " +
-               nl + LogFormatter.addIndent("Description = '" + description + "'" +
-                                           nl + (restartTaskOnError.isSet()
-                                                                            ? "restartTaskOnError = '" +
-                                                                              restartTaskOnError.getValue() + '\'' + nl
-                                                                            : "") +
-                                           (onTaskError.isSet() ? "onTaskError = '" + onTaskError.getValue() + '\'' + nl
-                                                                : "") +
-                                           (maxNumberOfExecution.isSet() ? "maxNumberOfExecution = '" +
-                                                                           maxNumberOfExecution.getValue()
-                                                                                               .getIntegerValue() +
-                                                                           '\'' + nl
-                                                                         : "") +
-                                           "tag = " + tag + nl + LogFormatter.displayMap("variables", variables) + nl +
-                                           LogFormatter.displayMap("genericInformation", genericInformation) + nl +
-                                           "InputFiles = " + inputFiles + nl + "OutputFiles = " + outputFiles + nl +
-                                           "ParallelEnvironment = " + parallelEnvironment + nl + "FlowBlock = '" +
-                                           flowBlock + "'" + nl + "SelectionScripts = " + displaySelectionScripts() +
-                                           nl + "ForkEnvironment = " + forkEnvironment + nl + "PreScript = " +
-                                           ((preScript != null) ? preScript.display() : null) + nl + "PostScript = " +
-                                           ((postScript != null) ? postScript.display() : null) + nl +
-                                           "CleanScript = " + ((cScript != null) ? cScript.display() : null) + nl +
-                                           "FlowScript = " + ((flowScript != null) ? flowScript.display() : null) + nl +
-                                           "PreciousResult = " + preciousResult + nl + "PreciousLogs = " +
-                                           preciousLogs + nl + "RunAsMe = " + runAsMe + nl + "WallTime = " + wallTime +
-                                           nl + "Dependences = " + dependences);
+                                   line("PreScript", preScript, () -> preScript.display()),
+                                   line("PostScript", postScript, () -> postScript.display()),
+                                   line("CleanScript", cScript, () -> cScript.display()),
+                                   line("FlowScript", flowScript, () -> flowScript.display()),
+
+                                   line("PreciousResult", preciousResult),
+                                   line("PreciousLogs", preciousLogs),
+                                   line("RunAsMe", runAsMe),
+                                   line("WallTime", wallTime),
+                                   line("Dependences", dependences))
+                               .filter(s -> !s.isEmpty())
+                               .collect(Collectors.joining(System.lineSeparator())));
     }
 
     private String displaySelectionScripts() {
         StringBuilder answer = new StringBuilder("[");
         if (sScripts != null && !sScripts.isEmpty()) {
             answer.append(System.lineSeparator());
-            answer.append(LogFormatter.addIndent(sScripts.stream()
-                                                         .map(Script::display)
-                                                         .collect(Collectors.joining("," + System.lineSeparator()))));
+            answer.append(addIndent(sScripts.stream()
+                                            .map(Script::display)
+                                            .collect(Collectors.joining("," + System.lineSeparator()))));
         }
         answer.append("]");
         return answer.toString();

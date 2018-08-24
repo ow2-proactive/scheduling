@@ -145,7 +145,8 @@ public class TaskFlowJob extends Job {
 
     private String displayAllTasks() {
         String nl = System.lineSeparator();
-        StringBuilder answer = new StringBuilder("Tasks = {" + nl);
+        StringBuilder answer = new StringBuilder("Tasks = {");
+        answer.append(nl);
         for (String tid : tasks.keySet()) {
             answer.append(LogFormatter.addIndent(tasks.get(tid).display())).append(nl).append(nl);
         }
