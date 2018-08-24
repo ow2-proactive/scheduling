@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.core;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -265,83 +266,6 @@ public class NodesRecoveryManager {
 
     private boolean isEligible(RMNode node) {
         return node != null && node.isFree() && !node.isLocked();
-    }
-
-    private class RecoveryNode implements Node {
-
-        private String name;
-
-        private String url;
-
-        private RecoveryNode(String name, String url) {
-            this.name = name;
-            this.url = url;
-        }
-
-        @Override
-        public NodeInformation getNodeInformation() {
-            return new NodeInformation() {
-                @Override
-                public String getName() {
-                    return RecoveryNode.this.name;
-                }
-
-                @Override
-                public String getURL() {
-                    return RecoveryNode.this.url;
-                }
-
-                @Override
-                public VMInformation getVMInformation() {
-                    return null;
-                }
-            };
-        }
-
-        @Override
-        public VMInformation getVMInformation() {
-            return null;
-        }
-
-        @Override
-        public ProActiveRuntime getProActiveRuntime() {
-            return null;
-        }
-
-        @Override
-        public Object[] getActiveObjects() throws NodeException, ActiveObjectCreationException {
-            return new Object[0];
-        }
-
-        @Override
-        public Object[] getActiveObjects(String s) throws NodeException, ActiveObjectCreationException {
-            return new Object[0];
-        }
-
-        @Override
-        public int getNumberOfActiveObjects() throws NodeException {
-            return 0;
-        }
-
-        @Override
-        public void killAllActiveObjects() throws NodeException, IOException {
-
-        }
-
-        @Override
-        public Object setProperty(String s, String s1) throws ProActiveException {
-            return null;
-        }
-
-        @Override
-        public String getProperty(String s) throws ProActiveException {
-            return "";
-        }
-
-        @Override
-        public String getThreadDump() throws ProActiveException {
-            return "";
-        }
     }
 
 }
