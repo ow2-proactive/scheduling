@@ -69,7 +69,7 @@ public class LogFormatter {
     }
 
     public static String lineWithQuotes(String name, Object value) {
-        if(value != null){
+        if (value != null) {
             return String.format("%s = '%s'", name, value);
         } else {
             return String.format("%s = null", name);
