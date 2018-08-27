@@ -8,6 +8,8 @@ dependencies {
     compile 'commons-io:commons-io:2.5'
     compile group: 'org.springframework', name: 'spring-expression', version: '4.2.5.RELEASE'
 
+    compile 'joda-time:joda-time:2.9.1'
+
     compile project(':common:common-api')
 
     runtime 'com.fasterxml.woodstox:woodstox-core:5.0.1'

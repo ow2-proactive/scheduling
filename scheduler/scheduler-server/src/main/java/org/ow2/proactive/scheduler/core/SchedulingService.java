@@ -65,7 +65,6 @@ import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.policy.Policy;
-import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -186,6 +185,10 @@ public class SchedulingService {
 
     public boolean isSubmitPossible() {
         return status.isSubmittable();
+    }
+
+    public boolean isPausedOrStopped() {
+        return status == SchedulerStatus.PAUSED || status == SchedulerStatus.STOPPED;
     }
 
     public boolean start() {
@@ -416,7 +419,7 @@ public class SchedulingService {
      * Should be called only by scheduling method impl when job scheduling starts
      */
     public Map<JobId, JobDescriptor> lockJobsToSchedule() {
-        return jobs.lockJobsToSchedule();
+        return jobs.lockJobsToSchedule(isPausedOrStopped());
     }
 
     /*
@@ -444,14 +447,12 @@ public class SchedulingService {
      * Should be called only by scheduling method impl while it holds job lock
      */
     public void simulateJobStartAndCancelIt(final List<EligibleTaskDescriptor> tasksToSchedule, final String errorMsg) {
-        infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
-            public void run() {
-                TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
-                try {
-                    terminationData.handleTermination(SchedulingService.this);
-                } catch (Exception e) {
-                    logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
-                }
+        infrastructure.getInternalOperationsThreadPool().submit(() -> {
+            TerminationData terminationData = jobs.simulateJobStart(tasksToSchedule, errorMsg);
+            try {
+                terminationData.handleTermination(SchedulingService.this);
+            } catch (Exception e) {
+                logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
             }
         });
     }
@@ -469,13 +470,7 @@ public class SchedulingService {
             if (status.isShuttingDown()) {
                 return false;
             }
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    return jobs.pauseJob(jobId);
-                }
-
-            }).get();
+            return infrastructure.getClientOperationsThreadPool().submit(() -> jobs.pauseJob(jobId)).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
@@ -486,13 +481,9 @@ public class SchedulingService {
             if (status.isShuttingDown()) {
                 return false;
             }
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    return jobs.updateStartAt(jobId, startAt);
-                }
-
-            }).get();
+            return infrastructure.getClientOperationsThreadPool()
+                                 .submit(() -> jobs.updateStartAt(jobId, startAt))
+                                 .get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
@@ -500,13 +491,10 @@ public class SchedulingService {
 
     public boolean restartAllInErrorTasks(final JobId jobId) {
         try {
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    Boolean result = jobs.restartAllInErrorTasks(jobId);
-                    wakeUpSchedulingThread();
-                    return result;
-                }
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                Boolean result = jobs.restartAllInErrorTasks(jobId);
+                wakeUpSchedulingThread();
+                return result;
             }).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
@@ -515,13 +503,10 @@ public class SchedulingService {
 
     public boolean resumeJob(final JobId jobId) {
         try {
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    Boolean result = jobs.resumeJob(jobId);
-                    wakeUpSchedulingThread();
-                    return result;
-                }
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                Boolean result = jobs.resumeJob(jobId);
+                wakeUpSchedulingThread();
+                return result;
             }).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
@@ -533,13 +518,10 @@ public class SchedulingService {
             return;
         }
         try {
-            infrastructure.getClientOperationsThreadPool().submit(new Runnable() {
-                @Override
-                public void run() {
-                    jlogger.info(jobId, "request to change the priority to " + priority);
-                    jobs.changeJobPriority(jobId, priority);
-                    wakeUpSchedulingThread();
-                }
+            infrastructure.getClientOperationsThreadPool().submit(() -> {
+                jlogger.info(jobId, "request to change the priority to " + priority);
+                jobs.changeJobPriority(jobId, priority);
+                wakeUpSchedulingThread();
             }).get();
         } catch (Exception e) {
             throw handleFutureWaitException(e);
@@ -569,17 +551,14 @@ public class SchedulingService {
         if (status.isUnusable()) {
             return;
         }
-        infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
-                try {
-                    terminationData.handleTermination(SchedulingService.this);
-                } catch (Exception e) {
-                    logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
-                }
-                wakeUpSchedulingThread();
+        infrastructure.getInternalOperationsThreadPool().submit(() -> {
+            TerminationData terminationData = jobs.restartTaskOnNodeFailure(task);
+            try {
+                terminationData.handleTermination(SchedulingService.this);
+            } catch (Exception e) {
+                logger.error("Exception occurred, fail to get variables into the cleaning script: ", e);
             }
+            wakeUpSchedulingThread();
         });
     }
 
@@ -606,18 +585,14 @@ public class SchedulingService {
                 return false;
             }
 
-            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    TerminationData terminationData = jobs.killJob(jobId);
-                    boolean jobKilled = terminationData.jobTerminated(jobId);
-                    submitTerminationDataHandler(terminationData);
-                    wakeUpSchedulingThread();
-                    return jobKilled;
-                }
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                TerminationData terminationData = jobs.killJob(jobId);
+                boolean jobKilled = terminationData.jobTerminated(jobId);
+                submitTerminationDataHandler(terminationData);
+                wakeUpSchedulingThread();
+                return jobKilled;
             }).get();
 
-            return result;
         } catch (Exception e) {
             throw handleFutureWaitException(e);
         }
@@ -635,18 +610,13 @@ public class SchedulingService {
                 return false;
             }
 
-            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    TerminationData terminationData = jobs.killTask(jobId, taskName);
-                    boolean taskKilled = terminationData.taskTerminated(jobId, taskName);
-                    submitTerminationDataHandler(terminationData);
-                    wakeUpSchedulingThread();
-                    return taskKilled;
-                }
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                TerminationData terminationData = jobs.killTask(jobId, taskName);
+                boolean taskKilled = terminationData.taskTerminated(jobId, taskName);
+                submitTerminationDataHandler(terminationData);
+                wakeUpSchedulingThread();
+                return taskKilled;
             }).get();
-
-            return result;
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
                 throw (UnknownTaskException) e.getCause();
@@ -667,18 +637,13 @@ public class SchedulingService {
                 return false;
             }
 
-            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    TerminationData terminationData = jobs.restartTask(jobId, taskName, restartDelay);
-                    boolean taskRestarted = terminationData.taskTerminated(jobId, taskName);
-                    submitTerminationDataHandler(terminationData);
-                    wakeUpSchedulingThread();
-                    return taskRestarted;
-                }
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                TerminationData terminationData = jobs.restartTask(jobId, taskName, restartDelay);
+                boolean taskRestarted = terminationData.taskTerminated(jobId, taskName);
+                submitTerminationDataHandler(terminationData);
+                wakeUpSchedulingThread();
+                return taskRestarted;
             }).get();
-
-            return result;
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
                 throw (UnknownTaskException) e.getCause();
@@ -699,15 +664,12 @@ public class SchedulingService {
                 return false;
             }
 
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    TerminationData terminationData = jobs.finishInErrorTask(jobId, taskName);
-                    boolean taskfinished = terminationData.taskTerminated(jobId, taskName);
-                    submitTerminationDataHandler(terminationData);
-                    wakeUpSchedulingThread();
-                    return taskfinished;
-                }
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                TerminationData terminationData = jobs.finishInErrorTask(jobId, taskName);
+                boolean taskfinished = terminationData.taskTerminated(jobId, taskName);
+                submitTerminationDataHandler(terminationData);
+                wakeUpSchedulingThread();
+                return taskfinished;
             }).get();
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
@@ -729,13 +691,10 @@ public class SchedulingService {
                 return false;
             }
 
-            return infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    jobs.restartInErrorTask(jobId, taskName);
-                    wakeUpSchedulingThread();
-                    return Boolean.TRUE;
-                }
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                jobs.restartInErrorTask(jobId, taskName);
+                wakeUpSchedulingThread();
+                return Boolean.TRUE;
             }).get();
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
@@ -753,18 +712,14 @@ public class SchedulingService {
     public boolean preemptTask(final JobId jobId, final String taskName, final int restartDelay)
             throws UnknownJobException, UnknownTaskException {
         try {
-            Boolean result = infrastructure.getClientOperationsThreadPool().submit(new Callable<Boolean>() {
-                @Override
-                public Boolean call() throws Exception {
-                    TerminationData terminationData = jobs.preemptTask(jobId, taskName, restartDelay);
-                    boolean taskRestarted = terminationData.taskTerminated(jobId, taskName);
-                    submitTerminationDataHandler(terminationData);
-                    wakeUpSchedulingThread();
-                    return taskRestarted;
-                }
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                TerminationData terminationData = jobs.preemptTask(jobId, taskName, restartDelay);
+                boolean taskRestarted = terminationData.taskTerminated(jobId, taskName);
+                submitTerminationDataHandler(terminationData);
+                wakeUpSchedulingThread();
+                return taskRestarted;
             }).get();
 
-            return result;
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownTaskException) {
                 throw (UnknownTaskException) e.getCause();
@@ -780,12 +735,9 @@ public class SchedulingService {
 
     public void listenJobLogs(final JobId jobId, final AppenderProvider appenderProvider) throws UnknownJobException {
         try {
-            infrastructure.getClientOperationsThreadPool().submit(new Callable<Void>() {
-                @Override
-                public Void call() throws UnknownJobException {
-                    getListenJobLogsSupport().listenJobLogs(jobId, appenderProvider);
-                    return null;
-                }
+            infrastructure.getClientOperationsThreadPool().submit((Callable<Void>) () -> {
+                getListenJobLogsSupport().listenJobLogs(jobId, appenderProvider);
+                return null;
             }).get();
         } catch (ExecutionException e) {
             if (e.getCause() instanceof UnknownJobException) {
@@ -799,17 +751,13 @@ public class SchedulingService {
     }
 
     public void taskTerminatedWithResult(final TaskId taskId, final TaskResult taskResult) {
-        infrastructure.getInternalOperationsThreadPool().submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    TerminationData terminationData = jobs.taskTerminatedWithResult(taskId,
-                                                                                    (TaskResultImpl) taskResult);
-                    terminationData.handleTermination(SchedulingService.this);
-                    wakeUpSchedulingThread();
-                } catch (Throwable e) {
-                    logger.error("Failed to terminate task " + taskId, e);
-                }
+        infrastructure.getInternalOperationsThreadPool().submit(() -> {
+            try {
+                TerminationData terminationData = jobs.taskTerminatedWithResult(taskId, (TaskResultImpl) taskResult);
+                terminationData.handleTermination(SchedulingService.this);
+                wakeUpSchedulingThread();
+            } catch (Throwable e) {
+                logger.error("Failed to terminate task " + taskId, e);
             }
         });
     }
@@ -970,10 +918,8 @@ public class SchedulingService {
 
         if (SCHEDULER_REMOVED_JOB_DELAY > 0 || SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {
             logger.debug("Removing non-managed jobs");
-            Iterator<InternalJob> iterJob = recoveredState.getFinishedJobs().iterator();
 
-            while (iterJob.hasNext()) {
-                final InternalJob job = iterJob.next();
+            for (InternalJob job : recoveredState.getFinishedJobs()) {
                 //re-set job removed delay (if job result has been sent to user)
                 long toWait = 0;
                 if (job.isToBeRemoved()) {
@@ -994,10 +940,7 @@ public class SchedulingService {
     }
 
     private void recoverTasksState(List<InternalJob> jobs, boolean restoreInErrorTasks) {
-        Iterator<InternalJob> iterJob = jobs.iterator();
-        while (iterJob.hasNext()) {
-            InternalJob job = iterJob.next();
-
+        for (InternalJob job : jobs) {
             int faultyTasksCount = 0;
 
             for (InternalTask internalTask : job.getITasks()) {

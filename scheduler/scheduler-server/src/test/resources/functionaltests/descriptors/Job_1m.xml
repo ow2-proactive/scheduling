@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.11"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd"
+        name="Job_to_block"
+        priority="normal"
+        onTaskError="cancelJob"
+        maxNumberOfExecution="1"
+        restartTaskOnError="elsewhere"
+>
+    <description>
+        <![CDATA[ A workflow that executes groovy in JVM. ]]>
+    </description>
+    <taskFlow>
+        <task name="WaitIng_Task" onTaskError="cancelJob">
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+Thread.sleep(30000)
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <metadata>
+                <positionTop>
+                    478
+                </positionTop>
+                <positionLeft>
+                    768
+                </positionLeft>
+            </metadata>
+        </task>
+    </taskFlow>
+</job>

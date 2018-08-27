@@ -26,14 +26,18 @@
 package org.ow2.proactive.scheduler.common.job;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 
 import com.google.common.base.Joiner;
 
@@ -57,16 +61,28 @@ import com.google.common.base.Joiner;
 @PublicAPI
 public abstract class Job extends CommonAttribute {
 
-    /** Name of the job */
+    private static final Logger LOGGER = Logger.getLogger(Job.class);
+
+    public static final String JOB_DDL = "JOB_DDL";
+
+    /**
+     * Name of the job
+     */
     protected String name = SchedulerConstants.JOB_DEFAULT_NAME;
 
-    /** Short description of this job */
+    /**
+     * Short description of this job
+     */
     protected String description = "No description";
 
-    /** Project name for this job */
+    /**
+     * Project name for this job
+     */
     protected String projectName = "Not Assigned";
 
-    /** Job priority */
+    /**
+     * Job priority
+     */
     protected JobPriority priority = JobPriority.NORMAL;
 
     protected String inputSpace = null;
@@ -77,10 +93,14 @@ public abstract class Job extends CommonAttribute {
 
     protected String userSpace = null;
 
-    /** A map to holds job descriptor variables */
+    /**
+     * A map to holds job descriptor variables
+     */
     protected Map<String, JobVariable> variables = Collections.synchronizedMap(new LinkedHashMap());
 
-    /** ProActive Empty Constructor */
+    /**
+     * ProActive Empty Constructor
+     */
     public Job() {
     }
 
@@ -154,7 +174,7 @@ public abstract class Job extends CommonAttribute {
 
     /**
      * Returns the project Name.
-     * 
+     *
      * @return the project Name.
      */
     public String getProjectName() {
@@ -234,7 +254,7 @@ public abstract class Job extends CommonAttribute {
 
     /**
      * Sets the variable map for this job.
-     * 
+     *
      * @param variables the variables map
      */
     public void setVariables(Map<String, JobVariable> variables) {
@@ -254,7 +274,7 @@ public abstract class Job extends CommonAttribute {
 
     /**
      * Returns the variable map of this job.
-     * 
+     *
      * @return a variable map
      */
     public Map<String, JobVariable> getVariables() {
@@ -295,5 +315,20 @@ public abstract class Job extends CommonAttribute {
                "\tOutputSpace = '" + outputSpace + '\'' + nl + "\tGlobalSpace = '" + globalSpace + '\'' + nl +
                "\tUserSpace = '" + userSpace + '\'' + nl + "\tVariables = {" + nl +
                Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}";
+    }
+
+    /**
+     * @return job deadline if it exists
+     * (currently deadline can be set as job GI vairable in ISO8601 date format)
+     */
+    public Optional<Date> getJobDeadline() {
+        if (genericInformation.containsKey(JOB_DDL)) {
+            try {
+                return Optional.of(ISO8601DateUtil.toDate(genericInformation.get(JOB_DDL)));
+            } catch (Exception e) {
+                LOGGER.warn("Imposible to parse JOB_DDL GI variable as ISO8601 date", e);
+            }
+        }
+        return Optional.empty();
     }
 }

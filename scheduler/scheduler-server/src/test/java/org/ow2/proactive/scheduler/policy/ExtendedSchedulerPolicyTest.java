@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -47,7 +48,6 @@ import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 import org.ow2.tests.ProActiveTestClean;
 
 

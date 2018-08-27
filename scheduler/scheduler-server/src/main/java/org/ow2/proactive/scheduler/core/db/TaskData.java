@@ -72,6 +72,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.InputSelector;
 import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
+import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -83,7 +84,6 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -1198,8 +1198,7 @@ public class TaskData {
 
     public TaskInfo toTaskInfo() {
         JobIdImpl jobId = new JobIdImpl(getJobData().getId(), getJobData().getJobName());
-        TaskInfoImpl taskInfo = createTaskInfo(jobId);
-        return taskInfo;
+        return createTaskInfo(jobId);
     }
 
     public TaskState toTaskState() {

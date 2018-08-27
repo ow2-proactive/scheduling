@@ -120,14 +120,12 @@ final class TerminationData {
 
     private final InternalTaskParentFinder internalTaskParentFinder;
 
-    static final TerminationData EMPTY = new TerminationData(Collections.<JobId> emptySet(),
-                                                             Collections.<TaskIdWrapper, TaskTerminationData> emptyMap(),
-                                                             Collections.<TaskIdWrapper, TaskRestartData> emptyMap());
+    static final TerminationData EMPTY = new TerminationData(Collections.emptySet(),
+                                                             Collections.emptyMap(),
+                                                             Collections.emptyMap());
 
     static TerminationData newTerminationData() {
-        return new TerminationData(new HashSet<JobId>(),
-                                   new HashMap<TaskIdWrapper, TaskTerminationData>(),
-                                   new HashMap<TaskIdWrapper, TaskRestartData>());
+        return new TerminationData(new HashSet<>(), new HashMap<>(), new HashMap<>());
     }
 
     private TerminationData(Set<JobId> jobsToTerminate, Map<TaskIdWrapper, TaskTerminationData> tasksToTerminate,
@@ -186,11 +184,8 @@ final class TerminationData {
 
     private void restartWaitingTasks(final SchedulingService service) {
         for (final TaskRestartData restartData : tasksToRestart.values()) {
-            service.getInfrastructure().schedule(new Runnable() {
-                public void run() {
-                    service.getJobs().restartWaitingTask(restartData.taskId);
-                }
-            }, restartData.waitTime);
+            service.getInfrastructure().schedule(() -> service.getJobs().restartWaitingTask(restartData.taskId),
+                                                 restartData.waitTime);
         }
     }
 
@@ -207,20 +202,17 @@ final class TerminationData {
 
             for (final TaskTerminationData taskToTerminate : tasksToTerminate.values()) {
 
-                callables.add(new Callable<Void>() {
-                    @Override
-                    public Void call() throws Exception {
-                        try {
-                            RunningTaskData taskData = taskToTerminate.taskData;
-                            if (taskToTerminate.terminatedWhileRunning()) {
-                                terminateRunningTask(service, taskToTerminate, taskData);
-                            }
-                        } catch (Throwable e) {
-                            logger.error("Failed to terminate task " + taskToTerminate.taskData.getTask().getName(), e);
-                            throw new RuntimeException(e);
+                callables.add(() -> {
+                    try {
+                        RunningTaskData taskData = taskToTerminate.taskData;
+                        if (taskToTerminate.terminatedWhileRunning()) {
+                            terminateRunningTask(service, taskToTerminate, taskData);
                         }
-                        return null;
+                    } catch (Throwable e) {
+                        logger.error("Failed to terminate task " + taskToTerminate.taskData.getTask().getName(), e);
+                        throw new RuntimeException(e);
                     }
+                    return null;
                 });
             }
             parallelTerminationService.invokeAll(callables);
