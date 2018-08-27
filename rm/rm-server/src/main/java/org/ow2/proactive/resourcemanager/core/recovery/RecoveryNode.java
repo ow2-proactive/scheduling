@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.core;
+package org.ow2.proactive.resourcemanager.core.recovery;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -106,7 +106,7 @@ public class RecoveryNode implements Node, Serializable {
 
     @Override
     public void killAllActiveObjects() throws NodeException, IOException {
-
+        // nothing to do
     }
 
     @Override

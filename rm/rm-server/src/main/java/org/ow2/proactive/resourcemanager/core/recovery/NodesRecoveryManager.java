@@ -23,10 +23,8 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.core;
+package org.ow2.proactive.resourcemanager.core.recovery;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,15 +35,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeInformation;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.VMInformation;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
@@ -74,11 +67,11 @@ public class NodesRecoveryManager {
 
     private NodesLockRestorationManager nodesLockRestorationManager;
 
-    protected NodesRecoveryManager(RMCore rmCore) {
+    public NodesRecoveryManager(RMCore rmCore) {
         this.rmCore = rmCore;
     }
 
-    protected void initialize() {
+    public void initialize() {
         this.initNodesRestorationManager();
     }
 
@@ -92,7 +85,7 @@ public class NodesRecoveryManager {
         }
     }
 
-    protected void restoreLock(RMNode rmNode, Client provider) {
+    public void restoreLock(RMNode rmNode, Client provider) {
         this.nodesLockRestorationManager.handle(rmNode, provider);
     }
 
@@ -100,7 +93,7 @@ public class NodesRecoveryManager {
         return NodesLockRestorationManager::new;
     }
 
-    protected void recoverNodeSourcesAndNodes() {
+    public void recoverNodeSourcesAndNodes() {
         Collection<NodeSourceData> nodeSources = this.rmCore.getDbManager().getNodeSources();
         this.logPersistedNodeSourceInfo(nodeSources);
 
@@ -115,7 +108,7 @@ public class NodesRecoveryManager {
         }
     }
 
-    protected boolean recoverFullyDeployedInfrastructureOrReset(String nodeSourceName, NodeSource nodeSourceToDeploy,
+    public boolean recoverFullyDeployedInfrastructureOrReset(String nodeSourceName, NodeSource nodeSourceToDeploy,
             NodeSourceDescriptor descriptor) {
         boolean recoverNodes = false;
         boolean existPersistedNodes = this.existPersistedNodes(nodeSourceName);
@@ -135,7 +128,7 @@ public class NodesRecoveryManager {
         return recoverNodes;
     }
 
-    protected void recoverNodes(NodeSource nodeSource) {
+    public void recoverNodes(NodeSource nodeSource) {
         logger.info(START_TO_RECOVER_NODES); // this log line is important for performance tests
         String nodeSourceName = nodeSource.getName();
         Collection<RMNodeData> nodesData = this.rmCore.getDbManager().getNodesByNodeSource(nodeSourceName);
@@ -155,7 +148,7 @@ public class NodesRecoveryManager {
         this.logNodeRecoverySummary(nodeSourceName, recoveredNodeStatesCounter, recoveredEligibleNodes.size());
     }
 
-    protected void logRecoveryAbortedReason(String nodeSourceName, String reason) {
+    public void logRecoveryAbortedReason(String nodeSourceName, String reason) {
         logger.info("Not recovering node source " + nodeSourceName + ": " + reason);
     }
 
