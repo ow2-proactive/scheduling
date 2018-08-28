@@ -234,7 +234,7 @@ public class NodesRecoveryManager {
             logger.info("Node " + nodeUrl + " was looked up successfully");
         } catch (Exception e) {
             logger.info("Node " + nodeUrl + " could not be looked up");
-            node = new RecoveryNode(rmNodeData.getName(), rmNodeData.getNodeUrl());
+            node = new FakeDownNodeForRecovery(rmNodeData.getName(), rmNodeData.getNodeUrl());
             rmNodeData.setState(NodeState.DOWN);
         }
         return this.addRMNodeToCoreAndSource(nodeSource,

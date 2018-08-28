@@ -48,13 +48,13 @@ import org.objectweb.proactive.core.runtime.VMInformation;
  * {@link Node} because they are handled as this in lifecycle policies, in which
  * mostly the node's URL is used to ensure proper handling.
  */
-public class RecoveryNode implements Node, Serializable {
+public class FakeDownNodeForRecovery implements Node, Serializable {
 
     private String name;
 
     private String url;
 
-    public RecoveryNode(String name, String url) {
+    public FakeDownNodeForRecovery(String name, String url) {
         this.name = name;
         this.url = url;
     }
@@ -64,12 +64,12 @@ public class RecoveryNode implements Node, Serializable {
         return new NodeInformation() {
             @Override
             public String getName() {
-                return RecoveryNode.this.name;
+                return FakeDownNodeForRecovery.this.name;
             }
 
             @Override
             public String getURL() {
-                return RecoveryNode.this.url;
+                return FakeDownNodeForRecovery.this.url;
             }
 
             @Override
@@ -116,7 +116,7 @@ public class RecoveryNode implements Node, Serializable {
 
     @Override
     public String getProperty(String s) throws ProActiveException {
-        return "";
+        return null;
     }
 
     @Override
