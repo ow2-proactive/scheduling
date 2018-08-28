@@ -88,6 +88,7 @@ import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.core.recovery.NodesRecoveryManager;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
@@ -1015,7 +1016,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, preemptive, isTriggeredFromShutdownHook));
     }
 
-    protected void setEligibleNodesToRecover(List<RMNode> eligibleNodes) {
+    public void setEligibleNodesToRecover(List<RMNode> eligibleNodes) {
         this.eligibleNodes = eligibleNodes;
     }
 
@@ -1564,7 +1565,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @param nodeSourceDescriptor the descriptor of the node source to recover
      */
-    protected void recoverNodeSource(NodeSourceDescriptor nodeSourceDescriptor) {
+    public void recoverNodeSource(NodeSourceDescriptor nodeSourceDescriptor) {
 
         String nodeSourceName = nodeSourceDescriptor.getName();
         NodeSource nodeSource = this.createNodeSourceInstance(nodeSourceDescriptor);
@@ -1580,6 +1581,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 recoverNodes = this.nodesRecoveryManager.recoverFullyDeployedInfrastructureOrReset(nodeSourceName,
                                                                                                    nodeSourceToDeploy,
                                                                                                    nodeSourceDescriptor);
+            } else {
+                this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName,
+                                                                   "Recovery is not enabled for this node source");
             }
 
             NodeSourcePolicy nodeSourcePolicyStub = this.createNodeSourcePolicyActivity(nodeSourceDescriptor,
@@ -1596,6 +1600,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                              nodeSourcePolicyStub);
 
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
+        } else {
+            this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName, "This node source is undeployed");
         }
     }
 
@@ -2492,7 +2498,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return lockNodes(urls, caller);
     }
 
-    protected BooleanWrapper lockNodes(Set<String> urls, final Client caller) {
+    public BooleanWrapper lockNodes(Set<String> urls, final Client caller) {
         return mapOnNodeUrlSet(urls, new Predicate<RMNode>() {
             @Override
             public boolean apply(RMNode node) {
