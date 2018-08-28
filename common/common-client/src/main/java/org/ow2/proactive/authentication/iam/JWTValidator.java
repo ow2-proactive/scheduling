@@ -32,8 +32,8 @@ import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.AssertionImpl;
 import org.jasig.cas.client.validation.TicketValidationException;
 import org.jasig.cas.client.validation.TicketValidator;
-
-import io.jsonwebtoken.Claims;
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.MalformedClaimException;
 
 
 public class JWTValidator implements TicketValidator {
@@ -120,17 +120,29 @@ public class JWTValidator implements TicketValidator {
     public Assertion validate(String jsonWebToken, String service) throws TicketValidationException {
 
         // Parse JWT and get attributes
-        Claims claims = JWTUtils.parseToken(jsonWebToken);
+        JwtClaims claims = JWTUtils.parseJWT(jsonWebToken,
+                                             jsonWebTokenSigned,
+                                             jsonWebTokenSignatureKey,
+                                             jsonWebTokenEncrypted,
+                                             jsonWebTokenEncryptionKey,
+                                             iamServerUrlPrefix,
+                                             service);
 
-        // Extract JWT principal from attributes
-        AttributePrincipal principal = new AttributePrincipalImpl(claims.getSubject());
+        try {
+            // Extract JWT principal from attributes
+            AttributePrincipal principal = new AttributePrincipalImpl(claims.getSubject());
 
-        //Create authentication assertion
-        Assertion assertion = new AssertionImpl(new AttributePrincipalImpl(principal.getName(), claims));
+            //Create authentication assertion
+            Assertion assertion = new AssertionImpl(new AttributePrincipalImpl(principal.getName(),
+                                                                               claims.getClaimsMap()));
 
-        logger.debug("Assertion generated for principal " + principal.getName());
+            logger.debug("Assertion generated for principal " + principal.getName());
 
-        return assertion;
+            return assertion;
+        } catch (MalformedClaimException e) {
+            throw new IAMException("");
+        }
+
     }
 
 }
