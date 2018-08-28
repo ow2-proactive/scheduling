@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
 import org.ow2.proactive.scheduler.synchronization.Synchronization;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
@@ -201,18 +202,27 @@ public class RMProxyActiveObject {
             Decrypter decrypter = new Decrypter(Credentials.getPrivateKey(privateKeyPath));
             decrypter.setCredentials(creds);
 
+            Node node = nodes.get(0);
+            String nodeUrl = node.getNodeInformation().getURL();
+            String nodeName = node.getNodeInformation().getName();
+
             HashMap<String, Serializable> dictionary = new HashMap<>();
 
             dictionary.putAll(variables.getScriptMap());
             dictionary.putAll(variables.getInheritedMap());
             dictionary.putAll(variables.getPropagatedVariables());
             dictionary.putAll(variables.getScopeMap());
+            dictionary.put(SchedulerVars.PA_NODE_URL.toString(), nodeUrl);
+            dictionary.put(SchedulerVars.PA_NODE_NAME.toString(), nodeName);
 
             //start handler for binding
-            ScriptHandler handler = ScriptLoader.createHandler(nodes.get(0));
+
+            ScriptHandler handler = ScriptLoader.createHandler(node);
             VariablesMap resolvedMap = new VariablesMap();
             resolvedMap.setInheritedMap(VariableSubstitutor.resolveVariables(variables.getInheritedMap(), dictionary));
             resolvedMap.setScopeMap(VariableSubstitutor.resolveVariables(variables.getScopeMap(), dictionary));
+            resolvedMap.put(SchedulerVars.PA_NODE_URL.toString(), nodeUrl);
+            resolvedMap.put(SchedulerVars.PA_NODE_NAME.toString(), nodeName);
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) resolvedMap);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
             handler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME, store);

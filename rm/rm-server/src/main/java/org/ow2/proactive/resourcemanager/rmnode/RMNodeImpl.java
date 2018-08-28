@@ -103,6 +103,10 @@ public class RMNodeImpl extends AbstractRMNode {
     /** true if node is protected with token */
     private boolean protectedByToken = false;
 
+    public static final String NODE_URL_BINDING = "nodeurl";
+
+    public static final String NODE_NAME_BINDING = "nodename";
+
     /**
      * Constructs a new instance. Initial state is set to {@link NodeState#FREE}.
      *
@@ -317,6 +321,12 @@ public class RMNodeImpl extends AbstractRMNode {
             if (bindings != null) {
                 for (String key : bindings.keySet()) {
                     this.handler.addBinding(key, bindings.get(key));
+                }
+                if (!bindings.containsKey(NODE_URL_BINDING)) {
+                    this.handler.addBinding(NODE_URL_BINDING, this.getNode().getNodeInformation().getURL());
+                }
+                if (!bindings.containsKey(NODE_NAME_BINDING)) {
+                    this.handler.addBinding(NODE_NAME_BINDING, this.getNode().getNodeInformation().getName());
                 }
             }
             return this.handler.handle(script);

@@ -301,6 +301,8 @@ public class TaskContextVariableExtractor implements Serializable {
         variables.put(SchedulerVars.PA_NODESNUMBER.toString(), taskContext.getOtherNodesURLs().size() + 1);
         variables.put(SchedulerVars.PA_SCHEDULER_REST_URL.toString(), initializer.getSchedulerRestUrl());
         variables.put(SchedulerVars.PA_CATALOG_REST_URL.toString(), initializer.getCatalogRestUrl());
+        variables.put(SchedulerVars.PA_NODE_URL.toString(), taskContext.getNodeUrl());
+        variables.put(SchedulerVars.PA_NODE_NAME.toString(), taskContext.getNodeName());
 
         return variables;
     }

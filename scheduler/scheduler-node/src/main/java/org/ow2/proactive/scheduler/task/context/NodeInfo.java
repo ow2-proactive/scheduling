@@ -23,26 +23,30 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.task;
+package org.ow2.proactive.scheduler.task.context;
 
-/**
- * Scheduler related java properties.
- */
-public enum SchedulerVars {
-    PA_JOB_ID,
-    PA_JOB_NAME,
-    PA_NODESFILE,
-    PA_NODESNUMBER,
-    PA_SCHEDULER_HOME,
-    PA_TASK_ID,
-    PA_TASK_NAME,
-    PA_TASK_ITERATION,
-    PA_TASK_PROGRESS_FILE,
-    PA_TASK_REPLICATION,
-    PA_TASK_SUCCESS,
-    PA_USER,
-    PA_SCHEDULER_REST_URL,
-    PA_CATALOG_REST_URL,
-    PA_NODE_URL,
-    PA_NODE_NAME
+public class NodeInfo {
+    private final String currentNodeHostname;
+
+    private final String currentNodeUrl;
+
+    private final String currentNodeName;
+
+    public NodeInfo(String currentNodeHostname, String currentNodeUrl, String currentNodeName) {
+        this.currentNodeHostname = currentNodeHostname;
+        this.currentNodeUrl = currentNodeUrl;
+        this.currentNodeName = currentNodeName;
+    }
+
+    public String getCurrentNodeHostname() {
+        return currentNodeHostname;
+    }
+
+    public String getCurrentNodeUrl() {
+        return currentNodeUrl;
+    }
+
+    public String getCurrentNodeName() {
+        return currentNodeName;
+    }
 }
