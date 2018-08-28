@@ -34,10 +34,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
+import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
-import org.ow2.proactive.scheduler.util.policy.ISO8601DateUtil;
 
 
 /**
