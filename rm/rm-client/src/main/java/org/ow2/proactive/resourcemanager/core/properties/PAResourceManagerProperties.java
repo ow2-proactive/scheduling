@@ -260,6 +260,13 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     RM_PRESERVE_NODES_ON_SHUTDOWN("pa.rm.preserve.nodes.on.shutdown", PropertyType.BOOLEAN, "false"),
 
     /**
+     * Defines the frequency in minutes with which the down nodes managed by
+     * the Resource Manager are listed and removed from their respective node
+     * source. The default value is 24h (1440 minutes).
+     */
+    RM_REMOVE_DOWN_NODES_FREQUENCY("pa.rm.remove.down.nodes.frequency", PropertyType.INTEGER, "1440"),
+
+    /**
      * Defines whether the node recovery mechanism is enabled on RM startup.
      * If set to {@code true}, it indicates that the node states and the node
      * source infrastructure states should be reloaded from database.
