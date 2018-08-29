@@ -54,15 +54,14 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
+import org.ow2.proactive.scheduler.task.context.NodeInfo;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.InProcessTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
@@ -100,7 +99,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -125,7 +124,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                             null,
                                                             new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                             "",
-                                                            ""),
+                                                            new NodeInfo("", "", "")),
                                             taskOutput.outputStream,
                                             taskOutput.error);
 
@@ -150,7 +149,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -177,7 +176,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                             null,
                                                             new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                             "",
-                                                            ""),
+                                                            new NodeInfo("", "", "")),
                                             taskOutput.outputStream,
                                             taskOutput.error);
 
@@ -208,7 +207,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -240,7 +239,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -270,7 +269,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -303,7 +302,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                             previousTasksResults,
                                                             new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                             "",
-                                                            ""),
+                                                            new NodeInfo("", "", "")),
                                             taskOutput.outputStream,
                                             taskOutput.error);
 
@@ -325,7 +324,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                             previousTasksResults,
                                                             new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                             "",
-                                                            ""),
+                                                            new NodeInfo("", "", "")),
                                             taskOutput.outputStream,
                                             taskOutput.error);
 
@@ -350,7 +349,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -378,7 +377,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -406,7 +405,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -434,7 +433,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -461,7 +460,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                            "",
                                                                                                            ""),
                                                                                     "",
-                                                                                    ""),
+                                                                                    new NodeInfo("", "", "")),
                                                                     taskOutput.outputStream,
                                                                     taskOutput.error);
 
@@ -485,7 +484,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                             null,
                                                             new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                             "",
-                                                            ""),
+                                                            new NodeInfo("", "", "")),
                                             taskOutput.outputStream,
                                             taskOutput.error);
 
@@ -515,7 +514,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                   "",
-                                                  "",
+                                                  new NodeInfo("", "", ""),
                                                   decrypter);
         new InProcessTaskExecutor().execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
@@ -535,7 +534,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                             null,
                                                             new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                             "",
-                                                            ""),
+                                                            new NodeInfo("", "", "")),
                                             taskOutput.outputStream,
                                             taskOutput.error);
 
@@ -563,7 +562,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                      "",
                                                                      ""),
                                               "",
-                                              "thisHost");
+                                              new NodeInfo("thisHost", "", ""));
         TaskResultImpl taskResult = new InProcessTaskExecutor().execute(context,
                                                                         taskOutput.outputStream,
                                                                         taskOutput.error);
@@ -593,7 +592,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                      "",
                                                                      ""),
                                               "",
-                                              "thisHost");
+                                              new NodeInfo("thisHost", "", ""));
         TaskResultImpl taskResult = new InProcessTaskExecutor().execute(context,
                                                                         taskOutput.outputStream,
                                                                         taskOutput.error);
