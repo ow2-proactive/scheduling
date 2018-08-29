@@ -25,14 +25,21 @@
  */
 package org.ow2.proactive.authentication.iam;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.impl.DefaultClaims;
+import org.apache.commons.codec.binary.Base64;
+import org.jose4j.jwa.AlgorithmConstraints;
+import org.jose4j.jwe.JsonWebEncryption;
+import org.jose4j.jwk.JsonWebKey;
+import org.jose4j.jws.AlgorithmIdentifiers;
+import org.jose4j.jws.JsonWebSignature;
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.consumer.InvalidJwtException;
+import org.jose4j.jwt.consumer.JwtConsumer;
+import org.jose4j.jwt.consumer.JwtConsumerBuilder;
+import org.jose4j.keys.AesKey;
+import org.jose4j.lang.JoseException;
 
 
 public class JWTUtils {
@@ -42,38 +49,141 @@ public class JWTUtils {
     }
 
     /**
-     * Tries to parse specified String as a JWT token. If successful, returns the set of claims (extracted from the token body).
-     * If unsuccessful (token is invalid or not containing all required properties), simply returns null.
+     * Parse secured JWT (Json Web Token). If successful, returns the set of claims extracted from the token body.
      *
-     * @param token the JWT token to parse
-     * @return the User object extracted from specified token or null if a token is invalid.
+     * @param jwt JWT (Json Web Token) to parse
+     * @param jwtSigned boolean variable indicating whether the token is signed.
+     * @param jwtSignatureKey Key used to sign the token.
+     * @param jwtEncrypted boolean variable indicating whether the token is encrypted.
+     * @param jwtEncryptionKey Key used to encrypt the token.
+     * @param issuer service that issued the JWT.
+     * @param service service to which the JWT is intended for.
+     *
+     * @return the set of claims extracted from the token body, or empty claims if the token is invalid.
      */
-    public static Claims parseToken(String token) {
+    public static JwtClaims parseJWT(String jwt, boolean jwtSigned, String jwtSignatureKey, boolean jwtEncrypted,
+            String jwtEncryptionKey, String issuer, String service) {
 
-        Claims claims = new DefaultClaims();
-
-        JsonFactory factory = new JsonFactory();
-        try (JsonParser parser = factory.createParser(token)) {
-
-            while (!parser.isClosed()) {
-
-                JsonToken jsonToken = parser.nextToken();
-
-                if (JsonToken.FIELD_NAME.equals(jsonToken)) {
-                    String key = parser.getCurrentName();
-
-                    parser.nextToken();
-                    String value = parser.getValueAsString();
-
-                    claims.put(key, value);
-                }
-
-            }
-
-        } catch (IOException ioe) {
-            throw new IAMException("Failed to parse JWT acquired from IAM: " + token, ioe);
+        if (jwtSigned) {
+            jwt = verifySignature(jwt, jwtSignatureKey);
         }
 
-        return claims;
+        if (jwtEncrypted) {
+
+            if (!jwtSigned) {
+                jwt = decodeJWT(jwt);
+                jwt = jwt.replaceFirst("\\{\"alg\":.+\\}", "");
+            }
+
+            jwt = decryptJWT(jwt, jwtEncryptionKey);
+        }
+
+        return parsePlainJWT(jwt, issuer, service);
+    }
+
+    /**
+     * Parse signed JWT (Json Web Token).
+     *
+     * @param jwt JWT (Json Web Token) to parse
+     * @param jwtSignatureKey Key used to sign the token
+     *
+     * @return JsonWebSignature used to verify the key
+     */
+    private static String verifySignature(String jwt, String jwtSignatureKey) {
+
+        Key key = new AesKey(jwtSignatureKey.getBytes(StandardCharsets.UTF_8));
+
+        try {
+            JsonWebSignature jws = new JsonWebSignature();
+            jws.setCompactSerialization(jwt);
+            jws.setKey(key);
+
+            if (!jws.verifySignature()) {
+                throw new IAMException("JWT signature verification failed. Used signature key: " + jwtSignatureKey);
+            }
+
+            return jws.getPayload();
+
+        } catch (JoseException je) {
+            throw new IAMException("Decoding signed JWT failed", je);
+        }
+    }
+
+    /**
+     * Parse signed JWT (Json Web Token).
+     * @param jwt JWT (Json Web Token) to decode.
+     *
+     * @return Base-64 decoded Json Web Token.
+     */
+    private static String decodeJWT(String jwt) {
+
+        byte[] decodedBytes = Base64.decodeBase64(jwt.getBytes(StandardCharsets.UTF_8));
+        return new String(decodedBytes, StandardCharsets.UTF_8);
+
+    }
+
+    /**
+     * Parse encrypted JWT (Json Web Token).
+     *
+     * @param jwt encrypted JWT (Json Web Token) to parse.
+     * @param jwtEncryptionKey Key used to encrypt the token.
+     *
+     * @return plain text (decrypted) Json Web Token.
+     */
+    private static String decryptJWT(String jwt, String jwtEncryptionKey) {
+        JsonWebEncryption jwe = new JsonWebEncryption();
+
+        try {
+            JsonWebKey jsonWebKey = JsonWebKey.Factory.newJwk("\n" + "{\"kty\":\"oct\",\n" + " \"k\":\"" +
+                                                              jwtEncryptionKey + "\"\n" + "}");
+            jwe.setCompactSerialization(jwt);
+
+            jwe.setKey(new AesKey(jsonWebKey.getKey().getEncoded()));
+
+            return jwe.getPlaintextString();
+
+        } catch (JoseException je) {
+            throw new IAMException("Decrypting secured JWT failed. Used encryption key: " + jwtEncryptionKey, je);
+        }
+    }
+
+    /**
+     * Parses plain text JWT (Json Web Token). If successful, returns the set of claims extracted from the token body.
+     * If unsuccessful (token is invalid or not containing all required properties), simply returns empty claims.
+     *
+     * @param jwt  Plain text JWT (Json Web Token) to parse
+     * @param issuer service that issued the JWT.
+     * @param service service to which the JWT is intended for.
+     *
+     * @return the set of claims extracted from the token body, or empty claims if the token is invalid.
+     */
+    private static JwtClaims parsePlainJWT(String jwt, String issuer, String service) {
+
+        try {
+
+            JsonWebSignature jws = new JsonWebSignature();
+            jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.NONE);
+            jws.setAlgorithmConstraints(AlgorithmConstraints.ALLOW_ONLY_NONE);
+            jws.setPayload(jwt);
+
+            JwtConsumer jwtConsumer = new JwtConsumerBuilder().setRequireExpirationTime() // the JWT must have an expiration time
+                                                              .setRequireSubject() // the JWT must have a subject claim
+                                                              .setExpectedIssuer(issuer) // the JWT needs to have been issued by
+                                                              .setExpectedAudience(service) // the JWT is intended for
+                                                              .setRequireIssuedAt() //the JWT must have a 'iat' claim
+                                                              .setDisableRequireSignature()
+                                                              .setJwsAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST,
+                                                                                                                   AlgorithmIdentifiers.NONE))
+                                                              .build(); // create the JwtConsumer instance
+
+            //  Validate the JWT and return the resulting Claims
+            return jwtConsumer.processToClaims(jws.getCompactSerialization());
+
+        } catch (JoseException je) {
+            throw new IAMException("Building JWT from Json failed", je);
+
+        } catch (InvalidJwtException e) {
+            throw new IAMException("JWT validation error", e);
+        }
     }
 }
