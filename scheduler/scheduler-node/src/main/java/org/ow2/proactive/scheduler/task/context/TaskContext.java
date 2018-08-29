@@ -62,9 +62,7 @@ public class TaskContext implements Serializable {
 
     private final String progressFilePath;
 
-    private final String nodeUrl;
-
-    private final String nodeName;
+    private final NodeInfo nodeInfo;
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
             TaskResult[] previousTasksResults, NodeDataSpacesURIs nodeDataSpacesURIs, String progressFilePath,
@@ -89,8 +87,7 @@ public class TaskContext implements Serializable {
         this.schedulerHome = ClasspathUtils.findSchedulerHome();
         this.executableContainer = executableContainer;
         this.decrypter = decrypter;
-        this.nodeUrl = nodeInfo.getCurrentNodeUrl();
-        this.nodeName = nodeInfo.getCurrentNodeName();
+        this.nodeInfo = nodeInfo;
 
         // Added executableContainer != null for now. It is too much work to refactor all of this.
         // This class should not be so overloaded with parameters in the constructor.
@@ -180,10 +177,14 @@ public class TaskContext implements Serializable {
     }
 
     public String getNodeUrl() {
-        return nodeUrl;
+        return nodeInfo.getCurrentNodeUrl();
     }
 
     public String getNodeName() {
-        return nodeName;
+        return nodeInfo.getCurrentNodeName();
+    }
+
+    public String getNodeHostname() {
+        return nodeInfo.getCurrentNodeHostname();
     }
 }

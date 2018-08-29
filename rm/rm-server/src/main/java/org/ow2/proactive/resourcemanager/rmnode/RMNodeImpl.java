@@ -107,6 +107,8 @@ public class RMNodeImpl extends AbstractRMNode {
 
     public static final String NODE_NAME_BINDING = "nodename";
 
+    public static final String NODE_HOST_BINDING = "nodehost";
+
     /**
      * Constructs a new instance. Initial state is set to {@link NodeState#FREE}.
      *
@@ -327,6 +329,9 @@ public class RMNodeImpl extends AbstractRMNode {
                 }
                 if (!bindings.containsKey(NODE_NAME_BINDING)) {
                     this.handler.addBinding(NODE_NAME_BINDING, this.getNode().getNodeInformation().getName());
+                }
+                if (!bindings.containsKey(NODE_HOST_BINDING)) {
+                    this.handler.addBinding(NODE_HOST_BINDING, this.getNode().getVMInformation().getHostName());
                 }
             }
             return this.handler.handle(script);

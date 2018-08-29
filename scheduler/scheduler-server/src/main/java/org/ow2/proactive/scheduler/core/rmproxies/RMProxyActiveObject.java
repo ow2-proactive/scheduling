@@ -205,6 +205,7 @@ public class RMProxyActiveObject {
             Node node = nodes.get(0);
             String nodeUrl = node.getNodeInformation().getURL();
             String nodeName = node.getNodeInformation().getName();
+            String hostName = node.getVMInformation().getHostName();
 
             HashMap<String, Serializable> dictionary = new HashMap<>();
 
@@ -214,6 +215,7 @@ public class RMProxyActiveObject {
             dictionary.putAll(variables.getScopeMap());
             dictionary.put(SchedulerVars.PA_NODE_URL.toString(), nodeUrl);
             dictionary.put(SchedulerVars.PA_NODE_NAME.toString(), nodeName);
+            dictionary.put(SchedulerVars.PA_NODE_HOST.toString(), hostName);
 
             //start handler for binding
 
@@ -223,6 +225,7 @@ public class RMProxyActiveObject {
             resolvedMap.setScopeMap(VariableSubstitutor.resolveVariables(variables.getScopeMap(), dictionary));
             resolvedMap.put(SchedulerVars.PA_NODE_URL.toString(), nodeUrl);
             resolvedMap.put(SchedulerVars.PA_NODE_NAME.toString(), nodeName);
+            resolvedMap.put(SchedulerVars.PA_NODE_HOST.toString(), hostName);
             handler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, (Serializable) resolvedMap);
             handler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME, (Serializable) genericInformation);
             handler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME, store);

@@ -25,7 +25,10 @@
  */
 package org.ow2.proactive.scheduler.task.context;
 
-public class NodeInfo {
+import java.io.Serializable;
+
+
+public class NodeInfo implements Serializable {
     private final String currentNodeHostname;
 
     private final String currentNodeUrl;
