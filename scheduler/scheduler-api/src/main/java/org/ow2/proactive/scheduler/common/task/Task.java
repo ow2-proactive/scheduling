@@ -25,11 +25,17 @@
  */
 package org.ow2.proactive.scheduler.common.task;
 
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.addIndent;
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.line;
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.lineWithQuotes;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -49,8 +55,6 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
-
-import com.google.common.base.Joiner;
 
 
 /**
@@ -723,41 +727,47 @@ public abstract class Task extends CommonAttribute {
     }
 
     public String display() {
-        String nl = System.lineSeparator();
+        return "Task '" + name + "' : " + System.lineSeparator() +
+               addIndent(Stream.of(lineWithQuotes("Description", description),
+                                   line("restartTaskOnError", restartTaskOnError),
+                                   line("onTaskError", onTaskError),
+                                   line("maxNumberOfExecution",
+                                        maxNumberOfExecution,
+                                        () -> maxNumberOfExecution.getValue().getIntegerValue()),
+                                   line("tag", tag),
+                                   line("variables", variables),
+                                   line("genericInformation", genericInformation),
+                                   line("InputFiles", inputFiles),
+                                   line("OutputFiles", outputFiles),
+                                   line("ParallelEnvironment", parallelEnvironment),
+                                   lineWithQuotes("FlowBlock", flowBlock),
+                                   line("SelectionScripts", displaySelectionScripts()),
+                                   line("ForkEnvironment", forkEnvironment),
 
-        return "Task \'" + name + "\' : " + nl + "\tDescription = '" + description + "'" + nl +
-               (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl
-                                           : "") +
-               (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue() + '\'' + nl : "") +
-               (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
-                                               maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl
-                                             : "") +
-               "\ttag = " + tag + nl + "\tvariables = {" + nl +
-               Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}" + nl + "\tgenericInformation = {" +
-               nl + Joiner.on('\n').withKeyValueSeparator("=").join(genericInformation) + nl + "}" + nl +
-               "\tInputFiles = " + inputFiles + nl + "\tOutputFiles = " + outputFiles + nl +
-               "\tParallelEnvironment = " + parallelEnvironment + nl + "\tFlowBlock = '" + flowBlock + "'" + nl +
-               "\tSelectionScripts = " + displaySelectionScripts() + nl + "\tForkEnvironment = " + forkEnvironment +
-               nl + "\tPreScript = " + ((preScript != null) ? preScript.display() : null) + nl + "\tPostScript = " +
-               ((postScript != null) ? postScript.display() : null) + nl + "\tCleanScript = " +
-               ((cScript != null) ? cScript.display() : null) + nl + "\tFlowScript = " +
-               ((flowScript != null) ? flowScript.display() : null) + nl + "\tPreciousResult = " + preciousResult + nl +
-               "\tPreciousLogs = " + preciousLogs + nl + "\tRunAsMe = " + runAsMe + nl + "\tWallTime = " + wallTime +
-               nl + "\tDependences = " + dependences;
+                                   line("PreScript", preScript, () -> preScript.display()),
+                                   line("PostScript", postScript, () -> postScript.display()),
+                                   line("CleanScript", cScript, () -> cScript.display()),
+                                   line("FlowScript", flowScript, () -> flowScript.display()),
+
+                                   line("PreciousResult", preciousResult),
+                                   line("PreciousLogs", preciousLogs),
+                                   line("RunAsMe", runAsMe),
+                                   line("WallTime", wallTime),
+                                   line("Dependences", dependences))
+                               .filter(s -> !s.isEmpty())
+                               .collect(Collectors.joining(System.lineSeparator())));
     }
 
     private String displaySelectionScripts() {
-        if (sScripts == null)
-            return null;
-        String answer = "{ ";
-        for (int i = 0; i < sScripts.size(); i++) {
-            SelectionScript ss = sScripts.get(i);
-            if (ss != null) {
-                answer += ss.display() + ((i < sScripts.size() - 1) ? " , " : "");
-            }
+        StringBuilder answer = new StringBuilder("[");
+        if (sScripts != null && !sScripts.isEmpty()) {
+            answer.append(System.lineSeparator());
+            answer.append(addIndent(sScripts.stream()
+                                            .map(Script::display)
+                                            .collect(Collectors.joining("," + System.lineSeparator()))));
         }
-        answer += " }";
-        return answer;
+        answer.append("]");
+        return answer.toString();
     }
 
     public ForkEnvironment getForkEnvironment() {

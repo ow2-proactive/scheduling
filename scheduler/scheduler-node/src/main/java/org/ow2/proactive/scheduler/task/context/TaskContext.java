@@ -62,21 +62,23 @@ public class TaskContext implements Serializable {
 
     private final String progressFilePath;
 
+    private final NodeInfo nodeInfo;
+
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
             TaskResult[] previousTasksResults, NodeDataSpacesURIs nodeDataSpacesURIs, String progressFilePath,
-            String currentNodeHostname) throws NodeException {
+            NodeInfo nodeInfo) throws NodeException {
         this(executableContainer,
              initializer,
              previousTasksResults,
              nodeDataSpacesURIs,
              progressFilePath,
-             currentNodeHostname,
+             nodeInfo,
              null);
     }
 
     public TaskContext(ExecutableContainer executableContainer, TaskLauncherInitializer initializer,
             TaskResult[] previousTasksResults, NodeDataSpacesURIs nodeDataSpacesURIs, String progressFilePath,
-            String currentNodeHostname, Decrypter decrypter) throws NodeException {
+            NodeInfo nodeInfo, Decrypter decrypter) throws NodeException {
         this.initializer = initializer;
         initializer.setNamingService(null);
         this.previousTasksResults = previousTasksResults;
@@ -85,6 +87,7 @@ public class TaskContext implements Serializable {
         this.schedulerHome = ClasspathUtils.findSchedulerHome();
         this.executableContainer = executableContainer;
         this.decrypter = decrypter;
+        this.nodeInfo = nodeInfo;
 
         // Added executableContainer != null for now. It is too much work to refactor all of this.
         // This class should not be so overloaded with parameters in the constructor.
@@ -97,7 +100,7 @@ public class TaskContext implements Serializable {
             otherNodesURLs = new ArrayList<>(nbNodes);
             nodesHosts = new ArrayList<>(nbNodes + 1);
 
-            nodesHosts.add(currentNodeHostname);
+            nodesHosts.add(nodeInfo.getCurrentNodeHostname());
             for (Node node : executableContainer.getNodes()) {
                 otherNodesURLs.add(node.getNodeInformation().getURL());
                 nodesHosts.add(node.getNodeInformation().getVMInformation().getHostName());
@@ -171,5 +174,17 @@ public class TaskContext implements Serializable {
 
     public Synchronization getSynchronizationAPI() {
         return initializer.getSynchronizationAPI();
+    }
+
+    public String getNodeUrl() {
+        return nodeInfo.getCurrentNodeUrl();
+    }
+
+    public String getNodeName() {
+        return nodeInfo.getCurrentNodeName();
+    }
+
+    public String getNodeHostname() {
+        return nodeInfo.getCurrentNodeHostname();
     }
 }

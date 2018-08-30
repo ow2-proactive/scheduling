@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.TestTaskOutput;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
+import org.ow2.proactive.scheduler.task.context.NodeInfo;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.executors.ForkedTaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
@@ -85,7 +86,7 @@ public class ForkedTaskExecutorRunAsMeTest {
                                                   null,
                                                   new NodeDataSpacesURIs("", "", "", "", "", ""),
                                                   "",
-                                                  "",
+                                                  new NodeInfo("", "", ""),
                                                   decrypter);
         TaskResultImpl result = taskExecutor.execute(taskContext, taskOutput.outputStream, taskOutput.error);
 
