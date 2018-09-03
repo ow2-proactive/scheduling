@@ -65,6 +65,9 @@ public class NodesHouseKeepingService {
 
     }
 
+    /*
+     * This method is useful to mock the CRON scheduler in unit test.
+     */
     Scheduler createOrGetCronScheduler() {
         if (this.nodesHouseKeepingScheduler == null) {
             return new Scheduler();

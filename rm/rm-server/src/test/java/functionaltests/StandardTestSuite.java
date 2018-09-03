@@ -25,7 +25,6 @@
  */
 package functionaltests;
 
-import functionaltests.housekeeping.NodesHouseKeepingPropertiesTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -38,6 +37,7 @@ import functionaltests.db.NodeSourcesTest;
 import functionaltests.db.RMDBManagerBufferTest;
 import functionaltests.db.RMDBManagerTest;
 import functionaltests.execremote.TestExecRemote;
+import functionaltests.housekeeping.NodesHouseKeepingPropertiesTest;
 import functionaltests.jmx.RMProxyUserInterfaceTest;
 import functionaltests.jmx.ResourceManagerJMXTest;
 import functionaltests.jmx.account.AddGetDownRemoveTest;
