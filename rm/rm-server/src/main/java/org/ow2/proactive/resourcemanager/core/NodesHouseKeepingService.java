@@ -51,15 +51,15 @@ class NodesHouseKeepingService {
     public void start() {
         if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.isSet() &&
             PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet() &&
-            PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsLong() > 0) {
+            PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt() > 0) {
 
             this.nodesHouseKeepingScheduler = createOrGetCronScheduler();
             String cronExpression = PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.getValueAsString();
             this.scheduledCronIdentifier = this.nodesHouseKeepingScheduler.schedule(cronExpression,
-                                                                                            getNodesHouseKeepingHandler());
+                                                                                    getNodesHouseKeepingHandler());
             this.nodesHouseKeepingScheduler.start();
             logger.info("Nodes housekeeping started with periodic schedule: " +
-                    this.nodesHouseKeepingScheduler.getSchedulingPattern(this.scheduledCronIdentifier));
+                        this.nodesHouseKeepingScheduler.getSchedulingPattern(this.scheduledCronIdentifier));
         }
 
     }
@@ -74,13 +74,13 @@ class NodesHouseKeepingService {
 
     private Runnable getNodesHouseKeepingHandler() {
         return () -> {
-            List<String> downAndLostNodesUrls = this.rmCoreStub.getDownAndLostNodesUrls();
-            if (!downAndLostNodesUrls.isEmpty()) {
-                logger.info("Remove " + downAndLostNodesUrls.size() + " unusable nodes");
-                if (logger.isDebugEnabled() && downAndLostNodesUrls.size() < 100) {
-                    logger.debug("Nodes URL: " + Arrays.toString(downAndLostNodesUrls.toArray()));
+            List<String> unavailableNodesUrls = this.rmCoreStub.getToBeRemovedUnavailableNodesUrls();
+            if (!unavailableNodesUrls.isEmpty()) {
+                logger.info("Remove " + unavailableNodesUrls.size() + " unavailable nodes");
+                if (logger.isDebugEnabled() && unavailableNodesUrls.size() < 100) {
+                    logger.debug("Nodes URL: " + Arrays.toString(unavailableNodesUrls.toArray()));
                 }
-                downAndLostNodesUrls.forEach(nodeUrl -> this.rmCoreStub.removeNode(nodeUrl, true));
+                unavailableNodesUrls.forEach(nodeUrl -> this.rmCoreStub.removeNode(nodeUrl, true));
             }
         };
     }

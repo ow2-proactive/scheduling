@@ -25,8 +25,6 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import static org.ow2.proactive.resourcemanager.common.NodeState.LOST;
-
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -64,7 +62,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -2275,26 +2272,34 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return state;
     }
 
-    public List<String> getDownAndLostNodesUrls() {
-        List<NodeSource> nodeSourceList = this.deployedNodeSources.entrySet()
-                                                                  .stream()
-                                                                  .map(Entry::getValue)
-                                                                  .collect(Collectors.toList());
-        List<String> downAndLostNodesUrl = new LinkedList<>();
-        downAndLostNodesUrl.addAll(nodeSourceList.stream()
-                                                 .map(NodeSource::getDownNodes)
-                                                 .flatMap(list -> list.stream()
-                                                                      .map(Node::getNodeInformation)
-                                                                      .map(NodeInformation::getURL))
-                                                 .collect(Collectors.toList()));
-        downAndLostNodesUrl.addAll(nodeSourceList.stream()
-                                                 .map(NodeSource::getDeployingAndLostNodes)
-                                                 .flatMap(list -> list.stream()
-                                                                      .filter(node -> node.getState().equals(LOST))
-                                                                      .map(RMDeployingNode::getNodeURL))
-                                                 .collect(Collectors.toList()));
-        logger.info("retrived nodes " + Arrays.toString(downAndLostNodesUrl.toArray()));
-        return downAndLostNodesUrl;
+    public List<String> getToBeRemovedUnavailableNodesUrls() {
+
+        List<String> unavailableNodesUrl = new LinkedList<>();
+
+        unavailableNodesUrl.addAll(this.allNodes.values()
+                                                .stream()
+                                                .filter(this::isNodeUnavailableForTooLong)
+                                                .map(RMNode::getNodeURL)
+                                                .collect(Collectors.toList()));
+
+        unavailableNodesUrl.addAll(this.deployedNodeSources.entrySet()
+                                                           .stream()
+                                                           .map(Entry::getValue)
+                                                           .map(NodeSource::getDeployingAndLostNodes)
+                                                           .flatMap(list -> list.stream()
+                                                                                .filter(this::isNodeUnavailableForTooLong)
+                                                                                .map(RMDeployingNode::getNodeURL))
+                                                           .collect(Collectors.toList()));
+
+        return unavailableNodesUrl;
+    }
+
+    private boolean isNodeUnavailableForTooLong(RMNode node) {
+        int period = PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt();
+        int periodInMilliseconds = period * 60 * 1000;
+        long now = System.currentTimeMillis();
+        return (node.getState().equals(NodeState.DOWN) || node.getState().equals(NodeState.LOST)) &&
+               (now - node.getStateChangeTime() > periodInMilliseconds);
     }
 
     /**
