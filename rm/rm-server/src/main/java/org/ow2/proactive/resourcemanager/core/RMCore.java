@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import static org.ow2.proactive.resourcemanager.common.NodeState.LOST;
+
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -62,6 +64,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -304,6 +307,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    private NodesHouseKeepingService nodesHouseKeepingService;
+
     /**
      * ProActive Empty constructor
      */
@@ -434,6 +439,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             clientPinger.ping();
 
             nodeSourceParameterHelper = new NodeSourceParameterHelper();
+
+            nodesHouseKeepingService = new NodesHouseKeepingService(rmcoreStub);
+            nodesHouseKeepingService.start();
 
             initiateRecoveryIfRequired();
 
@@ -1662,6 +1670,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
+        this.nodesHouseKeepingService.stop();
+
         if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean() ||
             this.deployedNodeSources.size() == 0) {
             finalizeShutdown();
@@ -2263,6 +2273,28 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               nodesListToUrlsSet(allNodes.values()));
         RMState state = new RMState(rmStateNodeUrls, maximumNumberOfNodes);
         return state;
+    }
+
+    public List<String> getDownAndLostNodesUrls() {
+        List<NodeSource> nodeSourceList = this.deployedNodeSources.entrySet()
+                                                                  .stream()
+                                                                  .map(Entry::getValue)
+                                                                  .collect(Collectors.toList());
+        List<String> downAndLostNodesUrl = new LinkedList<>();
+        downAndLostNodesUrl.addAll(nodeSourceList.stream()
+                                                 .map(NodeSource::getDownNodes)
+                                                 .flatMap(list -> list.stream()
+                                                                      .map(Node::getNodeInformation)
+                                                                      .map(NodeInformation::getURL))
+                                                 .collect(Collectors.toList()));
+        downAndLostNodesUrl.addAll(nodeSourceList.stream()
+                                                 .map(NodeSource::getDeployingAndLostNodes)
+                                                 .flatMap(list -> list.stream()
+                                                                      .filter(node -> node.getState().equals(LOST))
+                                                                      .map(RMDeployingNode::getNodeURL))
+                                                 .collect(Collectors.toList()));
+        logger.info("retrived nodes " + Arrays.toString(downAndLostNodesUrl.toArray()));
+        return downAndLostNodesUrl;
     }
 
     /**

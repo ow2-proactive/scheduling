@@ -33,6 +33,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.core.properties.PACommonProperties;
 import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
 import org.ow2.proactive.core.properties.PropertyType;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
@@ -180,6 +181,20 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /** Frequency of node history removal (cron expression) */
     RM_HISTORY_REMOVAL_CRONPERIOD("pa.rm.history.removal.cronperiod", PropertyType.STRING, "*/10 * * * *"),
 
+    /**
+     * Defines the frequency of attempts to remove {@link NodeState#DOWN} or
+     * {@link NodeState#LOST} node (cron expression)
+     */
+    RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY("pa.rm.nodes.unavailable.removal.frequency", PropertyType.STRING, "*/30 * * * *"),
+
+    /**
+     * Defines the period, in minutes, after which a {@link NodeState#DOWN} or
+     * {@link NodeState#LOST} node is eligible to automatic removal. The
+     * default value is 24h (1440 minutes). If this property is not set, these
+     * nodes will never be removed automatically.
+     */
+    RM_UNAVAILABLE_NODES_MAX_PERIOD("pa.rm.nodes.unavailable.maxperiod", PropertyType.INTEGER, "1440"),
+
     /** Max number of lines stored from the infrastructure processes output */
     RM_INFRASTRUCTURE_PROCESS_OUTPUT_MAX_LINES("pa.rm.infrastructure.process.output.maxlines", PropertyType.INTEGER, "2000"),
 
@@ -258,13 +273,6 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * clean also its nodes.
      */
     RM_PRESERVE_NODES_ON_SHUTDOWN("pa.rm.preserve.nodes.on.shutdown", PropertyType.BOOLEAN, "false"),
-
-    /**
-     * Defines the frequency in minutes with which the down nodes managed by
-     * the Resource Manager are listed and removed from their respective node
-     * source. The default value is 24h (1440 minutes).
-     */
-    RM_REMOVE_DOWN_NODES_FREQUENCY("pa.rm.remove.down.nodes.frequency", PropertyType.INTEGER, "1440"),
 
     /**
      * Defines whether the node recovery mechanism is enabled on RM startup.
