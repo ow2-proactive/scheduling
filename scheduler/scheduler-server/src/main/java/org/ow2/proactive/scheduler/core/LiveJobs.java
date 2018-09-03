@@ -692,7 +692,11 @@ class LiveJobs {
 
     private void setJobStatusToInErrorIfNotPaused(InternalJob job) {
         if (!job.getStatus().equals(JobStatus.PAUSED)) {
-            job.setStatus(JobStatus.IN_ERROR);
+            if(job.getNumberOfInErrorTasks() > 0) {
+                job.setStatus(JobStatus.IN_ERROR);
+            } else {
+                job.setStatus(JobStatus.PENDING);
+            }
         }
     }
 
