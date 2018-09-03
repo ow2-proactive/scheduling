@@ -25,6 +25,7 @@
  */
 package functionaltests;
 
+import functionaltests.housekeeping.NodesHouseKeepingPropertiesTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -84,7 +85,7 @@ import functionaltests.topology.SelectionTest;
                       SelectionWithSeveralScriptsTest.class, SelectionWithSeveralScriptsTest2.class,
                       StaticSelectionScriptTest.class, UnauthorizedSelectionScriptTest.class, LocalSelectionTest.class,
                       SelectionTest.class, SSHInfrastructureV2LifecycleTest.class, TestSSHInfrastructureV2.class,
-                      LocalInfrastructureLifecycleTest.class })
+                      LocalInfrastructureLifecycleTest.class, NodesHouseKeepingPropertiesTest.class })
 
 /**
  * @author ActiveEon Team

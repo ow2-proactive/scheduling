@@ -23,18 +23,19 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.core;
+package org.ow2.proactive.resourcemanager.housekeeping;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 
 import it.sauronsoftware.cron4j.Scheduler;
 
 
-class NodesHouseKeepingService {
+public class NodesHouseKeepingService {
 
     private static final Logger logger = Logger.getLogger(NodesHouseKeepingService.class);
 

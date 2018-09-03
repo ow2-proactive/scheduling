@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.core;
+package org.ow2.proactive.resourcemanager.housekeeping;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -71,6 +71,11 @@ public class NodesHouseKeepingServiceTest {
 
         verify(this.nodesHouseKeepingScheduler).deschedule(anyString());
         verify(this.nodesHouseKeepingScheduler).stop();
+    }
+
+    @Test
+    public void testNodesAreRemoved() {
+
     }
 
 }
