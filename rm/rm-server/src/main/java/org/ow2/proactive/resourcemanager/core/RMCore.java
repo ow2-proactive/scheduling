@@ -2296,10 +2296,13 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private boolean isNodeUnavailableForTooLong(RMNode node) {
-        int periodInMinutes = PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt();
-        int periodInMilliseconds = periodInMinutes * 60 * 1000;
-        return (node.getState().equals(NodeState.DOWN) || node.getState().equals(NodeState.LOST)) &&
-               (node.millisSinceStateChanged() > periodInMilliseconds);
+        if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet()) {
+            int periodInMinutes = PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt();
+            int periodInMilliseconds = periodInMinutes * 60 * 1000;
+            return (node.getState().equals(NodeState.DOWN) || node.getState().equals(NodeState.LOST)) &&
+                   (node.millisSinceStateChanged() > periodInMilliseconds);
+        }
+        return false;
     }
 
     /**

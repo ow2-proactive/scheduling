@@ -189,11 +189,10 @@ public enum PAResourceManagerProperties implements PACommonProperties {
 
     /**
      * Defines the period, in minutes, after which a {@link NodeState#DOWN} or
-     * {@link NodeState#LOST} node is eligible to automatic removal. The
-     * default value is 24h (1440 minutes). If this property is not set, these
-     * nodes will never be removed automatically.
+     * {@link NodeState#LOST} node is eligible to automatic removal. If this
+     * property is not set, these nodes will never be removed automatically.
      */
-    RM_UNAVAILABLE_NODES_MAX_PERIOD("pa.rm.nodes.unavailable.maxperiod", PropertyType.INTEGER, "1440"),
+    RM_UNAVAILABLE_NODES_MAX_PERIOD("pa.rm.nodes.unavailable.maxperiod", PropertyType.INTEGER),
 
     /** Max number of lines stored from the infrastructure processes output */
     RM_INFRASTRUCTURE_PROCESS_OUTPUT_MAX_LINES("pa.rm.infrastructure.process.output.maxlines", PropertyType.INTEGER, "2000"),

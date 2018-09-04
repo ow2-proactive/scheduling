@@ -50,8 +50,7 @@ public class NodesHouseKeepingService {
     }
 
     public void start() {
-        if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.isSet() &&
-            PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet() &&
+        if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet() &&
             PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt() > 0) {
 
             this.nodesHouseKeepingScheduler = createOrGetCronScheduler();

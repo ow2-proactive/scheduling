@@ -77,7 +77,7 @@ public class NodesHouseKeepingPropertiesTest extends RMFunctionalTest {
 
         int expiredDownNodeMillis = REMOVE_DOWN_NODES_AFTER_MINUTES * 60 * 1000;
         int nextDownNodesRemovalAttemptMillis = 60 * 1000;
-        Thread.sleep(expiredDownNodeMillis + nextDownNodesRemovalAttemptMillis);
+        Thread.sleep(expiredDownNodeMillis + nextDownNodesRemovalAttemptMillis); //NOSONAR we need to wait for the cron tick
         assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(0);
     }
 

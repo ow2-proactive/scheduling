@@ -73,9 +73,4 @@ public class NodesHouseKeepingServiceTest {
         verify(this.nodesHouseKeepingScheduler).stop();
     }
 
-    @Test
-    public void testNodesAreRemoved() {
-
-    }
-
 }
