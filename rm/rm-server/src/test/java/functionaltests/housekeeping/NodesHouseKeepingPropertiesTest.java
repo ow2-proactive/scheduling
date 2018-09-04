@@ -42,7 +42,7 @@ import functionaltests.utils.RMTHelper;
 
 public class NodesHouseKeepingPropertiesTest extends RMFunctionalTest {
 
-    private static final String RM_CONFIG_FILE_PATH = "/functionaltests/config/functionalTRMProperties-remove-nodes-unavailable-for-five-min-every-min.ini";
+    private static final String RM_CONFIG_FILE_PATH = "/functionaltests/config/functionalTRMProperties-remove-nodes-unavailable-for-two-min-every-min.ini";
 
     private static final String NODE_SOURCE_NAME = "LocalNodeSource-" +
                                                    NodesHouseKeepingPropertiesTest.class.getSimpleName();
