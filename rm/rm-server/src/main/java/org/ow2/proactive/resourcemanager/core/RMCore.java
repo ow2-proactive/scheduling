@@ -99,6 +99,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
+import org.ow2.proactive.resourcemanager.housekeeping.NodesHouseKeepingService;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
@@ -304,6 +305,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    private NodesHouseKeepingService nodesHouseKeepingService;
+
     /**
      * ProActive Empty constructor
      */
@@ -434,6 +437,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             clientPinger.ping();
 
             nodeSourceParameterHelper = new NodeSourceParameterHelper();
+
+            nodesHouseKeepingService = new NodesHouseKeepingService(rmcoreStub);
+            nodesHouseKeepingService.start();
 
             initiateRecoveryIfRequired();
 
@@ -1662,6 +1668,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
 
+        this.nodesHouseKeepingService.stop();
+
         if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean() ||
             this.deployedNodeSources.size() == 0) {
             finalizeShutdown();
@@ -2263,6 +2271,38 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                               nodesListToUrlsSet(allNodes.values()));
         RMState state = new RMState(rmStateNodeUrls, maximumNumberOfNodes);
         return state;
+    }
+
+    public List<String> getToBeRemovedUnavailableNodesUrls() {
+
+        List<String> unavailableNodesUrl = new LinkedList<>();
+
+        unavailableNodesUrl.addAll(this.allNodes.values()
+                                                .stream()
+                                                .filter(this::isNodeUnavailableForTooLong)
+                                                .map(RMNode::getNodeURL)
+                                                .collect(Collectors.toList()));
+
+        unavailableNodesUrl.addAll(this.deployedNodeSources.entrySet()
+                                                           .stream()
+                                                           .map(Entry::getValue)
+                                                           .map(NodeSource::getDeployingAndLostNodes)
+                                                           .flatMap(list -> list.stream()
+                                                                                .filter(this::isNodeUnavailableForTooLong)
+                                                                                .map(RMDeployingNode::getNodeURL))
+                                                           .collect(Collectors.toList()));
+
+        return unavailableNodesUrl;
+    }
+
+    private boolean isNodeUnavailableForTooLong(RMNode node) {
+        if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet()) {
+            int periodInMinutes = PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt();
+            int periodInMilliseconds = periodInMinutes * 60 * 1000;
+            return (node.getState().equals(NodeState.DOWN) || node.getState().equals(NodeState.LOST)) &&
+                   (node.millisSinceStateChanged() > periodInMilliseconds);
+        }
+        return false;
     }
 
     /**
