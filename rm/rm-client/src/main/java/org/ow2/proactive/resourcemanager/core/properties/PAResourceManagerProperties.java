@@ -33,6 +33,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.core.properties.PACommonProperties;
 import org.ow2.proactive.core.properties.PACommonPropertiesHelper;
 import org.ow2.proactive.core.properties.PropertyType;
+import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.utils.PAPropertiesLazyLoader;
 
 
@@ -179,6 +180,19 @@ public enum PAResourceManagerProperties implements PACommonProperties {
 
     /** Frequency of node history removal (cron expression) */
     RM_HISTORY_REMOVAL_CRONPERIOD("pa.rm.history.removal.cronperiod", PropertyType.STRING, "*/10 * * * *"),
+
+    /**
+     * Defines the frequency of attempts to remove {@link NodeState#DOWN} or
+     * {@link NodeState#LOST} node (cron expression)
+     */
+    RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY("pa.rm.nodes.unavailable.removal.frequency", PropertyType.STRING),
+
+    /**
+     * Defines the period, in minutes, after which a {@link NodeState#DOWN} or
+     * {@link NodeState#LOST} node is eligible to automatic removal. If this
+     * property is not set, these nodes will never be removed automatically.
+     */
+    RM_UNAVAILABLE_NODES_MAX_PERIOD("pa.rm.nodes.unavailable.maxperiod", PropertyType.INTEGER),
 
     /** Max number of lines stored from the infrastructure processes output */
     RM_INFRASTRUCTURE_PROCESS_OUTPUT_MAX_LINES("pa.rm.infrastructure.process.output.maxlines", PropertyType.INTEGER, "2000"),

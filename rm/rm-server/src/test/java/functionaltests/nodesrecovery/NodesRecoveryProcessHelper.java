@@ -114,7 +114,7 @@ public class NodesRecoveryProcessHelper {
         throw new ProcessNotFoundException(processName, stringBuilder);
     }
 
-    static class ProcessNotFoundException extends Exception {
+    public static class ProcessNotFoundException extends Exception {
 
         ProcessNotFoundException(String processName, StringBuilder stringBuilder) {
             // build sentence in reverse manner

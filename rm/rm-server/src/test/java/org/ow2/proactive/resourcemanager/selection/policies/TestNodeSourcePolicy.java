@@ -26,32 +26,23 @@
 package org.ow2.proactive.resourcemanager.selection.policies;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.Serializable;
-import java.security.Permission;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.objectweb.proactive.core.node.NodeException;
-import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
-import org.ow2.proactive.resourcemanager.authentication.Client;
-import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.scripting.Script;
-import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive.scripting.SelectionScript;
 
 
 /**
@@ -59,243 +50,8 @@ import org.ow2.proactive.scripting.SelectionScript;
  * Test for NodeSourcePriorityPolicy
  *
  */
+@RunWith(MockitoJUnitRunner.class)
 public class TestNodeSourcePolicy {
-
-    class Node implements RMNode {
-
-        String name;
-
-        String nsName;
-
-        Node(String name, String nsName) {
-            this.name = name;
-            this.nsName = nsName;
-        }
-
-        @Override
-        public int compareTo(RMNode o) {
-            return name.compareTo(o.getNodeName());
-        }
-
-        public ScriptResult<Boolean> executeScript(SelectionScript script) {
-            return null;
-        }
-
-        @Override
-        public HashMap<SelectionScript, Integer> getScriptStatus() {
-            return null;
-        }
-
-        @Override
-        public void clean() throws NodeException {
-        }
-
-        @Override
-        public String getNodeInfo() {
-            return null;
-        }
-
-        @Override
-        public String getNodeName() {
-            return name;
-        }
-
-        @Override
-        public org.objectweb.proactive.core.node.Node getNode() {
-            return null;
-        }
-
-        @Override
-        public String getVNodeName() {
-            return null;
-        }
-
-        @Override
-        public String getHostName() {
-            return null;
-        }
-
-        @Override
-        public String getDescriptorVMName() {
-            return null;
-        }
-
-        @Override
-        public String getNodeSourceName() {
-            return nsName;
-        }
-
-        @Override
-        public String getNodeURL() {
-            return null;
-        }
-
-        @Override
-        public NodeSource getNodeSource() {
-            return null;
-        }
-
-        @Override
-        public NodeState getState() {
-            return null;
-        }
-
-        @Override
-        public long getStateChangeTime() {
-            return 0;
-        }
-
-        @Override
-        public Client getProvider() {
-            return null;
-        }
-
-        @Override
-        public Client getOwner() {
-            return null;
-        }
-
-        @Override
-        public Permission getUserPermission() {
-            return null;
-        }
-
-        @Override
-        public Permission getAdminPermission() {
-            return null;
-        }
-
-        @Override
-        public RMNodeEvent getAddEvent() {
-            return null;
-        }
-
-        @Override
-        public RMNodeEvent getLastEvent() {
-            return null;
-        }
-
-        @Override
-        public boolean isFree() {
-            return false;
-        }
-
-        @Override
-        public boolean isDown() {
-            return false;
-        }
-
-        @Override
-        public boolean isToRemove() {
-            return false;
-        }
-
-        @Override
-        public boolean isBusy() {
-            return false;
-        }
-
-        @Override
-        public boolean isConfiguring() {
-            return false;
-        }
-
-        @Override
-        public boolean isLocked() {
-            return false;
-        }
-
-        @Override
-        public long getLockTime() {
-            return -1;
-        }
-
-        @Override
-        public Client getLockedBy() {
-            return null;
-        }
-
-        @Override
-        public void setFree() {
-        }
-
-        @Override
-        public void setBusy(Client owner) {
-        }
-
-        @Override
-        public void setToRemove() {
-        }
-
-        @Override
-        public void setDown() {
-        }
-
-        @Override
-        public void setConfiguring(Client owner) {
-        }
-
-        @Override
-        public void lock(Client owner) {
-        }
-
-        @Override
-        public void unlock(Client owner) {
-
-        }
-
-        @Override
-        public void setNodeSource(NodeSource nodeSource) {
-        }
-
-        @Override
-        public void setAddEvent(RMNodeEvent addEvent) {
-        }
-
-        @Override
-        public void setLastEvent(RMNodeEvent lastEvent) {
-        }
-
-        @Override
-        public void setJMXUrl(JMXTransportProtocol protocol, String address) {
-        }
-
-        @Override
-        public String getJMXUrl(JMXTransportProtocol protocol) {
-            return null;
-        }
-
-        @Override
-        public String[] getJmxUrls() {
-            return null;
-        }
-
-        @Override
-        public <T> ScriptResult<T> executeScript(Script<T> script, Map<String, Serializable> bindings) {
-            return null;
-        }
-
-        @Override
-        public boolean isProtectedByToken() {
-            return false;
-        }
-
-        @Override
-        public RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator) {
-            return null;
-        }
-
-        @Override
-        public RMNodeEvent createNodeEvent() {
-            return null;
-        }
-
-        @Override
-        public boolean isDeploying() {
-            return false;
-        }
-
-    }
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -338,7 +94,14 @@ public class TestNodeSourcePolicy {
         List<RMNode> nodes = new LinkedList<>();
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 20; j++) {
-                nodes.add(new Node(String.valueOf(j), String.valueOf(j)));
+                RMNode mockedNode = Mockito.mock(RMNode.class);
+                when(mockedNode.getNodeName()).thenReturn(String.valueOf(j));
+                when(mockedNode.getNodeSourceName()).thenReturn(String.valueOf(j));
+                when(mockedNode.compareTo(any())).thenAnswer(invocation -> mockedNode.getNodeName()
+                                                                                     .compareTo(invocation.getArgumentAt(0,
+                                                                                                                         RMNode.class)
+                                                                                                          .getNodeName()));
+                nodes.add(mockedNode);
             }
         }
         return nodes;
