@@ -185,7 +185,7 @@ public enum PAResourceManagerProperties implements PACommonProperties {
      * Defines the frequency of attempts to remove {@link NodeState#DOWN} or
      * {@link NodeState#LOST} node (cron expression)
      */
-    RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY("pa.rm.nodes.unavailable.removal.frequency", PropertyType.STRING, "*/30 * * * *"),
+    RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY("pa.rm.nodes.unavailable.removal.frequency", PropertyType.STRING),
 
     /**
      * Defines the period, in minutes, after which a {@link NodeState#DOWN} or

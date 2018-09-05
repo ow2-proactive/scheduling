@@ -50,7 +50,8 @@ public class NodesHouseKeepingService {
     }
 
     public void start() {
-        if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet() &&
+        if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.isSet() &&
+            PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet() &&
             PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt() > 0) {
 
             this.nodesHouseKeepingScheduler = createOrGetCronScheduler();
@@ -79,10 +80,8 @@ public class NodesHouseKeepingService {
         return () -> {
             List<String> unavailableNodesUrls = this.rmCoreStub.getToBeRemovedUnavailableNodesUrls();
             if (!unavailableNodesUrls.isEmpty()) {
-                logger.info("Remove " + unavailableNodesUrls.size() + " unavailable nodes");
-                if (logger.isDebugEnabled() && unavailableNodesUrls.size() < 100) {
-                    logger.debug("Nodes URL: " + Arrays.toString(unavailableNodesUrls.toArray()));
-                }
+                logger.info("Remove " + unavailableNodesUrls.size() + " unavailable nodes: " +
+                            Arrays.toString(unavailableNodesUrls.toArray()));
                 unavailableNodesUrls.forEach(nodeUrl -> this.rmCoreStub.removeNode(nodeUrl, true));
             }
         };
