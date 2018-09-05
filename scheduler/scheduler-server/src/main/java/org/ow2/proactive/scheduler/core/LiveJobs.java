@@ -679,8 +679,8 @@ class LiveJobs {
         InternalJob job = jobData.job;
         job.setInErrorTime(System.currentTimeMillis());
         job.setTaskPausedOnError(task);
-        setJobStatusToInErrorIfNotPaused(job);
         job.incrementNumberOfInErrorTasksBy(1);
+        setJobStatusToInErrorIfNotPaused(job);
 
         task.setInErrorTime(task.getStartTime() + taskDuration);
 
