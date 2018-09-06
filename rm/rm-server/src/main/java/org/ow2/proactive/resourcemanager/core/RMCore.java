@@ -88,6 +88,7 @@ import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.core.recovery.NodesRecoveryManager;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
@@ -98,6 +99,7 @@ import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyException;
+import org.ow2.proactive.resourcemanager.housekeeping.NodesHouseKeepingService;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceDescriptor;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSourceStatus;
@@ -303,6 +305,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
+    private NodesHouseKeepingService nodesHouseKeepingService;
+
     /**
      * ProActive Empty constructor
      */
@@ -433,6 +437,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             clientPinger.ping();
 
             nodeSourceParameterHelper = new NodeSourceParameterHelper();
+
+            nodesHouseKeepingService = new NodesHouseKeepingService(rmcoreStub);
+            nodesHouseKeepingService.start();
 
             initiateRecoveryIfRequired();
 
@@ -1015,7 +1022,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }, preemptive, isTriggeredFromShutdownHook));
     }
 
-    protected void setEligibleNodesToRecover(List<RMNode> eligibleNodes) {
+    public void setEligibleNodesToRecover(List<RMNode> eligibleNodes) {
         this.eligibleNodes = eligibleNodes;
     }
 
@@ -1564,7 +1571,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      *
      * @param nodeSourceDescriptor the descriptor of the node source to recover
      */
-    protected void recoverNodeSource(NodeSourceDescriptor nodeSourceDescriptor) {
+    public void recoverNodeSource(NodeSourceDescriptor nodeSourceDescriptor) {
 
         String nodeSourceName = nodeSourceDescriptor.getName();
         NodeSource nodeSource = this.createNodeSourceInstance(nodeSourceDescriptor);
@@ -1580,6 +1587,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 recoverNodes = this.nodesRecoveryManager.recoverFullyDeployedInfrastructureOrReset(nodeSourceName,
                                                                                                    nodeSourceToDeploy,
                                                                                                    nodeSourceDescriptor);
+            } else {
+                this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName,
+                                                                   "Recovery is not enabled for this node source");
             }
 
             NodeSourcePolicy nodeSourcePolicyStub = this.createNodeSourcePolicyActivity(nodeSourceDescriptor,
@@ -1596,6 +1606,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                              nodeSourcePolicyStub);
 
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
+        } else {
+            this.nodesRecoveryManager.logRecoveryAbortedReason(nodeSourceName, "This node source is undeployed");
         }
     }
 
@@ -1655,6 +1667,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         logger.info("RMCore shutdown request");
         this.monitoring.rmEvent(new RMEvent(RMEventType.SHUTTING_DOWN));
         this.toShutDown = true;
+
+        this.nodesHouseKeepingService.stop();
 
         if (PAResourceManagerProperties.RM_PRESERVE_NODES_ON_SHUTDOWN.getValueAsBoolean() ||
             this.deployedNodeSources.size() == 0) {
@@ -2259,6 +2273,38 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return state;
     }
 
+    public List<String> getToBeRemovedUnavailableNodesUrls() {
+
+        List<String> unavailableNodesUrl = new LinkedList<>();
+
+        unavailableNodesUrl.addAll(this.allNodes.values()
+                                                .stream()
+                                                .filter(this::isNodeUnavailableForTooLong)
+                                                .map(RMNode::getNodeURL)
+                                                .collect(Collectors.toList()));
+
+        unavailableNodesUrl.addAll(this.deployedNodeSources.entrySet()
+                                                           .stream()
+                                                           .map(Entry::getValue)
+                                                           .map(NodeSource::getDeployingAndLostNodes)
+                                                           .flatMap(list -> list.stream()
+                                                                                .filter(this::isNodeUnavailableForTooLong)
+                                                                                .map(RMDeployingNode::getNodeURL))
+                                                           .collect(Collectors.toList()));
+
+        return unavailableNodesUrl;
+    }
+
+    private boolean isNodeUnavailableForTooLong(RMNode node) {
+        if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet()) {
+            int periodInMinutes = PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt();
+            int periodInMilliseconds = periodInMinutes * 60 * 1000;
+            return (node.getState().equals(NodeState.DOWN) || node.getState().equals(NodeState.LOST)) &&
+                   (node.millisSinceStateChanged() > periodInMilliseconds);
+        }
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -2477,8 +2523,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // checking if the caller is an administrator
             client.checkPermission(nodeSource.getAdminPermission(), errorMessage);
         } catch (SecurityException ex) {
-            // the caller is not an administrator, so checking if it is a node provider
-            client.checkPermission(rmnode.getAdminPermission(), errorMessage);
+            // the caller is not an administrator, so checking if it is a node source provider
+            client.checkPermission(nodeSource.getProviderPermission(), errorMessage);
         }
 
         return true;
@@ -2492,7 +2538,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return lockNodes(urls, caller);
     }
 
-    protected BooleanWrapper lockNodes(Set<String> urls, final Client caller) {
+    public BooleanWrapper lockNodes(Set<String> urls, final Client caller) {
         return mapOnNodeUrlSet(urls, new Predicate<RMNode>() {
             @Override
             public boolean apply(RMNode node) {

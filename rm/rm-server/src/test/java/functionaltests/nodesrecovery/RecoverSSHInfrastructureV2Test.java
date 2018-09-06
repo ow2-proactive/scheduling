@@ -37,7 +37,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -74,7 +75,14 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
     @After
     public void tearDown() throws Exception {
         // kill the remaining nodes that were preserved for the test
-        RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
+        boolean nodeProcessFound = true;
+        while (nodeProcessFound) {
+            try {
+                RecoverInfrastructureTestHelper.killNodesWithStrongSigKill();
+            } catch (NodesRecoveryProcessHelper.ProcessNotFoundException e) {
+                nodeProcessFound = false;
+            }
+        }
         TestSSHInfrastructureV2.stopSSHServer();
     }
 
@@ -83,7 +91,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         // kill only the RM by sending a SIGKILL and leave node processes alive
         RecoverInfrastructureTestHelper.killRmWithStrongSigKill();
         // nodes should be re-taken into account by the restarted RM
-        restartRmAndCheckFinalState(false);
+        restartRmAndCheckFinalState(TestSSHInfrastructureV2.NB_NODES, 0);
     }
 
     @Test
@@ -91,7 +99,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         // kill RM and nodes with SIGKILL
         RecoverInfrastructureTestHelper.killRmAndNodesWithStrongSigKill();
         // nodes should be re-deployed by the restarted RM
-        restartRmAndCheckFinalState(true);
+        restartRmAndCheckFinalState(0, TestSSHInfrastructureV2.NB_NODES);
     }
 
     private void startRmWithConfig(String configurationFilePath) throws Exception {
@@ -126,7 +134,7 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         assertThat(resourceManagerMonitor.getState().getAllNodes().size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
     }
 
-    private void restartRmAndCheckFinalState(boolean nodesShouldBeRecreated) throws Exception {
+    private void restartRmAndCheckFinalState(int expectedNbAliveNodes, int expectedNbDownNodes) throws Exception {
         // restart RM
         rmHelper = new RMTHelper();
         startRmWithConfig(RESTART_CONFIG);
@@ -141,18 +149,20 @@ public class RecoverSSHInfrastructureV2Test extends RMFunctionalTest {
         assertThat(nodeSourceEvent.size()).isEqualTo(1);
         assertThat(nodeSourceEvent.get(0).getSourceName()).isEqualTo(NODE_SOURCE_NAME);
 
-        // wait for nodes to be recreated if needed
-        if (nodesShouldBeRecreated) {
-            rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, TestSSHInfrastructureV2.NB_NODES);
-        }
-
         // the nodes should have been recovered too, and should be alive
         Set<String> allNodes = resourceManagerMonitor.getState().getAllNodes();
         assertThat(allNodes.size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
         Set<String> nodeSourceNames = new HashSet<>();
         nodeSourceNames.add(NODE_SOURCE_NAME);
-        Set<String> aliveNodeUrls = resourceManager.listAliveNodeUrls(nodeSourceNames);
-        assertThat(aliveNodeUrls.size()).isEqualTo(TestSSHInfrastructureV2.NB_NODES);
+        List<RMNodeEvent> nodeEvents = resourceManagerMonitor.getInitialState().getNodeEvents();
+        long nbFreeNodes = nodeEvents.stream()
+                                     .filter(nodeEvent -> nodeEvent.getNodeState().equals(NodeState.FREE))
+                                     .count();
+        assertThat(nbFreeNodes).isEqualTo(expectedNbAliveNodes);
+        long nbDownNodes = nodeEvents.stream()
+                                     .filter(nodeEvent -> nodeEvent.getNodeState().equals(NodeState.DOWN))
+                                     .count();
+        assertThat(nbDownNodes).isEqualTo(expectedNbDownNodes);
 
         // the recovered nodes should be usable, try to lock/unlock them to see
         BooleanWrapper lockSucceeded = resourceManager.lockNodes(allNodes);

@@ -79,6 +79,9 @@ print("ok");
 			check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString(),path2)
 			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
 			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_URL.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_NAME.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_HOST.toString(),path2)
 			check_var_equals("test","initialValue",path2)
 			check_gi_equals("firstTaskGI","generic1",path2)
 
@@ -151,6 +154,9 @@ variables.put("var4", "propagatedVar4");
 			check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString(),path2)
 			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
 			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_URL.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_NAME.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_HOST.toString(),path2)
 			check_var_equals("test","newValue",path2)
 
 			check_var_equals("WORKFLOW_VAR1", "workflow_value",path2)
@@ -229,6 +235,9 @@ a=b;
 			check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString(),path2)
 			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
 			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_URL.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_NAME.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_HOST.toString(),path2)
 			check_var_equals("test","newNewValue",path2)
                     	]]>
 					</code>
@@ -296,6 +305,9 @@ a=b;
 			check_defined_var(SchedulerVars.PA_TASK_REPLICATION.toString(),path2)
 			check_defined_var(SchedulerVars.PA_USER.toString(),path2)
 			check_defined_var(SchedulerVars.PA_SCHEDULER_HOME.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_URL.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_NAME.toString(),path2)
+			check_defined_var(SchedulerVars.PA_NODE_HOST.toString(),path2)
 			check_var_equals("var1","taskVar1",path2)
 			check_var_equals("var2","jobVar2",path2)
 			check_var_equals("var3","taskVar3",path2)

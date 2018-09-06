@@ -37,6 +37,7 @@ import functionaltests.db.NodeSourcesTest;
 import functionaltests.db.RMDBManagerBufferTest;
 import functionaltests.db.RMDBManagerTest;
 import functionaltests.execremote.TestExecRemote;
+import functionaltests.housekeeping.NodesHouseKeepingPropertiesTest;
 import functionaltests.jmx.RMProxyUserInterfaceTest;
 import functionaltests.jmx.ResourceManagerJMXTest;
 import functionaltests.jmx.account.AddGetDownRemoveTest;
@@ -84,7 +85,7 @@ import functionaltests.topology.SelectionTest;
                       SelectionWithSeveralScriptsTest.class, SelectionWithSeveralScriptsTest2.class,
                       StaticSelectionScriptTest.class, UnauthorizedSelectionScriptTest.class, LocalSelectionTest.class,
                       SelectionTest.class, SSHInfrastructureV2LifecycleTest.class, TestSSHInfrastructureV2.class,
-                      LocalInfrastructureLifecycleTest.class })
+                      LocalInfrastructureLifecycleTest.class, NodesHouseKeepingPropertiesTest.class })
 
 /**
  * @author ActiveEon Team
