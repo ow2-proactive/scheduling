@@ -61,6 +61,7 @@ import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.task.containers.ExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
+import org.ow2.proactive.scheduler.task.context.NodeInfo;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
@@ -198,7 +199,7 @@ public class TaskLauncher implements InitActive {
                                                              dataspaces.getUserURI(),
                                                              dataspaces.getGlobalURI()),
                                       progressFileReader.getProgressFile().toString(),
-                                      getHostname(),
+                                      new NodeInfo(getHostname(), getNodeUrl(), getNodeName()),
                                       decrypter);
 
             File workingDir = getTaskWorkingDir(context, dataspaces);
@@ -505,6 +506,24 @@ public class TaskLauncher implements InitActive {
 
     private static String getHostname() {
         return ProActiveInet.getInstance().getInetAddress().getHostName();
+    }
+
+    private String getNodeUrl() {
+        try {
+            return PAActiveObject.getNode().getNodeInformation().getURL();
+        } catch (Exception e) {
+            logger.debug("Failed to acquire task launcher node information", e);
+            return null;
+        }
+    }
+
+    private String getNodeName() {
+        try {
+            return PAActiveObject.getNode().getNodeInformation().getName();
+        } catch (Exception e) {
+            logger.debug("Failed to acquire task launcher node information", e);
+            return null;
+        }
     }
 
 }

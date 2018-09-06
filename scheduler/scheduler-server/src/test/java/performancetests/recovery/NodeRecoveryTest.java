@@ -40,9 +40,8 @@ import org.junit.runners.Parameterized.Parameters;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.core.NodesRecoveryManager;
-import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.resourcemanager.core.recovery.NodesRecoveryManager;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 import functionaltests.nodesrecovery.RecoverInfrastructureTestHelper;

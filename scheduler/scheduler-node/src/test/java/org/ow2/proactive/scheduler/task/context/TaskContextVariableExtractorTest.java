@@ -101,7 +101,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   taskResultArray,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  null);
+                                                  new NodeInfo(null, null, null));
 
         new TaskContextVariableExtractor().getAllVariables(taskContext);
 
@@ -131,7 +131,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   taskResultArray,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  null);
+                                                  new NodeInfo(null, null, null));
 
         Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllVariables(taskContext);
 
@@ -159,7 +159,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  null);
+                                                  new NodeInfo(null, null, null));
 
         Map<String, Serializable> scopeVariables = new TaskContextVariableExtractor().getScopeVariables(taskContext);
 
@@ -177,7 +177,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  null);
+                                                  new NodeInfo(null, null, null));
 
         Map<String, Serializable> scopeVariables = new TaskContextVariableExtractor().getAllNonTaskVariables(taskContext);
 
@@ -195,7 +195,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  null);
+                                                  new NodeInfo(null, null, null));
 
         Map<String, byte[]> taskResultVariables = new HashMap<>();
 
@@ -225,6 +225,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
+                                                  new NodeInfo(null, null, null),
                                                   null);
         Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllNonTaskVariablesInjectNodesFile(taskContext,
                                                                                                                               nodesfileContent);
@@ -251,7 +252,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  null);
+                                                  new NodeInfo(null, null, null));
 
         Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllVariables(taskContext);
 
@@ -280,7 +281,7 @@ public class TaskContextVariableExtractorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  null);
+                                                  new NodeInfo(null, null, null));
 
         Map<String, Serializable> contextVariables = new TaskContextVariableExtractor().getAllVariables(taskContext);
 

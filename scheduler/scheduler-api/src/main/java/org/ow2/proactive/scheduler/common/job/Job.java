@@ -25,12 +25,18 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.addIndent;
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.line;
+import static org.ow2.proactive.scheduler.common.util.LogFormatter.lineWithQuotes;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -38,8 +44,6 @@ import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
-
-import com.google.common.base.Joiner;
 
 
 /**
@@ -300,21 +304,23 @@ public abstract class Job extends CommonAttribute {
     }
 
     public String display() {
-        String nl = System.lineSeparator();
-
-        return "Job '" + name + "' : " + nl + "\tDescription = '" + description + '\'' + nl + "\tProjectName = '" +
-               projectName + '\'' + nl +
-               (onTaskError.isSet() ? "\tonTaskError = '" + onTaskError.getValue().toString() + '\'' + nl : "") +
-               (restartTaskOnError.isSet() ? "\trestartTaskOnError = '" + restartTaskOnError.getValue() + '\'' + nl
-                                           : "") +
-               (maxNumberOfExecution.isSet() ? "\tmaxNumberOfExecution = '" +
-                                               maxNumberOfExecution.getValue().getIntegerValue() + '\'' + nl
-                                             : "") +
-               "\tgenericInformation = {" + nl + Joiner.on('\n').withKeyValueSeparator("=").join(genericInformation) +
-               nl + "}" + nl + "\tPriority = " + priority + nl + "\tInputSpace = '" + inputSpace + '\'' + nl +
-               "\tOutputSpace = '" + outputSpace + '\'' + nl + "\tGlobalSpace = '" + globalSpace + '\'' + nl +
-               "\tUserSpace = '" + userSpace + '\'' + nl + "\tVariables = {" + nl +
-               Joiner.on('\n').withKeyValueSeparator("=").join(variables) + nl + "}";
+        return "Job '" + name + "' : " + System.lineSeparator() +
+               addIndent(Stream.of(lineWithQuotes("Description", description),
+                                   lineWithQuotes("ProjectName", projectName),
+                                   line("onTaskError", onTaskError),
+                                   line("restartTaskOnError", restartTaskOnError),
+                                   line("maxNumberOfExecution",
+                                        maxNumberOfExecution,
+                                        () -> maxNumberOfExecution.getValue().getIntegerValue()),
+                                   line("genericInformation", genericInformation),
+                                   line("Priority", priority),
+                                   lineWithQuotes("InputSpace", inputSpace),
+                                   lineWithQuotes("OutputSpace", outputSpace),
+                                   lineWithQuotes("GlobalSpace", globalSpace),
+                                   lineWithQuotes("UserSpace", userSpace),
+                                   line("Variables", variables))
+                               .filter(s -> !s.isEmpty())
+                               .collect(Collectors.joining(System.lineSeparator())));
     }
 
     /**

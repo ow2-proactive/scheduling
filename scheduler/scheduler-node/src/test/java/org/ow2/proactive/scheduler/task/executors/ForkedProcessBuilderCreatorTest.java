@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskLauncherInitializer;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.context.NodeDataSpacesURIs;
+import org.ow2.proactive.scheduler.task.context.NodeInfo;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextVariableExtractor;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ForkedJvmTaskExecutionCommandCreator;
@@ -191,7 +192,7 @@ public class ForkedProcessBuilderCreatorTest extends ProActiveTestClean {
                                                   null,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
                                                   null,
-                                                  null);
+                                                  new NodeInfo(null, null, null));
         return taskContext;
     }
 
