@@ -48,6 +48,8 @@ public class IAMConfiguration {
 
     public static final String READY_MARKER = "iam.ready.marker";
 
+    public static final String ERROR_MARKER = "iam.error.markercle";
+
     public static final String JVM_ARGS = "iam.jvm.args";
 
     public static final String IAM_URL = "cas.server.prefix";

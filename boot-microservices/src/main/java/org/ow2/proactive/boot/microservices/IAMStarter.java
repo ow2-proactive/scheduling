@@ -58,6 +58,14 @@ public class IAMStarter {
 
     }
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                if (process != null) {
+                    process.destroyForcibly();
+                }
+        }));
+    }
+
     /**
      * The method starts IAM microservice as separate java process,
      * given the executable war file and configuration directory of IAM.
@@ -113,14 +121,19 @@ public class IAMStarter {
         // Stream microservice output
         ExecutorService executor = Executors.newSingleThreadExecutor();
 
+        String readyMarker = config.getString(IAMConfiguration.READY_MARKER);
+        String errorMarker = config.getString(IAMConfiguration.ERROR_MARKER);
+
         Future<String> future = executor.submit((Callable) () -> {
 
             try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
                 String line;
 
                 while ((line = br.readLine()) != null) {
-                    if (line.contains(config.getString(IAMConfiguration.READY_MARKER))) {
+                    if (line.contains(readyMarker)) {
                         break;
+                    } else if (line.contains(errorMarker)) {
+                        throw new IAMStarterException("IAM started with errors. See IAM logs for the details.");
                     }
                 }
             }
@@ -131,7 +144,7 @@ public class IAMStarter {
         try {
             return future.get(config.getInt(IAMConfiguration.STARTUP_TIMEOUT), TimeUnit.SECONDS);
         } catch (TimeoutException toe) {
-            return "IAM Microservice timed out to start. See the logs for the details.";
+            return "IAM Microservice timed out to start. See IAM logs for the details.";
         } finally {
             executor.shutdownNow();
             future.cancel(true);
