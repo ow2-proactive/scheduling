@@ -50,19 +50,30 @@ public class NodesHouseKeepingService {
     }
 
     public void start() {
-        if (PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.isSet() &&
-            PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet() &&
-            PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt() > 0) {
-
-            this.nodesHouseKeepingScheduler = createOrGetCronScheduler();
-            String cronExpression = PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.getValueAsString();
-            this.scheduledCronIdentifier = this.nodesHouseKeepingScheduler.schedule(cronExpression,
-                                                                                    getNodesHouseKeepingHandler());
-            this.nodesHouseKeepingScheduler.start();
-            logger.info("Nodes housekeeping started with periodic schedule: " +
-                        this.nodesHouseKeepingScheduler.getSchedulingPattern(this.scheduledCronIdentifier));
+        if (validProperties()) {
+            try {
+                this.nodesHouseKeepingScheduler = createOrGetCronScheduler();
+                String cronExpression = PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.getValueAsString();
+                this.scheduledCronIdentifier = this.nodesHouseKeepingScheduler.schedule(cronExpression,
+                                                                                        getNodesHouseKeepingHandler());
+                this.nodesHouseKeepingScheduler.start();
+                logger.info("Nodes housekeeping started with periodic schedule: " +
+                            this.nodesHouseKeepingScheduler.getSchedulingPattern(this.scheduledCronIdentifier));
+            } catch (RuntimeException e) {
+                logger.error("Nodes housekeeping could not be started. Nodes housekeeping will be deactivated.", e);
+            }
         }
+    }
 
+    private boolean validProperties() {
+        try {
+            return PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.isSet() &&
+                   PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.isSet() &&
+                   PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt() > 0;
+        } catch (RuntimeException e) {
+            logger.error("Nodes housekeeping properties are not valid. Nodes housekeeping will be deactivated.", e);
+            return false;
+        }
     }
 
     /*

@@ -44,12 +44,16 @@ public class NodesHouseKeepingPropertiesTest extends RMFunctionalTest {
 
     private static final String RM_CONFIG_FILE_PATH = "/functionaltests/config/functionalTRMProperties-remove-nodes-unavailable-for-two-min-every-min.ini";
 
+    private static final String ERRONEOUS_RM_CONFIG_FILE_PATH = "/functionaltests/config/functionalTRMProperties-erroneous-remove-nodes-unavailable.ini";
+
     private static final String NODE_SOURCE_NAME = "LocalNodeSource-" +
                                                    NodesHouseKeepingPropertiesTest.class.getSimpleName();
 
     private static final int NODE_NUMBER = 4;
 
     private static final String EVERY_MINUTE_CRON_EXPRESSION = "* * * * *";
+
+    private static final String ERRONEOUS_CRON_EXPRESSION = "4* *";
 
     private static final int REMOVE_DOWN_NODES_AFTER_MINUTES = 2;
 
@@ -61,6 +65,35 @@ public class NodesHouseKeepingPropertiesTest extends RMFunctionalTest {
         ResourceManager resourceManager = this.rmHelper.getResourceManager();
 
         assertThat(PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.getValueAsString()).isEqualTo(EVERY_MINUTE_CRON_EXPRESSION);
+
+        checkInitialRMState(resourceManager);
+
+        findNodeProcessAndKill();
+
+        waitForNodesHousekeepingTick(resourceManager);
+
+        assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testNodesHousekeepingIsNotStartedIfPropertyHasError() throws Exception {
+        String rmConfigurationFile = new File(RMTHelper.class.getResource(ERRONEOUS_RM_CONFIG_FILE_PATH)
+                                                             .toURI()).getAbsolutePath();
+        this.rmHelper.startRM(rmConfigurationFile);
+        ResourceManager resourceManager = this.rmHelper.getResourceManager();
+
+        assertThat(PAResourceManagerProperties.RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY.getValueAsString()).isEqualTo(ERRONEOUS_CRON_EXPRESSION);
+
+        checkInitialRMState(resourceManager);
+
+        findNodeProcessAndKill();
+
+        waitForNodesHousekeepingTick(resourceManager);
+
+        assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(4);
+    }
+
+    private void checkInitialRMState(ResourceManager resourceManager) throws Exception {
         assertThat(PAResourceManagerProperties.RM_UNAVAILABLE_NODES_MAX_PERIOD.getValueAsInt()).isEqualTo(REMOVE_DOWN_NODES_AFTER_MINUTES);
 
         assertThat(this.rmHelper.isRMStarted()).isTrue();
@@ -68,17 +101,6 @@ public class NodesHouseKeepingPropertiesTest extends RMFunctionalTest {
 
         this.rmHelper.createNodeSource(NODE_SOURCE_NAME, NODE_NUMBER);
         assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(4);
-
-        findNodeProcessAndKill();
-
-        this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NODE_NUMBER);
-        assertThat(resourceManager.listAliveNodeUrls()).isEmpty();
-        assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(4);
-
-        int expiredDownNodeMillis = REMOVE_DOWN_NODES_AFTER_MINUTES * 60 * 1000;
-        int nextDownNodesRemovalAttemptMillis = 60 * 1000;
-        Thread.sleep(expiredDownNodeMillis + nextDownNodesRemovalAttemptMillis); //NOSONAR we need to wait for the cron tick
-        assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(0);
     }
 
     private void findNodeProcessAndKill() throws Exception {
@@ -90,6 +112,16 @@ public class NodesHouseKeepingPropertiesTest extends RMFunctionalTest {
                 nodeProcessFound = false;
             }
         }
+    }
+
+    private void waitForNodesHousekeepingTick(ResourceManager resourceManager) throws InterruptedException {
+        this.rmHelper.waitForAnyMultipleNodeEvent(RMEventType.NODE_STATE_CHANGED, NODE_NUMBER);
+        assertThat(resourceManager.listAliveNodeUrls()).isEmpty();
+        assertThat(resourceManager.getState().getAllNodes().size()).isEqualTo(4);
+
+        int expiredDownNodeMillis = REMOVE_DOWN_NODES_AFTER_MINUTES * 60 * 1000;
+        int nextDownNodesRemovalAttemptMillis = 60 * 1000;
+        Thread.sleep(expiredDownNodeMillis + nextDownNodesRemovalAttemptMillis); //NOSONAR we need to wait for the cron tick
     }
 
 }
