@@ -60,9 +60,9 @@ public class IAMStarter {
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                if (process != null) {
-                    process.destroyForcibly();
-                }
+            if (process != null) {
+                process.destroyForcibly();
+            }
         }));
     }
 
