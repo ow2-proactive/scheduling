@@ -52,10 +52,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -778,6 +780,13 @@ public class RMCoreTest {
         rmCore.removeAllNodes(mockedNodeSource.getName(), false);
     }
 
+    @Test
+    public void testGetNodeThreadDump() {
+        String threadDump = rmCore.getNodeThreadDump(RMDeployingNode.PROTOCOL_ID + "://unRemovableNode")
+                                  .getStringValue();
+        assertThat(threadDump).isEqualTo("threadDumpExample");
+    }
+
     private void configureNodeForStateChange(RMNode mockedRmNode, NodeState previousNodeState) {
         RMNodeEvent rmNodeEvent = createRmNodeEvent(previousNodeState);
         when(mockedRmNode.getLastEvent()).thenReturn(rmNodeEvent);
@@ -928,6 +937,12 @@ public class RMCoreTest {
         when(client.getName()).thenReturn("test");
 
         when(rmNode.getNodeURL()).thenReturn(param.getUrl());
+
+        try {
+            when(mockedNode.getThreadDump()).thenReturn("threadDumpExample");
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
     }
 
     private void configureNodeSource(NodeSource nodeSource, String nodeSourceName) {

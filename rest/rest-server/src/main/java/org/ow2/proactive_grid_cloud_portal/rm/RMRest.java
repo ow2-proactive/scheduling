@@ -77,6 +77,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -925,6 +926,23 @@ public class RMRest implements RMRestInterface {
     @Path("/")
     public Response index() throws URISyntaxException {
         return Response.seeOther(new URI("doc/jaxrsdocs/rm/index.html")).build();
+    }
+
+    @Override
+    @GET
+    @GZIP
+    @Path("node/threaddump")
+    @Produces("application/json")
+    public String getNodeThreadDump(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String nodeUrl)
+            throws NotConnectedException {
+        RMProxyUserInterface rm = checkAccess(sessionId);
+        String threadDump;
+        try {
+            threadDump = rm.getNodeThreadDump(nodeUrl).getStringValue();
+        } catch (Exception exception) {
+            return exception.getMessage();
+        }
+        return threadDump;
     }
 
     private Object[] getAllInfrastructureParameters(String infrastructureType, String[] infrastructureParameters,

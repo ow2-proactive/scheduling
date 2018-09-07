@@ -712,4 +712,12 @@ public interface RMRestInterface {
     List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("host") String host, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable;
+
+    @GET
+    @GZIP
+    @Path("node/threaddump")
+    @Produces("application/json")
+    String getNodeThreadDump(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String nodeUrl)
+            throws NotConnectedException;
+
 }

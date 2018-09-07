@@ -116,6 +116,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.ThreadDumpNotAccessibleException;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
@@ -1956,6 +1957,32 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.error("Could not lookup stub for RMMonitoring interface", e);
             return null;
         }
+    }
+
+    @Override
+    public StringWrapper getNodeThreadDump(String nodeUrl) {
+        RMNode node = checkNodeAliveOrFail(nodeUrl);
+        String threadDump;
+        try {
+            threadDump = node.getNode().getThreadDump();
+        } catch (ProActiveException e) {
+            logger.error("Could not get node thread dump for node " + nodeUrl, e);
+            throw new ThreadDumpNotAccessibleException(nodeUrl, "failed fetching thread dump", e);
+        }
+        logger.debug("Thread dump for node " + nodeUrl + ": " + threadDump);
+        return new StringWrapper(threadDump);
+    }
+
+    private RMNode checkNodeAliveOrFail(String nodeUrl) {
+        if (!this.allNodes.containsKey(nodeUrl)) {
+            logger.warn("Could not get node thread dump for node " + nodeUrl);
+            throw new ThreadDumpNotAccessibleException(nodeUrl, "the node is not managed by the Resource Manager");
+        }
+        RMNode node = this.allNodes.get(nodeUrl);
+        if (node.isDown()) {
+            throw new ThreadDumpNotAccessibleException(nodeUrl, "the node is DOWN");
+        }
+        return node;
     }
 
     @Override
