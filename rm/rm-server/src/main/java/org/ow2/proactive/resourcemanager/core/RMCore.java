@@ -1438,8 +1438,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             NodeSourceDescriptor nodeSourceDescriptor = this.getDefinedNodeSourceDescriptorOrFail(nodeSourceName);
 
-            this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
-
             NodeSource nodeSourceToDeploy = this.createNodeSourceInstance(nodeSourceDescriptor);
             NodeSourcePolicy nodeSourcePolicyStub = this.createNodeSourcePolicyActivity(nodeSourceDescriptor,
                                                                                         nodeSourceToDeploy);
@@ -1450,10 +1448,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                              nodeSourceStub,
                                              nodeSourcePolicyStub);
 
+            this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
-
             this.emitNodeSourceEvent(nodeSourceStub, RMEventType.NODESOURCE_CREATED);
-
             logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully deployed");
         }
 
