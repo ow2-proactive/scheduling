@@ -355,4 +355,9 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         return getNodeInfo();
     }
 
+    @Override
+    public long millisSinceStateChanged() {
+        return System.currentTimeMillis() - this.stateChangeTime;
+    }
+
 }

@@ -679,8 +679,8 @@ class LiveJobs {
         InternalJob job = jobData.job;
         job.setInErrorTime(System.currentTimeMillis());
         job.setTaskPausedOnError(task);
-        setJobStatusToInErrorIfNotPaused(job);
         job.incrementNumberOfInErrorTasksBy(1);
+        setJobStatusToInErrorIfNotPaused(job);
 
         task.setInErrorTime(task.getStartTime() + taskDuration);
 
@@ -691,8 +691,10 @@ class LiveJobs {
     }
 
     private void setJobStatusToInErrorIfNotPaused(InternalJob job) {
-        if (!job.getStatus().equals(JobStatus.PAUSED)) {
+        if (!job.getStatus().equals(JobStatus.PAUSED) && job.getNumberOfInErrorTasks() > 0) {
+
             job.setStatus(JobStatus.IN_ERROR);
+
         }
     }
 
