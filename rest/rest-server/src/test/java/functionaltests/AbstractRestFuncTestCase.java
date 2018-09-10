@@ -40,7 +40,6 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -60,6 +59,12 @@ import functionaltests.utils.RestFuncTUtils;
 
 
 public abstract class AbstractRestFuncTestCase {
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            RestFuncTHelper.stopRestfulSchedulerWebapp();
+        }));
+    }
 
     static {
         configureSecurityManager();
@@ -333,11 +338,6 @@ public abstract class AbstractRestFuncTestCase {
 
     public static void init() throws Exception {
         init(RestFuncTHelper.DEFAULT_NUMBER_OF_NODES);
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
 
 }

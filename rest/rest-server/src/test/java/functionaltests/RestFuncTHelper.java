@@ -58,7 +58,6 @@ import org.ow2.proactive.scheduler.util.SchedulerStarter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.web.WebProperties;
 
-import com.google.common.collect.Sets;
 import com.jayway.awaitility.Duration;
 
 import functionaltests.utils.ProcessStreamReader;
@@ -98,67 +97,70 @@ public class RestFuncTHelper {
     }
 
     public static void startRestfulSchedulerWebapp(int nbNodes) throws Exception {
-        // Kill all children processes on exit
-        org.apache.log4j.BasicConfigurator.configure(new org.apache.log4j.varia.NullAppender());
-        CookieBasedProcessTreeKiller.registerKillChildProcessesOnShutdown("rest_tests");
 
-        List<String> cmd = new ArrayList<>();
-        String javaPath = RestFuncTUtils.getJavaPathFromSystemProperties();
-        cmd.add(javaPath);
-        cmd.add("-Djava.security.manager");
-        cmd.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + toPath(serverJavaPolicy));
+        if (schedProcess == null) {
+            // Kill all children processes on exit
+            org.apache.log4j.BasicConfigurator.configure(new org.apache.log4j.varia.NullAppender());
+            CookieBasedProcessTreeKiller.registerKillChildProcessesOnShutdown("rest_tests");
 
-        cmd.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + getSchedHome());
-        cmd.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() + getSchedHome());
-        cmd.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + getRmHome());
+            List<String> cmd = new ArrayList<>();
+            String javaPath = RestFuncTUtils.getJavaPathFromSystemProperties();
+            cmd.add(javaPath);
+            cmd.add("-Djava.security.manager");
+            cmd.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + toPath(serverJavaPolicy));
 
-        cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() +
-                System.getProperty("rm.deploy.dropDB", "true"));
-        cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(rmHibernateConfig));
+            cmd.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + getSchedHome());
+            cmd.add(PASchedulerProperties.SCHEDULER_HOME.getCmdLine() + getSchedHome());
+            cmd.add(PAResourceManagerProperties.RM_HOME.getCmdLine() + getRmHome());
 
-        cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getCmdLine() +
-                System.getProperty("scheduler.deploy.dropDB", "true"));
-        cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(schedHibernateConfig));
+            cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_DROPDB.getCmdLine() +
+                    System.getProperty("rm.deploy.dropDB", "true"));
+            cmd.add(PAResourceManagerProperties.RM_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(rmHibernateConfig));
 
-        cmd.add(WebProperties.WEB_HTTPS.getCmdLine() + "true");
+            cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_DROPDB.getCmdLine() +
+                    System.getProperty("scheduler.deploy.dropDB", "true"));
+            cmd.add(PASchedulerProperties.SCHEDULER_DB_HIBERNATE_CONFIG.getCmdLine() + toPath(schedHibernateConfig));
 
-        cmd.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
-        cmd.add(PNPConfig.PA_PNP_PORT.getCmdLine() + "1200");
+            cmd.add(WebProperties.WEB_HTTPS.getCmdLine() + "true");
 
-        cmd.add("-cp");
-        cmd.add(getClassPath());
-        cmd.add(SchedulerStarter.class.getName());
-        cmd.add("-ln");
-        cmd.add("" + nbNodes);
+            cmd.add(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "pnp");
+            cmd.add(PNPConfig.PA_PNP_PORT.getCmdLine() + "1200");
 
-        ProcessBuilder processBuilder = new ProcessBuilder(cmd);
-        processBuilder.redirectErrorStream(true);
-        schedProcess = processBuilder.start();
+            cmd.add("-cp");
+            cmd.add(getClassPath());
+            cmd.add(SchedulerStarter.class.getName());
+            cmd.add("-ln");
+            cmd.add("" + nbNodes);
 
-        ProcessStreamReader out = new ProcessStreamReader("scheduler-output: ", schedProcess.getInputStream());
-        out.start();
+            ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+            processBuilder.redirectErrorStream(true);
+            schedProcess = processBuilder.start();
 
-        // RM and scheduler are on the same url
-        String port = "1200";
-        String url = "pnp://localhost:" + port + "/";
+            ProcessStreamReader out = new ProcessStreamReader("scheduler-output: ", schedProcess.getInputStream());
+            out.start();
 
-        // Connect a scheduler client
-        SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url,
-                                                                                     TimeUnit.SECONDS.toMillis(SCHEDULER_CONNECTION_TIMEOUT));
-        schedulerPublicKey = schedAuth.getPublicKey();
-        Credentials schedCred = RestFuncTUtils.createCredentials("admin", "admin", schedulerPublicKey);
-        scheduler = schedAuth.login(schedCred);
+            // RM and scheduler are on the same url
+            String port = "1200";
+            String url = "pnp://localhost:" + port + "/";
 
-        // Connect a rm client
-        RMAuthentication rmAuth = RMConnection.waitAndJoin(url,
-                                                           TimeUnit.SECONDS.toMillis(SCHEDULER_CONNECTION_TIMEOUT));
-        Credentials rmCredentials = getRmCredentials();
-        rm = rmAuth.login(rmCredentials);
+            // Connect a scheduler client
+            SchedulerAuthenticationInterface schedAuth = SchedulerConnection.waitAndJoin(url,
+                                                                                         TimeUnit.SECONDS.toMillis(SCHEDULER_CONNECTION_TIMEOUT));
+            schedulerPublicKey = schedAuth.getPublicKey();
+            Credentials schedCred = RestFuncTUtils.createCredentials("admin", "admin", schedulerPublicKey);
+            scheduler = schedAuth.login(schedCred);
 
-        restServerUrl = "https://localhost:8443/rest/";
-        restfulSchedulerUrl = restServerUrl + "scheduler";
+            // Connect a rm client
+            RMAuthentication rmAuth = RMConnection.waitAndJoin(url,
+                                                               TimeUnit.SECONDS.toMillis(SCHEDULER_CONNECTION_TIMEOUT));
+            Credentials rmCredentials = getRmCredentials();
+            rm = rmAuth.login(rmCredentials);
 
-        await().atMost(Duration.FIVE_MINUTES).until(restIsStarted());
+            restServerUrl = "https://localhost:8443/rest/";
+            restfulSchedulerUrl = restServerUrl + "scheduler";
+
+            await().atMost(Duration.FIVE_MINUTES).until(restIsStarted());
+        }
     }
 
     public static void stopRestfulSchedulerWebapp() {
