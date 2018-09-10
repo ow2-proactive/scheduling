@@ -1437,7 +1437,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
             deployNodeSourceOrFail(nodeSourceName, nodeSourceDescriptor);
         } else {
-            logger.debug("Node source " + nodeSourceName + " is already deployed");
+            logger.debug(NODE_SOURCE_STRING + nodeSourceName + " is already deployed");
         }
         return new BooleanWrapper(true);
     }
