@@ -1455,7 +1455,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
             this.emitNodeSourceEvent(nodeSourceStub, RMEventType.NODESOURCE_CREATED);
             logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully deployed");
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor,
                                                                 NodeSourceStatus.NODES_UNDEPLOYED);
             logger.error(NODE_SOURCE_STRING + nodeSourceName + " failed to be deployed", e);
