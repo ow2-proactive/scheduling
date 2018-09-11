@@ -43,7 +43,6 @@ import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.entity.mime.content.FileBody;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -86,11 +85,6 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
             scheduler.killJob(jobId);
             scheduler.removeJob(jobId);
         }
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        RestFuncTHelper.stopRestfulSchedulerWebapp();
     }
 
     @Test

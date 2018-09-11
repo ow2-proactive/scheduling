@@ -41,10 +41,8 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.tests.ProActiveTest;
 
 import functionaltests.monitor.RMMonitorEventReceiver;

@@ -174,7 +174,7 @@ public class SchedulerStarter {
                 start(commandLine);
             }
         } catch (Exception e) {
-            LOGGER.error("Error when starting the scheduler", e);
+            LOGGER.error("Error when starting ProActive", e);
             displayHelp(options);
             System.exit(6);
         }
