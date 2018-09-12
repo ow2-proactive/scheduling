@@ -1961,26 +1961,36 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     @Override
     public StringWrapper getNodeThreadDump(String nodeUrl) {
-        RMNode node = checkNodeAliveOrFail(nodeUrl);
+        RMNode node;
+        try {
+            node = getAliveNodeOrFail(nodeUrl);
+        } catch (RuntimeException e) {
+            logger.warn("Could not get node thread dump for node " + nodeUrl + ": " + e.getMessage());
+            throw new ThreadDumpNotAccessibleException(nodeUrl, e.getMessage());
+        }
+
         String threadDump;
         try {
             threadDump = node.getNode().getThreadDump();
         } catch (ProActiveException e) {
             logger.error("Could not get node thread dump for node " + nodeUrl, e);
-            throw new ThreadDumpNotAccessibleException(nodeUrl, "failed fetching thread dump", e);
+            throw new ThreadDumpNotAccessibleException(nodeUrl, "Failed fetching thread dump", e);
         }
+
         logger.debug("Thread dump for node " + nodeUrl + ": " + threadDump);
         return new StringWrapper(threadDump);
     }
 
-    private RMNode checkNodeAliveOrFail(String nodeUrl) {
+    private RMNode getAliveNodeOrFail(String nodeUrl) {
+        if (nodeUrl == null) {
+            throw new IllegalArgumentException("The given node URL is null");
+        }
         if (!this.allNodes.containsKey(nodeUrl)) {
-            logger.warn("Could not get node thread dump for node " + nodeUrl);
-            throw new ThreadDumpNotAccessibleException(nodeUrl, "the node is not managed by the Resource Manager");
+            throw new IllegalArgumentException("The node is not managed by the Resource Manager");
         }
         RMNode node = this.allNodes.get(nodeUrl);
         if (node.isDown()) {
-            throw new ThreadDumpNotAccessibleException(nodeUrl, "the node is DOWN");
+            throw new IllegalArgumentException("The node is DOWN");
         }
         return node;
     }

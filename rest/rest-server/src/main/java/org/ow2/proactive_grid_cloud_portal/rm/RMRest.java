@@ -77,7 +77,6 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
