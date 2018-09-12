@@ -1077,7 +1077,7 @@ public class TaskData {
         this.iteration = iteration;
     }
 
-    @Column(name = "REPLICATION")
+    @Column(name = "REPLICATE")
     public int getReplication() {
         return replication;
     }
