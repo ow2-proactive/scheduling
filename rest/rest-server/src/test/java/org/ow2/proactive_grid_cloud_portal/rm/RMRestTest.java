@@ -183,7 +183,7 @@ public class RMRestTest extends RestTestServer {
         when(rm.getNodeThreadDump("pnp://nodeurl")).thenReturn(new StringWrapper("threadDumpExample"));
         String sessionId = SharedSessionStoreTestUtils.createValidSession(rm);
 
-        HttpResponse response = callHttpGetMethod("node/threaddump?nodeUrl=pnp://nodeurl", sessionId);
+        HttpResponse response = callHttpGetMethod("node/threaddump?nodeurl=pnp://nodeurl", sessionId);
         assertEquals(HttpURLConnection.HTTP_OK, response.getStatusLine().getStatusCode());
         verify(rm).getNodeThreadDump("pnp://nodeurl");
 
