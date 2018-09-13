@@ -446,6 +446,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
+    public StringWrapper getRMThreadDump() {
+        return target.getRMThreadDump();
+    }
+
+    @Override
     public StringWrapper getNodeThreadDump(String nodeUrl) {
         return target.getNodeThreadDump(nodeUrl);
     }

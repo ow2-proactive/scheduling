@@ -930,6 +930,22 @@ public class RMRest implements RMRestInterface {
     @Override
     @GET
     @GZIP
+    @Path("threaddump")
+    @Produces("application/json")
+    public String getRMThreadDump(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+        RMProxyUserInterface rm = checkAccess(sessionId);
+        String threadDump;
+        try {
+            threadDump = rm.getRMThreadDump().getStringValue();
+        } catch (Exception exception) {
+            return exception.getMessage();
+        }
+        return threadDump;
+    }
+
+    @Override
+    @GET
+    @GZIP
     @Path("node/threaddump")
     @Produces("application/json")
     public String getNodeThreadDump(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String nodeUrl)

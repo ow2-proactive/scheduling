@@ -310,6 +310,14 @@ public interface ResourceManager {
 
     /**
      * Returns the string content of the thread dump asked to the {@link Node}
+     * of the Resource Manager.
+     *
+     * @return the thread dump on the RM node
+     */
+    StringWrapper getRMThreadDump();
+
+    /**
+     * Returns the string content of the thread dump asked to the {@link Node}
      * identified by the given URL.
      *
      * @param nodeUrl node to ask the thread dump to

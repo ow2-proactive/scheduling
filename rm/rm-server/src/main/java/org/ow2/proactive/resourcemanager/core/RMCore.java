@@ -1960,6 +1960,22 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @ImmediateService
+    public StringWrapper getRMThreadDump() {
+        String threadDump;
+        try {
+            threadDump = this.nodeRM.getThreadDump();
+        } catch (ProActiveException e) {
+            logger.error("Could not get Resource Manager thread dump", e);
+            throw new ThreadDumpNotAccessibleException(this.getUrl(), "Failed fetching thread dump", e);
+        }
+
+        logger.debug("Resource Manager thread dump: " + threadDump);
+        return new StringWrapper(threadDump);
+    }
+
+    @Override
+    @ImmediateService
     public StringWrapper getNodeThreadDump(String nodeUrl) {
         RMNode node;
         try {

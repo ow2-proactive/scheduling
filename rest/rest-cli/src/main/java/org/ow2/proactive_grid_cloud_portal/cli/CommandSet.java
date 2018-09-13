@@ -51,31 +51,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSessionFileCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetSilentCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.SetUrlCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.VersionCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.AddNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.CreateNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DefineNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.DeployNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.EditNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ForceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeThreadDumpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListInfrastructureCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListPolicyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.LockNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RemoveNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmJsHelpCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetInfrastructureCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.SetPolicyCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UndeployNodeSourceCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UnlockNodeCommand;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.UpdateDynamicParametersCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.*;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
@@ -838,6 +814,15 @@ public class CommandSet {
                                                                            .jsCommand("nodeinfo(node-url)")
                                                                            .entry();
 
+    public static final CommandSet.Entry RM_THREAD_DUMP = CommandSetEntryBuilder.newInstance()
+                                                                                .opt("rmtd")
+                                                                                .longOpt("rmthreaddump")
+                                                                                .description("Retrieve thread dump of Resource Manager")
+                                                                                .hasArgs(false)
+                                                                                .commandClass(GetRMThreadDumpCommand.class)
+                                                                                .jsCommand("rmthreaddump()")
+                                                                                .entry();
+
     public static final CommandSet.Entry NODE_THREAD_DUMP = CommandSetEntryBuilder.newInstance()
                                                                                   .opt("ntd")
                                                                                   .longOpt("nodethreaddump")
@@ -1004,13 +989,13 @@ public class CommandSet {
      * CommandSet.Entry objects which are specific to Resource Manager CLI
      */
     public static final CommandSet.Entry[] RM_ONLY = new CommandSet.Entry[] { LOGIN, NODE_ADD, NODE_LIST, NODE_INFO,
-                                                                              NODE_THREAD_DUMP, NODE_LOCK, NODE_UNLOCK,
-                                                                              NODE_REMOVE, NS_DEFINE, NS_EDIT,
-                                                                              NS_UPDATE_PARAM, NS_CREATE, NS_DEPLOY,
-                                                                              NS_UNDEPLOY, NS_LIST, NS_REMOVE, NS,
-                                                                              INFRASTRUCTURE, INFRASTRUCTURE_LIST,
-                                                                              POLICY, POLICY_LIST, TOPOLOGY, FORCE,
-                                                                              RM_STATS, RM_HELP };
+                                                                              RM_THREAD_DUMP, NODE_THREAD_DUMP,
+                                                                              NODE_LOCK, NODE_UNLOCK, NODE_REMOVE,
+                                                                              NS_DEFINE, NS_EDIT, NS_UPDATE_PARAM,
+                                                                              NS_CREATE, NS_DEPLOY, NS_UNDEPLOY,
+                                                                              NS_LIST, NS_REMOVE, NS, INFRASTRUCTURE,
+                                                                              INFRASTRUCTURE_LIST, POLICY, POLICY_LIST,
+                                                                              TOPOLOGY, FORCE, RM_STATS, RM_HELP };
 
     public static final Entry[] INTERACTIVE_COMMANDS = { JS_LIST_ALL, JS_LIST_LATEST, JS_LIST_FROM, EXIT, RM_JS_HELP,
                                                          SCHED_JS_HELP, COMMON_JS_HELP, VERSION };

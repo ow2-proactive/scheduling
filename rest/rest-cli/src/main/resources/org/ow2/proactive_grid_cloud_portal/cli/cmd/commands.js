@@ -40,6 +40,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListNodeSourceCommand
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListInfrastructureCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.ListPolicyCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeInfoCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetRMThreadDumpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetNodeThreadDumpCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.RmStatsCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.GetTopologyCommand);
@@ -547,6 +548,10 @@ function listns() {
 
 function nodeinfo(nodeUrl) {
     execute(new GetNodeInfoCommand('' + nodeUrl));
+}
+
+function rmthreaddump() {
+    execute(new GetRMThreadDumpCommand());
 }
 
 function nodethreaddump(nodeUrl) {

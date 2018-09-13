@@ -715,6 +715,12 @@ public interface RMRestInterface {
 
     @GET
     @GZIP
+    @Path("threaddump")
+    @Produces("application/json")
+    String getRMThreadDump(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+
+    @GET
+    @GZIP
     @Path("node/threaddump")
     @Produces("application/json")
     String getNodeThreadDump(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String nodeUrl)
