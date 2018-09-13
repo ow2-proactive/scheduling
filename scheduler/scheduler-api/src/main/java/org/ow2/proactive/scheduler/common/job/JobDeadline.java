@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Optional;
@@ -39,7 +42,6 @@ public class JobDeadline {
     public JobDeadline(Date absoluteDeadline) {
         this.absoluteDeadline = absoluteDeadline;
         this.relativeDeadline = null;
-        Duration s;
     }
 
     public JobDeadline(Duration relativeDeadline) {
@@ -75,29 +77,30 @@ public class JobDeadline {
      */
     public static Optional<Duration> parseDuration(String stringAsDuration) throws Exception {
         if (stringAsDuration != null && stringAsDuration.length() > 0) {
-            final String[] parts = stringAsDuration.split(":");
-            if (parts.length > 3) {
-                throw new Exception("Wrong format: " + stringAsDuration);
-            }
-            int seconds = 0;
 
-            if (parts.length == 3) {
-                seconds += 60 * 60 * Integer.parseInt(parts[0]);
-                seconds += 60 * Integer.parseInt(parts[1]);
-                seconds += Integer.parseInt(parts[2]);
-            }
-            if (parts.length == 2) {
-                seconds += 60 * Integer.parseInt(parts[0]);
-                seconds += Integer.parseInt(parts[1]);
-            }
-            if (parts.length == 1) {
-                seconds += Integer.parseInt(parts[0]);
-            }
+            final Date date = applyFormats(stringAsDuration,
+                                           new SimpleDateFormat("HH:mm:ss"),
+                                           new SimpleDateFormat("mm:ss"),
+                                           new SimpleDateFormat("ss"));
 
-            return Optional.of(Duration.ofSeconds(seconds));
+            return Optional.of(Duration.ofMillis(date.getTime()));
         } else {
             return Optional.empty();
         }
 
     }
+
+    public static Date applyFormats(String expression, DateFormat... dateFormats) throws ParseException {
+        int i = 0;
+        for (; i < dateFormats.length - 1; ++i) {
+            try {
+                return dateFormats[i].parse(expression);
+            } catch (ParseException e) {
+                // ignore parse exceptions because `expression` has to follow only one format
+            }
+        }
+        // but if last attempt fails we throw exception
+        return dateFormats[i].parse(expression);
+    }
+
 }

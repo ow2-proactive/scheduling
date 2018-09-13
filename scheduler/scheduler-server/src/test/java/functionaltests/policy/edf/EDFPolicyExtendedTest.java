@@ -27,9 +27,7 @@ package functionaltests.policy.edf;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
@@ -55,6 +53,21 @@ public class EDFPolicyExtendedTest extends SchedulerFunctionalTestWithCustomConf
                                                true,
                                                new File(EDFPolicyExtendedTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-edfpolicyextended.ini")
                                                                                    .toURI()).getAbsolutePath());
+    }
+
+    @Test
+    public void testAbsoluteDateFormat() throws Exception {
+        final JobId jobId0 = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                             generalInformation("1990-10-20T19:45:00+01", "4:30:00"));
+
+        final JobId jobId1 = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                             generalInformation("1990-10-20T19:45:00+00", "4:30:00"));
+
+        schedulerHelper.createNodeSource("local", 1);
+
+        EDFPolicyTest.waitAndcheckJobOrderByFinishedTime(jobId0, jobId1);
+
+        schedulerHelper.removeNodeSource("local");
     }
 
     @Test

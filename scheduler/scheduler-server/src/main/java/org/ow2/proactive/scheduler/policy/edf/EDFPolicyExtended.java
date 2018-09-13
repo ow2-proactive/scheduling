@@ -74,19 +74,24 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
             JobPriority job1Priority = internalJob1.getPriority();
             JobPriority job2Priority = internalJob2.getPriority();
             if (!job1Priority.equals(job2Priority)) {
+                // if priorities are different compare by them
                 return job2Priority.compareTo(job1Priority);
-            } else {
+            } else { // priorities are the same
                 if (internalJob1.getJobDeadline().isPresent() & !internalJob2.getJobDeadline().isPresent()) {
+                    // job with deadline has an advanrage to the job without deadline
                     return -1;
                 } else if (!internalJob1.getJobDeadline().isPresent() & internalJob2.getJobDeadline().isPresent()) {
+                    // job with deadline has an advanrage to the job without deadline
                     return 1;
                 } else if (!internalJob1.getJobDeadline().isPresent() & !internalJob2.getJobDeadline().isPresent()) {
+                    // if two jobs do not have deadlines - we compare by the submitted time
                     return Long.compare(internalJob1.getJobInfo().getSubmittedTime(),
                                         internalJob2.getJobInfo().getSubmittedTime());
-                } else { // if(internalJob1.getJobDeadline().isPresent() & internalJob2.getJobDeadline().isPresent()) {
+                } else { // both dead line are present
                     if (internalJob1.getJobInfo().getStartTime() >= 0 &&
                         internalJob2.getJobInfo().getStartTime() >= 0) {
-                        // both started
+                        // both jobs are started
+                        // then compare their startTime
                         return Long.compare(internalJob1.getJobInfo().getStartTime(),
                                             internalJob2.getJobInfo().getStartTime());
                     } else if (internalJob1.getJobInfo().getStartTime() >= 0 &&
@@ -97,8 +102,9 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
                                internalJob2.getJobInfo().getStartTime() >= 0) {
                         // priority to already started - internalJob2
                         return 1;
-                    } else {//if(internalJob1.getJobInfo().getStartTime() < 0 && internalJob2.getJobInfo().getStartTime() < 0) {
-                        // non of the jobs are started
+                    } else { // non of the jobs are started
+                        // give a priority with the smaller interval between possible end of the job
+                        // and job deadline
                         final Duration gap1 = durationBetweenFinishAndDeadline(internalJob1, now);
                         final Duration gap2 = durationBetweenFinishAndDeadline(internalJob2, now);
                         return gap1.compareTo(gap2);

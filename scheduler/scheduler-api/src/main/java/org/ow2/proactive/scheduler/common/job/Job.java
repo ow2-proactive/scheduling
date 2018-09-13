@@ -31,6 +31,7 @@ import static org.ow2.proactive.scheduler.common.util.LogFormatter.lineWithQuote
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -350,6 +351,15 @@ public abstract class Job extends CommonAttribute {
         }
 
         return Optional.empty();
+    }
+
+    public static void main(String[] args) {
+        final Date date = ISODateTimeFormat.dateTimeNoMillis().parseDateTime("2230-10-20T19:45:00+01").toDate();
+
+        final Date date1 = ISODateTimeFormat.dateTimeNoMillis().parseDateTime("2230-10-20T19:45:00+02").toDate();
+
+        System.out.println(date.compareTo(date1));
+
     }
 
     public Optional<Duration> getJobExpectedExecutionTime() {

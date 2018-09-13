@@ -26,7 +26,6 @@
 package functionaltests.policy.edf;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
@@ -150,7 +149,7 @@ public class EDFPolicyTest extends SchedulerFunctionalTestWithCustomConfigAndRes
             schedulerHelper.waitForEventJobFinished(jobId);
         }
 
-        List<JobId> actualOrder = Arrays.asList(expectedOrder);
+        List<JobId> actualOrder = new ArrayList<>(Arrays.asList(expectedOrder));
 
         actualOrder.sort((firstJob, secondJob) -> {
             try {
@@ -161,7 +160,7 @@ public class EDFPolicyTest extends SchedulerFunctionalTestWithCustomConfigAndRes
             }
         });
 
-        assertEquals(expectedOrder, actualOrder);
+        assertEquals(Arrays.asList(expectedOrder), actualOrder);
     }
 
 }
