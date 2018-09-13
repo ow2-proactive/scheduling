@@ -30,12 +30,14 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.ow2.proactive.resourcemanager.core.recovery.NodesLockRestorationManager;
+
 
 /**
  * Stores data about nodes locked per Node Source.
  *
  * @see org.ow2.proactive.resourcemanager.db.RMDBManager
- * @see org.ow2.proactive.resourcemanager.core.NodesLockRestorationManager
+ * @see NodesLockRestorationManager
  */
 @Entity
 @Table(name = "LockHistory")

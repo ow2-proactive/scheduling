@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.core;
+package org.ow2.proactive.resourcemanager.core.recovery;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.ow2.proactive.resourcemanager.authentication.Client;
+import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
 
@@ -64,7 +65,7 @@ public class NodesLockRestorationManager {
 
     protected boolean initialized;
 
-    NodesLockRestorationManager(RMCore rmCore) {
+    public NodesLockRestorationManager(RMCore rmCore) {
         this.nodeLockedOnPreviousRun = Maps.newHashMap();
         this.rmCore = rmCore;
     }

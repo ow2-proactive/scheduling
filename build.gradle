@@ -358,7 +358,13 @@ class CustomCreateStartScripts extends CreateStartScripts {
         def generator = new org.gradle.api.internal.plugins.StartScriptGenerator()
         generator.applicationName = getApplicationName()
         generator.mainClassName = getMainClassName()
-        generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8"]
+
+        if (getApplicationName().equals("proactive-server")) {
+            generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8", "-Xms4g"]
+        } else {
+            generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8"]
+        }
+
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
         generator.exitEnvironmentVar = getExitEnvironmentVar()
         if (getApplicationName().equals("proactive-client")) {

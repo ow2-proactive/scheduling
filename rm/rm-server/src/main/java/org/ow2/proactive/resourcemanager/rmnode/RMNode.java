@@ -350,4 +350,6 @@ public interface RMNode extends Comparable<RMNode> {
 
     RMNodeEvent createNodeEvent();
 
+    long millisSinceStateChanged();
+
 }
