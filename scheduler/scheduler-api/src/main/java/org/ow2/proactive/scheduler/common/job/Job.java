@@ -29,6 +29,7 @@ import static org.ow2.proactive.scheduler.common.util.LogFormatter.addIndent;
 import static org.ow2.proactive.scheduler.common.util.LogFormatter.line;
 import static org.ow2.proactive.scheduler.common.util.LogFormatter.lineWithQuotes;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,11 +40,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
+import org.joda.time.format.ISODateTimeFormat;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.CommonAttribute;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
-import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 
 
 /**
@@ -68,6 +69,8 @@ public abstract class Job extends CommonAttribute {
     private static final Logger LOGGER = Logger.getLogger(Job.class);
 
     public static final String JOB_DDL = "JOB_DDL";
+
+    public static final String JOB_EXEC_TIME = "JOB_EXEC_TIME";
 
     /**
      * Name of the job
@@ -324,17 +327,51 @@ public abstract class Job extends CommonAttribute {
     }
 
     /**
+     * Deadline can be as absolute or relative (from the job started time)
+     * Absolute deadline can be set as GI vairable `JOB_DDL` in ISO8601 date format
+     * without milliseconds, e.g. 2018-08-14T08:40:30+02:00.
+     * Relative deadline can be set as GI vairable `JOB_DDL` in the following format
+     * +HH:MM:SS, e.g. `+02:30:00`, or as +MM:SS, e.g. `+15:30`, or as +SS, e.g. `+40`.
      * @return job deadline if it exists
-     * (currently deadline can be set as job GI vairable in ISO8601 date format)
      */
-    public Optional<Date> getJobDeadline() {
+    public Optional<JobDeadline> getJobDeadline() {
         if (genericInformation.containsKey(JOB_DDL)) {
+            final String strJobDeadline = genericInformation.get(Job.JOB_DDL);
             try {
-                return Optional.of(ISO8601DateUtil.toDate(genericInformation.get(JOB_DDL)));
+                if (strJobDeadline.startsWith("+")) { // should be relative deadline
+                    return Optional.of(new JobDeadline(JobDeadline.parseDuration(strJobDeadline.substring(1)).get()));
+                } else { // should be absolute deadline
+                    return Optional.of(new JobDeadline(ISODateTimeFormat.dateTimeNoMillis()
+                                                                        .parseDateTime(strJobDeadline)
+                                                                        .toDate()));
+                }
             } catch (Exception e) {
-                LOGGER.warn("Imposible to parse JOB_DDL GI variable as ISO8601 date", e);
+                LOGGER.warn("Imposible to parse JOB_DDL GI variable as ISO8601 date: " + strJobDeadline);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public static void main(String[] args) {
+        final Date date = ISODateTimeFormat.dateTimeNoMillis().parseDateTime("2230-10-20T19:45:00+01").toDate();
+
+        final Date date1 = ISODateTimeFormat.dateTimeNoMillis().parseDateTime("2230-10-20T19:45:00+02").toDate();
+
+        System.out.println(date.compareTo(date1));
+
+    }
+
+    public Optional<Duration> getJobExpectedExecutionTime() {
+        if (genericInformation.containsKey(JOB_EXEC_TIME)) {
+            final String strJobExecTime = genericInformation.get(Job.JOB_EXEC_TIME);
+            try {
+                return Optional.of(JobDeadline.parseDuration(strJobExecTime).get());
+            } catch (Exception e) {
+                LOGGER.warn("Imposible to parse JOB_EXEC_TIME GI variable as `HH:MM:SS`: " + strJobExecTime);
             }
         }
         return Optional.empty();
     }
+
 }

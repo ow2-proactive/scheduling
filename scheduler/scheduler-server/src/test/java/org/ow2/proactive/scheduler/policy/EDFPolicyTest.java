@@ -39,6 +39,7 @@ import java.util.Optional;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.JobDeadline;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -103,7 +104,14 @@ public class EDFPolicyTest extends ProActiveTestClean {
         when(job.getJobId()).thenReturn(jobId);
         final InternalJob internalJob = mock(InternalJob.class);
         when(job.getInternal()).thenReturn(internalJob);
-        when(internalJob.getJobDeadline()).thenReturn(deadline);
+        if (deadline.isPresent()) {
+            final JobDeadline jobDeadline = mock(JobDeadline.class);
+            when(internalJob.getJobDeadline()).thenReturn(Optional.of(jobDeadline));
+            when(jobDeadline.isAbsolute()).thenReturn(true);
+            when(jobDeadline.getAbsoluteDeadline()).thenReturn(deadline.get());
+        } else {
+            when(internalJob.getJobDeadline()).thenReturn(Optional.empty());
+        }
         when(internalJob.getPriority()).thenReturn(jobPriority);
 
         final EligibleTaskDescriptor taskDescriptor0 = mock(EligibleTaskDescriptor.class);
