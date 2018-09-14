@@ -353,15 +353,6 @@ public abstract class Job extends CommonAttribute {
         return Optional.empty();
     }
 
-    public static void main(String[] args) {
-        final Date date = ISODateTimeFormat.dateTimeNoMillis().parseDateTime("2230-10-20T19:45:00+01").toDate();
-
-        final Date date1 = ISODateTimeFormat.dateTimeNoMillis().parseDateTime("2230-10-20T19:45:00+02").toDate();
-
-        System.out.println(date.compareTo(date1));
-
-    }
-
     public Optional<Duration> getJobExpectedExecutionTime() {
         if (genericInformation.containsKey(JOB_EXEC_TIME)) {
             final String strJobExecTime = genericInformation.get(Job.JOB_EXEC_TIME);

@@ -71,6 +71,41 @@ public class EDFPolicyExtendedTest extends SchedulerFunctionalTestWithCustomConf
     }
 
     @Test
+    public void jobsAbsoluteAgainstRelativeDeadline() throws Exception {
+
+        final JobId jobIdAbsolute = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                    generalInformation(new DateTime().plusHours(1),
+                                                                                       ""));
+
+        final JobId jobIdRelated = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                   generalInformation("+2:00:00", ""));
+
+        schedulerHelper.createNodeSource("local", 1);
+
+        EDFPolicyTest.waitAndcheckJobOrderByFinishedTime(jobIdAbsolute, jobIdRelated);
+
+        schedulerHelper.removeNodeSource("local");
+    }
+
+    @Test
+    public void jobsExpectedTime() throws Exception {
+
+        final JobId jobIdAbsolute = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                    generalInformation(new DateTime().plusHours(1),
+                                                                                       "30:00"));
+
+        final JobId jobIdRelated = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                   generalInformation(new DateTime().plusHours(1),
+                                                                                      "40:00"));
+
+        schedulerHelper.createNodeSource("local", 1);
+
+        EDFPolicyTest.waitAndcheckJobOrderByFinishedTime(jobIdRelated, jobIdAbsolute);
+
+        schedulerHelper.removeNodeSource("local");
+    }
+
+    @Test
     public void jobsHaveSamePriorityTest() throws Exception {
 
         JobId noDeadLine0 = schedulerHelper.submitJob(new File(lowest.toURI()).getAbsolutePath());
@@ -107,14 +142,18 @@ public class EDFPolicyExtendedTest extends SchedulerFunctionalTestWithCustomConf
     public static Map<String, String> generalInformation(DateTime deadline, String expectedTime) throws Exception {
         Map<String, String> variables = new HashMap<>();
         variables.put("JOB_DDL", EDFPolicyTest.dateToISOWithoutMillisecondsString(deadline));
-        variables.put("JOB_EXEC_TIME", expectedTime);
+        if (expectedTime != null && expectedTime.length() > 0) {
+            variables.put("JOB_EXEC_TIME", expectedTime);
+        }
         return variables;
     }
 
     public static Map<String, String> generalInformation(String deadline, String expectedTime) {
         Map<String, String> variables = new HashMap<>();
         variables.put("JOB_DDL", deadline);
-        variables.put("JOB_EXEC_TIME", expectedTime);
+        if (expectedTime != null && expectedTime.length() > 0) {
+            variables.put("JOB_EXEC_TIME", expectedTime);
+        }
         return variables;
     }
 
