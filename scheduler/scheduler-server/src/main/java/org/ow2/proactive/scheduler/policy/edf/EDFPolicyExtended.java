@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -63,6 +64,8 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
 
     private static final Date MAXIMUM_DATE = new Date(Long.MAX_VALUE);
 
+    private static final Logger LOGGER = Logger.getLogger(EDFPolicyExtended.class);
+
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         final Date now = new Date();
@@ -83,13 +86,12 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
                 } else if (!internalJob1.getJobDeadline().isPresent() & internalJob2.getJobDeadline().isPresent()) {
                     // job with deadline has an advanrage to the job without deadline
                     return 1;
-                } else if (!internalJob1.getJobDeadline().isPresent() & !internalJob2.getJobDeadline().isPresent()) {
+                } else if (noDeadlines(internalJob1, internalJob2)) {
                     // if two jobs do not have deadlines - we compare by the submitted time
                     return Long.compare(internalJob1.getJobInfo().getSubmittedTime(),
                                         internalJob2.getJobInfo().getSubmittedTime());
                 } else { // both dead line are present
-                    if (internalJob1.getJobInfo().getStartTime() >= 0 &&
-                        internalJob2.getJobInfo().getStartTime() >= 0) {
+                    if (bothStarted(internalJob1, internalJob2)) {
                         // both jobs are started
                         // then compare their startTime
                         return Long.compare(internalJob1.getJobInfo().getStartTime(),
@@ -119,6 +121,14 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
                    .flatMap(jobDescriptor -> jobDescriptor.getEligibleTasks().stream())
                    .map(taskDescriptors -> (EligibleTaskDescriptor) taskDescriptors)
                    .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    private boolean bothStarted(InternalJob internalJob1, InternalJob internalJob2) {
+        return internalJob1.getJobInfo().getStartTime() >= 0 && internalJob2.getJobInfo().getStartTime() >= 0;
+    }
+
+    private boolean noDeadlines(InternalJob internalJob1, InternalJob internalJob2) {
+        return !internalJob1.getJobDeadline().isPresent() & !internalJob2.getJobDeadline().isPresent();
     }
 
     private static Duration durationBetweenFinishAndDeadline(InternalJob internalJob, Date now) {
