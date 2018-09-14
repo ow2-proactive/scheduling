@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Optional;
+import java.util.TimeZone;
 
 
 public class JobDeadline {
@@ -94,6 +95,7 @@ public class JobDeadline {
         int i = 0;
         for (; i < dateFormats.length - 1; ++i) {
             try {
+                dateFormats[i].setTimeZone(TimeZone.getTimeZone("GMT"));
                 return dateFormats[i].parse(expression);
             } catch (ParseException e) {
                 // ignore parse exceptions because `expression` has to follow only one format
