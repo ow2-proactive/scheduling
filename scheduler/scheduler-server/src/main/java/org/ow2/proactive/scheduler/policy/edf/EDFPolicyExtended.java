@@ -33,10 +33,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
-import org.ow2.proactive.scheduler.core.JobEmailNotificationException;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -65,13 +63,11 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
 
     private static final Date MAXIMUM_DATE = new Date(Long.MAX_VALUE);
 
-    private static final Logger LOGGER = Logger.getLogger(EDFPolicyExtended.class);
-
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         final Date now = new Date();
 
-        fireEventsIfSomeJobsWillNotMeetTheirDeadlines(jobs);
+        new JobDeadlineEmailNotification(jobs).doActionAndSendIfNeedIt();
 
         final Comparator<JobDescriptor> jobDescriptorComparator = (job1, job2) -> {
 
@@ -135,10 +131,14 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
     }
 
     private static Duration durationBetweenFinishAndDeadline(InternalJob internalJob, Date now) {
-        final Date effectiveDeadline = getEffectiveDeadline(internalJob, now);
-        final Date effectiveExpectedExecutionTime = getEffectiveExpectedExecutionTime(internalJob, now);
-        final long gapInMillis = effectiveDeadline.getTime() - effectiveExpectedExecutionTime.getTime();
-        return Duration.ofMillis(gapInMillis);
+        if(internalJob.getJobDeadline().isPresent()) {
+            Date effectiveDeadline = getEffectiveDeadline(internalJob, now);
+            Date effectiveExpectedExecutionTime = getEffectiveExpectedExecutionTime(internalJob, now);
+            long gapInMillis = effectiveDeadline.getTime() - effectiveExpectedExecutionTime.getTime();
+            return Duration.ofMillis(gapInMillis);
+        } else {
+            return Duration.ZERO;
+        }
     }
 
     /**
@@ -173,25 +173,5 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
         }
     }
 
-    private void fireEventsIfSomeJobsWillNotMeetTheirDeadlines(List<JobDescriptor> jobs) {
-        Date now = new Date();
-        final List<InternalJob> jobsWhichWillMissDeadlines = jobs.stream()
-                                                                 .map(jobDescriptor -> ((JobDescriptorImpl) jobDescriptor).getInternal())
-                                                                 .filter(job -> getEffectiveDeadline(job,
-                                                                                                     now).compareTo(getEffectiveExpectedExecutionTime(job,
-                                                                                                                                                      now)) < 0)
-                                                                 .collect(Collectors.toList());
 
-        jobsWhichWillMissDeadlines.forEach(job -> {
-            LOGGER.warn(String.format("Job[id=%s] might miss its deadline (expected finish: %s after deadline: %s)",
-                                      job.getId().value(),
-                                      getEffectiveExpectedExecutionTime(job, now),
-                                      getEffectiveDeadline(job, now)));
-            try {
-                new JobDeadlineEmailNotification(job).doSend();
-            } catch (JobEmailNotificationException e) {
-                LOGGER.error(e);
-            }
-        });
-    }
 }
