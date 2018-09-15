@@ -33,7 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
@@ -64,11 +63,11 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
 
     private static final Date MAXIMUM_DATE = new Date(Long.MAX_VALUE);
 
-    private static final Logger LOGGER = Logger.getLogger(EDFPolicyExtended.class);
-
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         final Date now = new Date();
+
+        new JobDeadlineEmailNotification(jobs).doActionAndSendIfNeedIt();
 
         final Comparator<JobDescriptor> jobDescriptorComparator = (job1, job2) -> {
 
@@ -132,17 +131,21 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
     }
 
     private static Duration durationBetweenFinishAndDeadline(InternalJob internalJob, Date now) {
-        final Date effectiveDeadline = getEffectiveDeadline(internalJob, now);
-        final Date effectiveExpectedExecutionTime = getEffectiveExpectedExecutionTime(internalJob, now);
-        final long gapInMillis = effectiveDeadline.getTime() - effectiveExpectedExecutionTime.getTime();
-        return Duration.ofMillis(gapInMillis);
+        if (internalJob.getJobDeadline().isPresent()) {
+            Date effectiveDeadline = getEffectiveDeadline(internalJob, now);
+            Date effectiveExpectedExecutionTime = getEffectiveExpectedExecutionTime(internalJob, now);
+            long gapInMillis = effectiveDeadline.getTime() - effectiveExpectedExecutionTime.getTime();
+            return Duration.ofMillis(gapInMillis);
+        } else {
+            return Duration.ZERO;
+        }
     }
 
     /**
      * @return deadline of the job if existed, otherwise returns biggest date possible
      * (this is how this policy treats absence of deadline)
      */
-    private static Date getEffectiveDeadline(InternalJob internalJob, Date now) {
+    public static Date getEffectiveDeadline(InternalJob internalJob, Date now) {
         if (internalJob.getJobDeadline().isPresent()) {
             if (internalJob.getJobDeadline().get().isAbsolute()) {
                 return internalJob.getJobDeadline().get().getAbsoluteDeadline();
@@ -158,7 +161,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
         }
     }
 
-    private static Date getEffectiveExpectedExecutionTime(InternalJob internalJob, Date now) {
+    public static Date getEffectiveExpectedExecutionTime(InternalJob internalJob, Date now) {
         if (internalJob.getJobExpectedExecutionTime().isPresent()) {
             final Duration expectedTime = internalJob.getJobExpectedExecutionTime().get();
             Calendar cal = Calendar.getInstance(); // creates calendar
