@@ -131,7 +131,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
     }
 
     private static Duration durationBetweenFinishAndDeadline(InternalJob internalJob, Date now) {
-        if(internalJob.getJobDeadline().isPresent()) {
+        if (internalJob.getJobDeadline().isPresent()) {
             Date effectiveDeadline = getEffectiveDeadline(internalJob, now);
             Date effectiveExpectedExecutionTime = getEffectiveExpectedExecutionTime(internalJob, now);
             long gapInMillis = effectiveDeadline.getTime() - effectiveExpectedExecutionTime.getTime();
@@ -172,6 +172,5 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
             return now;
         }
     }
-
 
 }
