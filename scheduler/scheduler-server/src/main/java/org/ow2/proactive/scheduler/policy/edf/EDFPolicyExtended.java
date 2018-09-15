@@ -66,9 +66,30 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
 
     private static final Logger LOGGER = Logger.getLogger(EDFPolicyExtended.class);
 
+    private void logIfJobWillMissItsDeadline(List<JobDescriptor> jobs) {
+        Date now = new Date();
+        jobs.stream()
+            .map(jobDescriptor -> ((JobDescriptorImpl) jobDescriptor).getInternal())
+            .filter(job -> job.getJobDeadline().isPresent())
+            .filter(job -> {
+                Date deadline = getEffectiveDeadline(job, now);
+                Date expeFinish = getEffectiveExpectedExecutionTime(job, now);
+                return deadline.compareTo(expeFinish) < 0;
+            })
+            .forEach(job -> {
+                LOGGER.warn(String.format("Job[id=%s] might miss its deadline (expected finish: %s after deadline: %s)",
+                                          job.getId().value(),
+                                          getEffectiveExpectedExecutionTime(job, now),
+                                          getEffectiveDeadline(job, now)));
+
+            });
+    }
+
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         final Date now = new Date();
+
+        logIfJobWillMissItsDeadline(jobs);
 
         final Comparator<JobDescriptor> jobDescriptorComparator = (job1, job2) -> {
 
