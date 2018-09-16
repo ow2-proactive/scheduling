@@ -26,15 +26,12 @@
 package org.ow2.proactive.scheduler.policy.edf;
 
 import java.time.Duration;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -66,9 +63,35 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
 
     private static final Logger LOGGER = Logger.getLogger(EDFPolicyExtended.class);
 
+    private static final Set<JobId> alreadyNotified = new HashSet<>();
+
+    private synchronized void logIfJobWillMissItsDeadline(List<JobDescriptor> jobs) {
+        Date now = new Date();
+        jobs.stream()
+            .map(jobDescriptor -> ((JobDescriptorImpl) jobDescriptor).getInternal())
+            .filter(job -> job.getJobDeadline().isPresent())
+            .filter(job -> job.getJobInfo().getStartTime() >= 0)
+            .filter(job -> {
+                Date deadline = getEffectiveDeadline(job);
+                Date expeFinish = getEffectiveExpectedExecutionTime(job, now);
+                return deadline.compareTo(expeFinish) < 0;
+            })
+            .forEach(job -> {
+                if (!alreadyNotified.contains(job.getId())) {
+                    LOGGER.warn(String.format("Job[id=%s] might miss its deadline (expected finish: %s after deadline: %s)",
+                                              job.getId().value(),
+                                              getEffectiveExpectedExecutionTime(job, now),
+                                              getEffectiveDeadline(job)));
+                    alreadyNotified.add(job.getId());
+                }
+            });
+    }
+
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         final Date now = new Date();
+
+        logIfJobWillMissItsDeadline(jobs);
 
         final Comparator<JobDescriptor> jobDescriptorComparator = (job1, job2) -> {
 
