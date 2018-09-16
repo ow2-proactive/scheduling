@@ -132,7 +132,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
     }
 
     private static Duration durationBetweenFinishAndDeadline(InternalJob internalJob, Date now) {
-        final Date effectiveDeadline = getEffectiveDeadline(internalJob, now);
+        final Date effectiveDeadline = getEffectiveDeadline(internalJob);
         final Date effectiveExpectedExecutionTime = getEffectiveExpectedExecutionTime(internalJob, now);
         final long gapInMillis = effectiveDeadline.getTime() - effectiveExpectedExecutionTime.getTime();
         return Duration.ofMillis(gapInMillis);
@@ -142,15 +142,15 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
      * @return deadline of the job if existed, otherwise returns biggest date possible
      * (this is how this policy treats absence of deadline)
      */
-    private static Date getEffectiveDeadline(InternalJob internalJob, Date now) {
+    private static Date getEffectiveDeadline(InternalJob internalJob) {
         if (internalJob.getJobDeadline().isPresent()) {
             if (internalJob.getJobDeadline().get().isAbsolute()) {
                 return internalJob.getJobDeadline().get().getAbsoluteDeadline();
             } else {
                 final Duration relativeDeadline = internalJob.getJobDeadline().get().getRelativeDeadline();
-                Calendar cal = Calendar.getInstance(); // creates calendar
-                cal.setTime(now); // sets calendar time/date
-                cal.add(Calendar.SECOND, (int) relativeDeadline.getSeconds()); // adds one hour
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(internalJob.getJobInfo().getSubmittedTime());
+                cal.add(Calendar.SECOND, (int) relativeDeadline.getSeconds());
                 return cal.getTime();
             }
         } else {
@@ -161,9 +161,9 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
     private static Date getEffectiveExpectedExecutionTime(InternalJob internalJob, Date now) {
         if (internalJob.getJobExpectedExecutionTime().isPresent()) {
             final Duration expectedTime = internalJob.getJobExpectedExecutionTime().get();
-            Calendar cal = Calendar.getInstance(); // creates calendar
-            cal.setTime(now); // sets calendar time/date
-            cal.add(Calendar.SECOND, (int) expectedTime.getSeconds()); // adds one hour
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(now);
+            cal.add(Calendar.SECOND, (int) expectedTime.getSeconds());
             return cal.getTime();
         } else {
             return now;
