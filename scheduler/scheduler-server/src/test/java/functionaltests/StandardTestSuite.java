@@ -27,6 +27,7 @@ package functionaltests;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.ow2.proactive.scheduler.policy.edf.EDFPolicyExtended;
 
 import functionaltests.api.AuthenticationTest;
 import functionaltests.api.SchedulerUsageTest;
@@ -116,6 +117,7 @@ import functionaltests.job.taskkill.TestKilledJobResult;
 import functionaltests.job.taskkill.TestMarkedAsFinished;
 import functionaltests.job.workingdir.TestForkedTaskWorkingDir;
 import functionaltests.job.workingdir.TestWorkingDirStaticCommand;
+import functionaltests.policy.edf.EDFPolicyExtendedTest;
 import functionaltests.policy.edf.EDFPolicyTest;
 import functionaltests.policy.license.TestLicensePolicy;
 import functionaltests.policy.ram.TestRamPolicy;
@@ -248,7 +250,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestSubmitJobWithPartiallyUnaccessibleDataSpaces.class,
                       TestSubmitJobWithUnaccessibleDataSpaces.class, TestTaskRestartOnNodeFailure.class,
                       TestTasksCompleteAfterSelectiontimeout.class, TestUnauthorizedScripts.class,
-                      TestVariablesPropagation.class, EDFPolicyTest.class })
+                      TestVariablesPropagation.class, EDFPolicyTest.class, EDFPolicyExtendedTest.class })
 
 /**
  * @author ActiveEon Team

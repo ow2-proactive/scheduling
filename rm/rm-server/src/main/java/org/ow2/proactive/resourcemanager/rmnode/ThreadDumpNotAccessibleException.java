@@ -23,22 +23,18 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.utils;
+package org.ow2.proactive.resourcemanager.rmnode;
 
-import java.io.File;
+public class ThreadDumpNotAccessibleException extends RuntimeException {
 
-import org.junit.BeforeClass;
+    private static final String ERROR_HEADER = "Could not perform thread dump";
 
+    public ThreadDumpNotAccessibleException(String nodeUrl, String reason) {
+        super(ERROR_HEADER + " (" + nodeUrl + "): " + reason);
+    }
 
-public class SchedulerFunctionalTestEDFPolicy extends SchedulerFunctionalTestWithCustomConfigAndRestart {
-
-    @BeforeClass
-    public static void startDedicatedScheduler() throws Exception {
-        schedulerHelper.log("Start Scheduler with EDFPolicy.");
-        schedulerHelper = new SchedulerTHelper(false,
-                                               true,
-                                               new File(SchedulerFunctionalTestLicensePolicy.class.getResource("/functionaltests/config/functionalTSchedulerProperties-edfpolicy.ini")
-                                                                                                  .toURI()).getAbsolutePath());
+    public ThreadDumpNotAccessibleException(String nodeUrl, String reason, Exception exceptionCause) {
+        super(ERROR_HEADER + " (" + nodeUrl + "): " + reason, exceptionCause);
     }
 
 }

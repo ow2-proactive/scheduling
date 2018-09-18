@@ -51,6 +51,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -59,6 +60,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
@@ -173,6 +175,20 @@ public class RMRestTest extends RestTestServer {
         callHttpPostMethod("node", sessionId, secondCall);
 
         verify(rm).addNode("urlwithnsname", "ns");
+    }
+
+    @Test
+    public void testGetNodeThreadDump() throws Exception {
+        RMProxyUserInterface rm = mock(RMProxyUserInterface.class);
+        when(rm.getNodeThreadDump("pnp://nodeurl")).thenReturn(new StringWrapper("threadDumpExample"));
+        String sessionId = SharedSessionStoreTestUtils.createValidSession(rm);
+
+        HttpResponse response = callHttpGetMethod("node/threaddump?nodeurl=pnp://nodeurl", sessionId);
+        assertEquals(HttpURLConnection.HTTP_OK, response.getStatusLine().getStatusCode());
+        verify(rm).getNodeThreadDump("pnp://nodeurl");
+
+        String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
+        assertEquals("threadDumpExample", responseString);
     }
 
     private HttpResponse callHttpGetMethod(String httpMethod, String sessionId) throws IOException {

@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.core;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSIONS_TO_GET_THE_LOGS_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB;
@@ -207,6 +208,22 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
     }
 
     @Test
+    public void testFinishInErrorTask() throws UnknownJobException, NotConnectedException, PermissionException {
+        Mockito.when(frontendState.getIdentifiedJob(jobId)).thenReturn(ij);
+        Mockito.when(ij.isFinished()).thenReturn(false);
+        Mockito.when(frontendState.getJobState(jobId)).thenReturn(jobstate);
+
+        try {
+            schedulerFrontend.finishInErrorTask("123", "taskname");
+        } catch (Exception e) {
+        }
+
+        Mockito.verify(frontendState, times(1)).checkPermissions("finishInErrorTask",
+                                                                 ij,
+                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
+    }
+
+    @Test
     public void testRestartInErrorTask() throws KeyException, AlreadyConnectedException, NotConnectedException,
             PermissionException, UnknownJobException {
 
@@ -219,7 +236,7 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         } catch (Exception e) {
         }
 
-        Mockito.verify(frontendState, times(1)).checkPermissions("restartTaskOnError",
+        Mockito.verify(frontendState, times(1)).checkPermissions("restartInErrorTask",
                                                                  ij,
                                                                  YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
 
