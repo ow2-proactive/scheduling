@@ -116,6 +116,7 @@ import org.ow2.proactive.resourcemanager.nodesource.policy.NodeSourcePolicyFacto
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.resourcemanager.rmnode.RMDeployingNode;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
+import org.ow2.proactive.resourcemanager.rmnode.ThreadDumpNotAccessibleException;
 import org.ow2.proactive.resourcemanager.selection.SelectionManager;
 import org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyManager;
@@ -1431,30 +1432,36 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Override
     public BooleanWrapper deployNodeSource(String nodeSourceName) {
-
         logger.info("Deploy node source " + nodeSourceName + REQUESTED_BY_STRING + this.caller.getName());
-
         if (!this.deployedNodeSources.containsKey(nodeSourceName)) {
-
             NodeSourceDescriptor nodeSourceDescriptor = this.getDefinedNodeSourceDescriptorOrFail(nodeSourceName);
+            this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
+            deployNodeSourceOrFail(nodeSourceName, nodeSourceDescriptor);
+        } else {
+            logger.debug(NODE_SOURCE_STRING + nodeSourceName + " is already deployed");
+        }
+        return new BooleanWrapper(true);
+    }
 
+    private void deployNodeSourceOrFail(String nodeSourceName, NodeSourceDescriptor nodeSourceDescriptor) {
+        try {
             NodeSource nodeSourceToDeploy = this.createNodeSourceInstance(nodeSourceDescriptor);
             NodeSourcePolicy nodeSourcePolicyStub = this.createNodeSourcePolicyActivity(nodeSourceDescriptor,
                                                                                         nodeSourceToDeploy);
             NodeSource nodeSourceStub = this.createNodeSourceActivity(nodeSourceName, nodeSourceToDeploy);
-
             this.configureDeployedNodeSource(nodeSourceName,
                                              nodeSourceDescriptor,
                                              nodeSourceStub,
                                              nodeSourcePolicyStub);
-
-            this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor, NodeSourceStatus.NODES_DEPLOYED);
             this.deployedNodeSources.put(nodeSourceName, nodeSourceStub);
             this.emitNodeSourceEvent(nodeSourceStub, RMEventType.NODESOURCE_CREATED);
             logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully deployed");
+        } catch (Exception e) {
+            this.updateNodeSourceDescriptorWithStatusAndPersist(nodeSourceDescriptor,
+                                                                NodeSourceStatus.NODES_UNDEPLOYED);
+            logger.error(NODE_SOURCE_STRING + nodeSourceName + " failed to be deployed", e);
+            throw e;
         }
-
-        return new BooleanWrapper(true);
     }
 
     private void configureDeployedNodeSource(String nodeSourceName, NodeSourceDescriptor nodeSourceDescriptor,
@@ -1499,22 +1506,19 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     private NodeSource createNodeSourceActivity(String nodeSourceName, NodeSource nodeSourceToDeploy) {
-
         try {
             nodeSourceToDeploy = PAActiveObject.turnActive(nodeSourceToDeploy, this.nodeRM);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException("Cannot create node source activity " + nodeSourceName, e);
+            String errorMessage = "Failed to create node source activity " + nodeSourceName;
+            logger.error(errorMessage, e);
+            throw new RuntimeException(errorMessage, e);
         }
-
         return nodeSourceToDeploy;
     }
 
     private void updateNodeSourceDescriptorWithStatusAndPersist(NodeSourceDescriptor descriptor,
             NodeSourceStatus status) {
-
         descriptor.setStatus(status);
-
         persistNodeSourceWithNewDescriptor(descriptor);
     }
 
@@ -1953,6 +1957,58 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.error("Could not lookup stub for RMMonitoring interface", e);
             return null;
         }
+    }
+
+    @Override
+    @ImmediateService
+    public StringWrapper getRMThreadDump() {
+        String threadDump;
+        try {
+            threadDump = this.nodeRM.getThreadDump();
+        } catch (ProActiveException e) {
+            logger.error("Could not get Resource Manager thread dump", e);
+            throw new ThreadDumpNotAccessibleException(this.getUrl(), "Failed fetching thread dump", e);
+        }
+
+        logger.debug("Resource Manager thread dump: " + threadDump);
+        return new StringWrapper(threadDump);
+    }
+
+    @Override
+    @ImmediateService
+    public StringWrapper getNodeThreadDump(String nodeUrl) {
+        RMNode node;
+        try {
+            node = getAliveNodeOrFail(nodeUrl);
+        } catch (RuntimeException e) {
+            logger.warn("Could not get node thread dump for node " + nodeUrl + ": " + e.getMessage());
+            throw new ThreadDumpNotAccessibleException(nodeUrl, e.getMessage());
+        }
+
+        String threadDump;
+        try {
+            threadDump = node.getNode().getThreadDump();
+        } catch (ProActiveException e) {
+            logger.error("Could not get node thread dump for node " + nodeUrl, e);
+            throw new ThreadDumpNotAccessibleException(nodeUrl, "Failed fetching thread dump", e);
+        }
+
+        logger.debug("Thread dump for node " + nodeUrl + ": " + threadDump);
+        return new StringWrapper(threadDump);
+    }
+
+    private RMNode getAliveNodeOrFail(String nodeUrl) {
+        if (nodeUrl == null) {
+            throw new IllegalArgumentException("The given node URL is null");
+        }
+        if (!this.allNodes.containsKey(nodeUrl)) {
+            throw new IllegalArgumentException("The node is not managed by the Resource Manager");
+        }
+        RMNode node = this.allNodes.get(nodeUrl);
+        if (node.isDown()) {
+            throw new IllegalArgumentException("The node is DOWN");
+        }
+        return node;
     }
 
     @Override

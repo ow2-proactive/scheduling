@@ -927,6 +927,39 @@ public class RMRest implements RMRestInterface {
         return Response.seeOther(new URI("doc/jaxrsdocs/rm/index.html")).build();
     }
 
+    @Override
+    @GET
+    @GZIP
+    @Path("threaddump")
+    @Produces("application/json")
+    public String getRMThreadDump(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+        RMProxyUserInterface rm = checkAccess(sessionId);
+        String threadDump;
+        try {
+            threadDump = rm.getRMThreadDump().getStringValue();
+        } catch (Exception exception) {
+            return exception.getMessage();
+        }
+        return threadDump;
+    }
+
+    @Override
+    @GET
+    @GZIP
+    @Path("node/threaddump")
+    @Produces("application/json")
+    public String getNodeThreadDump(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String nodeUrl)
+            throws NotConnectedException {
+        RMProxyUserInterface rm = checkAccess(sessionId);
+        String threadDump;
+        try {
+            threadDump = rm.getNodeThreadDump(nodeUrl).getStringValue();
+        } catch (Exception exception) {
+            return exception.getMessage();
+        }
+        return threadDump;
+    }
+
     private Object[] getAllInfrastructureParameters(String infrastructureType, String[] infrastructureParameters,
             String[] infrastructureFileParameters, ResourceManager rm) {
         for (PluginDescriptor infrastructureDescriptor : rm.getSupportedNodeSourceInfrastructures()) {

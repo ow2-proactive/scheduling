@@ -759,7 +759,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("finishTaskInError",
+        frontendState.checkPermissions("finishInErrorTask",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_FINISH_THIS_TASK);
         return schedulingService.finishInErrorTask(jobIdObject, taskName);
@@ -774,7 +774,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         // checking permissions
         final JobId jobIdObject = JobIdImpl.makeJobId(jobId);
-        frontendState.checkPermissions("restartTaskOnError",
+        frontendState.checkPermissions("restartInErrorTask",
                                        frontendState.getIdentifiedJob(jobIdObject),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_RESTART_THIS_TASK);
         return schedulingService.restartInErrorTask(jobIdObject, taskName);

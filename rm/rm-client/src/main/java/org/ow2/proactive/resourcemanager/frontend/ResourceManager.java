@@ -309,6 +309,23 @@ public interface ResourceManager {
     RMMonitoring getMonitoring();
 
     /**
+     * Returns the string content of the thread dump asked to the {@link Node}
+     * of the Resource Manager.
+     *
+     * @return the thread dump on the RM node
+     */
+    StringWrapper getRMThreadDump();
+
+    /**
+     * Returns the string content of the thread dump asked to the {@link Node}
+     * identified by the given URL.
+     *
+     * @param nodeUrl node to ask the thread dump to
+     * @return the thread dump on this node
+     */
+    StringWrapper getNodeThreadDump(String nodeUrl);
+
+    /**
      * Returns a list of all alive Nodes Urls. Alive means neither down nor currently deploying.
      * @return list of node urls
      */
