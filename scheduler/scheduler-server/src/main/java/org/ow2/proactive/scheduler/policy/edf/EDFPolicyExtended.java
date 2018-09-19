@@ -70,6 +70,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
         jobs.stream()
             .map(jobDescriptor -> ((JobDescriptorImpl) jobDescriptor).getInternal())
             .filter(job -> job.getJobDeadline().isPresent())
+            .filter(job -> job.getJobInfo().getStartTime() < 0)
             .filter(job -> {
                 Date deadline = getEffectiveDeadline(job);
                 Date expeFinish = getEffectiveExpectedExecutionTime(job, now);
