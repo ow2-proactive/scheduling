@@ -26,24 +26,36 @@
 package functionaltests.policy.edf;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobStatus;
-import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
 
 import functionaltests.job.TestJobWhenSchedulerPaused;
-import functionaltests.utils.SchedulerFunctionalTestEDFPolicy;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
 
 
-public class EDFPolicyTest extends SchedulerFunctionalTestEDFPolicy {
+public class EDFPolicyTest extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+
+    @BeforeClass
+    public static void startDedicatedScheduler() throws Exception {
+        schedulerHelper.log("Start Scheduler with EDFPolicy.");
+        schedulerHelper = new SchedulerTHelper(false,
+                                               true,
+                                               new File(EDFPolicyTest.class.getResource("/functionaltests/config/functionalTSchedulerProperties-edfpolicy.ini")
+                                                                           .toURI()).getAbsolutePath());
+    }
 
     private static URL lowest = TestJobWhenSchedulerPaused.class.getResource("/functionaltests/descriptors/Job_5s_lowest.xml");
 
@@ -61,14 +73,7 @@ public class EDFPolicyTest extends SchedulerFunctionalTestEDFPolicy {
         schedulerHelper.waitForEventJobFinished(highestId);
         schedulerHelper.waitForEventJobFinished(lowestId);
 
-        assertEquals(JobStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(lowestId).getStatus());
-        assertEquals(JobStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(highestId).getStatus());
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(highestId)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(lowestId)
-                                                                      .getFinishedTime());
+        waitAndcheckJobOrderByFinishedTime(highestId, lowestId);
 
         schedulerHelper.removeNodeSource("local");
     }
@@ -92,35 +97,11 @@ public class EDFPolicyTest extends SchedulerFunctionalTestEDFPolicy {
 
         schedulerHelper.createNodeSource("local", 1);
 
-        schedulerHelper.waitForEventJobFinished(jobMinus2HoursHighest);
-        schedulerHelper.waitForEventJobFinished(jobPlus2HoursHighest);
-        schedulerHelper.waitForEventJobFinished(jobPlus5HoursHighest);
-        schedulerHelper.waitForEventJobFinished(jobPlus10HoursHighest);
-        schedulerHelper.waitForEventJobFinished(jobEmptyDeadlineHighest);
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(jobMinus2HoursHighest)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(jobPlus2HoursHighest)
-                                                                      .getFinishedTime());
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(jobPlus2HoursHighest)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(jobPlus5HoursHighest)
-                                                                      .getFinishedTime());
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(jobPlus5HoursHighest)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(jobPlus10HoursHighest)
-                                                                      .getFinishedTime());
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(jobPlus10HoursHighest)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(jobEmptyDeadlineHighest)
-                                                                      .getFinishedTime());
+        waitAndcheckJobOrderByFinishedTime(jobMinus2HoursHighest,
+                                           jobPlus2HoursHighest,
+                                           jobPlus5HoursHighest,
+                                           jobPlus10HoursHighest,
+                                           jobEmptyDeadlineHighest);
 
         schedulerHelper.removeNodeSource("local");
     }
@@ -144,47 +125,42 @@ public class EDFPolicyTest extends SchedulerFunctionalTestEDFPolicy {
 
         schedulerHelper.createNodeSource("local", 1);
 
-        schedulerHelper.waitForEventJobFinished(jobMinus2HoursHighest);
-        schedulerHelper.waitForEventJobFinished(jobPlus2HoursLowest);
-        schedulerHelper.waitForEventJobFinished(jobPlus5HoursHighest);
-        schedulerHelper.waitForEventJobFinished(jobPlus10HoursHighest);
-        schedulerHelper.waitForEventJobFinished(jobEmptyDeadlineLowest);
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(jobMinus2HoursHighest)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(jobPlus5HoursHighest)
-                                                                      .getFinishedTime());
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(jobPlus5HoursHighest)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(jobPlus10HoursHighest)
-                                                                      .getFinishedTime());
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(jobPlus10HoursHighest)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(jobPlus2HoursLowest)
-                                                                      .getFinishedTime());
-
-        assertTrue(schedulerHelper.getSchedulerInterface()
-                                  .getJobState(jobPlus2HoursLowest)
-                                  .getFinishedTime() < schedulerHelper.getSchedulerInterface()
-                                                                      .getJobState(jobEmptyDeadlineLowest)
-                                                                      .getFinishedTime());
+        waitAndcheckJobOrderByFinishedTime(jobMinus2HoursHighest,
+                                           jobPlus5HoursHighest,
+                                           jobPlus10HoursHighest,
+                                           jobPlus2HoursLowest,
+                                           jobEmptyDeadlineLowest);
 
         schedulerHelper.removeNodeSource("local");
     }
 
-    public static Map<String, String> generalInformation(DateTime dateTime) {
+    private static Map<String, String> generalInformation(DateTime dateTime) {
         Map<String, String> variables = new HashMap<>();
-        variables.put("JOB_DDL", EDFPolicyTest.dateToISOString(dateTime));
+        variables.put("JOB_DDL", EDFPolicyTest.dateToISOWithoutMillisecondsString(dateTime));
         return variables;
     }
 
-    public static String dateToISOString(DateTime dateTime) {
-        return ISO8601DateUtil.parse(dateTime.toDate());
+    public static String dateToISOWithoutMillisecondsString(DateTime dateTime) {
+        return ISODateTimeFormat.dateTimeNoMillis().print(dateTime);
+    }
+
+    public static void waitAndcheckJobOrderByFinishedTime(JobId... expectedOrder) throws Exception {
+        for (JobId jobId : expectedOrder) {
+            schedulerHelper.waitForEventJobFinished(jobId);
+        }
+
+        List<JobId> actualOrder = new ArrayList<>(Arrays.asList(expectedOrder));
+
+        actualOrder.sort((firstJob, secondJob) -> {
+            try {
+                return (int) (schedulerHelper.getSchedulerInterface().getJobState(firstJob).getFinishedTime() -
+                              schedulerHelper.getSchedulerInterface().getJobState(secondJob).getFinishedTime());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        assertEquals(Arrays.asList(expectedOrder), actualOrder);
     }
 
 }

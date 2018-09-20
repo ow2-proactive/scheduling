@@ -30,7 +30,7 @@ class LoadPackages {
         this.TOOLS_DIR = new File(this.SCHEDULER_HOME, "tools")
 
         // Deduced variables
-        this.EXAMPLES_DIR_PATH = this.EXAMPLES_ZIP_PATH.substring(0, this.EXAMPLES_ZIP_PATH.lastIndexOf("."))
+        this.EXAMPLES_DIR_PATH = this.SCHEDULER_HOME + "/samples/workflows/proactive-examples"
 
         // Create a new instance of the package loader
         File load_package_script = new File(this.TOOLS_DIR, this.LOAD_PACKAGE_SCRIPT_NAME)

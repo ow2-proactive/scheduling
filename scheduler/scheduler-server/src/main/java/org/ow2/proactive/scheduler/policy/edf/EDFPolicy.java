@@ -51,6 +51,8 @@ import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
  */
 public class EDFPolicy extends ExtendedSchedulerPolicy {
 
+    private static final Date MAXIMUM_DATE = new Date(Long.MAX_VALUE);
+
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         return jobs.stream()
@@ -82,6 +84,12 @@ public class EDFPolicy extends ExtendedSchedulerPolicy {
      * (this is how this policy treats absence of deadline)
      */
     private static Date getDeadLineFromJob(InternalJob internalJob) {
-        return internalJob.getJobDeadline().orElse(new Date(Long.MAX_VALUE));
+        if (internalJob.getJobDeadline().isPresent()) {
+            if (internalJob.getJobDeadline().get().isAbsolute()) {
+                return internalJob.getJobDeadline().get().getAbsoluteDeadline();
+            }
+        }
+        return MAXIMUM_DATE;
     }
+
 }
