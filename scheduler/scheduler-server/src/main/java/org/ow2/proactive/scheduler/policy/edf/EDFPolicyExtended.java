@@ -65,12 +65,12 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
 
     private static final Set<JobId> alreadyNotified = new HashSet<>();
 
-    private synchronized void logIfJobWillMissItsDeadline(List<JobDescriptor> jobs) {
+    private synchronized void logMostLikelyMissedJobs(List<JobDescriptor> jobs) {
         Date now = new Date();
         jobs.stream()
             .map(jobDescriptor -> ((JobDescriptorImpl) jobDescriptor).getInternal())
             .filter(job -> job.getJobDeadline().isPresent())
-            .filter(job -> job.getJobInfo().getStartTime() >= 0)
+            .filter(job -> job.getJobInfo().getStartTime() < 0)
             .filter(job -> {
                 Date deadline = getEffectiveDeadline(job);
                 Date expeFinish = getEffectiveExpectedExecutionTime(job, now);
@@ -78,10 +78,15 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
             })
             .forEach(job -> {
                 if (!alreadyNotified.contains(job.getId())) {
-                    LOGGER.warn(String.format("Job[id=%s] might miss its deadline (expected finish: %s after deadline: %s)",
+                    final Date expectedFinishingTime = getEffectiveExpectedExecutionTime(job, now);
+                    final Date effectiveDeadline = getEffectiveDeadline(job);
+                    LOGGER.warn(String.format("Job[id=%s] will most likely miss its deadline (expected finish: %s, after deadline: %s)",
                                               job.getId().value(),
-                                              getEffectiveExpectedExecutionTime(job, now),
-                                              getEffectiveDeadline(job)));
+                                              expectedFinishingTime,
+                                              effectiveDeadline));
+                    new JobMostLikelyMissedEmailNotification(job,
+                                                             expectedFinishingTime,
+                                                             effectiveDeadline).checkAndSend();
                     alreadyNotified.add(job.getId());
                 }
             });
@@ -91,7 +96,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         final Date now = new Date();
 
-        logIfJobWillMissItsDeadline(jobs);
+        logMostLikelyMissedJobs(jobs);
 
         final Comparator<JobDescriptor> jobDescriptorComparator = (job1, job2) -> {
 
