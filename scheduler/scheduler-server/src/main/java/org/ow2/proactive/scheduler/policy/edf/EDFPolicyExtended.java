@@ -84,9 +84,20 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
                                               job.getId().value(),
                                               expectedFinishingTime,
                                               effectiveDeadline));
-                    new JobMostLikelyMissedEmailNotification(job,
-                                                             expectedFinishingTime,
-                                                             effectiveDeadline).checkAndSend();
+
+                    JobMostLikelyMissedEmailNotification notificationSender;
+                    if (job.getJobExpectedExecutionTime().isPresent()) {
+                        notificationSender = new JobMostLikelyMissedEmailNotification(job,
+                                                                                      expectedFinishingTime,
+                                                                                      effectiveDeadline,
+                                                                                      job.getJobExpectedExecutionTime()
+                                                                                         .get());
+                    } else {
+                        notificationSender = new JobMostLikelyMissedEmailNotification(job,
+                                                                                      expectedFinishingTime,
+                                                                                      effectiveDeadline);
+                    }
+                    notificationSender.checkAndSend();
                     alreadyNotified.add(job.getId());
                 }
             });
@@ -177,6 +188,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
             } else {
                 final Duration relativeDeadline = internalJob.getJobDeadline().get().getRelativeDeadline();
                 Calendar cal = Calendar.getInstance();
+                cal.setTimeZone(TimeZone.getDefault());
                 cal.setTimeInMillis(internalJob.getJobInfo().getSubmittedTime());
                 cal.add(Calendar.SECOND, (int) relativeDeadline.getSeconds());
                 return cal.getTime();
@@ -190,6 +202,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
         if (internalJob.getJobExpectedExecutionTime().isPresent()) {
             final Duration expectedTime = internalJob.getJobExpectedExecutionTime().get();
             Calendar cal = Calendar.getInstance();
+            cal.setTimeZone(TimeZone.getDefault());
             cal.setTime(now);
             cal.add(Calendar.SECOND, (int) expectedTime.getSeconds());
             return cal.getTime();
