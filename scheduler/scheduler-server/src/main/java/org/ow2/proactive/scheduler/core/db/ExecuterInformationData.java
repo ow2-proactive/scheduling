@@ -61,7 +61,7 @@ public class ExecuterInformationData implements Serializable {
             if (executerInformation.getLauncher() != null) {
                 try {
                     taskLauncherNodeUrl = PAActiveObject.getUrl(executerInformation.getLauncher());
-                } catch (ProActiveRuntimeException e) {
+                } catch (Exception e) {
                     logger.warn("TaskLauncher node URL could not be retrieved for task " + taskId);
                 }
             }
