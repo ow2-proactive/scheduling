@@ -78,6 +78,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
             })
             .forEach(job -> {
                 if (!alreadyNotified.contains(job.getId())) {
+                    alreadyNotified.add(job.getId());
                     final Date deadline = getDeadlineAsAbsoluteDate(job);
                     final Date finishingTime = getFinishingTimeIfJobStartedNow(job, now);
                     LOGGER.warn(String.format("Job[id=%s] will most likely miss its deadline (expected finish: %s is after deadline: %s)",
@@ -96,7 +97,6 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
                         notificationSender = new JobMostLikelyMissedEmailNotification(job, finishingTime, deadline);
                     }
                     notificationSender.tryToSend();
-                    alreadyNotified.add(job.getId());
                 }
             });
     }
