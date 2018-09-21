@@ -38,7 +38,6 @@ import java.util.TimeZone;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.ow2.proactive.addons.email.exception.EmailException;
 import org.ow2.proactive.scheduler.core.JobEmailNotificationException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -48,59 +47,48 @@ import org.ow2.proactive.scheduler.util.SendMail;
 
 public class JobMostLikelyMissedEmailNotification {
 
-    private static final Logger logger = Logger.getLogger(JobMostLikelyMissedEmailNotification.class);
+    private static final Logger LOGGER = Logger.getLogger(JobMostLikelyMissedEmailNotification.class);
 
     private static final JobLogger jlogger = JobLogger.getInstance();
 
     private final InternalJob internalJob;
 
-    private final Date expectedFinishingTime;
+    private final Date finishingTime;
 
     private final Date deadline;
 
     private Duration jobExecutionTime = null;
 
-    public JobMostLikelyMissedEmailNotification(InternalJob internalJob, Date expectedFinishingTime, Date deadline) {
+    JobMostLikelyMissedEmailNotification(InternalJob internalJob, Date finishingTime, Date deadline) {
         this.internalJob = internalJob;
-        this.expectedFinishingTime = expectedFinishingTime;
+        this.finishingTime = finishingTime;
         this.deadline = deadline;
     }
 
-    public JobMostLikelyMissedEmailNotification(InternalJob internalJob, Date expectedFinishingTime, Date deadline,
+    JobMostLikelyMissedEmailNotification(InternalJob internalJob, Date finishingTime, Date deadline,
             Duration jobExecutionTime) {
         this.internalJob = internalJob;
-        this.expectedFinishingTime = expectedFinishingTime;
+        this.finishingTime = finishingTime;
         this.deadline = deadline;
         this.jobExecutionTime = jobExecutionTime;
     }
 
-    public static void main(String[] args) {
-        System.out.println(new Date().getTime());
-        System.out.println(System.currentTimeMillis());
-    }
-
-    public boolean doSend() throws JobEmailNotificationException {
+    void tryToSend() {
         if (!PASchedulerProperties.EMAIL_NOTIFICATIONS_ENABLED.getValueAsBoolean()) {
-            logger.debug("Notification emails disabled, doing nothing");
-            return false;
+            LOGGER.debug("Notification emails disabled, doing nothing");
+            return;
         }
+
         try {
             new SendMail().sender(getTo(), getSubject(), getBody());
-            return true;
-        } catch (EmailException | IOException e) {
-            throw new JobEmailNotificationException("Error sending email: " + e.getMessage(), e);
-        }
-    }
-
-    public void checkAndSend() {
-        try {
-            boolean sent = doSend();
-            if (sent) {
-                jlogger.info(internalJob.getId(), "sent notification email for finished job");
-            }
+            jlogger.info(internalJob.getId(), "sent 'most-likely-missed' email for not started yet job");
         } catch (JobEmailNotificationException e) {
+            LOGGER.trace(String.format("'most-likely-missed' email was not sent, because GI '%s' was not set for the job %s.",
+                                       GENERIC_INFORMATION_KEY_EMAIL,
+                                       internalJob.getId().value()));
+        } catch (IOException e) {
             jlogger.warn(internalJob.getId(), "failed to send email notification: " + e.getMessage());
-            logger.trace("Stack trace:", e);
+            LOGGER.warn("Error sending email: " + e.getMessage(), e);
         }
     }
 
@@ -136,16 +124,12 @@ public class JobMostLikelyMissedEmailNotification {
             calendar.add(Calendar.SECOND, (int) jobExecutionTime.getSeconds());
             final String strJobExecutionTime = jobExecutionTimeFormat.format(calendar.getTime());
 
-            return String.format(template,
-                                 internalJob.getId().value(),
-                                 deadline,
-                                 strJobExecutionTime,
-                                 expectedFinishingTime);
+            return String.format(template, internalJob.getId().value(), deadline, strJobExecutionTime, finishingTime);
         } else {
             final String template = IOUtils.toString(Objects.requireNonNull(classLoader.getResource("email-templates/most-likely-missed-without-duration.template")),
                                                      Charset.defaultCharset());
 
-            return String.format(template, internalJob.getId().value(), deadline, expectedFinishingTime);
+            return String.format(template, internalJob.getId().value(), deadline, finishingTime);
         }
     }
 }
