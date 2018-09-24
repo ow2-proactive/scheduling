@@ -346,7 +346,7 @@ public abstract class Job extends CommonAttribute {
                                                                         .toDate()));
                 }
             } catch (Exception e) {
-                LOGGER.warn("Imposible to parse JOB_DDL GI variable as deadline: " + strJobDeadline );
+                LOGGER.warn("Imposible to parse JOB_DDL GI variable as deadline: " + strJobDeadline);
             }
         }
 
