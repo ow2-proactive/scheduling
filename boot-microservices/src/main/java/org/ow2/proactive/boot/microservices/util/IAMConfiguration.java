@@ -52,9 +52,29 @@ public class IAMConfiguration {
 
     public static final String JVM_ARGS = "iam.jvm.args";
 
-    public static final String IAM_URL = "cas.server.prefix";
+    public static final String SSL_CERTTIFICATE = "server.ssl.key-store";
+
+    public static final String SSL_CERTTIFICATE_PASS = "server.ssl.key-store-password";
 
     public static final String SPRING_PROACTIVE_ENV_PROFILE = "proactive";
+
+    public static final String IAM_PROTOCOL = "https://";
+
+    public static final String IAM_HOST = "cas.host.name";
+
+    public static final String IAM_PORT = "server.port";
+
+    public static final String IAM_CONTEXT = "server.context-path";
+
+    public static final String IAM_LOGIN_PAGE = "/login";
+
+    public static final String IAM_URL = "casServerUrlPrefix";
+
+    public static final String IAM_LOGIN = "casServerLoginUrl";
+
+    public static final String PA_SERVER_NAME = "serverName";
+
+    public static final String PA_HOME_PLACEHOLDER = "${pa.scheduler.home}";
 
     private static final Logger LOGGER = Logger.getLogger(IAMConfiguration.class);
 

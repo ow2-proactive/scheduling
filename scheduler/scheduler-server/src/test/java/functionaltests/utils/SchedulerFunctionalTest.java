@@ -28,6 +28,7 @@ package functionaltests.utils;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -128,8 +129,8 @@ public class SchedulerFunctionalTest extends ProActiveTest {
      * @throws ExecutionException
      * @throws ConfigurationException
      */
-    public static void startIAMIfNeeded()
-            throws IOException, InterruptedException, ExecutionException, ConfigurationException {
+    public static void startIAMIfNeeded() throws IOException, InterruptedException, ExecutionException,
+            ConfigurationException, GeneralSecurityException {
 
         //Check if PA is configured to use IAM microservice for authentication
         if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().equals(IAM_LOGIN_METHOD)) {

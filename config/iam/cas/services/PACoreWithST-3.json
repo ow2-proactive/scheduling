@@ -1,17 +1,10 @@
 {
   "@class": "org.apereo.cas.services.RegexRegisteredService",
-  "serviceId": "PACoreWithJWT",
+  "serviceId": "PACoreWithST",
   "name": "PA Core services (Scheduler and RM)",
-  "id": 5,
+  "id": 3,
   "description": "PA scheduler and RM client for IAM",
   "evaluationOrder": 2,
-  "properties" : {
-    "@class" : "java.util.HashMap",
-    "jwtAsServiceTicket" : {
-      "@class" : "org.apereo.cas.services.DefaultRegisteredServiceProperty",
-      "values" : [ "java.util.HashSet", [ "true" ] ]
-    }
-  },
   "attributeReleasePolicy" : {
     "@class" : "org.apereo.cas.services.ReturnMappedAttributeReleasePolicy",
     "allowedAttributes" : {

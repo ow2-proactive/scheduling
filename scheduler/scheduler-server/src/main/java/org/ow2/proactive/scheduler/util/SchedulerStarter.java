@@ -38,6 +38,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.security.GeneralSecurityException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.List;
@@ -229,8 +230,8 @@ public class SchedulerStarter {
      *  Launch boot (i.e., early-starting) microservices (notably, IAM microservice)
      *
      */
-    private static void startBootMicroservices()
-            throws IOException, InterruptedException, ExecutionException, ConfigurationException {
+    private static void startBootMicroservices() throws IOException, InterruptedException, ExecutionException,
+            ConfigurationException, GeneralSecurityException {
 
         if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().endsWith("") ||
             PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().endsWith(IAM_LOGIN_METHOD)) {

@@ -26,6 +26,7 @@
 package functionaltests.utils;
 
 import java.io.*;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.*;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -46,7 +47,8 @@ public class IAMTHelper {
     }
 
     public static void startIAM(String paHome, String bootMicroservicesPath, String bootConfigurationPath)
-            throws InterruptedException, IOException, ExecutionException, ConfigurationException {
+            throws InterruptedException, IOException, ExecutionException, ConfigurationException,
+            GeneralSecurityException {
 
         if (iamProcess == null) {
 
