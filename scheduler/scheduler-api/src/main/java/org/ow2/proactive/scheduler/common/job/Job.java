@@ -346,7 +346,7 @@ public abstract class Job extends CommonAttribute {
                                                                         .toDate()));
                 }
             } catch (Exception e) {
-                LOGGER.warn("Imposible to parse JOB_DDL GI variable as ISO8601 date: " + strJobDeadline.substring(1));
+                LOGGER.warn("Imposible to parse JOB_DDL GI variable as deadline: " + strJobDeadline );
             }
         }
 
