@@ -33,6 +33,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
@@ -58,7 +59,7 @@ public class AzureBlobDownloader extends JavaExecutable {
 
     private String containerName;
 
-    private String blobName;
+    Optional<String> optionalBlobName;
 
     private String accountName;
 
@@ -68,29 +69,21 @@ public class AzureBlobDownloader extends JavaExecutable {
 
     private static final String CONTAINER_NAME = "containerName";
 
-    private static final String BLOB_NAME = "blobName";
+    private static final String BLOB_NAME = "optionalBlobName";
 
     private ContainerURL containerURL;
 
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
 
-        if (args.containsKey(CONTAINER_NAME) && !args.get(CONTAINER_NAME).toString().isEmpty()) {
-            containerName = args.get(CONTAINER_NAME).toString();
-        } else {
-            throw new IllegalArgumentException("You have to specify a container name. Empty value is not allowed.");
-        }
+        containerName = (String) Optional.ofNullable(args.get(CONTAINER_NAME)).filter(container -> ! container.toString().isEmpty()).orElseThrow( () -> new IllegalArgumentException("You have to specify a container name. Empty value is not allowed."));
 
-        if (args.containsKey(BLOB_NAME) && !args.get(BLOB_NAME).toString().isEmpty()) {
-            blobName = args.get(BLOB_NAME).toString();
-        }
 
-        if (args.containsKey(OUTPUT_PATH) && !args.get(OUTPUT_PATH).toString().isEmpty()) {
-            outputPath = args.get(OUTPUT_PATH).toString();
-        } else {
-            //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
-            outputPath = getLocalSpace();
-        }
+        optionalBlobName = Optional.ofNullable(args.get(BLOB_NAME).toString()).filter(blob -> blob.isEmpty());
+
+        //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
+        outputPath = (String) Optional.ofNullable(args.get(OUTPUT_PATH)).filter(output -> ! output.toString().isEmpty()).orElse(getLocalSpace());
+
         // Retrieve the credentials
         accountName = getThirdPartyCredential("ACCOUNT_NAME");
         accountKey = getThirdPartyCredential("ACCOUNT_KEY");
@@ -108,17 +101,16 @@ public class AzureBlobDownloader extends JavaExecutable {
         File file = new File(outputPath);
         containerURL = AzureStorageConnectorUtils.createContainerURL(accountName, accountKey, containerName);
         //download a single blob
-        if (blobName != null && !blobName.isEmpty()) {
+        if (optionalBlobName.isPresent()) {
             //check weather or not the outputPath is a folder path or a file path
-            if ((outputPath.lastIndexOf('/') == outputPath.length() - 1)) {
+            if (outputPath.lastIndexOf('/') == outputPath.length() - 1) {
                 createDirIfNotExists(file);
-                String azureBlobLocalRelativePath = Paths.get(outputPath, Paths.get(blobName).getFileName().toString())
+                String azureBlobLocalRelativePath = Paths.get(outputPath, Paths.get(optionalBlobName.get()).getFileName().toString())
                                                          .toString();
-                downloadBlob(new File(azureBlobLocalRelativePath), blobName);
+                downloadBlob(new File(azureBlobLocalRelativePath), optionalBlobName.get());
             } else {
-                downloadBlob(file, blobName);
+                downloadBlob(file, optionalBlobName.get());
             }
-
         } else { //download the whole container
             createDirIfNotExists(file);
             downloadContainerBlobs(containerURL);

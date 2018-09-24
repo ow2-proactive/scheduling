@@ -34,6 +34,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -57,7 +58,7 @@ public class AzureBlobUploader extends JavaExecutable {
 
     private String containerName;
 
-    private String blobName;
+    Optional<String> optionalBlobName;
 
     private String accountName;
 
@@ -67,30 +68,21 @@ public class AzureBlobUploader extends JavaExecutable {
 
     private static final String CONTAINER_NAME = "containerName";
 
-    private static final String BLOB_NAME = "blobName";
+    private static final String BLOB_NAME = "optionalBlobName";
 
     private ContainerURL containerURL;
 
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
 
-        if (args.containsKey(CONTAINER_NAME) && !args.get(CONTAINER_NAME).toString().isEmpty()) {
-            containerName = args.get(CONTAINER_NAME).toString();
+        containerName = (String) Optional.ofNullable(args.get(CONTAINER_NAME)).filter(container -> ! container.toString().isEmpty()).orElseThrow( () -> new IllegalArgumentException("You have to specify a container name. Empty value is not allowed."));
 
-        } else {
-            throw new IllegalArgumentException("You have to specify a container name. Empty value is not allowed.");
-        }
 
-        if (args.containsKey(BLOB_NAME) && !args.get(BLOB_NAME).toString().isEmpty()) {
-            blobName = args.get(BLOB_NAME).toString();
-        }
+        optionalBlobName = Optional.ofNullable(args.get(BLOB_NAME).toString()).filter(blob -> blob.isEmpty());
 
-        if (args.containsKey(INPUT_PATH) && !args.get(INPUT_PATH).toString().isEmpty()) {
-            inputPath = args.get(INPUT_PATH).toString();
-        } else {
-            //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
-            inputPath = getLocalSpace();
-        }
+        //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
+        inputPath = (String) Optional.ofNullable(args.get(INPUT_PATH)).filter(output -> ! output.toString().isEmpty()).orElse(getLocalSpace());
+
         // Retrieve the credentials
         accountName = getThirdPartyCredential("ACCOUNT_NAME");
         accountKey = getThirdPartyCredential("ACCOUNT_KEY");
@@ -112,15 +104,15 @@ public class AzureBlobUploader extends JavaExecutable {
 
         if (file.exists()) {
             if (file.isDirectory()) {
-                if (blobName != null && !blobName.isEmpty()) {
-                    filesRelativePathName = recursiveFolderUpload(inputPath, blobName, true);
+                if (optionalBlobName.isPresent()) {
+                    filesRelativePathName = recursiveFolderUpload(inputPath, optionalBlobName.get(), true);
                 } else {
                     filesRelativePathName = recursiveFolderUpload(inputPath, "", false);
                 }
 
             } else {
-                if (blobName != null && !blobName.isEmpty()) {
-                    uploadFile(file, blobName);
+                if (optionalBlobName.isPresent()) {
+                    uploadFile(file, optionalBlobName.get());
                 } else {
                     uploadFile(file, file.getName());
                 }
