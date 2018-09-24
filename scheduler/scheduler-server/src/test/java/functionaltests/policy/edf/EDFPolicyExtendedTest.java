@@ -88,6 +88,81 @@ public class EDFPolicyExtendedTest extends SchedulerFunctionalTestWithCustomConf
     }
 
     @Test
+    public void jobsRelativeSeconds() throws Exception {
+        final JobId jobIdRelative0 = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                     generalInformation("+2", "1"));
+
+        final JobId jobIdRelative1 = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                     generalInformation("+3", "1"));
+
+        schedulerHelper.createNodeSource("local", 1);
+
+        EDFPolicyTest.waitAndcheckJobOrderByFinishedTime(jobIdRelative0, jobIdRelative1);
+
+        schedulerHelper.removeNodeSource("local");
+    }
+
+    @Test
+    public void jobsRelativeMinutes() throws Exception {
+        final JobId jobIdRelative0 = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                     generalInformation("+2:00", "1:00"));
+
+        final JobId jobIdRelative1 = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                     generalInformation("+3:00", "1:00"));
+
+        schedulerHelper.createNodeSource("local", 1);
+
+        EDFPolicyTest.waitAndcheckJobOrderByFinishedTime(jobIdRelative0, jobIdRelative1);
+
+        schedulerHelper.removeNodeSource("local");
+    }
+
+    @Test
+    public void jobsRelativeVsNoDeadline() throws Exception {
+        final JobId noDeadline = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                 generalInformation("", ""));
+
+        final JobId relativeDaedline = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                       generalInformation("+3:00", "1:00"));
+
+        schedulerHelper.createNodeSource("local", 1);
+
+        EDFPolicyTest.waitAndcheckJobOrderByFinishedTime(relativeDaedline, noDeadline);
+
+        schedulerHelper.removeNodeSource("local");
+    }
+
+    @Test
+    public void jobsRelativeWithAndWithoutExpectedTime() throws Exception {
+        final JobId noExpectedTime = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                     generalInformation("+1:00", ""));
+
+        final JobId relativeDaedline = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                       generalInformation("+60", "1"));
+
+        schedulerHelper.createNodeSource("local", 1);
+
+        EDFPolicyTest.waitAndcheckJobOrderByFinishedTime(relativeDaedline, noExpectedTime);
+
+        schedulerHelper.removeNodeSource("local");
+    }
+
+    @Test
+    public void jobsRelativeWithAndWithoutExpectedTime2() throws Exception {
+        final JobId noExpectedTime = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                     generalInformation("+1:00", ""));
+
+        final JobId relativeDaedline = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
+                                                                       generalInformation("+63", "1"));
+
+        schedulerHelper.createNodeSource("local", 1);
+
+        EDFPolicyTest.waitAndcheckJobOrderByFinishedTime(noExpectedTime, relativeDaedline);
+
+        schedulerHelper.removeNodeSource("local");
+    }
+
+    @Test
     public void jobsExpectedTime() throws Exception {
 
         final JobId jobIdAbsolute = schedulerHelper.submitJobWithGI(new File(lowest.toURI()).getAbsolutePath(),
