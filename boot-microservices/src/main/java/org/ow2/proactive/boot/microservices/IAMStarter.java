@@ -118,9 +118,7 @@ public class IAMStarter {
 
             /*
              * IAM post-startup operations
-             *
              */
-
             // add SSL certificate to the current JVM instance truststore
             addSSLCertificate(paHome);
 
@@ -259,7 +257,10 @@ public class IAMStarter {
             throw new IAMStarterException("IAM SSL Certificate not found in: " + sslCertificatePath);
         }
 
-        SSLUtils.mergeKeyStoreWithSystem(sslCertificatePath, config.getString(IAMConfiguration.SSL_CERTTIFICATE_PASS));
+        SSLUtils.mergeKeyStoreWithSystem(config.getString(IAMConfiguration.SSL_PROTOCOL),
+                                         config.getString(IAMConfiguration.SSL_X509_ALGORITHM),
+                                         sslCertificatePath,
+                                         config.getString(IAMConfiguration.SSL_CERTTIFICATE_PASS));
 
         LOGGER.debug("SSL certificate [" + sslCertificatePath + "] successfully added to the current JVM truststore.");
     }

@@ -45,10 +45,6 @@ import com.oneandone.compositejks.SslContextUtils;
  */
 public final class SSLUtils {
 
-    private static final String X509_ALGORITHM = "SunX509";
-
-    private static final String SSL_CONTEXT = "SSL";
-
     private SSLUtils() {
     }
 
@@ -58,10 +54,13 @@ public final class SSLUtils {
      *
      * @throws GeneralSecurityException, IOException
      */
-    public static void mergeKeyStoreWithSystem(String certificatePath, String certificatePassword)
-            throws GeneralSecurityException, IOException {
+    public static void mergeKeyStoreWithSystem(String sslProtocol, String x509Algorithm, String certificatePath,
+            String certificatePassword) throws GeneralSecurityException, IOException {
 
-        SSLContext.setDefault(buildMergedWithSystem(KeyStoreLoader.fromFile(certificatePath), certificatePassword));
+        SSLContext.setDefault(buildMergedWithSystem(sslProtocol,
+                                                    x509Algorithm,
+                                                    KeyStoreLoader.fromFile(certificatePath),
+                                                    certificatePassword));
     }
 
     /**
@@ -72,23 +71,23 @@ public final class SSLUtils {
      * @return The SSL context
      * @throws GeneralSecurityException
      */
-    private static SSLContext buildMergedWithSystem(KeyStore keyStore, String password)
-            throws GeneralSecurityException {
+    private static SSLContext buildMergedWithSystem(String sslProtocol, String x509Algorithm, KeyStore keyStore,
+            String password) throws GeneralSecurityException {
         String defaultAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
 
-        KeyManager[] keyManagers = { new CompositeX509KeyManager(SslContextUtils.getSystemKeyManager(X509_ALGORITHM,
+        KeyManager[] keyManagers = { new CompositeX509KeyManager(SslContextUtils.getSystemKeyManager(x509Algorithm,
                                                                                                      keyStore,
                                                                                                      password.toCharArray()),
                                                                  SslContextUtils.getSystemKeyManager(defaultAlgorithm,
                                                                                                      null,
                                                                                                      null)) };
 
-        TrustManager[] trustManagers = { new CompositeX509TrustManager(SslContextUtils.getSystemTrustManager(X509_ALGORITHM,
+        TrustManager[] trustManagers = { new CompositeX509TrustManager(SslContextUtils.getSystemTrustManager(x509Algorithm,
                                                                                                              keyStore),
                                                                        SslContextUtils.getSystemTrustManager(defaultAlgorithm,
                                                                                                              null)) };
 
-        SSLContext context = SSLContext.getInstance(SSL_CONTEXT);
+        SSLContext context = SSLContext.getInstance(sslProtocol);
         context.init(keyManagers, trustManagers, null);
         return context;
     }

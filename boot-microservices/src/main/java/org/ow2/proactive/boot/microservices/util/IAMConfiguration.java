@@ -52,6 +52,10 @@ public class IAMConfiguration {
 
     public static final String JVM_ARGS = "iam.jvm.args";
 
+    public static final String SSL_PROTOCOL = "iam.ssl.protocol";
+
+    public static final String SSL_X509_ALGORITHM = "iam.ssl.x509.algorithm";
+
     public static final String SSL_CERTTIFICATE = "server.ssl.key-store";
 
     public static final String SSL_CERTTIFICATE_PASS = "server.ssl.key-store-password";
