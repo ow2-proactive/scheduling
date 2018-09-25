@@ -58,7 +58,7 @@ public class AzureBlobUploader extends JavaExecutable {
 
     private String containerName;
 
-    Optional<String> optionalBlobName;
+    Optional<String> optionalBlobName = Optional.empty();
 
     private String accountName;
 
@@ -68,20 +68,23 @@ public class AzureBlobUploader extends JavaExecutable {
 
     private static final String CONTAINER_NAME = "containerName";
 
-    private static final String BLOB_NAME = "optionalBlobName";
+    private static final String BLOB_NAME = "blobName";
 
     private ContainerURL containerURL;
 
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
 
-        containerName = (String) Optional.ofNullable(args.get(CONTAINER_NAME)).filter(container -> ! container.toString().isEmpty()).orElseThrow( () -> new IllegalArgumentException("You have to specify a container name. Empty value is not allowed."));
+        containerName = (String) Optional.ofNullable(args.get(CONTAINER_NAME))
+                                         .filter(container -> !container.toString().isEmpty())
+                                         .orElseThrow(() -> new IllegalArgumentException("You have to specify a container name. Empty value is not allowed."));
 
-
-        optionalBlobName = Optional.ofNullable(args.get(BLOB_NAME).toString()).filter(blob -> blob.isEmpty());
+        optionalBlobName = Optional.ofNullable(args.get(BLOB_NAME).toString()).filter(name -> !name.isEmpty());
 
         //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
-        inputPath = (String) Optional.ofNullable(args.get(INPUT_PATH)).filter(output -> ! output.toString().isEmpty()).orElse(getLocalSpace());
+        inputPath = (String) Optional.ofNullable(args.get(INPUT_PATH))
+                                     .filter(output -> !output.toString().isEmpty())
+                                     .orElse(getLocalSpace());
 
         // Retrieve the credentials
         accountName = getThirdPartyCredential("ACCOUNT_NAME");
@@ -111,11 +114,7 @@ public class AzureBlobUploader extends JavaExecutable {
                 }
 
             } else {
-                if (optionalBlobName.isPresent()) {
-                    uploadFile(file, optionalBlobName.get());
-                } else {
-                    uploadFile(file, file.getName());
-                }
+                uploadFile(file, optionalBlobName.orElse(file.getName()));
 
                 filesRelativePathName.add(file.getPath());
             }

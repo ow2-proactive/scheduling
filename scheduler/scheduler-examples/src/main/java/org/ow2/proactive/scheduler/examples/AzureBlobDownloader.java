@@ -69,20 +69,23 @@ public class AzureBlobDownloader extends JavaExecutable {
 
     private static final String CONTAINER_NAME = "containerName";
 
-    private static final String BLOB_NAME = "optionalBlobName";
+    private static final String BLOB_NAME = "blobName";
 
     private ContainerURL containerURL;
 
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
 
-        containerName = (String) Optional.ofNullable(args.get(CONTAINER_NAME)).filter(container -> ! container.toString().isEmpty()).orElseThrow( () -> new IllegalArgumentException("You have to specify a container name. Empty value is not allowed."));
+        containerName = (String) Optional.ofNullable(args.get(CONTAINER_NAME))
+                                         .filter(container -> !container.toString().isEmpty())
+                                         .orElseThrow(() -> new IllegalArgumentException("You have to specify a container name. Empty value is not allowed."));
 
-
-        optionalBlobName = Optional.ofNullable(args.get(BLOB_NAME).toString()).filter(blob -> blob.isEmpty());
+        optionalBlobName = Optional.ofNullable(args.get(BLOB_NAME).toString()).filter(name -> !name.isEmpty());
 
         //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
-        outputPath = (String) Optional.ofNullable(args.get(OUTPUT_PATH)).filter(output -> ! output.toString().isEmpty()).orElse(getLocalSpace());
+        outputPath = (String) Optional.ofNullable(args.get(OUTPUT_PATH))
+                                      .filter(output -> !output.toString().isEmpty())
+                                      .orElse(getLocalSpace());
 
         // Retrieve the credentials
         accountName = getThirdPartyCredential("ACCOUNT_NAME");
@@ -105,7 +108,10 @@ public class AzureBlobDownloader extends JavaExecutable {
             //check weather or not the outputPath is a folder path or a file path
             if (outputPath.lastIndexOf('/') == outputPath.length() - 1) {
                 createDirIfNotExists(file);
-                String azureBlobLocalRelativePath = Paths.get(outputPath, Paths.get(optionalBlobName.get()).getFileName().toString())
+                String azureBlobLocalRelativePath = Paths.get(outputPath,
+                                                              Paths.get(optionalBlobName.get())
+                                                                   .getFileName()
+                                                                   .toString())
                                                          .toString();
                 downloadBlob(new File(azureBlobLocalRelativePath), optionalBlobName.get());
             } else {
@@ -141,6 +147,7 @@ public class AzureBlobDownloader extends JavaExecutable {
                 if (!azureBlobFile.getParentFile().exists()) {
                     azureBlobFile.getParentFile().mkdirs();
                 }
+                getOut().println("blob name: " + b.name());
                 downloadBlob(azureBlobFile, b.name());
             }
         } else {
