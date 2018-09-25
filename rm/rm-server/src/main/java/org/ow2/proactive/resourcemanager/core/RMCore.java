@@ -2366,11 +2366,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // return false for non connected clients
         // it should be verified by checkPermissionsMethod but it returns true for
         // local active objects
-        String methodName = PAActiveObject.getContext().getCurrentRequest().getMethodName();
-        final Client sourceBodyCaller = checkMethodCallPermission(methodName,
-                                                                  PAActiveObject.getContext()
-                                                                                .getCurrentRequest()
-                                                                                .getSourceBodyID());
+        final Request currentRequest = PAActiveObject.getContext().getCurrentRequest();
+        String methodName = currentRequest.getMethodName();
+        final Client sourceBodyCaller = checkMethodCallPermission(methodName, currentRequest.getSourceBodyID());
         return new BooleanWrapper(!toShutDown && clients.containsKey(sourceBodyCaller.getId()));
     }
 
