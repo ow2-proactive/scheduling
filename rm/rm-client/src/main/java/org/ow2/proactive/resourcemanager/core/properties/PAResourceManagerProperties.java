@@ -183,14 +183,16 @@ public enum PAResourceManagerProperties implements PACommonProperties {
 
     /**
      * Defines the frequency of attempts to remove {@link NodeState#DOWN} or
-     * {@link NodeState#LOST} node (cron expression)
+     * {@link NodeState#LOST} node (cron expression). If this property is not
+     * set, these nodes will never be removed automatically.
      */
     RM_UNAVAILABLE_NODES_REMOVAL_FREQUENCY("pa.rm.nodes.unavailable.removal.frequency", PropertyType.STRING),
 
     /**
      * Defines the period, in minutes, after which a {@link NodeState#DOWN} or
      * {@link NodeState#LOST} node is eligible to automatic removal. If this
-     * property is not set, these nodes will never be removed automatically.
+     * property is not set, or not greater than 0, these nodes will never be
+     * removed automatically.
      */
     RM_UNAVAILABLE_NODES_MAX_PERIOD("pa.rm.nodes.unavailable.maxperiod", PropertyType.INTEGER),
 
