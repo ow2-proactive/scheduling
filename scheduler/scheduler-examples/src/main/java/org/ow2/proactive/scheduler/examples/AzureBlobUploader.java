@@ -60,7 +60,7 @@ public class AzureBlobUploader extends JavaExecutable {
 
     Optional<String> optionalBlobName = Optional.empty();
 
-    private String accountName;
+    private String storageAccount;
 
     private String accountKey;
 
@@ -87,10 +87,10 @@ public class AzureBlobUploader extends JavaExecutable {
                                      .orElse(getLocalSpace());
 
         // Retrieve the credentials
-        accountName = getThirdPartyCredential("ACCOUNT_NAME");
+        storageAccount = getThirdPartyCredential("STORAGE_ACCOUNT");
         accountKey = getThirdPartyCredential("ACCOUNT_KEY");
-        if (accountName == null || accountKey == null) {
-            throw new IllegalArgumentException("You first need to add your account name and account key (ACCOUNT_NAME, ACCOUNT_KEY) to the third party credentials.");
+        if (storageAccount == null || accountKey == null) {
+            throw new IllegalArgumentException("You first need to add your account name and account key (STORAGE_ACCOUNT, ACCOUNT_KEY) to the third party credentials.");
         }
     }
 
@@ -103,7 +103,7 @@ public class AzureBlobUploader extends JavaExecutable {
         List<String> filesRelativePathName = new ArrayList<>();
         File file = new File(inputPath);
 
-        containerURL = AzureStorageConnectorUtils.createContainerURL(accountName, accountKey, containerName);
+        containerURL = AzureStorageConnectorUtils.createContainerURL(storageAccount, accountKey, containerName);
 
         if (file.exists()) {
             if (file.isDirectory()) {

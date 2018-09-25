@@ -61,7 +61,7 @@ public class AzureBlobDownloader extends JavaExecutable {
 
     Optional<String> optionalBlobName;
 
-    private String accountName;
+    private String storageAccount;
 
     private String accountKey;
 
@@ -88,10 +88,10 @@ public class AzureBlobDownloader extends JavaExecutable {
                                       .orElse(getLocalSpace());
 
         // Retrieve the credentials
-        accountName = getThirdPartyCredential("ACCOUNT_NAME");
+        storageAccount = getThirdPartyCredential("STORAGE_ACCOUNT");
         accountKey = getThirdPartyCredential("ACCOUNT_KEY");
-        if (accountName == null || accountKey == null) {
-            throw new IllegalArgumentException("You first need to add your account name and account key (ACCOUNT_NAME, ACCOUNT_KEY) to the third party credentials.");
+        if (storageAccount == null || accountKey == null) {
+            throw new IllegalArgumentException("You first need to add your account name and account key (STORAGE_ACCOUNT, ACCOUNT_KEY) to the third party credentials.");
         }
     }
 
@@ -102,7 +102,7 @@ public class AzureBlobDownloader extends JavaExecutable {
     public Serializable execute(TaskResult... results) throws IOException {
 
         File file = new File(outputPath);
-        containerURL = AzureStorageConnectorUtils.createContainerURL(accountName, accountKey, containerName);
+        containerURL = AzureStorageConnectorUtils.createContainerURL(storageAccount, accountKey, containerName);
         //download a single blob
         if (optionalBlobName.isPresent()) {
             //check weather or not the outputPath is a folder path or a file path
