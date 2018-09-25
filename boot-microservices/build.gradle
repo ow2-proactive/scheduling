@@ -20,6 +20,8 @@ dependencies {
 
     compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.2'
 
+    compile group: 'com.oneandone', name: 'composite-jks', version: '1.0'
+
     iamWar group: "org.ow2.proactive", name: "iam", version: "${schedulingVersion}", ext: "war", changing: true
 }
 

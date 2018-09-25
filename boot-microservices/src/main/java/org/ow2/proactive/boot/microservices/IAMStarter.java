@@ -26,6 +26,7 @@
 package org.ow2.proactive.boot.microservices;
 
 import java.io.*;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -35,6 +36,7 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.boot.microservices.util.IAMConfiguration;
+import org.ow2.proactive.boot.microservices.util.SSLUtils;
 import org.ow2.proactive.resourcemanager.utils.OperatingSystem;
 
 
@@ -53,6 +55,8 @@ public class IAMStarter {
     private static List<String> command = new ArrayList<>();
 
     private static boolean started = false;
+
+    private static String iamURL;
 
     private IAMStarter() {
 
@@ -78,16 +82,21 @@ public class IAMStarter {
      * @throws ExecutionException if a problem occurs during the process execution
      * @throws IOException if a problem occurs when redirecting the process output
      * @throws InterruptedException if a problem occurs when getting the process result
+     * @throws GeneralSecurityException if a problem occurs when adding IAM SSL certificate to the current JVM truststore
      * @since version 8.3.0
      */
     public static Process start(String paHome, String iamMicroservicesPath, String iamConfigurationPath)
-            throws InterruptedException, IOException, ExecutionException, ConfigurationException {
+            throws InterruptedException, IOException, ExecutionException, ConfigurationException,
+            GeneralSecurityException {
 
         if (!started) {
             LOGGER.info("Starting IAM microservice...");
 
             // load IAM configuration
             loadIAMConfiguration(iamConfigurationPath);
+
+            // build IAM URL from the loaded config
+            buildIamUrl();
 
             // build java command to launch IAM
             buildJavaCommand(paHome);
@@ -106,6 +115,15 @@ public class IAMStarter {
             process = processBuilder.start();
 
             LOGGER.debug(streamOutput(process.getInputStream()));
+
+            /*
+             * IAM post-startup operations
+             */
+            // add SSL certificate to the current JVM instance truststore
+            addSSLCertificate(paHome);
+
+            // add system properties needed by web microservices (IAM clients)
+            addIAMSystemProperties();
 
             started = true;
         }
@@ -137,7 +155,7 @@ public class IAMStarter {
                     }
                 }
             }
-            return "IAM Microservice started at: " + config.getString(IAMConfiguration.IAM_URL);
+            return "IAM Microservice started at: " + iamURL;
         });
 
         // Check for timeout
@@ -223,5 +241,51 @@ public class IAMStarter {
 
         config = IAMConfiguration.loadConfig(configFile);
 
+        LOGGER.debug("IAM Configuration loaded from file: " + configFile.getAbsolutePath());
+
+    }
+
+    /**
+     * add SSL certificate to the JVM instance truststore
+     */
+    private static void addSSLCertificate(String paHome) throws IOException, GeneralSecurityException {
+
+        String sslCertificatePath = config.getString(IAMConfiguration.SSL_CERTTIFICATE)
+                                          .replace(IAMConfiguration.PA_HOME_PLACEHOLDER, paHome);
+
+        if (!new File(sslCertificatePath).exists()) {
+            throw new IAMStarterException("IAM SSL Certificate not found in: " + sslCertificatePath);
+        }
+
+        SSLUtils.mergeKeyStoreWithSystem(config.getString(IAMConfiguration.SSL_PROTOCOL),
+                                         config.getString(IAMConfiguration.SSL_X509_ALGORITHM),
+                                         sslCertificatePath,
+                                         config.getString(IAMConfiguration.SSL_CERTTIFICATE_PASS));
+
+        LOGGER.debug("SSL certificate [" + sslCertificatePath + "] successfully added to the current JVM truststore.");
+    }
+
+    /**
+     * add IAM and PA URLs to system properties
+     */
+    private static void addIAMSystemProperties() {
+
+        System.setProperty(IAMConfiguration.IAM_URL, iamURL);
+        System.setProperty(IAMConfiguration.IAM_LOGIN, iamURL + IAMConfiguration.IAM_LOGIN_PAGE);
+        System.setProperty(IAMConfiguration.PA_SERVER_NAME, "https://localhost:8443");
+
+        LOGGER.debug("IAM and PA URLs set as system properties");
+        LOGGER.debug(IAMConfiguration.IAM_URL + ": " + System.getProperty(IAMConfiguration.IAM_URL));
+        LOGGER.debug(IAMConfiguration.IAM_LOGIN + ": " + System.getProperty(IAMConfiguration.IAM_LOGIN));
+        LOGGER.debug(IAMConfiguration.PA_SERVER_NAME + ": " + System.getProperty(IAMConfiguration.PA_SERVER_NAME));
+
+    }
+
+    /**
+     * build IAM URL
+     */
+    private static void buildIamUrl() {
+        iamURL = IAMConfiguration.IAM_PROTOCOL + config.getString(IAMConfiguration.IAM_HOST) + ":" +
+                 config.getString(IAMConfiguration.IAM_PORT) + config.getString(IAMConfiguration.IAM_CONTEXT);
     }
 }

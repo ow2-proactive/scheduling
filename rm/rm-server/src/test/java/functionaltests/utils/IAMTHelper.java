@@ -25,8 +25,10 @@
  */
 package functionaltests.utils;
 
-import java.io.*;
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.ow2.proactive.boot.microservices.IAMStarter;
@@ -46,7 +48,8 @@ public class IAMTHelper {
     }
 
     public static void startIAM(String paHome, String bootMicroservicesPath, String bootConfigurationPath)
-            throws InterruptedException, IOException, ExecutionException, ConfigurationException {
+            throws InterruptedException, IOException, ExecutionException, ConfigurationException,
+            GeneralSecurityException {
 
         if (iamProcess == null) {
 

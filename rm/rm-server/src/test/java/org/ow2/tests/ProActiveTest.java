@@ -26,6 +26,7 @@
 package org.ow2.tests;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.Policy;
 import java.util.concurrent.ExecutionException;
 
@@ -87,8 +88,8 @@ public class ProActiveTest {
      * @throws ExecutionException
      * @throws ConfigurationException
      */
-    public static void startIAMIfNeeded()
-            throws IOException, InterruptedException, ExecutionException, ConfigurationException {
+    public static void startIAMIfNeeded() throws IOException, InterruptedException, ExecutionException,
+            ConfigurationException, GeneralSecurityException {
 
         //Check if PA is configured to use IAM microservice for authentication
         if (PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().equals(IAM_LOGIN_METHOD)) {
