@@ -2125,7 +2125,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return;
         }
 
-        if (!clients.containsKey(owner.getId())) {
+        if ((!clients.containsKey(owner.getId()) && owner != localClient)) {
             logger.warn(nodeUrl + " cannot set busy as the client disconnected " + owner);
             throw new NotConnectedException("Client " + owner + " is not connected to the resource manager");
         }
