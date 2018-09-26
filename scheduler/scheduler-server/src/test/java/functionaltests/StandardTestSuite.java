@@ -124,6 +124,7 @@ import functionaltests.policy.ram.TestRamPolicy;
 import functionaltests.rm.TestNodeDiesAtSchedulerRestart;
 import functionaltests.rm.TestRMProxy;
 import functionaltests.rm.TestRMProxyRebind;
+import functionaltests.rm.TestRMReconnectionWhileRunning;
 import functionaltests.rm.nodesource.TestJobNodeAccessToken;
 import functionaltests.runasme.TestRunAsMeLinuxKey;
 import functionaltests.runasme.TestRunAsMeLinuxNone;
@@ -205,7 +206,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       JettyStarterTest.class, TestXMLTransformer.class, TagTest.class,
 
                       // RM proxy tests
-                      TestRMProxy.class, TestRMProxyRebind.class,
+                      TestRMProxy.class, TestRMProxyRebind.class, TestRMReconnectionWhileRunning.class,
 
                       // Tests without scheduler restart
                       AuthenticationTest.class, ComplexTypeArgsTest.class, SchedulerJMXTest.class,
