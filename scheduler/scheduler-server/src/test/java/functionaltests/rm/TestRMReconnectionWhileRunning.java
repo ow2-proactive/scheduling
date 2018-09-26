@@ -119,7 +119,11 @@ public class TestRMReconnectionWhileRunning extends MultipleRMTBase {
                                                       .size();
         int attemptsThatDidNotCauseReconnection = LogProcessor.linesThatMatch("Do not reconnect to the RM as connection is active for ")
                                                               .size();
-        int actualNumberOfReconnections = numberOfAttemptsToReconnect - attemptsThatDidNotCauseReconnection;
+
+        // we print 'do not reconnect' for each user, and now we have 2 users, 'admin' and 'demo'
+        int EXP_NUMBER_OF_USERS = 2;
+        int actualNumberOfReconnections = EXP_NUMBER_OF_USERS * numberOfAttemptsToReconnect -
+                                          attemptsThatDidNotCauseReconnection;
 
         assertEquals(0, actualNumberOfReconnections);
     }

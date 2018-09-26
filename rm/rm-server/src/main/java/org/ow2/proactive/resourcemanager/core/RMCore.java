@@ -2125,7 +2125,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return;
         }
 
-        if (!clients.containsKey(owner.getId())) {
+        if (!clients.containsKey(owner.getId()) && owner != localClient) {
             logger.warn(nodeUrl + " cannot set busy as the client disconnected " + owner);
             throw new NotConnectedException("Client " + owner + " is not connected to the resource manager");
         }
@@ -2366,10 +2366,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // return false for non connected clients
         // it should be verified by checkPermissionsMethod but it returns true for
         // local active objects
-
-        // caller == localClient added, because otherwise whatever exception thrown from main scheduler loop
-        // will cause reconnection to RM.
-        return new BooleanWrapper(!toShutDown && (clients.containsKey(caller.getId()) || caller == localClient));
+        final Request currentRequest = PAActiveObject.getContext().getCurrentRequest();
+        String methodName = currentRequest.getMethodName();
+        final Client sourceBodyCaller = checkMethodCallPermission(methodName, currentRequest.getSourceBodyID());
+        return new BooleanWrapper(!toShutDown && clients.containsKey(sourceBodyCaller.getId()));
     }
 
     /**
