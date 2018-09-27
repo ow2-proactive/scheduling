@@ -686,6 +686,8 @@ public class SchedulerDBManager {
                        .setParameter("jobId", id)
                        .executeUpdate();
 
+                session.getNamedQuery("deleteJobDataVariable").setParameter("jobId", id).executeUpdate();
+
                 removeJobScripts(session, id);
 
                 session.getNamedQuery("deleteJobData").setParameter("jobId", id).executeUpdate();
