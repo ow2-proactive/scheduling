@@ -106,13 +106,13 @@ public class AzureBlobDownloader extends JavaExecutable {
         //download a single blob
         if (optionalBlobName.isPresent()) {
             //check weather or not the outputPath is a folder path or a file path
+            String azureBlobLocalRelativePath = Paths.get(outputPath,
+                                                          Paths.get(optionalBlobName.get()).getFileName().toString())
+                                                     .toString();
             if (outputPath.lastIndexOf('/') == outputPath.length() - 1) {
                 createDirIfNotExists(file);
-                String azureBlobLocalRelativePath = Paths.get(outputPath,
-                                                              Paths.get(optionalBlobName.get())
-                                                                   .getFileName()
-                                                                   .toString())
-                                                         .toString();
+                downloadBlob(new File(azureBlobLocalRelativePath), optionalBlobName.get());
+            } else if (outputPath.contains("Nodes")) {
                 downloadBlob(new File(azureBlobLocalRelativePath), optionalBlobName.get());
             } else {
                 downloadBlob(file, optionalBlobName.get());
