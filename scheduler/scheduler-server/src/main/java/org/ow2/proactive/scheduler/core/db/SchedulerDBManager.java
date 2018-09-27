@@ -637,8 +637,6 @@ public class SchedulerDBManager {
 
         session.getNamedQuery("deleteEnvironmentModifierData").setParameter("jobId", jobId).executeUpdate();
 
-        session.getNamedQuery("deleteJobDataVariable").setParameter("jobId", jobId).executeUpdate();
-
         session.getNamedQuery("deleteTaskDataVariable").setParameter("jobId", jobId).executeUpdate();
 
         session.getNamedQuery("deleteSelectorData").setParameter("jobId", jobId).executeUpdate();
@@ -687,6 +685,8 @@ public class SchedulerDBManager {
                 session.createSQLQuery("delete from JOB_CONTENT where JOB_ID = :jobId")
                        .setParameter("jobId", id)
                        .executeUpdate();
+
+                session.getNamedQuery("deleteJobDataVariable").setParameter("jobId", id).executeUpdate();
 
                 removeJobScripts(session, id);
 
