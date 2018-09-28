@@ -58,7 +58,7 @@ public class AzureBlobUploader extends JavaExecutable {
 
     private String containerName;
 
-    Optional<String> optionalBlobName = Optional.empty();
+    Optional<String> optionalBlobName;
 
     private String storageAccount;
 
