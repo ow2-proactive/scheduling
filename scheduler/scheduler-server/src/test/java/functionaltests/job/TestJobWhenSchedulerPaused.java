@@ -48,11 +48,11 @@ public class TestJobWhenSchedulerPaused extends SchedulerFunctionalTestNoRestart
 
     private static String simpleJobPath = "/functionaltests/descriptors/Job_simple.xml";
 
-    private static String sleep5sJobPath = "/functionaltests/descriptors/Job_5s.xml";
+    private static String threeSleepingTasksJobPath = "/functionaltests/descriptors/Job_3tasks_2s.xml";
 
     private static URL simpleJobUrl = TestJobWhenSchedulerPaused.class.getResource(simpleJobPath);
 
-    private static URL sleep5sJobUrl = TestJobWhenSchedulerPaused.class.getResource(sleep5sJobPath);
+    private static URL threeSleepingTasksJobUrl = TestJobWhenSchedulerPaused.class.getResource(threeSleepingTasksJobPath);
 
     private final static int EVENT_TIMEOUT = 5000;
 
@@ -106,8 +106,8 @@ public class TestJobWhenSchedulerPaused extends SchedulerFunctionalTestNoRestart
         int initialJobsNumber = refreshAndGetTotalJobCount();
 
         // Submit jobs
-        JobId jobId1 = schedulerHelper.submitJob(new File(sleep5sJobUrl.toURI()).getAbsolutePath());
-        JobId jobId2 = schedulerHelper.submitJob(new File(sleep5sJobUrl.toURI()).getAbsolutePath());
+        JobId jobId1 = schedulerHelper.submitJob(new File(threeSleepingTasksJobUrl.toURI()).getAbsolutePath());
+        JobId jobId2 = schedulerHelper.submitJob(new File(threeSleepingTasksJobUrl.toURI()).getAbsolutePath());
 
         // Ensure they are running
         schedulerHelper.waitForEventJobRunning(jobId1);
@@ -117,8 +117,8 @@ public class TestJobWhenSchedulerPaused extends SchedulerFunctionalTestNoRestart
         Scheduler schedAdminInterface = schedulerHelper.getSchedulerInterface();
         assertTrue(schedAdminInterface.pause());
 
-        schedulerHelper.waitForEventJobFinished(jobId1);
-        schedulerHelper.waitForEventJobFinished(jobId2);
+        schedulerHelper.waitForEventJobFinished(jobId1, 15000);
+        schedulerHelper.waitForEventJobFinished(jobId2, 15000);
 
         assertEquals(JobStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(jobId1).getStatus());
         assertEquals(JobStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(jobId2).getStatus());

@@ -307,9 +307,9 @@ class LiveJobs {
         for (Map.Entry<JobId, JobData> entry : jobs.entrySet()) {
             JobData value = entry.getValue();
 
-            // If the scheduler is paused, schedule only running jobs
+            // If the scheduler is paused, schedule only running or stalled jobs
             if (isSchedulerPausedOrStopped &&
-                (value.job.getStatus() != JobStatus.RUNNING || value.job.getStatus() != JobStatus.STALLED)) {
+                (value.job.getStatus() != JobStatus.RUNNING && value.job.getStatus() != JobStatus.STALLED)) {
                 continue;
             }
 
