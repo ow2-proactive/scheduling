@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.11"
+        xsi:schemaLocation="urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd"
+        name="Job_sleep"
+        priority="normal"
+        onTaskError="continueJobExecution"
+        maxNumberOfExecution="2"
+>
+    <taskFlow>
+        <task name="WaitIng_Task" >
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+sleep(2000)
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <metadata>
+                <positionTop>
+                    230.5
+                </positionTop>
+                <positionLeft>
+                    1013.5
+                </positionLeft>
+            </metadata>
+        </task>
+        <task name="WaitIng_Task2" >
+            <depends>
+                <task ref="WaitIng_Task"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+sleep(2000)
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <metadata>
+                <positionTop>
+                    355
+                </positionTop>
+                <positionLeft>
+                    1037
+                </positionLeft>
+            </metadata>
+        </task>
+        <task name="WaitIng_Task3" >
+            <depends>
+                <task ref="WaitIng_Task2"/>
+            </depends>
+            <scriptExecutable>
+                <script>
+                    <code language="groovy">
+                        <![CDATA[
+sleep(2000)
+]]>
+                    </code>
+                </script>
+            </scriptExecutable>
+            <metadata>
+                <positionTop>
+                    508
+                </positionTop>
+                <positionLeft>
+                    1019
+                </positionLeft>
+            </metadata>
+        </task>
+    </taskFlow>
+</job>
