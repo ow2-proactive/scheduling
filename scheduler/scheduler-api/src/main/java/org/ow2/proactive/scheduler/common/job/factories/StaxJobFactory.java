@@ -289,6 +289,11 @@ public class StaxJobFactory extends JobFactory {
                     } else if (XMLTags.TASK.matches(current)) {
                         //once here, the job instance has been created
                         fillJobWithTasks(cursorRoot, job, dependencies);
+                    } else if (XMLTags.METADATA_VISUALIZATION.matches(current) && job != null) {
+                        // Add workflow visualization's embedded html
+                        job.setVisualization(getJobVisualization(cursorRoot));
+                        // Metadata is the last element to parse
+                        break;
                     }
                 }
             }
@@ -355,7 +360,6 @@ public class StaxJobFactory extends JobFactory {
         Job job = commonPropertiesHolder;
         try {
             int eventType;
-            boolean shouldContinue = true;
 
             if (replacementVariables != null) {
                 commonPropertiesHolder.getVariables()
@@ -364,46 +368,45 @@ public class StaxJobFactory extends JobFactory {
                                                                   .collect(Collectors.toMap(Map.Entry::getKey,
                                                                                             this::newJobVariable)));
             }
-            while (shouldContinue && cursorJob.hasNext()) {
+            while (cursorJob.hasNext()) {
                 eventType = cursorJob.next();
-                switch (eventType) {
-                    case XMLEvent.START_ELEMENT:
-                        String current = cursorJob.getLocalName();
-                        if (XMLTags.VARIABLES.matches(current)) {
+                if (eventType == XMLEvent.START_ELEMENT) {
+                    String current = cursorJob.getLocalName();
+                    if (XMLTags.VARIABLES.matches(current)) {
 
-                            // create job variables using the replacement map provided at job submission
-                            // the final value of the variable can either be overwritten by a value of the replacement map or
-                            // use in a pattern such value
-                            commonPropertiesHolder.getVariables()
-                                                  .putAll(createJobVariables(cursorJob, replacementVariables));
+                        // create job variables using the replacement map provided at job submission
+                        // the final value of the variable can either be overwritten by a value of the replacement map or
+                        // use in a pattern such value
+                        commonPropertiesHolder.getVariables()
+                                              .putAll(createJobVariables(cursorJob, replacementVariables));
 
-                        } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
-                            commonPropertiesHolder.setGenericInformation(getGenericInformation(cursorJob,
-                                                                                               commonPropertiesHolder.getVariablesAsReplacementMap()));
-                        } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
-                            logger.warn("Element " + XMLTags.JOB_CLASSPATHES.getXMLName() +
-                                        " is no longer supported. Please define a " +
-                                        XMLTags.FORK_ENVIRONMENT.getXMLName() + " per task if needed.");
-                        } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
-                            commonPropertiesHolder.setDescription(getDescription(cursorJob,
-                                                                                 commonPropertiesHolder.getVariablesAsReplacementMap()));
-                        } else if (XMLTags.DS_INPUT_SPACE.matches(current)) {
-                            commonPropertiesHolder.setInputSpace(getIOSpace(cursorJob,
-                                                                            commonPropertiesHolder.getVariablesAsReplacementMap()));
-                        } else if (XMLTags.DS_OUTPUT_SPACE.matches(current)) {
-                            commonPropertiesHolder.setOutputSpace(getIOSpace(cursorJob,
+                    } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
+                        commonPropertiesHolder.setGenericInformation(getGenericInformation(cursorJob,
+                                                                                           commonPropertiesHolder.getVariablesAsReplacementMap()));
+                    } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
+                        logger.warn("Element " + XMLTags.JOB_CLASSPATHES.getXMLName() +
+                                    " is no longer supported. Please define a " +
+                                    XMLTags.FORK_ENVIRONMENT.getXMLName() + " per task if needed.");
+                    } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
+                        commonPropertiesHolder.setDescription(getDescription(cursorJob,
                                                                              commonPropertiesHolder.getVariablesAsReplacementMap()));
-                        } else if (XMLTags.DS_GLOBAL_SPACE.matches(current)) {
-                            commonPropertiesHolder.setGlobalSpace(getIOSpace(cursorJob,
-                                                                             commonPropertiesHolder.getVariablesAsReplacementMap()));
-                        } else if (XMLTags.DS_USER_SPACE.matches(current)) {
-                            commonPropertiesHolder.setUserSpace(getIOSpace(cursorJob,
-                                                                           commonPropertiesHolder.getVariablesAsReplacementMap()));
-                        } else if (XMLTags.TASK_FLOW.matches(current)) {
-                            job = new TaskFlowJob();
-                            shouldContinue = false;
-                        }
+                    } else if (XMLTags.DS_INPUT_SPACE.matches(current)) {
+                        commonPropertiesHolder.setInputSpace(getIOSpace(cursorJob,
+                                                                        commonPropertiesHolder.getVariablesAsReplacementMap()));
+                    } else if (XMLTags.DS_OUTPUT_SPACE.matches(current)) {
+                        commonPropertiesHolder.setOutputSpace(getIOSpace(cursorJob,
+                                                                         commonPropertiesHolder.getVariablesAsReplacementMap()));
+                    } else if (XMLTags.DS_GLOBAL_SPACE.matches(current)) {
+                        commonPropertiesHolder.setGlobalSpace(getIOSpace(cursorJob,
+                                                                         commonPropertiesHolder.getVariablesAsReplacementMap()));
+                    } else if (XMLTags.DS_USER_SPACE.matches(current)) {
+                        commonPropertiesHolder.setUserSpace(getIOSpace(cursorJob,
+                                                                       commonPropertiesHolder.getVariablesAsReplacementMap()));
+                    } else if (XMLTags.TASK_FLOW.matches(current)) {
+                        job = new TaskFlowJob();
+                        // Stop cursor at the beginning of 'taskflow' tag, at this level all job properties are extracted except metadata
                         break;
+                    }
                 }
             }
 
@@ -424,6 +427,7 @@ public class StaxJobFactory extends JobFactory {
                 job.setGlobalSpace(commonPropertiesHolder.getGlobalSpace());
                 job.setUserSpace(commonPropertiesHolder.getUserSpace());
                 job.setVariables(commonPropertiesHolder.getVariables());
+                job.setVisualization(commonPropertiesHolder.getVisualization());
             }
             return job;
         } catch (JobCreationException jce) {
@@ -513,6 +517,8 @@ public class StaxJobFactory extends JobFactory {
                             return replaceVariablesInJobVariablesMap(variablesMap, replacementVariables);
                         }
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
         } catch (JobCreationException jce) {
@@ -657,6 +663,8 @@ public class StaxJobFactory extends JobFactory {
                             return infos;
                         }
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
             return infos;
@@ -697,6 +705,33 @@ public class StaxJobFactory extends JobFactory {
             return description;
         } catch (JobCreationException jce) {
             throw jce;
+        } catch (Exception e) {
+            throw new JobCreationException((String) null, null, e);
+        }
+    }
+
+    /**
+     * Get job's SVG visualization as HTML String from Workflows's Metadata.
+     * Leave the method with the cursor at the end of 'VISUALIZATION' tag.
+     *
+     * @param cursorMetadata the streamReader with the cursor on the 'VISUALIZATION' tag.
+     * @return the Workflow's visualization HTML String between the tags.
+     */
+    private String getJobVisualization(XMLStreamReader cursorMetadata) throws JobCreationException {
+        try {
+            String visualization = "";
+            //if visualization tag exists, then we have a characters event next.
+            int eventType = cursorMetadata.next();
+            if (eventType == XMLEvent.CHARACTERS) {
+                visualization = cursorMetadata.getText();
+            } else if (eventType == XMLEvent.END_ELEMENT) {
+                return visualization;
+            }
+            //go to the description END_ELEMENT
+            while (cursorMetadata.next() != XMLEvent.END_ELEMENT)
+                ;
+
+            return visualization;
         } catch (Exception e) {
             throw new JobCreationException((String) null, null, e);
         }
@@ -764,9 +799,11 @@ public class StaxJobFactory extends JobFactory {
                             current = XMLTags.TASK;
                             throw new RuntimeException("Job parameter sweeping is not yet implemented!");
                         default:
-                            //do nothing just cope with sonarqube rule switch must have default
-                            //https://sonarcloud.io/coding_rules?rule_key=squid%3ASwitchLastCaseIsDefaultCheck
+                            // do nothing just cope with sonarqube rule switch must have default
                     }
+                } else {
+                    // Leave the method with the cursor at the end of the taskflow tag
+                    break;
                 }
             }
         } catch (JobCreationException jce) {
@@ -899,6 +936,8 @@ public class StaxJobFactory extends JobFactory {
                             shouldContinue = false;
                         }
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
             //fill the real task with common attribute if it is a new one
@@ -988,6 +1027,8 @@ public class StaxJobFactory extends JobFactory {
                             shouldContinue = false;
                         }
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
         } catch (JobCreationException jce) {
@@ -1031,6 +1072,8 @@ public class StaxJobFactory extends JobFactory {
                         }
 
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
             return dependencies;
@@ -1321,10 +1364,8 @@ public class StaxJobFactory extends JobFactory {
                             toReturn = new SimpleScript(toReturn.getScript(),
                                                         toReturn.getEngineName(),
                                                         getArguments(cursorScript));
-                        } else if (XMLTags.SCRIPT_SCRIPT.matches(current)) {
-                            if (cursorScript.getAttributeCount() > 0) {
-                                isDynamic = !"static".equals(cursorScript.getAttributeValue(0));
-                            }
+                        } else if (XMLTags.SCRIPT_SCRIPT.matches(current) && cursorScript.getAttributeCount() > 0) {
+                            isDynamic = !"static".equals(cursorScript.getAttributeValue(0));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
@@ -1336,6 +1377,8 @@ public class StaxJobFactory extends JobFactory {
                             }
                         }
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
             return toReturn;
@@ -1375,13 +1418,11 @@ public class StaxJobFactory extends JobFactory {
                     case XMLEvent.END_ELEMENT:
                         current = cursorScript.getLocalName();
                         if (current.equals(selectionTag)) {
-                            if (scripts.size() == 0) {
-                                return null;
-                            } else {
-                                return scripts;
-                            }
+                            return scripts.isEmpty() ? null : scripts;
                         }
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
         } catch (JobCreationException jce) {
@@ -1435,6 +1476,8 @@ public class StaxJobFactory extends JobFactory {
                                 return args.toArray(new String[args.size()]);
                             }
                             break;
+                        default:
+                            // do nothing just cope with sonarqube rule switch must have default
                     }
                 }
                 return args.toArray(new String[args.size()]);
@@ -1499,6 +1542,8 @@ public class StaxJobFactory extends JobFactory {
                                     return;
                                 }
                                 break;
+                            default:
+                                // do nothing just cope with sonarqube rule switch must have default
                         }
                     }
                 } catch (Exception e) {
@@ -1563,6 +1608,8 @@ public class StaxJobFactory extends JobFactory {
                             return;
                         }
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
         } catch (JobCreationException jce) {
@@ -1611,7 +1658,8 @@ public class StaxJobFactory extends JobFactory {
                         if (XMLTags.FORK_SYSTEM_PROPERTY.matches(current)) {
                             attrCount = cursorExec.getAttributeCount();
 
-                            String name = null, value = null;
+                            String name = null;
+                            String value = null;
                             for (i = 0; i < attrCount; i++) {
                                 String attrName = cursorExec.getAttributeLocalName(i);
                                 if (XMLAttributes.COMMON_NAME.matches(attrName)) {
@@ -1636,6 +1684,8 @@ public class StaxJobFactory extends JobFactory {
                             return forkEnv;
                         }
                         break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
             return forkEnv;
@@ -1657,18 +1707,16 @@ public class StaxJobFactory extends JobFactory {
      * @throws JobCreationException if a dependencies name is unknown.
      */
     private void makeDependences(Job job, Map<String, ArrayList<String>> dependencies) throws JobCreationException {
-        if (dependencies != null && dependencies.size() > 0) {
-            if (job.getType() == JobType.TASKSFLOW) {
-                TaskFlowJob tfj = (TaskFlowJob) job;
-                for (Task t : tfj.getTasks()) {
-                    ArrayList<String> names = dependencies.get(t.getName());
-                    if (names != null) {
-                        for (String name : names) {
-                            if (tfj.getTask(name) == null) {
-                                throw new JobCreationException("Unknown dependence: " + name);
-                            } else {
-                                t.addDependence(tfj.getTask(name));
-                            }
+        if (dependencies != null && dependencies.size() > 0 && job.getType() == JobType.TASKSFLOW) {
+            TaskFlowJob tfj = (TaskFlowJob) job;
+            for (Task t : tfj.getTasks()) {
+                ArrayList<String> names = dependencies.get(t.getName());
+                if (names != null) {
+                    for (String name : names) {
+                        if (tfj.getTask(name) == null) {
+                            throw new JobCreationException("Unknown dependence: " + name);
+                        } else {
+                            t.addDependence(tfj.getTask(name));
                         }
                     }
                 }
@@ -1712,11 +1760,7 @@ public class StaxJobFactory extends JobFactory {
         path = replace(path, variables);
         //prepend if file is relative
         File f = new File(path);
-        if (f.isAbsolute()) {
-            return path;
-        } else {
-            return relativePathRoot + File.separator + path;
-        }
+        return f.isAbsolute() ? path : relativePathRoot + File.separator + path;
     }
 
     private void displayJobInfo(Job job) {
@@ -1733,15 +1777,12 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("inputSpace: " + job.getInputSpace());
             logger.debug("outputSpace: " + job.getOutputSpace());
             logger.debug("genericInformation: " + job.getGenericInformation());
+            logger.debug("visualization: " + job.getVisualization());
             logger.debug("TASKS ------------------------------------------------");
 
             ArrayList<Task> tasks = new ArrayList<>();
-            switch (job.getType()) {
-                case TASKSFLOW:
-                    tasks.addAll(((TaskFlowJob) job).getTasks());
-                    break;
-                default:
-                    break;
+            if (job.getType().equals(JobType.TASKSFLOW)) {
+                tasks.addAll(((TaskFlowJob) job).getTasks());
             }
             for (Task t : tasks) {
                 logger.debug("name: " + t.getName());
@@ -1762,17 +1803,15 @@ public class StaxJobFactory extends JobFactory {
 
                 try {
                     logger.debug("inputFileList: length=" + t.getInputFilesList().size());
-                } catch (NullPointerException ignored) {
-                }
-                try {
                     logger.debug("outputFileList: length=" + t.getOutputFilesList().size());
                 } catch (NullPointerException ignored) {
+                    // Ignore this exception
                 }
 
                 if (t.getDependencesList() != null) {
-                    String dep = "dependence: ";
+                    StringBuilder dep = new StringBuilder("dependence: ");
                     for (Task tdep : t.getDependencesList()) {
-                        dep += tdep.getName() + " ";
+                        dep.append(tdep.getName() + " ");
                     }
                     logger.debug(dep);
                 } else {

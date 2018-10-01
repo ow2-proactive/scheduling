@@ -26,8 +26,11 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -57,6 +60,7 @@ public class WorkflowSubmitter {
 
     /**
      * Submits a workflow to the scheduler (XML or archive).
+     * It also creates a job visualization HTML file.
      *
      * @param workflowFile a workflow file (XML or archive)
      * @param variables    variables to be replaced on submission
@@ -69,7 +73,15 @@ public class WorkflowSubmitter {
     public JobId submit(File workflowFile, Map<String, String> variables) throws NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, JobCreationRestException {
         try {
-            return scheduler.submit(createJobObject(workflowFile, variables));
+            Job job = createJobObject(workflowFile, variables);
+            JobId jobId = scheduler.submit(job);
+            // Create Job's SVG visualization file
+            File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId.value()) + ".html");
+            Files.deleteIfExists(visualizationFile.toPath());
+            FileUtils.write(new File(visualizationFile.getAbsolutePath()),
+                            job.getVisualization(),
+                            StandardCharsets.UTF_8);
+            return jobId;
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {

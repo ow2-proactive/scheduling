@@ -97,17 +97,15 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(55L, "job"));
 
         final AtomicInteger successfullyFinished = new AtomicInteger(0);
-        Runnable runnable = new Runnable() {
-            public void run() {
-                try {
-                    String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
-                    JobIdData jobId = schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
-                    if (jobId.getId() == 55L) {
-                        successfullyFinished.incrementAndGet();
-                    }
-                } catch (Exception e) {
-                    fail(e.getMessage());
+        Runnable runnable = () -> {
+            try {
+                String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
+                JobIdData jobId = schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+                if (jobId.getId() == 55L) {
+                    successfullyFinished.incrementAndGet();
                 }
+            } catch (Exception e) {
+                fail(e.getMessage());
             }
         };
         List<Thread> threads = new ArrayList<>(NRO_THREADS);

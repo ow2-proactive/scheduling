@@ -26,9 +26,10 @@
 package org.ow2.proactive_grid_cloud_portal.studio;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -70,7 +71,7 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 public class StudioRest implements StudioInterface {
 
-    private final static Logger logger = Logger.getLogger(StudioRest.class);
+    private static final Logger logger = Logger.getLogger(StudioRest.class);
 
     private SchedulerStateRest schedulerRest = null;
 
@@ -250,15 +251,10 @@ public class StudioRest implements StudioInterface {
 
         ArrayList<String> classes = new ArrayList<>();
         if (classesDir.exists()) {
-            File[] jars = classesDir.listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(".jar");
-                }
-            });
+            File[] jars = classesDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".jar"));
 
             for (File jar : jars) {
-                try {
-                    JarFile jarFile = new JarFile(jar.getAbsolutePath());
+                try (JarFile jarFile = new JarFile(jar.getAbsolutePath())) {
                     Enumeration allEntries = jarFile.entries();
                     while (allEntries.hasMoreElements()) {
                         JarEntry entry = (JarEntry) allEntries.nextElement();
@@ -305,7 +301,7 @@ public class StudioRest implements StudioInterface {
                 byte[] bytes = IOUtils.toByteArray(inputStream);
 
                 //constructs upload file path
-                fileName = classesDir.getAbsolutePath() + "/" + name;
+                fileName = classesDir.getAbsolutePath() + File.separator + name;
 
                 FileUtils.writeByteArrayToFile(new File(fileName), bytes);
             } catch (IOException e) {
@@ -342,7 +338,7 @@ public class StudioRest implements StudioInterface {
             throws NotConnectedRestException, IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
-            return FileUtils.readFileToString(new File(visualizationFile.getAbsolutePath()));
+            return FileUtils.readFileToString(new File(visualizationFile.getAbsolutePath()), StandardCharsets.UTF_8);
         }
         return "";
     }
@@ -351,10 +347,8 @@ public class StudioRest implements StudioInterface {
     public boolean updateVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId,
             @FormParam("visualization") String visualization) throws NotConnectedRestException, IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
-        if (visualizationFile.exists()) {
-            visualizationFile.delete();
-        }
-        FileUtils.write(new File(visualizationFile.getAbsolutePath()), visualization);
+        Files.deleteIfExists(visualizationFile.toPath());
+        FileUtils.write(new File(visualizationFile.getAbsolutePath()), visualization, StandardCharsets.UTF_8);
         return true;
     }
 }
