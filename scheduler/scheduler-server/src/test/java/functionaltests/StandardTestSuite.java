@@ -81,19 +81,7 @@ import functionaltests.db.schedulerdb.TestThirdPartyCredentials;
 import functionaltests.db.schedulerdb.TestUsageData;
 import functionaltests.jmx.SchedulerJMXTest;
 import functionaltests.jmx.SchedulerRuntimeDataMBeanTest;
-import functionaltests.job.TagTest;
-import functionaltests.job.TestExecuteScriptsOnBusyNode;
-import functionaltests.job.TestJobRemoved;
-import functionaltests.job.TestJobSchedulerHome;
-import functionaltests.job.TestJobSubmittedParallel;
-import functionaltests.job.TestJobWalltime;
-import functionaltests.job.TestPauseJob;
-import functionaltests.job.TestPreemptRestartKillTask;
-import functionaltests.job.TestPreemptRestartKillTaskSchema33;
-import functionaltests.job.TestResumeJob;
-import functionaltests.job.TestTaskNotRestarted;
-import functionaltests.job.TestTaskNotStarted;
-import functionaltests.job.TestVariablesPropagation;
+import functionaltests.job.*;
 import functionaltests.job.error.TestErrorAndFailure;
 import functionaltests.job.error.TestJobAborted;
 import functionaltests.job.error.TestJobCanceledWithReplication;
@@ -231,7 +219,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestThirdPartyCredentialsDefined.class, TestUserSpace.class, TestWorkflowDataspace.class,
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
                       Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class, TestTaskSynchronization.class,
-                      TestMarkedAsFinished.class, RestartAllInErrorTasksTest.class,
+                      TestMarkedAsFinished.class, RestartAllInErrorTasksTest.class, TestJobWhenSchedulerPaused.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,
