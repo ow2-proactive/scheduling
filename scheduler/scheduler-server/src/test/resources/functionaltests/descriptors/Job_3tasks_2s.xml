@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:proactive:jobdescriptor:3.11"
         xsi:schemaLocation="urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd"
-        name="Job_sleep"
+        name="Job_3tasks_2s"
         priority="normal"
         onTaskError="continueJobExecution"
         maxNumberOfExecution="2"
