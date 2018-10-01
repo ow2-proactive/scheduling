@@ -148,4 +148,23 @@ public class SchedulerExamplesUtils {
         }
         return filesRelativePathName;
     }
+
+    /**
+     * Creates a directory if it does not exist
+     * @param file
+     */
+    protected static void createDirIfNotExists(File file) {
+        // If the path already exists, print a warning.
+        if (!file.exists()) {
+            try {
+                file.mkdir();
+                logger.info("The " + file.getName() + " directory is created");
+            } catch (Exception e) {
+                logger.error("Couldn't create destination directory!");
+                System.exit(1);
+            }
+        } else {
+            logger.info("The given local path " + file.getName() + " already exists");
+        }
+    }
 }
