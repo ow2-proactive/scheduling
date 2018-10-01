@@ -26,7 +26,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -41,6 +41,7 @@ import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
@@ -51,6 +52,9 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 public class WorkflowSubmitter {
 
     private static final Logger logger = ProActiveLogger.getLogger(WorkflowSubmitter.class);
+
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.isSet() ? PASchedulerProperties.FILE_ENCODING.getValueAsString()
+                                                                                            : "UTF-8";
 
     private Scheduler scheduler;
 
@@ -76,11 +80,14 @@ public class WorkflowSubmitter {
             Job job = createJobObject(workflowFile, variables);
             JobId jobId = scheduler.submit(job);
             // Create Job's SVG visualization file
-            File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId.value()) + ".html");
-            Files.deleteIfExists(visualizationFile.toPath());
-            FileUtils.write(new File(visualizationFile.getAbsolutePath()),
-                            job.getVisualization(),
-                            StandardCharsets.UTF_8);
+            String visualization = job.getVisualization();
+            if (visualization != null && !visualization.isEmpty()) {
+                File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId.value()) + ".html");
+                Files.deleteIfExists(visualizationFile.toPath());
+                FileUtils.write(new File(visualizationFile.getAbsolutePath()),
+                                job.getVisualization(),
+                                Charset.forName(FILE_ENCODING));
+            }
             return jobId;
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);

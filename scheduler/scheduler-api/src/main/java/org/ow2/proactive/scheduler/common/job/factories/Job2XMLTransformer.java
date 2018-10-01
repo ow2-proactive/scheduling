@@ -93,6 +93,9 @@ public class Job2XMLTransformer {
 
     public static Logger logger = Logger.getLogger(Job2XMLTransformer.class);
 
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.isSet() ? PASchedulerProperties.FILE_ENCODING.getValueAsString()
+                                                                                            : "UTF-8";
+
     public static final String XSD_LOCATION = "urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd";
 
     public Job2XMLTransformer() {
@@ -122,11 +125,7 @@ public class Job2XMLTransformer {
         trans.setOutputProperty(OutputKeys.INDENT, "yes");
         // If the encoding property is set on the client JVM, use it (it has to match the server-side encoding),
         // otherwise use UTF-8
-        if (PASchedulerProperties.FILE_ENCODING.isSet()) {
-            trans.setOutputProperty(OutputKeys.ENCODING, PASchedulerProperties.FILE_ENCODING.getValueAsString());
-        } else {
-            trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        }
+        trans.setOutputProperty(OutputKeys.ENCODING, FILE_ENCODING);
         trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
         // write the xml

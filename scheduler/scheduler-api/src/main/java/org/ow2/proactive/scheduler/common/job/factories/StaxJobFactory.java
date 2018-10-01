@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLInputFactory;
@@ -99,6 +100,9 @@ public class StaxJobFactory extends JobFactory {
 
     public static final Logger logger = Logger.getLogger(StaxJobFactory.class);
 
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.isSet() ? PASchedulerProperties.FILE_ENCODING.getValueAsString()
+                                                                                            : "UTF-8";
+
     public static final String MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES = "Unable to instanciate job validation factories";
 
     private enum ScriptType {
@@ -137,9 +141,7 @@ public class StaxJobFactory extends JobFactory {
     @Override
     public Job createJob(String filePath, Map<String, String> replacementVariables) throws JobCreationException {
         try {
-            // Check if the file exist
-            File file = new File(filePath);
-            return createJob(file, replacementVariables);
+            return createJob(new File(filePath), replacementVariables);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -155,9 +157,7 @@ public class StaxJobFactory extends JobFactory {
     @Override
     public Job createJob(URI filePath, Map<String, String> replacementVariables) throws JobCreationException {
         try {
-            //Check if the file exist
-            File file = new File(filePath);
-            return createJob(file, replacementVariables);
+            return createJob(new File(filePath), replacementVariables);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -181,12 +181,7 @@ public class StaxJobFactory extends JobFactory {
             Job job;
             try (InputStream inputStream = new FileInputStream(updatedFile)) {
                 // use the server side property to accept encoding
-                if (PASchedulerProperties.FILE_ENCODING.isSet()) {
-                    xmlsr = xmlInputFactory.createXMLStreamReader(inputStream,
-                                                                  PASchedulerProperties.FILE_ENCODING.getValueAsString());
-                } else {
-                    xmlsr = xmlInputFactory.createXMLStreamReader(inputStream);
-                }
+                xmlsr = xmlInputFactory.createXMLStreamReader(inputStream, FILE_ENCODING);
 
                 //Create the job starting at the first cursor position of the XML Stream reader
                 job = createJob(xmlsr, replacementVariables, dependencies);
@@ -1707,19 +1702,21 @@ public class StaxJobFactory extends JobFactory {
      * @throws JobCreationException if a dependencies name is unknown.
      */
     private void makeDependences(Job job, Map<String, ArrayList<String>> dependencies) throws JobCreationException {
-        if (dependencies != null && dependencies.size() > 0 && job.getType() == JobType.TASKSFLOW) {
+        if (dependencies != null && !dependencies.isEmpty() && job.getType() == JobType.TASKSFLOW) {
             TaskFlowJob tfj = (TaskFlowJob) job;
             for (Task t : tfj.getTasks()) {
                 ArrayList<String> names = dependencies.get(t.getName());
-                if (names != null) {
-                    for (String name : names) {
-                        if (tfj.getTask(name) == null) {
-                            throw new JobCreationException("Unknown dependence: " + name);
-                        } else {
-                            t.addDependence(tfj.getTask(name));
-                        }
-                    }
-                }
+                createTaskDependencies(tfj, t, names);
+            }
+        }
+    }
+
+    private void createTaskDependencies(TaskFlowJob tfj, Task t, ArrayList<String> dependencies)
+            throws JobCreationException {
+        if (dependencies != null) {
+            for (String name : dependencies) {
+                t.addDependence(Optional.ofNullable(tfj.getTask(name))
+                                        .orElseThrow(() -> new JobCreationException("Unknown dependence: " + name)));
             }
         }
     }
@@ -1780,10 +1777,9 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("visualization: " + job.getVisualization());
             logger.debug("TASKS ------------------------------------------------");
 
-            ArrayList<Task> tasks = new ArrayList<>();
-            if (job.getType().equals(JobType.TASKSFLOW)) {
-                tasks.addAll(((TaskFlowJob) job).getTasks());
-            }
+            ArrayList<Task> tasks = job.getType().equals(JobType.TASKSFLOW) ? ((TaskFlowJob) job).getTasks()
+                                                                            : new ArrayList<>();
+
             for (Task t : tasks) {
                 logger.debug("name: " + t.getName());
                 logger.debug("description: " + t.getDescription());
@@ -1810,9 +1806,7 @@ public class StaxJobFactory extends JobFactory {
 
                 if (t.getDependencesList() != null) {
                     StringBuilder dep = new StringBuilder("dependence: ");
-                    for (Task tdep : t.getDependencesList()) {
-                        dep.append(tdep.getName() + " ");
-                    }
+                    t.getDependencesList().forEach(tdep -> dep.append(tdep.getName() + " "));
                     logger.debug(dep);
                 } else {
                     logger.debug("dependence: null");

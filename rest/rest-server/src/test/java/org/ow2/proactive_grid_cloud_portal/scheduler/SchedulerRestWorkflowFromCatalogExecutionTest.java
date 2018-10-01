@@ -26,6 +26,7 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,6 +66,8 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
 
     private String sessionId;
 
+    private long currentJobId;
+
     @BeforeClass
     public static void setUpWorkflowsServer() throws Exception {
         // This resource will expose workflow contents so that they can
@@ -77,6 +80,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         schedulerRest = new SchedulerStateRest();
         scheduler = mock(SchedulerProxyUserInterface.class);
         sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);
+        currentJobId = 55L;
     }
 
     @Test
@@ -94,16 +98,14 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     @Test
     public void testWhenSubmittingConcurrentlyUsingAValidWfContentUrlAllValidJobIdsMustBeRetrieved() throws Exception {
         Integer NRO_THREADS = 100;
-        when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(55L, "job"));
+        doAnswer(invocation -> new JobIdImpl(currentJobId++, "job")).when(scheduler).submit(Matchers.any());
 
-        final AtomicInteger successfullyFinished = new AtomicInteger(0);
+        final AtomicInteger successfullySubmitted = new AtomicInteger(0);
         Runnable runnable = () -> {
             try {
                 String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
-                JobIdData jobId = schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
-                if (jobId.getId() == 55L) {
-                    successfullyFinished.incrementAndGet();
-                }
+                schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+                successfullySubmitted.incrementAndGet();
             } catch (Exception e) {
                 fail(e.getMessage());
             }
@@ -118,7 +120,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
             t.join();
         }
 
-        Assert.assertEquals(NRO_THREADS, (Integer) successfullyFinished.get());
+        Assert.assertEquals(NRO_THREADS, (Integer) successfullySubmitted.get());
     }
 
     @Test

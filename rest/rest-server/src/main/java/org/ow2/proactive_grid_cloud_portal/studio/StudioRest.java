@@ -28,7 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.studio;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.security.KeyException;
 import java.util.ArrayList;
@@ -51,6 +51,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
@@ -72,6 +73,9 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 public class StudioRest implements StudioInterface {
 
     private static final Logger logger = Logger.getLogger(StudioRest.class);
+
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.isSet() ? PASchedulerProperties.FILE_ENCODING.getValueAsString()
+                                                                                            : "UTF-8";
 
     private SchedulerStateRest schedulerRest = null;
 
@@ -338,7 +342,8 @@ public class StudioRest implements StudioInterface {
             throws NotConnectedRestException, IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
-            return FileUtils.readFileToString(new File(visualizationFile.getAbsolutePath()), StandardCharsets.UTF_8);
+            return FileUtils.readFileToString(new File(visualizationFile.getAbsolutePath()),
+                                              Charset.forName(FILE_ENCODING));
         }
         return "";
     }
@@ -348,7 +353,7 @@ public class StudioRest implements StudioInterface {
             @FormParam("visualization") String visualization) throws NotConnectedRestException, IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         Files.deleteIfExists(visualizationFile.toPath());
-        FileUtils.write(new File(visualizationFile.getAbsolutePath()), visualization, StandardCharsets.UTF_8);
+        FileUtils.write(new File(visualizationFile.getAbsolutePath()), visualization, Charset.forName(FILE_ENCODING));
         return true;
     }
 }
