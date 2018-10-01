@@ -228,6 +228,13 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Override
     protected void notifyDeployingNodeLost(String pnURL) {
         putPnTimeoutWithLockAndPersist(pnURL, Boolean.TRUE);
+        String host = nodeNameBuilder.extractHostFromNode(pnURL);
+        int lostNodeNotifications = addAndGetLostNodeNotificationWithLockAndPersist(host);
+        if (lostNodeNotifications >= getConfiguredNodeNumberWithLockAndPersist(host) * maxDeploymentFailure) {
+            logger.info("Received " + lostNodeNotifications + " LOST Node notifications. New nodes will be required.");
+            resetLostNodeNotificationsWithLockAndPersist(host);
+            setNeedsNodesWithLockAndPersist(host, true);
+        }
     }
 
     /**
@@ -239,7 +246,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         String nodeUrl = node.getNodeInformation().getURL();
         InetAddress nodeHost = node.getVMInformation().getInetAddress();
 
-        String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
+        String parsedHost = nodeNameBuilder.extractHostFromNode(nodeName);
         putAliveNodeUrlWithLockAndPersist(parsedHost, nodeUrl);
         logger.info("New acquired node " + nodeUrl + " on host " + nodeHost);
     }
@@ -253,7 +260,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         String nodeUrl = node.getNodeInformation().getURL();
         InetAddress nodeHost = node.getVMInformation().getInetAddress();
 
-        String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
+        String parsedHost = nodeNameBuilder.extractHostFromNode(nodeName);
         putRemovedNodeUrlWithLockAndPersist(parsedHost, node.getNodeInformation().getURL());
         logger.info("Removed node " + nodeUrl + " on host " + nodeHost);
 
@@ -273,7 +280,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         if (node != null) {
             nodeHost = node.getVMInformation().getInetAddress();
         }
-        String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
+        String parsedHost = nodeNameBuilder.extractHostFromNode(nodeName);
         putDownNodeUrlWithLockAndPersist(parsedHost, nodeUrl);
         logger.info("Down node " + nodeUrl + " on host " + nodeHost);
 
@@ -292,7 +299,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         String nodeUrl = node.getNodeInformation().getURL();
         InetAddress nodeHost = node.getVMInformation().getInetAddress();
 
-        String parsedHost = nodeNameBuilder.extractHostFromNodeName(nodeName);
+        String parsedHost = nodeNameBuilder.extractHostFromNode(nodeName);
         putAliveNodeUrlWithLockAndPersist(parsedHost, node.getNodeInformation().getURL());
         logger.info("Reconnected node " + nodeUrl + " on host " + nodeHost);
     }
@@ -479,6 +486,29 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         });
     }
 
+    private int addAndGetLostNodeNotificationWithLockAndPersist(final String configuredHostAddress) {
+        return setPersistedInfraVariable(() -> {
+            HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
+            int lostNodeNotificationsNumber = hostTracker.addAndGetLostNodeNotification();
+            getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
+            return lostNodeNotificationsNumber;
+        });
+    }
+
+    private void resetLostNodeNotificationsWithLockAndPersist(final String configuredHostAddress) {
+        setPersistedInfraVariable(() -> {
+            HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
+            hostTracker.resetLostNodeNotifications();
+            getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
+            return null;
+        });
+    }
+
+    private int getConfiguredNodeNumberWithLockAndPersist(final String configuredHostAddress) {
+        return getPersistedInfraVariable(() -> getHostTrackerPerHost().get(configuredHostAddress)
+                                                                      .getConfiguredNodeNumber());
+    }
+
     private Map<String, Boolean> getPnTimeoutMap() {
         return (Map<String, Boolean>) persistedInfraVariables.get(PN_TIMEOUT_KEY);
     }
@@ -522,21 +552,21 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                    ProActiveCounter.getUniqID();
         }
 
-        protected String extractHostFromNodeName(String nodeName) {
+        protected String extractHostFromNode(String nodeNameOrUrl) {
             String compliantNodeName = "";
             Pattern pattern = Pattern.compile(COMPLIANT_ADDRESS_DELIMITER_REGEX);
-            Matcher matcher = pattern.matcher(nodeName);
+            Matcher matcher = pattern.matcher(nodeNameOrUrl);
             if (matcher.find()) {
                 try {
                     compliantNodeName = matcher.group(1);
                     logger.debug("Extracted configured host address " + compliantNodeName);
                 } catch (IndexOutOfBoundsException e) {
                     throw new IllegalStateException("Configured host address could not be extracted from the node name " +
-                                                    nodeName, e);
+                                                    nodeNameOrUrl, e);
                 }
             } else {
                 throw new IllegalStateException("Configured host address could not be found when parsing node name " +
-                                                nodeName);
+                                                nodeNameOrUrl);
             }
             return convertToConfiguredAddress(compliantNodeName);
         }
