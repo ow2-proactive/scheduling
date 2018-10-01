@@ -302,7 +302,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             logger.trace("DeployingNode " + url + " removed from IM");
             // one notifies listeners about the deploying node removal
             // if the node is not lost
-            if (!isLost) {
+            if (isLost) {
                 this.notifyDeployingNodeLost(pn.getNodeURL());
             }
             return true;
