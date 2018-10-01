@@ -207,13 +207,11 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
                 final int neededNodeNumber = getNeededNodesNumberWithLock(host);
                 logger.info("Acquiring " + neededNodeNumber + " nodes on host " + hostTracker);
 
-                this.nodeSource.executeInParallel(new Runnable() {
-                    public void run() {
-                        try {
-                            startNodeImplWithRetries(hostTracker, neededNodeNumber, maxDeploymentFailure);
-                        } catch (Exception e) {
-                            logger.error("Could not acquire nodes on host " + hostTracker, e);
-                        }
+                this.nodeSource.executeInParallel(() -> {
+                    try {
+                        startNodeImplWithRetries(hostTracker, neededNodeNumber, maxDeploymentFailure);
+                    } catch (Exception e) {
+                        logger.error("Could not acquire nodes on host " + hostTracker, e);
                     }
                 });
 
@@ -430,86 +428,54 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private Set<Map.Entry<String, HostTracker>> getHostTrackerPerHostEntrySetWithLock() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Set<Map.Entry<String, HostTracker>>>() {
-            @Override
-            public Set<Map.Entry<String, HostTracker>> handle() {
-                return getHostTrackerPerHost().entrySet();
-            }
-        });
+        return getPersistedInfraVariable(getHostTrackerPerHost()::entrySet);
     }
 
     private boolean needsNodes(final String configuredHostAddress) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return getHostTrackerPerHost().get(configuredHostAddress).needsNodes();
-            }
-        });
+        return getPersistedInfraVariable(getHostTrackerPerHost().get(configuredHostAddress)::needsNodes);
     }
 
     private int getNeededNodesNumberWithLock(final String configuredHostAddress) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Integer>() {
-            @Override
-            public Integer handle() {
-                return getHostTrackerPerHost().get(configuredHostAddress).getNeededNodesNumber();
-            }
-        });
+        return getPersistedInfraVariable(getHostTrackerPerHost().get(configuredHostAddress)::getNeededNodesNumber);
     }
 
     private void setNeedsNodesWithLockAndPersist(final String configuredHostAddress, final boolean needsNodes) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
-                hostTracker.setNeedsNodes(needsNodes);
-                getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
-                return null;
-            }
+        setPersistedInfraVariable(() -> {
+            HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
+            hostTracker.setNeedsNodes(needsNodes);
+            getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
+            return null;
         });
     }
 
     private void putAliveNodeUrlWithLockAndPersist(final String configuredHostAddress, final String aliveNodeUrl) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
-                hostTracker.putAliveNodeUrl(aliveNodeUrl);
-                getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
-                return null;
-            }
+        setPersistedInfraVariable(() -> {
+            HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
+            hostTracker.putAliveNodeUrl(aliveNodeUrl);
+            getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
+            return null;
         });
     }
 
     private boolean hasAliveNodes(final String configuredHostAddress) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return getHostTrackerPerHost().get(configuredHostAddress).hasAliveNodes();
-            }
-        });
+        return getPersistedInfraVariable(getHostTrackerPerHost().get(configuredHostAddress)::hasAliveNodes);
     }
 
     private void putRemovedNodeUrlWithLockAndPersist(final String configuredHostAddress, final String removedNodeUrl) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
-                hostTracker.putRemovedNodeUrl(removedNodeUrl);
-                getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
-                return null;
-            }
+        setPersistedInfraVariable(() -> {
+            HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
+            hostTracker.putRemovedNodeUrl(removedNodeUrl);
+            getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
+            return null;
         });
     }
 
     private void putDownNodeUrlWithLockAndPersist(final String configuredHostAddress, final String downNodeUrl) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
-                hostTracker.putDownNodeUrl(downNodeUrl);
-                getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
-                return null;
-            }
+        setPersistedInfraVariable(() -> {
+            HostTracker hostTracker = getHostTrackerPerHost().get(configuredHostAddress);
+            hostTracker.putDownNodeUrl(downNodeUrl);
+            getHostTrackerPerHost().put(configuredHostAddress, hostTracker);
+            return null;
         });
     }
 
@@ -518,32 +484,15 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     }
 
     private Boolean getPnTimeoutWithLock(final String key) {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Boolean>() {
-            @Override
-            public Boolean handle() {
-                return getPnTimeoutMap().get(key);
-            }
-        });
+        return getPersistedInfraVariable(() -> getPnTimeoutMap().get(key));
     }
 
     private void putPnTimeoutWithLockAndPersist(final String key, final Boolean value) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                getPnTimeoutMap().put(key, value);
-                return null;
-            }
-        });
+        setPersistedInfraVariable(() -> getPnTimeoutMap().put(key, value));
     }
 
     private void removePnTimeoutWithLockAndPersist(final String key) {
-        setPersistedInfraVariable(new PersistedInfraVariablesHandler<Void>() {
-            @Override
-            public Void handle() {
-                getPnTimeoutMap().remove(key);
-                return null;
-            }
-        });
+        setPersistedInfraVariable(() -> getPnTimeoutMap().remove(key));
     }
 
     /**
