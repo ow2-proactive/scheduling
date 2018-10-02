@@ -92,16 +92,18 @@ public class JobDeadline {
     }
 
     public static Date applyFormats(String expression, DateFormat... dateFormats) throws ParseException {
+        final TimeZone timeZone = TimeZone.getTimeZone("GMT");
         int i = 0;
         for (; i < dateFormats.length - 1; ++i) {
             try {
-                dateFormats[i].setTimeZone(TimeZone.getTimeZone("GMT"));
+                dateFormats[i].setTimeZone(timeZone);
                 return dateFormats[i].parse(expression);
             } catch (ParseException e) {
                 // ignore parse exceptions because `expression` has to follow only one format
             }
         }
         // but if last attempt fails we throw exception
+        dateFormats[i].setTimeZone(timeZone);
         return dateFormats[i].parse(expression);
     }
 

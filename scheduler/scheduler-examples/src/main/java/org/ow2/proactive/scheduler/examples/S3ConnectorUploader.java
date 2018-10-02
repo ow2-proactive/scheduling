@@ -234,7 +234,7 @@ public class S3ConnectorUploader extends JavaExecutable {
     }
 
     /**
-     * Upload a local directory to S3. <br>
+     * Upload a local file to S3. <br>
      * Requires a bucket name. <br>
      *
      * @param filePath

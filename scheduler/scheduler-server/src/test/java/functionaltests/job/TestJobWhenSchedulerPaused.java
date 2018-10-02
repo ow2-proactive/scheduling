@@ -33,12 +33,15 @@ import java.net.URL;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
+import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
+import functionaltests.utils.UserType;
 
 
 /**
@@ -48,23 +51,26 @@ public class TestJobWhenSchedulerPaused extends SchedulerFunctionalTestNoRestart
 
     private static String simpleJobPath = "/functionaltests/descriptors/Job_simple.xml";
 
-    private static String sleep5sJobPath = "/functionaltests/descriptors/Job_5s.xml";
+    private static String threeSleepingTasksJobPath = "/functionaltests/descriptors/Job_3tasks_2s.xml";
 
     private static URL simpleJobUrl = TestJobWhenSchedulerPaused.class.getResource(simpleJobPath);
 
-    private static URL sleep5sJobUrl = TestJobWhenSchedulerPaused.class.getResource(sleep5sJobPath);
+    private static URL threeSleepingTasksJobUrl = TestJobWhenSchedulerPaused.class.getResource(threeSleepingTasksJobPath);
 
     private final static int EVENT_TIMEOUT = 5000;
 
     @Test
     public void testJobsDontRunWhenSchedulerPaused() throws Throwable {
 
+        Scheduler schedAdminInterface = schedulerHelper.getSchedulerInterface(UserType.ADMIN);
+
         // Get the initial job number
-        int initialJobsNumber = refreshAndGetTotalJobCount();
+        int initialJobsNumber = refreshAndGetTotalJobCount(schedAdminInterface);
 
         // Pause the scheduler
-        Scheduler schedAdminInterface = schedulerHelper.getSchedulerInterface();
-        assertTrue(schedAdminInterface.pause());
+        schedAdminInterface.pause();
+        schedulerHelper.waitForEventSchedulerState(SchedulerEvent.PAUSED);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.PAUSED));
 
         // Ensure that every job newly submitted will be pending
         JobId jobId1 = schedulerHelper.submitJob(new File(simpleJobUrl.toURI()).getAbsolutePath());
@@ -77,10 +83,10 @@ public class TestJobWhenSchedulerPaused extends SchedulerFunctionalTestNoRestart
         // .. without waiting long enough that they run
         Thread.sleep(10000);
 
-        JobState js1 = schedulerHelper.getSchedulerInterface().getJobState(jobId1);
+        JobState js1 = schedAdminInterface.getJobState(jobId1);
         assertEquals(JobStatus.PENDING, js1.getStatus());
 
-        JobState js2 = schedulerHelper.getSchedulerInterface().getJobState(jobId2);
+        JobState js2 = schedAdminInterface.getJobState(jobId2);
         assertEquals(JobStatus.PENDING, js2.getStatus());
 
         // Kill + Remove + Clean + Resume
@@ -89,11 +95,10 @@ public class TestJobWhenSchedulerPaused extends SchedulerFunctionalTestNoRestart
 
         schedulerHelper.removeJob(jobId1);
         schedulerHelper.removeJob(jobId2);
-
         schedulerHelper.waitForEventJobRemoved(jobId1, EVENT_TIMEOUT);
         schedulerHelper.waitForEventJobRemoved(jobId2, EVENT_TIMEOUT);
 
-        assertEquals(initialJobsNumber, refreshAndGetTotalJobCount());
+        assertEquals(initialJobsNumber, refreshAndGetTotalJobCount(schedAdminInterface));
         schedulerHelper.checkNodesAreClean();
 
         assertTrue(schedAdminInterface.resume());
@@ -102,52 +107,43 @@ public class TestJobWhenSchedulerPaused extends SchedulerFunctionalTestNoRestart
     @Test
     public void testRunningJobsTerminate() throws Throwable {
 
+        Scheduler schedAdminInterface = schedulerHelper.getSchedulerInterface(UserType.ADMIN);
+
         // Get the initial job number
-        int initialJobsNumber = refreshAndGetTotalJobCount();
+        int initialJobsNumber = refreshAndGetTotalJobCount(schedAdminInterface);
 
-        // Submit jobs
-        JobId jobId1 = schedulerHelper.submitJob(new File(sleep5sJobUrl.toURI()).getAbsolutePath());
-        JobId jobId2 = schedulerHelper.submitJob(new File(sleep5sJobUrl.toURI()).getAbsolutePath());
+        // Submit a job
+        JobId jobId = schedulerHelper.submitJob(new File(threeSleepingTasksJobUrl.toURI()).getAbsolutePath());
 
-        // Ensure they are running
-        schedulerHelper.waitForEventJobRunning(jobId1);
-        schedulerHelper.waitForEventJobRunning(jobId2);
+        // Ensure it is running
+        schedulerHelper.waitForEventJobRunning(jobId);
 
-        // Pause the scheduler
-        Scheduler schedAdminInterface = schedulerHelper.getSchedulerInterface();
-        assertTrue(schedAdminInterface.pause());
+        // Pause the scheduler and ensure it is paused
+        schedAdminInterface.pause();
+        schedulerHelper.waitForEventSchedulerState(SchedulerEvent.PAUSED);
+        assertTrue(schedAdminInterface.getStatus().equals(SchedulerStatus.PAUSED));
 
-        schedulerHelper.waitForEventJobFinished(jobId1);
-        schedulerHelper.waitForEventJobFinished(jobId2);
-
-        assertEquals(JobStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(jobId1).getStatus());
-        assertEquals(JobStatus.FINISHED, schedulerHelper.getSchedulerInterface().getJobState(jobId2).getStatus());
+        // Ensure the job terminates
+        schedulerHelper.waitForEventJobFinished(jobId, 30000);
+        assertEquals(JobStatus.FINISHED, schedAdminInterface.getJobState(jobId).getStatus());
 
         // Kill + Remove + Clean + Resume
-        schedulerHelper.killJob(jobId1.toString());
-        schedulerHelper.killJob(jobId2.toString());
+        schedulerHelper.killJob(jobId.toString());
 
-        schedulerHelper.removeJob(jobId1);
-        schedulerHelper.removeJob(jobId2);
+        schedulerHelper.removeJob(jobId);
+        schedulerHelper.waitForEventJobRemoved(jobId, EVENT_TIMEOUT);
 
-        schedulerHelper.waitForEventJobRemoved(jobId1, EVENT_TIMEOUT);
-        schedulerHelper.waitForEventJobRemoved(jobId2, EVENT_TIMEOUT);
-
-        assertEquals(initialJobsNumber, refreshAndGetTotalJobCount());
+        assertEquals(initialJobsNumber, refreshAndGetTotalJobCount(schedAdminInterface));
         schedulerHelper.checkNodesAreClean();
 
         assertTrue(schedAdminInterface.resume());
     }
 
-    private int refreshAndGetTotalJobCount() throws Exception {
-        return getTotalJobsCount(refreshState());
+    private int refreshAndGetTotalJobCount(Scheduler schedAdminInterface) throws Exception {
+        return getTotalJobsCount(schedAdminInterface.getState());
     }
 
     private int getTotalJobsCount(SchedulerState state) {
         return state.getFinishedJobs().size() + state.getPendingJobs().size() + state.getRunningJobs().size();
-    }
-
-    private SchedulerState refreshState() throws Exception {
-        return schedulerHelper.getSchedulerInterface().getState();
     }
 }
