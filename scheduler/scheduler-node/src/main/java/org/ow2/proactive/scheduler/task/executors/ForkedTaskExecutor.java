@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
@@ -40,6 +41,7 @@ import org.ow2.proactive.scheduler.task.context.TaskContextSerializer;
 import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ExecuteForkedTaskInsideNewJvm;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
+import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 
 
@@ -116,6 +118,12 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
             if (process != null) {
                 process.destroy();
+                try {
+                    //wait for twice the time of the cleanup process
+                    process.waitFor((new CleanupTimeoutGetter()).getCleanupTimeSeconds()*2, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    //TODO log when this exception happens
+                }
             }
             if (taskProcessTreeKiller != null) {
                 taskProcessTreeKiller.kill();
