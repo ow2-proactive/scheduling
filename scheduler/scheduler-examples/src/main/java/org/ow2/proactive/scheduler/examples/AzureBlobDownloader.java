@@ -50,6 +50,9 @@ import io.reactivex.Single;
 
 
 /**
+ * Import file(s) from an Azure Blob Storage using an AzureBlobDownloader task.
+ * This task can be launched with parameters.
+ *
  * @author ActiveEon Team
  * @since 13/09/2018
  */
@@ -73,6 +76,8 @@ public class AzureBlobDownloader extends JavaExecutable {
 
     private ContainerURL containerURL;
 
+    private static final String STORAGE_ACCOUNT = "storageAccount";
+
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
 
@@ -87,11 +92,15 @@ public class AzureBlobDownloader extends JavaExecutable {
                                       .filter(output -> !output.toString().isEmpty())
                                       .orElse(getLocalSpace());
 
-        // Retrieve the credentials
-        storageAccount = getThirdPartyCredential("STORAGE_ACCOUNT");
+        storageAccount = (String) Optional.ofNullable(args.get(STORAGE_ACCOUNT))
+                                          .filter(storage -> !storage.toString().isEmpty())
+                                          .orElseThrow(() -> new IllegalArgumentException("You have to specify a storage account name. Empty value is not allowed."));
+
+        // Retrieve the credential
         accountKey = getThirdPartyCredential("ACCOUNT_KEY");
-        if (storageAccount == null || accountKey == null) {
-            throw new IllegalArgumentException("You first need to add your account name and account key (STORAGE_ACCOUNT, ACCOUNT_KEY) to the third party credentials.");
+        if (accountKey == null) {
+            throw new IllegalArgumentException("You first need to add your account key to 3rd-party credentials under the key: " +
+                                               storageAccount);
         }
     }
 
@@ -105,20 +114,20 @@ public class AzureBlobDownloader extends JavaExecutable {
         containerURL = AzureStorageConnectorUtils.createContainerURL(storageAccount, accountKey, containerName);
         //download a single blob
         if (optionalBlobName.isPresent()) {
-            //check weather or not the outputPath is a folder path or a file path
-            if (outputPath.lastIndexOf('/') == outputPath.length() - 1) {
-                createDirIfNotExists(file);
-                String azureBlobLocalRelativePath = Paths.get(outputPath,
-                                                              Paths.get(optionalBlobName.get())
-                                                                   .getFileName()
-                                                                   .toString())
-                                                         .toString();
+            String azureBlobLocalRelativePath = Paths.get(outputPath,
+                                                          Paths.get(optionalBlobName.get()).getFileName().toString())
+                                                     .toString();
+            //check that the outputPath is either a path to a directory terminated by / or a path for the local space or a path for a file.
+            if (SchedulerExamplesUtils.isDirectoryPath(outputPath)) {
+                SchedulerExamplesUtils.createDirIfNotExists(file);
+                downloadBlob(new File(azureBlobLocalRelativePath), optionalBlobName.get());
+            } else if (outputPath.equals(getLocalSpace())) {
                 downloadBlob(new File(azureBlobLocalRelativePath), optionalBlobName.get());
             } else {
                 downloadBlob(file, optionalBlobName.get());
             }
         } else { //download the whole container
-            createDirIfNotExists(file);
+            SchedulerExamplesUtils.createDirIfNotExists(file);
             downloadContainerBlobs(containerURL);
         }
 
@@ -201,21 +210,6 @@ public class AzureBlobDownloader extends JavaExecutable {
 
             getErr().println(ex.toString());
             System.exit(1);
-        }
-    }
-
-    private void createDirIfNotExists(File file) {
-        // If the path already exists, print a warning.
-        if (!file.exists()) {
-            try {
-                file.mkdir();
-                getOut().println("The " + file.getName() + " directory is created");
-            } catch (Exception e) {
-                getErr().println("Couldn't create destination directory!");
-                System.exit(1);
-            }
-        } else {
-            getOut().println("The given local path " + file.getName() + " already exists");
         }
     }
 }
