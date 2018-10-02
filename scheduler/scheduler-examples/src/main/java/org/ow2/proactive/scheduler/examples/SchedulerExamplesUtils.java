@@ -55,7 +55,7 @@ public class SchedulerExamplesUtils {
      * waits for the transfer to complete, catching any exceptions that occur.
       * @param xfer
      */
-    protected static void waitForCompletion(Transfer xfer) {
+    static void waitForCompletion(Transfer xfer) {
         try {
             xfer.waitForCompletion();
         } catch (AmazonServiceException e) {
@@ -75,7 +75,7 @@ public class SchedulerExamplesUtils {
      * Prints progress while waiting for the transfer to finish.
      * @param xfer
      */
-    protected static void showTransferProgress(Transfer xfer) {
+    static void showTransferProgress(Transfer xfer) {
         // print the transfer's human-readable description
         logger.info(xfer.getDescription());
         // print an empty progress bar...
@@ -104,7 +104,7 @@ public class SchedulerExamplesUtils {
      * prints a simple text progressbar: [#####     ]
      * @param pct
      */
-    protected static void printProgressBar(double pct) {
+    static void printProgressBar(double pct) {
         // if bar_size changes, then change erase_bar (in eraseProgressBar) to
         // match.
         final int bar_size = 40;
@@ -120,7 +120,7 @@ public class SchedulerExamplesUtils {
     /**
      * erases the progress bar.
      */
-    protected static void eraseProgressBar() {
+    static void eraseProgressBar() {
         // erase_bar is bar_size (from printProgressBar) + 4 chars.
         final String erase_bar = "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
         logger.info(erase_bar);
@@ -133,8 +133,7 @@ public class SchedulerExamplesUtils {
      * @return List of Files' names of the given directory
      * @throws IOException
      */
-    protected static List<String> listDirectoryContents(File dir, List<String> filesRelativePathName)
-            throws IOException {
+    static List<String> listDirectoryContents(File dir, List<String> filesRelativePathName) throws IOException {
         File[] files = dir.listFiles();
         if (files == null) {
             throw new IOException("Download failed. The resource in the given S3 URL does not exist or is not accessible");
@@ -153,18 +152,28 @@ public class SchedulerExamplesUtils {
      * Creates a directory if it does not exist
      * @param file
      */
-    protected static void createDirIfNotExists(File file) {
+    static void createDirIfNotExists(File file) {
         // If the path already exists, print a warning.
         if (!file.exists()) {
             try {
                 file.mkdir();
                 logger.info("The " + file.getName() + " directory is created");
             } catch (Exception e) {
-                logger.error("Couldn't create destination directory!");
+                logger.error("Couldn't create destination directory! " + file.getName());
                 System.exit(1);
             }
         } else {
             logger.info("The given local path " + file.getName() + " already exists");
         }
+    }
+
+    /**
+     * check whether or not the given file path is a path to a directory terminated by /
+     * @param filePath
+     * @return
+     */
+    protected static boolean isDirectoryPath(String filePath) {
+
+        return filePath.endsWith(File.separator);
     }
 }

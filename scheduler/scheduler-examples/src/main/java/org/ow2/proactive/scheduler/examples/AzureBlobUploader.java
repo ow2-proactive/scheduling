@@ -134,8 +134,10 @@ public class AzureBlobUploader extends JavaExecutable {
 
         } else {
             if (optionalBlobName.isPresent()) {
+                //remove all white spaces from the blob name
                 optionalBlobName = Optional.of(optionalBlobName.get().replaceAll("\\s+", ""));
             }
+            //this condition is true in the case where the blob name is initially a white spaces string and becomes an empty string
             if (!optionalBlobName.isPresent() || optionalBlobName.get().isEmpty()) {
                 uploadFile(file, file.getName());
             } else {

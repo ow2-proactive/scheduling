@@ -114,11 +114,11 @@ public class AzureBlobDownloader extends JavaExecutable {
         containerURL = AzureStorageConnectorUtils.createContainerURL(storageAccount, accountKey, containerName);
         //download a single blob
         if (optionalBlobName.isPresent()) {
-            //check weather or not the outputPath is a folder path or a file path
             String azureBlobLocalRelativePath = Paths.get(outputPath,
                                                           Paths.get(optionalBlobName.get()).getFileName().toString())
                                                      .toString();
-            if (outputPath.endsWith(File.separator)) {
+            //check that the outputPath is either a path to a directory terminated by / or a path for the local space or a path for a file.
+            if (SchedulerExamplesUtils.isDirectoryPath(outputPath)) {
                 SchedulerExamplesUtils.createDirIfNotExists(file);
                 downloadBlob(new File(azureBlobLocalRelativePath), optionalBlobName.get());
             } else if (outputPath.equals(getLocalSpace())) {

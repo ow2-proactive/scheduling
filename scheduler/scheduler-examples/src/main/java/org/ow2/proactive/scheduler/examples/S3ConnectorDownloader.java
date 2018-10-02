@@ -120,8 +120,8 @@ public class S3ConnectorDownloader extends JavaExecutable {
 
         AmazonS3 amazonS3 = S3ConnectorUtils.getS3Client(accessKey, secretKey, scheme, host);
 
-        // Assume that the path exists, do the download.
-        if (s3RemoteRelativePath.endsWith(File.separator)) {
+        // Check that the key name (s3RemoteRelativePath) is either a path to a directory terminated by / or a path for a file
+        if (SchedulerExamplesUtils.isDirectoryPath(s3RemoteRelativePath)) {
             downloadDir(bucketName, s3RemoteRelativePath, s3LocalRelativePath, false, amazonS3);
             return (Serializable) SchedulerExamplesUtils.listDirectoryContents(file, new ArrayList<>());
         } else {
