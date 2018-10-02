@@ -46,6 +46,7 @@ import com.oneandone.compositejks.SslContextUtils;
 public final class SSLUtils {
 
     private SSLUtils() {
+
     }
 
     /**

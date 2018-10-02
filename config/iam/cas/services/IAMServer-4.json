@@ -1,0 +1,9 @@
+{
+  "@class": "org.apereo.cas.services.RegexRegisteredService",
+  "serviceId": ".*",
+  "name": "IAMServer",
+  "id": 4,
+  "description": "IAM Server URL",
+  "evaluationOrder": 2
+}
+

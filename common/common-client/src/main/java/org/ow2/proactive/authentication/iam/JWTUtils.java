@@ -44,6 +44,8 @@ import org.jose4j.lang.JoseException;
 
 public class JWTUtils {
 
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(JWTUtils.class.getName());
+
     private JWTUtils() {
 
     }
@@ -77,6 +79,8 @@ public class JWTUtils {
 
             jwt = decryptJWT(jwt, jwtEncryptionKey);
         }
+
+        LOG.debug("Plain JWT: "+jwt);
 
         return parsePlainJWT(jwt, issuer, service);
     }

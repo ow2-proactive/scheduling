@@ -45,9 +45,12 @@ import org.ow2.proactive.http.CommonHttpClientBuilder;
 
 public class IAMRestClient {
 
+    private static final String TOKEN_KEY = "token" ;
+    private static final String TOKEN_VALUE= "true" ;
+
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());
 
-    public String getSSOTicket(String url, String username, String password, String ticketMarker) {
+    public String getSSOTicket(String url, String username, String password, String ticketMarker, boolean asJWT) {
 
         String ssoTicket = null;
 
@@ -58,6 +61,10 @@ public class IAMRestClient {
             List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("username", username));
             params.add(new BasicNameValuePair("password", password));
+
+            if (asJWT){
+                params.add(new BasicNameValuePair(TOKEN_KEY, TOKEN_VALUE));
+            }
 
             httpPost.setEntity(new UrlEncodedFormEntity(params));
 
