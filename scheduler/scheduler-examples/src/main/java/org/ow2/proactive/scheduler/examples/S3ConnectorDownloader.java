@@ -73,6 +73,8 @@ public class S3ConnectorDownloader extends JavaExecutable {
 
     private static final String S3_URI = "s3Url";
 
+    private static final String ACCESS_KEY = "accessKey";
+
     /**
      * @see JavaExecutable#init(Map)
      */
@@ -92,11 +94,17 @@ public class S3ConnectorDownloader extends JavaExecutable {
             //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
             s3LocalRelativePath = getLocalSpace();
         }
+        if (args.containsKey(ACCESS_KEY) && !args.get(ACCESS_KEY).toString().isEmpty()) {
+            accessKey = args.get(ACCESS_KEY).toString();
+        } else {
+            throw new IllegalArgumentException("You have to specify a your access key. Empty value is not allowed.");
+        }
 
-        accessKey = getThirdPartyCredential("S3_ACCESS_KEY");
-        secretKey = getThirdPartyCredential("S3_SECRET_KEY");
-        if (accessKey == null || secretKey == null) {
-            throw new IllegalArgumentException("You first need to add your Access Key ID and Secret Access Key (S3_ACCESS_KEY, S3_SECRET_KEY) to the third party credentials");
+        // Retrieve the credential
+        secretKey = getThirdPartyCredential(accessKey);
+        if (secretKey == null) {
+            throw new IllegalArgumentException("You first need to add your Secret Key to 3rd-party credentials under the key: " +
+                                               accessKey);
         }
     }
 
@@ -106,17 +114,16 @@ public class S3ConnectorDownloader extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws IOException {
 
-        boolean s3PathIsPrefix = (s3RemoteRelativePath.lastIndexOf('/') == s3RemoteRelativePath.length() - 1);
-        File f = new File(s3LocalRelativePath);
+        File file = new File(s3LocalRelativePath);
 
-        createDirIfNotExists(f, s3PathIsPrefix);
+        SchedulerExamplesUtils.createDirIfNotExists(file);
 
         AmazonS3 amazonS3 = S3ConnectorUtils.getS3Client(accessKey, secretKey, scheme, host);
 
-        // Assume that the path exists, do the download.
-        if (s3PathIsPrefix) {
+        // Check that the key name (s3RemoteRelativePath) is either a path to a directory terminated by / or a path for a file
+        if (SchedulerExamplesUtils.isDirectoryPath(s3RemoteRelativePath)) {
             downloadDir(bucketName, s3RemoteRelativePath, s3LocalRelativePath, false, amazonS3);
-            return (Serializable) SchedulerExamplesUtils.listDirectoryContents(f, new ArrayList<>());
+            return (Serializable) SchedulerExamplesUtils.listDirectoryContents(file, new ArrayList<>());
         } else {
             s3LocalRelativePath = Paths.get(s3LocalRelativePath, Paths.get(s3Url).getFileName().toString()).toString();
             downloadFile(bucketName, s3RemoteRelativePath, s3LocalRelativePath, false, amazonS3);
@@ -204,20 +211,4 @@ public class S3ConnectorDownloader extends JavaExecutable {
         }
 
     }
-
-    private void createDirIfNotExists(File f, boolean s3PathIsPrefix) {
-        // If the path already exists, print a warning.
-        if (f.exists()) {
-            getOut().println("The local path already exists");
-            if (s3PathIsPrefix) {
-                try {
-                    f.mkdir();
-                } catch (Exception e) {
-                    getOut().println("Couldn't create destination directory!");
-                    System.exit(1);
-                }
-            }
-        }
-    }
-
 }
