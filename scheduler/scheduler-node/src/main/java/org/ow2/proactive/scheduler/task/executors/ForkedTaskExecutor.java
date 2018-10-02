@@ -120,7 +120,7 @@ public class ForkedTaskExecutor implements TaskExecutor {
                 process.destroy();
                 try {
                     //wait for twice the time of the cleanup process
-                    process.waitFor((new CleanupTimeoutGetter()).getCleanupTimeSeconds()*2, TimeUnit.SECONDS);
+                    process.waitFor((new CleanupTimeoutGetter()).getCleanupTimeSeconds() * 2, TimeUnit.SECONDS);
                 } catch (Exception e) {
                     //TODO log when this exception happens
                 }
