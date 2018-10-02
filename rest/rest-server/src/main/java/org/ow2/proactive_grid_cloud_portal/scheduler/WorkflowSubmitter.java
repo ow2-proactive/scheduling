@@ -53,8 +53,7 @@ public class WorkflowSubmitter {
 
     private static final Logger logger = ProActiveLogger.getLogger(WorkflowSubmitter.class);
 
-    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.isSet() ? PASchedulerProperties.FILE_ENCODING.getValueAsString()
-                                                                                            : "UTF-8";
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
     private Scheduler scheduler;
 

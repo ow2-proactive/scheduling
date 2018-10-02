@@ -74,8 +74,7 @@ public class StudioRest implements StudioInterface {
 
     private static final Logger logger = Logger.getLogger(StudioRest.class);
 
-    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.isSet() ? PASchedulerProperties.FILE_ENCODING.getValueAsString()
-                                                                                            : "UTF-8";
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
     private SchedulerStateRest schedulerRest = null;
 

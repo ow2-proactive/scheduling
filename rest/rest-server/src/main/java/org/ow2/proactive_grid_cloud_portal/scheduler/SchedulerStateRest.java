@@ -213,8 +213,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private static final int TASKS_PAGE_SIZE = PASchedulerProperties.TASKS_PAGE_SIZE.getValueAsInt();
 
-    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.isSet() ? PASchedulerProperties.FILE_ENCODING.getValueAsString()
-                                                                                            : "UTF-8";
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
     private static final String PATH_JOBS = "jobs/";
 

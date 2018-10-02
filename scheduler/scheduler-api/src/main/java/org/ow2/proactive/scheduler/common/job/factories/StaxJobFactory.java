@@ -100,8 +100,7 @@ public class StaxJobFactory extends JobFactory {
 
     public static final Logger logger = Logger.getLogger(StaxJobFactory.class);
 
-    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.isSet() ? PASchedulerProperties.FILE_ENCODING.getValueAsString()
-                                                                                            : "UTF-8";
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
     public static final String MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES = "Unable to instanciate job validation factories";
 
