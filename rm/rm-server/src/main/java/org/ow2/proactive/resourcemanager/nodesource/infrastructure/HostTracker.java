@@ -63,6 +63,8 @@ public class HostTracker implements Serializable {
 
     private AtomicBoolean needsNodesFlag;
 
+    private AtomicInteger lostNodeNotificationsCounter;
+
     protected HostTracker(String configuredAddress, int configuredNodeNumber, InetAddress resolvedAddress) {
         this.configuredAddress = configuredAddress;
         this.configuredNodeNumber = configuredNodeNumber;
@@ -74,6 +76,7 @@ public class HostTracker implements Serializable {
         // a newly created host tracker requires nodes because it has not
         // been deployed yet
         needsNodesFlag = new AtomicBoolean(true);
+        lostNodeNotificationsCounter = new AtomicInteger(0);
     }
 
     /**
@@ -102,6 +105,18 @@ public class HostTracker implements Serializable {
      */
     protected void setNeedsNodes(boolean needNodesFlag) {
         this.needsNodesFlag.set(needNodesFlag);
+    }
+
+    protected int addAndGetLostNodeNotification() {
+        return lostNodeNotificationsCounter.addAndGet(1);
+    }
+
+    protected void resetLostNodeNotifications() {
+        lostNodeNotificationsCounter = new AtomicInteger(0);
+    }
+
+    protected int getConfiguredNodeNumber() {
+        return configuredNodeNumber;
     }
 
     /**
@@ -196,7 +211,8 @@ public class HostTracker implements Serializable {
         String minimalInfo = "Host " + configuredAddress + ". Configured with " + configuredNodeNumber +
                              " nodes. Current state: [alive node number=" + aliveNodesCounter.get() +
                              ", down node number=" + downNodesCounter.get() + ", removed node number=" +
-                             removedNodesCounter.get() + "].";
+                             removedNodesCounter.get() + ", lost node notification number=" +
+                             lostNodeNotificationsCounter + "].";
         if (logger.isDebugEnabled()) {
             List<String> allAliveNodeUrls = listNodesUrlWithStatus(NodeStatus.ALIVE);
             List<String> allDownNodeUrls = listNodesUrlWithStatus(NodeStatus.DOWN);
