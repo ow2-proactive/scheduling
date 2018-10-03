@@ -94,7 +94,7 @@ public class SchedulingService {
 
     public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED = "SchedulingService::recoverTasksState finished";
 
-    public static final int SCHEDULER_EXIT_DELAY = PASchedulerProperties.SCHEDULER_EXIT_DELAY.getValueAsInt();
+    public static final int SCHEDULER_KILL_DELAY = PASchedulerProperties.SCHEDULER_KILL_DELAY.getValueAsInt();
 
     private final SchedulingInfrastructure infrastructure;
 
@@ -354,7 +354,7 @@ public class SchedulingService {
         // To properly exit the java scheduling process
         new Thread(() -> {
             try {
-                Thread.sleep(SCHEDULER_EXIT_DELAY);
+                Thread.sleep(SCHEDULER_KILL_DELAY);
             } catch (InterruptedException e) {
                 logger.error("Exception occurred, fail to sleep the scheduler killing thread", e);
             }
