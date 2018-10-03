@@ -39,7 +39,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public enum JobType implements java.io.Serializable {
 
     /**
-     * Tasks can be executed one by one or all in same time but
+     * Tasks can be executed one by one or all at the same time but
      * every task represents the same native or java task.
      * Only the parameters given to the task will change.
      */
