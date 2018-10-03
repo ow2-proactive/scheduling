@@ -457,7 +457,9 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      */
     protected void multipleDeclareDeployingNodeLost(List<String> deployingNodes, String message) {
         for (String node : deployingNodes) {
-            this.declareDeployingNodeLost(node, message);
+            if (this.declareDeployingNodeLost(node, message)) {
+                this.notifyDeployingNodeLost(node);
+            }
         }
 
     }
