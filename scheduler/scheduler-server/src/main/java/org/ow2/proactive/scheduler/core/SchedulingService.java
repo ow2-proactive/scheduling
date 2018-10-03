@@ -356,7 +356,8 @@ public class SchedulingService {
             try {
                 Thread.sleep(SCHEDULER_KILL_DELAY);
             } catch (InterruptedException e) {
-                logger.error("Exception occurred, fail to sleep the scheduler killing thread", e);
+                logger.warn("Scheduler.kill() was interrupted while waiting for its configured delay, now terminating the process",
+                            e);
             }
             System.exit(0);
         }).start();
