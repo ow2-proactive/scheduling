@@ -94,6 +94,8 @@ public class SchedulingService {
 
     public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED = "SchedulingService::recoverTasksState finished";
 
+    public static final int SCHEDULER_EXIT_DELAY = PASchedulerProperties.SCHEDULER_EXIT_DELAY.getValueAsInt();
+
     private final SchedulingInfrastructure infrastructure;
 
     private final LiveJobs jobs;
@@ -348,6 +350,19 @@ public class SchedulingService {
         infrastructure.shutdown();
 
         listener.schedulerStateUpdated(SchedulerEvent.KILLED);
+
+        // To properly exit the java scheduling process
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(SCHEDULER_EXIT_DELAY);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.exit(0);
+            }
+        }).start();
 
         return true;
     }
