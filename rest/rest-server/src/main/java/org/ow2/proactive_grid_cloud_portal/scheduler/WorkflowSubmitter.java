@@ -26,8 +26,11 @@
 package org.ow2.proactive_grid_cloud_portal.scheduler;
 
 import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.Scheduler;
@@ -38,6 +41,7 @@ import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
@@ -49,6 +53,8 @@ public class WorkflowSubmitter {
 
     private static final Logger logger = ProActiveLogger.getLogger(WorkflowSubmitter.class);
 
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
+
     private Scheduler scheduler;
 
     public WorkflowSubmitter(Scheduler scheduler) {
@@ -57,6 +63,7 @@ public class WorkflowSubmitter {
 
     /**
      * Submits a workflow to the scheduler (XML or archive).
+     * It also creates a job visualization HTML file.
      *
      * @param workflowFile a workflow file (XML or archive)
      * @param variables    variables to be replaced on submission
@@ -69,7 +76,18 @@ public class WorkflowSubmitter {
     public JobId submit(File workflowFile, Map<String, String> variables) throws NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, JobCreationRestException {
         try {
-            return scheduler.submit(createJobObject(workflowFile, variables));
+            Job job = createJobObject(workflowFile, variables);
+            JobId jobId = scheduler.submit(job);
+            // Create Job's SVG visualization file
+            String visualization = job.getVisualization();
+            if (visualization != null && !visualization.isEmpty()) {
+                File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId.value()) + ".html");
+                Files.deleteIfExists(visualizationFile.toPath());
+                FileUtils.write(new File(visualizationFile.getAbsolutePath()),
+                                job.getVisualization(),
+                                Charset.forName(FILE_ENCODING));
+            }
+            return jobId;
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {

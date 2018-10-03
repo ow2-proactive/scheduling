@@ -58,7 +58,7 @@ public class AzureBlobUploader extends JavaExecutable {
 
     private String containerName;
 
-    Optional<String> optionalBlobName = Optional.empty();
+    Optional<String> optionalBlobName;
 
     private String storageAccount;
 
@@ -69,6 +69,8 @@ public class AzureBlobUploader extends JavaExecutable {
     private static final String CONTAINER_NAME = "containerName";
 
     private static final String BLOB_NAME = "blobName";
+
+    private static final String STORAGE_ACCOUNT = "storageAccount";
 
     private ContainerURL containerURL;
 
@@ -83,14 +85,18 @@ public class AzureBlobUploader extends JavaExecutable {
 
         //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
         inputPath = (String) Optional.ofNullable(args.get(INPUT_PATH))
-                                     .filter(output -> !output.toString().isEmpty())
+                                     .filter(input -> !input.toString().isEmpty())
                                      .orElse(getLocalSpace());
 
-        // Retrieve the credentials
-        storageAccount = getThirdPartyCredential("STORAGE_ACCOUNT");
+        storageAccount = (String) Optional.ofNullable(args.get(STORAGE_ACCOUNT))
+                                          .filter(storage -> !storage.toString().isEmpty())
+                                          .orElseThrow(() -> new IllegalArgumentException("You have to specify a storage account name. Empty value is not allowed."));
+
+        // Retrieve the credential
         accountKey = getThirdPartyCredential("ACCOUNT_KEY");
-        if (storageAccount == null || accountKey == null) {
-            throw new IllegalArgumentException("You first need to add your account name and account key (STORAGE_ACCOUNT, ACCOUNT_KEY) to the third party credentials.");
+        if (accountKey == null) {
+            throw new IllegalArgumentException("You first need to add your account key to 3rd-party credentials under the key: " +
+                                               storageAccount);
         }
     }
 
@@ -100,29 +106,46 @@ public class AzureBlobUploader extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws IOException, ExecutionException, InterruptedException {
 
-        List<String> filesRelativePathName = new ArrayList<>();
         File file = new File(inputPath);
-
         containerURL = AzureStorageConnectorUtils.createContainerURL(storageAccount, accountKey, containerName);
-
         if (file.exists()) {
-            if (file.isDirectory()) {
-                if (optionalBlobName.isPresent()) {
-                    filesRelativePathName = recursiveFolderUpload(inputPath, optionalBlobName.get(), true);
-                } else {
-                    filesRelativePathName = recursiveFolderUpload(inputPath, "", false);
-                }
-
-            } else {
-                uploadFile(file, optionalBlobName.orElse(file.getName()));
-
-                filesRelativePathName.add(file.getPath());
-            }
+            return (Serializable) uploadResources(file);
         } else {
             throw new FileNotFoundException("The input file cannot be found at " + inputPath);
         }
+    }
 
-        return (Serializable) filesRelativePathName;
+    /**
+     * This method uploads resources (file or folder to an Azure Blob Storage
+     * @param file
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws IOException
+     */
+
+    private List<String> uploadResources(File file) throws InterruptedException, ExecutionException, IOException {
+        List<String> filesRelativePathName = new ArrayList<>();
+        if (file.isDirectory()) {
+            if (optionalBlobName.isPresent()) {
+                filesRelativePathName = recursiveFolderUpload(inputPath, optionalBlobName.get(), true);
+            } else {
+                filesRelativePathName = recursiveFolderUpload(inputPath, "", false);
+            }
+
+        } else {
+            if (optionalBlobName.isPresent()) {
+                //remove all white spaces from the blob name
+                optionalBlobName = Optional.of(optionalBlobName.get().replaceAll("\\s+", ""));
+            }
+            //this condition is true in the case where the blob name is initially a white spaces string and becomes an empty string
+            if (!optionalBlobName.isPresent() || optionalBlobName.get().isEmpty()) {
+                uploadFile(file, file.getName());
+            } else {
+                uploadFile(file, optionalBlobName.get());
+            }
+            filesRelativePathName.add(file.getPath());
+        }
+        return filesRelativePathName;
     }
 
     /**
