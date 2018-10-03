@@ -97,7 +97,7 @@ public class AzureBlobDownloader extends JavaExecutable {
                                           .orElseThrow(() -> new IllegalArgumentException("You have to specify a storage account name. Empty value is not allowed."));
 
         // Retrieve the credential
-        accountKey = getThirdPartyCredential("ACCOUNT_KEY");
+        accountKey = getThirdPartyCredential(storageAccount);
         if (accountKey == null) {
             throw new IllegalArgumentException("You first need to add your account key to 3rd-party credentials under the key: " +
                                                storageAccount);
