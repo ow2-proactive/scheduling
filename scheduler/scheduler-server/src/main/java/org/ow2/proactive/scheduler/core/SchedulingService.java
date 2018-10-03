@@ -352,16 +352,13 @@ public class SchedulingService {
         listener.schedulerStateUpdated(SchedulerEvent.KILLED);
 
         // To properly exit the java scheduling process
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(SCHEDULER_EXIT_DELAY);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.exit(0);
+        new Thread(() -> {
+            try {
+                Thread.sleep(SCHEDULER_EXIT_DELAY);
+            } catch (InterruptedException e) {
+                logger.error("Exception occurred, fail to sleep the scheduler killing thread", e);
             }
+            System.exit(0);
         }).start();
 
         return true;
