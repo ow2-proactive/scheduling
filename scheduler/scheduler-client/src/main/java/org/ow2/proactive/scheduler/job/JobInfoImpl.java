@@ -221,6 +221,11 @@ public class JobInfoImpl implements JobInfo {
         return startTime;
     }
 
+    @Override
+    public boolean isStarted() {
+        return startTime > 0;
+    }
+
     public void setStartTime(long startTime) {
         this.startTime = startTime;
     }

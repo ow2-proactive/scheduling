@@ -81,6 +81,11 @@ public interface JobInfo extends Serializable {
     long getStartTime();
 
     /**
+     * @return true if job is already started
+     */
+    boolean isStarted();
+
+    /**
      * Returns the time at which a Job was seen as in-error
      * for the last time.
      *

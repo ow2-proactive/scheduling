@@ -65,24 +65,38 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
 
     private static final Set<JobId> alreadyNotified = new HashSet<>();
 
-    private synchronized void logIfJobWillMissItsDeadline(List<JobDescriptor> jobs) {
+    private synchronized void logMostLikelyMissedJobs(List<JobDescriptor> jobs) {
         Date now = new Date();
         jobs.stream()
             .map(jobDescriptor -> ((JobDescriptorImpl) jobDescriptor).getInternal())
             .filter(job -> job.getJobDeadline().isPresent())
-            .filter(job -> job.getJobInfo().getStartTime() >= 0)
+            .filter(job -> !job.getJobInfo().isStarted())
             .filter(job -> {
-                Date deadline = getEffectiveDeadline(job);
-                Date expeFinish = getEffectiveExpectedExecutionTime(job, now);
-                return deadline.compareTo(expeFinish) < 0;
+                Date deadline = getDeadlineAsAbsoluteDate(job);
+                Date finishingTime = getFinishingTimeIfJobStartedNow(job, now);
+                return deadline.compareTo(finishingTime) < 0;
             })
             .forEach(job -> {
                 if (!alreadyNotified.contains(job.getId())) {
-                    LOGGER.warn(String.format("Job[id=%s] might miss its deadline (expected finish: %s after deadline: %s)",
-                                              job.getId().value(),
-                                              getEffectiveExpectedExecutionTime(job, now),
-                                              getEffectiveDeadline(job)));
                     alreadyNotified.add(job.getId());
+                    final Date deadline = getDeadlineAsAbsoluteDate(job);
+                    final Date finishingTime = getFinishingTimeIfJobStartedNow(job, now);
+                    LOGGER.warn(String.format("Job[id=%s] will most likely miss its deadline (expected finish: %s is after deadline: %s)",
+                                              job.getId().value(),
+                                              finishingTime,
+                                              deadline));
+
+                    JobMostLikelyMissedEmailNotification notificationSender;
+                    if (job.getJobExpectedExecutionTime().isPresent()) {
+                        notificationSender = new JobMostLikelyMissedEmailNotification(job,
+                                                                                      finishingTime,
+                                                                                      deadline,
+                                                                                      job.getJobExpectedExecutionTime()
+                                                                                         .get());
+                    } else {
+                        notificationSender = new JobMostLikelyMissedEmailNotification(job, finishingTime, deadline);
+                    }
+                    notificationSender.tryToSend();
                 }
             });
     }
@@ -91,7 +105,7 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         final Date now = new Date();
 
-        logIfJobWillMissItsDeadline(jobs);
+        logMostLikelyMissedJobs(jobs);
 
         final Comparator<JobDescriptor> jobDescriptorComparator = (job1, job2) -> {
 
@@ -155,8 +169,8 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
     }
 
     private static Duration durationBetweenFinishAndDeadline(InternalJob internalJob, Date now) {
-        final Date effectiveDeadline = getEffectiveDeadline(internalJob);
-        final Date effectiveExpectedExecutionTime = getEffectiveExpectedExecutionTime(internalJob, now);
+        final Date effectiveDeadline = getDeadlineAsAbsoluteDate(internalJob);
+        final Date effectiveExpectedExecutionTime = getFinishingTimeIfJobStartedNow(internalJob, now);
         final long gapInMillis = effectiveDeadline.getTime() - effectiveExpectedExecutionTime.getTime();
         return Duration.ofMillis(gapInMillis);
     }
@@ -165,13 +179,14 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
      * @return deadline of the job if existed, otherwise returns biggest date possible
      * (this is how this policy treats absence of deadline)
      */
-    private static Date getEffectiveDeadline(InternalJob internalJob) {
+    private static Date getDeadlineAsAbsoluteDate(InternalJob internalJob) {
         if (internalJob.getJobDeadline().isPresent()) {
             if (internalJob.getJobDeadline().get().isAbsolute()) {
                 return internalJob.getJobDeadline().get().getAbsoluteDeadline();
             } else {
                 final Duration relativeDeadline = internalJob.getJobDeadline().get().getRelativeDeadline();
                 Calendar cal = Calendar.getInstance();
+                cal.setTimeZone(TimeZone.getDefault());
                 cal.setTimeInMillis(internalJob.getJobInfo().getSubmittedTime());
                 cal.add(Calendar.SECOND, (int) relativeDeadline.getSeconds());
                 return cal.getTime();
@@ -181,10 +196,11 @@ public class EDFPolicyExtended extends ExtendedSchedulerPolicy {
         }
     }
 
-    private static Date getEffectiveExpectedExecutionTime(InternalJob internalJob, Date now) {
+    private static Date getFinishingTimeIfJobStartedNow(InternalJob internalJob, Date now) {
         if (internalJob.getJobExpectedExecutionTime().isPresent()) {
             final Duration expectedTime = internalJob.getJobExpectedExecutionTime().get();
             Calendar cal = Calendar.getInstance();
+            cal.setTimeZone(TimeZone.getDefault());
             cal.setTime(now);
             cal.add(Calendar.SECOND, (int) expectedTime.getSeconds());
             return cal.getTime();
