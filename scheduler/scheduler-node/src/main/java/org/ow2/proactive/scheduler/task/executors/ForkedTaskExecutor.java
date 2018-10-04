@@ -33,8 +33,10 @@ import java.io.PrintStream;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextSerializer;
@@ -52,6 +54,8 @@ import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
  * @see InProcessTaskExecutor
  */
 public class ForkedTaskExecutor implements TaskExecutor {
+
+    private static final Logger logger = Logger.getLogger(TaskExecutor.class);
 
     private final ForkedProcessBuilderCreator forkedJvmProcessBuilderCreator = new ForkedProcessBuilderCreator();
 
@@ -120,9 +124,9 @@ public class ForkedTaskExecutor implements TaskExecutor {
                 process.destroy();
                 try {
                     //wait for twice the time of the cleanup process
-                    process.waitFor((new CleanupTimeoutGetter()).getCleanupTimeSeconds() * 2, TimeUnit.SECONDS);
+                    process.waitFor((new CleanupTimeoutGetter()).getCleanupTimeSeconds(), TimeUnit.SECONDS);
                 } catch (Exception e) {
-                    //TODO log when this exception happens
+                    logger.info("Exception while waiting task to finish " + e);
                 }
             }
             if (taskProcessTreeKiller != null) {
