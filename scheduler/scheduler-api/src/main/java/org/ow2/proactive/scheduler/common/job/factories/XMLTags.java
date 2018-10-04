@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 
 
 /**
@@ -115,7 +114,11 @@ public enum XMLTags {
     DS_INPUT_SPACE("inputSpace"),
     DS_OUTPUT_FILES("outputFiles"),
     DS_OUTPUT_SPACE("outputSpace"),
-    DS_USER_SPACE("userSpace");
+    DS_USER_SPACE("userSpace"),
+
+    // METADATA
+    METADATA("metadata"),
+    METADATA_VISUALIZATION("visualization");
 
     private String xmlName;
 
