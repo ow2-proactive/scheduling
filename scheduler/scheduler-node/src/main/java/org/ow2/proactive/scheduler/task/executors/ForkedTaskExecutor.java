@@ -36,7 +36,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
 import org.ow2.proactive.scheduler.task.context.TaskContextSerializer;
