@@ -67,8 +67,12 @@ public class SynchronizationWrapper implements Synchronization {
         this.originator = originator;
         this.taskId = taskId;
         this.internalAPI = internalAPI;
-        if (internalAPI != null && MOP.isReifiedObject(internalAPI)) {
-            internalAPIUrls = PAActiveObject.getUrls(internalAPI);
+        try {
+            if (internalAPI != null && MOP.isReifiedObject(internalAPI)) {
+                internalAPIUrls = PAActiveObject.getUrls(internalAPI);
+            }
+        } catch (Exception e) {
+            logger.warn("Could not initialize the SynchronizationWrapper for taskId " + taskId, e);
         }
     }
 
@@ -84,6 +88,8 @@ public class SynchronizationWrapper implements Synchronization {
             }
             throw new IllegalStateException("Could not locate the Synchronization service at " +
                                             Arrays.toString(internalAPIUrls));
+        } else if (this.internalAPI == null && this.internalAPIUrls == null) {
+            throw new IllegalStateException("Synchronization api was not initialized properly (see Scheduler logs for details)");
         }
     }
 
