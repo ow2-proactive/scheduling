@@ -1053,58 +1053,65 @@ public class SchedulerDBManager {
             JobInfo jobInfo = job.getJobInfo();
 
             final int updateJob = session.getNamedQuery("updateJobDataAfterTaskFinished")
-                    .setParameter("status", jobInfo.getStatus())
-                    .setParameter("finishedTime", jobInfo.getFinishedTime())
-                    .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
-                    .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
-                    .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
-                    .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
-                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
-                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
-                    .setParameter("lastUpdatedTime", new Date().getTime())
-                    .setParameter("jobId", jobId)
-                    .executeUpdate();
+                                         .setParameter("status", jobInfo.getStatus())
+                                         .setParameter("finishedTime", jobInfo.getFinishedTime())
+                                         .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
+                                         .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
+                                         .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                                         .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                                         .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                                         .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                                         .setParameter("lastUpdatedTime", new Date().getTime())
+                                         .setParameter("jobId", jobId)
+                                         .executeUpdate();
 
             final int notReStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
-                    " where task.jobData.id = :jobId and task.taskStatus in :taskStatuses ")
-                    .setParameter("jobId", jobId)
-                    .setParameterList("taskStatuses",
-                            Arrays.asList(TaskStatus.WAITING_ON_ERROR, TaskStatus.WAITING_ON_FAILURE))
-                    .executeUpdate();
+                                                         " where task.jobData.id = :jobId and task.taskStatus in :taskStatuses ")
+                                            .setParameter("jobId", jobId)
+                                            .setParameterList("taskStatuses",
+                                                              Arrays.asList(TaskStatus.WAITING_ON_ERROR,
+                                                                            TaskStatus.WAITING_ON_FAILURE))
+                                            .executeUpdate();
 
             final int notStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
-                    " where task.jobData.id = :jobId and task.taskStatus in :taskStatuses ")
-                    .setParameter("jobId", jobId)
-                    .setParameterList("taskStatuses",
-                            TaskStatus.allExceptThese(TaskStatus.RUNNING,
-                                    TaskStatus.WAITING_ON_ERROR,
-                                    TaskStatus.WAITING_ON_FAILURE,
-                                    TaskStatus.FAILED,
-                                    TaskStatus.NOT_STARTED,
-                                    TaskStatus.FAULTY,
-                                    TaskStatus.FINISHED,
-                                    TaskStatus.SKIPPED))
-                    .executeUpdate();
+                                                       " where task.jobData.id = :jobId and task.taskStatus in :taskStatuses ")
+                                          .setParameter("jobId", jobId)
+                                          .setParameterList("taskStatuses",
+                                                            TaskStatus.allExceptThese(TaskStatus.RUNNING,
+                                                                                      TaskStatus.WAITING_ON_ERROR,
+                                                                                      TaskStatus.WAITING_ON_FAILURE,
+                                                                                      TaskStatus.FAILED,
+                                                                                      TaskStatus.NOT_STARTED,
+                                                                                      TaskStatus.FAULTY,
+                                                                                      TaskStatus.FINISHED,
+                                                                                      TaskStatus.SKIPPED))
+                                          .executeUpdate();
 
             final int runningToAborted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                    " task.finishedTime = :finishedTime where task.jobData.id = :jobId " +
-                    " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                    " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
-                    .setParameter("finishedTime", System.currentTimeMillis())
-                    .setParameter("jobId", jobId)
-                    .executeUpdate();
+                                                             " task.finishedTime = :finishedTime where task.jobData.id = :jobId " +
+                                                             " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                             " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
+                                                .setParameter("finishedTime", System.currentTimeMillis())
+                                                .setParameter("jobId", jobId)
+                                                .executeUpdate();
 
             final int runningToAbortedWithDuration = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
-                    " task.finishedTime = :finishedTime, " +
-                    " task.executionDuration = task.finishedTime - task.startTime " +
-                    " where task.jobData.id = :jobId " +
-                    " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
-                    " and task.startTime > 0 and task.executionDuration < 0 ")
-                    .setParameter("jobId", jobId)
-                    .setParameter("finishedTime", System.currentTimeMillis())
-                    .executeUpdate();
+                                                                         " task.finishedTime = :finishedTime, " +
+                                                                         " task.executionDuration = task.finishedTime - task.startTime " +
+                                                                         " where task.jobData.id = :jobId " +
+                                                                         " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                                         " and task.startTime > 0 and task.executionDuration < 0 ")
+                                                            .setParameter("jobId", jobId)
+                                                            .setParameter("finishedTime", System.currentTimeMillis())
+                                                            .executeUpdate();
 
-            logger.trace(String.format("Kill job %d and tasks: %d %d %d %d %d", jobId, updateJob, notReStarted, notStarted, runningToAborted, runningToAbortedWithDuration));
+            logger.trace(String.format("Kill job %d and tasks: %d %d %d %d %d",
+                                       jobId,
+                                       updateJob,
+                                       notReStarted,
+                                       notStarted,
+                                       runningToAborted,
+                                       runningToAbortedWithDuration));
 
             if (FINISHED_JOB_STATUSES.contains(job.getStatus())) {
                 session.flush();
