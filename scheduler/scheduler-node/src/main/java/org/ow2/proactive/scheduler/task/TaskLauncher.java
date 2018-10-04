@@ -68,7 +68,6 @@ import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
-import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetter;
 import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetterDoubleValue;
 import org.ow2.proactive.scheduler.task.utils.task.termination.TaskKiller;
 
