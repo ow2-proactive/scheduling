@@ -68,7 +68,6 @@ import org.ow2.proactive.scheduler.task.data.TaskDataspaces;
 import org.ow2.proactive.scheduler.task.executors.TaskExecutor;
 import org.ow2.proactive.scheduler.task.utils.Decrypter;
 import org.ow2.proactive.scheduler.task.utils.WallTimer;
-import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetter;
 import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetterDoubleValue;
 import org.ow2.proactive.scheduler.task.utils.task.termination.TaskKiller;
 
@@ -130,7 +129,7 @@ public class TaskLauncher implements InitActive {
         this.taskId = initializer.getTaskId();
         this.taskLogger = new TaskLogger(taskId, getHostname());
         this.progressFileReader = new ProgressFileReader();
-        this.taskKiller = new TaskKiller(Thread.currentThread(), new CleanupTimeoutGetter());
+        this.taskKiller = new TaskKiller(Thread.currentThread(), new CleanupTimeoutGetterDoubleValue());
         nodeShutdownHook = new Thread(this::kill);
     }
 
@@ -167,8 +166,6 @@ public class TaskLauncher implements InitActive {
             taskStarted.set(true);
 
             logger.info("Task started " + taskId.getJobId().getReadableName() + " : " + taskId.getReadableName());
-
-            this.taskKiller = this.replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(executableContainer.isRunAsUser());
 
             wallTimer = new WallTimer(initializer.getWalltime(), taskKiller);
 
@@ -305,14 +302,6 @@ public class TaskLauncher implements InitActive {
             }
         }
         return null;
-    }
-
-    private TaskKiller replaceTaskKillerWithDoubleTimeoutValueIfRunAsMe(boolean isRunAsUser) {
-        if (isRunAsUser) {
-            return new TaskKiller(Thread.currentThread(), new CleanupTimeoutGetterDoubleValue());
-        } else {
-            return this.taskKiller;
-        }
     }
 
     private void addShutdownHook() {
