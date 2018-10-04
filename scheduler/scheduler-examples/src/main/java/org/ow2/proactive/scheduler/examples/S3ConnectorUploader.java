@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -77,6 +76,8 @@ public class S3ConnectorUploader extends JavaExecutable {
 
     private static final String PAUSE = "pause";
 
+    private static final String ACCESS_KEY = "accessKey";
+
     /**
      * @see JavaExecutable#init(Map)
      */
@@ -107,11 +108,17 @@ public class S3ConnectorUploader extends JavaExecutable {
             //Default value is getLocalSpace() because it will always be writable and moreover can be used to transfer files to another data space (global, user)
             s3LocalRelativePath = getLocalSpace();
         }
+        if (args.containsKey(ACCESS_KEY) && !args.get(ACCESS_KEY).toString().isEmpty()) {
+            accessKey = args.get(ACCESS_KEY).toString();
+        } else {
+            throw new IllegalArgumentException("You have to specify a your access key. Empty value is not allowed.");
+        }
 
-        accessKey = getThirdPartyCredential("S3_ACCESS_KEY");
-        secretKey = getThirdPartyCredential("S3_SECRET_KEY");
-        if (accessKey == null || secretKey == null) {
-            throw new IllegalArgumentException("You first need to add your s3 username and password (S3_ACCESS_KEY, S3_SECRET_KEY) to the third party credentials");
+        // Retrieve the credential
+        secretKey = getThirdPartyCredential(accessKey);
+        if (secretKey == null) {
+            throw new IllegalArgumentException("You first need to add your Secret Key to 3rd-party credentials under the key: " +
+                                               accessKey);
         }
     }
 
@@ -122,45 +129,22 @@ public class S3ConnectorUploader extends JavaExecutable {
     public Serializable execute(TaskResult... results) throws IOException {
         List<String> filesRelativePathName = new ArrayList<>();
 
-        File f = new File(s3LocalRelativePath);
-
-        // Any remaining args are assumed to be local paths to copy.
-        // They may be directories, arrays, or a mix of both.
-        ArrayList<String> dirsToCopy = new ArrayList<>();
-        ArrayList<String> filesToCopy = new ArrayList<>();
-
-        // If the path already exists, print a warning.
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                dirsToCopy.add(s3LocalRelativePath);
-            } else {
-                filesToCopy.add(s3LocalRelativePath);
-            }
-        } else {
-            throw new FileNotFoundException("The input file cannot be found at " + s3LocalRelativePath);
-        }
-
+        File file = new File(s3LocalRelativePath);
         AmazonS3 amazonS3 = S3ConnectorUtils.getS3Client(accessKey, secretKey, region);
 
         // Create Bucket if it does not exist
         S3ConnectorUtils.createBucketIfNotExists(bucketName, amazonS3);
 
-        // Upload any directories in the list.
-        for (String dirPath : dirsToCopy) {
-            uploadDir(dirPath, bucketName, s3RemoteRelativePath, true, false, amazonS3);
-            filesRelativePathName = SchedulerExamplesUtils.listDirectoryContents(f, new ArrayList<>());
+        // If the path does not exists, raise an exception.
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                uploadDir(s3LocalRelativePath, bucketName, s3RemoteRelativePath, true, false, amazonS3);
+            } else {
+                uploadFile(s3LocalRelativePath, bucketName, s3RemoteRelativePath, false, amazonS3);
+            }
+        } else {
+            throw new FileNotFoundException("The input file cannot be found at " + s3LocalRelativePath);
         }
-
-        // If there's more than one file in the list, upload it as a file list.
-        // Otherwise, upload it as a single file.
-        if (filesToCopy.size() > 1) {
-            uploadFileList(filesToCopy.toArray(new String[0]), bucketName, s3RemoteRelativePath, false, amazonS3);
-            filesRelativePathName.addAll(filesToCopy);
-        } else if (filesToCopy.size() == 1) {
-            uploadFile(filesToCopy.get(0), bucketName, s3RemoteRelativePath, false, amazonS3);
-            filesRelativePathName.add(filesToCopy.get(0));
-
-        } // else: nothing to do.
 
         return (Serializable) filesRelativePathName;
     }
@@ -188,40 +172,6 @@ public class S3ConnectorUploader extends JavaExecutable {
         TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();
         try {
             MultipleFileUpload uploader = transferManager.uploadDirectory(bucketName, keyName, folder, recursive);
-            // loop with Transfer.isDone()
-            SchedulerExamplesUtils.showTransferProgress(uploader);
-            // or block with Transfer.waitForCompletion()
-            SchedulerExamplesUtils.waitForCompletion(uploader);
-        } catch (AmazonServiceException e) {
-            getErr().println(e.getErrorMessage());
-            System.exit(1);
-        }
-        transferManager.shutdownNow();
-    }
-
-    /**
-     * Upload a list of files to S3. <br>
-     * Requires a bucket name. <br>
-     *
-     * @param filePaths
-     * @param bucketName
-     * @param keyPrefix
-     * @param pause
-     * @param s3Client
-     */
-    private void uploadFileList(String[] filePaths, String bucketName, String keyPrefix, boolean pause,
-            AmazonS3 s3Client) {
-        getOut().println("file list: " + Arrays.toString(filePaths) + (pause ? " (" + PAUSE + ")" : ""));
-        // convert the file paths to a list of File objects (required by the
-        // uploadFileList method)
-        ArrayList<File> files = new ArrayList<>();
-        for (String path : filePaths) {
-            files.add(new File(path));
-        }
-
-        TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();
-        try {
-            MultipleFileUpload uploader = transferManager.uploadFileList(bucketName, keyPrefix, new File("."), files);
             // loop with Transfer.isDone()
             SchedulerExamplesUtils.showTransferProgress(uploader);
             // or block with Transfer.waitForCompletion()

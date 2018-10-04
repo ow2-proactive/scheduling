@@ -46,7 +46,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 @PublicAPI
 public abstract class JobFactory {
 
-    public static Logger logger = Logger.getLogger(JobFactory.class);
+    public static final Logger logger = Logger.getLogger(JobFactory.class);
 
     /** Temp dir to store temporary archive content */
     public static final String JOBFACTORY_TMPDIR_PROPERTY = "pas.jobfactory.tmpdir";
