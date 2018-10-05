@@ -94,7 +94,7 @@ public class TransactionHelper {
         for (int i = 0; i <= maximumNumberOfRetries; i++) {
             try {
                 return tryExecuteTransaction(sessionWork, readWriteTransaction, readOnlyEntities);
-            } catch (DatabaseManagerException e) {
+            } catch (DatabaseManagerException | IllegalArgumentException e) {
                 throw e;
             } catch (Throwable exception) {
                 lastException = exception;
@@ -126,7 +126,7 @@ public class TransactionHelper {
             session.getTransaction().commit();
 
             return result;
-        } catch (DatabaseManagerException e) {
+        } catch (DatabaseManagerException | IllegalArgumentException e) {
             throw e;
         } catch (Throwable e) {
             logger.warn("Database operation failed", e);
