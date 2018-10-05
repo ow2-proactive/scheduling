@@ -532,6 +532,11 @@ public interface SchedulerRestInterface {
     String getJobHtml(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws IOException, NotConnectedRestException;
 
+    @GET
+    @Path("jobs/{jobid}/xml")
+    @Produces("application/xml")
+    InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId);
+
     /**
      * Returns a list of taskState
      * 

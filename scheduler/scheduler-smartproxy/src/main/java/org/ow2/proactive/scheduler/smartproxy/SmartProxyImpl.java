@@ -842,6 +842,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public Job getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException, JobCreationException,
+            NotConnectedException, PermissionException {
+        return schedulerProxy.getJobContent(jobId);
+    }
+
+    @Override
     public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
         return schedulerProxy.getPortalConfiguration();
     }

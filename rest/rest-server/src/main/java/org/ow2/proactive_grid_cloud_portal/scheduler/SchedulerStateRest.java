@@ -77,6 +77,8 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -133,7 +135,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -1159,6 +1163,37 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try (InputStream ips = new BufferedInputStream(new FileInputStream(jobHtml))) {
             return new String(IOUtils.toByteArray(ips));
         }
+    }
+
+    @Override
+    @GET
+    @Path("jobs/{jobid}/xml")
+    @Produces("application/xml")
+    public InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) {
+        try {
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
+
+            //            final Scheduler s = checkAccess(sessionId, "GEt jobs?jobid=" + jobId);
+            final Job jobContent = s.getJobContent(JobIdImpl.makeJobId(jobId));
+            return new Job2XMLTransformer().jobToxml((TaskFlowJob) jobContent);
+        } catch (NotConnectedRestException e) {
+            e.printStackTrace();
+        } catch (PermissionException e) {
+            e.printStackTrace();
+        } catch (JobCreationException e) {
+            e.printStackTrace();
+        } catch (NotConnectedException e) {
+            e.printStackTrace();
+        } catch (UnknownJobException e) {
+            e.printStackTrace();
+        } catch (SubmissionClosedException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

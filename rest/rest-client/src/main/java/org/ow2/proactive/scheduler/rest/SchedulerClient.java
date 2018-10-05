@@ -1223,6 +1223,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public Job getJobContent(JobId jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
         try {
             return restApi().getPortalConfiguration(sid);

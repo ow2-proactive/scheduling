@@ -664,6 +664,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public Job getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException, JobCreationException,
+            NotConnectedException, PermissionException {
+        return _getScheduler().getJobContent(jobId);
+    }
+
+    @Override
     public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
         return _getScheduler().getPortalConfiguration();
     }

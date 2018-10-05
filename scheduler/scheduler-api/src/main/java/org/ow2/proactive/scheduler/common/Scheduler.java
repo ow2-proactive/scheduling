@@ -1499,6 +1499,13 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             UnknownJobException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
+     * @param jobId job id of existing job
+     * @return copy of the object which was submitted to the scheduler
+     */
+    Job getJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException,
+            SubmissionClosedException, JobCreationException;
+
+    /**
      * @return
      * @throws PermissionException 
      * @throws NotConnectedException 

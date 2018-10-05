@@ -634,6 +634,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public Job getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException, JobCreationException,
+            NotConnectedException, PermissionException {
+        renewSession();
+        return client.getJobContent(jobId);
+    }
+
+    @Override
     public void init(ConnectionInfo connectionInfo) throws Exception {
         if (client == null)
             throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");

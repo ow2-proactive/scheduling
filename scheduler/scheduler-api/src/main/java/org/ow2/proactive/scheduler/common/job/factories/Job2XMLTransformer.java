@@ -95,7 +95,7 @@ public class Job2XMLTransformer {
 
     private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
-    public static final String XSD_LOCATION = "urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd";
+    private static final String XSD_LOCATION = "urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd";
 
     public Job2XMLTransformer() {
 
