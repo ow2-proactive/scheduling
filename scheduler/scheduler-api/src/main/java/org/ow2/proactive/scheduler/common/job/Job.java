@@ -31,7 +31,6 @@ import static org.ow2.proactive.scheduler.common.util.LogFormatter.lineWithQuote
 
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -99,6 +98,11 @@ public abstract class Job extends CommonAttribute {
     protected String globalSpace = null;
 
     protected String userSpace = null;
+
+    /**
+     * SVG Visualization rendering of this job
+     */
+    protected String visualization = null;
 
     /**
      * A map to holds job descriptor variables
@@ -257,6 +261,22 @@ public abstract class Job extends CommonAttribute {
      */
     public void setUserSpace(String userSpace) {
         this.userSpace = userSpace;
+    }
+
+    /**
+     * Get the job visualization rendering in SVG format
+     * @return Job visualization SVG code
+     */
+    public String getVisualization() {
+        return visualization;
+    }
+
+    /**
+     * Set the SVG code of the job visualization
+     * @param visualization SVG code String
+     */
+    public void setVisualization(String visualization) {
+        this.visualization = visualization;
     }
 
     /**

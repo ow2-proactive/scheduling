@@ -30,8 +30,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
@@ -40,6 +42,7 @@ import org.ow2.proactive.scheduler.task.context.TaskContextSerializer;
 import org.ow2.proactive.scheduler.task.exceptions.ForkedJvmProcessException;
 import org.ow2.proactive.scheduler.task.executors.forked.env.ExecuteForkedTaskInsideNewJvm;
 import org.ow2.proactive.scheduler.task.utils.ProcessStreamsReader;
+import org.ow2.proactive.scheduler.task.utils.task.termination.CleanupTimeoutGetter;
 import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 
 
@@ -50,6 +53,8 @@ import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
  * @see InProcessTaskExecutor
  */
 public class ForkedTaskExecutor implements TaskExecutor {
+
+    private static final Logger logger = Logger.getLogger(TaskExecutor.class);
 
     private final ForkedProcessBuilderCreator forkedJvmProcessBuilderCreator = new ForkedProcessBuilderCreator();
 
@@ -116,6 +121,12 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
             if (process != null) {
                 process.destroy();
+                try {
+                    //wait for twice the time of the cleanup process
+                    process.waitFor((new CleanupTimeoutGetter()).getCleanupTimeSeconds(), TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    logger.info("Exception while waiting task to finish " + e);
+                }
             }
             if (taskProcessTreeKiller != null) {
                 taskProcessTreeKiller.kill();
