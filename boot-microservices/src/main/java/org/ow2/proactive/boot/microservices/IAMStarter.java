@@ -48,15 +48,15 @@ public class IAMStarter {
 
     private static final String SEPARATOR = File.separator;
 
-    private static Configuration config = new BaseConfiguration();
-
     private static Process process;
 
     private static List<String> command = new ArrayList<>();
 
     private static boolean started = false;
 
-    private static String iamURL;
+    public static Configuration config = new BaseConfiguration();
+
+    public static String iamURL;
 
     private IAMStarter() {
 

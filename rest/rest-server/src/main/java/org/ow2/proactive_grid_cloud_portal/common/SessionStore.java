@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jose4j.jwt.JwtClaims;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 
@@ -52,6 +53,14 @@ public class SessionStore {
         Session session = createUnnamedSession();
         session.setUserName(username);
         return session;
+    }
+
+    // Create an IAMSession instead of the legacy Session
+    public Session create(String sessionToken, String userName, JwtClaims jwtClaims) {
+        IAMSession iamSession = new IAMSession(sessionToken, jwtClaims, schedulerRMProxyFactory, clock);
+        iamSession.setUserName(userName);
+        sessions.put(sessionToken, iamSession);
+        return iamSession;
     }
 
     public boolean exists(String sessionId) {

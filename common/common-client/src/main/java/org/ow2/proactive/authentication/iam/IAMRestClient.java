@@ -34,10 +34,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jasig.cas.client.util.CommonUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.ow2.proactive.http.CommonHttpClientBuilder;
@@ -45,8 +47,11 @@ import org.ow2.proactive.http.CommonHttpClientBuilder;
 
 public class IAMRestClient {
 
-    private static final String TOKEN_KEY = "token" ;
-    private static final String TOKEN_VALUE= "true" ;
+    private static final String TOKEN_KEY = "token";
+
+    private static final String TOKEN_VALUE = "true";
+
+    private static final Pattern pattern = Pattern.compile("(TGT-\\d+-\\S+)");
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());
 
@@ -62,7 +67,7 @@ public class IAMRestClient {
             params.add(new BasicNameValuePair("username", username));
             params.add(new BasicNameValuePair("password", password));
 
-            if (asJWT){
+            if (asJWT) {
                 params.add(new BasicNameValuePair(TOKEN_KEY, TOKEN_VALUE));
             }
 
@@ -72,28 +77,37 @@ public class IAMRestClient {
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) ||
                 (null == httpResponse.getEntity())) {
-                throw new IAMException("Failed to acquire SSO ticket for the user " + username);
+
+                throw new IAMException("Failed to acquire SSO ticket for the user '" + username + "'. IAM response: " +
+                                       httpResponse);
             }
 
-            String htmlResponse = EntityUtils.toString(httpResponse.getEntity());
-            Document doc = Jsoup.parse(htmlResponse);
-            String htmlSsoTicket = doc.getElementsByAttribute(ticketMarker).first().attributes().get(ticketMarker);
+            LOG.debug("IAM response: " + httpResponse);
 
-            if (htmlSsoTicket != null) {
+            String iamResponse = EntityUtils.toString(httpResponse.getEntity());
 
-                Pattern pattern = Pattern.compile("(TGT-\\d+-\\S+)");
-                Matcher matcher = pattern.matcher(htmlSsoTicket);
+            if (!asJWT) {
+                Document doc = Jsoup.parse(iamResponse);
+                String htmlSsoTicket = doc.getElementsByAttribute(ticketMarker).first().attributes().get(ticketMarker);
 
-                if (matcher.find()) {
-                    ssoTicket = matcher.group(1);
+                if (htmlSsoTicket != null) {
+
+                    Matcher matcher = pattern.matcher(htmlSsoTicket);
+
+                    if (matcher.find()) {
+                        ssoTicket = matcher.group(1);
+                    }
                 }
+            } else {
+                ssoTicket = iamResponse;
             }
+
+            CommonUtils.assertNotNull(ssoTicket, "Unable to extract SSO ticket form IAM response. SSO ticket is null.");
 
             LOG.debug("SSO ticket successfully generated for user " + username + "\n Token: " + ssoTicket);
 
         } catch (Exception e) {
-            throw new IAMException("Authentication failed: Error occurred while acquiring SSO ticket for the user " +
-                                   username, e);
+            throw new IAMException("Error occurred while acquiring SSO ticket for the user " + username, e);
         }
 
         return ssoTicket;
@@ -115,17 +129,28 @@ public class IAMRestClient {
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) ||
                 (null == httpResponse.getEntity()))
-                throw new IAMException("Failed to acquire authentication token for the service " + service);
+                throw new IAMException("Failed to acquire token for the service '" + service + "'. IAM response: " +
+                                       httpResponse);
 
             token = EntityUtils.toString(httpResponse.getEntity());
 
             LOG.debug("Service token successfully generated for service " + service + "\n Token: " + token);
 
         } catch (Exception e) {
-            throw new IAMException("Authentication failed: Error occurred while acquiring authentication token for the service " +
-                                   service, e);
+            throw new IAMException("Error occurred while acquiring authentication token for the service " + service, e);
         }
 
         return token;
+    }
+
+    public boolean isSSOTicketValid(String url) {
+
+        try (CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build()) {
+
+            return httpClient.execute(new HttpGet(url)).getStatusLine().getStatusCode() == HttpStatus.SC_OK;
+
+        } catch (Exception e) {
+            throw new IAMException("Error occurred while validating SSO ticket.", e);
+        }
     }
 }

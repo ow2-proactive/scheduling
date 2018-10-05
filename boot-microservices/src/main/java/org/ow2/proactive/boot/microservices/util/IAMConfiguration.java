@@ -70,6 +70,22 @@ public class IAMConfiguration {
 
     public static final String IAM_CONTEXT = "server.context-path";
 
+    public static final String IAM_TOKEN_SIGNATURE_KEY = "cas.authn.token.crypto.signing.key";
+
+    public static final String IAM_TOKEN_ENCRYPTION_KEY = "cas.authn.token.crypto.encryption.key";
+
+    public static final String IAM_TOKEN_SIGNATURE_ENABLED = "cas.authn.token.crypto.signingEnabled";
+
+    public static final String IAM_TOKEN_ENCRYPTION_ENABLED = "cas.authn.token.crypto.encryptionEnabled";
+
+    public static final String IAM_PASS_SIGNATURE_KEY = "cas.clearpass.crypto.signing.key";
+
+    public static final String IAM_PASS_ENCRYPTION_KEY = "cas.clearpass.crypto.encryption.key";
+
+    public static final String IAM_PASS_CRYPTO_ENABLED = "cas.clearpass.crypto.enabled";
+
+    public static final String IAM_TICKET_REQUEST = "/v1/tickets";
+
     public static final String IAM_LOGIN_PAGE = "/login";
 
     public static final String IAM_URL = "casServerUrlPrefix";

@@ -285,12 +285,13 @@ public class IAMLoginModule implements LoginModule {
         String ssoTicket = new IAMRestClient().getSSOTicket(iamServerUrlPrefix + iamTicketRequest,
                                                             username,
                                                             password,
-                                                            ssoTicketMarker);
+                                                            ssoTicketMarker,
+                                                            false);
         // Acquire Service Token (i.e., JWT or CAS ST) based on SSO ticket
         String serviceToken = new IAMRestClient().getServiceToken(iamServerUrlPrefix + iamTicketRequest + "/" +
                                                                   ssoTicket, service);
 
-        CommonUtils.assertNotNull(serviceToken, "no service token produced by IAM");
+        CommonUtils.assertNotNull(serviceToken, "no service token is produced by IAM");
 
         return serviceToken;
 

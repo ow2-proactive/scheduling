@@ -233,7 +233,7 @@ public class SchedulerStarter {
     private static void startBootMicroservices() throws IOException, InterruptedException, ExecutionException,
             ConfigurationException, GeneralSecurityException {
 
-        if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().endsWith("") ||
+        if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().endsWith(IAM_LOGIN_METHOD) ||
             PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().endsWith(IAM_LOGIN_METHOD)) {
 
             // Do nothing if PA_home or the boot microservices path is not specified

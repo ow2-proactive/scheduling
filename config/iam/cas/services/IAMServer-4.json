@@ -1,6 +1,6 @@
 {
   "@class": "org.apereo.cas.services.RegexRegisteredService",
-  "serviceId": ".*",
+  "serviceId": "^(?!.*(PACoreWithJWT)).*$",
   "name": "IAMServer",
   "id": 4,
   "description": "IAM Server URL",

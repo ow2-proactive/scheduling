@@ -97,6 +97,8 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jose4j.jwt.MalformedClaimException;
+import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -145,10 +147,7 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
-import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.*;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
@@ -2000,6 +1999,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * @throws NotConnectedRestException
      */
     private SchedulerProxyUserInterface checkAccess(String sessionId, String path) throws NotConnectedRestException {
+
         Session session = sessionStore.get(sessionId);
 
         if (session == null) {
@@ -2010,6 +2010,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         if (schedulerProxy == null) {
             throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+
+        if (IAMSessionUtil.IAM_IS_USED) {
+            try {
+                sessionId = IAMSessionUtil.renewIAMSession(sessionStore, sessionId);
+            } catch (MalformedClaimException e) {
+                throw new NotConnectedRestException(e);
+            }
         }
 
         renewSession(sessionId);
@@ -2878,23 +2886,30 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("login")
     @Produces("application/json")
-    public String login(@FormParam("username") String username, @FormParam("password") String password)
-            throws LoginException, SchedulerRestException {
+    public String login(@FormParam("username") String username, @FormParam("password") String password) {
         try {
-            if ((username == null) || (password == null)) {
+            if ((username == null || username == "") || (password == null || password == "")) {
                 throw new LoginException("Empty login/password");
             }
-            Session session = sessionStore.create(username);
+
+            Session session;
+
+            // When authentication is performed againt the IAM microservice, generate a JWT as session Id
+            if (IAMSessionUtil.IAM_IS_USED) {
+                session = IAMSessionUtil.createNewSessionToken(username, password, sessionStore);
+            }
+            // Legacy Session
+            else {
+                session = sessionStore.create(username);
+            }
+
             session.connectToScheduler(new CredData(username, password));
             logger.info("Binding user " + username + " to session " + session.getSessionId());
 
             return session.getSessionId();
-        } catch (ActiveObjectCreationException e) {
-            throw new SchedulerRestException(e);
-        } catch (SchedulerException e) {
-            throw new SchedulerRestException(e);
-        } catch (NodeException e) {
-            throw new SchedulerRestException(e);
+
+        } catch (Exception e) {
+            return "[Error] " + e.getClass() + ": " + e.getMessage();
         }
     }
 
@@ -3022,13 +3037,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return session.getSessionId();
 
-        } catch (PermissionException e) {
-            throw new SchedulerRestException(e);
-        } catch (ActiveObjectCreationException e) {
+        } catch (PermissionException | ActiveObjectCreationException | NodeException e) {
             throw new SchedulerRestException(e);
         } catch (SchedulerException e) {
-            throw new SchedulerRestException(e);
-        } catch (NodeException e) {
             throw new SchedulerRestException(e);
         }
     }

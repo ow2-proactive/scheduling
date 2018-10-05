@@ -66,6 +66,24 @@ public class JWTUtils {
     public static JwtClaims parseJWT(String jwt, boolean jwtSigned, String jwtSignatureKey, boolean jwtEncrypted,
             String jwtEncryptionKey, String issuer, String service) {
 
+        return validatePlainJWT(decypherJWT(jwt, jwtSigned, jwtSignatureKey, jwtEncrypted, jwtEncryptionKey),
+                                issuer,
+                                service);
+    }
+
+    /**
+     * Decypher secured JWT (Json Web Token). If successful, returns plain content of the token.
+     *
+     * @param jwt JWT (Json Web Token) to parse
+     * @param jwtSigned boolean variable indicating whether the token is signed.
+     * @param jwtSignatureKey Key used to sign the token.
+     * @param jwtEncrypted boolean variable indicating whether the token is encrypted.
+     * @param jwtEncryptionKey Key used to encrypt the token.
+     *
+     * @return plain content of the token.
+     */
+    public static String decypherJWT(String jwt, boolean jwtSigned, String jwtSignatureKey, boolean jwtEncrypted,
+            String jwtEncryptionKey) {
         if (jwtSigned) {
             jwt = verifySignature(jwt, jwtSignatureKey);
         }
@@ -80,9 +98,9 @@ public class JWTUtils {
             jwt = decryptJWT(jwt, jwtEncryptionKey);
         }
 
-        LOG.debug("Plain JWT: "+jwt);
+        LOG.debug("Plain JWT: " + jwt);
 
-        return parsePlainJWT(jwt, issuer, service);
+        return jwt;
     }
 
     /**
@@ -109,7 +127,7 @@ public class JWTUtils {
             return jws.getPayload();
 
         } catch (JoseException je) {
-            throw new IAMException("Decoding signed JWT failed", je);
+            throw new IAMException("JWT signature verification failed", je);
         }
     }
 
@@ -161,7 +179,7 @@ public class JWTUtils {
      *
      * @return the set of claims extracted from the token body, or empty claims if the token is invalid.
      */
-    private static JwtClaims parsePlainJWT(String jwt, String issuer, String service) {
+    private static JwtClaims validatePlainJWT(String jwt, String issuer, String service) {
 
         try {
 
@@ -187,7 +205,7 @@ public class JWTUtils {
             throw new IAMException("Building JWT from Json failed", je);
 
         } catch (InvalidJwtException e) {
-            throw new IAMException("JWT validation error", e);
+            throw new IAMException("Invalid JWT error", e);
         }
     }
 }

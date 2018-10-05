@@ -47,6 +47,8 @@ dependencies {
 
     compile project(':rest:rest-api')
     compile project(':common:common-http')
+    compile project(':common:common-client')
+    compile project(':boot-microservices')
 
     testCompile functionalTestDependencies
 
