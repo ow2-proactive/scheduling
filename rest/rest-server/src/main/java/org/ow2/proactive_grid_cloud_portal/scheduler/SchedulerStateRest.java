@@ -42,6 +42,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -211,6 +212,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private static final int TASKS_PAGE_SIZE = PASchedulerProperties.TASKS_PAGE_SIZE.getValueAsInt();
 
+    private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
+
+    private static final String PATH_JOBS = "jobs/";
+
+    private static final String PATH_TASKS = "/tasks/";
+
     static {
         sortableTaskAttrMap = createSortableTaskAttrMap();
     }
@@ -257,11 +264,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                            new JobFilterCriteria(false, true, true, true),
                                            DEFAULT_JOB_SORT_PARAMS);
 
-            List<String> ids = new ArrayList<String>(page.getList().size());
+            List<String> ids = new ArrayList<>(page.getList().size());
             for (JobInfo jobInfo : page.getList()) {
                 ids.add(jobInfo.getJobId().value());
             }
-            return new RestPage<String>(ids, page.getSize());
+            return new RestPage<>(ids, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -329,12 +336,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                            limit,
                                            new JobFilterCriteria(false, true, true, true),
                                            DEFAULT_JOB_SORT_PARAMS);
-            List<UserJobData> userJobInfoList = new ArrayList<UserJobData>(page.getList().size());
+            List<UserJobData> userJobInfoList = new ArrayList<>(page.getList().size());
             for (JobInfo jobInfo : page.getList()) {
                 userJobInfoList.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
 
-            return new RestPage<UserJobData>(userJobInfoList, page.getSize());
+            return new RestPage<>(userJobInfoList, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -423,9 +430,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 jobs.add(new UserJobData(mapper.map(jobInfo, JobInfoData.class)));
             }
 
-            HashMap<Long, ArrayList<UserJobData>> map = new HashMap<Long, ArrayList<UserJobData>>(1);
+            HashMap<Long, ArrayList<UserJobData>> map = new HashMap<>(1);
             map.put(SchedulerStateListener.getInstance().getSchedulerStateRevision(), jobs);
-            RestMapPage<Long, ArrayList<UserJobData>> restMapPage = new RestMapPage<Long, ArrayList<UserJobData>>();
+            RestMapPage<Long, ArrayList<UserJobData>> restMapPage = new RestMapPage<>();
             restMapPage.setMap(map);
             restMapPage.setSize(page.getSize());
             return restMapPage;
@@ -587,7 +594,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public JobResultData jobResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/result");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/result");
             return mapper.map(PAFuture.getFutureValue(s.getJobResult(jobId)), JobResultData.class);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -604,7 +611,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public JobInfoData jobInfo(String sessionId, String jobId)
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
-        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/info");
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/info");
         JobInfoData job = null;
         try {
             job = mapper.map(s.getJobInfo(jobId), JobInfoData.class);
@@ -640,7 +647,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("jobid") String jobId)
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/result/value");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/result/value");
             JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
             if (jobResult == null) {
                 return null;
@@ -708,7 +715,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public String jobServerLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/log/server");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/log/server");
             return s.getJobServerLogs(jobId);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -767,7 +774,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/kill");
+            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/kill");
             return s.killTask(jobid, taskname);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -804,7 +811,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/preempt");
+            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/preempt");
             return s.preemptTask(jobid, taskname, 5);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -839,7 +846,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/restart");
+            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/restart");
             return s.restartTask(jobid, taskname, 5);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -874,7 +881,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/finishInErrorTask");
+            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/finishInErrorTask");
             return s.finishInErrorTask(jobid, taskname);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -909,7 +916,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + "/tasks/" + taskname + "/restartInErrorTask");
+            Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/restartInErrorTask");
             return s.restartInErrorTask(jobid, taskname);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -966,7 +973,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks");
 
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTasksPaginated(offset, limit);
@@ -974,7 +981,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             for (TaskState ts : page.getTaskStates()) {
                 tasksNames.add(ts.getId().getReadableName());
             }
-            return new RestPage<String>(tasksNames, page.getSize());
+            return new RestPage<>(tasksNames, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1004,7 +1011,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks");
 
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, 0, TASKS_PAGE_SIZE);
@@ -1014,7 +1021,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 tasksName.add(ts.getId().getReadableName());
             }
 
-            return new RestPage<String>(tasksName, page.getSize());
+            return new RestPage<>(tasksName, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1053,7 +1060,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskTag + "/paginated");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskTag + "/paginated");
 
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, offset, limit);
@@ -1064,7 +1071,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 tasksName.add(ts.getId().getReadableName());
             }
 
-            return new RestPage<String>(tasksName, page.getSize());
+            return new RestPage<>(tasksName, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1090,7 +1097,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public List<String> getJobTaskTags(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tags");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tags");
             JobState jobState = s.getJobState(jobId);
             return jobState.getTags();
         } catch (PermissionException e) {
@@ -1121,7 +1128,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("jobid") String jobId, @PathParam("prefix") String prefix)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tags/startswith/" + prefix);
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tags/startswith/" + prefix);
             JobState jobState = s.getJobState(jobId);
             return jobState.getTags(prefix);
         } catch (PermissionException e) {
@@ -1198,7 +1205,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
         try {
-            Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/paginated");
+            Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/paginated");
             TaskStatesPage page = scheduler.getTaskPaginated(jobId, offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
@@ -1232,11 +1239,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag);
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/" + taskTag);
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, 0, TASKS_PAGE_SIZE);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage<TaskStateData>(tasks, page.getSize());
+            return new RestPage<>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1261,11 +1268,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/taskstates/" + taskTag + "/paginated");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/" + taskTag + "/paginated");
             JobState jobState = s.getJobState(jobId);
             TaskStatesPage page = jobState.getTaskByTagPaginated(taskTag, offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
-            return new RestPage<TaskStateData>(tasks, page.getSize());
+            return new RestPage<>(tasks, page.getSize());
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1289,7 +1296,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
 
         try {
-            Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/log/full");
+            Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + "/log/full");
 
             JobState jobState = scheduler.getJobState(jobId);
 
@@ -1300,35 +1307,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             for (TaskState taskState : tasks) {
 
-                InputStream inputStream = null;
-
-                try {
-                    if (taskState.isPreciousLogs()) {
-                        inputStream = retrieveTaskLogsUsingDataspaces(sessionId, jobId, taskState.getId());
-                    } else {
-                        String taskLogs = retrieveTaskLogsUsingDatabase(sessionId, jobId, taskState.getName());
-
-                        if (!taskLogs.isEmpty()) {
-                            inputStream = IOUtils.toInputStream(taskLogs);
-                        }
-
-                        logger.warn("Retrieving truncated logs for task '" + taskState.getId() + "'");
-                    }
-                } catch (Exception e) {
-                    logger.info("Could not retrieve logs for task " + taskState.getId() +
-                                " (could be a non finished or killed task)", e);
-                }
+                InputStream inputStream = retrieveTaskLogs(taskState, sessionId, jobId);
 
                 if (inputStream != null) {
                     streams.add(inputStream);
                 }
             }
 
-            if (streams.isEmpty()) {
-                return null; // will produce HTTP 204 code
-            } else {
-                return new SequenceInputStream(Collections.enumeration(streams));
-            }
+            // will produce HTTP 204 code if null
+            return streams.isEmpty() ? null : new SequenceInputStream(Collections.enumeration(streams));
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (UnknownJobException e) {
@@ -1336,6 +1323,27 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
+    }
+
+    protected InputStream retrieveTaskLogs(TaskState taskState, String sessionId, String jobId) {
+        InputStream inputStream = null;
+        try {
+            if (taskState.isPreciousLogs()) {
+                inputStream = retrieveTaskLogsUsingDataspaces(sessionId, jobId, taskState.getId());
+            } else {
+                String taskLogs = retrieveTaskLogsUsingDatabase(sessionId, jobId, taskState.getName());
+
+                if (!taskLogs.isEmpty()) {
+                    inputStream = IOUtils.toInputStream(taskLogs, Charset.forName(FILE_ENCODING));
+                }
+
+                logger.warn("Retrieving truncated logs for task '" + taskState.getId() + "'");
+            }
+        } catch (Exception e) {
+            logger.info("Could not retrieve logs for task " + taskState.getId() +
+                        " (could be a non finished or killed task)", e);
+        }
+        return inputStream;
     }
 
     public InputStream retrieveTaskLogsUsingDataspaces(String sessionId, String jobId, TaskId taskId)
@@ -1366,7 +1374,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             PermissionRestException, UnknownTaskRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname);
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname);
 
             JobState jobState = s.getJobState(jobId);
 
@@ -1409,7 +1417,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("*/*")
     public Serializable valueOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
             @PathParam("taskname") String taskname) throws Throwable {
-        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/value");
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
         TaskResult taskResult = s.getTaskResult(jobId, taskname);
         return getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
     }
@@ -1437,9 +1445,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     public Map<String, String> valueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
-        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/value");
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/value");
         List<TaskResult> taskResults = s.getTaskResultsByTag(jobId, taskTag);
-        Map<String, String> result = new HashMap<String, String>(taskResults.size());
+        Map<String, String> result = new HashMap<>(taskResults.size());
         for (TaskResult currentTaskResult : taskResults) {
             result.put(currentTaskResult.getTaskId().getReadableName(),
                        getTaskResultValueAsStringOrExceptionStackTrace(currentTaskResult));
@@ -1492,7 +1500,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("*/*")
     public Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
-        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/value");
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
         TaskResult taskResult = s.getTaskResult(jobId, taskname);
         taskResult = PAFuture.getFutureValue(taskResult);
         return taskResult.getMetadata();
@@ -1516,7 +1524,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     public Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
-        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
         List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
         Map<String, Map<String, String>> result = new HashMap<>(trs.size());
         for (TaskResult currentResult : trs) {
@@ -1546,7 +1554,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("*/*")
     public byte[] serializedValueOfTaskResult(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
-        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/serializedvalue");
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/serializedvalue");
         TaskResult tr = s.getTaskResult(jobId, taskname);
         tr = PAFuture.getFutureValue(tr);
         return tr.getSerializedValue();
@@ -1573,7 +1581,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Produces("application/json")
     public Map<String, byte[]> serializedValueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
-        Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
         List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
         Map<String, byte[]> result = new HashMap<>(trs.size());
         for (TaskResult currentResult : trs) {
@@ -1604,7 +1612,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result");
             TaskResult taskResult = s.getTaskResult(jobId, taskname);
             if (taskResult == null) {
                 TaskIdData taskIdData = new TaskIdData();
@@ -1650,9 +1658,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskTag + "/result");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskTag + "/result");
             List<TaskResult> taskResults = s.getTaskResultsByTag(jobId, taskTag);
-            ArrayList<TaskResultData> results = new ArrayList<TaskResultData>(taskResults.size());
+            ArrayList<TaskResultData> results = new ArrayList<>(taskResults.size());
             for (TaskResult current : taskResults) {
                 TaskResultData r = buildTaskResultData(PAFuture.getFutureValue(current));
                 results.add(r);
@@ -1692,7 +1700,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private String retrieveTaskLogsUsingDatabase(String sessionId, String jobId, String taskName)
             throws NotConnectedRestException, UnknownJobException, UnknownTaskException, NotConnectedException,
             PermissionException, PermissionRestException {
-        Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskName + "/result/log/all");
+        Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskName + "/result/log/all");
         StringBuilder allLogs = new StringBuilder();
         List<TaskResult> resultList = scheduler.getTaskResultAllIncarnations(jobId, taskName);
         for (TaskResult result : resultList) {
@@ -1713,7 +1721,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("tasktag") String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/log/err");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/log/err");
             List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
             StringBuffer buf = new StringBuffer();
             for (TaskResult tr : trs) {
@@ -1740,7 +1748,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/result/log/all");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/result/log/all");
             JobResult jobResult = s.getJobResult(jobId);
             if (jobResult == null) {
                 return "";
@@ -1771,7 +1779,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/err");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/log/err");
             StringBuilder errLogs = new StringBuilder();
             List<TaskResult> resultList = s.getTaskResultAllIncarnations(jobId, taskname);
             for (TaskResult result : resultList) {
@@ -1801,7 +1809,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("tasktag") String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/log/err");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/log/err");
             List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
             StringBuffer buf = new StringBuffer();
             for (TaskResult tr : trs) {
@@ -1828,7 +1836,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/out");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/log/out");
             StringBuilder outLogs = new StringBuilder();
             List<TaskResult> resultList = s.getTaskResultAllIncarnations(jobId, taskname);
             for (TaskResult result : resultList) {
@@ -1858,7 +1866,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("tasktag") String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/result/log/out");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/log/out");
             List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
             StringBuffer result = new StringBuffer();
             for (TaskResult tr : trs) {
@@ -1891,7 +1899,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 sessionId = session;
             }
 
-            Scheduler scheduler = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/result/log/all");
+            Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/log/all");
             TaskResult taskResult = scheduler.getTaskResult(jobId, taskname);
 
             if (taskResult != null) {
@@ -1909,7 +1917,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     return retrieveTaskLogsUsingDataspaces(sessionId, jobId, taskResult.getTaskId());
                 } else {
                     logger.warn("Retrieving truncated logs for task '" + taskname + "'");
-                    return IOUtils.toInputStream(retrieveTaskLogsUsingDatabase(sessionId, jobId, taskname));
+                    return IOUtils.toInputStream(retrieveTaskLogsUsingDatabase(sessionId, jobId, taskname),
+                                                 Charset.forName(FILE_ENCODING));
                 }
             } else {
                 return null;
@@ -1945,7 +1954,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/" + taskname + "/log/server");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/log/server");
             return s.getTaskServerLogs(jobId, taskname);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -1978,7 +1987,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             @PathParam("tasktag") String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/tasks/tag/" + taskTag + "/log/server");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/log/server");
             return s.getTaskServerLogsByTag(jobId, taskTag);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -2236,7 +2245,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             tmpWorkflowFile = File.createTempFile("job", "d");
             JobId jobId;
             try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
-                IOUtils.write(jobXml, outputStream);
+                IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
 
                 WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
                 jobId = workflowSubmitter.submit(tmpWorkflowFile,
@@ -2320,7 +2329,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             filePath = "";
         }
         if (fileName != null && filePath.length() > 0 && !filePath.endsWith("/")) {
-            filePath = (filePath + "/" + fileName);
+            filePath = (filePath + File.separator + fileName);
         } else if (fileName != null) {
             filePath = fileName;
         }
@@ -2404,13 +2413,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
 
         List<InputPart> fNL = formDataMap.get("fileName");
-        if ((fNL == null) || (fNL.size() == 0)) {
+        if ((fNL == null) || (fNL.isEmpty())) {
             throw new IllegalArgumentException("Illegal multipart argument definition (fileName), received " + fNL);
         }
         String fileName = fNL.get(0).getBody(String.class, null);
 
         List<InputPart> fCL = formDataMap.get("fileContent");
-        if ((fCL == null) || (fCL.size() == 0)) {
+        if ((fCL == null) || (fCL.isEmpty())) {
             throw new IllegalArgumentException("Illegal multipart argument definition (fileContent), received " + fCL);
         }
         InputStream fileContent = fCL.get(0).getBody(InputStream.class, null);
@@ -2488,7 +2497,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 sb.append(fo.getName().getBaseName() + nl);
 
             }
-            return IOUtils.toInputStream(sb.toString());
+            return IOUtils.toInputStream(sb.toString(), Charset.forName(FILE_ENCODING));
 
         } else if (sourcefo.getType().equals(FileType.FILE)) {
             logger.info("[pullFile] reading file content from " + sourcefo.getURL());
@@ -2673,7 +2682,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     final String jobId, @PathParam("name") String priorityName) throws NotConnectedRestException,
             UnknownJobRestException, PermissionRestException, JobAlreadyFinishedRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/priority/byname/" + priorityName);
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byname/" + priorityName);
             s.changeJobPriority(jobId, JobPriority.findPriority(priorityName));
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -2710,7 +2719,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NumberFormatException, NotConnectedRestException, UnknownJobRestException, PermissionRestException,
             JobAlreadyFinishedRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "jobs/" + jobId + "/priority/byvalue" + priorityValue);
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byvalue" + priorityValue);
             s.changeJobPriority(jobId, JobPriority.findPriority(Integer.parseInt(priorityValue)));
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -2983,8 +2992,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             try {
                 renewSession(sessionId);
                 Scheduler scheduler = sessionStore.get(sessionId).getScheduler();
-                UserData userData = scheduler.getCurrentUserData();
-                return userData;
+                return scheduler.getCurrentUserData();
             } catch (NotConnectedRestException | NotConnectedException e) {
                 logger.trace(e);
             } catch (Exception e) {
@@ -3037,9 +3045,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return session.getSessionId();
 
-        } catch (PermissionException | ActiveObjectCreationException | NodeException e) {
-            throw new SchedulerRestException(e);
-        } catch (SchedulerException e) {
+        } catch (ActiveObjectCreationException | NodeException | SchedulerException e) {
             throw new SchedulerRestException(e);
         }
     }
@@ -3300,7 +3306,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             tmpWorkflowFile = File.createTempFile("job", "d");
             Map<String, String> jobVariables;
             try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
-                IOUtils.write(jobXml, outputStream);
+                IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
 
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
             }
@@ -3509,7 +3515,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             for (TaskId taskId : taskIds) {
                 taskNames.add(taskId.getReadableName());
             }
-            return new RestPage<String>(taskNames, page.getSize());
+            return new RestPage<>(taskNames, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -3562,7 +3568,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                    boundaries.getLimit(),
                                    sortParams);
             List<TaskStateData> tasks = map(page.getList(), TaskStateData.class);
-            return new RestPage<TaskStateData>(tasks, page.getSize());
+            return new RestPage<>(tasks, page.getSize());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
@@ -3673,7 +3679,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException {
         SchedulerProxyUserInterface scheduler = checkAccess(sessionId, "properties");
-        Map<String, Object> schedulerProperties = new HashMap<String, Object>();
+        Map<String, Object> schedulerProperties;
         try {
             schedulerProperties = scheduler.getSchedulerProperties();
         } catch (NotConnectedException e) {

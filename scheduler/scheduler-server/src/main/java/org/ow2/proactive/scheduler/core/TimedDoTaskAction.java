@@ -31,7 +31,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -119,7 +119,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             int resultSize = taskDescriptor.getParents().size();
             if ((job.getType() == JobType.TASKSFLOW) && (resultSize > 0) && task.handleResultsArguments()) {
 
-                Set<TaskId> parentIds = new HashSet<>(resultSize);
+                Set<TaskId> parentIds = new LinkedHashSet<>(resultSize);
                 for (int i = 0; i < resultSize; i++) {
                     parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(((EligibleTaskDescriptorImpl) taskDescriptor.getParents()
                                                                                                                                           .get(i)).getInternal()));

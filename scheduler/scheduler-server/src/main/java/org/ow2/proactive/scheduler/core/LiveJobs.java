@@ -307,9 +307,9 @@ class LiveJobs {
         for (Map.Entry<JobId, JobData> entry : jobs.entrySet()) {
             JobData value = entry.getValue();
 
-            // If the scheduler is paused, schedule only running jobs
+            // If the scheduler is paused, schedule only running or stalled jobs
             if (isSchedulerPausedOrStopped &&
-                (value.job.getStatus() != JobStatus.RUNNING || value.job.getStatus() != JobStatus.STALLED)) {
+                (value.job.getStatus() != JobStatus.RUNNING && value.job.getStatus() != JobStatus.STALLED)) {
                 continue;
             }
 
@@ -1023,7 +1023,7 @@ class LiveJobs {
         // if job has been killed
         if (jobStatus == JobStatus.KILLED) {
             Set<TaskId> tasksToUpdate = job.failed(null, jobStatus);
-            dbManager.killJob(job, null, null);
+            dbManager.killJob(job);
             updateTasksInSchedulerState(job, tasksToUpdate);
         } else {
             // don't tamper the original job status if it's already in a

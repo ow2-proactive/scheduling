@@ -94,6 +94,8 @@ public class SchedulingService {
 
     public static final String SCHEDULING_SERVICE_RECOVER_TASKS_STATE_FINISHED = "SchedulingService::recoverTasksState finished";
 
+    public static final int SCHEDULER_KILL_DELAY = PASchedulerProperties.SCHEDULER_KILL_DELAY.getValueAsInt();
+
     private final SchedulingInfrastructure infrastructure;
 
     private final LiveJobs jobs;
@@ -348,6 +350,17 @@ public class SchedulingService {
         infrastructure.shutdown();
 
         listener.schedulerStateUpdated(SchedulerEvent.KILLED);
+
+        // To properly exit the java scheduling process
+        new Thread(() -> {
+            try {
+                Thread.sleep(SCHEDULER_KILL_DELAY);
+            } catch (InterruptedException e) {
+                logger.warn("Scheduler.kill() was interrupted while waiting for its configured delay, now terminating the process",
+                            e);
+            }
+            System.exit(0);
+        }).start();
 
         return true;
     }

@@ -186,6 +186,11 @@ public class JobInfoImpl implements JobInfo {
     }
 
     @Override
+    public boolean isStarted() {
+        return startTime > 0;
+    }
+
+    @Override
     public long getInErrorTime() {
         return inErrorTime;
     }
