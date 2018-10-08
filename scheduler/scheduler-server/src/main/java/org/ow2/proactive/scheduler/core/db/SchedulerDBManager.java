@@ -1697,7 +1697,7 @@ public class SchedulerDBManager {
         return transactionHelper.executeReadWriteTransaction(sessionWork);
     }
 
-    public <T> T executeReadWriteTransaction(SessionWork<T> sessionWork, boolean readOnlyEntities) {
+    private <T> T executeReadWriteTransaction(SessionWork<T> sessionWork, boolean readOnlyEntities) {
         return transactionHelper.executeReadWriteTransaction(sessionWork, readOnlyEntities);
     }
 
@@ -1822,6 +1822,10 @@ public class SchedulerDBManager {
             long id = jobId(jobId);
 
             Query query = session.getNamedQuery("loadJobContent").setLong("id", id);
+            if (query.uniqueResult() == null) {
+                throw new DatabaseManagerException("Invalid job id: " + jobId);
+            }
+
             JobContent jobContent = (JobContent) query.uniqueResult();
             return jobContent.getInitJobContent();
         });
