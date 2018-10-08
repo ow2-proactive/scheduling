@@ -1169,31 +1169,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/xml")
     @Produces("application/xml")
-    public InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) {
+    public InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
+            SubmissionClosedRestException, JobCreationRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/livelog");
-
-            //            final Scheduler s = checkAccess(sessionId, "GEt jobs?jobid=" + jobId);
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/xml");
             final Job jobContent = s.getJobContent(JobIdImpl.makeJobId(jobId));
             return new Job2XMLTransformer().jobToxml((TaskFlowJob) jobContent);
-        } catch (NotConnectedRestException e) {
-            e.printStackTrace();
-        } catch (PermissionException e) {
-            e.printStackTrace();
-        } catch (JobCreationException e) {
-            e.printStackTrace();
         } catch (NotConnectedException e) {
-            e.printStackTrace();
+            throw new NotConnectedRestException(e);
         } catch (UnknownJobException e) {
-            e.printStackTrace();
+            throw new UnknownJobRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
         } catch (SubmissionClosedException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+            throw new SubmissionClosedRestException(e);
+        } catch (JobCreationException e) {
+            throw new JobCreationRestException(e);
+        } catch (TransformerException | ParserConfigurationException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     /**
