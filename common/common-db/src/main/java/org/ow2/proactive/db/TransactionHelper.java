@@ -126,8 +126,6 @@ public class TransactionHelper {
             session.getTransaction().commit();
 
             return result;
-        } catch (DatabaseManagerException | IllegalArgumentException e) {
-            throw e;
         } catch (Throwable e) {
             logger.warn("Database operation failed", e);
 
