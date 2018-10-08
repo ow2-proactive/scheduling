@@ -204,7 +204,7 @@ public class Job2XMLTransformer {
 
         // <ref name="jobDescription"/>
         if (job.getDescription() != null) {
-            Element descrNode = createElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), job.getDescription());
+            Element descrNode = createCDataElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), job.getDescription());
             rootJob.appendChild(descrNode);
         }
 
@@ -268,6 +268,18 @@ public class Job2XMLTransformer {
         }
         if (elementText != null) {
             Text text = doc.createTextNode(elementText);
+            el.appendChild(text);
+        }
+        return el;
+    }
+
+    private Element createCDataElement(Document doc, String tagName, String elementText, Attribute... attribs) {
+        Element el = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), tagName);
+        for (Attribute a : attribs) {
+            el.setAttribute(a.getName(), a.getValue());
+        }
+        if (elementText != null) {
+            Text text = doc.createCDATASection(elementText);
             el.appendChild(text);
         }
         return el;
@@ -443,7 +455,7 @@ public class Job2XMLTransformer {
 
         // <ref name="taskDescription"/>
         if (task.getDescription() != null) {
-            Element descrNode = createElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), task.getDescription());
+            Element descrNode = createCDataElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), task.getDescription());
             taskE.appendChild(descrNode);
         }
 
