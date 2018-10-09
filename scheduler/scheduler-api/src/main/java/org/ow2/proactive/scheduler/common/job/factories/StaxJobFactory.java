@@ -78,6 +78,7 @@ import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -1730,10 +1731,20 @@ public class StaxJobFactory extends JobFactory {
      * @throws JobCreationException if a Variable has not been found
      */
     private String replace(String str, Map<String, String> variables) throws JobCreationException {
+
+        // Include System Variables
         Map<String, String> replacements = new HashMap<>();
         for (Map.Entry<Object, Object> o : System.getProperties().entrySet()) {
             replacements.put(o.getKey().toString(), o.getValue().toString());
         }
+
+        // Include useful "global" scheduler variables
+        replacements.put(SchedulerVars.PA_CATALOG_REST_URL.toString(),
+                         PASchedulerProperties.CATALOG_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_SCHEDULER_REST_URL.toString(),
+                         PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString());
+
+        // Include given variables if any
         if (variables != null) {
             replacements.putAll(variables);
         }
