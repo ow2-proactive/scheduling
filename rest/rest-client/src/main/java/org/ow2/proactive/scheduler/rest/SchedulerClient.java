@@ -50,6 +50,7 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -1229,8 +1230,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             final InputStream jobContent = restApi().getJobContent(sid, jobId.value());
             tempFile = File.createTempFile("jobContent", jobId.value());
             FileUtils.copyInputStreamToFile(jobContent, tempFile);
-            final Job job = JobFactory.getFactory().createJob(tempFile.getPath());
-            return job;
+            return JobFactory.getFactory().createJob(tempFile.getPath());
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         } catch (UnknownJobRestException e) {
@@ -1245,7 +1245,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throw new RuntimeException(e);
         } finally {
             if (tempFile != null) {
-                tempFile.delete();
+                try {
+                    Files.delete(tempFile.toPath());
+                } catch (IOException e) {
+                    logger.error("Cannot delete file: " + e);
+                }
             }
         }
     }

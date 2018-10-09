@@ -257,8 +257,8 @@ public class Job2XMLTransformer {
         if (job.getVisualization() != null) {
             final Element metadata = createElement(doc, XMLTags.METADATA.getXMLName(), null);
             metadata.appendChild(createCDataElement(doc,
-                                               XMLTags.METADATA_VISUALIZATION.getXMLName(),
-                                               job.getVisualization()));
+                                                    XMLTags.METADATA_VISUALIZATION.getXMLName(),
+                                                    job.getVisualization()));
             rootJob.appendChild(metadata);
         }
 
