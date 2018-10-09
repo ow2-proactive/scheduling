@@ -130,10 +130,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 import com.google.common.io.Closer;
 
@@ -1223,8 +1220,21 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Job getJobContent(JobId jobId) {
-        throw new UnsupportedOperationException();
+    public Job getJobContent(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException,
+            JobCreationException, SubmissionClosedException {
+        try {
+            restApi().getJobContent(sid, jobId.value());
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (UnknownJobRestException e) {
+            throw new UnknownJobException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        } catch (SubmissionClosedRestException e) {
+            throw new SubmissionClosedException(e);
+        } catch (JobCreationRestException e) {
+            throw new JobCreationException(e);
+        }
     }
 
     @Override
