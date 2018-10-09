@@ -103,10 +103,6 @@ public class StaxJobFactory extends JobFactory {
 
     private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
-    private static final String PA_CATALOG_REST_URL = PASchedulerProperties.CATALOG_REST_URL.getValueAsString();
-
-    private static final String PA_SCHEDULER_REST_URL = PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString();
-
     public static final String MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES = "Unable to instanciate job validation factories";
 
     private enum ScriptType {
@@ -1743,8 +1739,10 @@ public class StaxJobFactory extends JobFactory {
         }
 
         // Include useful "global" scheduler variables
-        replacements.put(SchedulerVars.PA_CATALOG_REST_URL.toString(), PA_CATALOG_REST_URL);
-        replacements.put(SchedulerVars.PA_SCHEDULER_REST_URL.toString(), PA_SCHEDULER_REST_URL);
+        replacements.put(SchedulerVars.PA_CATALOG_REST_URL.toString(),
+                         PASchedulerProperties.CATALOG_REST_URL.getValueAsString());
+        replacements.put(SchedulerVars.PA_SCHEDULER_REST_URL.toString(),
+                         PASchedulerProperties.SCHEDULER_REST_URL.getValueAsString());
 
         // Include given variables if any
         if (variables != null) {
