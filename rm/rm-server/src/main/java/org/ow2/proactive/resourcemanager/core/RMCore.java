@@ -1798,6 +1798,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                         if (rmnode.isToRemove()) {
                             removeNodeFromCoreAndSource(rmnode, caller);
                             nodesReleased.add(node);
+                            if (delayedNodeSourceRemovalEvents.containsKey(rmnode.getNodeSourceName()) &&
+                                nodeSourceCanBeRemoved(rmnode.getNodeSourceName())) {
+
+                                final RMNodeSourceEvent removedEvent = delayedNodeSourceRemovalEvents.remove(rmnode.getNodeSourceName());
+
+                                logger.info(NODE_SOURCE_STRING + rmnode.getNodeSourceName() +
+                                            " has been successfully " + removedEvent.getEventType().getDescription());
+
+                                this.monitoring.nodeSourceEvent(removedEvent);
+                            }
                         } else {
                             internalSetFree(rmnode);
                             nodesReleased.add(node);
@@ -2060,6 +2070,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(true);
     }
 
+    private Map<String, RMNodeSourceEvent> delayedNodeSourceRemovalEvents = new HashMap<>();
+
     private void emitRemovedEventIfNodeSourceWasNotUndeployed(NodeSource nodeSource,
             NodeSourceStatus nodeSourceStatus) {
 
@@ -2075,11 +2087,22 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                    nodeSourceAdministratorName,
                                                                    nodeSourceStatus.toString());
 
-            logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
-                        removedEvent.getEventType().getDescription());
+            if (nodeSourceCanBeRemoved(nodeSourceName)) {
 
-            this.monitoring.nodeSourceEvent(removedEvent);
+                logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
+                            removedEvent.getEventType().getDescription());
+
+                this.monitoring.nodeSourceEvent(removedEvent);
+            } else {
+                delayedNodeSourceRemovalEvents.put(nodeSourceName, removedEvent);
+                // postpone node source removal event
+            }
+
         }
+    }
+
+    private boolean nodeSourceCanBeRemoved(String nodeSourceName) {
+        return allNodes.values().stream().noneMatch(rmNode -> rmNode.getNodeSourceName().equals(nodeSourceName));
     }
 
     private void disconnectNodeSourceClient(String nodeSourceName, NodeSource nodeSource) {
