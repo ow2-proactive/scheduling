@@ -77,6 +77,8 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -133,7 +135,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
+import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -1158,6 +1162,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
         try (InputStream ips = new BufferedInputStream(new FileInputStream(jobHtml))) {
             return new String(IOUtils.toByteArray(ips));
+        }
+    }
+
+    @Override
+    @GET
+    @Path("jobs/{jobid}/xml")
+    @Produces("application/xml")
+    public InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
+            SubmissionClosedRestException, JobCreationRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/xml");
+            final Job jobContent = s.getJobContent(JobIdImpl.makeJobId(jobId));
+            return new Job2XMLTransformer().jobToxml((TaskFlowJob) jobContent);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (SubmissionClosedException e) {
+            throw new SubmissionClosedRestException(e);
+        } catch (JobCreationException e) {
+            throw new JobCreationRestException(e);
+        } catch (TransformerException | ParserConfigurationException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -3610,31 +3640,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
-    }
-
-    @POST
-    @Path("jobs")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public JobIdData copyAndResubmitWithGeneralInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("jobid")
-    final String jobId, Map<String, String> generalInformation) throws NotConnectedRestException,
-            PermissionRestException, UnknownJobRestException, JobCreationRestException, SubmissionClosedRestException {
-
-        final Scheduler s = checkAccess(sessionId, "POST jobs?jobid=" + jobId);
-        try {
-            s.copyJobAndResubmitWithGeneralInfo(JobIdImpl.makeJobId(jobId), generalInformation);
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
-        } catch (UnknownJobException e) {
-            throw new UnknownJobRestException(e);
-        } catch (PermissionException e) {
-            throw new PermissionRestException(e);
-        } catch (SubmissionClosedException e) {
-            throw new SubmissionClosedRestException(e);
-        } catch (JobCreationException e) {
-            throw new JobCreationRestException(e);
-        }
-        return null;
     }
 
     @GET

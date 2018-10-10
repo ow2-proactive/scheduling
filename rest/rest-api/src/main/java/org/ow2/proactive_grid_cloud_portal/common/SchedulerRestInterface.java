@@ -530,7 +530,14 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/html")
     @Produces("application/json;charset=utf-8")
     String getJobHtml(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-            throws IOException, NotConnectedRestException;
+            throws IOException, NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    @GET
+    @Path("jobs/{jobid}/xml")
+    @Produces("application/xml")
+    InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
+            SubmissionClosedRestException, JobCreationRestException;
 
     /**
      * Returns a list of taskState
@@ -1927,26 +1934,6 @@ public interface SchedulerRestInterface {
     final String sessionId, @PathParam("jobid")
     final String jobId, @PathParam("startAt")
     final String startAt) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
-
-    /**
-     * 
-     * @param sessionId
-     * @param jobId
-     * @param generalInformation
-     * @return
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     * @throws UnknownJobRestException
-     * @throws JobCreationRestException
-     * @throws SubmissionClosedRestException
-     */
-    @POST
-    @Path("jobs")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public JobIdData copyAndResubmitWithGeneralInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("jobid")
-    final String jobId, Map<String, String> generalInformation) throws NotConnectedRestException,
-            PermissionRestException, UnknownJobRestException, JobCreationRestException, SubmissionClosedRestException;
 
     /**
      * Get portal configuration properties

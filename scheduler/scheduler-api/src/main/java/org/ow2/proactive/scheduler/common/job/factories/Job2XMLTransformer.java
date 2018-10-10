@@ -95,8 +95,6 @@ public class Job2XMLTransformer {
 
     private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
-    public static final String XSD_LOCATION = "urn:proactive:jobdescriptor:dev ../../src/scheduler/src/org/ow2/proactive/scheduler/common/xml/schemas/jobdescriptor/dev/schedulerjob.xsd";
-
     public Job2XMLTransformer() {
 
     }
@@ -175,7 +173,11 @@ public class Job2XMLTransformer {
         Element rootJob = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), "job");
 
         // ********** attributes ***********
-        rootJob.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation", XSD_LOCATION);
+        rootJob.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
+                               "xsi:schemaLocation",
+                               Schemas.SCHEMA_LATEST.getNamespace() +
+                                                     " http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/" +
+                                                     Schemas.SCHEMA_LATEST.getVersion() + "/schedulerjob.xsd");
         setAttribute(rootJob, XMLAttributes.JOB_PROJECT_NAME, job.getProjectName(), true);
         setAttribute(rootJob, XMLAttributes.JOB_PRIORITY, job.getPriority().toString());
         if (job.getOnTaskErrorProperty().isSet()) {
@@ -204,7 +206,7 @@ public class Job2XMLTransformer {
 
         // <ref name="jobDescription"/>
         if (job.getDescription() != null) {
-            Element descrNode = createElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), job.getDescription());
+            Element descrNode = createCDataElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), job.getDescription());
             rootJob.appendChild(descrNode);
         }
 
@@ -254,6 +256,14 @@ public class Job2XMLTransformer {
         Element taskFlow = createTaskFlowElement(doc, job);
         rootJob.appendChild(taskFlow);
 
+        if (job.getVisualization() != null) {
+            final Element metadata = createElement(doc, XMLTags.METADATA.getXMLName(), null);
+            metadata.appendChild(createCDataElement(doc,
+                                                    XMLTags.METADATA_VISUALIZATION.getXMLName(),
+                                                    job.getVisualization()));
+            rootJob.appendChild(metadata);
+        }
+
         return rootJob;
     }
 
@@ -268,6 +278,18 @@ public class Job2XMLTransformer {
         }
         if (elementText != null) {
             Text text = doc.createTextNode(elementText);
+            el.appendChild(text);
+        }
+        return el;
+    }
+
+    private Element createCDataElement(Document doc, String tagName, String elementText, Attribute... attribs) {
+        Element el = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), tagName);
+        for (Attribute a : attribs) {
+            el.setAttribute(a.getName(), a.getValue());
+        }
+        if (elementText != null) {
+            Text text = doc.createCDATASection(elementText);
             el.appendChild(text);
         }
         return el;
@@ -443,7 +465,7 @@ public class Job2XMLTransformer {
 
         // <ref name="taskDescription"/>
         if (task.getDescription() != null) {
-            Element descrNode = createElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), task.getDescription());
+            Element descrNode = createCDataElement(doc, XMLTags.COMMON_DESCRIPTION.getXMLName(), task.getDescription());
             taskE.appendChild(descrNode);
         }
 
