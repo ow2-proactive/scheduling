@@ -187,6 +187,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     public static final String REQUESTED_BY_STRING = " requested by ";
 
+    public static final String HAS_BEEN_SUCCESSFULLY = " has been successfully ";
+
     /**
      * Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
      * Explanation: This software can be licensed to a certain amount of nodes.
@@ -1809,8 +1811,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
                                 final RMNodeSourceEvent removedEvent = delayedNodeSourceRemovalEvents.remove(rmnode.getNodeSourceName());
 
-                                logger.info(NODE_SOURCE_STRING + rmnode.getNodeSourceName() +
-                                            " has been successfully " + removedEvent.getEventType().getDescription());
+                                logger.info(NODE_SOURCE_STRING + rmnode.getNodeSourceName() + HAS_BEEN_SUCCESSFULLY +
+                                            removedEvent.getEventType().getDescription());
 
                                 this.monitoring.nodeSourceEvent(removedEvent);
                             }
@@ -2066,8 +2068,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.disconnectNodeSourceClient(nodeSourceName, nodeSource);
 
-        logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
-                    evt.getEventType().getDescription());
+        logger.info(NODE_SOURCE_STRING + nodeSourceName + HAS_BEEN_SUCCESSFULLY + evt.getEventType().getDescription());
 
         this.monitoring.nodeSourceEvent(evt);
 
@@ -2093,7 +2094,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
             if (nodeSourceCanBeRemoved(nodeSourceName)) {
 
-                logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
+                logger.info(NODE_SOURCE_STRING + nodeSourceName + HAS_BEEN_SUCCESSFULLY +
                             removedEvent.getEventType().getDescription());
 
                 this.monitoring.nodeSourceEvent(removedEvent);
