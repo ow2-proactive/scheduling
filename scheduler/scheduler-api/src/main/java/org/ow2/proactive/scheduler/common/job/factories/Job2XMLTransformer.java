@@ -175,7 +175,9 @@ public class Job2XMLTransformer {
         // ********** attributes ***********
         rootJob.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
                                "xsi:schemaLocation",
-                               Schemas.SCHEMA_LATEST.getLocation());
+                               Schemas.SCHEMA_LATEST.getNamespace() +
+                                                     " http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/" +
+                                                     Schemas.SCHEMA_LATEST.getVersion() + "/schedulerjob.xsd");
         setAttribute(rootJob, XMLAttributes.JOB_PROJECT_NAME, job.getProjectName(), true);
         setAttribute(rootJob, XMLAttributes.JOB_PRIORITY, job.getPriority().toString());
         if (job.getOnTaskErrorProperty().isSet()) {
