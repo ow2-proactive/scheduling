@@ -1331,7 +1331,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             try {
                 jobsInfoList.add(this.getJobInfo(jobId));
             } catch (UnknownJobException e) {
-                logger.warn("The job with job ID " + jobId + "couldn't be found", e);
+                logger.warn("The job with job ID " + jobId + " couldn't be found");
             }
         }
         return jobsInfoList;
