@@ -1209,20 +1209,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
-            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
-            JobCreationException {
-        try {
-            JobIdData id = restApi().copyAndResubmitWithGeneralInfo(sid, jobId.value(), generalInfo);
-
-            return id == null ? null : DataUtility.jobId(id);
-        } catch (Exception e) {
-            throwNCEOrPEOrSCEOrJCE(e);
-        }
-        return null;
-    }
-
-    @Override
     public Job getJobContent(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException,
             JobCreationException, SubmissionClosedException {
         File tempFile = null;

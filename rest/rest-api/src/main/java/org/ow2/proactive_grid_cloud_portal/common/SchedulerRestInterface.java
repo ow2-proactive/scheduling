@@ -1936,26 +1936,6 @@ public interface SchedulerRestInterface {
     final String startAt) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
-     * 
-     * @param sessionId
-     * @param jobId
-     * @param generalInformation
-     * @return
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     * @throws UnknownJobRestException
-     * @throws JobCreationRestException
-     * @throws SubmissionClosedRestException
-     */
-    @POST
-    @Path("jobs")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public JobIdData copyAndResubmitWithGeneralInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("jobid")
-    final String jobId, Map<String, String> generalInformation) throws NotConnectedRestException,
-            PermissionRestException, UnknownJobRestException, JobCreationRestException, SubmissionClosedRestException;
-
-    /**
      * Get portal configuration properties
      * @param sessionId
      * @return

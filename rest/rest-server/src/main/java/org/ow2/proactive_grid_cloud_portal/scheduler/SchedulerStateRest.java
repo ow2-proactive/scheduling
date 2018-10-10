@@ -3642,31 +3642,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @POST
-    @Path("jobs")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public JobIdData copyAndResubmitWithGeneralInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("jobid")
-    final String jobId, Map<String, String> generalInformation) throws NotConnectedRestException,
-            PermissionRestException, UnknownJobRestException, JobCreationRestException, SubmissionClosedRestException {
-
-        final Scheduler s = checkAccess(sessionId, "POST jobs?jobid=" + jobId);
-        try {
-            s.copyJobAndResubmitWithGeneralInfo(JobIdImpl.makeJobId(jobId), generalInformation);
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
-        } catch (UnknownJobException e) {
-            throw new UnknownJobRestException(e);
-        } catch (PermissionException e) {
-            throw new PermissionRestException(e);
-        } catch (SubmissionClosedException e) {
-            throw new SubmissionClosedRestException(e);
-        } catch (JobCreationException e) {
-            throw new JobCreationRestException(e);
-        }
-        return null;
-    }
-
     @GET
     @Override
     @Path("configuration/portal")
