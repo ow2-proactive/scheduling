@@ -219,6 +219,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     private RMMonitoringImpl monitoring;
 
     /**
+     * stores delayed NodeSource removal events. Used when NodeSource has some toBeRemoved nodes.
+     * In this case, we postpone NodeSource removal event until last node was removed.
+     */
+    private Map<String, RMNodeSourceEvent> delayedNodeSourceRemovalEvents = new HashMap<>();
+
+    /**
      * authentication active object
      */
     private RMAuthenticationImpl authentication;
@@ -2070,8 +2076,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(true);
     }
 
-    private Map<String, RMNodeSourceEvent> delayedNodeSourceRemovalEvents = new HashMap<>();
-
     private void emitRemovedEventIfNodeSourceWasNotUndeployed(NodeSource nodeSource,
             NodeSourceStatus nodeSourceStatus) {
 
@@ -2567,7 +2571,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Node Source name cannot be empty");
         }
         if (this.definedNodeSources.containsKey(nodeSourceName) ||
-            this.deployedNodeSources.containsKey(nodeSourceName)) {
+            this.deployedNodeSources.containsKey(nodeSourceName) ||
+            this.delayedNodeSourceRemovalEvents.containsKey(nodeSourceName)) {
             throw new IllegalArgumentException("Node Source name " + nodeSourceName + " already exist");
         }
         Pattern pattern = Pattern.compile("[^-\\w]");//letters,digits,_and-
