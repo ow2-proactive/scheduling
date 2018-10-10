@@ -95,8 +95,6 @@ public class Job2XMLTransformer {
 
     private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
-    private static final String XSD_LOCATION = "urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd";
-
     public Job2XMLTransformer() {
 
     }
@@ -175,7 +173,9 @@ public class Job2XMLTransformer {
         Element rootJob = doc.createElementNS(Schemas.SCHEMA_LATEST.getNamespace(), "job");
 
         // ********** attributes ***********
-        rootJob.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:schemaLocation", XSD_LOCATION);
+        rootJob.setAttributeNS("http://www.w3.org/2001/XMLSchema-instance",
+                               "xsi:schemaLocation",
+                               Schemas.SCHEMA_LATEST.getLocation());
         setAttribute(rootJob, XMLAttributes.JOB_PROJECT_NAME, job.getProjectName(), true);
         setAttribute(rootJob, XMLAttributes.JOB_PRIORITY, job.getPriority().toString());
         if (job.getOnTaskErrorProperty().isSet()) {
