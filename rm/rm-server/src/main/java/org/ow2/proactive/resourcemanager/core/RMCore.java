@@ -224,7 +224,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * stores delayed NodeSource removal events. Used when NodeSource has some toBeRemoved nodes.
      * In this case, we postpone NodeSource removal event until last node was removed.
      */
-    private Map<String, RMNodeSourceEvent> delayedNodeSourceRemovalEvents = new HashMap<>();
+    private Map<String, RMNodeSourceEvent> delayedNodeSourceRemovalEvents = new ConcurrentHashMap<>();
 
     /**
      * authentication active object
@@ -337,6 +337,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.deployedNodeSources = new HashMap<>();
         this.definedNodeSources = new HashMap<>();
         this.allNodes = new ConcurrentHashMap<>();
+        this.delayedNodeSourceRemovalEvents = new ConcurrentHashMap<>();
         this.eligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
 
         this.accountsManager = new RMAccountsManager();
