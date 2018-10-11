@@ -25,23 +25,36 @@
  */
 package functionaltests.nodesource;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.utils.OperatingSystem;
+import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.SSHInfrastructureV2;
-import org.ow2.proactive.resourcemanager.nodesource.policy.RestartDownNodesPolicy;
+import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 
 import functionaltests.monitor.RMMonitorsHandler;
 import functionaltests.utils.RMFunctionalTest;
 import functionaltests.utils.RMTHelper;
 
 
-public class TestSSHInfrastructureV2InfiniteRetry extends RMFunctionalTest {
+public class TestNodeSourceThreadPool extends RMFunctionalTest {
 
-    private static final String NODE_SOURCE_NAME = TestSSHInfrastructureV2InfiniteRetry.class.getSimpleName();
+    private static final String CONFIG_FILE_PATH = "/functionaltests/config/functionalTRMProperties-RM-small-node-source-thread-pool.ini";
+
+    private static final String NODE_SOURCE_NAME = TestNodeSourceThreadPool.class.getSimpleName();
+
+    private static final String FAKE_HOST_FOR_DEPLOYMENT_FAILURE = "10.2.3.4";
+
+    private static final int DOWN_NODE_DETECTION_TIMEOUT = 30000; // 30 seconds
 
     private static final int ONE_NODE_PER_HOST = 1;
 
@@ -52,17 +65,20 @@ public class TestSSHInfrastructureV2InfiniteRetry extends RMFunctionalTest {
     @Before
     public void setup() throws Exception {
         TestSSHInfrastructureV2.startSSHServer();
+        String rmconf = new File(RMTHelper.class.getResource(CONFIG_FILE_PATH).toURI()).getAbsolutePath();
+        this.rmHelper.startRM(rmconf);
+        this.resourceManager = this.rmHelper.getResourceManager();
     }
 
     @Test
-    public void testSSHInfrastructureV2WithRestartDownNodes() throws Exception {
+    public void testDownNodesCanStillBeDetectedWhenDeploymentThreadsAreExhausted() throws Exception {
 
         this.resourceManager = this.rmHelper.getResourceManager();
 
         this.resourceManager.defineNodeSource(NODE_SOURCE_NAME,
                                               SSHInfrastructureV2.class.getName(),
                                               getInfiniteRetryInfrastructureParameters(),
-                                              RestartDownNodesPolicy.class.getName(),
+                                              StaticPolicy.class.getName(),
                                               TestSSHInfrastructureV2.policyParameters,
                                               NODES_NOT_RECOVERABLE);
         this.resourceManager.deployNodeSource(NODE_SOURCE_NAME);
@@ -77,17 +93,15 @@ public class TestSSHInfrastructureV2InfiniteRetry extends RMFunctionalTest {
         String freeNodeUrl = this.resourceManager.getState().getFreeNodes().iterator().next();
         RMTHelper.killRuntime(freeNodeUrl);
 
-        RMTHelper.log("Waiting for the RM to detect the down node");
-        while (this.resourceManager.getState().getFreeNodesNumber() != 0) {
-            Thread.sleep(500);
-        }
-        RMTHelper.log("The RM has detected the down node");
+        RMMonitorsHandler monitor = this.rmHelper.getMonitorsHandler();
+        monitor.flushEvents();
+        RMTHelper.log("Waiting for the RM to detect the node down");
+        RMNodeEvent nodeEvent = RMTHelper.waitForNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                           freeNodeUrl,
+                                                           DOWN_NODE_DETECTION_TIMEOUT,
+                                                           monitor);
 
-        RMTHelper.log("Waiting for the down node to be redeployed by the policy");
-        while (this.resourceManager.getState().getFreeNodesNumber() != ONE_NODE_PER_HOST) {
-            Thread.sleep(500);
-        }
-        RMTHelper.log("The down node has been redeployed by the policy");
+        assertEquals(NodeState.DOWN, nodeEvent.getNodeState());
     }
 
     private Object[] getInfiniteRetryInfrastructureParameters() {
@@ -106,9 +120,8 @@ public class TestSSHInfrastructureV2InfiniteRetry extends RMFunctionalTest {
     }
 
     private byte[] getHostsFileContent() {
-        return ("localhost " + ONE_NODE_PER_HOST + "\n10.2.3.4 " + ONE_NODE_PER_HOST + "\n10.2.3.5 " +
-                ONE_NODE_PER_HOST + "\n10.2.3.6 " + ONE_NODE_PER_HOST + "\n10.2.3.7 " + ONE_NODE_PER_HOST +
-                "\n10.2.3.8 " + ONE_NODE_PER_HOST).getBytes();
+        return ("localhost " + ONE_NODE_PER_HOST + "\n" + FAKE_HOST_FOR_DEPLOYMENT_FAILURE + " " + ONE_NODE_PER_HOST +
+                "\n").getBytes();
     }
 
     @After
