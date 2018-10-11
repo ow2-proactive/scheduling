@@ -161,7 +161,7 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     RM_SCHEDULER_AWARE_POLICY_NODESOURCE_RECOVERY_TRIAL_NUMBER("pa.rm.scheduler.aware.policy.nodesource.recovery.trial.number", PropertyType.INTEGER, "10"),
 
     /** Max number of threads in node source for parallel task execution */
-    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PropertyType.INTEGER, "50"),
+    RM_NODESOURCE_MAX_THREAD_NUMBER("pa.rm.nodesource.maxthreadnumber", PropertyType.INTEGER, "75"),
 
     /** The full class name of the policy selected nodes */
     RM_SELECTION_POLICY("pa.rm.selection.policy", PropertyType.STRING, "org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy"),
