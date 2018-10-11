@@ -191,6 +191,14 @@ public class TestSSHInfrastructureV2 extends RMFunctionalTest {
 
     }
 
+    protected static int getPort() {
+        return port;
+    }
+
+    protected static String getJavaPath() {
+        return javaExePath;
+    }
+
     @AfterClass
     public static void stopSSHServer() throws Exception {
         if (sshd != null) {
