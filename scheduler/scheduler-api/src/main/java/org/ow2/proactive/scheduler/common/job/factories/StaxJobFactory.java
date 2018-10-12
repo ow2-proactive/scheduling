@@ -387,12 +387,16 @@ public class StaxJobFactory extends JobFactory {
                                               .putAll(createJobVariables(cursorJob, replacementVariables));
 
                     } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
-                        // We need to resolve job generic infos using the job submission generic infos with the resolved variables
-                        Map<String, String> resolvedJobVariablesWithReplacementGenericInfos = commonPropertiesHolder.getVariablesAsReplacementMap();
-                        resolvedJobVariablesWithReplacementGenericInfos.putAll(commonPropertiesHolder.getGenericInformation());
+                        // Resolve the generic infos in the xml with the resolved variables
+                        Map<String, String> resolvedJobVariables = commonPropertiesHolder.getVariablesAsReplacementMap();
+                        Map<String, String> resolvedGenericInformationDefinedInWorkflow = getGenericInformation(cursorJob,
+                                                                                                                resolvedJobVariables);
+                        // Then add/replace the resolved generic infos in the xml with the job submission ones
+                        Map<String, String> submittedGenericInformation = commonPropertiesHolder.getGenericInformation();
+                        resolvedGenericInformationDefinedInWorkflow.putAll(submittedGenericInformation);
+                        // And set them to the temporary job
+                        commonPropertiesHolder.setGenericInformation(resolvedGenericInformationDefinedInWorkflow);
 
-                        commonPropertiesHolder.addGenericInformations(getGenericInformation(cursorJob,
-                                                                                            resolvedJobVariablesWithReplacementGenericInfos));
                     } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
                         logger.warn("Element " + XMLTags.JOB_CLASSPATHES.getXMLName() +
                                     " is no longer supported. Please define a " +

@@ -14,6 +14,7 @@
     <description>UpdateVariablesTestJob</description>
     <genericInformation>
         <info name="job_generic_info" value="${job_generic_info}"/>
+        <info name="job_generic_info_novar" value="value_job_generic_info_novar"/>
     </genericInformation>
     <taskFlow>
         <task name="task1" preciousResult="true">
