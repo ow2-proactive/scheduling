@@ -306,7 +306,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     protected void startNodeImplWithRetries(final HostTracker hostTracker, final int nbNodes, int retries)
             throws RMException {
-        while (true) {
+        while (!isShutDown()) {
             final List<String> depNodeURLs = new ArrayList<>(nbNodes);
             try {
                 startNodeImpl(hostTracker, nbNodes, depNodeURLs);

@@ -187,6 +187,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     public static final String REQUESTED_BY_STRING = " requested by ";
 
+    public static final String HAS_BEEN_SUCCESSFULLY = " has been successfully ";
+
     /**
      * Limits the number of nodes the Resource Manager accepts. >-1 or null means UNLIMITED, <=0 enforces the limit.
      * Explanation: This software can be licensed to a certain amount of nodes.
@@ -217,6 +219,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * stub of RMMonitoring active object of the RM
      */
     private RMMonitoringImpl monitoring;
+
+    /**
+     * stores delayed NodeSource removal events. Used when NodeSource has some toBeRemoved nodes.
+     * In this case, we postpone NodeSource removal event until last node was removed.
+     */
+    private Map<String, RMNodeSourceEvent> delayedNodeSourceRemovalEvents = new ConcurrentHashMap<>();
 
     /**
      * authentication active object
@@ -329,6 +337,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         this.deployedNodeSources = new HashMap<>();
         this.definedNodeSources = new HashMap<>();
         this.allNodes = new ConcurrentHashMap<>();
+        this.delayedNodeSourceRemovalEvents = new ConcurrentHashMap<>();
         this.eligibleNodes = Collections.synchronizedList(new ArrayList<RMNode>());
 
         this.accountsManager = new RMAccountsManager();
@@ -1798,6 +1807,16 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                         if (rmnode.isToRemove()) {
                             removeNodeFromCoreAndSource(rmnode, caller);
                             nodesReleased.add(node);
+                            if (delayedNodeSourceRemovalEvents.containsKey(rmnode.getNodeSourceName()) &&
+                                nodeSourceCanBeRemoved(rmnode.getNodeSourceName())) {
+
+                                final RMNodeSourceEvent removedEvent = delayedNodeSourceRemovalEvents.remove(rmnode.getNodeSourceName());
+
+                                logger.info(NODE_SOURCE_STRING + rmnode.getNodeSourceName() + HAS_BEEN_SUCCESSFULLY +
+                                            removedEvent.getEventType().getDescription());
+
+                                this.monitoring.nodeSourceEvent(removedEvent);
+                            }
                         } else {
                             internalSetFree(rmnode);
                             nodesReleased.add(node);
@@ -2050,8 +2069,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         this.disconnectNodeSourceClient(nodeSourceName, nodeSource);
 
-        logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
-                    evt.getEventType().getDescription());
+        logger.info(NODE_SOURCE_STRING + nodeSourceName + HAS_BEEN_SUCCESSFULLY + evt.getEventType().getDescription());
 
         this.monitoring.nodeSourceEvent(evt);
 
@@ -2075,11 +2093,22 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                    nodeSourceAdministratorName,
                                                                    nodeSourceStatus.toString());
 
-            logger.info(NODE_SOURCE_STRING + nodeSourceName + " has been successfully " +
-                        removedEvent.getEventType().getDescription());
+            if (nodeSourceCanBeRemoved(nodeSourceName)) {
 
-            this.monitoring.nodeSourceEvent(removedEvent);
+                logger.info(NODE_SOURCE_STRING + nodeSourceName + HAS_BEEN_SUCCESSFULLY +
+                            removedEvent.getEventType().getDescription());
+
+                this.monitoring.nodeSourceEvent(removedEvent);
+            } else {
+                delayedNodeSourceRemovalEvents.put(nodeSourceName, removedEvent);
+                // postpone node source removal event
+            }
+
         }
+    }
+
+    private boolean nodeSourceCanBeRemoved(String nodeSourceName) {
+        return allNodes.values().stream().noneMatch(rmNode -> rmNode.getNodeSourceName().equals(nodeSourceName));
     }
 
     private void disconnectNodeSourceClient(String nodeSourceName, NodeSource nodeSource) {
@@ -2544,7 +2573,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Node Source name cannot be empty");
         }
         if (this.definedNodeSources.containsKey(nodeSourceName) ||
-            this.deployedNodeSources.containsKey(nodeSourceName)) {
+            this.deployedNodeSources.containsKey(nodeSourceName) ||
+            this.delayedNodeSourceRemovalEvents.containsKey(nodeSourceName)) {
             throw new IllegalArgumentException("Node Source name " + nodeSourceName + " already exist");
         }
         Pattern pattern = Pattern.compile("[^-\\w]");//letters,digits,_and-

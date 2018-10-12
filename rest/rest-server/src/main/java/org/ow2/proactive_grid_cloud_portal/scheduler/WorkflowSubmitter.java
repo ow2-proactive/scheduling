@@ -80,9 +80,9 @@ public class WorkflowSubmitter {
             JobId jobId = scheduler.submit(job);
             // Create Job's SVG visualization file
             String visualization = job.getVisualization();
+            File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId.value()) + ".html");
+            Files.deleteIfExists(visualizationFile.toPath());
             if (visualization != null && !visualization.isEmpty()) {
-                File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId.value()) + ".html");
-                Files.deleteIfExists(visualizationFile.toPath());
                 FileUtils.write(new File(visualizationFile.getAbsolutePath()),
                                 job.getVisualization(),
                                 Charset.forName(FILE_ENCODING));

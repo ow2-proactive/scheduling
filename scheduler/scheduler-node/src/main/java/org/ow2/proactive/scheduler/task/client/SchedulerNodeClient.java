@@ -626,11 +626,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
-            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+    public Job getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException, JobCreationException,
+            NotConnectedException, PermissionException {
         renewSession();
-        return client.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+        return client.getJobContent(jobId);
     }
 
     @Override

@@ -55,7 +55,6 @@ import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
-import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -111,6 +110,10 @@ public class NodeSource implements InitActive, RunActive {
     public static final int INTERNAL_POOL = 0;
 
     public static final int EXTERNAL_POOL = 1;
+
+    public static final int PINGER_POOL = 2;
+
+    public static final int NUMBER_OF_THREAD_POOLS = 3;
 
     /** unique name of the source */
     private final String name;
@@ -171,12 +174,14 @@ public class NodeSource implements InitActive, RunActive {
     static {
         try {
             int maxThreads = PAResourceManagerProperties.RM_NODESOURCE_MAX_THREAD_NUMBER.getValueAsInt();
-            if (maxThreads < 2) {
-                maxThreads = 2;
+            if (maxThreads < NUMBER_OF_THREAD_POOLS) {
+                maxThreads = NUMBER_OF_THREAD_POOLS;
             }
 
             // executor service initialization
-            NodeSource.threadPoolHolder = new ThreadPoolHolder(new int[] { maxThreads / 2, maxThreads / 2 });
+            NodeSource.threadPoolHolder = new ThreadPoolHolder(new int[] { maxThreads / NUMBER_OF_THREAD_POOLS,
+                                                                           maxThreads / NUMBER_OF_THREAD_POOLS,
+                                                                           maxThreads / NUMBER_OF_THREAD_POOLS });
         } catch (Exception e) {
             logger.error("Could not initialize threadPoolHolder", e);
         }
@@ -888,20 +893,18 @@ public class NodeSource implements InitActive, RunActive {
      * If the node is dead sends the request to the node source.
      */
     public void pingNode(final Node node) {
-        executeInParallel(new Runnable() {
-            public void run() {
-                String nodeName = node.getNodeInformation().getName();
-                String nodeUrl = node.getNodeInformation().getURL();
+        NodeSource.threadPoolHolder.execute(PINGER_POOL, () -> {
+            String nodeName = node.getNodeInformation().getName();
+            String nodeUrl = node.getNodeInformation().getURL();
 
-                try {
-                    node.getNumberOfActiveObjects();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Node " + nodeUrl + " is alive");
-                    }
-                } catch (Throwable t) {
-                    logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
-                    stub.detectedPingedDownNode(nodeName, nodeUrl);
+            try {
+                node.getNumberOfActiveObjects();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Node " + nodeUrl + " is alive");
                 }
+            } catch (Throwable t) {
+                logger.warn("Error occurred when trying to ping node " + nodeUrl, t);
+                stub.detectedPingedDownNode(nodeName, nodeUrl);
             }
         });
     }

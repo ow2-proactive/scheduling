@@ -113,9 +113,9 @@ public class JobContent implements Serializable {
             byte[] deCompressed = ByteCompressionUtils.decompress(jobContentAsByteArray);
             return SerializationUtils.deserialize(deCompressed);
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Could not load job content for Job " + jobId + " : " + e.getMessage());
+            return null;
         }
-        return SerializationUtils.deserialize(jobContentAsByteArray);
     }
 
     public void setInitJobContent(Job job) {

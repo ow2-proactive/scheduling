@@ -94,6 +94,8 @@ public class TransactionHelper {
         for (int i = 0; i <= maximumNumberOfRetries; i++) {
             try {
                 return tryExecuteTransaction(sessionWork, readWriteTransaction, readOnlyEntities);
+            } catch (DatabaseManagerException | IllegalArgumentException e) {
+                throw e;
             } catch (Throwable exception) {
                 lastException = exception;
 
