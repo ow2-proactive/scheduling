@@ -176,22 +176,24 @@ public abstract class EntryPoint {
 
     private void writeError(ApplicationContext currentContext, String errorMsg, Throwable cause,
             boolean isDebugModeEnabled) {
-        PrintWriter writer = new PrintWriter(currentContext.getDevice().getWriter(), true);
-        writer.printf("%s", errorMsg);
 
-        if (cause != null) {
-            if (cause.getMessage() != null) {
-                writer.printf("%n%nError message: %s%n", cause.getMessage());
-            }
+        try (PrintWriter writer = new PrintWriter(currentContext.getDevice().getWriter(), true)) {
+            writer.printf("%s", errorMsg);
 
-            if (isDebugModeEnabled) {
-                if (cause instanceof CLIException && ((CLIException) cause).stackTrace() != null) {
-                    writer.printf("%nStack trace: %s%n", ((CLIException) cause).stackTrace());
-                } else {
-                    writer.printf("%nStack trace: %s%n", getStackTraceAsString(cause));
+            if (cause != null) {
+                if (cause.getMessage() != null) {
+                    writer.printf("%n%nError message: %s%n", cause.getMessage());
                 }
-            } else {
-                writeDebugModeUsageWithBreakEndLine(currentContext);
+
+                if (isDebugModeEnabled) {
+                    if (cause instanceof CLIException && ((CLIException) cause).stackTrace() != null) {
+                        writer.printf("%nStack trace: %s%n", ((CLIException) cause).stackTrace());
+                    } else {
+                        writer.printf("%nStack trace: %s%n", getStackTraceAsString(cause));
+                    }
+                } else {
+                    writeDebugModeUsageWithBreakEndLine(currentContext);
+                }
             }
         }
     }

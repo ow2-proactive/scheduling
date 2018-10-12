@@ -61,7 +61,7 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements Co
                                                                     CommandSet.INTERACTIVE_COMMANDS,
                                                                     CommandSet.Entry.class));
         } catch (IOException e) {
-            e.printStackTrace();
+            handleError("An error occurred while initializing the console:", e, currentContext);
         }
         currentContext.setDevice(console);
         currentContext.setProperty(IMODE, true);
@@ -81,7 +81,7 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements Co
                 }
                 engine.eval(command);
             } catch (ScriptException se) {
-                handleError(String.format("An error occurred while executing the script:"), se, currentContext);
+                handleError("An error occurred while executing the script:", se, currentContext);
             }
         }
     }
