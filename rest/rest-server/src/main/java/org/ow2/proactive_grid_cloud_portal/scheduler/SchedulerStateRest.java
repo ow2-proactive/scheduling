@@ -162,8 +162,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private final WorkflowVariablesTransformer workflowVariablesTransformer = new WorkflowVariablesTransformer();
 
-    private final ValidationUtil jobValidator = new ValidationUtil();
-
     /**
      * Returns the ids of the current jobs under a list of string.
      *
@@ -3303,7 +3301,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
             }
 
-            return jobValidator.validateJobDescriptor(tmpFile, jobVariables);
+            return ValidationUtil.validateJobDescriptor(tmpFile, jobVariables);
         } catch (IOException e) {
             JobValidationData validation = new JobValidationData();
             validation.setErrorMessage("Cannot read from the job validation request.");
@@ -3332,7 +3330,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
             }
 
-            return jobValidator.validateJobDescriptor(tmpWorkflowFile, jobVariables);
+            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables);
 
         } catch (JobCreationRestException | IOException e) {
             JobValidationData validation = new JobValidationData();

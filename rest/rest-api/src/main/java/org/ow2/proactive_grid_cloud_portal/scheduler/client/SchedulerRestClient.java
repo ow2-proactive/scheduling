@@ -435,7 +435,7 @@ public class SchedulerRestClient {
     }
 
     private JobIdData submit(String sessionId, InputStream job, MediaType mediaType, Map<String, String> variables,
-            Map<String, String> genericInfos) throws Exception {
+            Map<String, String> genericInfos) throws NotConnectedRestException {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
 
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
