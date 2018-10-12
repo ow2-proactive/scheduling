@@ -113,7 +113,12 @@ public class SchedulerRestClient {
     }
 
     public JobIdData submitXml(String sessionId, InputStream jobXml, Map<String, String> variables) throws Exception {
-        return submit(sessionId, jobXml, MediaType.APPLICATION_XML_TYPE, variables);
+        return submit(sessionId, jobXml, MediaType.APPLICATION_XML_TYPE, variables, null);
+    }
+
+    public JobIdData submitXml(String sessionId, InputStream jobXml, Map<String, String> variables,
+            Map<String, String> genericInfos) throws Exception {
+        return submit(sessionId, jobXml, MediaType.APPLICATION_XML_TYPE, variables, genericInfos);
     }
 
     public JobIdData submitJobArchive(String sessionId, InputStream jobArchive) throws Exception {
@@ -122,7 +127,7 @@ public class SchedulerRestClient {
 
     public JobIdData submitJobArchive(String sessionId, InputStream jobArchive, Map<String, String> variables)
             throws Exception {
-        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE, variables);
+        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE, variables, null);
     }
 
     public boolean pushFile(String sessionId, String space, String path, String fileName, InputStream fileContent)
@@ -429,17 +434,26 @@ public class SchedulerRestClient {
         }
     }
 
-    private JobIdData submit(String sessionId, InputStream job, MediaType mediaType, Map<String, String> variables)
-            throws Exception {
+    private JobIdData submit(String sessionId, InputStream job, MediaType mediaType, Map<String, String> variables,
+            Map<String, String> genericInfos) throws Exception {
         String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/submit";
 
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
                                                            .providerFactory(providerFactory)
                                                            .build();
         ResteasyWebTarget target = client.target(uriTmpl);
+
+        // Variables
         if (variables != null) {
             for (String key : variables.keySet()) {
                 target = target.matrixParam(key, variables.get(key));
+            }
+        }
+
+        // Generic infos
+        if (genericInfos != null) {
+            for (String key : genericInfos.keySet()) {
+                target = target.queryParam(key, genericInfos.get(key));
             }
         }
 

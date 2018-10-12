@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.scheduler;
+package org.ow2.proactive_grid_cloud_portal.scheduler.util;
 
 /*
  * ################################################################
@@ -94,7 +94,7 @@ public class ValidationUtil {
         JobValidationData data = new JobValidationData();
         try {
             JobFactory factory = JobFactory.getFactory();
-            Job job = factory.createJob(jobFilePath, jobVariables);
+            Job job = factory.createJob(jobFilePath, jobVariables, null);
 
             if (job instanceof TaskFlowJob) {
                 validateJob((TaskFlowJob) job, data);

@@ -133,6 +133,47 @@ public interface ISchedulerClient extends Scheduler {
      * precious result.
      * <p>
      *
+     * @param job a job provided as a url
+     * @param variables job variables to use during the job execution
+     * @return the generated new job ID.
+     * @throws NotConnectedException
+     * @throws JobCreationException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     */
+    JobId submit(URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
+     * @param genericInfos map with generic informations
+     * @param job a job provided as a url
+     * @param variables job variables to use during the job execution
+     * @return the generated new job ID.
+     * @throws NotConnectedException
+     * @throws JobCreationException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     */
+    JobId submit(Map<String, String> genericInfos, URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
      * @param job       a job provided as a url
      * @param variables job variables to use during the job execution
      * @param headerParams map with request header parameters
@@ -143,6 +184,29 @@ public interface ISchedulerClient extends Scheduler {
      * @throws SubmissionClosedException
      */
     JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
+     * @param job  a job provided as a url
+     * @param variables job variables to use during the job execution
+     * @param genericInfos map with generic informations
+     * @param headerParams map with request header parameters
+     * @return the generated new job ID.
+     * @throws NotConnectedException
+     * @throws JobCreationException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     */
+    JobId submit(URL job, Map<String, String> variables, Map<String, String> genericInfos,
+            Map<String, String> headerParams)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
@@ -174,15 +238,16 @@ public interface ISchedulerClient extends Scheduler {
      * precious result.
      * <p>
      *
-     * @param job       a job provided as a url
+     * @param job a job provided as a local File
      * @param variables job variables to use during the job execution
+     * @param genericInfos map with generic informations
      * @return the generated new job ID.
      * @throws NotConnectedException
      * @throws JobCreationException
      * @throws PermissionException
      * @throws SubmissionClosedException
      */
-    JobId submit(URL job, Map<String, String> variables)
+    JobId submit(File job, Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
@@ -206,6 +271,30 @@ public interface ISchedulerClient extends Scheduler {
      */
     JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
             Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
+
+    /**
+     * Submit a new job to the scheduler from the catalogRestURL with provided variables.
+     * <p>
+     * It will execute the tasks of the jobs as soon as resources are available.
+     * The job will be considered as finished once every tasks have finished
+     * (error or success). Thus, user could get the job result according to the
+     * precious result.
+     * <p>
+     *
+     * @param catalogRestURL
+     * @param bucketName
+     * @param workflowName
+     * @param variables
+     * @param genericInfos map with generic informations
+     * @return
+     * @throws NotConnectedException
+     * @throws PermissionException
+     * @throws SubmissionClosedException
+     * @throws JobCreationException
+     */
+    JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
+            Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
