@@ -46,9 +46,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractLoginCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
-import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
-
-import com.google.common.collect.ObjectArrays;
 
 
 public abstract class EntryPoint {
@@ -139,13 +136,8 @@ public abstract class EntryPoint {
     }
 
     protected static CommandFactory getCommandFactory(ApplicationContext currentContext) throws IOException {
-        CommandFactory commandFactory;
-        AbstractDevice console;
-        commandFactory = getCommandFactory();
-        console = AbstractDevice.getConsole(AbstractDevice.JLINE);
-        ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(),
-                                                                CommandSet.INTERACTIVE_COMMANDS,
-                                                                CommandSet.Entry.class));
+        CommandFactory commandFactory = getCommandFactory();
+        AbstractDevice console = AbstractDevice.getConsole(AbstractDevice.STANDARD);
         currentContext.setDevice(console);
         return commandFactory;
     }

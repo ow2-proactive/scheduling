@@ -31,7 +31,7 @@ import java.io.Writer;
 
 public abstract class AbstractDevice {
 
-    public static final short STARDARD = 1;
+    public static final short STANDARD = 1;
 
     public static final short JLINE = 2;
 
@@ -53,7 +53,7 @@ public abstract class AbstractDevice {
 
     public static AbstractDevice getConsole(int type) throws IOException {
         switch (type) {
-            case STARDARD:
+            case STANDARD:
                 return (System.console() != null) ? new ConsoleDevice(System.console())
                                                   : new CharacterDevice(System.in, System.out);
             case JLINE:

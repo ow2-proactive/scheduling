@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -33,6 +34,12 @@ import javax.script.ScriptException;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandFactory;
+import org.ow2.proactive_grid_cloud_portal.cli.CommandSet;
+import org.ow2.proactive_grid_cloud_portal.cli.console.AbstractDevice;
+import org.ow2.proactive_grid_cloud_portal.cli.console.JLineDevice;
+
+import com.google.common.collect.ObjectArrays;
 
 
 public abstract class AbstractIModeCommand extends AbstractCommand implements Command {
@@ -46,6 +53,17 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements Co
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+        CommandFactory commandFactory = CommandFactory.getCommandFactory(CommandFactory.Type.ALL);
+        AbstractDevice console = null;
+        try {
+            console = AbstractDevice.getConsole(AbstractDevice.JLINE);
+            ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(),
+                                                                    CommandSet.INTERACTIVE_COMMANDS,
+                                                                    CommandSet.Entry.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        currentContext.setDevice(console);
         currentContext.setProperty(IMODE, true);
         ScriptEngine engine = currentContext.getEngine();
         try {
