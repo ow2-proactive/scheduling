@@ -2233,16 +2233,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             try (OutputStream outputStream = new FileOutputStream(tmpWorkflowFile)) {
                 IOUtils.write(jobXml, outputStream, Charset.forName(FILE_ENCODING));
 
-                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
+                // Get the job submission variables
+                Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
-                // Get the generic infos
-                Map genericInfos = null;
+                // Get the job submission generic infos
+                Map<String, String> genericInfos = null;
                 if (contextInfos != null)
                     genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
-                jobId = workflowSubmitter.submit(tmpWorkflowFile,
-                                                 workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment),
-                                                 genericInfos);
+                WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(s);
+                jobId = workflowSubmitter.submit(tmpWorkflowFile, jobVariables, genericInfos);
             }
 
             return mapper.map(jobId, JobIdData.class);
@@ -2331,12 +2331,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 try (OutputStream outputStream = new FileOutputStream(tmpJobFile)) {
                     IOUtils.copy(is, outputStream);
 
+                    // Get the job submission variables
                     Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
+                    // Get the job submission generic infos
+                    Map<String, String> genericInfos = null;
+                    if (contextInfos != null)
+                        genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
+
                     WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
-
-                    Map genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
-
                     jobId = workflowSubmitter.submit(tmpJobFile, jobVariables, genericInfos);
                 }
 
