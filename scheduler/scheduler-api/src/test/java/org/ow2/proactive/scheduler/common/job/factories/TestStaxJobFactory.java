@@ -117,15 +117,94 @@ public class TestStaxJobFactory {
     @Test
     public void testCreateJobShouldUseVariableMapToReplaceJobNameVariable() throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
-        variablesMap.put("job_name", "updated_job_name2");
-        Job testScriptJob = factory.createJob(jobDescriptorUri, variablesMap);
-        assertEquals("updated_job_name2", testScriptJob.getName());
+        String updatedValue = "job_name_updated_using_variables_map";
+
+        variablesMap.put("job_name", updatedValue);
+        Job testScriptJob = factory.createJob(jobDescriptorUri, variablesMap, null);
+
+        assertEquals(updatedValue, testScriptJob.getName());
+    }
+
+    @Test
+    public void testCreateJobShouldUseGenericInfosMapToOverrideJobGenericInfos() throws Exception {
+        Map<String, String> genericInfosMap = Maps.newHashMap();
+        String updatedValue = "job_generic_info_updated_using_generic_info_map";
+
+        genericInfosMap.put("job_generic_info", updatedValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, null, genericInfosMap);
+
+        assertEquals(updatedValue, testJob.getGenericInformation().get("job_generic_info"));
+    }
+
+    @Test
+    public void testCreateJobShouldUseJobVariablesToReplaceInJobGenericInfo() throws Exception {
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri);
+        assertEquals("updated_job_generic_info_value", testJob.getGenericInformation().get("job_generic_info"));
+    }
+
+    @Test
+    public void testCreateJobShouldUseVariableMapToReplaceInJobGenericInfo() throws Exception {
+        Map<String, String> variablesMap = Maps.newHashMap();
+        String updatedValue = "job_generic_info_updated_using_variables_map";
+
+        variablesMap.put("job_generic_info", updatedValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap, null);
+
+        assertEquals(updatedValue, testJob.getGenericInformation().get("job_generic_info"));
+    }
+
+    @Test
+    public void testCreateJobShouldUseVariableMapAndGenericInfoMapToReplaceInJobGenericInfo() throws Exception {
+        Map<String, String> variablesMap = Maps.newHashMap();
+        String updatedValue = "job_generic_info_updated_using_variables_map";
+        variablesMap.put("job_generic_info", updatedValue);
+
+        Map<String, String> genericInfoMap = Maps.newHashMap();
+        genericInfoMap.put("job_generic_info", "${job_generic_info}");
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap, genericInfoMap);
+
+        assertEquals(updatedValue, testJob.getGenericInformation().get("job_generic_info"));
+    }
+
+    @Test
+    public void testCreateJobShouldUseGenericInfoMapToReplaceInJobGenericInfo() throws Exception {
+        Map<String, String> variablesMap = Maps.newHashMap();
+
+        Map<String, String> genericInfoMap = Maps.newHashMap();
+        String updatedValue = "job_generic_info_novar_value";
+        genericInfoMap.put("job_generic_info_novar", updatedValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap, genericInfoMap);
+
+        assertEquals(updatedValue, testJob.getGenericInformation().get("job_generic_info_novar"));
+    }
+
+    @Test
+    public void testCreateJobShouldUseGenericInfosMapToCreateJobGenericInfoVariables() throws Exception {
+        Map<String, String> genericInfosMap = Maps.newHashMap();
+        String updatedValue = "new_job_generic_info_value";
+
+        genericInfosMap.put("new_job_generic_info", updatedValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, null, genericInfosMap);
+
+        assertEquals(updatedValue, testJob.getGenericInformation().get("new_job_generic_info"));
+    }
+
+    @Test
+    public void
+            testCreateJobShouldUseGenericInfosMapToCreateJobGenericInfoVariablesOnWorkflowsWithEmptyGenericInfoSection()
+                    throws Exception {
+        Map<String, String> genericInfosMap = Maps.newHashMap();
+        String updatedValue = "new_job_generic_info_value";
+
+        genericInfosMap.put("new_job_generic_info", updatedValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri, null, genericInfosMap);
+
+        assertEquals(updatedValue, testJob.getGenericInformation().get("new_job_generic_info"));
     }
 
     @Test
     public void testCreateJobShouldUseJobVariablesToReplaceTaskGenericInfoVariables() throws Exception {
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri);
-
         assertEquals("updated_task_generic_info_value",
                      testJob.getTask("task1").getGenericInformation().get("task_generic_info"));
     }
@@ -133,12 +212,23 @@ public class TestStaxJobFactory {
     @Test
     public void testCreateJobShouldUseVariableMapToReplaceTaskGenericInfoVariables() throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
-        variablesMap.put("task_generic_info", "updated_task_generic_info_value2");
+        String updatedValue = "task_generic_info_updated_using_variables_map";
 
-        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap);
+        variablesMap.put("task_generic_info", updatedValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap, null);
 
-        assertEquals("updated_task_generic_info_value2",
-                     testJob.getTask("task1").getGenericInformation().get("task_generic_info"));
+        assertEquals(updatedValue, testJob.getTask("task1").getGenericInformation().get("task_generic_info"));
+    }
+
+    @Test
+    public void testCreateJobShouldUseGenericInfosMapToReplaceTaskGenericInfoVariables() throws Exception {
+        Map<String, String> genericInfosMap = Maps.newHashMap();
+        String updatedValue = "task_generic_info_updated_using_generic_infos_map";
+
+        genericInfosMap.put("task_generic_info", updatedValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, null, genericInfosMap);
+
+        assertEquals(updatedValue, testJob.getTask("task1").getGenericInformation().get("task_generic_info"));
     }
 
     @Test
@@ -146,7 +236,7 @@ public class TestStaxJobFactory {
         Map<String, String> variablesMap = Maps.newHashMap();
         variablesMap.put("from_create_job_parameter", "from_create_job_parameter_value");
 
-        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap, null);
 
         assertEquals("from_create_job_parameter_value",
                      testJob.getVariables().get("from_create_job_parameter").getValue());
@@ -167,7 +257,7 @@ public class TestStaxJobFactory {
         String expectedPcaInstanceId = "42";
         String variablePcaInstanceId = "PCA_INSTANCE_ID";
         variablesMap.put(variablePcaInstanceId, expectedPcaInstanceId);
-        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri, variablesMap);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri, variablesMap, null);
         assertEquals(expectedPcaInstanceId, testJob.getVariables().get(variablePcaInstanceId).getValue());
     }
 

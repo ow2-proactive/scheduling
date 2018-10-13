@@ -105,4 +105,7 @@ public enum Schemas {
         return SCHEMAS_BY_NAMESPACE.get(namespace);
     }
 
+    public String getVersion() {
+        return namespace.substring(namespace.lastIndexOf(":") + 1);
+    }
 }

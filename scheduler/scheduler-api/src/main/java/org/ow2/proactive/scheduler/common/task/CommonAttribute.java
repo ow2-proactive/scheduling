@@ -170,7 +170,7 @@ public abstract class CommonAttribute implements Serializable {
     }
 
     /**
-     * Add an information to the generic field informations field.
+     * Add an information to the generic informations map field.
      * This information will be given to the scheduling policy.
      *
      * @param key the key in which to store the informations.
@@ -181,6 +181,20 @@ public abstract class CommonAttribute implements Serializable {
             throw new IllegalArgumentException("Key is too long, it must have 255 chars length max : " + key);
         }
         this.genericInformation.put(key, genericInformation);
+    }
+
+    /**
+     * Add a map of generic informations into the generic informations map field.
+     *
+     * @param genericInformations the generic informations map to add.
+     */
+    public void addGenericInformations(Map<String, String> genericInformations) {
+        if (genericInformations != null) {
+            Set<Entry<String, String>> entries = genericInformations.entrySet();
+            for (Entry<String, String> entry : entries) {
+                addGenericInformation(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     /**
