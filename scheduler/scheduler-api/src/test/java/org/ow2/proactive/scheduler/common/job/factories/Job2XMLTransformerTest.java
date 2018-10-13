@@ -257,4 +257,23 @@ public class Job2XMLTransformerTest {
                          recreatedJob.getTask(taskName).getWallTime());
         }
     }
+
+    @Test
+    public void checkMetadataIsPresent() throws Exception {
+        File xmlFile = tmpFolder.newFile();
+
+        String visualization = "visualization";
+
+        TaskFlowJob job = new TaskFlowJob();
+        JavaTask task = new JavaTask();
+        task.setName("task");
+        task.setExecutableClassName("oo.Bar");
+        job.setVisualization(visualization);
+        job.addTask(task);
+
+        new Job2XMLTransformer().job2xmlFile(job, xmlFile);
+        TaskFlowJob recreatedJob = (TaskFlowJob) (JobFactory.getFactory().createJob(xmlFile.getAbsolutePath()));
+
+        assertEquals(visualization, recreatedJob.getVisualization());
+    }
 }

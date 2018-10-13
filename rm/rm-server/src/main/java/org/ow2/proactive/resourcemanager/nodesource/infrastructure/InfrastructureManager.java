@@ -489,6 +489,10 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         }
     }
 
+    protected boolean isShutDown() {
+        return shutDown.get();
+    }
+
     /**
      * Called by the node source at shutdown time. First removes every
      * registered Deploying and Lost nodes and delegates the call to the

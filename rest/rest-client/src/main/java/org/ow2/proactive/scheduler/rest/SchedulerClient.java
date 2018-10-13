@@ -50,6 +50,7 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -63,6 +64,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -99,6 +101,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -130,10 +133,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskStateData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
 
 import com.google.common.io.Closer;
 
@@ -729,17 +729,17 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submit(URL job, Map<String, String> variables, Map<String, String> requestHeaderParams)
+    public JobId submit(File job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return submit(job, variables, null);
+    }
+
+    @Override
+    public JobId submit(File job, Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
-        try {
-            URLConnection urlConnection = job.openConnection();
-
-            for (Map.Entry<String, String> requestHeaderEntry : requestHeaderParams.entrySet()) {
-                urlConnection.addRequestProperty(requestHeaderEntry.getKey(), requestHeaderEntry.getValue());
-            }
-            InputStream is = urlConnection.getInputStream();
-            jobIdData = restApiClient().submitXml(sid, is, variables);
+        try (InputStream is = new FileInputStream(job)) {
+            jobIdData = restApiClient().submitXml(sid, is, variables, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
@@ -749,25 +749,40 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public JobId submit(URL job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return this.submit(job, Collections.<String, String> emptyMap(), Collections.<String, String> emptyMap());
+        return this.submit(job, null, null);
     }
 
     @Override
-    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName)
+    public JobId submit(URL job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return this.submitFromCatalog(catalogRestURL,
-                                      bucketName,
-                                      workflowName,
-                                      Collections.<String, String> emptyMap());
-
+        return this.submit(job, variables, null);
     }
 
     @Override
-    public JobId submit(File job, Map<String, String> variables)
+    public JobId submit(Map<String, String> genericInfos, URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return this.submit(job, variables, genericInfos, null);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> requestHeaderParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return submit(job, variables, null, requestHeaderParams);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> genericInfos,
+            Map<String, String> requestHeaderParams)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         JobIdData jobIdData = null;
-        try (InputStream is = new FileInputStream(job)) {
-            jobIdData = restApiClient().submitXml(sid, is, variables);
+        try {
+            URLConnection urlConnection = job.openConnection();
+
+            for (Map.Entry<String, String> requestHeaderEntry : requestHeaderParams.entrySet()) {
+                urlConnection.addRequestProperty(requestHeaderEntry.getKey(), requestHeaderEntry.getValue());
+            }
+            InputStream is = urlConnection.getInputStream();
+            jobIdData = restApiClient().submitXml(sid, is, variables, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
@@ -775,14 +790,24 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId submit(URL job, Map<String, String> variables)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return this.submit(job, variables, Collections.<String, String> emptyMap());
+        return this.submitFromCatalog(catalogRestURL, bucketName, workflowName, null);
+
     }
 
     @Override
     public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
             Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+
+        return submitFromCatalog(catalogRestURL, bucketName, workflowName, variables, null);
+
+    }
+
+    @Override
+    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
+            Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
 
         JobIdData jobIdData = null;
@@ -794,7 +819,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try (CloseableHttpClient httpclient = HttpClients.createDefault();
                 CloseableHttpResponse response = httpclient.execute(httpGet)) {
 
-            jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables);
+            jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables, genericInfos);
         } catch (Exception e) {
             throwNCEOrPEOrSCEOrJCE(e);
         }
@@ -1209,17 +1234,35 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
-            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+    public Job getJobContent(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException,
+            JobCreationException, SubmissionClosedException {
+        File tempFile = null;
         try {
-            JobIdData id = restApi().copyAndResubmitWithGeneralInfo(sid, jobId.value(), generalInfo);
-
-            return id == null ? null : DataUtility.jobId(id);
-        } catch (Exception e) {
-            throwNCEOrPEOrSCEOrJCE(e);
+            final InputStream jobContent = restApi().getJobContent(sid, jobId.value());
+            tempFile = File.createTempFile("jobContent", jobId.value());
+            FileUtils.copyInputStreamToFile(jobContent, tempFile);
+            return JobFactory.getFactory().createJob(tempFile.getPath());
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (UnknownJobRestException e) {
+            throw new UnknownJobException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        } catch (SubmissionClosedRestException e) {
+            throw new SubmissionClosedException(e);
+        } catch (JobCreationRestException e) {
+            throw new JobCreationException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (tempFile != null) {
+                try {
+                    Files.delete(tempFile.toPath());
+                } catch (IOException e) {
+                    logger.error("Cannot delete file: " + e);
+                }
+            }
         }
-        return null;
     }
 
     @Override

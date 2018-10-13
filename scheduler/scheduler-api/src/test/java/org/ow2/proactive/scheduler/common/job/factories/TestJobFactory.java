@@ -333,7 +333,8 @@ public class TestJobFactory {
                                                                                                   "priority",
                                                                                                   "high",
                                                                                                   "nb.execution",
-                                                                                                  "2")));
+                                                                                                  "2"),
+                                                                                  null));
     }
 
 }

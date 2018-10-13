@@ -72,6 +72,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
+import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -1697,7 +1698,7 @@ public class SchedulerDBManager {
         return transactionHelper.executeReadWriteTransaction(sessionWork);
     }
 
-    public <T> T executeReadWriteTransaction(SessionWork<T> sessionWork, boolean readOnlyEntities) {
+    private <T> T executeReadWriteTransaction(SessionWork<T> sessionWork, boolean readOnlyEntities) {
         return transactionHelper.executeReadWriteTransaction(sessionWork, readOnlyEntities);
     }
 
@@ -1822,8 +1823,16 @@ public class SchedulerDBManager {
             long id = jobId(jobId);
 
             Query query = session.getNamedQuery("loadJobContent").setLong("id", id);
+            if (query.uniqueResult() == null) {
+                throw new DatabaseManagerException("Invalid job id: " + jobId.value());
+            }
+
             JobContent jobContent = (JobContent) query.uniqueResult();
-            return jobContent.getInitJobContent();
+            final TaskFlowJob initJobContent = jobContent.getInitJobContent();
+            if (initJobContent == null) {
+                throw new DatabaseManagerException("Job content should not be null for job id: " + jobId.value());
+            }
+            return initJobContent;
         });
     }
 
