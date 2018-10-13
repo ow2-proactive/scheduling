@@ -44,7 +44,7 @@ import org.jose4j.lang.JoseException;
 
 public class JWTUtils {
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(JWTUtils.class.getName());
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(JWTUtils.class);
 
     private JWTUtils() {
 

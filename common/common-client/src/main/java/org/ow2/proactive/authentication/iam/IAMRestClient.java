@@ -47,10 +47,18 @@ import org.ow2.proactive.http.CommonHttpClientBuilder;
 
 public class IAMRestClient {
 
+    /**
+     * An attribute (key) used to generate SSO ticket as a JWT (Json Web Token)
+     */
     private static final String TOKEN_KEY = "token";
 
+    // The attribute value set to 'true' when SSO ticket is generated as a JWT
     private static final String TOKEN_VALUE = "true";
 
+    /**
+     * Pattern used to extract SSO ticket generated as a TGT (Ticket-Granting-Ticket)
+     * Example: TGT-1-cS39DsDtjIXUV4-zVF23dYys5GpfSIGPmWU7vdA8tzM0aI7FB4H52EG6BLPADMik3zA-activeeon
+     */
     private static final Pattern pattern = Pattern.compile("(TGT-\\d+-\\S+)");
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());

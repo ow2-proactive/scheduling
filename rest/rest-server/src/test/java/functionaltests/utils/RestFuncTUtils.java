@@ -25,8 +25,6 @@
  */
 package functionaltests.utils;
 
-import static com.jayway.awaitility.Awaitility.await;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -45,8 +43,6 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-
-import com.jayway.awaitility.Duration;
 
 
 public class RestFuncTUtils {

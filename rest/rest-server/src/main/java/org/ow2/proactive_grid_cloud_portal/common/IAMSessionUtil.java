@@ -25,6 +25,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
+import java.util.AbstractMap;
+
+import org.apache.commons.configuration2.Configuration;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.ow2.proactive.authentication.iam.IAMRestClient;
@@ -41,77 +44,85 @@ public class IAMSessionUtil {
 
     private static final String CREDENTIAL_KEY = "credential";
 
-    public static final boolean IAM_IS_USED = PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString()
+    public static final Boolean IAM_IS_USED = PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString()
                                                                                           .endsWith(IAM_LOGIN_METHOD) ||
                                               PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString()
                                                                                          .endsWith(IAM_LOGIN_METHOD);
 
-    private static final String IAM_URL = IAMStarter.iamURL;
+    private Configuration config;
 
-    private static final String IAM_TICKET_REQUEST = IAMConfiguration.IAM_TICKET_REQUEST;
+    private String iamURL;
 
-    private static IAMRestClient iamRestClient = new IAMRestClient();
+    private boolean tokenSignatureEnabled;
 
-    private static boolean tokenSignatureEnabled = IAMStarter.config.getBoolean(IAMConfiguration.IAM_TOKEN_SIGNATURE_ENABLED);
+    private boolean tokenEncryptionEnabled;
 
-    private static boolean tokenEncryptionEnabled = IAMStarter.config.getBoolean(IAMConfiguration.IAM_TOKEN_ENCRYPTION_ENABLED);
+    private String tokenSignatureKey;
 
-    private static String tokenSignatureKey = IAMStarter.config.getString(IAMConfiguration.IAM_TOKEN_SIGNATURE_KEY);
+    private String tokenEncryptionKey;
 
-    private static String tokenEncryptionKey = IAMStarter.config.getString(IAMConfiguration.IAM_TOKEN_ENCRYPTION_KEY);
+    private boolean passwordCryptoEnabled;
 
-    private static boolean passwordCryptoEnabled = IAMStarter.config.getBoolean(IAMConfiguration.IAM_PASS_CRYPTO_ENABLED);
+    private String passwordSignatureKey;
 
-    private static String passwordSignatureKey = IAMStarter.config.getString(IAMConfiguration.IAM_PASS_SIGNATURE_KEY);
+    private String passwordEncryptionKey;
 
-    private static String passwordEncryptionKey = IAMStarter.config.getString(IAMConfiguration.IAM_PASS_ENCRYPTION_KEY);
+    public IAMSessionUtil() {
 
-    private IAMSessionUtil() {
+        config = IAMStarter.getConfiguration();
 
+        iamURL = IAMStarter.getIamURL();
+
+        tokenSignatureEnabled = config.getBoolean(IAMConfiguration.IAM_TOKEN_SIGNATURE_ENABLED);
+
+        tokenEncryptionEnabled = config.getBoolean(IAMConfiguration.IAM_TOKEN_ENCRYPTION_ENABLED);
+
+        tokenSignatureKey = config.getString(IAMConfiguration.IAM_TOKEN_SIGNATURE_KEY);
+
+        tokenEncryptionKey = config.getString(IAMConfiguration.IAM_TOKEN_ENCRYPTION_KEY);
+
+        passwordCryptoEnabled = config.getBoolean(IAMConfiguration.IAM_PASS_CRYPTO_ENABLED);
+
+        passwordSignatureKey = config.getString(IAMConfiguration.IAM_PASS_SIGNATURE_KEY);
+
+        passwordEncryptionKey = config.getString(IAMConfiguration.IAM_PASS_ENCRYPTION_KEY);
     }
 
-    public static String renewIAMSession(SessionStore sessionStore, String sessionId) throws MalformedClaimException {
-
-        IAMSession iamSession = (IAMSession) sessionStore.get(sessionId);
-
-        String ssoTicket = iamSession.getJwtClaims().getJwtId();
-
-        if (!iamRestClient.isSSOTicketValid(IAM_URL + IAM_TICKET_REQUEST + "/" + ssoTicket)) {
-
-            // Retrieve cyphered user password form the current IAMSession token
-            String cypheredPassword = (String) iamSession.getJwtClaims().getClaimValue(CREDENTIAL_KEY);
-
-            // Decypher user password
-            String password = JWTUtils.decypherJWT(cypheredPassword,
-                                                   passwordCryptoEnabled,
-                                                   passwordSignatureKey,
-                                                   passwordCryptoEnabled,
-                                                   passwordEncryptionKey);
-
-            // Create a new IAMSession using user credentials
-            Session newIAMSession = createNewSessionToken(iamSession.getUserName(), password, sessionStore);
-
-            // Remove the old IAMSession
-            sessionStore.terminate(sessionId);
-
-            return newIAMSession.getSessionId();
-
-        } else
-            return sessionId;
+    public boolean tokenIsValid(JwtClaims jwtClaims) {
+        try {
+            String ssoTicket = jwtClaims.getJwtId();
+            return new IAMRestClient().isSSOTicketValid(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket);
+        } catch (MalformedClaimException e) {
+            throw new IllegalStateException("SSO token contains wrong session id (jti)");
+        }
     }
 
-    public static Session createNewSessionToken(String username, String password, SessionStore sessionStore) {
+    public char[] getTokenPassword(JwtClaims jwtClaims) {
+        String cypheredPassword = (String) jwtClaims.getClaimValue(CREDENTIAL_KEY);
+        return JWTUtils.decypherJWT(cypheredPassword,
+                                    passwordCryptoEnabled,
+                                    passwordSignatureKey,
+                                    passwordCryptoEnabled,
+                                    passwordEncryptionKey)
+                       .toCharArray();
+    }
 
-        String sessionToken = iamRestClient.getSSOTicket(IAM_URL + IAM_TICKET_REQUEST, username, password, null, true);
+    public AbstractMap.SimpleEntry<String, JwtClaims> createNewSessionToken(String username, char[] password) {
+
+        String sessionToken = new IAMRestClient().getSSOTicket(iamURL + IAMConfiguration.IAM_TICKET_REQUEST,
+                                                               username,
+                                                               new String(password),
+                                                               null,
+                                                               true);
 
         JwtClaims claims = JWTUtils.parseJWT(sessionToken,
                                              tokenSignatureEnabled,
                                              tokenSignatureKey,
                                              tokenEncryptionEnabled,
                                              tokenEncryptionKey,
-                                             IAM_URL,
-                                             IAM_URL);
+                                             iamURL,
+                                             iamURL);
 
-        return sessionStore.create(sessionToken, username, claims);
+        return new AbstractMap.SimpleEntry(sessionToken, claims);
     }
 }

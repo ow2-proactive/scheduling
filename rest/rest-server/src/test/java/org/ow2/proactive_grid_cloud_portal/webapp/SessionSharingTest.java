@@ -33,21 +33,25 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.AbstractMap;
 import java.util.HashSet;
 
 import javax.ws.rs.NotFoundException;
 
+import org.jose4j.jwt.JwtClaims;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.ow2.proactive.authentication.crypto.CredData;
+import org.ow2.proactive.authentication.iam.JWTUtils;
+import org.ow2.proactive.boot.microservices.IAMStarter;
+import org.ow2.proactive.boot.microservices.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.RMStateNodeUrls;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRMProxyFactory;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.*;
 import org.ow2.proactive_grid_cloud_portal.rm.RMRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
@@ -68,6 +72,9 @@ public class SessionSharingTest {
 
     @Before
     public void setUp() throws Exception {
+
+        IAMTestUtil.setUpIAM();
+
         schedulerRest = new SchedulerStateRest();
         rmRest = new RMRest();
         studioRest = new StudioRest();
@@ -83,6 +90,7 @@ public class SessionSharingTest {
 
     @Test
     public void sessions_are_shared_scheduler_login() throws Exception {
+
         String sessionId = schedulerRest.login("login", "pw");
 
         when(rmMock.getState()).thenReturn(new RMState(new RMStateNodeUrls(new HashSet<String>(),

@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
+import java.util.AbstractMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +40,8 @@ public class SessionStore {
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
     private SchedulerRMProxyFactory schedulerRMProxyFactory = new SchedulerRMProxyFactory();
+
+    private IAMSessionUtil iamSessionUtil = new IAMSessionUtil();
 
     private Clock clock = new Clock();
 
@@ -56,10 +59,18 @@ public class SessionStore {
     }
 
     // Create an IAMSession instead of the legacy Session
-    public Session create(String sessionToken, String userName, JwtClaims jwtClaims) {
-        IAMSession iamSession = new IAMSession(sessionToken, jwtClaims, schedulerRMProxyFactory, clock);
-        iamSession.setUserName(userName);
-        sessions.put(sessionToken, iamSession);
+    public Session create(String username, char[] password) {
+
+        // Call IAM and create a new JWT
+        AbstractMap.SimpleEntry<String, JwtClaims> jwt = iamSessionUtil.createNewSessionToken(username, password);
+
+        // Create an IAMSession using the generated JWT
+        IAMSession iamSession = new IAMSession(jwt.getKey(), jwt.getValue(), schedulerRMProxyFactory, clock);
+        iamSession.setUserName(username);
+
+        // Add IAMSession to SessionStore
+        sessions.put(iamSession.getSessionId(), iamSession);
+
         return iamSession;
     }
 
@@ -79,6 +90,11 @@ public class SessionStore {
     /** For testing only */
     public void setSchedulerRMProxyFactory(SchedulerRMProxyFactory schedulerRMProxyFactory) {
         this.schedulerRMProxyFactory = schedulerRMProxyFactory;
+    }
+
+    /** For testing only */
+    public void setIamSessionUtil(IAMSessionUtil iamSessionUtil) {
+        this.iamSessionUtil = iamSessionUtil;
     }
 
     public void terminate(String sessionId) {
@@ -124,6 +140,32 @@ public class SessionStore {
 
         if (session != null) {
             session.renewSession();
+        } else {
+            throw new NotConnectedException(SchedulerStateRest.YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
+
+    public void renewIAMSession(String sessionId) throws NotConnectedException {
+
+        IAMSession iamSession = (IAMSession) get(sessionId);
+
+        if (iamSession != null) {
+            JwtClaims jwtClaims = iamSession.getJwtClaims();
+
+            // If IAMSession expires create a new IAMSession and remove the old one
+            if (!iamSessionUtil.tokenIsValid(jwtClaims)) {
+                char[] password = iamSessionUtil.getTokenPassword(jwtClaims);
+
+                // Create a new IAMSession using user credentials
+                create(iamSession.getUserName(), password);
+                sessionId = iamSession.getSessionId();
+
+                // Remove the old IAMSession
+                terminate(sessionId);
+            }
+
+            renewSession(sessionId);
+
         } else {
             throw new NotConnectedException(SchedulerStateRest.YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
         }

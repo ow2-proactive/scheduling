@@ -118,6 +118,8 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
         assertHttpStatusOK(response);
         String sessionId = assertContentNotEmpty(response);
 
+        System.out.println(sessionId);
+
         String currentUserUrl = getResourceUrl("logins/sessionid/" + sessionId);
 
         HttpGet httpGet = new HttpGet(currentUserUrl);

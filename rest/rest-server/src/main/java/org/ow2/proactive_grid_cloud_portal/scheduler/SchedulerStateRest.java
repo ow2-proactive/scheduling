@@ -45,15 +45,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.security.auth.login.LoginException;
@@ -98,8 +91,6 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jose4j.jwt.MalformedClaimException;
-import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -277,9 +268,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
-     * 
+     *
      * Check if the user has the permission to execute the method passed as argument
-     * 
+     *
      * @param sessionId
      * @param jobId
      * @param method
@@ -700,7 +691,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns job server logs
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -755,7 +746,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Kill a task within a job
-     * 
+     *
      * @param sessionId
      *            current session
      * @param jobid
@@ -791,7 +782,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Preempt a task within a job
      * <p>
      * The task will be stopped and restarted later
-     * 
+     *
      * @param sessionId
      *            current session
      * @param jobid
@@ -826,7 +817,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Restart a task within a job
-     * 
+     *
      * @param sessionId
      *            current session
      * @param jobid
@@ -896,7 +887,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Restart a pause on error task within a job
-     * 
+     *
      * @param sessionId
      *            current session
      * @param jobid
@@ -932,7 +923,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -951,7 +942,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code> with pagination
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1034,7 +1025,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code> (with pagination)
-     * 
+     *
      * @param sessionId
      *            a valid session id.
      * @param jobId
@@ -1084,7 +1075,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns a list of the tags of the tasks belonging to job
      * <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1112,7 +1103,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns a list of the tags of the tasks belonging to job
      * <code>jobId</code> and filtered by a prefix pattern
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1429,7 +1420,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * content is replaced by the string 'Unknown value type' </strong>. To get
      * the serialized form of a given result, one has to call the following
      * restful service jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1564,7 +1555,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Returns the values of a set of tasks of the job <code>jobId</code>
      * filtered by a given tag. This method returns the result as a byte array
      * whatever the result is.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1640,7 +1631,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Returns the task results of the set of task filtered by a given tag and
      * owned by the job <code>jobId</code>
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1936,7 +1927,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns task server logs
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -1969,7 +1960,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Returns server logs for a set of tasks filtered by a given tag.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId
@@ -2021,14 +2012,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
         }
 
-        if (IAMSessionUtil.IAM_IS_USED) {
-            try {
-                sessionId = IAMSessionUtil.renewIAMSession(sessionStore, sessionId);
-            } catch (MalformedClaimException e) {
-                throw new NotConnectedRestException(e);
-            }
-        }
-
         renewSession(sessionId);
 
         return schedulerProxy;
@@ -2042,7 +2025,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      */
     protected void renewSession(String sessionId) throws NotConnectedRestException {
         try {
-            sessionStore.renewSession(sessionId);
+
+            // When IAM is used, check whether IAM SSO session is still valid
+            if (IAMSessionUtil.IAM_IS_USED) {
+                sessionStore.renewIAMSession(sessionId);
+            } else {
+                sessionStore.renewSession(sessionId);
+            }
+
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST, e);
         }
@@ -2138,7 +2128,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Submit job using flat command file
-     * 
+     *
      * @param sessionId
      *            valid session id
      * @param commandFileContent
@@ -2386,7 +2376,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Pushes a file from the local file system into the given DataSpace
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param spaceName
@@ -2459,7 +2449,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * returns as an input stream In the case the path to a directory is given,
      * the input stream returned will be a text stream containing at each line
      * the content of the directory
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param spaceName
@@ -2513,7 +2503,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     /**
      * Deletes a file or recursively delete a directory from the given DataSpace
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param spaceName
@@ -2895,17 +2885,18 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("login")
     @Produces("application/json")
-    public String login(@FormParam("username") String username, @FormParam("password") String password) {
+    public String login(@FormParam("username") String username, @FormParam("password") String password)
+            throws LoginException, SchedulerRestException {
         try {
-            if ((username == null || username == "") || (password == null || password == "")) {
+            if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
                 throw new LoginException("Empty login/password");
             }
 
             Session session;
 
-            // When authentication is performed againt the IAM microservice, generate a JWT as session Id
+            // When authentication is performed against the IAM microservice, generate a JWT as session Id
             if (IAMSessionUtil.IAM_IS_USED) {
-                session = IAMSessionUtil.createNewSessionToken(username, password, sessionStore);
+                session = sessionStore.create(username, password.toCharArray());
             }
             // Legacy Session
             else {
@@ -2917,8 +2908,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return session.getSessionId();
 
-        } catch (Exception e) {
-            return "[Error] " + e.getClass() + ": " + e.getMessage();
+        } catch (ActiveObjectCreationException | SchedulerException | NodeException e) {
+            throw new SchedulerRestException(e);
         }
     }
 
@@ -3021,11 +3012,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws LoginException, KeyException, SchedulerRestException {
         try {
             Session session;
+            CredData credData;
             if (multipart.getCredential() != null) {
                 Credentials credentials;
                 try {
-                    session = sessionStore.createUnnamedSession();
                     credentials = Credentials.getCredentials(multipart.getCredential());
+                    String schedulerPrivateKey = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+                    credData = credentials.decrypt(schedulerPrivateKey);
+
+                    // When authentication is performed against the IAM microservice, generate a JWT as session Id
+                    if (IAMSessionUtil.IAM_IS_USED) {
+                        session = sessionStore.create(credData.getLogin(), credData.getPassword().toCharArray());
+                    }
+                    // Legacy Session
+                    else {
+                        session = sessionStore.createUnnamedSession();
+                    }
+
                     session.connectToScheduler(credentials);
                 } catch (IOException e) {
                     throw new LoginException(e.getMessage());
@@ -3035,11 +3038,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     throw new LoginException("empty login/password");
                 }
 
-                session = sessionStore.create(multipart.getUsername());
-                CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
-                                                 CredData.parseDomain(multipart.getUsername()),
-                                                 multipart.getPassword(),
-                                                 multipart.getSshKey());
+                String login = multipart.getUsername();
+                String password = multipart.getPassword();
+
+                // When authentication is performed against the IAM microservice, generate a JWT as session Id
+                if (IAMSessionUtil.IAM_IS_USED) {
+                    session = sessionStore.create(login, password.toCharArray());
+                }
+                // Legacy Session
+                else {
+                    session = sessionStore.create(multipart.getUsername());
+                }
+
+                credData = new CredData(CredData.parseLogin(login),
+                                        CredData.parseDomain(login),
+                                        password,
+                                        multipart.getSshKey());
                 session.connectToScheduler(credData);
             }
 
@@ -3567,6 +3581,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                    boundaries.getOffset(),
                                    boundaries.getLimit(),
                                    sortParams);
+
             List<TaskStateData> tasks = map(page.getList(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (NotConnectedException e) {
@@ -3580,7 +3595,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * Translates the tasks attributes names that are used to sort the result
      * For example the task status is called `status` client-side, it is
      * represented by `taskStatus` in the DB
-     * 
+     *
      * @param sortParams
      *            The sort parameters using the client-side namespace
      * @return the sort parameters using the DB namespace
@@ -3600,7 +3615,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     /**
      * Change the START_AT generic information at job level and reset the
      * scheduledAt at task level
-     * 
+     *
      * @param sessionId
      *            current session
      * @param jobId

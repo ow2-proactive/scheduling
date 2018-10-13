@@ -72,6 +72,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jose4j.jwt.MalformedClaimException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -95,13 +96,12 @@ import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfigurati
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.ScriptResult;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
-import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
+import org.ow2.proactive_grid_cloud_portal.common.*;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
@@ -127,17 +127,25 @@ public class RMRest implements RMRestInterface {
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
+
         Session session = sessionStore.get(sessionId);
+
         if (session == null) {
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
+
+        // When IAM is used, check whether IAM SSO session is still valid
+        if (IAMSessionUtil.IAM_IS_USED) {
+            sessionStore.renewIAMSession(sessionId);
+        }
+
         RMProxyUserInterface s = session.getRM();
 
         if (s == null) {
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
 
-        return session.getRM();
+        return s;
     }
 
     @Override
@@ -147,10 +155,19 @@ public class RMRest implements RMRestInterface {
     public String rmConnect(@FormParam("username") String username, @FormParam("password") String password)
             throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException {
 
-        Session session = sessionStore.create(username);
+        Session session;
+
+        // When authentication is performed against the IAM microservice, generate a JWT as session Id
+        if (IAMSessionUtil.IAM_IS_USED) {
+            session = sessionStore.create(username, password.toCharArray());
+        }
+        // Legacy Session
+        else {
+            session = sessionStore.create(username);
+        }
+
         session.connectToRM(new CredData(CredData.parseLogin(username), CredData.parseDomain(username), password));
         return session.getSessionId();
-
     }
 
     @Override
@@ -178,18 +195,42 @@ public class RMRest implements RMRestInterface {
             NodeException, KeyException, IOException, LoginException, RMException {
 
         Session session;
+        CredData credData;
         if (multipart.getCredential() != null) {
-            session = sessionStore.createUnnamedSession();
-            Credentials credentials = Credentials.getCredentials(multipart.getCredential());
-            session.connectToRM(credentials);
-        } else {
-            session = sessionStore.create(multipart.getUsername());
-            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
-                                             CredData.parseDomain(multipart.getUsername()),
-                                             multipart.getPassword(),
-                                             multipart.getSshKey());
-            session.connectToRM(credData);
+            Credentials credentials;
+            try {
+                credentials = Credentials.getCredentials(multipart.getCredential());
+                String schedulerPrivateKey = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+                credData = credentials.decrypt(schedulerPrivateKey);
 
+                // When authentication is performed against the IAM microservice, generate a JWT as session Id
+                if (IAMSessionUtil.IAM_IS_USED) {
+                    session = sessionStore.create(credData.getLogin(), credData.getPassword().toCharArray());
+                }
+                // Legacy Session
+                else {
+                    session = sessionStore.createUnnamedSession();
+                }
+
+                session.connectToRM(credentials);
+
+            } catch (IOException e) {
+                throw new LoginException(e.getMessage());
+            }
+        } else {
+            // When authentication is performed against the IAM microservice, generate a JWT as session Id
+            if (IAMSessionUtil.IAM_IS_USED) {
+                session = sessionStore.create(multipart.getUsername(), multipart.getPassword().toCharArray());
+
+            } else {
+                session = sessionStore.create(multipart.getUsername());
+            }
+
+            credData = new CredData(CredData.parseLogin(multipart.getUsername()),
+                                    CredData.parseDomain(multipart.getUsername()),
+                                    multipart.getPassword(),
+                                    multipart.getSshKey());
+            session.connectToRM(credData);
         }
 
         return session.getSessionId();

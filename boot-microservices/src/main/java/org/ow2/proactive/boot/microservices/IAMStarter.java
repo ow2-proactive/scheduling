@@ -54,9 +54,9 @@ public class IAMStarter {
 
     private static boolean started = false;
 
-    public static Configuration config = new BaseConfiguration();
+    private static Configuration config = new BaseConfiguration();
 
-    public static String iamURL;
+    private static String iamURL;
 
     private IAMStarter() {
 
@@ -288,4 +288,13 @@ public class IAMStarter {
         iamURL = IAMConfiguration.IAM_PROTOCOL + config.getString(IAMConfiguration.IAM_HOST) + ":" +
                  config.getString(IAMConfiguration.IAM_PORT) + config.getString(IAMConfiguration.IAM_CONTEXT);
     }
+
+    public static String getIamURL() {
+        return iamURL;
+    }
+
+    public static Configuration getConfiguration() {
+        return config;
+    }
+
 }
