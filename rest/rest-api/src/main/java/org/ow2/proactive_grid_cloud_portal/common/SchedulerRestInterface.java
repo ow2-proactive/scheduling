@@ -48,8 +48,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -1231,6 +1233,8 @@ public interface SchedulerRestInterface {
      * 
      * @param sessionId
      *            a valid session id
+     * @param pathSegment
+     *            variables of the workflow
      * @param multipart
      *            a form with the job file as form data
      * @return the <code>jobid</code> of the newly created job
@@ -1242,6 +1246,27 @@ public interface SchedulerRestInterface {
     JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
+     * Submits a job to the scheduler
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param pathSegment
+     *            variables of the workflow
+     * @param multipart
+     *            a form with the job file as form data
+     * @param contextInfos
+     *            the context informations (generic parameters,..)
+     * @return the <code>jobid</code> of the newly created job
+     */
+    @POST
+    @Path("{path:submit}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            MultipartFormDataInput multipart, @Context UriInfo contextInfos) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
      * submit a planned workflow
@@ -1287,6 +1312,32 @@ public interface SchedulerRestInterface {
     JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
             @PathParam("path") PathSegment pathSegment) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
+     * Submits a workflow to the scheduler from a workflow URL, creating hence a
+     * new job resource.
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param url
+     *            url to the workflow content
+     * @param pathSegment
+     *            variables of the workflow
+     * @param contextInfos
+     *            the context informations (generic parameters,..)
+     * @return the <code>jobid</code> of the newly created job
+     * @throws NotConnectedRestException
+     * @throws IOException
+     * @throws JobCreationRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     */
+    @POST
+    @Path("jobs")
+    @Produces("application/json")
+    JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
+            @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
      * Pushes a file from the local file system into the given DataSpace
