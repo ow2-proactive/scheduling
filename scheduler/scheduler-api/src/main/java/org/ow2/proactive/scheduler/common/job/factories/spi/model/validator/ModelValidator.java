@@ -30,6 +30,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CRONParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CatalogObjectParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DateTimeParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DoubleParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.FloatParserValidator;
@@ -77,6 +78,7 @@ public class ModelValidator implements Validator<String> {
      * Returns a registered parser validator based on the model syntax.
      * If no implementation is found of the provided model, returns null
      * as this model might be handled by a different module.
+     *
      * @return a registered model parser or null if no registered parser could be found.
      * @throws ModelSyntaxException if an error occurred during the parser creation
      */
@@ -112,6 +114,8 @@ public class ModelValidator implements Validator<String> {
                 return new CRONParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(SPELParserValidator.SPEL_TYPE)) {
                 return new SPELParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(CatalogObjectParserValidator.CATALOG_OBJECT_TYPE)) {
+                return new CatalogObjectParserValidator(removePrefix(model));
             } else {
                 throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
             }
