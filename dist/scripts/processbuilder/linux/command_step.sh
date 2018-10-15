@@ -19,7 +19,6 @@ OSPL_E_CAUSE="CAUSE";
 OSLP_PACKAGE="org.objectweb.proactive.extensions.processbuilder.exception."
 #---------------
 
-
 trap "echo trapped signal" SIGTERM
 
 token=$1
@@ -80,8 +79,12 @@ fi;
 
 if [ -e "$cmd_path" ]; then
   if [ -x "$cmd_path" ]; then
+    # load the user default environment
+    if [ -f "$HOME/.bashrc" ]; then
+        source "$HOME/.bashrc"
+    fi
 
-    # load the environment variables
+    # load the custom environment variables
     set -a
     source $tmpenv
     rm $tmpenv 2> /dev/null

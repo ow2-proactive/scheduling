@@ -149,11 +149,15 @@ public class TestJobSchedulingStarvationAndPriority extends SchedulerFunctionalT
 
         String jobDescriptorPath = new File(jobDescriptor.toURI()).getAbsolutePath();
 
-        Job jobHigh = JobFactory.getFactory().createJob(jobDescriptorPath, ImmutableMap.of("RUNS", "" + nbRunsHigh));
+        Job jobHigh = JobFactory.getFactory().createJob(jobDescriptorPath,
+                                                        ImmutableMap.of("RUNS", "" + nbRunsHigh),
+                                                        null);
         jobHigh.setPriority(JobPriority.HIGH);
         JobId jobIdHigh = schedulerHelper.submitJob(jobHigh);
         schedulerHelper.waitForEventTaskRunning(jobIdHigh, REPLICATE_TASK_NAME);
-        Job jobLow = JobFactory.getFactory().createJob(jobDescriptorPath, ImmutableMap.of("RUNS", "" + nbRunsLow));
+        Job jobLow = JobFactory.getFactory().createJob(jobDescriptorPath,
+                                                       ImmutableMap.of("RUNS", "" + nbRunsLow),
+                                                       null);
         jobLow.setPriority(JobPriority.LOW);
         JobId jobIdLow = schedulerHelper.submitJob(jobLow);
 

@@ -128,6 +128,12 @@ public class ModelValidatorTest {
                                 ModelFromURLParserValidator.class);
     }
 
+    @Test
+    public void testModelValidatorCatalogObject() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + CatalogObjectParserValidator.CATALOG_OBJECT_TYPE,
+                                CatalogObjectParserValidator.class);
+    }
+
     public void createAndCheckValidator(String model, Class expectedClass) throws ModelSyntaxException {
         ModelValidator validator = new ModelValidator(model);
         Assert.assertEquals(expectedClass, validator.createParserValidator().getClass());
