@@ -96,8 +96,7 @@ public class TaskResultCreator {
     }
 
     private Map<String, byte[]> getPropagatedVariables(SchedulerDBManager dbManager,
-            EligibleTaskDescriptor eligibleTaskDescriptor, InternalJob job, InternalTask task)
-            throws UnknownTaskException {
+            EligibleTaskDescriptor eligibleTaskDescriptor, InternalJob job, InternalTask task) {
 
         Map<String, byte[]> variables = new HashMap<>();
 

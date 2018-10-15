@@ -41,6 +41,8 @@ public class JobResultData {
 
     private Map<String, TaskResultData> preciousResults;
 
+    private Map<String, TaskResultData> jobResults;
+
     private Map<String, TaskResultData> exceptionResults;
 
     public JobIdData getId() {
@@ -87,5 +89,13 @@ public class JobResultData {
     public String toString() {
         return "JobResultData{" + "id=" + id + ", allResults=" + allResults + ", preciousResults=" + preciousResults +
                ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
+    }
+
+    public void setJobResults(Map<String, TaskResultData> jobResults) {
+        this.jobResults = jobResults;
+    }
+
+    public Map<String, TaskResultData> getJobResults() {
+        return jobResults;
     }
 }

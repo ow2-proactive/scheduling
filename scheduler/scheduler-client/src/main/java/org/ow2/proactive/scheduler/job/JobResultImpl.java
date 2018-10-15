@@ -57,6 +57,9 @@ public class JobResultImpl implements JobResult {
     /** List of precious results */
     private Map<String, TaskResult> preciousResults = null;
 
+    /** Map of jobResults which merged in the end of the job */
+    private Map<String, TaskResult> jobResults = null;
+
     /** Info of the job at the end */
     private JobInfo jobInfo;
 
@@ -110,6 +113,8 @@ public class JobResultImpl implements JobResult {
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
         //add to all Results
         allResults.put(taskName, taskResult);
+
+        jobResults.putAll(taskResult.getJobResult());
         //add to precious results if needed
         if (isPrecious) {
             preciousResults.put(taskName, taskResult);
@@ -166,6 +171,11 @@ public class JobResultImpl implements JobResult {
      */
     public Map<String, TaskResult> getPreciousResults() {
         return preciousResults;
+    }
+
+    @Override
+    public Map<String, TaskResult> getJobResults() {
+        return jobResults;
     }
 
     /**

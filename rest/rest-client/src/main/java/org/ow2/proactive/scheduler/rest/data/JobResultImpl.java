@@ -30,6 +30,7 @@ import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -54,6 +55,8 @@ public class JobResultImpl implements JobResult {
 
     private Map<String, TaskResult> preciousResults;
 
+    private Map<String, TaskResult> jobResults = null;
+
     private Map<String, TaskResult> exceptionResults;
 
     JobResultImpl(JobResultData data) {
@@ -62,16 +65,15 @@ public class JobResultImpl implements JobResult {
         allResults = createTaskResultMap(data.getAllResults());
         preciousResults = createTaskResultMap(data.getPreciousResults());
         exceptionResults = createTaskResultMap(data.getExceptionResults());
+        jobResults = createTaskResultMap(data.getJobResults());
         jobInfo = data.getJobInfo();
     }
 
     private Map<String, TaskResult> createTaskResultMap(Map<String, TaskResultData> inputDataMap) {
-        Map<String, TaskResult> map = new HashMap<>();
-        for (String taskName : inputDataMap.keySet()) {
-            TaskResultData taskResultData = inputDataMap.get(taskName);
-            map.put(taskName, toTaskResult(jobId, taskResultData));
-        }
-        return map;
+        return inputDataMap.entrySet()
+                           .stream()
+                           .collect(Collectors.toMap(Map.Entry::getKey,
+                                                     entry -> toTaskResult(jobId, entry.getValue())));
     }
 
     @Override
@@ -102,6 +104,11 @@ public class JobResultImpl implements JobResult {
     @Override
     public Map<String, TaskResult> getPreciousResults() {
         return preciousResults;
+    }
+
+    @Override
+    public Map<String, TaskResult> getJobResults() {
+        return jobResults;
     }
 
     @Override

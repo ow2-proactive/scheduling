@@ -139,4 +139,5 @@ public interface TaskResult extends Serializable {
      */
     boolean isRaw();
 
+    Map<String, TaskResult> getJobResult();
 }

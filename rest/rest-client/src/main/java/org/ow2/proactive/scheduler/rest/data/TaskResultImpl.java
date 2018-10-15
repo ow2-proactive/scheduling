@@ -57,6 +57,8 @@ public class TaskResultImpl implements TaskResult {
 
     private Map<String, byte[]> propagatedVariables;
 
+    private Map<String, TaskResult> jobResults = new HashMap<>();
+
     private Map<String, String> metadata = new HashMap<>();
 
     private boolean isRaw;
@@ -117,6 +119,11 @@ public class TaskResultImpl implements TaskResult {
     @Override
     public boolean isRaw() {
         return isRaw;
+    }
+
+    @Override
+    public Map<String, TaskResult> getJobResult() {
+        return jobResults;
     }
 
     @Override
