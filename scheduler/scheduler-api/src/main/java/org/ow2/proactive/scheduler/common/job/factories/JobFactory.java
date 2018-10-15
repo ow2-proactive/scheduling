@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
@@ -156,5 +157,13 @@ public abstract class JobFactory {
      */
     public abstract Job createJob(URI filePath, Map<String, String> variables, Map<String, String> genericInfos)
             throws JobCreationException;
+
+    /**
+     * @see #createJob(String)
+     */
+    public abstract Job createJob(InputStream workflowStream) throws JobCreationException;
+
+    public abstract Job createJob(InputStream workflowStream, Map<String, String> variables,
+            Map<String, String> genericInfos) throws JobCreationException;
 
 }
