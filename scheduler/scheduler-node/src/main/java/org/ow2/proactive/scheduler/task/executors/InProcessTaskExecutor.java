@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.task.executors;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
@@ -37,6 +38,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
 
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
@@ -209,10 +214,26 @@ public class InProcessTaskExecutor implements TaskExecutor {
         if (taskContext.getPreScript() != null) {
             Script<?> script = taskContext.getPreScript();
             forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, error);
-            ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
-            if (preScriptResult.errorOccured()) {
-                throw new TaskException("Failed to execute pre script: " + preScriptResult.getException().getMessage(),
-                                        preScriptResult.getException());
+            Map<String, String> genericInfo = taskContext.getInitializer().getGenericInformation();
+            if (genericInfo != null && genericInfo.containsKey("PRE_SCRIPT_AS_FILE")) {
+                String path = genericInfo.get("PRE_SCRIPT_AS_FILE");
+                ScriptEngineFactory factory = new ScriptEngineManager().getEngineByName(script.getEngineName())
+                                                                       .getFactory();
+                String extension = factory.getExtensions().get(0);
+                String code = script.fetchScript().trim();
+                try (FileWriter fw = new FileWriter(new File(path + "." + extension))) {
+                    fw.write(code);
+                    fw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
+                if (preScriptResult.errorOccured()) {
+                    throw new TaskException("Failed to execute pre script: " +
+                                            preScriptResult.getException().getMessage(),
+                                            preScriptResult.getException());
+                }
             }
         }
 
