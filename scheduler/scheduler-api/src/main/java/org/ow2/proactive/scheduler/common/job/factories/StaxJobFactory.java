@@ -49,6 +49,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
@@ -160,6 +161,27 @@ public class StaxJobFactory extends JobFactory {
             Map<String, String> replacementGenericInfos) throws JobCreationException {
         try {
             return createJob(new File(filePath), replacementVariables, replacementGenericInfos);
+        } catch (JobCreationException jce) {
+            throw jce;
+        } catch (Exception e) {
+            throw new JobCreationException(e);
+        }
+    }
+
+    @Override
+    public Job createJob(InputStream workflowStream) throws JobCreationException {
+        return createJob(workflowStream, null, null);
+    }
+
+    @Override
+    public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos) throws JobCreationException {
+        try {
+            File temporaryJobContentFile = File.createTempFile("jobContent" +
+                                                               workflowStream.toString().replaceAll("\\W+", ""),
+                                                               ".tmp");
+            FileUtils.copyInputStreamToFile(workflowStream, temporaryJobContentFile);
+            return createJob(temporaryJobContentFile, replacementVariables, replacementGenericInfos);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
