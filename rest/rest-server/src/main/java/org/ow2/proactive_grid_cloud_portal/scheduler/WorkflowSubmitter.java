@@ -66,17 +66,19 @@ public class WorkflowSubmitter {
      * It also creates a job visualization HTML file.
      *
      * @param workflowFile a workflow file (XML or archive)
-     * @param variables    variables to be replaced on submission
+     * @param variables variables to be replaced on submission
+     * @param genericInfos generic informations to be replaced on submission
      * @return job ID of the job created for the specified workflow and associated variables.
      * @throws JobCreationRestException
      * @throws NotConnectedRestException
      * @throws PermissionRestException
      * @throws SubmissionClosedRestException
      */
-    public JobId submit(File workflowFile, Map<String, String> variables) throws NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, JobCreationRestException {
+    public JobId submit(File workflowFile, Map<String, String> variables, Map<String, String> genericInfos)
+            throws NotConnectedRestException, PermissionRestException, SubmissionClosedRestException,
+            JobCreationRestException {
         try {
-            Job job = createJobObject(workflowFile, variables);
+            Job job = createJobObject(workflowFile, variables, genericInfos);
             JobId jobId = scheduler.submit(job);
             // Create Job's SVG visualization file
             String visualization = job.getVisualization();
@@ -102,8 +104,9 @@ public class WorkflowSubmitter {
         }
     }
 
-    private Job createJobObject(File jobFile, Map<String, String> jobVariables) throws JobCreationException {
-        return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(), jobVariables);
+    private Job createJobObject(File jobFile, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws JobCreationException {
+        return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(), jobVariables, jobGenericInfos);
     }
 
 }

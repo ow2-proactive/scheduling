@@ -404,7 +404,7 @@ public class SchedulerTHelper {
      * @throws Exception
      */
     public JobId submitJob(String jobDescPath, Map<String, String> variables) throws Exception {
-        Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath, variables);
+        Job jobToSubmit = JobFactory.getFactory().createJob(jobDescPath, variables, null);
         Scheduler userInt = getSchedulerInterface();
         return userInt.submit(jobToSubmit);
     }

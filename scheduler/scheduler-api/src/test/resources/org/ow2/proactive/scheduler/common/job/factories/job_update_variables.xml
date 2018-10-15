@@ -4,6 +4,7 @@
     name="${job_name}" onTaskError="continueJobExecution" priority="normal">
     <variables>
         <variable name="job_name" value="updated_job_name" />
+        <variable name="job_generic_info" value="updated_job_generic_info_value" />
         <variable name="task_generic_info" value="updated_task_generic_info_value" />
         <variable name="prescript_variable" value="value_of_prescript_variable" />
         <variable name="script_variable" value="value_of_script_variable" />
@@ -11,6 +12,10 @@
         <variable name="from_create_job_parameter" value="${from_create_job_parameter}" />
     </variables>
     <description>UpdateVariablesTestJob</description>
+    <genericInformation>
+        <info name="job_generic_info" value="${job_generic_info}"/>
+        <info name="job_generic_info_novar" value="value_job_generic_info_novar"/>
+    </genericInformation>
     <taskFlow>
         <task name="task1" preciousResult="true">
             <genericInformation>

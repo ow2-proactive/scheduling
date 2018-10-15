@@ -50,6 +50,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -178,7 +179,10 @@ public class Job2XMLTransformer {
                                Schemas.SCHEMA_LATEST.getNamespace() +
                                                      " http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/" +
                                                      Schemas.SCHEMA_LATEST.getVersion() + "/schedulerjob.xsd");
-        setAttribute(rootJob, XMLAttributes.JOB_PROJECT_NAME, job.getProjectName(), true);
+
+        if (!Job.DEFAULT_PROJECT_NAME.equals(job.getProjectName())) {
+            setAttribute(rootJob, XMLAttributes.JOB_PROJECT_NAME, job.getProjectName(), true);
+        }
         setAttribute(rootJob, XMLAttributes.JOB_PRIORITY, job.getPriority().toString());
         if (job.getOnTaskErrorProperty().isSet()) {
             setAttribute(rootJob,
