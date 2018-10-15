@@ -40,13 +40,7 @@ import org.iso_relax.verifier.VerifierConfigurationException;
 import org.iso_relax.verifier.VerifierFactory;
 import org.iso_relax.verifier.VerifierHandler;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
+import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import com.sun.msv.verifier.ErrorInfo;
@@ -61,15 +55,15 @@ public class ValidationUtil {
     /**
      * Validates the job descriptor file against the specified schema.
      * 
-     * @param jobFile
-     *            the job descriptor file
+     * @param jobInputStream
+     *            the job file content as an InputStream
      * @param schemaIs
      *            the job schema
      * 
      * @throws JobCreationException
      *             if the job descriptor is invalid
      */
-    public static void validate(File jobFile, InputStream schemaIs)
+    public static void validate(InputStream jobInputStream, InputStream schemaIs)
             throws SAXException, IOException, JobCreationException {
         try {
 
@@ -84,7 +78,7 @@ public class ValidationUtil {
             ValidationErrorHandler errHandler = new ValidationErrorHandler(contentHandlerDecorator);
             verifier.setErrorHandler(errHandler);
 
-            reader.parse(jobFile.getAbsolutePath());
+            reader.parse(new InputSource(jobInputStream));
         } catch (SAXException se) {
             Throwable cause = se.getCause();
             if (cause != null && cause instanceof JobCreationException) {
