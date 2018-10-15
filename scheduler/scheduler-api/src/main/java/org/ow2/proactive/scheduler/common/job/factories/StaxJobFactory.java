@@ -49,7 +49,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
@@ -172,11 +171,7 @@ public class StaxJobFactory extends JobFactory {
     public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
         try {
-            File temporaryJobContentFile = File.createTempFile("jobContent" +
-                                                               workflowStream.toString().replaceAll("\\W+", ""),
-                                                               ".tmp");
-            FileUtils.copyInputStreamToFile(workflowStream, temporaryJobContentFile);
-            return createJob(temporaryJobContentFile, replacementVariables, replacementGenericInfos);
+            return createJobFromInputStream(workflowStream, replacementVariables, replacementGenericInfos);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -192,7 +187,7 @@ public class StaxJobFactory extends JobFactory {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
             try (InputStream inputStream = new FileInputStream(file)) {
-                return createJob(replacementVariables, replacementGenericInfos, inputStream);
+                return createJobFromInputStream(inputStream, replacementVariables, replacementGenericInfos);
             }
         } catch (JobCreationException jce) {
             jce.pushTag(XMLTags.JOB.getXMLName());
@@ -202,8 +197,8 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
-    private Job createJob(Map<String, String> replacementVariables, Map<String, String> replacementGenericInfos,
-            InputStream inputStream) throws Exception {
+    private Job createJobFromInputStream(InputStream inputStream, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos) throws Exception {
         Map<String, ArrayList<String>> dependencies = new HashMap<>();
         InputStream updatedInputStream = validate(inputStream);
         // use the server side property to accept encoding
