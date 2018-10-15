@@ -191,35 +191,37 @@ public class StaxJobFactory extends JobFactory {
             if (!file.exists()) {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
-            XMLStreamReader xmlsr;
-            Map<String, ArrayList<String>> dependencies = new HashMap<>();
-            Job job;
             try (InputStream inputStream = new FileInputStream(file)) {
-                //validate content using the proper XML schema
-                InputStream updatedInputStream = validate(inputStream);
-                // use the server side property to accept encoding
-                xmlsr = xmlInputFactory.createXMLStreamReader(updatedInputStream, FILE_ENCODING);
-
-                //Create the job starting at the first cursor position of the XML Stream reader
-                job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
-                //Close the stream
-                xmlsr.close();
+                return createJob(replacementVariables, replacementGenericInfos, inputStream);
             }
-            //make dependencies
-            makeDependences(job, dependencies);
-
-            validate((TaskFlowJob) job);
-
-            logger.debug("Job successfully created!");
-            //debug mode only
-            displayJobInfo(job);
-            return job;
         } catch (JobCreationException jce) {
             jce.pushTag(XMLTags.JOB.getXMLName());
             throw jce;
         } catch (Exception e) {
             throw new JobCreationException(e);
         }
+    }
+
+    private Job createJob(Map<String, String> replacementVariables, Map<String, String> replacementGenericInfos,
+            InputStream inputStream) throws Exception {
+        Map<String, ArrayList<String>> dependencies = new HashMap<>();
+        InputStream updatedInputStream = validate(inputStream);
+        // use the server side property to accept encoding
+        XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(updatedInputStream, FILE_ENCODING);
+
+        //Create the job starting at the first cursor position of the XML Stream reader
+        Job job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
+        //Close the stream
+        xmlsr.close();
+        //make dependencies
+        makeDependences(job, dependencies);
+
+        validate((TaskFlowJob) job);
+
+        logger.debug("Job successfully created!");
+        //debug mode only
+        displayJobInfo(job);
+        return job;
     }
 
     /*
