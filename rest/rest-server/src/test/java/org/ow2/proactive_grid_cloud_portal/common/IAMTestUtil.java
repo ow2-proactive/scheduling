@@ -69,7 +69,6 @@ public class IAMTestUtil {
         when(iamSessionUtil.tokenIsValid(Matchers.<JwtClaims> any())).thenReturn(true);
         when(iamSessionUtil.getTokenPassword(Matchers.<JwtClaims> any())).thenReturn("".toCharArray());
 
-        SessionStore sessionStore = SharedSessionStore.getInstance();
-        sessionStore.setIamSessionUtil(iamSessionUtil);
+        SharedSessionStore.getInstance().setIamSessionUtil(iamSessionUtil);
     }
 }

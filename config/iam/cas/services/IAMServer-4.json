@@ -4,6 +4,10 @@
   "name": "IAMServer",
   "id": 4,
   "description": "IAM Server URL",
-  "evaluationOrder": 2
+  "evaluationOrder": 2,
+  "attributeReleasePolicy" : {
+    "@class": "org.apereo.cas.services.ReturnMappedAttributeReleasePolicy",
+    "authorizedToReleaseCredentialPassword": false
+  }
 }
 

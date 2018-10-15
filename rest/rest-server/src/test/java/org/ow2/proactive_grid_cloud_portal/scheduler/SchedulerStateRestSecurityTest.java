@@ -36,7 +36,9 @@ import java.util.Set;
 
 import javax.ws.rs.HeaderParam;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.ow2.proactive_grid_cloud_portal.common.IAMTestUtil;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
@@ -45,9 +47,16 @@ import com.google.common.collect.ImmutableSet;
 
 public class SchedulerStateRestSecurityTest {
 
-    private final SchedulerRestInterface restInterface = new SchedulerStateRest();
-
     private final Set<String> EXCLUDED_METHODS = ImmutableSet.of("loginOrRenewSession");
+
+    private SchedulerRestInterface restInterface;
+
+    @Before
+    public void setUp() throws Exception {
+        IAMTestUtil.setUpIAM();
+
+        restInterface = new SchedulerStateRest();
+    }
 
     // call all interface's methods using reflection
     @Test
