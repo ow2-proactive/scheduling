@@ -191,15 +191,14 @@ public class StaxJobFactory extends JobFactory {
             if (!file.exists()) {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
-            //validate content using the proper XML schema
-            File updatedFile = validate(file);
-            //create and get XML STAX reader
             XMLStreamReader xmlsr;
             Map<String, ArrayList<String>> dependencies = new HashMap<>();
             Job job;
-            try (InputStream inputStream = new FileInputStream(updatedFile)) {
+            try (InputStream inputStream = new FileInputStream(file)) {
+                //validate content using the proper XML schema
+                InputStream updatedInputStream = validate(inputStream);
                 // use the server side property to accept encoding
-                xmlsr = xmlInputFactory.createXMLStreamReader(inputStream, FILE_ENCODING);
+                xmlsr = xmlInputFactory.createXMLStreamReader(updatedInputStream, FILE_ENCODING);
 
                 //Create the job starting at the first cursor position of the XML Stream reader
                 job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
@@ -226,7 +225,8 @@ public class StaxJobFactory extends JobFactory {
     /*
      * Validate the given job descriptor
      */
-    private File validate(File file) throws VerifierConfigurationException, JobCreationException {
+    private InputStream validate(InputStream jobInputStream)
+            throws VerifierConfigurationException, JobCreationException {
         Map<String, JobValidatorService> factories;
         try {
             factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
@@ -235,12 +235,12 @@ public class StaxJobFactory extends JobFactory {
             throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
         }
 
-        File updatedFile = file;
+        InputStream updatedJobInputStream = jobInputStream;
 
         try {
 
             for (JobValidatorService factory : factories.values()) {
-                updatedFile = factory.validateJob(updatedFile);
+                updatedJobInputStream = factory.validateJob(updatedJobInputStream);
             }
         } catch (JobValidationException e) {
             throw e;
@@ -248,7 +248,7 @@ public class StaxJobFactory extends JobFactory {
             throw new JobValidationException(true, e);
         }
 
-        return updatedFile;
+        return updatedJobInputStream;
     }
 
     /*

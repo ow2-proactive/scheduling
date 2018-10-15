@@ -61,18 +61,18 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
     }
 
     @Override
-    public File validateJob(File jobFile) throws JobValidationException {
+    public InputStream validateJob(InputStream jobInputStream) throws JobValidationException {
         String findSchemaByNamespaceUsed;
         try {
-            findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(jobFile);
+            findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(jobInputStream);
             InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed);
-            ValidationUtil.validate(jobFile, schemaStream);
+            ValidationUtil.validate(jobInputStream, schemaStream);
         } catch (Exception e) {
             // wrap all occurring exceptions as a schema exception
             throw new JobValidationException(true, e);
         }
 
-        return jobFile;
+        return jobInputStream;
     }
 
     @Override
@@ -81,26 +81,22 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
         return job;
     }
 
-    private String findSchemaByNamespaceUsed(File file)
+    private String findSchemaByNamespaceUsed(InputStream jobInputStream)
             throws FileNotFoundException, XMLStreamException, JobValidationException {
-        try (InputStream inputStream = new FileInputStream(file)) {
-            XMLStreamReader cursorRoot = xmlInputFactory.createXMLStreamReader(inputStream);
-            try {
-                while (cursorRoot.hasNext()) {
-                    String namespace = advanceCursorAndFindSchema(cursorRoot);
-                    if (namespace != null)
-                        return namespace;
-                }
-                return Schemas.SCHEMA_LATEST.getLocation();
-            } catch (Exception e) {
-                throw new JobValidationException(e.getMessage(), e);
-            } finally {
-                if (cursorRoot != null) {
-                    cursorRoot.close();
-                }
+        XMLStreamReader cursorRoot = xmlInputFactory.createXMLStreamReader(jobInputStream);
+        try {
+            while (cursorRoot.hasNext()) {
+                String namespace = advanceCursorAndFindSchema(cursorRoot);
+                if (namespace != null)
+                    return namespace;
             }
-        } catch (IOException e) {
+            return Schemas.SCHEMA_LATEST.getLocation();
+        } catch (Exception e) {
             throw new JobValidationException(e.getMessage(), e);
+        } finally {
+            if (cursorRoot != null) {
+                cursorRoot.close();
+            }
         }
     }
 
