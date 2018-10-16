@@ -208,12 +208,17 @@ public class StaxJobFactory extends JobFactory {
             Map<String, String> replacementGenericInfos)
             throws JobCreationException, VerifierConfigurationException, IOException, XMLStreamException {
         byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
-        validate(new ByteArrayInputStream(bytes));
+        try (ByteArrayInputStream jobInputStreamForValidation = new ByteArrayInputStream(bytes)) {
+            validate(jobInputStreamForValidation);
+        }
 
         Map<String, ArrayList<String>> dependencies = new HashMap<>();
-        XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(new ByteArrayInputStream(bytes), FILE_ENCODING);
-        Job job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
-        xmlsr.close();
+        Job job;
+        try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
+            XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
+            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
+            xmlsr.close();
+        }
 
         makeDependences(job, dependencies);
         validate((TaskFlowJob) job);

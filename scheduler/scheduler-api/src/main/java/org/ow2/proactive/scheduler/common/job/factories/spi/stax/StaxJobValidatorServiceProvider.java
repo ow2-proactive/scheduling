@@ -62,9 +62,13 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
     public void validateJob(InputStream jobInputStream) throws JobValidationException {
         try {
             byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
-            String findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(new ByteArrayInputStream(bytes));
-            InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed);
-            ValidationUtil.validate(new ByteArrayInputStream(bytes), schemaStream);
+            try (ByteArrayInputStream jobInputStreamForSchema = new ByteArrayInputStream(bytes)) {
+                String findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(jobInputStreamForSchema);
+                InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed);
+                try (ByteArrayInputStream jobInputStreamForValidation = new ByteArrayInputStream(bytes)) {
+                    ValidationUtil.validate(jobInputStreamForValidation, schemaStream);
+                }
+            }
         } catch (Exception e) {
             throw new JobValidationException(true, e);
         }

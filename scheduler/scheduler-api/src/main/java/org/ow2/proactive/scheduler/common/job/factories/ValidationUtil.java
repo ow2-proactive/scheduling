@@ -94,9 +94,11 @@ public class ValidationUtil {
     }
 
     public static byte[] getInputStreamBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        IOUtils.copy(inputStream, outputStream);
-        return outputStream.toByteArray();
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            IOUtils.copy(inputStream, outputStream);
+            outputStream.toByteArray();
+            return outputStream.toByteArray();
+        }
     }
 
     private static class ValidationErrorHandler implements ErrorHandler {
