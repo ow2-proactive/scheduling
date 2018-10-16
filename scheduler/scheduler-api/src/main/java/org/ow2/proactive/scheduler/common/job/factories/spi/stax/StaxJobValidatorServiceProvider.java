@@ -25,10 +25,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.stax;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.stream.XMLInputFactory;
@@ -61,18 +59,15 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
     }
 
     @Override
-    public InputStream validateJob(InputStream jobInputStream) throws JobValidationException {
-        String findSchemaByNamespaceUsed;
+    public void validateJob(InputStream jobInputStream) throws JobValidationException {
         try {
-            findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(jobInputStream);
+            byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
+            String findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(new ByteArrayInputStream(bytes));
             InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed);
-            ValidationUtil.validate(jobInputStream, schemaStream);
+            ValidationUtil.validate(new ByteArrayInputStream(bytes), schemaStream);
         } catch (Exception e) {
-            // wrap all occurring exceptions as a schema exception
             throw new JobValidationException(true, e);
         }
-
-        return jobInputStream;
     }
 
     @Override

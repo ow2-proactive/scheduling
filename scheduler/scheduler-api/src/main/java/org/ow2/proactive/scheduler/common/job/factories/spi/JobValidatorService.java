@@ -48,7 +48,7 @@ public interface JobValidatorService {
      * @return if the validator eventually made some modifications to the job, return a new version
      * @throws JobValidationException if the job is not valid
      */
-    InputStream validateJob(InputStream jobInputStream) throws JobValidationException;
+    void validateJob(InputStream jobInputStream) throws JobValidationException;
 
     /**
      * Validate a job object after the job has been parsed by the scheduler.

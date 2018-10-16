@@ -29,11 +29,13 @@ import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.SCRIPT_EX
 import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.TASK;
 import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.TASK_FLOW;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Stack;
 
+import org.apache.commons.io.IOUtils;
 import org.iso_relax.verifier.Schema;
 import org.iso_relax.verifier.Verifier;
 import org.iso_relax.verifier.VerifierConfigurationException;
@@ -90,6 +92,12 @@ public class ValidationUtil {
         } catch (VerifierConfigurationException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public static byte[] getInputStreamBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        IOUtils.copy(inputStream, outputStream);
+        return outputStream.toByteArray();
     }
 
     private static class ValidationErrorHandler implements ErrorHandler {

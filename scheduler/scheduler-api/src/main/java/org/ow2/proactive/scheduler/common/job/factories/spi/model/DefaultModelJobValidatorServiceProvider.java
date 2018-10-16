@@ -47,9 +47,8 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
     }
 
     @Override
-    public InputStream validateJob(InputStream jobInputStream) throws JobValidationException {
+    public void validateJob(InputStream jobInputStream) throws JobValidationException {
         // validate any job
-        return jobInputStream;
     }
 
     @Override
