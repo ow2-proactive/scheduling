@@ -537,7 +537,7 @@ public interface SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/xml")
     @Produces("application/xml")
-    InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+    String getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
             SubmissionClosedRestException, JobCreationRestException;
 

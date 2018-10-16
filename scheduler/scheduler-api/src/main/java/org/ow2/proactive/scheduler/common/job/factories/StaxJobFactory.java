@@ -33,10 +33,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,7 +52,12 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stax.StAXSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
@@ -286,7 +293,7 @@ public class StaxJobFactory extends JobFactory {
      * @throws JobCreationException if an error occurred during job creation process.
      */
     private Job createJob(XMLStreamReader cursorRoot, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos, Map<String, ArrayList<String>> dependencies)
+            Map<String, String> replacementGenericInfos, Map<String, ArrayList<String>> dependencies, String jobContent)
             throws JobCreationException {
 
         String current = null;
@@ -300,7 +307,7 @@ public class StaxJobFactory extends JobFactory {
                     current = cursorRoot.getLocalName();
                     if (XMLTags.JOB.matches(current)) {
                         //first tag of the job.
-                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos);
+                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos, jobContent);
                     } else if (XMLTags.TASK.matches(current)) {
                         //once here, the job instance has been created
                         fillJobWithTasks(cursorRoot, job, dependencies);
@@ -342,10 +349,11 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorJob          the streamReader with the cursor on the job element.
      * @param replacementVariables job submission variables map taking priority on those defined in the xml
      * @param replacementGenericInfos job submission generic infos map taking priority on those defined in the xml
+     * @param jobContent
      * @throws JobCreationException if an exception occurs during job creation.
      */
     private Job createAndFillJob(XMLStreamReader cursorJob, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos) throws JobCreationException {
+            Map<String, String> replacementGenericInfos, String jobContent) throws JobCreationException {
 
         // A temporary job
         Job commonPropertiesHolder = new Job() {
@@ -458,6 +466,13 @@ public class StaxJobFactory extends JobFactory {
                 job.setUserSpace(commonPropertiesHolder.getUserSpace());
                 job.setVariables(commonPropertiesHolder.getVariables());
                 job.setVisualization(commonPropertiesHolder.getVisualization());
+
+                String updatedJobContent = replaceVarsAndGenericInfo(jobContent,
+                                                                     commonPropertiesHolder.getVariables(),
+                                                                     commonPropertiesHolder.getGenericInformation());
+
+                job.setJobContent(updatedJobContent);
+
             }
             return job;
         } catch (JobCreationException jce) {
@@ -471,6 +486,73 @@ public class StaxJobFactory extends JobFactory {
             throw new JobCreationException(cursorJob.getLocalName(), temporaryAttribute, e);
         }
 
+    }
+
+    private String replaceVarsAndGenericInfo(String jobContent, Map<String, JobVariable> variables,
+            Map<String, String> genericInformation) {
+        final int end = jobContent.indexOf(XMLTags.TASK_FLOW.getXMLName());
+
+        String replacedJobContent = replaceTagContent(jobContent,
+                                                      XMLTags.VARIABLES,
+                                                      newVariablesContent(variables),
+                                                      end);
+        replacedJobContent = replaceTagContent(replacedJobContent,
+                                               XMLTags.COMMON_GENERIC_INFORMATION,
+                                               newGenericInfoContent(genericInformation),
+                                               end);
+
+        return replacedJobContent;
+    }
+
+    private String newGenericInfoContent(Map<String, String> genericInformation) {
+        return genericInformation.entrySet().stream().map(this::genericInfoContent).collect(Collectors.joining("\n"));
+    }
+
+    private String genericInfoContent(Map.Entry<String, String> pair) {
+        return String.format("    <%s %s=\"%s\" %s=\"%s\"/>",
+                             XMLTags.COMMON_INFO,
+                             XMLAttributes.COMMON_NAME,
+                             pair.getKey(),
+                             XMLAttributes.COMMON_VALUE,
+                             pair.getValue());
+    }
+
+    private String replaceTagContent(String jobContent, XMLTags tag, String newContent, int end) {
+        final String firstHalf = jobContent.substring(0, end);
+        final String secondHalf = jobContent.substring(end);
+
+        final int afterOpenTag = firstHalf.indexOf(tag.getOpenTag()) + tag.getOpenTag().length();
+        final int beforeCloseTag = firstHalf.indexOf(tag.getCloseTag());
+        if (afterOpenTag == -1 || beforeCloseTag == -1) {
+            return jobContent;
+        }
+
+        return firstHalf.substring(0, afterOpenTag) + "\n" + newContent + "\n  " + firstHalf.substring(beforeCloseTag) +
+               secondHalf;
+    }
+
+    private String newVariablesContent(Map<String, JobVariable> variables) {
+        return variables.values().stream().map(this::variableContent).collect(Collectors.joining("\n"));
+    }
+
+    private String variableContent(JobVariable jobVariable) {
+        if (jobVariable.getModel() != null) {
+            return String.format("    <%s %s=\"%s\" %s=\"%s\" %s=\"%s\" />",
+                                 XMLTags.VARIABLE.getXMLName(),
+                                 XMLAttributes.VARIABLE_NAME,
+                                 jobVariable.getName(),
+                                 XMLAttributes.VARIABLE_VALUE,
+                                 jobVariable.getValue(),
+                                 XMLAttributes.VARIABLE_MODEL,
+                                 jobVariable.getModel());
+        } else {
+            return String.format("    <%s %s=\"%s\" %s=\"%s\" />",
+                                 XMLTags.VARIABLE.getXMLName(),
+                                 XMLAttributes.VARIABLE_NAME,
+                                 jobVariable.getName(),
+                                 XMLAttributes.VARIABLE_VALUE,
+                                 jobVariable.getValue());
+        }
     }
 
     private void handleJobAttributes(Job commonPropertiesHolder, Map<String, String> delayedJobAttributes)

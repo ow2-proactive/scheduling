@@ -46,8 +46,6 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -84,7 +82,6 @@ import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
 import org.ow2.proactive.scheduler.common.job.factories.FlatJobFactory;
-import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
 import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
@@ -1090,13 +1087,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("jobs/{jobid}/xml")
     @Produces("application/xml")
-    public InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+    public String getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
             SubmissionClosedRestException, JobCreationRestException {
         try {
-            Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/xml");
-            final Job jobContent = s.getJobContent(JobIdImpl.makeJobId(jobId));
-            return new Job2XMLTransformer().jobToxml((TaskFlowJob) jobContent);
+            Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/xml");
+            return scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (UnknownJobException e) {
@@ -1107,8 +1103,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new SubmissionClosedRestException(e);
         } catch (JobCreationException e) {
             throw new JobCreationRestException(e);
-        } catch (TransformerException | ParserConfigurationException e) {
-            throw new RuntimeException(e);
         }
     }
 
