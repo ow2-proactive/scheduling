@@ -34,12 +34,13 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.io.Writer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
@@ -216,17 +217,37 @@ public class InProcessTaskExecutor implements TaskExecutor {
             forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, error);
             Map<String, String> genericInfo = taskContext.getInitializer().getGenericInformation();
             if (genericInfo != null && genericInfo.containsKey("PRE_SCRIPT_AS_FILE")) {
+
                 String path = genericInfo.get("PRE_SCRIPT_AS_FILE");
-                ScriptEngineFactory factory = new ScriptEngineManager().getEngineByName(script.getEngineName())
-                                                                       .getFactory();
-                String extension = factory.getExtensions().get(0);
-                String code = script.fetchScript().trim();
-                try (FileWriter fw = new FileWriter(new File(path + "." + extension))) {
-                    fw.write(code);
-                    fw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                //If the path doesn't contain an extension, add an extension to it
+                if (!path.contains(".")) {
+                    ScriptEngineFactory factory = new ScriptEngineManager().getEngineByName(script.getEngineName())
+                                                                           .getFactory();
+                    String extension = factory.getExtensions().get(0);
+                    path = path + "." + extension;
                 }
+
+                String code = script.fetchScript().trim();
+
+                //Check if the path is an absolute path or a relative path, if it is a relative path store the file in the local space
+                Path p = Paths.get(path);
+                boolean isAbsolute = p.isAbsolute();
+                if (isAbsolute) {
+                    try (FileWriter fw = new FileWriter(new File(path))) {
+                        fw.write(code);
+                    } catch (IOException e) {
+                        throw new TaskException("Failed to close the file: ", e.getCause());
+                    }
+                } else {
+                    //Needs to be stored in the local space
+                    String uri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+                    try (FileWriter fw = new FileWriter(new File(uri, path))) {
+                        fw.write(code);
+                    } catch (IOException e) {
+                        throw new TaskException("Failed to close the file: ", e.getCause());
+                    }
+                }
+
             } else {
                 ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
                 if (preScriptResult.errorOccured()) {
