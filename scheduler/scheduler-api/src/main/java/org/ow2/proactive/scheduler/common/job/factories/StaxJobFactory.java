@@ -27,9 +27,11 @@ package org.ow2.proactive.scheduler.common.job.factories;
 
 import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -167,39 +169,33 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
+    @Override
+    public Job createJob(InputStream workflowStream) throws JobCreationException {
+        return createJob(workflowStream, null, null);
+    }
+
+    @Override
+    public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos) throws JobCreationException {
+        try {
+            return createJobFromInputStream(workflowStream, replacementVariables, replacementGenericInfos);
+        } catch (JobCreationException jce) {
+            throw jce;
+        } catch (Exception e) {
+            throw new JobCreationException(e);
+        }
+    }
+
     private Job createJob(File file, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
         try {
-            //Check if the file exist
             if (!file.exists()) {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
-            //validate content using the proper XML schema
-            File updatedFile = validate(file);
-            //set relative path
-            relativePathRoot = updatedFile.getParentFile().getAbsolutePath();
-            //create and get XML STAX reader
-            XMLStreamReader xmlsr;
-            Map<String, ArrayList<String>> dependencies = new HashMap<>();
-            Job job;
-            try (InputStream inputStream = new FileInputStream(updatedFile)) {
-                // use the server side property to accept encoding
-                xmlsr = xmlInputFactory.createXMLStreamReader(inputStream, FILE_ENCODING);
-
-                //Create the job starting at the first cursor position of the XML Stream reader
-                job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
-                //Close the stream
-                xmlsr.close();
+            relativePathRoot = file.getParentFile().getAbsolutePath();
+            try (InputStream inputStream = new FileInputStream(file)) {
+                return createJobFromInputStream(inputStream, replacementVariables, replacementGenericInfos);
             }
-            //make dependencies
-            makeDependences(job, dependencies);
-
-            validate((TaskFlowJob) job);
-
-            logger.debug("Job successfully created!");
-            //debug mode only
-            displayJobInfo(job);
-            return job;
         } catch (JobCreationException jce) {
             jce.pushTag(XMLTags.JOB.getXMLName());
             throw jce;
@@ -208,10 +204,35 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
+    private Job createJobFromInputStream(InputStream jobInputStream, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos)
+            throws JobCreationException, VerifierConfigurationException, IOException, XMLStreamException {
+        byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
+        try (ByteArrayInputStream jobInputStreamForValidation = new ByteArrayInputStream(bytes)) {
+            validate(jobInputStreamForValidation);
+        }
+
+        Map<String, ArrayList<String>> dependencies = new HashMap<>();
+        Job job;
+        try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
+            XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
+            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
+            xmlsr.close();
+        }
+
+        makeDependences(job, dependencies);
+        validate((TaskFlowJob) job);
+
+        logger.debug("Job successfully created!");
+        //debug mode only
+        displayJobInfo(job);
+        return job;
+    }
+
     /*
      * Validate the given job descriptor
      */
-    private File validate(File file) throws VerifierConfigurationException, JobCreationException {
+    private void validate(InputStream jobInputStream) throws VerifierConfigurationException, JobCreationException {
         Map<String, JobValidatorService> factories;
         try {
             factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
@@ -220,20 +241,15 @@ public class StaxJobFactory extends JobFactory {
             throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
         }
 
-        File updatedFile = file;
-
         try {
-
             for (JobValidatorService factory : factories.values()) {
-                updatedFile = factory.validateJob(updatedFile);
+                factory.validateJob(jobInputStream);
             }
         } catch (JobValidationException e) {
             throw e;
         } catch (Exception e) {
             throw new JobValidationException(true, e);
         }
-
-        return updatedFile;
     }
 
     /*
