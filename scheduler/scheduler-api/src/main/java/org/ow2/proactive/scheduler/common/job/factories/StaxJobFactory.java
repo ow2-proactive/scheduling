@@ -118,6 +118,11 @@ public class StaxJobFactory extends JobFactory {
     private XMLInputFactory xmlInputFactory = null;
 
     /**
+     * file relative path (relative file path (js) given in XML will be relative to this path)
+     */
+    private String relativePathRoot = "./";
+
+    /**
      * Create a new instance of StaxJobFactory.
      */
     StaxJobFactory() {
@@ -186,6 +191,7 @@ public class StaxJobFactory extends JobFactory {
             if (!file.exists()) {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
+            relativePathRoot = file.getParentFile().getAbsolutePath();
             try (InputStream inputStream = new FileInputStream(file)) {
                 return createJobFromInputStream(inputStream, replacementVariables, replacementGenericInfos);
             }
@@ -1376,6 +1382,8 @@ public class StaxJobFactory extends JobFactory {
                                     url = replace(cursorScript.getAttributeValue(i), variables);
                                 } else if (XMLAttributes.LANGUAGE.matches(attrtmp)) {
                                     language = replace(cursorScript.getAttributeValue(i), variables);
+                                } else if (XMLAttributes.PATH.matches(attrtmp)) {
+                                    path = checkPath(cursorScript.getAttributeValue(i), variables);
                                 } else {
                                     throw new JobCreationException("Unrecognized attribute : " + attrtmp);
                                 }
@@ -1799,6 +1807,25 @@ public class StaxJobFactory extends JobFactory {
             replacements.putAll(variables);
         }
         return filterAndUpdate(str, replacements);
+    }
+
+    /**
+     * Replace the given file path by prepending relative root path if needed.<br/>
+     * This method prepends the relative root path to the given path if it is not considered as an absolute path.
+     *
+     * @param path the path to be evaluated.
+     * @return the same path with ${...} variables replaced and the relative path directory if this path was not absolute.
+     * @throws JobCreationException if a Variable has not been found
+     */
+    private String checkPath(String path, Map<String, String> variables) throws JobCreationException {
+        if (path == null || "".equals(path)) {
+            return path;
+        }
+        //make variables replacement
+        path = replace(path, variables);
+        //prepend if file is relative
+        File f = new File(path);
+        return f.isAbsolute() ? path : relativePathRoot + File.separator + path;
     }
 
     private void displayJobInfo(Job job) {
