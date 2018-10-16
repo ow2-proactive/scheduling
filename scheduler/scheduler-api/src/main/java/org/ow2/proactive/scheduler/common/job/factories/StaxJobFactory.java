@@ -223,7 +223,7 @@ public class StaxJobFactory extends JobFactory {
         Job job;
         try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
             XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
-            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
+            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies, new String(bytes));
             xmlsr.close();
         }
 
