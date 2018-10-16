@@ -30,7 +30,6 @@ import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.TASK;
 import static org.ow2.proactive.scheduler.common.job.factories.XMLTags.TASK_FLOW;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Stack;

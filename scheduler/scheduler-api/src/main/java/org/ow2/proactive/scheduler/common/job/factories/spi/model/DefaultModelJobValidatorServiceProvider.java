@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
-import java.io.File;
 import java.io.InputStream;
 
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;

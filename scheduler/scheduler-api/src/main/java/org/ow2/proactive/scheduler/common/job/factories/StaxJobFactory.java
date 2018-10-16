@@ -31,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -204,7 +205,8 @@ public class StaxJobFactory extends JobFactory {
     }
 
     private Job createJobFromInputStream(InputStream jobInputStream, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos) throws Exception {
+            Map<String, String> replacementGenericInfos)
+            throws JobCreationException, VerifierConfigurationException, IOException, XMLStreamException {
         byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
         validate(new ByteArrayInputStream(bytes));
 
