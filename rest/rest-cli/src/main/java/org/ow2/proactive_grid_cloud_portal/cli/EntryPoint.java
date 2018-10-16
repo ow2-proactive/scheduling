@@ -186,6 +186,8 @@ public abstract class EntryPoint {
                 }
 
                 if (isDebugModeEnabled) {
+                    // when debug mode is enabled we display extra info
+                    // like the java stacktrace when possible
                     if (cause instanceof CLIException && ((CLIException) cause).stackTrace() != null) {
                         writer.printf("%nStack trace: %s%n", ((CLIException) cause).stackTrace());
                     } else {

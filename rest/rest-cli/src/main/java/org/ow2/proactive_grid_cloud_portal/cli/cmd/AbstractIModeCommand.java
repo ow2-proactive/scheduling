@@ -56,6 +56,7 @@ public abstract class AbstractIModeCommand extends AbstractCommand implements Co
         CommandFactory commandFactory = CommandFactory.getCommandFactory(CommandFactory.Type.ALL);
         AbstractDevice console = null;
         try {
+            // force the console to JLine to provide commands completion and suggestions
             console = AbstractDevice.getConsole(AbstractDevice.JLINE);
             ((JLineDevice) console).setCommands(ObjectArrays.concat(commandFactory.supportedCommandEntries(),
                                                                     CommandSet.INTERACTIVE_COMMANDS,
