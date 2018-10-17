@@ -126,17 +126,17 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
             throws InvalidScriptException, NodeException, NoSuchFieldException, IllegalAccessException {
         ScriptHandler scriptHandler = new ScriptHandler();
 
-        Map<String, Serializable> jobMap = new ConcurrentHashMap<>();
-        jobMap.put(testJobResultVariable1Key, testJobResultVariable1Value);
+        Map<String, Serializable> resultMap = new ConcurrentHashMap<>();
+        resultMap.put(testJobResultVariable1Key, testJobResultVariable1Value);
 
         validateThatScriptHandlerBindingsContain(scriptHandler,
                                                  createTaskContext(null),
                                                  new VariablesMap(),
-                                                 jobMap,
+                                                 resultMap,
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
-                                                 SchedulerConstants.JOB_MAP_BINDING_NAME,
-                                                 jobMap);
+                                                 SchedulerConstants.RESULT_MAP_BINDING_NAME,
+                                                 resultMap);
 
     }
 
@@ -536,13 +536,13 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
     }
 
     private <T> void validateThatScriptHandlerBindingsContain(ScriptHandler scriptHandler, TaskContext taskContext,
-            VariablesMap variables, Map<String, Serializable> jobMap, Map<String, String> credentials,
+            VariablesMap variables, Map<String, Serializable> resultMap, Map<String, String> credentials,
             Map<String, String> resultMetadata, String key, T entry)
             throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
         Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler,
                                                                                         taskContext,
                                                                                         variables,
-                                                                                        jobMap,
+                                                                                        resultMap,
                                                                                         credentials,
                                                                                         resultMetadata);
 
@@ -551,13 +551,13 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
     }
 
     private <T> void validateThatScriptHandlerBindingsInstanceOf(ScriptHandler scriptHandler, TaskContext taskContext,
-            VariablesMap variables, Map<String, Serializable> jobMap, Map<String, String> credentials,
+            VariablesMap variables, Map<String, Serializable> resultMap, Map<String, String> credentials,
             Map<String, String> resultMetadata, String key, Class clazz)
             throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
         Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler,
                                                                                         taskContext,
                                                                                         variables,
-                                                                                        jobMap,
+                                                                                        resultMap,
                                                                                         credentials,
                                                                                         resultMetadata);
 
@@ -566,7 +566,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
     }
 
     private Map<String, Object> initializeForkedTaskVariableManager(ScriptHandler scriptHandler,
-            TaskContext taskContext, VariablesMap variables, Map<String, Serializable> jobMap,
+            TaskContext taskContext, VariablesMap variables, Map<String, Serializable> resultMap,
             Map<String, String> credentials, Map<String, String> resultMetadata)
             throws IllegalAccessException, NoSuchFieldException {
         // Create class
@@ -584,7 +584,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
                                                               taskContext,
                                                               variables,
-                                                              jobMap,
+                                                              resultMap,
                                                               credentials,
                                                               schedulerNodeClient,
                                                               forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,

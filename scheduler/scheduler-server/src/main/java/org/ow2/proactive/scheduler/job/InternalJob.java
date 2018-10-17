@@ -105,7 +105,7 @@ public abstract class InternalJob extends JobState {
     /**
      * Merged map of job results
      */
-    private Map<String, Serializable> jobMap = new ConcurrentHashMap<>();
+    private Map<String, Serializable> resultMap = new ConcurrentHashMap<>();
 
     /**
      * Job descriptor for dependencies management
@@ -365,7 +365,7 @@ public abstract class InternalJob extends JobState {
     public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId, SchedulerStateUpdate frontend,
             FlowAction action, TaskResultImpl result) {
         //add job results
-        jobMap.putAll(result.getJobMap());
+        resultMap.putAll(result.getResultMap());
         return terminateTask(errorOccurred, taskId, frontend, action, result, false);
     }
 
@@ -1296,7 +1296,7 @@ public abstract class InternalJob extends JobState {
         this.jobInfo.setGenericInformation(genericInformation);
     }
 
-    public Map<String, Serializable> getJobMap() {
-        return jobMap;
+    public Map<String, Serializable> getResultMap() {
+        return resultMap;
     }
 }

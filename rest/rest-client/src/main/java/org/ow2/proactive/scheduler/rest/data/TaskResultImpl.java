@@ -58,7 +58,7 @@ public class TaskResultImpl implements TaskResult {
 
     private Map<String, byte[]> propagatedVariables;
 
-    private Map<String, TaskResult> jobMap = new ConcurrentHashMap<>();
+    private Map<String, Serializable> resultMap = new ConcurrentHashMap<>();
 
     private Map<String, String> metadata = new HashMap<>();
 
@@ -123,8 +123,8 @@ public class TaskResultImpl implements TaskResult {
     }
 
     @Override
-    public Map<String, TaskResult> getJobMap() {
-        return jobMap;
+    public Map<String, Serializable> getResultMap() {
+        return resultMap;
     }
 
     @Override

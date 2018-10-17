@@ -40,7 +40,7 @@ public class JobResultTask extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
 
-        getJobMap().put(MYVAR, MYVALUE);
+        getResultMap().put(MYVAR, MYVALUE);
         return true;
     }
 }

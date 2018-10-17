@@ -28,10 +28,10 @@ package org.ow2.proactive.scheduler.common.task.executable;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.script.ScriptContext;
 
@@ -62,7 +62,7 @@ public abstract class JavaExecutable {
 
     private Map<String, String> metadata;
 
-    private Map<String, String> jobMap;
+    private Map<String, Serializable> resultMap;
 
     private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
 
@@ -77,7 +77,7 @@ public abstract class JavaExecutable {
      */
     public void internalInit(JavaStandaloneExecutableInitializer execInitializer, ScriptContext sc) throws Exception {
         this.execInitializer = execInitializer;
-        this.jobMap = new HashMap<>();
+        this.resultMap = new ConcurrentHashMap<>();
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
         Map<String, Serializable> arguments = this.execInitializer.getArguments(Thread.currentThread()
@@ -300,8 +300,8 @@ public abstract class JavaExecutable {
         return this.propagatedVariables;
     }
 
-    public Map<String, String> getJobMap() {
-        return this.jobMap;
+    public Map<String, Serializable> getResultMap() {
+        return this.resultMap;
     }
 
     /**

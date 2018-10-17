@@ -72,7 +72,7 @@ public class TaskResultImpl implements TaskResult {
     /** The value of the result if no exception occurred */
     private transient Serializable value = null;
 
-    private Map<String, TaskResult> jobMap = new ConcurrentHashMap<>();
+    private Map<String, Serializable> resultMap = new ConcurrentHashMap<>();
 
     private Map<String, String> metadata = new HashMap<>();
 
@@ -491,7 +491,7 @@ public class TaskResultImpl implements TaskResult {
     }
 
     @Override
-    public Map<String, TaskResult> getJobMap() {
-        return jobMap;
+    public Map<String, Serializable> getResultMap() {
+        return resultMap;
     }
 }
