@@ -1071,7 +1071,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Path("jobs/{jobid}/html")
     @Produces("text/html")
     public String getJobHtml(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-            throws IOException, NotConnectedRestException {
+            throws NotConnectedRestException, IOException {
         checkAccess(sessionId);
 
         File jobHtml = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");

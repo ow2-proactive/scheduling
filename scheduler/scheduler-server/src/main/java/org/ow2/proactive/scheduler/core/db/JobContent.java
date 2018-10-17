@@ -120,7 +120,7 @@ public class JobContent implements Serializable {
             this.jobContentAsByteArray = ByteCompressionUtils.compress(jobContent.getBytes());
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
-            this.jobContentAsByteArray = null;
+            this.jobContentAsByteArray = new byte[0];
         }
     }
 

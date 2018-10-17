@@ -40,9 +40,13 @@ import org.ow2.proactive.scheduler.common.job.JobVariable;
  */
 public class GetJobContentFactory {
 
-    private static final String FOUT_SPACES_INDENT = "    ";
+    private static final String FOUR_SPACES_INDENT = "    ";
 
     private static final String TWO_SPACES_INDENT = "  ";
+
+    private static final String TAG_WITH_TWO_ATTRIBUTES = "<%s %s=\"%s\" %s=\"%s\" />";
+
+    private static final String TAG_WITH_THREE_ATTRIBUTES = "<%s %s=\"%s\" %s=\"%s\" %s=\"%s\" />";
 
     /**
      * @param jobContent xml representation of the submitted job
@@ -76,7 +80,7 @@ public class GetJobContentFactory {
     }
 
     private String genericInfoContent(Map.Entry<String, String> pair) {
-        return String.format(FOUT_SPACES_INDENT + "<%s %s=\"%s\" %s=\"%s\"/>",
+        return String.format(FOUR_SPACES_INDENT + TAG_WITH_TWO_ATTRIBUTES,
                              XMLTags.COMMON_INFO,
                              XMLAttributes.COMMON_NAME,
                              pair.getKey(),
@@ -132,7 +136,7 @@ public class GetJobContentFactory {
 
     private String variableContent(JobVariable jobVariable) {
         if (jobVariable.getModel() != null && !jobVariable.getModel().trim().isEmpty()) {
-            return String.format(FOUT_SPACES_INDENT + "<%s %s=\"%s\" %s=\"%s\" %s=\"%s\" />",
+            return String.format(FOUR_SPACES_INDENT + TAG_WITH_THREE_ATTRIBUTES,
                                  XMLTags.VARIABLE.getXMLName(),
                                  XMLAttributes.VARIABLE_NAME,
                                  jobVariable.getName(),
@@ -141,7 +145,8 @@ public class GetJobContentFactory {
                                  XMLAttributes.VARIABLE_MODEL,
                                  jobVariable.getModel());
         } else {
-            return String.format(FOUT_SPACES_INDENT + "<%s %s=\"%s\" %s=\"%s\" />",
+            return String.format(FOUR_SPACES_INDENT + TAG_WITH_TWO_ATTRIBUTES,
+
                                  XMLTags.VARIABLE.getXMLName(),
                                  XMLAttributes.VARIABLE_NAME,
                                  jobVariable.getName(),
