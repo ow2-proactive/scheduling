@@ -38,6 +38,9 @@ class GetJobContentFactory {
 
     private static final String FOUT_SPACES_INDENT = "    ";
 
+    private GetJobContentFactory() {
+    }
+
     /**
      * @param jobContent xml representation of the submitted job
      * @param variables provided during job submit
