@@ -65,7 +65,7 @@ class GetJobContentFactory {
         return genericInformation.entrySet()
                                  .stream()
                                  .map(GetJobContentFactory::genericInfoContent)
-                                 .collect(Collectors.joining("\n"));
+                                 .collect(Collectors.joining(System.lineSeparator()));
     }
 
     private static String genericInfoContent(Map.Entry<String, String> pair) {
