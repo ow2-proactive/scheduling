@@ -67,8 +67,6 @@ public abstract class Job extends CommonAttribute {
 
     private static final Logger LOGGER = Logger.getLogger(Job.class);
 
-    public static final String DEFAULT_PROJECT_NAME = "Not Assigned";
-
     public static final String JOB_DDL = "JOB_DDL";
 
     public static final String JOB_EXEC_TIME = "JOB_EXEC_TIME";
@@ -81,12 +79,12 @@ public abstract class Job extends CommonAttribute {
     /**
      * Short description of this job
      */
-    protected String description = "No description";
+    protected String description = "";
 
     /**
      * Project name for this job
      */
-    protected String projectName = DEFAULT_PROJECT_NAME;
+    protected String projectName = "";
 
     /**
      * Job priority
