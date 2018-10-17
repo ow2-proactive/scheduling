@@ -132,7 +132,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             variables.setInheritedMap(taskContextVariableExtractor.getAllNonTaskVariablesInjectNodesFile(taskContext,
                                                                                                          nodesFile));
             variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(taskContext));
-            Map<String, Serializable> jobResults = taskContextVariableExtractor.getJobResultsVariables(taskContext);
+            Map<String, Serializable> jobMap = taskContextVariableExtractor.getJobMapVariables(taskContext);
             Map<String, String> resultMetadata = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
@@ -146,7 +146,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
                                                                   taskContext,
                                                                   variables,
-                                                                  jobResults,
+                                                                  jobMap,
                                                                   thirdPartyCredentials,
                                                                   schedulerNodeClient,
                                                                   userSpaceClient,
@@ -163,7 +163,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
                                               scriptHandler,
                                               thirdPartyCredentials,
                                               variables,
-                                              jobResults);
+                                              jobMap);
                 stopwatch.stop();
                 taskResult = new TaskResultImpl(taskContext.getTaskId(),
                                                 result,
@@ -203,19 +203,16 @@ public class InProcessTaskExecutor implements TaskExecutor {
      * @param scriptHandler
      * @param thirdPartyCredentials
      * @param variables             Environment variables.
+     * @param JobMap             Map of job results.
      * @return The result of the executed script.
      * @throws Throwable
      */
     private Serializable execute(TaskContext taskContext, PrintStream output, PrintStream error,
             ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, VariablesMap variables,
-            Map<String, Serializable> jobResults) throws Throwable {
+            Map<String, Serializable> JobMap) throws Throwable {
         if (taskContext.getPreScript() != null) {
             Script<?> script = taskContext.getPreScript();
-            forkedTaskVariablesManager.replaceScriptParameters(script,
-                                                               thirdPartyCredentials,
-                                                               variables,
-                                                               jobResults,
-                                                               error);
+            forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, JobMap, error);
             ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
             if (preScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute pre script: " + preScriptResult.getException().getMessage(),
@@ -224,7 +221,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         }
 
         Script<Serializable> script = ((ScriptExecutableContainer) taskContext.getExecutableContainer()).getScript();
-        forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, jobResults, error);
+        forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, JobMap, error);
         ScriptResult<Serializable> scriptResult = scriptHandler.handle(script, output, error);
 
         if (scriptResult.errorOccured()) {
@@ -236,7 +233,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             forkedTaskVariablesManager.replaceScriptParameters(taskContext.getPostScript(),
                                                                thirdPartyCredentials,
                                                                variables,
-                                                               jobResults,
+                                                               JobMap,
                                                                error);
             ScriptResult postScriptResult = scriptHandler.handle(taskContext.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {

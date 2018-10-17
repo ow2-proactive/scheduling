@@ -35,10 +35,12 @@ public class JobResultTask extends JavaExecutable {
 
     public static final String MYVAR = "myvar";
 
+    public static final String MYVALUE = "myvalue";
+
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
 
-        getJobResults().put("a", "b");
+        getJobMap().put(MYVAR, MYVALUE);
         return true;
     }
 }

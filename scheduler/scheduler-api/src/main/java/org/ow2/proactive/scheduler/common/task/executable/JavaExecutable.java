@@ -62,7 +62,7 @@ public abstract class JavaExecutable {
 
     private Map<String, String> metadata;
 
-    private Map<String, Serializable> jobResults;
+    private Map<String, Serializable> JobMap;
 
     private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
 
@@ -77,7 +77,7 @@ public abstract class JavaExecutable {
     public void internalInit(JavaStandaloneExecutableInitializer execInitializer, ScriptContext sc) throws Exception {
         this.execInitializer = execInitializer;
         //empty job result map
-        this.jobResults = new ConcurrentHashMap<>();
+        this.JobMap = new ConcurrentHashMap<>();
 
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
@@ -304,8 +304,8 @@ public abstract class JavaExecutable {
         return this.propagatedVariables;
     }
 
-    public Map<String, Serializable> getJobResults() {
-        return this.jobResults;
+    public Map<String, Serializable> getJobMap() {
+        return this.JobMap;
     }
 
     /**

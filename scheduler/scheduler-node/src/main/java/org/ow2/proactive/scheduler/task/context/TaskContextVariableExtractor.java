@@ -155,20 +155,20 @@ public class TaskContextVariableExtractor implements Serializable {
      * @return Map containing all job results variables extracted.
      *
      */
-    public Map<String, Serializable> getJobResultsVariables(TaskContext taskContext) {
-        Map<String, Serializable> jobResults = new HashMap<>();
+    public Map<String, Serializable> getJobMapVariables(TaskContext taskContext) {
+        Map<String, Serializable> JobMap = new HashMap<>();
         Map<String, Serializable> dictionary = new HashMap<>();
 
         try {
             if (taskContext != null) {
-                jobResults.putAll(extractJobResultsVariables(taskContext));
+                JobMap.putAll(extractJobMapVariables(taskContext));
             }
             dictionary = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
             logger.error(ERROR_READING_VARIABLES, e);
         }
 
-        return VariableSubstitutor.resolveVariables(jobResults, dictionary);
+        return VariableSubstitutor.resolveVariables(JobMap, dictionary);
     }
 
     /**
@@ -376,23 +376,23 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     /**
-     * Extract job results from the previous task result to be used now.
+     * Extract job map results from the previous task result to be used now.
      *
      * @param taskContext contains the information needed to extract.
      *
      * @return a map containing extracted job results variables or an empty hash if there are no variables.
      */
-    private Map<String, Serializable> extractJobResultsVariables(TaskContext taskContext)
+    private Map<String, Serializable> extractJobMapVariables(TaskContext taskContext)
             throws IOException, ClassNotFoundException {
-        Map<String, Serializable> jobResults = new HashMap<>();
+        Map<String, Serializable> JobMap = new HashMap<>();
 
         if (taskContext.getPreviousTasksResults() != null) {
             for (TaskResult previousTaskResult : taskContext.getPreviousTasksResults()) {
-                if (previousTaskResult.getJobResults() != null) {
-                    jobResults.putAll(previousTaskResult.getJobResults());
+                if (previousTaskResult.getJobMap() != null) {
+                    JobMap.putAll(previousTaskResult.getJobMap());
                 }
             }
         }
-        return jobResults;
+        return JobMap;
     }
 }

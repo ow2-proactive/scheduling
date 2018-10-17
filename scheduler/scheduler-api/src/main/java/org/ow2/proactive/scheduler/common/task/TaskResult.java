@@ -143,5 +143,5 @@ public interface TaskResult extends Serializable {
      * Returns a map of job results
      * @return merged map of job results
      */
-    Map<String, Serializable> getJobResults();
+    Map<String, Serializable> getJobMap();
 }

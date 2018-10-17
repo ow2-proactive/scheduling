@@ -147,12 +147,12 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
-    public void getJobResults() throws Throwable {
+    public void getJobMap() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = createJob(JobResultTask.class);
         JobId jobId = client.submit(job);
         final JobResult jobResult = client.getJobResult(jobId);
-        assertFalse(jobResult.getJobResults().isEmpty());
+        assertFalse(jobResult.getJobMap().isEmpty());
     }
 
     @Test(timeout = MAX_WAIT_TIME)

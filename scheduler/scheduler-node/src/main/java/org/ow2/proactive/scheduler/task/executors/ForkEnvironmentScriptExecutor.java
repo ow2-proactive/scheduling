@@ -29,7 +29,6 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
@@ -64,7 +63,7 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
         VariablesMap variables = new VariablesMap();
         variables.setInheritedMap(taskContextVariableExtractor.getAllNonTaskVariables(context));
         variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(context));
-        Map<String, Serializable> jobResults = taskContextVariableExtractor.getJobResultsVariables(context);
+        Map<String, Serializable> JobMap = taskContextVariableExtractor.getJobMapVariables(context);
 
         Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(context);
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
@@ -81,18 +80,14 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
                                                               context,
                                                               variables,
-                                                              jobResults,
+                                                              JobMap,
                                                               thirdPartyCredentials,
                                                               schedulerNodeClient,
                                                               userSpaceClient,
                                                               globalSpaceClient,
                                                               Collections.<String, String> emptyMap());
 
-        forkedTaskVariablesManager.replaceScriptParameters(script,
-                                                           thirdPartyCredentials,
-                                                           variables,
-                                                           jobResults,
-                                                           errorSink);
+        forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, JobMap, errorSink);
 
         ScriptResult scriptResult = scriptHandler.handle(script, outputSink, errorSink);
 
