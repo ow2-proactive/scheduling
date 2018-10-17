@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import static org.ow2.proactive.scheduler.common.job.factories.GetJobContentFactory.replaceVarsAndGenericInfo;
 import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
 import java.io.ByteArrayInputStream;
@@ -342,7 +343,7 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorJob          the streamReader with the cursor on the job element.
      * @param replacementVariables job submission variables map taking priority on those defined in the xml
      * @param replacementGenericInfos job submission generic infos map taking priority on those defined in the xml
-     * @param jobContent
+     * @param jobContent contains xml representation of this job
      * @throws JobCreationException if an exception occurs during job creation.
      */
     private Job createAndFillJob(XMLStreamReader cursorJob, Map<String, String> replacementVariables,
@@ -479,73 +480,6 @@ public class StaxJobFactory extends JobFactory {
             throw new JobCreationException(cursorJob.getLocalName(), temporaryAttribute, e);
         }
 
-    }
-
-    private String replaceVarsAndGenericInfo(String jobContent, Map<String, JobVariable> variables,
-            Map<String, String> genericInformation) {
-        final int end = jobContent.indexOf(XMLTags.TASK_FLOW.getXMLName());
-
-        String replacedJobContent = replaceTagContent(jobContent,
-                                                      XMLTags.VARIABLES,
-                                                      newVariablesContent(variables),
-                                                      end);
-        replacedJobContent = replaceTagContent(replacedJobContent,
-                                               XMLTags.COMMON_GENERIC_INFORMATION,
-                                               newGenericInfoContent(genericInformation),
-                                               end);
-
-        return replacedJobContent;
-    }
-
-    private String newGenericInfoContent(Map<String, String> genericInformation) {
-        return genericInformation.entrySet().stream().map(this::genericInfoContent).collect(Collectors.joining("\n"));
-    }
-
-    private String genericInfoContent(Map.Entry<String, String> pair) {
-        return String.format("    <%s %s=\"%s\" %s=\"%s\"/>",
-                             XMLTags.COMMON_INFO,
-                             XMLAttributes.COMMON_NAME,
-                             pair.getKey(),
-                             XMLAttributes.COMMON_VALUE,
-                             pair.getValue());
-    }
-
-    private String replaceTagContent(String jobContent, XMLTags tag, String newContent, int end) {
-        final String firstHalf = jobContent.substring(0, end);
-        final String secondHalf = jobContent.substring(end);
-
-        final int afterOpenTag = firstHalf.indexOf(tag.getOpenTag()) + tag.getOpenTag().length();
-        final int beforeCloseTag = firstHalf.indexOf(tag.getCloseTag());
-        if (afterOpenTag == -1 || beforeCloseTag == -1) {
-            return jobContent;
-        }
-
-        return firstHalf.substring(0, afterOpenTag) + "\n" + newContent + "\n  " + firstHalf.substring(beforeCloseTag) +
-               secondHalf;
-    }
-
-    private String newVariablesContent(Map<String, JobVariable> variables) {
-        return variables.values().stream().map(this::variableContent).collect(Collectors.joining("\n"));
-    }
-
-    private String variableContent(JobVariable jobVariable) {
-        if (jobVariable.getModel() != null) {
-            return String.format("    <%s %s=\"%s\" %s=\"%s\" %s=\"%s\" />",
-                                 XMLTags.VARIABLE.getXMLName(),
-                                 XMLAttributes.VARIABLE_NAME,
-                                 jobVariable.getName(),
-                                 XMLAttributes.VARIABLE_VALUE,
-                                 jobVariable.getValue(),
-                                 XMLAttributes.VARIABLE_MODEL,
-                                 jobVariable.getModel());
-        } else {
-            return String.format("    <%s %s=\"%s\" %s=\"%s\" />",
-                                 XMLTags.VARIABLE.getXMLName(),
-                                 XMLAttributes.VARIABLE_NAME,
-                                 jobVariable.getName(),
-                                 XMLAttributes.VARIABLE_VALUE,
-                                 jobVariable.getValue());
-        }
     }
 
     private void handleJobAttributes(Job commonPropertiesHolder, Map<String, String> delayedJobAttributes)

@@ -135,12 +135,12 @@ public enum XMLTags {
         return this.xmlName;
     }
 
-    public String getOpenTag() {
-        return String.format("<%s>", this.xmlName);
+    public String getOpenTagPattern() {
+        return String.format("<[ ]*%s[ ]*>", this.xmlName);
     }
 
-    public String getCloseTag() {
-        return String.format("</%s>", this.xmlName);
+    public String getCloseTagPattern() {
+        return String.format("<[ ]*/[ ]*%s[ ]*>", this.xmlName);
     }
 
     private static Map<String, XMLTags> namesToEnum = null;
