@@ -36,6 +36,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -63,7 +64,7 @@ import com.google.common.base.Stopwatch;
 
 /**
  * Run a task through a script handler.
- *
+ * <p>
  * Responsible for:
  * - running the different scripts
  * - variable propagation
@@ -132,6 +133,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             variables.setInheritedMap(taskContextVariableExtractor.getAllNonTaskVariablesInjectNodesFile(taskContext,
                                                                                                          nodesFile));
             variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(taskContext));
+            Map<String, Serializable> jobMap = new ConcurrentHashMap<>();
             Map<String, String> resultMetadata = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
@@ -145,6 +147,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
                                                                   taskContext,
                                                                   variables,
+                                                                  jobMap,
                                                                   thirdPartyCredentials,
                                                                   schedulerNodeClient,
                                                                   userSpaceClient,
@@ -204,8 +207,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
      * @throws Throwable
      */
     private Serializable execute(TaskContext taskContext, PrintStream output, PrintStream error,
-            ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, VariablesMap variables)
-            throws Throwable {
+            ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, VariablesMap variables) throws Throwable {
         if (taskContext.getPreScript() != null) {
             Script<?> script = taskContext.getPreScript();
             forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, error);

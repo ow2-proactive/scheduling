@@ -31,6 +31,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.script.ScriptContext;
 
@@ -61,6 +62,8 @@ public abstract class JavaExecutable {
 
     private Map<String, String> metadata;
 
+    private Map<String, Serializable> jobMap;
+
     private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
 
     private Synchronization synchronizationAPI;
@@ -69,11 +72,13 @@ public abstract class JavaExecutable {
      * Initialize the executable using the given executable Initializer.
      *
      * @param execInitializer the executable Initializer used to init the executable itself
-     *
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
     public void internalInit(JavaStandaloneExecutableInitializer execInitializer, ScriptContext sc) throws Exception {
         this.execInitializer = execInitializer;
+        //empty job result map
+        this.jobMap = new ConcurrentHashMap<>();
+
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
         Map<String, Serializable> arguments = this.execInitializer.getArguments(Thread.currentThread()
@@ -213,7 +218,7 @@ public abstract class JavaExecutable {
      * <p>
      * This is a convenience method to retrieve the Replication Index that was exported
      * as a Java Property by the TaskLauncher.
-     * 
+     *
      * @return the Replication Index of this Task
      */
     public final int getReplicationIndex() {
@@ -233,6 +238,7 @@ public abstract class JavaExecutable {
 
     /**
      * When using non forked Java tasks, you should use this PrintStream instead of System.out.
+     *
      * @return a stream that will write to the task's output stream
      */
     protected PrintStream getOut() {
@@ -241,6 +247,7 @@ public abstract class JavaExecutable {
 
     /**
      * When using non forked Java tasks, you should use this PrintStream instead of System.err.
+     *
      * @return a stream that will write to the task's error stream
      */
     protected PrintStream getErr() {
@@ -261,14 +268,15 @@ public abstract class JavaExecutable {
      * The results list order correspond to the order in the dependence list.
      *
      * @param results the results (as a taskResult) from parent tasks.
-     * @throws Throwable any exception thrown by the user's code
      * @return any serializable object from the user.
+     * @throws Throwable any exception thrown by the user's code
      */
     public abstract Serializable execute(TaskResult... results) throws Throwable;
 
     /**
      * Set the progress value for this Executable. Progress value must be ranged
      * between 0 and 100.
+     *
      * @param newValue the new progress value
      * @return the previous progress value
      * @throws IllegalArgumentException if the value is not ranged between 0 and 100.
@@ -294,6 +302,10 @@ public abstract class JavaExecutable {
 
     public Map<String, Serializable> getVariables() {
         return this.propagatedVariables;
+    }
+
+    public Map<String, Serializable> getJobMap() {
+        return this.jobMap;
     }
 
     /**

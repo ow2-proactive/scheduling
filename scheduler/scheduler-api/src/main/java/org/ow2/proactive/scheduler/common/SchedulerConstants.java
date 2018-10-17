@@ -74,6 +74,8 @@ public class SchedulerConstants {
 
     public static final String GENERIC_INFO_BINDING_NAME = "genericInformation";
 
+    public static final String JOB_MAP_BINDING_NAME = "jobMap";
+
     public static final String DS_SCRATCH_BINDING_NAME = "localspace";
 
     public static final String DS_CACHE_BINDING_NAME = "cachespace";
