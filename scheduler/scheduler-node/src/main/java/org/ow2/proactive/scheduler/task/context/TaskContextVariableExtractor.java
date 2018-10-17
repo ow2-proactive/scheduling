@@ -148,7 +148,7 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     /**
-     * Method to retrieve job results variables in scope. Note it ignores TaskResult variables and nodesFile.
+     * Method to retrieve job results variables in scope.
      *
      * @param taskContext task context container.
      *
@@ -161,9 +161,7 @@ public class TaskContextVariableExtractor implements Serializable {
 
         try {
             if (taskContext != null) {
-                jobResults.putAll(extractJobVariables(taskContext));
-                jobResults.putAll(extractInheritedVariables(taskContext));
-                jobResults.putAll(extractSystemVariables(taskContext, ""));
+                jobResults.putAll(extractJobResultsVariables(taskContext));
             }
             dictionary = extractAllVariables(taskContext, null, "");
         } catch (IOException | ClassNotFoundException e) {
@@ -375,5 +373,26 @@ public class TaskContextVariableExtractor implements Serializable {
             }
         }
         return variables;
+    }
+
+    /**
+     * Extract job results from the previous task result to be used now.
+     *
+     * @param taskContext contains the information needed to extract.
+     *
+     * @return a map containing extracted job results variables or an empty hash if there are no variables.
+     */
+    private Map<String, Serializable> extractJobResultsVariables(TaskContext taskContext)
+            throws IOException, ClassNotFoundException {
+        Map<String, Serializable> jobResults = new HashMap<>();
+
+        if (taskContext.getPreviousTasksResults() != null) {
+            for (TaskResult previousTaskResult : taskContext.getPreviousTasksResults()) {
+                if (previousTaskResult.getJobResults() != null) {
+                    jobResults.putAll(previousTaskResult.getJobResults());
+                }
+            }
+        }
+        return jobResults;
     }
 }

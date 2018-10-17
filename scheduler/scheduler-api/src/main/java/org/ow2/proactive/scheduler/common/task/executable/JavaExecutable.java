@@ -78,7 +78,7 @@ public abstract class JavaExecutable {
         this.execInitializer = execInitializer;
         //empty job result map
         this.jobResults = new ConcurrentHashMap<>();
-        //initJobResults(sc);
+
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
         Map<String, Serializable> arguments = this.execInitializer.getArguments(Thread.currentThread()
@@ -182,15 +182,6 @@ public abstract class JavaExecutable {
      */
     public void initMetadata(ScriptContext sc) {
         this.metadata = (Map<String, String>) sc.getAttribute(SchedulerConstants.RESULT_METADATA_VARIABLE);
-    }
-
-    /**
-     * Initialization of the job results.<br>
-     *
-     * @param sc the ScriptContext including as bindings the job results map.
-     */
-    public void initJobResults(ScriptContext sc) {
-        this.jobResults = (Map<String, Serializable>) sc.getAttribute(SchedulerConstants.JOB_RESULTS_BINDING_NAME);
     }
 
     /**
