@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import static org.ow2.proactive.scheduler.common.job.factories.GetJobContentFactory.replaceVarsAndGenericInfo;
 import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
 import java.io.ByteArrayInputStream;
@@ -123,6 +122,8 @@ public class StaxJobFactory extends JobFactory {
      * file relative path (relative file path (js) given in XML will be relative to this path)
      */
     private String relativePathRoot = "./";
+
+    private GetJobContentFactory getJobContentFactory = new GetJobContentFactory();
 
     /**
      * Create a new instance of StaxJobFactory.
@@ -461,9 +462,9 @@ public class StaxJobFactory extends JobFactory {
                 job.setVariables(commonPropertiesHolder.getVariables());
                 job.setVisualization(commonPropertiesHolder.getVisualization());
 
-                String updatedJobContent = replaceVarsAndGenericInfo(jobContent,
-                                                                     commonPropertiesHolder.getVariables(),
-                                                                     commonPropertiesHolder.getGenericInformation());
+                String updatedJobContent = getJobContentFactory.replaceVarsAndGenericInfo(jobContent,
+                                                                                          commonPropertiesHolder.getVariables(),
+                                                                                          commonPropertiesHolder.getGenericInformation());
 
                 job.setJobContent(updatedJobContent);
 

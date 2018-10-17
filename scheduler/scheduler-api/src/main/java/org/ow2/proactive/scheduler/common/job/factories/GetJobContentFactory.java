@@ -34,12 +34,15 @@ import java.util.stream.Collectors;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 
 
-class GetJobContentFactory {
+/**
+ * Factory used to create a job content as merge between submitted xml
+ * and provided <code>variables</code> and <code>genericInfo</code> maps.
+ */
+public class GetJobContentFactory {
 
     private static final String FOUT_SPACES_INDENT = "    ";
 
-    private GetJobContentFactory() {
-    }
+    private static final String TWO_SPACES_INDENT = "  ";
 
     /**
      * @param jobContent xml representation of the submitted job
@@ -48,7 +51,7 @@ class GetJobContentFactory {
      * @return new job content where 'variables' and 'genericInformation' tags content are replaced
      *  by provided <code>variables</code> and <code>genericInformation</code> respectively.
      */
-    static String replaceVarsAndGenericInfo(String jobContent, Map<String, JobVariable> variables,
+    public String replaceVarsAndGenericInfo(String jobContent, Map<String, JobVariable> variables,
             Map<String, String> genericInformation) {
         final int end = jobContent.indexOf(XMLTags.TASK_FLOW.getXMLName());
 
@@ -64,14 +67,15 @@ class GetJobContentFactory {
         return replacedJobContent;
     }
 
-    private static String newGenericInfoContent(Map<String, String> genericInformation) {
+    private String newGenericInfoContent(Map<String, String> genericInformation) {
         return genericInformation.entrySet()
                                  .stream()
-                                 .map(GetJobContentFactory::genericInfoContent)
-                                 .collect(Collectors.joining(System.lineSeparator()));
+                                 .map(this::genericInfoContent)
+                                 .map(s -> s + System.lineSeparator())
+                                 .reduce("", String::concat);
     }
 
-    private static String genericInfoContent(Map.Entry<String, String> pair) {
+    private String genericInfoContent(Map.Entry<String, String> pair) {
         return String.format(FOUT_SPACES_INDENT + "<%s %s=\"%s\" %s=\"%s\"/>",
                              XMLTags.COMMON_INFO,
                              XMLAttributes.COMMON_NAME,
@@ -80,29 +84,34 @@ class GetJobContentFactory {
                              pair.getValue());
     }
 
-    private static String replaceTagContent(String jobContent, XMLTags tag, String newContent, int end) {
+    private String replaceTagContent(String jobContent, XMLTags tag, String newContent, int end) {
         final String firstHalf = jobContent.substring(0, end);
-        final String secondHalf = jobContent.substring(end);
+
+        /*
+         * because tasks can contain variables as well we modify original string
+         * only till the provided end
+         */
+        final String untouchablePart = jobContent.substring(end);
 
         final Optional<Matcher> openMatcher = indexOfPattern(firstHalf, tag.getOpenTagPattern());
         if (!openMatcher.isPresent()) {
             return jobContent;
         }
-
         final int afterOpenTag = openMatcher.get().end();
 
         final Optional<Matcher> closeMatcher = indexOfPattern(firstHalf, tag.getCloseTagPattern());
         if (!closeMatcher.isPresent()) {
             return jobContent;
         }
-
         final int beforeCloseTag = closeMatcher.get().start();
 
-        return firstHalf.substring(0, afterOpenTag) + System.lineSeparator() + newContent + System.lineSeparator() +
-               "  " + firstHalf.substring(beforeCloseTag) + secondHalf;
+        final String beforeNewContent = firstHalf.substring(0, afterOpenTag) + System.lineSeparator();
+        final String afterNewContent = TWO_SPACES_INDENT + firstHalf.substring(beforeCloseTag);
+
+        return beforeNewContent + newContent + afterNewContent + untouchablePart;
     }
 
-    private static Optional<Matcher> indexOfPattern(String content, String pattern) {
+    private Optional<Matcher> indexOfPattern(String content, String pattern) {
         Pattern aPattern = Pattern.compile(pattern);
         Matcher matcher = aPattern.matcher(content);
 
@@ -113,14 +122,15 @@ class GetJobContentFactory {
         }
     }
 
-    private static String newVariablesContent(Map<String, JobVariable> variables) {
+    private String newVariablesContent(Map<String, JobVariable> variables) {
         return variables.values()
                         .stream()
-                        .map(GetJobContentFactory::variableContent)
-                        .collect(Collectors.joining(System.lineSeparator()));
+                        .map(this::variableContent)
+                        .map(s -> s + System.lineSeparator())
+                        .reduce("", String::concat);
     }
 
-    private static String variableContent(JobVariable jobVariable) {
+    private String variableContent(JobVariable jobVariable) {
         if (jobVariable.getModel() != null && !jobVariable.getModel().trim().isEmpty()) {
             return String.format(FOUT_SPACES_INDENT + "<%s %s=\"%s\" %s=\"%s\" %s=\"%s\" />",
                                  XMLTags.VARIABLE.getXMLName(),
