@@ -271,7 +271,7 @@ public class TestJobFactory {
         log("Test Job MULTI_NODES");
         TaskFlowJob mnJob = getJob(jobMultiNodesDescriptor, impl, scriptFolder);
         //Check job properties
-        assertEquals("No description", mnJob.getDescription());
+        assertEquals("", mnJob.getDescription());
         assertEquals("job_multiNodes", mnJob.getName());
         assertEquals(JobPriority.LOW, mnJob.getPriority());
         assertEquals(OnTaskError.NONE, mnJob.getOnTaskErrorProperty().getValue());
