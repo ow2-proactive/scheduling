@@ -148,6 +148,32 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     /**
+     * Method to retrieve job results variables in scope. Note it ignores TaskResult variables and nodesFile.
+     *
+     * @param taskContext task context container.
+     *
+     * @return Map containing all job results variables extracted.
+     *
+     */
+    public Map<String, Serializable> getJobResultsVariables(TaskContext taskContext) {
+        Map<String, Serializable> jobResults = new HashMap<>();
+        Map<String, Serializable> dictionary = new HashMap<>();
+
+        try {
+            if (taskContext != null) {
+                jobResults.putAll(extractJobVariables(taskContext));
+                jobResults.putAll(extractInheritedVariables(taskContext));
+                jobResults.putAll(extractSystemVariables(taskContext, ""));
+            }
+            dictionary = extractAllVariables(taskContext, null, "");
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error(ERROR_READING_VARIABLES, e);
+        }
+
+        return VariableSubstitutor.resolveVariables(jobResults, dictionary);
+    }
+
+    /**
      * Method to retrieve all variables in scope. Note it ignores TaskResult variables and nodesFile.
      *
      * @param taskContext task context container.

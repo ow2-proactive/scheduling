@@ -28,7 +28,7 @@ package org.ow2.proactive.scheduler.rest.data;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfo;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
-import java.util.HashMap;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -55,7 +55,7 @@ public class JobResultImpl implements JobResult {
 
     private Map<String, TaskResult> preciousResults;
 
-    private Map<String, TaskResult> jobResults = null;
+    private Map<String, Serializable> jobResults = null;
 
     private Map<String, TaskResult> exceptionResults;
 
@@ -65,7 +65,7 @@ public class JobResultImpl implements JobResult {
         allResults = createTaskResultMap(data.getAllResults());
         preciousResults = createTaskResultMap(data.getPreciousResults());
         exceptionResults = createTaskResultMap(data.getExceptionResults());
-        jobResults = createTaskResultMap(data.getJobResults());
+        jobResults = data.getJobResults();
         jobInfo = data.getJobInfo();
     }
 
@@ -107,7 +107,7 @@ public class JobResultImpl implements JobResult {
     }
 
     @Override
-    public Map<String, TaskResult> getJobResults() {
+    public Map<String, Serializable> getJobResults() {
         return jobResults;
     }
 

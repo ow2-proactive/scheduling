@@ -30,6 +30,7 @@ import java.io.NotSerializableException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -71,7 +72,7 @@ public class TaskResultImpl implements TaskResult {
     /** The value of the result if no exception occurred */
     private transient Serializable value = null;
 
-    private Map<String, TaskResult> jobResult = new HashMap<>();
+    private Map<String, Serializable> jobResults = new ConcurrentHashMap<>();
 
     private Map<String, String> metadata = new HashMap<>();
 
@@ -490,7 +491,7 @@ public class TaskResultImpl implements TaskResult {
     }
 
     @Override
-    public Map<String, TaskResult> getJobResult() {
-        return jobResult;
+    public Map<String, Serializable> getJobResults() {
+        return jobResults;
     }
 }

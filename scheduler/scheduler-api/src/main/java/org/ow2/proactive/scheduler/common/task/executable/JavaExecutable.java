@@ -28,10 +28,10 @@ package org.ow2.proactive.scheduler.common.task.executable;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.script.ScriptContext;
 
@@ -62,7 +62,7 @@ public abstract class JavaExecutable {
 
     private Map<String, String> metadata;
 
-    private Map<String, String> jobResults;
+    private Map<String, Serializable> jobResults;
 
     private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
 
@@ -72,12 +72,13 @@ public abstract class JavaExecutable {
      * Initialize the executable using the given executable Initializer.
      *
      * @param execInitializer the executable Initializer used to init the executable itself
-     *
      * @throws Exception an exception if something goes wrong during executable initialization.
      */
     public void internalInit(JavaStandaloneExecutableInitializer execInitializer, ScriptContext sc) throws Exception {
         this.execInitializer = execInitializer;
-        this.jobResults = new HashMap<>();
+        //empty job result map
+        this.jobResults = new ConcurrentHashMap<>();
+        //initJobResults(sc);
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
         Map<String, Serializable> arguments = this.execInitializer.getArguments(Thread.currentThread()
@@ -184,6 +185,15 @@ public abstract class JavaExecutable {
     }
 
     /**
+     * Initialization of the job results.<br>
+     *
+     * @param sc the ScriptContext including as bindings the job results map.
+     */
+    public void initJobResults(ScriptContext sc) {
+        this.jobResults = (Map<String, Serializable>) sc.getAttribute(SchedulerConstants.JOB_RESULTS_BINDING_NAME);
+    }
+
+    /**
      * Use this method for a multi-node task. It returns the list of nodes url demanded by the user
      * while describing the task.<br>
      * In a task, one node is used to start the task itself, the other are returned by this method.<br>
@@ -217,7 +227,7 @@ public abstract class JavaExecutable {
      * <p>
      * This is a convenience method to retrieve the Replication Index that was exported
      * as a Java Property by the TaskLauncher.
-     * 
+     *
      * @return the Replication Index of this Task
      */
     public final int getReplicationIndex() {
@@ -237,6 +247,7 @@ public abstract class JavaExecutable {
 
     /**
      * When using non forked Java tasks, you should use this PrintStream instead of System.out.
+     *
      * @return a stream that will write to the task's output stream
      */
     protected PrintStream getOut() {
@@ -245,6 +256,7 @@ public abstract class JavaExecutable {
 
     /**
      * When using non forked Java tasks, you should use this PrintStream instead of System.err.
+     *
      * @return a stream that will write to the task's error stream
      */
     protected PrintStream getErr() {
@@ -265,14 +277,15 @@ public abstract class JavaExecutable {
      * The results list order correspond to the order in the dependence list.
      *
      * @param results the results (as a taskResult) from parent tasks.
-     * @throws Throwable any exception thrown by the user's code
      * @return any serializable object from the user.
+     * @throws Throwable any exception thrown by the user's code
      */
     public abstract Serializable execute(TaskResult... results) throws Throwable;
 
     /**
      * Set the progress value for this Executable. Progress value must be ranged
      * between 0 and 100.
+     *
      * @param newValue the new progress value
      * @return the previous progress value
      * @throws IllegalArgumentException if the value is not ranged between 0 and 100.
@@ -300,7 +313,7 @@ public abstract class JavaExecutable {
         return this.propagatedVariables;
     }
 
-    public Map<String, String> getJobResults() {
+    public Map<String, Serializable> getJobResults() {
         return this.jobResults;
     }
 

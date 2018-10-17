@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -41,7 +42,7 @@ public class JobResultData {
 
     private Map<String, TaskResultData> preciousResults;
 
-    private Map<String, TaskResultData> jobResults;
+    private Map<String, Serializable> jobResults;
 
     private Map<String, TaskResultData> exceptionResults;
 
@@ -85,17 +86,18 @@ public class JobResultData {
         this.exceptionResults = exceptionResults;
     }
 
-    @Override
-    public String toString() {
-        return "JobResultData{" + "id=" + id + ", allResults=" + allResults + ", preciousResults=" + preciousResults +
-               ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
-    }
-
-    public void setJobResults(Map<String, TaskResultData> jobResults) {
+    public void setJobResults(Map<String, Serializable> jobResults) {
         this.jobResults = jobResults;
     }
 
-    public Map<String, TaskResultData> getJobResults() {
+    public Map<String, Serializable> getJobResults() {
         return jobResults;
     }
+
+    @Override
+    public String toString() {
+        return "JobResultData{" + "id=" + id + ", allResults=" + allResults + ", preciousResults=" + preciousResults +
+               ", jobResults=" + jobResults + ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
+    }
+
 }

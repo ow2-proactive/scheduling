@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -57,7 +58,7 @@ public class TaskResultImpl implements TaskResult {
 
     private Map<String, byte[]> propagatedVariables;
 
-    private Map<String, TaskResult> jobResults = new HashMap<>();
+    private Map<String, Serializable> jobResults = new ConcurrentHashMap<>();
 
     private Map<String, String> metadata = new HashMap<>();
 
@@ -122,7 +123,7 @@ public class TaskResultImpl implements TaskResult {
     }
 
     @Override
-    public Map<String, TaskResult> getJobResult() {
+    public Map<String, Serializable> getJobResults() {
         return jobResults;
     }
 

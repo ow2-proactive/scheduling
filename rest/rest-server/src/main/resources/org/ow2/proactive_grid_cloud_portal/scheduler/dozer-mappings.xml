@@ -55,11 +55,6 @@
 			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>
 		</field>
 		<field>
-			<a>jobResults</a>
-			<b>jobResults</b>
-			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>
-		</field>
-		<field>
 			<a>preciousResults</a>
 			<b>preciousResults</b>
 			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>

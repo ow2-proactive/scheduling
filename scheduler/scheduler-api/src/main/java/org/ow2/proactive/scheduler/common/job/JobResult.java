@@ -93,7 +93,7 @@ public interface JobResult extends Serializable {
      * Each task can contribute to this map.
      * @return merged map of job results
      */
-    Map<String, TaskResult> getJobResults();
+    Map<String, Serializable> getJobResults();
 
     /**
      * Return only the task results that have generated an exception.<br>
