@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,7 +70,6 @@ import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateIfTaskHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateLoopHandler;
 import org.ow2.proactive.scheduler.job.termination.handlers.TerminateReplicateTaskHandler;
-import org.ow2.proactive.scheduler.synchronization.Synchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
@@ -98,12 +98,17 @@ public abstract class InternalJob extends JobState {
     protected Map<TaskId, InternalTask> tasks = new ConcurrentHashMap<>();
 
     /**
-     * Informations (that can be modified) about job execution
+     * Information (that can be modified) about job execution
      */
     protected JobInfoImpl jobInfo = new JobInfoImpl();
 
     /**
-     * Job descriptor for dependences management
+     * Merged map of job results
+     */
+    private Map<String, Serializable> jobMap = new ConcurrentHashMap<>();
+
+    /**
+     * Job descriptor for dependencies management
      */
     @XmlTransient
     private JobDescriptor jobDescriptor;
@@ -359,6 +364,8 @@ public abstract class InternalJob extends JobState {
      */
     public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId, SchedulerStateUpdate frontend,
             FlowAction action, TaskResultImpl result) {
+        //add job results
+        jobMap.putAll(result.getJobMap());
         return terminateTask(errorOccurred, taskId, frontend, action, result, false);
     }
 
@@ -1289,4 +1296,7 @@ public abstract class InternalJob extends JobState {
         this.jobInfo.setGenericInformation(genericInformation);
     }
 
+    public Map<String, Serializable> getJobMap() {
+        return jobMap;
+    }
 }

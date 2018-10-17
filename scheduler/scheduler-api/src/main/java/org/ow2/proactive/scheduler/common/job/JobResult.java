@@ -90,6 +90,12 @@ public interface JobResult extends Serializable {
     Map<String, TaskResult> getPreciousResults();
 
     /**
+     * Each task can contribute to this map.
+     * @return merged map of job results
+     */
+    Map<String, Serializable> getJobMap();
+
+    /**
      * Return only the task results that have generated an exception.<br>
      * User that wants to get a specific result may get this map and ask for a specific mapping.
      *

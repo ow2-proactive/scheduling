@@ -33,6 +33,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ import com.google.common.base.Stopwatch;
 
 /**
  * Run a task through a script handler.
- *
+ * <p>
  * Responsible for:
  * - running the different scripts
  * - variable propagation
@@ -145,11 +146,12 @@ public class InProcessTaskExecutor implements TaskExecutor {
             forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
                                                                   taskContext,
                                                                   variables,
+                                                                  Collections.<String, Serializable> emptyMap(),
                                                                   thirdPartyCredentials,
                                                                   schedulerNodeClient,
                                                                   userSpaceClient,
                                                                   globalSpaceClient,
-                                                                  resultMetadata);
+                                                                  Collections.<String, String> emptyMap());
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
