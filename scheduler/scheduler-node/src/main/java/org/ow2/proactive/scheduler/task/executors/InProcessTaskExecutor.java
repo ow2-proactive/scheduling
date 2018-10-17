@@ -94,7 +94,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         } else {
             File directory;
             if (taskContext.getNodeDataSpaceURIs().getScratchURI() == null ||
-                    taskContext.getNodeDataSpaceURIs().getScratchURI().isEmpty()) {
+                taskContext.getNodeDataSpaceURIs().getScratchURI().isEmpty()) {
                 directory = new File(".");
             } else {
                 directory = new File(taskContext.getNodeDataSpaceURIs().getScratchURI());
@@ -102,7 +102,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             File nodesFile = new File(directory, NODES_FILE_DIRECTORY_NAME + "_" + taskContext.getTaskId());
 
             try (Writer outputWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(nodesFile),
-                    PAProperties.getFileEncoding()))) {
+                                                                                 PAProperties.getFileEncoding()))) {
                 for (String nodeHost : nodesHosts) {
                     outputWriter.append(nodeHost).append(System.lineSeparator());
                 }
@@ -131,51 +131,51 @@ public class InProcessTaskExecutor implements TaskExecutor {
             nodesFile = writeNodesFile(taskContext);
             VariablesMap variables = new VariablesMap();
             variables.setInheritedMap(taskContextVariableExtractor.getAllNonTaskVariablesInjectNodesFile(taskContext,
-                    nodesFile));
+                                                                                                         nodesFile));
             variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(taskContext));
             Map<String, String> resultMetadata = new HashMap<>();
             Map<String, Serializable> resultMap = new ConcurrentHashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
             userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
-                    schedulerNodeClient,
-                    IDataSpaceClient.Dataspace.USER);
+                                                                                   schedulerNodeClient,
+                                                                                   IDataSpaceClient.Dataspace.USER);
             globalSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
-                    schedulerNodeClient,
-                    IDataSpaceClient.Dataspace.GLOBAL);
+                                                                                     schedulerNodeClient,
+                                                                                     IDataSpaceClient.Dataspace.GLOBAL);
 
             forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
-                    taskContext,
-                    variables,
-                    resultMap,
-                    thirdPartyCredentials,
-                    schedulerNodeClient,
-                    userSpaceClient,
-                    globalSpaceClient,
-                    resultMetadata);
+                                                                  taskContext,
+                                                                  variables,
+                                                                  resultMap,
+                                                                  thirdPartyCredentials,
+                                                                  schedulerNodeClient,
+                                                                  userSpaceClient,
+                                                                  globalSpaceClient,
+                                                                  resultMetadata);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;
             try {
                 stopwatch.start();
                 Serializable result = execute(taskContext,
-                        output,
-                        error,
-                        scriptHandler,
-                        thirdPartyCredentials,
-                        variables);
+                                              output,
+                                              error,
+                                              scriptHandler,
+                                              thirdPartyCredentials,
+                                              variables);
                 stopwatch.stop();
                 taskResult = new TaskResultImpl(taskContext.getTaskId(),
-                        result,
-                        null,
-                        stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                                                result,
+                                                null,
+                                                stopwatch.elapsed(TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 stopwatch.stop();
                 e.printStackTrace(error);
                 taskResult = new TaskResultImpl(taskContext.getTaskId(),
-                        e,
-                        null,
-                        stopwatch.elapsed(TimeUnit.MILLISECONDS));
+                                                e,
+                                                null,
+                                                stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
 
             executeFlowScript(taskContext.getControlFlowScript(), scriptHandler, output, error, taskResult);
@@ -207,7 +207,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
      * @throws Throwable
      */
     private Serializable execute(TaskContext taskContext, PrintStream output, PrintStream error,
-                                 ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, VariablesMap variables)
+            ScriptHandler scriptHandler, Map<String, String> thirdPartyCredentials, VariablesMap variables)
             throws Throwable {
         if (taskContext.getPreScript() != null) {
             Script<?> script = taskContext.getPreScript();
@@ -215,7 +215,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
             if (preScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute pre script: " + preScriptResult.getException().getMessage(),
-                        preScriptResult.getException());
+                                        preScriptResult.getException());
             }
         }
 
@@ -225,25 +225,25 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
         if (scriptResult.errorOccured()) {
             throw new TaskException("Failed to execute task: " + scriptResult.getException().getMessage(),
-                    scriptResult.getException());
+                                    scriptResult.getException());
         }
 
         if (taskContext.getPostScript() != null) {
             forkedTaskVariablesManager.replaceScriptParameters(taskContext.getPostScript(),
-                    thirdPartyCredentials,
-                    variables,
-                    error);
+                                                               thirdPartyCredentials,
+                                                               variables,
+                                                               error);
             ScriptResult postScriptResult = scriptHandler.handle(taskContext.getPostScript(), output, error);
             if (postScriptResult.errorOccured()) {
                 throw new TaskException("Failed to execute post script: " +
-                        postScriptResult.getException().getMessage(), postScriptResult.getException());
+                                        postScriptResult.getException().getMessage(), postScriptResult.getException());
             }
         }
         return scriptResult.getResult();
     }
 
     private void executeFlowScript(FlowScript flowScript, ScriptHandler scriptHandler, PrintStream output,
-                                   PrintStream error, TaskResultImpl taskResult) {
+            PrintStream error, TaskResultImpl taskResult) {
         if (flowScript != null) {
             try {
                 scriptHandler.addBinding(FlowScript.resultVariable, taskResult.value());

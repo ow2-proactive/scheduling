@@ -222,6 +222,21 @@ public interface SchedulerRestInterface {
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 
     /**
+     * Returns the job results map associated to the job referenced by the id
+     * <code>jobid</code>
+     *
+     * @param sessionId
+     *            a valid session id
+     * @return the job results map of the corresponding job
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/resultmap")
+    @Produces("application/json")
+    Map<String, Serializable> jobResultMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+
+    /**
      * Returns the job info associated to the job referenced by the id
      * <code>jobid</code>
      * 

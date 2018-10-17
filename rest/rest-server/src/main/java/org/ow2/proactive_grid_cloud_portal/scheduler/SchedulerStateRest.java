@@ -532,6 +532,39 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * Returns the job results map associated to the job referenced by the id
+     * <code>jobid</code>
+     *
+     * @param sessionId
+     *            a valid session id
+     * @return the job result of the corresponding job
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/resultmap")
+    @Produces("application/json")
+    public Map<String, Serializable> jobResultMap(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/resultmap");
+            JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
+            if (jobResult == null) {
+                return null;
+            } else {
+                return jobResult.getResultMap();
+            }
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
