@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
@@ -124,13 +125,45 @@ public abstract class JobFactory {
      */
     public abstract Job createJob(String filePath) throws JobCreationException;
 
-    public abstract Job createJob(String filePath, Map<String, String> variables) throws JobCreationException;
+    /**
+     * Creates a job using the given job descriptor.
+     *
+     * @param filePath the path to an XML job descriptor.
+     * @param variables map of job submission variables
+     * @param genericInfos map of job submission generic infos
+     * @return a Job instance created with the given XML file.
+     * @throws JobCreationException if an exception occurred during job creation.
+     */
+    public abstract Job createJob(String filePath, Map<String, String> variables, Map<String, String> genericInfos)
+            throws JobCreationException;
+
+    /**
+     * Creates a job using the given job descriptor.
+     *
+     * @param filePath the path to an XML job descriptor.
+     * @return a Job instance created with the given XML file.
+     * @throws JobCreationException if an exception occurred during job creation.
+     */
+    public abstract Job createJob(URI filePath) throws JobCreationException;
+
+    /**
+     * Creates a job using the given job descriptor.
+     *
+     * @param filePath the path to an XML job descriptor.
+     * @param variables map of job submission variables
+     * @param genericInfos map of job submission generic infos
+     * @return a Job instance created with the given XML file.
+     * @throws JobCreationException if an exception occurred during job creation.
+     */
+    public abstract Job createJob(URI filePath, Map<String, String> variables, Map<String, String> genericInfos)
+            throws JobCreationException;
 
     /**
      * @see #createJob(String)
      */
-    public abstract Job createJob(URI filePath) throws JobCreationException;
+    public abstract Job createJob(InputStream workflowStream) throws JobCreationException;
 
-    public abstract Job createJob(URI filePath, Map<String, String> variables) throws JobCreationException;
+    public abstract Job createJob(InputStream workflowStream, Map<String, String> variables,
+            Map<String, String> genericInfos) throws JobCreationException;
 
 }
