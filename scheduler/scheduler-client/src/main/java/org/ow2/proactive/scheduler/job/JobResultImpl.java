@@ -59,8 +59,8 @@ public class JobResultImpl implements JobResult {
     /** List of precious results */
     private Map<String, TaskResult> preciousResults = null;
 
-    /** Map of jobResults which merged in the end of the job */
-    private Map<String, Serializable> JobMap = null;
+    /** Map of job results which merged in the end of the job */
+    private Map<String, Serializable> jobMap = null;
 
     /** Info of the job at the end */
     private JobInfo jobInfo;
@@ -71,7 +71,7 @@ public class JobResultImpl implements JobResult {
     public JobResultImpl() {
         allResults = new HashMap<>();
         preciousResults = new HashMap<>();
-        JobMap = new ConcurrentHashMap<>();
+        jobMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -118,7 +118,7 @@ public class JobResultImpl implements JobResult {
         allResults.put(taskName, taskResult);
 
         //add job results
-        JobMap.putAll(taskResult.getJobMap());
+        jobMap.putAll(taskResult.getJobMap());
         //add to precious results if needed
         if (isPrecious) {
             preciousResults.put(taskName, taskResult);
@@ -179,7 +179,7 @@ public class JobResultImpl implements JobResult {
 
     @Override
     public Map<String, Serializable> getJobMap() {
-        return JobMap;
+        return jobMap;
     }
 
     /**

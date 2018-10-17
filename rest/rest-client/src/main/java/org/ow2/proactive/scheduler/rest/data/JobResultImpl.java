@@ -55,7 +55,7 @@ public class JobResultImpl implements JobResult {
 
     private Map<String, TaskResult> preciousResults;
 
-    private Map<String, Serializable> JobMap = null;
+    private Map<String, Serializable> jobMap = null;
 
     private Map<String, TaskResult> exceptionResults;
 
@@ -65,7 +65,7 @@ public class JobResultImpl implements JobResult {
         allResults = createTaskResultMap(data.getAllResults());
         preciousResults = createTaskResultMap(data.getPreciousResults());
         exceptionResults = createTaskResultMap(data.getExceptionResults());
-        JobMap = data.getJobMap();
+        jobMap = data.getJobMap();
         jobInfo = data.getJobInfo();
     }
 
@@ -108,7 +108,7 @@ public class JobResultImpl implements JobResult {
 
     @Override
     public Map<String, Serializable> getJobMap() {
-        return JobMap;
+        return jobMap;
     }
 
     @Override

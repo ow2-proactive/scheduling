@@ -42,7 +42,7 @@ public class JobResultData {
 
     private Map<String, TaskResultData> preciousResults;
 
-    private Map<String, Serializable> JobMap;
+    private Map<String, Serializable> jobMap;
 
     private Map<String, TaskResultData> exceptionResults;
 
@@ -86,18 +86,18 @@ public class JobResultData {
         this.exceptionResults = exceptionResults;
     }
 
-    public void setJobMap(Map<String, Serializable> JobMap) {
-        this.JobMap = JobMap;
+    public void setJobMap(Map<String, Serializable> jobMap) {
+        this.jobMap = jobMap;
     }
 
     public Map<String, Serializable> getJobMap() {
-        return JobMap;
+        return jobMap;
     }
 
     @Override
     public String toString() {
         return "JobResultData{" + "id=" + id + ", allResults=" + allResults + ", preciousResults=" + preciousResults +
-               ", JobMap=" + JobMap + ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
+               ", jobMap=" + jobMap + ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
     }
 
 }

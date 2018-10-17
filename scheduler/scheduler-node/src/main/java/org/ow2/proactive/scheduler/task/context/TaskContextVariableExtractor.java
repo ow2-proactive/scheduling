@@ -148,30 +148,6 @@ public class TaskContextVariableExtractor implements Serializable {
     }
 
     /**
-     * Method to retrieve job results variables in scope.
-     *
-     * @param taskContext task context container.
-     *
-     * @return Map containing all job results variables extracted.
-     *
-     */
-    public Map<String, Serializable> getJobMapVariables(TaskContext taskContext) {
-        Map<String, Serializable> JobMap = new HashMap<>();
-        Map<String, Serializable> dictionary = new HashMap<>();
-
-        try {
-            if (taskContext != null) {
-                JobMap.putAll(extractJobMapVariables(taskContext));
-            }
-            dictionary = extractAllVariables(taskContext, null, "");
-        } catch (IOException | ClassNotFoundException e) {
-            logger.error(ERROR_READING_VARIABLES, e);
-        }
-
-        return VariableSubstitutor.resolveVariables(JobMap, dictionary);
-    }
-
-    /**
      * Method to retrieve all variables in scope. Note it ignores TaskResult variables and nodesFile.
      *
      * @param taskContext task context container.
@@ -373,26 +349,5 @@ public class TaskContextVariableExtractor implements Serializable {
             }
         }
         return variables;
-    }
-
-    /**
-     * Extract job map results from the previous task result to be used now.
-     *
-     * @param taskContext contains the information needed to extract.
-     *
-     * @return a map containing extracted job results variables or an empty hash if there are no variables.
-     */
-    private Map<String, Serializable> extractJobMapVariables(TaskContext taskContext)
-            throws IOException, ClassNotFoundException {
-        Map<String, Serializable> JobMap = new HashMap<>();
-
-        if (taskContext.getPreviousTasksResults() != null) {
-            for (TaskResult previousTaskResult : taskContext.getPreviousTasksResults()) {
-                if (previousTaskResult.getJobMap() != null) {
-                    JobMap.putAll(previousTaskResult.getJobMap());
-                }
-            }
-        }
-        return JobMap;
     }
 }

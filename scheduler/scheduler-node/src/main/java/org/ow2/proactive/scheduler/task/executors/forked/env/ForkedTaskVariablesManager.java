@@ -65,10 +65,10 @@ public class ForkedTaskVariablesManager implements Serializable {
     }
 
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext, VariablesMap variables,
-            Map<String, Serializable> JobMap, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client,
+            Map<String, Serializable> jobMap, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client,
             RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
-        scriptHandler.addBinding(SchedulerConstants.JOB_RESULTS_BINDING_NAME, JobMap);
+        scriptHandler.addBinding(SchedulerConstants.JOB_MAP_BINDING_NAME, jobMap);
 
         scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME,
                                  taskContext.getInitializer().getGenericInformation());
@@ -134,13 +134,12 @@ public class ForkedTaskVariablesManager implements Serializable {
     }
 
     public void replaceScriptParameters(Script<?> script, Map<String, String> thirdPartyCredentials,
-            VariablesMap variables, Map<String, Serializable> JobMap, PrintStream errorStream) {
+            VariablesMap variables, PrintStream errorStream) {
 
         Map<String, Serializable> variablesAndCredentials = new HashMap<>(variables.getInheritedMap());
 
         variablesAndCredentials.putAll(variables.getScopeMap());
         //add also job results variables
-        variablesAndCredentials.putAll(JobMap);
         for (Map.Entry<String, String> credentialEntry : thirdPartyCredentials.entrySet()) {
             variablesAndCredentials.put(CREDENTIALS_KEY_PREFIX + credentialEntry.getKey(), credentialEntry.getValue());
         }

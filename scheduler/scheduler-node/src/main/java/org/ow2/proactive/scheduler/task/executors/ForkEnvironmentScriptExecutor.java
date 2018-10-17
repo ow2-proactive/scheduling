@@ -63,7 +63,6 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
         VariablesMap variables = new VariablesMap();
         variables.setInheritedMap(taskContextVariableExtractor.getAllNonTaskVariables(context));
         variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(context));
-        Map<String, Serializable> JobMap = taskContextVariableExtractor.getJobMapVariables(context);
 
         Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(context);
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
@@ -71,23 +70,23 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
 
         SchedulerNodeClient schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(context);
         RemoteSpace userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(context,
-                                                                                           schedulerNodeClient,
-                                                                                           IDataSpaceClient.Dataspace.USER);
+                schedulerNodeClient,
+                IDataSpaceClient.Dataspace.USER);
         RemoteSpace globalSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(context,
-                                                                                             schedulerNodeClient,
-                                                                                             IDataSpaceClient.Dataspace.GLOBAL);
+                schedulerNodeClient,
+                IDataSpaceClient.Dataspace.GLOBAL);
 
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
-                                                              context,
-                                                              variables,
-                                                              JobMap,
-                                                              thirdPartyCredentials,
-                                                              schedulerNodeClient,
-                                                              userSpaceClient,
-                                                              globalSpaceClient,
-                                                              Collections.<String, String> emptyMap());
+                context,
+                variables,
+                Collections.<String, Serializable>emptyMap(),
+                thirdPartyCredentials,
+                schedulerNodeClient,
+                userSpaceClient,
+                globalSpaceClient,
+                Collections.<String, String>emptyMap());
 
-        forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, JobMap, errorSink);
+        forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, errorSink);
 
         ScriptResult scriptResult = scriptHandler.handle(script, outputSink, errorSink);
 
