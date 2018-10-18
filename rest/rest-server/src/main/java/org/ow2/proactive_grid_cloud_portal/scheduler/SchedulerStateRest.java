@@ -1083,6 +1083,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @GET
     @Path("jobs/{jobid}/xml")

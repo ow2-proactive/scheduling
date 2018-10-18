@@ -83,6 +83,7 @@ public class NodeSet extends ArrayList<Node> {
 
     /**
      * Constructs the nodes set from another node set.
+     * @param another
      */
     public NodeSet(NodeSet another) {
         super(another);
@@ -101,6 +102,7 @@ public class NodeSet extends ArrayList<Node> {
 
     /**
      * Sets new extra nodes list.
+     * @param extraNodes
      */
     public void setExtraNodes(Collection<Node> extraNodes) {
         this.extraNodes = extraNodes;
