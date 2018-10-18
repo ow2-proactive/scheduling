@@ -293,6 +293,14 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        renewSession();
+        return client.reSubmit(currentJobId, jobVariables, jobGenericInfos);
+    }
+
+    @Override
     public JobId submit(File job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();

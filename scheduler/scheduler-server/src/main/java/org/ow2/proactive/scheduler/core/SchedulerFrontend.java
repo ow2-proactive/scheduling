@@ -119,6 +119,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -440,6 +441,18 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws AlreadyConnectedException {
         this.frontendState.connect(sourceBodyID, identification, cred);
         this.spacesSupport.registerUserSpace(identification.getUsername());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        final String jobContent = getJobContent(currentJobId);
+        final Job job = JobFactory.getFactory().createJob(jobContent, jobVariables, jobGenericInfos);
+        return submit(job);
     }
 
     /**

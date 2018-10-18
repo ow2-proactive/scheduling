@@ -727,6 +727,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        //        final JobIdData jobIdData = restApi().reSubmit()
+        //        return jobId(jobIdData);
+        return null;
+    }
+
+    @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return submit(job, variables, null);
