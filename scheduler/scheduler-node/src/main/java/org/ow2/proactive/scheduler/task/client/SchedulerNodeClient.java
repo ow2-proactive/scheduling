@@ -652,8 +652,8 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public Job getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException, JobCreationException,
-            NotConnectedException, PermissionException {
+    public String getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException,
+            JobCreationException, NotConnectedException, PermissionException {
         renewSession();
         return client.getJobContent(jobId);
     }

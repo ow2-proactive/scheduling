@@ -1489,7 +1489,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
-    public Job getJobContent(JobId jobId) throws UnknownJobException, NotConnectedException, PermissionException {
+    public String getJobContent(JobId jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         frontendState.checkPermissions("getJobContent",
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB);

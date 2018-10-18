@@ -1482,9 +1482,9 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * @param jobId job id of existing job
-     * @return copy of the object which was submitted to the scheduler
+     * @return copy of the xml which was submitted to the scheduler
      */
-    Job getJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException,
+    String getJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException,
             SubmissionClosedException, JobCreationException;
 
     /**
