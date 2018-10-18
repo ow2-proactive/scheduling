@@ -55,6 +55,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.rm.*;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.DownloadFileCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.FreezeCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobContentCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand;
@@ -72,6 +73,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PutThirdPartyCredentialCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ReSubmitJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveThirdPartyCredentialCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartAllInErrorTasksCommand;
@@ -249,6 +251,17 @@ public class CommandSet {
                                                                         .commandClass(SubmitJobCommand.class)
                                                                         .entry();
 
+    public static final CommandSet.Entry RE_SUBMIT = CommandSetEntryBuilder.newInstance()
+                                                                           .longOpt("resubmit")
+                                                                           .description("Re-Submit existing job with new variables values")
+                                                                           .hasArgs(true)
+                                                                           .numOfArgs(2)
+                                                                           .hasOptionalArg(true)
+                                                                           .argNames("jobId '[{\"var1\":\"value1\",\"var2\":\"value2\"}]'")
+                                                                           .jsCommand("resubmit(job-id,'{\"var1\":\"value1\",\"var2\":\"value2\"}'")
+                                                                           .commandClass(ReSubmitJobCommand.class)
+                                                                           .entry();
+
     public static final CommandSet.Entry SCHEDULER_START = CommandSetEntryBuilder.newInstance()
                                                                                  .opt("start")
                                                                                  .longOpt("startscheduler")
@@ -384,6 +397,16 @@ public class CommandSet {
                                                                             .jsCommand("joboutput(job-id[,tag])")
                                                                             .commandClass(GetJobOutputCommand.class)
                                                                             .entry();
+
+    public static final CommandSet.Entry JOB_CONTENT = CommandSetEntryBuilder.newInstance()
+                                                                             .longOpt("jobcontent")
+                                                                             .description("Retrieve xml job representation")
+                                                                             .hasArgs(true)
+                                                                             .numOfArgs(1)
+                                                                             .argNames("job-id")
+                                                                             .jsCommand("jobcontent(job-id)")
+                                                                             .commandClass(GetJobContentCommand.class)
+                                                                             .entry();
 
     public static final CommandSet.Entry JOB_PRIORITY = CommandSetEntryBuilder.newInstance()
                                                                               .opt("jp")
@@ -974,11 +997,12 @@ public class CommandSet {
     public static final CommandSet.Entry[] SCHEDULER_ONLY = new CommandSet.Entry[] { SCHEDULER_START, SCHEDULER_STOP,
                                                                                      SCHEDULER_PAUSE, SCHEDULER_RESUME,
                                                                                      SCHEDULER_FREEZE, SCHEDULER_KILL,
-                                                                                     SCHEDULER_SHUTDOWN, LINK_RM,
-                                                                                     SCHEDULER_STATS, JOB_LIST, SUBMIT,
-                                                                                     JOB_STATE, JOB_OUTPUT, JOB_RESULT,
-                                                                                     JOB_PRIORITY, JOB_PAUSE,
-                                                                                     JOB_RESUME,
+                                                                                     SCHEDULER_SHUTDOWN,
+                                                                                     LINK_RM, SCHEDULER_STATS, JOB_LIST,
+                                                                                     SUBMIT, RE_SUBMIT, JOB_STATE,
+                                                                                     JOB_OUTPUT, JOB_CONTENT,
+                                                                                     JOB_RESULT, JOB_PRIORITY,
+                                                                                     JOB_PAUSE, JOB_RESUME,
                                                                                      JOB_RESUME_ALL_PAUSED_TASKS,
                                                                                      JOB_RESTART_ALL_IN_ERROR_TASKS,
                                                                                      JOB_RESUME_ALL_PAUSED_TASKS_AND_RESTART_ALL_IN_ERROR_TASKS,

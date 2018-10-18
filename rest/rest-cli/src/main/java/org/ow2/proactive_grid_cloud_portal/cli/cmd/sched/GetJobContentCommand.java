@@ -25,54 +25,29 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.apache.http.entity.ContentType.APPLICATION_XML;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_FILE_EMPTY;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URLConnection;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
-import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
+import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
+import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
 
-public class ReSubmitJobCommand extends AbstractCommand implements Command {
-    private final String jobId;
+public class GetJobContentCommand extends AbstractJobTagCommand implements Command {
 
-    private String variables;
+    public GetJobContentCommand(String jobId) {
+        super(jobId);
+    }
 
-    private static final Logger logger = null;
-
-    private final JobKeyValueTransformer jobKeyValueTransformer;
-
-    public ReSubmitJobCommand(String... params) throws NullPointerException {
-        Objects.requireNonNull(params);
-
-        this.jobId = params[0];
-        if (params.length > 1) {
-            this.variables = params[1];
-        }
-        this.jobKeyValueTransformer = new JobKeyValueTransformer();
-
+    public GetJobContentCommand(String jobId, String tag) {
+        super(jobId, tag);
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-
     }
 
 }
