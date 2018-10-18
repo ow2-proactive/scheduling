@@ -50,11 +50,9 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
 import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +62,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -101,7 +98,6 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
-import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -1234,14 +1230,10 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public Job getJobContent(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException,
+    public String getJobContent(JobId jobId) throws NotConnectedException, PermissionException, UnknownJobException,
             JobCreationException, SubmissionClosedException {
-        File tempFile = null;
         try {
-            final InputStream jobContent = restApi().getJobContent(sid, jobId.value());
-            tempFile = File.createTempFile("jobContent", jobId.value());
-            FileUtils.copyInputStreamToFile(jobContent, tempFile);
-            return JobFactory.getFactory().createJob(tempFile.getPath());
+            return restApi().getJobContent(sid, jobId.value());
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         } catch (UnknownJobRestException e) {
@@ -1252,16 +1244,6 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throw new SubmissionClosedException(e);
         } catch (JobCreationRestException e) {
             throw new JobCreationException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (tempFile != null) {
-                try {
-                    Files.delete(tempFile.toPath());
-                } catch (IOException e) {
-                    logger.error("Cannot delete file: " + e);
-                }
-            }
         }
     }
 
