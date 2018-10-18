@@ -39,6 +39,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -97,43 +98,69 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
 
     @Test
     public void testExecCommandUsesJavaHomeFromSystemProperties() throws Exception {
-        javaCommandContains(Arrays.asList(new String[] { System.getProperty("java.home") }), createForkEnvironment());
+        javaCommandContainsOrNot(Arrays.asList(new String[] { System.getProperty("java.home") }),
+                                 createForkEnvironment(),
+                                 true);
     }
 
     @Test
     public void testExecCommandUsesClassPathSystemProperties() throws Exception {
-        javaCommandContains(Arrays.asList(new String[] { "-cp", System.getProperty("java.class.path") }),
-                            createForkEnvironment());
+        javaCommandContainsOrNot(Arrays.asList(new String[] { "-cp", System.getProperty("java.class.path") }),
+                                 createForkEnvironment(),
+                                 true);
     }
 
     @Test
     public void testExecCommandContainsJavaCommandPrefix() throws Exception {
-        javaCommandContains(Arrays.asList(testPreJaveCommandString), createForkEnvironment());
+        javaCommandContainsOrNot(Arrays.asList(testPreJaveCommandString), createForkEnvironment(), true);
     }
 
     @Test
     public void testExecCommandContainsJavaArgumentsExtractedFromForkEnvironment() throws Exception {
-        javaCommandContains(Arrays.asList(forkEnvJvmArguments), createForkEnvironment());
+        javaCommandContainsOrNot(Arrays.asList(forkEnvJvmArguments), createForkEnvironment(), true);
     }
 
     @Test
     public void testExecCommandContainsAbsolutePathOfSerializedContext() throws Exception {
-        javaCommandContains(Arrays.asList(serializedContextAbsolutePath), createForkEnvironment());
+        javaCommandContainsOrNot(Arrays.asList(serializedContextAbsolutePath), createForkEnvironment(), true);
     }
 
     @Test
     public void testExecCommandContainsAdditionalClasspathSavedInForkEnvironment() throws Exception {
-        javaCommandContains(Arrays.asList(additionalClasspath), createForkEnvironment());
+        javaCommandContainsOrNot(Arrays.asList(additionalClasspath), createForkEnvironment(), true);
     }
 
     @Test
     public void testExecCommandOverwritesJavaHomeFromForkEnvironment() throws Exception {
         ForkEnvironment forkEnvironment = createForkEnvironment();
         forkEnvironment.setJavaHome(forkenvironmentJavaHome);
-        javaCommandContains(Arrays.asList(forkenvironmentJavaHome), forkEnvironment);
+        javaCommandContainsOrNot(Arrays.asList(forkenvironmentJavaHome), forkEnvironment, true);
     }
 
-    private void javaCommandContains(List<String> stringsContained, ForkEnvironment forkEnvironment) throws Exception {
+    @Test
+    public void testExecCommandForwardsProActiveProperties() throws Exception {
+        PAMRConfig.PA_NET_ROUTER_PORT.setValue(33648);
+        ForkEnvironment forkEnvironment = createForkEnvironment();
+        javaCommandContainsOrNot(Arrays.asList(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + 33648),
+                                 forkEnvironment,
+                                 true);
+    }
+
+    @Test
+    public void testExecCommandProActivePropertiesCanBeOverriden() throws Exception {
+        PAMRConfig.PA_NET_ROUTER_PORT.setValue(33648);
+        ForkEnvironment forkEnvironment = createForkEnvironment();
+        forkEnvironment.addJVMArgument(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + 33649);
+        javaCommandContainsOrNot(Arrays.asList(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + 33649),
+                                 forkEnvironment,
+                                 true);
+        javaCommandContainsOrNot(Arrays.asList(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + 33648),
+                                 forkEnvironment,
+                                 false);
+    }
+
+    private void javaCommandContainsOrNot(List<String> stringsContained, ForkEnvironment forkEnvironment,
+            boolean contains) throws Exception {
         ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
         replaceJavaPrefixCommandCreatorWithMock(forkedJvmTaskExecutionCommandCreator);
 
@@ -145,7 +172,11 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
                                                                                                                  serializedContextAbsolutePath);
 
         for (String insideJavaCommand : stringsContained) {
-            assertThatListHasAtLeastOneStringWhichContains(containsJavaHome, insideJavaCommand);
+            if (contains) {
+                assertThatListHasAtLeastOneStringWhichContains(containsJavaHome, insideJavaCommand);
+            } else {
+                assertThatListHasNoStringWhichContains(containsJavaHome, insideJavaCommand);
+            }
         }
     }
 
@@ -183,6 +214,24 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
         assertThat("List did not contain string with: " + matching + ".\n But was: " + list,
                    hasOneStringContaining,
                    is(true));
+    }
+
+    /**
+     * Assert that a list if strings has no string which contains as a substring the matching string.
+     *
+     * @param list     List of strings.
+     * @param shouldNotMatch String to look for in the list of strings.
+     */
+    private void assertThatListHasNoStringWhichContains(List<String> list, String shouldNotMatch) {
+        boolean hasOneStringContaining = false;
+        for (String string : list) {
+            if (string.contains(shouldNotMatch)) {
+                hasOneStringContaining = true;
+            }
+        }
+        assertThat("List should not contain string with: " + shouldNotMatch + ".\n But was: " + list,
+                   hasOneStringContaining,
+                   is(false));
     }
 
     /**

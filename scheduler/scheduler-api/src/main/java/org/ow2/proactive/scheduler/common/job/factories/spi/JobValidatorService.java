@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi;
 
-import java.io.File;
+import java.io.InputStream;
 
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -44,11 +44,11 @@ public interface JobValidatorService {
      *
      * Example of use: xml schema validation.
      *
-     * @param jobFile xml job file to validate
+     * @param jobInputStream job file content to validate
      * @return if the validator eventually made some modifications to the job, return a new version
      * @throws JobValidationException if the job is not valid
      */
-    File validateJob(File jobFile) throws JobValidationException;
+    void validateJob(InputStream jobInputStream) throws JobValidationException;
 
     /**
      * Validate a job object after the job has been parsed by the scheduler.
