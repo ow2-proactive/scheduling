@@ -150,7 +150,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         ISchedulerClient client = clientInstance();
         Job job = createJob(JobResultTask.class);
         JobId jobId = client.submit(job);
-        final JobResult jobResult = client.getJobResult(jobId);
+        final JobResult jobResult = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(2000));
         assertFalse(jobResult.getResultMap().isEmpty());
     }
 

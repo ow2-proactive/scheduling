@@ -537,7 +537,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *
      * @param sessionId
      *            a valid session id
-     * @return the job result of the corresponding job
+     * @return the job results map of the corresponding job
      */
     @Override
     @GET

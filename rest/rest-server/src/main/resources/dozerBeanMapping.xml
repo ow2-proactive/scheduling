@@ -40,6 +40,10 @@
 			<b>jobId</b>
 		</field>
 		<field>
+			<a>resultMap</a>
+			<b>resultMap</b>
+		</field>
+		<field>
 			<a>allResults</a>
 			<b>allResults</b>
 			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>
