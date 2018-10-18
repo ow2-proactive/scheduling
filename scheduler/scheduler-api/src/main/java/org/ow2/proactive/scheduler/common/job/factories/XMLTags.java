@@ -123,14 +123,14 @@ public enum XMLTags {
     /**
      * pattern that matches for open tag for provided tag name.
      * e.g.: <code>String.format(OPEN_TAG_PATTERN, XMLTags.VARIABLES</code> seeks
-     * for the string like this: <variables>, <   variables>, <variables   >, etc.
+     * for the string like this: &lt;variables&gt;, &lt;   variables&gt;, &lt;variables   &gt;, etc.
      */
     public static final String OPEN_TAG_PATTERN = "<[ ]*%s[ ]*>";
 
     /**
      * pattern that matches for open tag for provided tag name.
      * e.g.: <code>String.format(CLOSE_TAG_PATTERN, XMLTags.VARIABLES</code> seeks
-     * for the string like this: </variables>, </   variables>, <  /  variables   >, etc.
+     * for the string like this: &lt;/variables&gt;, &lt;/   variables&gt;, &lt;  /  variables   &gt;, etc.
      */
     public static final String CLOSE_TAG_PATTERN = "<[ ]*/[ ]*%s[ ]*>";
 
