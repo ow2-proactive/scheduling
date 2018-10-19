@@ -44,6 +44,8 @@ public class JobResultData {
 
     private Map<String, Serializable> resultMap;
 
+    private Map<String, String> serializedResultMap;
+
     private Map<String, TaskResultData> exceptionResults;
 
     public JobIdData getId() {
@@ -94,9 +96,17 @@ public class JobResultData {
         return resultMap;
     }
 
+    public Map<String, String> getSerializedResultMap() {
+        return serializedResultMap;
+    }
+
+    public void setSerializedResultMap(Map<String, String> serializedResultMap) {
+        this.serializedResultMap = serializedResultMap;
+    }
+
     @Override
     public String toString() {
         return "JobResultData{" + "id=" + id + ", allResults=" + allResults + ", preciousResults=" + preciousResults +
-               ", resultMap=" + resultMap + ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
+               ", resultMap=" + resultMap +  ", serializedResultMap=" + serializedResultMap + ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
     }
 }

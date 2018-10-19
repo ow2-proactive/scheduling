@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.utils.ObjectByteConverter;
 
 
 /**
@@ -176,9 +178,16 @@ public class JobResultImpl implements JobResult {
         return preciousResults;
     }
 
-    @Override
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.JobResult#getResultMap()
+     */
     public Map<String, Serializable> getResultMap() {
         return resultMap;
+    }
+
+    @Override
+    public Map<String, String> getSerializedResultMap() throws IOException, ClassNotFoundException {
+        return ObjectByteConverter.mapOfSerializableToString(resultMap);
     }
 
     /**

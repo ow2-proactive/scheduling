@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,12 +33,15 @@ import org.apache.log4j.Logger;
 import org.dozer.DozerConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
 
+/**
+ * @author ActiveEon Team
+ * @since 18/10/2018
+ */
+public class StringResultMapCustomConverter extends DozerConverter<Map, Map> {
 
-public class StringPropagatedVariablesCustomConverter extends DozerConverter<Map, Map> {
+    private static final Logger logger = Logger.getLogger(StringResultMapCustomConverter.class);
 
-    private static final Logger logger = Logger.getLogger(StringPropagatedVariablesCustomConverter.class);
-
-    public StringPropagatedVariablesCustomConverter() {
+    public StringResultMapCustomConverter() {
         super(Map.class, Map.class);
     }
 
@@ -53,9 +57,9 @@ public class StringPropagatedVariablesCustomConverter extends DozerConverter<Map
             return null;
         }
         Map<String, String> converted = new HashMap<>();
-        for (Map.Entry<String, byte[]> entry : ((Map<String, byte[]>) source).entrySet()) {
+        for (Map.Entry<String, Serializable> entry : ((Map<String, Serializable>) source).entrySet()) {
             try {
-                Object valueAsObject = ObjectByteConverter.byteArrayToObject(entry.getValue());
+                Object valueAsObject = ObjectByteConverter.serializableToBase64String(entry.getValue());
                 if (valueAsObject != null) {
                     converted.put(entry.getKey(), valueAsObject.toString());
                 } else if (entry.getValue() != null) {
@@ -69,3 +73,4 @@ public class StringPropagatedVariablesCustomConverter extends DozerConverter<Map
         return converted;
     }
 }
+

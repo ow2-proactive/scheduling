@@ -53,7 +53,7 @@ public final class ObjectByteConverter {
 
     /**
      * Convert the given Serializable Object into a byte array.
-     * 
+     *
      * @param obj the Serializable object to be compressed
      * @return a byteArray representing the Serialization of the given object.
      * @throws IOException if an I/O exception occurs when writing the output byte array
@@ -66,7 +66,7 @@ public final class ObjectByteConverter {
      * Convert the given Serializable Object into a byte array.
      * <p>
      * The returned byteArray can be compressed by setting compress boolean argument value to <code>true</code>.
-     * 
+     *
      * @param obj the Serializable object to be compressed
      * @param compress true if the returned byteArray must be also compressed, false if no compression is required.
      * @return a compressed (or not) byteArray representing the Serialization of the given object.
@@ -124,7 +124,7 @@ public final class ObjectByteConverter {
 
     /**
      * Convert the given byte array into the corresponding object.
-     * 
+     *
      * @param input the byteArray to be convert as an object.
      * @return the object corresponding to the given byteArray.
      * @throws IOException if an I/O exception occurs when writing the returned object
@@ -138,7 +138,7 @@ public final class ObjectByteConverter {
      * Convert the given byte array into the corresponding object.
      * <p>
      * The given byteArray can be uncompressed if it has been compressed before.
-     * 
+     *
      * @param input the byteArray to be convert as an object.
      * @param uncompress true if the given byteArray must be also uncompressed, false if no compression was made on it.
      * @return the object corresponding to the given byteArray.
@@ -226,6 +226,29 @@ public final class ObjectByteConverter {
         HashMap<String, byte[]> answer = new HashMap<>(input.size());
         for (Map.Entry<String, String> entry : input.entrySet()) {
             answer.put(entry.getKey(), base64StringToByteArray(entry.getValue()));
+        }
+        return answer;
+    }
+
+    public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input) throws IOException, ClassNotFoundException {
+        if (input == null) {
+            return null;
+        }
+        HashMap<String, Serializable> answer = new HashMap<>(input.size());
+        for (Map.Entry<String, String> entry : input.entrySet()) {
+            answer.put(entry.getKey(), base64StringToSerializable(entry.getValue()));
+        }
+        return answer;
+    }
+
+    public static Map<String, String> mapOfSerializableToString(Map<String, Serializable> input)
+            throws IOException, ClassNotFoundException {
+        if (input == null) {
+            return null;
+        }
+        HashMap<String, String> answer = new HashMap<>(input.size());
+        for (Map.Entry<String, Serializable> entry : input.entrySet()) {
+            answer.put(entry.getKey(), serializableToBase64String(entry.getValue()));
         }
         return answer;
     }

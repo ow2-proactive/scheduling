@@ -39,9 +39,15 @@
 			<a>id</a>
 			<b>jobId</b>
 		</field>
-		<field>
-			<a>resultMap</a>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.ResultMapCustomConverter">
+			<a>serializedResultMap</a>
 			<b>resultMap</b>
+		</field>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.StringResultMapCustomConverter">
+			<a>resultMap</a>
+			<b>serializedResultMap</b>
 		</field>
 		<field>
 			<a>allResults</a>

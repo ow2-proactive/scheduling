@@ -28,16 +28,19 @@ package org.ow2.proactive.scheduler.rest.data;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfo;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.utils.ObjectByteConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
@@ -47,6 +50,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 public class JobResultImpl implements JobResult {
     private static final long serialVersionUID = 1L;
 
+    private static final Logger logger = Logger.getLogger(JobResultImpl.class);
+
     private JobId jobId;
 
     private JobInfoData jobInfo;
@@ -55,7 +60,7 @@ public class JobResultImpl implements JobResult {
 
     private Map<String, TaskResult> preciousResults;
 
-    private Map<String, Serializable> resultMap = null;
+    private Map<String, Serializable> resultMap;
 
     private Map<String, TaskResult> exceptionResults;
 
@@ -65,7 +70,11 @@ public class JobResultImpl implements JobResult {
         allResults = createTaskResultMap(data.getAllResults());
         preciousResults = createTaskResultMap(data.getPreciousResults());
         exceptionResults = createTaskResultMap(data.getExceptionResults());
-        resultMap = data.getResultMap();
+        try {
+            resultMap = ObjectByteConverter.mapOfBase64StringToSerializable(data.getSerializedResultMap());
+        } catch (Exception e) {
+            logger.error("Error when serializing result map variables ", e);
+        }
         jobInfo = data.getJobInfo();
     }
 
@@ -109,6 +118,11 @@ public class JobResultImpl implements JobResult {
     @Override
     public Map<String, Serializable> getResultMap() {
         return resultMap;
+    }
+
+    @Override
+    public Map<String, String> getSerializedResultMap() throws IOException, ClassNotFoundException {
+        return ObjectByteConverter.mapOfSerializableToString(resultMap);
     }
 
     @Override

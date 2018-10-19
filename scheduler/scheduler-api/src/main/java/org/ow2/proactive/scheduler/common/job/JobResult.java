@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -94,6 +95,13 @@ public interface JobResult extends Serializable {
      * @return merged map of job results
      */
     Map<String, Serializable> getResultMap();
+
+
+    /**
+     * Each task can contribute to this map.
+     * @return merged map of job results
+     */
+    Map<String, String> getSerializedResultMap() throws IOException, ClassNotFoundException;
 
     /**
      * Return only the task results that have generated an exception.<br>

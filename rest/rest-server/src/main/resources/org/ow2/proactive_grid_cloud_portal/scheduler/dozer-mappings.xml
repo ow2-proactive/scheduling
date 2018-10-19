@@ -35,17 +35,6 @@
 			<b get-method="value" >value</b>
 		</field>
 	</mapping>
-
-	<mapping>
-		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData</class-a>
-		<class-b>org.ow2.proactive.scheduler.job.JobResultImpl</class-b>
-		<field>
-			<a>resultMap</a>
-			<b>resultMap</b>
-		</field>
-	</mapping>
-
-
 	<mapping>
 		<class-a>org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData</class-a>
 		<class-b>org.ow2.proactive.scheduler.common.job.JobResult</class-b>
@@ -64,9 +53,15 @@
 			<b>allResults</b>
 			<a-hint>org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData</a-hint>
 		</field>
-		<field>
-			<a>resultMap</a>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.ResultMapCustomConverter">
+			<a>serializedResultMap</a>
 			<b>resultMap</b>
+		</field>
+		<field custom-converter=
+					   "org.ow2.proactive_grid_cloud_portal.scheduler.dto.StringResultMapCustomConverter">
+			<a>resultMap</a>
+			<b>serializedResultMap</b>
 		</field>
 		<field>
 			<a>preciousResults</a>
