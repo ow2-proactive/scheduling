@@ -240,19 +240,6 @@ public final class ObjectByteConverter {
         }
         return answer;
     }
-
-    public static Map<String, String> mapOfSerializableToString(Map<String, Serializable> input)
-            throws IOException, ClassNotFoundException {
-        if (input == null) {
-            return null;
-        }
-        HashMap<String, String> answer = new HashMap<>(input.size());
-        for (Map.Entry<String, Serializable> entry : input.entrySet()) {
-            answer.put(entry.getKey(), serializableToBase64String(entry.getValue()));
-        }
-        return answer;
-    }
-
     public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input)
             throws IOException, ClassNotFoundException {
         if (input == null) {

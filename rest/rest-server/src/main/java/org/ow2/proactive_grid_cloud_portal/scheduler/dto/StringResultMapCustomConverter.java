@@ -59,11 +59,8 @@ public class StringResultMapCustomConverter extends DozerConverter<Map, Map> {
         Map<String, String> converted = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : ((Map<String, Serializable>) source).entrySet()) {
             try {
-                Object valueAsObject = ObjectByteConverter.serializableToBase64String(entry.getValue());
-                if (valueAsObject != null) {
-                    converted.put(entry.getKey(), valueAsObject.toString());
-                } else if (entry.getValue() != null) {
-                    logger.debug("Could not convert " + entry.toString());
+                if (entry.getValue() != null) {
+                    converted.put(entry.getKey(), entry.getValue().toString());
                 }
             } catch (Exception e) {
                 logger.error("Error when converting variables to json", e);

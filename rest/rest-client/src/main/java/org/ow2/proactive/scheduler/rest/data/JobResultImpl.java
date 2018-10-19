@@ -33,7 +33,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
@@ -50,8 +49,6 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 public class JobResultImpl implements JobResult {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger logger = Logger.getLogger(JobResultImpl.class);
-
     private JobId jobId;
 
     private JobInfoData jobInfo;
@@ -64,17 +61,13 @@ public class JobResultImpl implements JobResult {
 
     private Map<String, TaskResult> exceptionResults;
 
-    JobResultImpl(JobResultData data) {
+    JobResultImpl(JobResultData data) throws IOException, ClassNotFoundException {
         JobIdData id = data.getId();
         jobId = new JobIdImpl(id.getId(), id.getReadableName());
         allResults = createTaskResultMap(data.getAllResults());
         preciousResults = createTaskResultMap(data.getPreciousResults());
         exceptionResults = createTaskResultMap(data.getExceptionResults());
-        try {
-            resultMap = ObjectByteConverter.mapOfBase64StringToSerializable(data.getSerializedResultMap());
-        } catch (Exception e) {
-            logger.error("Error when serializing result map variables ", e);
-        }
+        resultMap = ObjectByteConverter.mapOfBase64StringToSerializable(data.getSerializedResultMap());
         jobInfo = data.getJobInfo();
     }
 
@@ -120,10 +113,6 @@ public class JobResultImpl implements JobResult {
         return resultMap;
     }
 
-    @Override
-    public Map<String, String> getSerializedResultMap() throws IOException, ClassNotFoundException {
-        return ObjectByteConverter.mapOfSerializableToString(resultMap);
-    }
 
     @Override
     public TaskResult getResult(String taskName) throws UnknownTaskException {
