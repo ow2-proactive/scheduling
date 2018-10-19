@@ -230,7 +230,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
         putPnTimeoutWithLockAndPersist(pnURL, Boolean.TRUE);
         String host = nodeNameBuilder.extractHostFromNode(pnURL);
         int lostNodeNotifications = addAndGetLostNodeNotificationWithLockAndPersist(host);
-        if (lostNodeNotifications >= getConfiguredNodeNumberWithLockAndPersist(host) * maxDeploymentFailure) {
+        if (maxDeploymentFailure >= 0 &&
+            lostNodeNotifications >= getConfiguredNodeNumberWithLockAndPersist(host) * maxDeploymentFailure) {
             logger.info("Received " + lostNodeNotifications + " LOST Node notifications. New nodes will be required.");
             resetLostNodeNotificationsWithLockAndPersist(host);
             setNeedsNodesWithLockAndPersist(host, true);
