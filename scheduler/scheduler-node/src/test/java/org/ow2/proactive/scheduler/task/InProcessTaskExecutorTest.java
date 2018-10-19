@@ -174,12 +174,7 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
                                                                                                                 "groovy"))),
                                                   initializer,
                                                   null,
-                                                  new NodeDataSpacesURIs(p.toString(),
-                                                                         "",
-                                                                         "",
-                                                                         "",
-                                                                         "",
-                                                                         ""),
+                                                  new NodeDataSpacesURIs(p.toString(), "", "", "", "", ""),
                                                   "",
                                                   new NodeInfo("", "", ""));
 
