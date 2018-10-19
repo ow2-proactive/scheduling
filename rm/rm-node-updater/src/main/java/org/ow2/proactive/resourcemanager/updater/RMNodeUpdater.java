@@ -194,6 +194,7 @@ public class RMNodeUpdater extends RMNodeStarter {
      * Check if the node jar is up-to-date and download it
      * @return true if the local jar is up-to-date or has been successfully renewed. false in case of error
      */
+    @SuppressWarnings({ "squid:squid:S2095" })
     private boolean makeNodeUpToDate() {
         switch (isLocalJarUpToDate(nodeJarUrl, nodeJarSaveAs)) {
             case OUT_DATED:
@@ -215,9 +216,7 @@ public class RMNodeUpdater extends RMNodeStarter {
                         lock = channel.lock();
 
                         if (isLocalJarUpToDate(nodeJarUrl, nodeJarSaveAs) == JarStatus.UP_TO_DATE) {
-                            logger.warn("Another process downloaded node.jar - don't do it anymore");
-                            releaseResources(lock, channel, lockFile);
-
+                            logger.warn("Another process downloaded node.jar");
                             return false;
                         }
                     }
@@ -227,14 +226,13 @@ public class RMNodeUpdater extends RMNodeStarter {
                     logger.info("Download finished");
 
                     cleanExpandDirectory(nodeJarSaveAs);
-
-                    releaseResources(lock, channel, lockFile);
                     return true;
 
                 } catch (Exception e) {
                     logError("Cannot download node.jar from " + nodeJarUrl, e);
-                    releaseResources(lock, channel, lockFile);
                     return false;
+                } finally {
+                    releaseResources(lock, channel, lockFile);
                 }
             case UP_TO_DATE:
                 return true;
