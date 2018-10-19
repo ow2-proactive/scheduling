@@ -45,7 +45,6 @@ public interface JobValidatorService {
      * Example of use: xml schema validation.
      *
      * @param jobInputStream job file content to validate
-     * @return if the validator eventually made some modifications to the job, return a new version
      * @throws JobValidationException if the job is not valid
      */
     void validateJob(InputStream jobInputStream) throws JobValidationException;

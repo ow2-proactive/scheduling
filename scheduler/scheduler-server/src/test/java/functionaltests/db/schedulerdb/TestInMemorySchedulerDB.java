@@ -62,26 +62,6 @@ public class TestInMemorySchedulerDB extends ProActiveTest {
     }
 
     @Test
-    public void sanityTestJobContent() throws Exception {
-        SchedulerDBManager dbManager = SchedulerDBManager.createInMemorySchedulerDBManager();
-
-        TaskFlowJob jobDef = new TaskFlowJob();
-        jobDef.addTask(BaseSchedulerDBTest.createDefaultTask("task1"));
-        jobDef.addTask(BaseSchedulerDBTest.createDefaultTask("task2"));
-        jobDef.addTask(BaseSchedulerDBTest.createDefaultTask("task3"));
-
-        InternalJob job = InternalJobFactory.createJob(jobDef, BaseSchedulerDBTest.getDefaultCredentials());
-        job.setOwner("test");
-
-        dbManager.newJobSubmitted(job);
-
-        Job content = dbManager.loadInitalJobContent(job.getId());
-
-        Assert.assertTrue(content instanceof TaskFlowJob);
-        Assert.assertThat(((TaskFlowJob) content).getTasks().size(), is(3));
-    }
-
-    @Test
     public void sanityLastUpdatedTimeTest() throws Exception {
         SchedulerDBManager dbManager = SchedulerDBManager.createInMemorySchedulerDBManager();
 

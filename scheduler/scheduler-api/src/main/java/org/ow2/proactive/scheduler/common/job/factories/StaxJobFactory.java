@@ -123,6 +123,8 @@ public class StaxJobFactory extends JobFactory {
      */
     private String relativePathRoot = "./";
 
+    private GetJobContentFactory getJobContentFactory = new GetJobContentFactory();
+
     /**
      * Create a new instance of StaxJobFactory.
      */
@@ -216,7 +218,7 @@ public class StaxJobFactory extends JobFactory {
         Job job;
         try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
             XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
-            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
+            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies, new String(bytes));
             xmlsr.close();
         }
 
@@ -286,7 +288,7 @@ public class StaxJobFactory extends JobFactory {
      * @throws JobCreationException if an error occurred during job creation process.
      */
     private Job createJob(XMLStreamReader cursorRoot, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos, Map<String, ArrayList<String>> dependencies)
+            Map<String, String> replacementGenericInfos, Map<String, ArrayList<String>> dependencies, String jobContent)
             throws JobCreationException {
 
         String current = null;
@@ -300,7 +302,7 @@ public class StaxJobFactory extends JobFactory {
                     current = cursorRoot.getLocalName();
                     if (XMLTags.JOB.matches(current)) {
                         //first tag of the job.
-                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos);
+                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos, jobContent);
                     } else if (XMLTags.TASK.matches(current)) {
                         //once here, the job instance has been created
                         fillJobWithTasks(cursorRoot, job, dependencies);
@@ -342,10 +344,11 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorJob          the streamReader with the cursor on the job element.
      * @param replacementVariables job submission variables map taking priority on those defined in the xml
      * @param replacementGenericInfos job submission generic infos map taking priority on those defined in the xml
+     * @param jobContent contains xml representation of this job
      * @throws JobCreationException if an exception occurs during job creation.
      */
     private Job createAndFillJob(XMLStreamReader cursorJob, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos) throws JobCreationException {
+            Map<String, String> replacementGenericInfos, String jobContent) throws JobCreationException {
 
         // A temporary job
         Job commonPropertiesHolder = new Job() {
@@ -458,6 +461,13 @@ public class StaxJobFactory extends JobFactory {
                 job.setUserSpace(commonPropertiesHolder.getUserSpace());
                 job.setVariables(commonPropertiesHolder.getVariables());
                 job.setVisualization(commonPropertiesHolder.getVisualization());
+
+                String updatedJobContent = getJobContentFactory.replaceVarsAndGenericInfo(jobContent,
+                                                                                          commonPropertiesHolder.getVariables(),
+                                                                                          commonPropertiesHolder.getGenericInformation());
+
+                job.setJobContent(updatedJobContent);
+
             }
             return job;
         } catch (JobCreationException jce) {
