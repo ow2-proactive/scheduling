@@ -215,7 +215,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             try (FileWriter fw = new FileWriter(new File(path))) {
                 fw.write(code);
             } catch (IOException e) {
-                throw new TaskException("Error writing script as file: " + path, e.getCause());
+                throw new TaskException("Error writing script as file: " + path, e);
             }
         } else {
             //Needs to be stored in the local space
@@ -223,7 +223,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             try (FileWriter fw = new FileWriter(new File(uri, path))) {
                 fw.write(code);
             } catch (IOException e) {
-                throw new TaskException("Error writing script as file: " + path, e.getCause());
+                throw new TaskException("Error writing script as file: " + path, e);
             }
         }
     }
