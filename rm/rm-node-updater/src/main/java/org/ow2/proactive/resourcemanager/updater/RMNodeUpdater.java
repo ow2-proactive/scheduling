@@ -124,6 +124,12 @@ public class RMNodeUpdater extends RMNodeStarter {
 
     public static final int NUMBER_OF_ATTEMPTS = 10;
 
+    private enum JarStatus {
+        UP_TO_DATE,
+        OUT_DATED,
+        NOT_READY
+    }
+
     public RMNodeUpdater() {
         // empty constructor
     }
@@ -138,7 +144,7 @@ public class RMNodeUpdater extends RMNodeStarter {
         return Logger.getLogger(RMNodeUpdater.class);
     }
 
-    private boolean isLocalJarUpToDate(String url, String filePath) {
+    private JarStatus isLocalJarUpToDate(String url, String filePath) {
 
         try {
             URLConnection urlConnection = new URL(url).openConnection();
@@ -147,18 +153,23 @@ public class RMNodeUpdater extends RMNodeStarter {
             logger.info("Url date=" + new Date(urlConnection.getLastModified()));
             logger.info("File date=" + new Date(file.lastModified()));
 
-            if (!file.exists() || file.lastModified() < urlConnection.getLastModified()) {
+            if (!file.exists() ||
+                (urlConnection.getLastModified() != 0 && file.lastModified() < urlConnection.getLastModified())) {
                 logger.info("Local jar " + file + " is obsolete or not present");
+                return JarStatus.OUT_DATED;
+            } else if (urlConnection.getLastModified() == 0) {
+                logger.info("Server url: " + url + " is not ready");
+                return JarStatus.NOT_READY;
             } else {
                 logger.info("Local jar " + file + " is up to date");
-                return true;
+                return JarStatus.UP_TO_DATE;
             }
 
         } catch (IOException e) {
             logError("Error when contacting the remote url " + url, e);
         }
 
-        return false;
+        return JarStatus.NOT_READY;
     }
 
     private static void logError(String message, Exception e) {
@@ -179,54 +190,70 @@ public class RMNodeUpdater extends RMNodeStarter {
         }
     }
 
+    /**
+     * Check if the node jar is up-to-date and download it
+     * @return true if the local jar is up-to-date or has been successfully renewed. false in case of error
+     */
     private boolean makeNodeUpToDate() {
-        if (!isLocalJarUpToDate(nodeJarUrl, nodeJarSaveAs)) {
-            logger.info("Downloading node.jar from " + nodeJarUrl + " to " + nodeJarSaveAs);
-
-            try {
+        switch (isLocalJarUpToDate(nodeJarUrl, nodeJarSaveAs)) {
+            case OUT_DATED:
+                logger.info("Downloading node.jar from " + nodeJarUrl + " to " + nodeJarSaveAs);
                 File destination = new File(nodeJarSaveAs);
                 File lockFile = null;
                 FileLock lock = null;
+                FileChannel channel = null;
+                try {
+                    if (destination.exists()) {
 
-                if (destination.exists()) {
+                        lockFile = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value(), "lock");
+                        if (!lockFile.exists()) {
+                            lockFile.createNewFile();
+                        }
 
-                    lockFile = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value(), "lock");
-                    if (!lockFile.exists()) {
-                        lockFile.createNewFile();
+                        logger.info("Getting the lock on " + lockFile.getAbsoluteFile());
+                        channel = new RandomAccessFile(lockFile, "rw").getChannel();
+                        lock = channel.lock();
+
+                        if (isLocalJarUpToDate(nodeJarUrl, nodeJarSaveAs) == JarStatus.UP_TO_DATE) {
+                            logger.warn("Another process downloaded node.jar - don't do it anymore");
+                            releaseResources(lock, channel, lockFile);
+
+                            return false;
+                        }
                     }
+                    fetchUrl(nodeJarUrl, destination);
+                    // Align the local file modification time with the remote url.
+                    destination.setLastModified(getRemoteLastModifiedMillis(nodeJarUrl));
+                    logger.info("Download finished");
 
-                    logger.info("Getting the lock on " + lockFile.getAbsoluteFile());
-                    FileChannel channel = new RandomAccessFile(lockFile, "rw").getChannel();
-                    lock = channel.lock();
+                    cleanExpandDirectory(nodeJarSaveAs);
 
-                    if (isLocalJarUpToDate(nodeJarUrl, nodeJarSaveAs)) {
-                        logger.warn("Another process downloaded node.jar - don't do it anymore");
-                        logger.info("Releasing the lock on " + lockFile.getAbsoluteFile());
-                        lock.release();
-                        channel.close();
+                    releaseResources(lock, channel, lockFile);
+                    return true;
 
-                        return false;
-                    }
+                } catch (Exception e) {
+                    logError("Cannot download node.jar from " + nodeJarUrl, e);
+                    releaseResources(lock, channel, lockFile);
+                    return false;
                 }
-                fetchUrl(nodeJarUrl, destination);
-                // Align the local file modification time with the remote url.
-                destination.setLastModified(getRemoteLastModifiedMillis(nodeJarUrl));
-                logger.info("Download finished");
-
-                cleanExpandDirectory(nodeJarSaveAs);
-
-                if (lock != null && lockFile != null) {
-                    logger.info("Releasing the lock on " + lockFile.getAbsoluteFile());
-                    lock.release();
-                }
+            case UP_TO_DATE:
                 return true;
-
-            } catch (Exception e) {
-                logError("Cannot download node.jar from " + nodeJarUrl, e);
+            default:
+                // server is not ready
                 return false;
+
+        }
+    }
+
+    private void releaseResources(FileLock lock, FileChannel channel, File lockFile) {
+        if (lock != null && lockFile != null && channel != null) {
+            logger.info("Releasing the lock on " + lockFile.getAbsoluteFile());
+            try {
+                lock.release();
+                channel.close();
+            } catch (IOException e) {
+                logError("Error when closing ressources ", e);
             }
-        } else {
-            return true;
         }
     }
 
