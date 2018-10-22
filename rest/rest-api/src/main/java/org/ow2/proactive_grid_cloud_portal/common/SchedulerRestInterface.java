@@ -233,7 +233,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/resultmap")
     @Produces("application/json")
-    Map<String, Serializable> jobResultMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+    Map<String, String> jobResultMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 
     /**

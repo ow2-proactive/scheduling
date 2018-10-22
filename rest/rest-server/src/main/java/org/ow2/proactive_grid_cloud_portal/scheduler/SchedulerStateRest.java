@@ -544,7 +544,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/resultmap")
     @Produces("application/json")
-    public Map<String, Serializable> jobResultMap(@HeaderParam("sessionid") String sessionId,
+    public Map<String, String> jobResultMap(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
         try {
@@ -553,7 +553,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if (jobResult == null) {
                 return null;
             } else {
-                return jobResult.getResultMap();
+                return getJobResultMapAsString(jobResult.getResultMap());
             }
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -562,6 +562,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
+    }
+
+    public Map getJobResultMapAsString(Map source) {
+        if (source == null) {
+            return null;
+        }
+        Map<String, String> converted = new HashMap<>();
+        for (Map.Entry<String, Serializable> entry : ((Map<String, Serializable>) source).entrySet()) {
+            if (entry.getValue() != null) {
+                converted.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        return converted;
     }
 
     /**

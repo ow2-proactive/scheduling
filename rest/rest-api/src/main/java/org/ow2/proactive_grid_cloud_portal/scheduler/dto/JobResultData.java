@@ -106,6 +106,7 @@ public class JobResultData {
     @Override
     public String toString() {
         return "JobResultData{" + "id=" + id + ", allResults=" + allResults + ", preciousResults=" + preciousResults +
-               ", resultMap=" + resultMap +  ", serializedResultMap=" + serializedResultMap + ", exceptionResults=" + exceptionResults + ", jobInfo=" + jobInfo + '}';
+               ", resultMap=" + resultMap + ", serializedResultMap=" + serializedResultMap + ", exceptionResults=" +
+               exceptionResults + ", jobInfo=" + jobInfo + '}';
     }
 }

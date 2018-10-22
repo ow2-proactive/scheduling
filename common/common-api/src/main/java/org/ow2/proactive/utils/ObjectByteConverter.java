@@ -230,7 +230,8 @@ public final class ObjectByteConverter {
         return answer;
     }
 
-    public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input) throws IOException, ClassNotFoundException {
+    public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input)
+            throws IOException, ClassNotFoundException {
         if (input == null) {
             return null;
         }
@@ -240,6 +241,7 @@ public final class ObjectByteConverter {
         }
         return answer;
     }
+
     public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input)
             throws IOException, ClassNotFoundException {
         if (input == null) {

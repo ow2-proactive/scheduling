@@ -31,7 +31,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dozer.DozerConverter;
-import org.ow2.proactive.utils.ObjectByteConverter;
+
 
 /**
  * @author ActiveEon Team
@@ -58,16 +58,11 @@ public class StringResultMapCustomConverter extends DozerConverter<Map, Map> {
         }
         Map<String, String> converted = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : ((Map<String, Serializable>) source).entrySet()) {
-            try {
-                if (entry.getValue() != null) {
-                    converted.put(entry.getKey(), entry.getValue().toString());
-                }
-            } catch (Exception e) {
-                logger.error("Error when converting variables to json", e);
-                return null;
+            if (entry.getValue() != null) {
+                converted.put(entry.getKey(), entry.getValue().toString());
             }
+
         }
         return converted;
     }
 }
-

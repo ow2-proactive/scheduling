@@ -113,7 +113,6 @@ public class JobResultImpl implements JobResult {
         return resultMap;
     }
 
-
     @Override
     public TaskResult getResult(String taskName) throws UnknownTaskException {
         return allResults.get(taskName);
