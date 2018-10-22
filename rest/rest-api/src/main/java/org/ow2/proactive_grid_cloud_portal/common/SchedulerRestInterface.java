@@ -48,8 +48,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriInfo;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -530,7 +532,24 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/html")
     @Produces("application/json;charset=utf-8")
     String getJobHtml(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-            throws IOException, NotConnectedRestException;
+            throws IOException, NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    /**
+     *
+     * @param sessionId
+     *          a valid session id
+     * @param jobId
+     *          job id which corresponds to already submitted job
+     * @return xml representation of the submitted job
+     * @throws UnknownJobRestException if <code>jobId</code> does not correspond to any job
+     * @throws PermissionRestException if current user does not have rights to access job with <code>jobId</code>
+     */
+    @GET
+    @Path("jobs/{jobid}/xml")
+    @Produces("application/xml")
+    String getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
+            SubmissionClosedRestException, JobCreationRestException;
 
     /**
      * Returns a list of taskState
@@ -1224,6 +1243,8 @@ public interface SchedulerRestInterface {
      * 
      * @param sessionId
      *            a valid session id
+     * @param pathSegment
+     *            variables of the workflow
      * @param multipart
      *            a form with the job file as form data
      * @return the <code>jobid</code> of the newly created job
@@ -1235,6 +1256,27 @@ public interface SchedulerRestInterface {
     JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
+     * Submits a job to the scheduler
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param pathSegment
+     *            variables of the workflow
+     * @param multipart
+     *            a form with the job file as form data
+     * @param contextInfos
+     *            the context informations (generic parameters,..)
+     * @return the <code>jobid</code> of the newly created job
+     */
+    @POST
+    @Path("{path:submit}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces("application/json")
+    JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            MultipartFormDataInput multipart, @Context UriInfo contextInfos) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
      * submit a planned workflow
@@ -1280,6 +1322,32 @@ public interface SchedulerRestInterface {
     JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
             @PathParam("path") PathSegment pathSegment) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
+     * Submits a workflow to the scheduler from a workflow URL, creating hence a
+     * new job resource.
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param url
+     *            url to the workflow content
+     * @param pathSegment
+     *            variables of the workflow
+     * @param contextInfos
+     *            the context informations (generic parameters,..)
+     * @return the <code>jobid</code> of the newly created job
+     * @throws NotConnectedRestException
+     * @throws IOException
+     * @throws JobCreationRestException
+     * @throws PermissionRestException
+     * @throws SubmissionClosedRestException
+     */
+    @POST
+    @Path("jobs")
+    @Produces("application/json")
+    JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
+            @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
      * Pushes a file from the local file system into the given DataSpace
@@ -1927,26 +1995,6 @@ public interface SchedulerRestInterface {
     final String sessionId, @PathParam("jobid")
     final String jobId, @PathParam("startAt")
     final String startAt) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
-
-    /**
-     * 
-     * @param sessionId
-     * @param jobId
-     * @param generalInformation
-     * @return
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     * @throws UnknownJobRestException
-     * @throws JobCreationRestException
-     * @throws SubmissionClosedRestException
-     */
-    @POST
-    @Path("jobs")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public JobIdData copyAndResubmitWithGeneralInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("jobid")
-    final String jobId, Map<String, String> generalInformation) throws NotConnectedRestException,
-            PermissionRestException, UnknownJobRestException, JobCreationRestException, SubmissionClosedRestException;
 
     /**
      * Get portal configuration properties

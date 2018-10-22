@@ -32,6 +32,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_LOGS_OF_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB;
+import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_JOB;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_KILL_THIS_TASK;
@@ -62,7 +63,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -119,7 +119,6 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -1325,7 +1324,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             try {
                 jobsInfoList.add(this.getJobInfo(jobId));
             } catch (UnknownJobException e) {
-                logger.warn("The job with job ID " + jobId + "couldn't be found", e);
+                logger.warn("The job with job ID " + jobId + " couldn't be found");
             }
         }
         return jobsInfoList;
@@ -1485,20 +1484,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
-    public boolean changeStartAt(JobId jobId, String startAt)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean changeStartAt(JobId jobId, String startAt) {
         return schedulingService.changeStartAt(jobId, startAt);
     }
 
     @Override
-    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
-            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
-            JobCreationException {
-        TaskFlowJob job = (TaskFlowJob) dbManager.loadInitalJobContent(jobId);
-        for (Entry<String, String> entry : generalInfo.entrySet()) {
-            job.addGenericInformation(entry.getKey(), entry.getValue());
-        }
-        return submit(job);
+    public String getJobContent(JobId jobId) throws UnknownJobException, NotConnectedException, PermissionException {
+        frontendState.checkPermissions("getJobContent",
+                                       frontendState.getIdentifiedJob(jobId),
+                                       YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THIS_JOB);
+        return dbManager.loadInitalJobContent(jobId);
     }
 
     @Override

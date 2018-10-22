@@ -79,12 +79,12 @@ public abstract class Job extends CommonAttribute {
     /**
      * Short description of this job
      */
-    protected String description = "No description";
+    protected String description = "";
 
     /**
      * Project name for this job
      */
-    protected String projectName = "Not Assigned";
+    protected String projectName = "";
 
     /**
      * Job priority
@@ -108,6 +108,11 @@ public abstract class Job extends CommonAttribute {
      * A map to holds job descriptor variables
      */
     protected Map<String, JobVariable> variables = Collections.synchronizedMap(new LinkedHashMap());
+
+    /**
+     * represent xml submitted, where variables and genetic info were updated according provided maps
+     */
+    private String jobContent = null;
 
     /**
      * ProActive Empty Constructor
@@ -385,4 +390,11 @@ public abstract class Job extends CommonAttribute {
         return Optional.empty();
     }
 
+    public String getJobContent() {
+        return jobContent;
+    }
+
+    public void setJobContent(String jobContent) {
+        this.jobContent = jobContent;
+    }
 }

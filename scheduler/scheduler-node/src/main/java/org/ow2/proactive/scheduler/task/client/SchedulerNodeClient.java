@@ -300,10 +300,51 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public JobId submit(File job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return submit(job, variables, null);
+    }
+
+    @Override
+    public JobId submit(File job, Map<String, String> variables, Map<String, String> genericInfos)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        renewSession();
+        return client.submit(job, variables, genericInfos);
+    }
+
+    @Override
     public JobId submit(URL job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
         return client.submit(job);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return submit(null, job, variables);
+    }
+
+    @Override
+    public JobId submit(Map<String, String> genericInfos, URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        renewSession();
+        return client.submit(job, variables, genericInfos);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return submit(job, variables, null, headerParams);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> genericInfos,
+            Map<String, String> headerParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        if (client == null)
+            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
+        return this.client.submit(job, variables, genericInfos, headerParams);
     }
 
     @Override
@@ -314,33 +355,18 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
+    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
+            Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        if (client == null)
-            throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
-        return this.client.submit(job, variables, headerParams);
-    }
-
-    @Override
-    public JobId submit(File job, Map<String, String> variables)
-            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        renewSession();
-        return client.submit(job, variables);
-    }
-
-    @Override
-    public JobId submit(URL job, Map<String, String> variables)
-            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        renewSession();
-        return client.submit(job, variables);
+        return submitFromCatalog(catalogRestURL, bucketName, workflowName, variables, null);
     }
 
     @Override
     public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
-            Map<String, String> variables)
+            Map<String, String> variables, Map<String, String> genericInfos)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
-        return client.submitFromCatalog(catalogRestURL, bucketName, workflowName, variables);
+        return client.submitFromCatalog(catalogRestURL, bucketName, workflowName, variables, genericInfos);
     }
 
     @Override
@@ -626,11 +652,10 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
-            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
-            JobCreationException {
+    public String getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException,
+            JobCreationException, NotConnectedException, PermissionException {
         renewSession();
-        return client.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+        return client.getJobContent(jobId);
     }
 
     @Override

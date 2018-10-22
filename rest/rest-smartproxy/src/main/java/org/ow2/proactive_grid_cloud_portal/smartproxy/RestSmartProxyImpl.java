@@ -215,27 +215,21 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public JobId submit(URL job)
-            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return _getScheduler().submit(job);
-    }
-
-    @Override
-    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName)
-            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return _getScheduler().submitFromCatalog(catalogRestURL, bucketName, workflowName);
-    }
-
-    @Override
-    public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
-            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-        return _getScheduler().submit(job, variables, headerParams);
-    }
-
-    @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return _getScheduler().submit(job, variables);
+    }
+
+    @Override
+    public JobId submit(File job, Map<String, String> variables, Map<String, String> genericInfos)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job, variables, genericInfos);
+    }
+
+    @Override
+    public JobId submit(URL job)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job);
     }
 
     @Override
@@ -245,10 +239,42 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> headerParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job, variables, headerParams);
+    }
+
+    @Override
+    public JobId submit(URL job, Map<String, String> variables, Map<String, String> genericInfos,
+            Map<String, String> headerParams)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(job, variables, genericInfos, headerParams);
+    }
+
+    @Override
+    public JobId submit(Map<String, String> genericInfos, URL job, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submit(genericInfos, job, variables);
+    }
+
+    @Override
+    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submitFromCatalog(catalogRestURL, bucketName, workflowName);
+    }
+
+    @Override
     public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
             Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return _getScheduler().submitFromCatalog(catalogRestURL, bucketName, workflowName, variables);
+    }
+
+    @Override
+    public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
+            Map<String, String> variables, Map<String, String> genericInfos)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+        return _getScheduler().submitFromCatalog(catalogRestURL, bucketName, workflowName, variables, genericInfos);
     }
 
     @Override
@@ -657,10 +683,9 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
-    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
-            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
-            JobCreationException {
-        return _getScheduler().copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+    public String getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException,
+            JobCreationException, NotConnectedException, PermissionException {
+        return _getScheduler().getJobContent(jobId);
     }
 
     @Override

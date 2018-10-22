@@ -42,13 +42,10 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
-import org.ow2.proactive.scheduler.common.job.Job;
-import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.util.ByteCompressionUtils;
 
 
@@ -108,23 +105,22 @@ public class JobContent implements Serializable {
     }
 
     @Transient
-    public TaskFlowJob getInitJobContent() {
+    public String getInitJobContent() {
         try {
             byte[] deCompressed = ByteCompressionUtils.decompress(jobContentAsByteArray);
-            return SerializationUtils.deserialize(deCompressed);
+            return new String(deCompressed);
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("Could not load job content for Job " + jobId + " : " + e.getMessage());
+            return null;
         }
-        return SerializationUtils.deserialize(jobContentAsByteArray);
     }
 
-    public void setInitJobContent(Job job) {
-        byte[] jobByte = SerializationUtils.serialize(job);
+    public void setInitJobContent(String jobContent) {
         try {
-            this.jobContentAsByteArray = ByteCompressionUtils.compress(jobByte);
+            this.jobContentAsByteArray = ByteCompressionUtils.compress(jobContent.getBytes());
         } catch (Exception e) {
-            LOGGER.error(e);
-            this.jobContentAsByteArray = jobByte;
+            LOGGER.error(e.getMessage(), e);
+            this.jobContentAsByteArray = new byte[0];
         }
     }
 

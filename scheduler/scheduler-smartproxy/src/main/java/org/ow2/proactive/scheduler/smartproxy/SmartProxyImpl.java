@@ -835,10 +835,9 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public JobId copyJobAndResubmitWithGeneralInfo(JobId jobId, Map<String, String> generalInfo)
-            throws NotConnectedException, UnknownJobException, PermissionException, SubmissionClosedException,
-            JobCreationException {
-        return schedulerProxy.copyJobAndResubmitWithGeneralInfo(jobId, generalInfo);
+    public String getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException,
+            JobCreationException, NotConnectedException, PermissionException {
+        return schedulerProxy.getJobContent(jobId);
     }
 
     @Override
