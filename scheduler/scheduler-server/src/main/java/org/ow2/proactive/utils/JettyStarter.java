@@ -213,6 +213,7 @@ public class JettyStarter {
                                                                  new HttpConnectionFactory(secureHttpConfiguration));
             httpsConnector.setName(HTTPS_CONNECTOR_NAME);
             httpsConnector.setPort(httpsPort);
+            httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
 
             if (redirectHttpToHttps) {
                 // The next two settings allow !403 errors to be redirected to HTTPS
@@ -228,6 +229,7 @@ public class JettyStarter {
             }
         } else {
             ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
+            httpConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
             connectors = new Connector[] { httpConnector };
         }
 
