@@ -835,8 +835,8 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Job getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException, JobCreationException,
-            NotConnectedException, PermissionException {
+    public String getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException,
+            JobCreationException, NotConnectedException, PermissionException {
         return schedulerProxy.getJobContent(jobId);
     }
 
