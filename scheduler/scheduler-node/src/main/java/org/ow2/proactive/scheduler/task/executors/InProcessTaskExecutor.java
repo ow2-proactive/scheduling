@@ -34,6 +34,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -208,10 +209,16 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
         String code = script.fetchScript().trim();
 
-        //Check if the path is an absolute path or a relative path, if it is a relative path store the file in the local space
         Path p = Paths.get(path);
+
+        //Check if the path is an absolute path or a relative path, if it is a relative path store the file in the local space
         boolean isAbsolute = p.isAbsolute();
         if (isAbsolute) {
+            //Check if the parent path exists, if not create it
+            Path hasParent = p.getParent();
+            if(!Files.exists(hasParent)) {
+                FileUtils.forceMkdirParent(new File(path));
+            }
             try (FileWriter fw = new FileWriter(new File(path))) {
                 fw.write(code);
             } catch (IOException e) {
