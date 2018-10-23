@@ -31,6 +31,7 @@ import org.junit.runners.Suite;
 import functionaltests.housekeeping.NodesHouseKeepingPropertiesTest;
 import functionaltests.nodesource.TestLocalInfrastructureCronPolicy;
 import functionaltests.nodesource.TestLocalInfrastructureTimeSlotPolicy;
+import functionaltests.nodesource.TestNodeSourceThreadPool;
 import functionaltests.nodesource.TestSSHInfrastructureV2RestartDownNodesPolicy;
 import functionaltests.nodesrecovery.NodesRecoveryPropertyTest;
 import functionaltests.nodesrecovery.RecoverLocalInfrastructureTest;
@@ -45,7 +46,7 @@ import functionaltests.selectionscript.SelectionScriptTimeOutTest;
                       RecoverLocalInfrastructureTest.class, RecoverSSHInfrastructureV2Test.class,
                       TestLocalInfrastructureCronPolicy.class, TestLocalInfrastructureTimeSlotPolicy.class,
                       TestSSHInfrastructureV2RestartDownNodesPolicy.class, NodesRecoveryPropertyTest.class,
-                      NodesHouseKeepingPropertiesTest.class })
+                      NodesHouseKeepingPropertiesTest.class, TestNodeSourceThreadPool.class })
 
 /**
  * @author ActiveEon Team
