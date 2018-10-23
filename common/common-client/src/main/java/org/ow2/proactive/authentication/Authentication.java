@@ -32,6 +32,7 @@ import javax.management.JMException;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 
@@ -50,7 +51,7 @@ public interface Authentication extends Loggable, Serializable {
      * 
      * @return true if it is activated.
      */
-    boolean isActivated();
+    BooleanWrapper isActivated();
 
     /**
      * Request this Authentication's public key for credentials encryption
