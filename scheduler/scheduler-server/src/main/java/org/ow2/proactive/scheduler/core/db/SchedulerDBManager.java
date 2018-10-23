@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -971,6 +972,8 @@ public class SchedulerDBManager {
             long jobId = jobId(job);
 
             JobInfo jobInfo = job.getJobInfo();
+            Map<String, Serializable> resultMap = job.getResultMap();
+            resultMap.putAll(result.getResultMap());
 
             session.getNamedQuery("updateJobDataAfterWorkflowTaskFinished")
                    .setParameter("status", jobInfo.getStatus())
@@ -983,6 +986,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
+                   .setParameter("resultMap", resultMap)
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
@@ -1052,7 +1056,6 @@ public class SchedulerDBManager {
             long jobId = jobId(job);
 
             JobInfo jobInfo = job.getJobInfo();
-
             final int updateJob = session.getNamedQuery("updateJobDataAfterTaskFinished")
                                          .setParameter("status", jobInfo.getStatus())
                                          .setParameter("finishedTime", jobInfo.getFinishedTime())
@@ -1063,6 +1066,7 @@ public class SchedulerDBManager {
                                          .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                                          .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                                          .setParameter("lastUpdatedTime", new Date().getTime())
+                                         .setParameter("resultMap", job.getResultMap())
                                          .setParameter("jobId", jobId)
                                          .executeUpdate();
 
@@ -1284,6 +1288,8 @@ public class SchedulerDBManager {
             long jobId = jobId(job);
 
             JobInfo jobInfo = job.getJobInfo();
+            Map<String, Serializable> resultMap = job.getResultMap();
+            resultMap.putAll(result.getResultMap());
 
             session.getNamedQuery("updateJobDataAfterTaskFinished")
                    .setParameter("status", jobInfo.getStatus())
@@ -1295,6 +1301,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
+                   .setParameter("resultMap", resultMap)
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
@@ -1487,6 +1494,7 @@ public class SchedulerDBManager {
     /**
      * Load all task results associated with the given job id and task name
      * When a task is executed several times (several attempts), all attempts are stored in the database.
+     *
      * @param jobId    job id
      * @param taskName task name
      * @return a list of task results
@@ -1519,6 +1527,7 @@ public class SchedulerDBManager {
     /**
      * Load all task results associated with the given task id
      * When a task is executed several times (several attempts), all attempts are stored in the database.
+     *
      * @param taskId task id
      * @return a list of task results
      */
