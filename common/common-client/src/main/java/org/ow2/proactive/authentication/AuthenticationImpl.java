@@ -41,8 +41,10 @@ import javax.security.auth.login.LoginException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 
@@ -56,7 +58,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 public abstract class AuthenticationImpl implements Authentication, RunActive {
 
     /** Activation is used to control authentication during scheduling initialization */
-    private boolean activated = false;
+    private volatile boolean activated = false;
 
     /**
      * Defines login method
@@ -205,8 +207,9 @@ public abstract class AuthenticationImpl implements Authentication, RunActive {
     /**
      * @see org.ow2.proactive.authentication.Authentication#isActivated()
      */
-    public boolean isActivated() {
-        return activated;
+    @ImmediateService
+    public BooleanWrapper isActivated() {
+        return new BooleanWrapper(activated);
     }
 
     /**
