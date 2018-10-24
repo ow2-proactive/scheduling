@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
@@ -55,6 +56,9 @@ public class ForkedTaskVariablesManager implements Serializable {
      */
     public static final String CREDENTIALS_KEY_PREFIX = "credentials_";
 
+    private static final Logger logger = Logger.getLogger(ForkedTaskVariablesManager.class);
+
+
     private static TaskResult[] tasksResults(TaskContext container) {
         TaskResult[] previousTasksResults = container.getPreviousTasksResults();
         if (previousTasksResults != null) {
@@ -68,8 +72,9 @@ public class ForkedTaskVariablesManager implements Serializable {
             Map<String, Serializable> resultMap, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client,
             RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
-        scriptHandler.addBinding(SchedulerConstants.RESULT_MAP_BINDING_NAME, resultMap);
 
+        scriptHandler.addBinding(SchedulerConstants.RESULT_MAP_BINDING_NAME, resultMap);
+        logger.info("resultMap: " + resultMap);
         scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME,
                                  taskContext.getInitializer().getGenericInformation());
 

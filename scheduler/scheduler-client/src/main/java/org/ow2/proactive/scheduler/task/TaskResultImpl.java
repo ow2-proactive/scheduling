@@ -494,4 +494,8 @@ public class TaskResultImpl implements TaskResult {
     public Map<String, Serializable> getResultMap() {
         return resultMap;
     }
+
+    public void setResultMap(Map<String, Serializable> resultMap) {
+        this.resultMap = resultMap;
+    }
 }

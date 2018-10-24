@@ -181,6 +181,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             executeFlowScript(taskContext.getControlFlowScript(), scriptHandler, output, error, taskResult);
 
             taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables.getPropagatedVariables()));
+            taskResult.setResultMap(resultMap);
             taskResult.setMetadata(resultMetadata);
 
             return taskResult;

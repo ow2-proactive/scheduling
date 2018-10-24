@@ -364,7 +364,7 @@ public abstract class InternalJob extends JobState {
      */
     public ChangedTasksInfo terminateTask(boolean errorOccurred, TaskId taskId, SchedulerStateUpdate frontend,
             FlowAction action, TaskResultImpl result) {
-        //add job results
+        //merge task map result to job map result
         resultMap.putAll(result.getResultMap());
         return terminateTask(errorOccurred, taskId, frontend, action, result, false);
     }

@@ -974,7 +974,7 @@ public class SchedulerDBManager {
             JobInfo jobInfo = job.getJobInfo();
             Map<String, Serializable> resultMap = job.getResultMap();
             resultMap.putAll(result.getResultMap());
-
+            logger.info("resultMap: " + resultMap.toString());
             session.getNamedQuery("updateJobDataAfterWorkflowTaskFinished")
                    .setParameter("status", jobInfo.getStatus())
                    .setParameter("finishedTime", jobInfo.getFinishedTime())
@@ -1056,6 +1056,7 @@ public class SchedulerDBManager {
             long jobId = jobId(job);
 
             JobInfo jobInfo = job.getJobInfo();
+            logger.info("resultMap: " + job.getResultMap());
             final int updateJob = session.getNamedQuery("updateJobDataAfterTaskFinished")
                                          .setParameter("status", jobInfo.getStatus())
                                          .setParameter("finishedTime", jobInfo.getFinishedTime())
@@ -1290,7 +1291,7 @@ public class SchedulerDBManager {
             JobInfo jobInfo = job.getJobInfo();
             Map<String, Serializable> resultMap = job.getResultMap();
             resultMap.putAll(result.getResultMap());
-
+            logger.info("resultMap: " + resultMap.toString());
             session.getNamedQuery("updateJobDataAfterTaskFinished")
                    .setParameter("status", jobInfo.getStatus())
                    .setParameter("finishedTime", jobInfo.getFinishedTime())
@@ -1435,6 +1436,8 @@ public class SchedulerDBManager {
     private JobResultImpl loadJobResult(Session session, Query query, JobData job, JobId jobId) {
         JobResultImpl jobResult = new JobResultImpl();
         jobResult.setJobInfo(job.createJobInfo(jobId));
+        logger.info("resultMap: " + job.getResultMap());
+        jobResult.getResultMap().putAll(job.getResultMap());
 
         DBTaskId currentTaskId = null;
 
