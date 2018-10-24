@@ -216,7 +216,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         if (isAbsolute) {
             //Check if the parent path exists, if not create it
             Path hasParent = p.getParent();
-            if(!Files.exists(hasParent)) {
+            if (!Files.exists(hasParent)) {
                 FileUtils.forceMkdirParent(new File(path));
             }
             try (FileWriter fw = new FileWriter(new File(path))) {
