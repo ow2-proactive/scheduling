@@ -55,6 +55,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
 
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -451,7 +453,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
             SubmissionClosedException {
         final String jobContent = getJobContent(currentJobId);
-        final Job job = JobFactory.getFactory().createJob(jobContent, jobVariables, jobGenericInfos);
+        final Job job = JobFactory.getFactory().createJob(IOUtils.toInputStream(jobContent, Charset.forName("UTF-8")),
+                                                          jobVariables,
+                                                          jobGenericInfos);
         return submit(job);
     }
 
