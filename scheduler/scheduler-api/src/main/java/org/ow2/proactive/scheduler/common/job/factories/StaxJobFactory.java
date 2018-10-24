@@ -408,7 +408,9 @@ public class StaxJobFactory extends JobFactory {
                     } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                         // Resolve the generic infos in the xml with the resolved variables
                         Map<String, String> resolvedJobVariables = commonPropertiesHolder.getVariablesAsReplacementMap();
-                        Map<String, String> resolvedGenericInformationDefinedInWorkflow = getGenericInformation(cursorJob,
+                        Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformation(cursorJob);
+                        commonPropertiesHolder.setUnresolvedGenericInformation(unresolvedGenericInformationDefinedInWorkflow);
+                        Map<String, String> resolvedGenericInformationDefinedInWorkflow = getGenericInformation(unresolvedGenericInformationDefinedInWorkflow,
                                                                                                                 resolvedJobVariables);
                         // Then add/replace the resolved generic infos in the xml with the job submission ones
                         Map<String, String> submittedGenericInformation = commonPropertiesHolder.getGenericInformation();
@@ -455,6 +457,7 @@ public class StaxJobFactory extends JobFactory {
                 job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
                 job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
                 job.setGenericInformation(commonPropertiesHolder.getGenericInformation());
+                job.setUnresolvedGenericInformation(commonPropertiesHolder.getUnresolvedGenericInformation());
                 job.setInputSpace(commonPropertiesHolder.getInputSpace());
                 job.setOutputSpace(commonPropertiesHolder.getOutputSpace());
                 job.setGlobalSpace(commonPropertiesHolder.getGlobalSpace());
@@ -696,6 +699,17 @@ public class StaxJobFactory extends JobFactory {
         return result.build();
     }
 
+    private Map<String, String> getUnresolvedAttributesAsMap(XMLStreamReader cursorVariables)
+            throws JobCreationException {
+        final ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
+
+        for (int i = 0; i < cursorVariables.getAttributeCount(); i++) {
+            result.put(cursorVariables.getAttributeLocalName(i), cursorVariables.getAttributeValue(i));
+        }
+
+        return result.build();
+    }
+
     /**
      * Get the defined generic information of the entity.
      * Leave the method at the end of 'ELEMENT_COMMON_GENERIC_INFORMATION' tag.
@@ -703,7 +717,7 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorInfo the streamReader with the cursor on the 'ELEMENT_COMMON_GENERIC_INFORMATION' tag.
      * @return the list of generic information as a hashMap.
      */
-    private HashMap<String, String> getGenericInformation(XMLStreamReader cursorInfo, Map<String, String> variables)
+    private HashMap<String, String> getUnresolvedGenericInformation(XMLStreamReader cursorInfo)
             throws JobCreationException {
         HashMap<String, String> infos = new HashMap<>();
         try {
@@ -713,7 +727,7 @@ public class StaxJobFactory extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.COMMON_INFO.matches(cursorInfo.getLocalName())) {
-                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorInfo, variables);
+                            Map<String, String> attributesAsMap = getUnresolvedAttributesAsMap(cursorInfo);
 
                             String name = attributesAsMap.get(XMLAttributes.COMMON_NAME.getXMLName());
                             String value = attributesAsMap.get(XMLAttributes.COMMON_VALUE.getXMLName());
@@ -741,6 +755,21 @@ public class StaxJobFactory extends JobFactory {
             }
             throw new JobCreationException(cursorInfo.getLocalName(), attrtmp, e);
         }
+    }
+
+    /**
+     * Get the generic information of the entity, with variables resolved.
+     *
+     * @return the list of generic information as a hashMap.
+     */
+    private HashMap<String, String> getGenericInformation(Map<String, String> unresolvedGenericInformation,
+            Map<String, String> variables) throws JobCreationException {
+        HashMap<String, String> infos = new HashMap<>();
+        for (Map.Entry<String, String> unresolvedGenericInformationValue : unresolvedGenericInformation.entrySet()) {
+            infos.put(unresolvedGenericInformationValue.getKey(),
+                      replace(unresolvedGenericInformationValue.getValue(), variables));
+        }
+        return infos;
     }
 
     /**
@@ -947,7 +976,9 @@ public class StaxJobFactory extends JobFactory {
                             if (job.getGenericInformation() != null)
                                 jobVariablesWithGenericInfos.putAll(job.getGenericInformation());
 
-                            tmpTask.setGenericInformation(getGenericInformation(cursorTask,
+                            Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformation(cursorTask);
+                            tmpTask.setUnresolvedGenericInformation(unresolvedGenericInformationDefinedInWorkflow);
+                            tmpTask.setGenericInformation(getGenericInformation(unresolvedGenericInformationDefinedInWorkflow,
                                                                                 jobVariablesWithGenericInfos));
                         } else if (XMLTags.VARIABLES.matches(current)) {
                             Map<String, TaskVariable> taskVariablesMap = createTaskVariables(cursorTask,
