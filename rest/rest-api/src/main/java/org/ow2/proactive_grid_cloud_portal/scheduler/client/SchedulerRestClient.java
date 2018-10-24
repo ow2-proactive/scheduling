@@ -52,6 +52,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
@@ -451,6 +452,42 @@ public class SchedulerRestClient {
         Response response = target.request()
                                   .header("sessionid", sessionId)
                                   .post(Entity.entity(entity, MediaType.MULTIPART_FORM_DATA_TYPE));
+
+        if (response.getStatus() != HttpURLConnection.HTTP_OK) {
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                throw new NotConnectedRestException("User not authenticated or session timeout.");
+            } else {
+                throwException(String.format("Job submission failed status code: %d", response.getStatus()), response);
+            }
+        }
+        return response.readEntity(JobIdData.class);
+    }
+
+    public JobIdData reSubmit(String sessionId, JobId job, Map<String, String> variables,
+            Map<String, String> genericInfos) throws NotConnectedRestException {
+        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/jobs/" + job.value() +
+                         "/reSubmit";
+
+        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
+                                                           .providerFactory(providerFactory)
+                                                           .build();
+        ResteasyWebTarget target = client.target(uriTmpl);
+
+        // Variables
+        if (variables != null) {
+            for (String key : variables.keySet()) {
+                target = target.matrixParam(key, variables.get(key));
+            }
+        }
+
+        // Generic infos
+        if (genericInfos != null) {
+            for (String key : genericInfos.keySet()) {
+                target = target.queryParam(key, genericInfos.get(key));
+            }
+        }
+
+        Response response = target.request().header("sessionid", sessionId).get();
 
         if (response.getStatus() != HttpURLConnection.HTTP_OK) {
             if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED) {

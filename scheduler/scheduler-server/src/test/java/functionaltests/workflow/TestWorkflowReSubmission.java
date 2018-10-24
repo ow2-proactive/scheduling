@@ -27,7 +27,7 @@ package functionaltests.workflow;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.Collections;
 
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -44,7 +44,8 @@ public class TestWorkflowReSubmission extends SchedulerFunctionalTestWithRestart
 
         final JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
-        final JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, new HashMap<>(), new HashMap<>());
+        final JobId jobId1 = schedulerHelper.getSchedulerInterface()
+                                            .reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
 
         schedulerHelper.waitForEventJobFinished(jobId);
 

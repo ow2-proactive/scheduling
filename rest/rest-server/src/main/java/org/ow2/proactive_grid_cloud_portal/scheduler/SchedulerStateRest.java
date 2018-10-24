@@ -2220,10 +2220,25 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    private String normalizeFilePath(String filePath, String fileName) {
+        if (filePath == null) {
+            filePath = "";
+        }
+        if (fileName != null && filePath.length() > 0 && !filePath.endsWith("/")) {
+            filePath = (filePath + File.separator + fileName);
+        } else if (fileName != null) {
+            filePath = fileName;
+        }
+
+        if (filePath.length() > 0 && filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
+        }
+        return filePath;
+    }
+
     @Override
-    public JobIdData reSubmit(String sessionId, String jobId, PathSegment pathSegment, UriInfo contextInfos)
-            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
-            SubmissionClosedRestException, IOException {
+    public JobIdData reSubmit(String sessionId, String jobId, PathSegment pathSegment) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
         Scheduler scheduler = checkAccess(sessionId, "reSubmit");
 
         File tmpJobFile = File.createTempFile("job", "d");
@@ -2248,29 +2263,40 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
         // Get the job submission generic infos
-        Map<String, String> genericInfos = null;
-        if (contextInfos != null)
-            genericInfos = getMapWithFirstValues(contextInfos.getQueryParameters());
 
         WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
-        newJobId = workflowSubmitter.submit(tmpJobFile, jobVariables, genericInfos);
+        newJobId = workflowSubmitter.submit(tmpJobFile, jobVariables, Collections.emptyMap());
         return mapper.map(newJobId, JobIdData.class);
     }
 
-    private String normalizeFilePath(String filePath, String fileName) {
-        if (filePath == null) {
-            filePath = "";
-        }
-        if (fileName != null && filePath.length() > 0 && !filePath.endsWith("/")) {
-            filePath = (filePath + File.separator + fileName);
-        } else if (fileName != null) {
-            filePath = fileName;
-        }
+    @Override
+    public JobIdData reSubmit(String sessionId, String jobId) throws JobCreationRestException,
+            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
+        Scheduler scheduler = checkAccess(sessionId, "reSubmit");
 
-        if (filePath.length() > 0 && filePath.startsWith("/")) {
-            filePath = filePath.substring(1);
+        File tmpJobFile = File.createTempFile("job", "d");
+
+        JobId newJobId;
+
+        try {
+            final String jobContent = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
+            FileUtils.write(tmpJobFile, jobContent, Charset.forName("UTF-8"));
+        } catch (NotConnectedException e) {
+            e.printStackTrace();
+        } catch (UnknownJobException e) {
+            e.printStackTrace();
+        } catch (PermissionException e) {
+            e.printStackTrace();
+        } catch (SubmissionClosedException e) {
+            e.printStackTrace();
+        } catch (JobCreationException e) {
+            e.printStackTrace();
         }
-        return filePath;
+        // Get the job submission generic infos
+
+        WorkflowSubmitter workflowSubmitter = new WorkflowSubmitter(scheduler);
+        newJobId = workflowSubmitter.submit(tmpJobFile, Collections.emptyMap(), Collections.emptyMap());
+        return mapper.map(newJobId, JobIdData.class);
     }
 
     @Consumes(MediaType.APPLICATION_JSON)
