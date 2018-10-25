@@ -610,6 +610,7 @@ public class StaxJobFactory extends JobFactory {
                     // model of an existing variable can use other variables as pattern replacements
                     replacedJobVariable.setModel(replace(replacedJobVariable.getModel(), updatedReplacementVariables));
                 }
+                updatedVariablesMap.put(replacementVariableKey, replacedJobVariable);
             } else {
                 // if the variable is not defined in the job, create a new job variable with an empty model
                 updatedVariablesMap.put(replacementVariableKey,
