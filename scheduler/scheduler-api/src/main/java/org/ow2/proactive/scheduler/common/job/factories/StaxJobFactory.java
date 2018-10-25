@@ -597,19 +597,23 @@ public class StaxJobFactory extends JobFactory {
         }
 
         for (Map.Entry<String, String> replacementVariable : updatedReplacementVariables.entrySet()) {
-            if (updatedVariablesMap.containsKey(replacementVariable.getKey())) {
+            String replacementVariableKey = replacementVariable.getKey();
+            if (updatedVariablesMap.containsKey(replacementVariableKey)) {
                 // if the variable is already defined in the job, overwrite its value by the replacement variable,
                 // eventually using other variables as pattern replacements
-                JobVariable jobVariable = updatedVariablesMap.get(replacementVariable.getKey());
-                jobVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
-                if (jobVariable.getModel() != null) {
+                JobVariable jobVariable = updatedVariablesMap.get(replacementVariableKey);
+                JobVariable replacedJobVariable = new JobVariable(jobVariable.getName(),
+                                                                  jobVariable.getValue(),
+                                                                  jobVariable.getModel());
+                replacedJobVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
+                if (replacedJobVariable.getModel() != null) {
                     // model of an existing variable can use other variables as pattern replacements
-                    jobVariable.setModel(replace(jobVariable.getModel(), updatedReplacementVariables));
+                    replacedJobVariable.setModel(replace(replacedJobVariable.getModel(), updatedReplacementVariables));
                 }
             } else {
                 // if the variable is not defined in the job, create a new job variable with an empty model
-                updatedVariablesMap.put(replacementVariable.getKey(),
-                                        new JobVariable(replacementVariable.getKey(),
+                updatedVariablesMap.put(replacementVariableKey,
+                                        new JobVariable(replacementVariableKey,
                                                         replace(replacementVariable.getValue(),
                                                                 updatedReplacementVariables),
                                                         null));
