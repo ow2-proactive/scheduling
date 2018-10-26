@@ -135,15 +135,6 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test(timeout = MAX_WAIT_TIME)
-    public void getJobContent() throws Exception {
-        ISchedulerClient client = clientInstance();
-        Job job = defaultJob();
-        JobId jobId = client.submit(job);
-        final Job retrievedJob = client.getJobContent(jobId);
-        assertEquals(job.getName(), retrievedJob.getName());
-    }
-
-    @Test(timeout = MAX_WAIT_TIME)
     public void testJobResult() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = createJobManyTasks("JobResult",

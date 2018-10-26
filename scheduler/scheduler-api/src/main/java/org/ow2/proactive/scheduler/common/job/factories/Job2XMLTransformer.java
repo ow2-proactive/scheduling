@@ -180,7 +180,7 @@ public class Job2XMLTransformer {
                                                      " http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/" +
                                                      Schemas.SCHEMA_LATEST.getVersion() + "/schedulerjob.xsd");
 
-        if (!Job.DEFAULT_PROJECT_NAME.equals(job.getProjectName())) {
+        if (!job.getProjectName().isEmpty()) {
             setAttribute(rootJob, XMLAttributes.JOB_PROJECT_NAME, job.getProjectName(), true);
         }
         setAttribute(rootJob, XMLAttributes.JOB_PRIORITY, job.getPriority().toString());

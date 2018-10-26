@@ -534,10 +534,20 @@ public interface SchedulerRestInterface {
     String getJobHtml(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws IOException, NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+    /**
+     *
+     * @param sessionId
+     *          a valid session id
+     * @param jobId
+     *          job id which corresponds to already submitted job
+     * @return xml representation of the submitted job
+     * @throws UnknownJobRestException if <code>jobId</code> does not correspond to any job
+     * @throws PermissionRestException if current user does not have rights to access job with <code>jobId</code>
+     */
     @GET
     @Path("jobs/{jobid}/xml")
     @Produces("application/xml")
-    InputStream getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+    String getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
             SubmissionClosedRestException, JobCreationRestException;
 

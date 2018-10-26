@@ -28,15 +28,22 @@ package org.ow2.proactive.scheduler.task.executors;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
 
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
@@ -191,6 +198,43 @@ public class InProcessTaskExecutor implements TaskExecutor {
         }
     }
 
+    private void saveScriptAsFile(String path, Script<?> script, TaskContext taskContext) throws Throwable {
+        //If the path doesn't contain an extension, add an extension to it
+        if (!path.contains(".")) {
+            ScriptEngineFactory factory = new ScriptEngineManager().getEngineByName(script.getEngineName())
+                                                                   .getFactory();
+            String extension = factory.getExtensions().get(0);
+            path = path + "." + extension;
+        }
+
+        String code = script.fetchScript().trim();
+
+        Path p = Paths.get(path);
+
+        //Check if the path is an absolute path or a relative path, if it is a relative path store the file in the local space
+        boolean isAbsolute = p.isAbsolute();
+        if (isAbsolute) {
+            //Check if the parent path exists, if not create it
+            Path hasParent = p.getParent();
+            if (!Files.exists(hasParent)) {
+                FileUtils.forceMkdirParent(new File(path));
+            }
+            try (FileWriter fw = new FileWriter(new File(path))) {
+                fw.write(code);
+            } catch (IOException e) {
+                throw new TaskException("Error writing script as file: " + path, e);
+            }
+        } else {
+            //Needs to be stored in the local space
+            String uri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+            try (FileWriter fw = new FileWriter(new File(uri, path))) {
+                fw.write(code);
+            } catch (IOException e) {
+                throw new TaskException("Error writing script as file: " + path, e);
+            }
+        }
+    }
+
     /**
      * Executes a task.
      *
@@ -209,10 +253,17 @@ public class InProcessTaskExecutor implements TaskExecutor {
         if (taskContext.getPreScript() != null) {
             Script<?> script = taskContext.getPreScript();
             forkedTaskVariablesManager.replaceScriptParameters(script, thirdPartyCredentials, variables, error);
-            ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
-            if (preScriptResult.errorOccured()) {
-                throw new TaskException("Failed to execute pre script: " + preScriptResult.getException().getMessage(),
-                                        preScriptResult.getException());
+            Map<String, String> genericInfo = taskContext.getInitializer().getGenericInformation();
+            if (genericInfo != null && genericInfo.containsKey("PRE_SCRIPT_AS_FILE")) {
+                String path = genericInfo.get("PRE_SCRIPT_AS_FILE");
+                saveScriptAsFile(path, script, taskContext);
+            } else {
+                ScriptResult preScriptResult = scriptHandler.handle(script, output, error);
+                if (preScriptResult.errorOccured()) {
+                    throw new TaskException("Failed to execute pre script: " +
+                                            preScriptResult.getException().getMessage(),
+                                            preScriptResult.getException());
+                }
             }
         }
 
