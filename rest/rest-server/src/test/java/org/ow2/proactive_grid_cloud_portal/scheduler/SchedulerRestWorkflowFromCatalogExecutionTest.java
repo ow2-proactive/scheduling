@@ -51,6 +51,7 @@ import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
+import org.ow2.proactive_grid_cloud_portal.common.IAMTestUtil;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStoreTestUtils;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
@@ -77,6 +78,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
 
     @Before
     public void setUp() throws Exception {
+        IAMTestUtil.setUpIAM();
         schedulerRest = new SchedulerStateRest();
         scheduler = mock(SchedulerProxyUserInterface.class);
         sessionId = SharedSessionStoreTestUtils.createValidSession(scheduler);

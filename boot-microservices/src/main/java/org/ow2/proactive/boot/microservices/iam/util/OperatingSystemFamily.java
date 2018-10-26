@@ -23,15 +23,17 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.authentication.iam;
+package org.ow2.proactive.boot.microservices.iam.util;
 
-public class IAMException extends RuntimeException {
-
-    public IAMException(String message) {
-        super(message);
-    }
-
-    public IAMException(String message, Throwable cause) {
-        super(message, cause);
-    }
+/**
+ * OperatingSystemFamily
+ *
+ * @author The ProActive Team
+ */
+public enum OperatingSystemFamily {
+    LINUX,
+    WINDOWS,
+    UNIX,
+    DEC_OS,
+    MAC;
 }

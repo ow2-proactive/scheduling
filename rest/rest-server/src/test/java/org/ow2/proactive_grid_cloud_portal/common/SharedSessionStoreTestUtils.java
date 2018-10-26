@@ -46,24 +46,46 @@ public class SharedSessionStoreTestUtils {
 
     public static String createValidSession(RMProxyUserInterface rm)
             throws ActiveObjectCreationException, NodeException, RMException, KeyException, LoginException {
+
+        Session session;
+        SessionStore sessionStore = SharedSessionStore.getInstance();
+
         SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
         when(schedulerFactory.connectToRM(Matchers.<CredData> any())).thenReturn(rm);
-        SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
+        sessionStore.setSchedulerRMProxyFactory(schedulerFactory);
 
-        // login
-        Session session = SharedSessionStore.getInstance().createUnnamedSession();
+        // When IAM is used, generate IAMSession
+        if (IAMTestUtil.IAM_IS_USED) {
+            session = sessionStore.create(IAMTestUtil.login, IAMTestUtil.password.toCharArray());
+        }
+        // Legacy Session
+        else {
+            session = sessionStore.createUnnamedSession();
+        }
+
         session.connectToRM(new CredData());
         return session.getSessionId();
     }
 
     public static String createValidSession(SchedulerProxyUserInterface scheduler)
             throws LoginException, ActiveObjectCreationException, SchedulerException, NodeException {
+
+        Session session;
+        SessionStore sessionStore = SharedSessionStore.getInstance();
+
         SchedulerRMProxyFactory schedulerFactory = mock(SchedulerRMProxyFactory.class);
         when(schedulerFactory.connectToScheduler(Matchers.<CredData> any())).thenReturn(scheduler);
-        SharedSessionStore.getInstance().setSchedulerRMProxyFactory(schedulerFactory);
+        sessionStore.setSchedulerRMProxyFactory(schedulerFactory);
 
-        // login
-        Session session = SharedSessionStore.getInstance().createUnnamedSession();
+        // When IAM is used, generate IAMSession
+        if (IAMTestUtil.IAM_IS_USED) {
+            session = sessionStore.create(IAMTestUtil.login, IAMTestUtil.password.toCharArray());
+        }
+        // Legacy Session
+        else {
+            session = sessionStore.createUnnamedSession();
+        }
+
         session.connectToScheduler(new CredData());
         return session.getSessionId();
     }

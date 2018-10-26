@@ -1,0 +1,12 @@
+{
+  "@class": "org.apereo.cas.services.RegexRegisteredService",
+  "serviceId": "^https://(.+)/studio(\\z|/.*)",
+  "name": "ProActive Studio",
+  "id": 5,
+  "description": "ProActive Studio",
+  "evaluationOrder": 3,
+  "logoutType": "FRONT_CHANNEL",
+  "attributeReleasePolicy" : {
+    "@class" : "org.jasig.cas.services.ReturnAllAttributeReleasePolicy"
+  }
+}

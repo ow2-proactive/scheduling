@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.authentication.iam;
+package org.ow2.proactive.boot.microservices.iam.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -40,6 +40,7 @@ import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
 import org.jose4j.keys.AesKey;
 import org.jose4j.lang.JoseException;
+import org.ow2.proactive.boot.microservices.iam.exceptions.IAMException;
 
 
 public class JWTUtils {

@@ -41,6 +41,8 @@ dependencies {
 
     compile project(":scheduler:scheduler-client")
     compile project(":rm:rm-client")
+    compile project(":boot-microservices")
+
     compile "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"
     compile "org.objectweb.proactive:programming-extension-dataspaces:${programmingVersion}"

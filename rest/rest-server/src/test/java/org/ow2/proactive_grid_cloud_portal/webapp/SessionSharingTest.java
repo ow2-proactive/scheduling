@@ -46,6 +46,7 @@ import org.ow2.proactive.resourcemanager.common.RMStateNodeUrls;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.util.SchedulerProxyUserInterface;
+import org.ow2.proactive_grid_cloud_portal.common.IAMTestUtil;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRMProxyFactory;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.rm.RMRest;
@@ -68,6 +69,9 @@ public class SessionSharingTest {
 
     @Before
     public void setUp() throws Exception {
+
+        IAMTestUtil.setUpIAM();
+
         schedulerRest = new SchedulerStateRest();
         rmRest = new RMRest();
         studioRest = new StudioRest();

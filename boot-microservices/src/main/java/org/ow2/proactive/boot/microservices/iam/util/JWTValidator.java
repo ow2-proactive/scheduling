@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.authentication.iam;
+package org.ow2.proactive.boot.microservices.iam.util;
 
 import org.apache.log4j.Logger;
 import org.jasig.cas.client.authentication.AttributePrincipal;
@@ -34,30 +34,19 @@ import org.jasig.cas.client.validation.TicketValidationException;
 import org.jasig.cas.client.validation.TicketValidator;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
+import org.ow2.proactive.boot.microservices.iam.exceptions.IAMException;
 
 
 public class JWTValidator implements TicketValidator {
 
     /** Logger instance */
-    private Logger logger = Logger.getLogger(JWTValidator.class.getName());
+    private Logger logger = Logger.getLogger(JWTValidator.class);
 
     /** IAM Server URL */
     protected String iamServerUrlPrefix;
 
-    /** IAM REST request for tickets */
-    protected String iamTicketRequest;
-
     /** IAM client service */
     protected String service;
-
-    /** Name of the attribute in the CAS assertion that should be used for username */
-    protected String userAttributeName;
-
-    /** Name of the attribute in the CAS assertion that should be used for role data */
-    protected String roleAttributeName;
-
-    /** IAM response header used to get the SSO ticket */
-    protected String ssoTicketHeader;
 
     /** Boolean mentioning whether the JWT is signed */
     protected boolean jsonWebTokenSigned;
@@ -71,34 +60,13 @@ public class JWTValidator implements TicketValidator {
     /** JWT encryption key */
     protected String jsonWebTokenEncryptionKey;
 
-    /**  Constructor used by IAMLoginModule  */
-    public JWTValidator(String iamServerUrlPrefix) {
-        this.iamServerUrlPrefix = iamServerUrlPrefix;
-    }
-
     // List of setters used by IAMLoginModule
     public void setIamServerUrlPrefix(String iamServerUrlPrefix) {
         this.iamServerUrlPrefix = iamServerUrlPrefix;
     }
 
-    public void setIamTicketRequest(String iamTicketRequest) {
-        this.iamTicketRequest = iamTicketRequest;
-    }
-
     public void setService(String service) {
         this.service = service;
-    }
-
-    public void setUserAttributeName(String userAttributeName) {
-        this.userAttributeName = userAttributeName;
-    }
-
-    public void setRoleAttributeName(String roleAttributeName) {
-        this.roleAttributeName = roleAttributeName;
-    }
-
-    public void setSsoTicketHeader(String ssoTicketHeader) {
-        this.ssoTicketHeader = ssoTicketHeader;
     }
 
     public void setJsonWebTokenSigned(boolean jsonWebTokenSigned) {
@@ -132,7 +100,7 @@ public class JWTValidator implements TicketValidator {
             // Extract JWT principal from attributes
             AttributePrincipal principal = new AttributePrincipalImpl(claims.getSubject());
 
-            //Create authentication assertion
+            // Create authentication assertion
             Assertion assertion = new AssertionImpl(new AttributePrincipalImpl(principal.getName(),
                                                                                claims.getClaimsMap()));
 
@@ -140,7 +108,7 @@ public class JWTValidator implements TicketValidator {
 
             return assertion;
         } catch (MalformedClaimException e) {
-            throw new IAMException("");
+            throw new IAMException("Malformed Json Web Token acquired from IAM [" + jsonWebToken + "]");
         }
 
     }

@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.ow2.proactive.boot.microservices.IAMStarter;
+import org.ow2.proactive.boot.microservices.iam.IAMStarter;
 
 
 public class IAMTHelper {

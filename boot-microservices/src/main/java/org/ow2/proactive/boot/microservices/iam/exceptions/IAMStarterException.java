@@ -23,9 +23,9 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.boot.microservices;
+package org.ow2.proactive.boot.microservices.iam.exceptions;
 
-class IAMStarterException extends RuntimeException {
+public class IAMStarterException extends RuntimeException {
 
     public IAMStarterException(String message) {
         super(message);

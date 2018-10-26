@@ -25,10 +25,15 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
+import java.util.AbstractMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jose4j.jwt.JwtClaims;
+import org.jose4j.jwt.MalformedClaimException;
+import org.ow2.proactive.boot.microservices.iam.exceptions.IAMException;
+import org.ow2.proactive.boot.microservices.iam.util.IAMSessionUtil;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
 
@@ -40,6 +45,8 @@ public class SessionStore {
     private SchedulerRMProxyFactory schedulerRMProxyFactory = new SchedulerRMProxyFactory();
 
     private Clock clock = new Clock();
+
+    private IAMSessionUtil iamSessionUtil = new IAMSessionUtil();
 
     public Session createUnnamedSession() {
         String sessionId = SessionIdGenerator.newSessionId();
@@ -70,6 +77,11 @@ public class SessionStore {
     /** For testing only */
     public void setSchedulerRMProxyFactory(SchedulerRMProxyFactory schedulerRMProxyFactory) {
         this.schedulerRMProxyFactory = schedulerRMProxyFactory;
+    }
+
+    /** For testing only */
+    public void setIamSessionUtil(IAMSessionUtil iamSessionUtil) {
+        this.iamSessionUtil = iamSessionUtil;
     }
 
     public void terminate(String sessionId) {
@@ -120,4 +132,66 @@ public class SessionStore {
         }
     }
 
+    // Create an IAMSession instead of the legacy Session
+    public Session create(String username, char[] password) {
+
+        // Call IAM and create a new JWT
+        AbstractMap.SimpleEntry<String, JwtClaims> jwt = iamSessionUtil.createNewSessionToken(username, password);
+
+        // Create an IAMSession using the generated JWT
+        IAMSession iamSession = new IAMSession(jwt.getKey(), jwt.getValue(), schedulerRMProxyFactory, clock);
+        iamSession.setUserName(username);
+
+        // Add IAMSession to SessionStore
+        sessions.put(iamSession.getSessionId(), iamSession);
+
+        return iamSession;
+    }
+
+    // Check that an IAMSession is still valid
+    public void renewIAMSession(String sessionId) {
+
+        IAMSession iamSession = (IAMSession) get(sessionId);
+
+        JwtClaims jwtClaims = iamSession.getJwtClaims();
+
+        try {
+            String ssoTicket = jwtClaims.getJwtId();
+
+            if (!iamSessionUtil.tokenIsValid(ssoTicket)) {
+                throw new IAMException("SSO ticket [" + ssoTicket + "] is no longer valid.");
+            }
+
+            iamSessionUtil.createServiceToken(ssoTicket);
+
+        } catch (MalformedClaimException e) {
+            throw new IAMException("SSO token contains malformed session id (jti)");
+        }
+    }
+
+    // Delete IAMSession (from IAM ticket registry)
+    public void destroyIAMSession(String sessionId) throws NotConnectedException {
+
+        IAMSession iamSession = (IAMSession) get(sessionId);
+
+        if (iamSession != null) {
+            JwtClaims jwtClaims = iamSession.getJwtClaims();
+
+            try {
+
+                String ssoTicket = jwtClaims.getJwtId();
+
+                if (!iamSessionUtil.deleteToken(ssoTicket)) {
+                    throw new IAMException("Error occurred while destroying SSO ticket [" + ssoTicket +
+                                           "] from IAM ticket registry.");
+                }
+
+            } catch (MalformedClaimException e) {
+                throw new IAMException("SSO token contains malformed session id (jti)");
+            }
+
+        } else {
+            throw new NotConnectedException(SchedulerStateRest.YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+    }
 }

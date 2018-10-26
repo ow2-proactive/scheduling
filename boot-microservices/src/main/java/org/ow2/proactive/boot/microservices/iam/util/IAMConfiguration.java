@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.boot.microservices.util;
+package org.ow2.proactive.boot.microservices.iam.util;
 
 import java.io.File;
 
@@ -50,6 +50,8 @@ public class IAMConfiguration {
 
     public static final String ERROR_MARKER = "iam.error.marker";
 
+    public static final String SSO_TICKET_MARKER = "iam.sso.ticket.marker";
+
     public static final String JVM_ARGS = "iam.jvm.args";
 
     public static final String SSL_PROTOCOL = "iam.ssl.protocol";
@@ -60,6 +62,16 @@ public class IAMConfiguration {
 
     public static final String SSL_CERTTIFICATE_PASS = "server.ssl.key-store-password";
 
+    public static final String ROLE_ATTRIBUTE = "iam.user.role.attribute";
+
+    public static final String ROLE_SEPARATOR = "iam.user.role.separator";
+
+    public static final String PA_CORE_CLIENT = "iam.pa.core.client";
+
+    public static final String PA_REST_SESSION = "iam.pa.rest.session.id";
+
+    public static final String TOKEN_VALIDATOR_CLASS = "iam.ticket.validator.class";
+
     public static final String SPRING_PROACTIVE_ENV_PROFILE = "proactive";
 
     public static final String IAM_PROTOCOL = "https://";
@@ -69,6 +81,18 @@ public class IAMConfiguration {
     public static final String IAM_PORT = "server.port";
 
     public static final String IAM_CONTEXT = "server.context-path";
+
+    public static final String IAM_TOKEN_SIGNATURE_KEY = "cas.authn.token.crypto.signing.key";
+
+    public static final String IAM_TOKEN_ENCRYPTION_KEY = "cas.authn.token.crypto.encryption.key";
+
+    public static final String IAM_TOKEN_SIGNATURE_ENABLED = "cas.authn.token.crypto.signingEnabled";
+
+    public static final String IAM_TOKEN_ENCRYPTION_ENABLED = "cas.authn.token.crypto.encryptionEnabled";
+
+    public static final String IAM_TICKET_REQUEST = "/v1/tickets";
+
+    public static final String IAM_USERS_REQUEST = "/v1/users";
 
     public static final String IAM_LOGIN_PAGE = "/login";
 
@@ -82,6 +106,8 @@ public class IAMConfiguration {
 
     private static final Logger LOGGER = Logger.getLogger(IAMConfiguration.class);
 
+    private static final ListDelimiterHandler DELIMITER = new DefaultListDelimiterHandler(';');
+
     private IAMConfiguration() {
 
     }
@@ -90,12 +116,10 @@ public class IAMConfiguration {
 
         Configuration config;
 
-        ListDelimiterHandler delimiter = new DefaultListDelimiterHandler(',');
-
         PropertiesBuilderParameters propertyParameters = new Parameters().properties();
         propertyParameters.setFile(configFile);
         propertyParameters.setThrowExceptionOnMissing(true);
-        propertyParameters.setListDelimiterHandler(delimiter);
+        propertyParameters.setListDelimiterHandler(DELIMITER);
 
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder = new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class);
 

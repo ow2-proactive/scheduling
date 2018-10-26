@@ -50,6 +50,9 @@ public class SessionStoreTest {
 
     @Before
     public void setUp() throws Exception {
+
+        IAMTestUtil.setUpIAM();
+
         sessionStore = new SessionStore();
         schedulerProxyFactory = mock(SchedulerRMProxyFactory.class);
         sessionStore.setSchedulerRMProxyFactory(schedulerProxyFactory);
