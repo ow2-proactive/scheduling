@@ -35,11 +35,14 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.exceptions.NotBoundException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
@@ -101,7 +104,7 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
      */
     public T connect(String url) throws Exception {
         T authentication = lookupAuthentication(url);
-        if (authentication.isActivated()) {
+        if (authentication.isActivated().getBooleanValue()) {
             return authentication;
         } else {
             throw new Exception(ERROR_NOT_ACTIVATED);
@@ -162,8 +165,16 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
             // waiting until scheduling is initialized
             while (leftTime > 0) {
                 long startTime = System.currentTimeMillis();
+                BooleanWrapper future = authentication.isActivated();
 
-                if (authentication.isActivated()) {
+                try {
+                    PAFuture.waitFor(future, leftTime);
+                } catch (ProActiveTimeoutException e) {
+                    logger.error(e);
+                    throw e;
+                }
+
+                if (authentication.isActivated().getBooleanValue()) {
                     // success
                     break;
                 } else {

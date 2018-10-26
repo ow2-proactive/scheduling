@@ -25,7 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
-import java.io.File;
+import java.io.InputStream;
 
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
@@ -46,9 +46,8 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
     }
 
     @Override
-    public File validateJob(File jobFile) throws JobValidationException {
+    public void validateJob(InputStream jobInputStream) throws JobValidationException {
         // validate any job
-        return jobFile;
     }
 
     @Override

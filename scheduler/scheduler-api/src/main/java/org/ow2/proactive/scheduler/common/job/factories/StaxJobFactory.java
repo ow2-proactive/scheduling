@@ -27,9 +27,11 @@ package org.ow2.proactive.scheduler.common.job.factories;
 
 import static org.ow2.proactive.scheduler.common.util.VariableSubstitutor.filterAndUpdate;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -121,6 +123,8 @@ public class StaxJobFactory extends JobFactory {
      */
     private String relativePathRoot = "./";
 
+    private GetJobContentFactory getJobContentFactory = new GetJobContentFactory();
+
     /**
      * Create a new instance of StaxJobFactory.
      */
@@ -167,39 +171,33 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
+    @Override
+    public Job createJob(InputStream workflowStream) throws JobCreationException {
+        return createJob(workflowStream, null, null);
+    }
+
+    @Override
+    public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos) throws JobCreationException {
+        try {
+            return createJobFromInputStream(workflowStream, replacementVariables, replacementGenericInfos);
+        } catch (JobCreationException jce) {
+            throw jce;
+        } catch (Exception e) {
+            throw new JobCreationException(e);
+        }
+    }
+
     private Job createJob(File file, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
         try {
-            //Check if the file exist
             if (!file.exists()) {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
-            //validate content using the proper XML schema
-            File updatedFile = validate(file);
-            //set relative path
-            relativePathRoot = updatedFile.getParentFile().getAbsolutePath();
-            //create and get XML STAX reader
-            XMLStreamReader xmlsr;
-            Map<String, ArrayList<String>> dependencies = new HashMap<>();
-            Job job;
-            try (InputStream inputStream = new FileInputStream(updatedFile)) {
-                // use the server side property to accept encoding
-                xmlsr = xmlInputFactory.createXMLStreamReader(inputStream, FILE_ENCODING);
-
-                //Create the job starting at the first cursor position of the XML Stream reader
-                job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
-                //Close the stream
-                xmlsr.close();
+            relativePathRoot = file.getParentFile().getAbsolutePath();
+            try (InputStream inputStream = new FileInputStream(file)) {
+                return createJobFromInputStream(inputStream, replacementVariables, replacementGenericInfos);
             }
-            //make dependencies
-            makeDependences(job, dependencies);
-
-            validate((TaskFlowJob) job);
-
-            logger.debug("Job successfully created!");
-            //debug mode only
-            displayJobInfo(job);
-            return job;
         } catch (JobCreationException jce) {
             jce.pushTag(XMLTags.JOB.getXMLName());
             throw jce;
@@ -208,10 +206,35 @@ public class StaxJobFactory extends JobFactory {
         }
     }
 
+    private Job createJobFromInputStream(InputStream jobInputStream, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos)
+            throws JobCreationException, VerifierConfigurationException, IOException, XMLStreamException {
+        byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
+        try (ByteArrayInputStream jobInputStreamForValidation = new ByteArrayInputStream(bytes)) {
+            validate(jobInputStreamForValidation);
+        }
+
+        Map<String, ArrayList<String>> dependencies = new HashMap<>();
+        Job job;
+        try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
+            XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
+            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies, new String(bytes));
+            xmlsr.close();
+        }
+
+        makeDependences(job, dependencies);
+        validate((TaskFlowJob) job);
+
+        logger.debug("Job successfully created!");
+        //debug mode only
+        displayJobInfo(job);
+        return job;
+    }
+
     /*
      * Validate the given job descriptor
      */
-    private File validate(File file) throws VerifierConfigurationException, JobCreationException {
+    private void validate(InputStream jobInputStream) throws VerifierConfigurationException, JobCreationException {
         Map<String, JobValidatorService> factories;
         try {
             factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
@@ -220,20 +243,15 @@ public class StaxJobFactory extends JobFactory {
             throw new VerifierConfigurationException(MSG_UNABLE_TO_INSTANCIATE_JOB_VALIDATION_FACTORIES, e);
         }
 
-        File updatedFile = file;
-
         try {
-
             for (JobValidatorService factory : factories.values()) {
-                updatedFile = factory.validateJob(updatedFile);
+                factory.validateJob(jobInputStream);
             }
         } catch (JobValidationException e) {
             throw e;
         } catch (Exception e) {
             throw new JobValidationException(true, e);
         }
-
-        return updatedFile;
     }
 
     /*
@@ -270,7 +288,7 @@ public class StaxJobFactory extends JobFactory {
      * @throws JobCreationException if an error occurred during job creation process.
      */
     private Job createJob(XMLStreamReader cursorRoot, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos, Map<String, ArrayList<String>> dependencies)
+            Map<String, String> replacementGenericInfos, Map<String, ArrayList<String>> dependencies, String jobContent)
             throws JobCreationException {
 
         String current = null;
@@ -284,7 +302,7 @@ public class StaxJobFactory extends JobFactory {
                     current = cursorRoot.getLocalName();
                     if (XMLTags.JOB.matches(current)) {
                         //first tag of the job.
-                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos);
+                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos, jobContent);
                     } else if (XMLTags.TASK.matches(current)) {
                         //once here, the job instance has been created
                         fillJobWithTasks(cursorRoot, job, dependencies);
@@ -326,10 +344,11 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorJob          the streamReader with the cursor on the job element.
      * @param replacementVariables job submission variables map taking priority on those defined in the xml
      * @param replacementGenericInfos job submission generic infos map taking priority on those defined in the xml
+     * @param jobContent contains xml representation of this job
      * @throws JobCreationException if an exception occurs during job creation.
      */
     private Job createAndFillJob(XMLStreamReader cursorJob, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos) throws JobCreationException {
+            Map<String, String> replacementGenericInfos, String jobContent) throws JobCreationException {
 
         // A temporary job
         Job commonPropertiesHolder = new Job() {
@@ -442,6 +461,13 @@ public class StaxJobFactory extends JobFactory {
                 job.setUserSpace(commonPropertiesHolder.getUserSpace());
                 job.setVariables(commonPropertiesHolder.getVariables());
                 job.setVisualization(commonPropertiesHolder.getVisualization());
+
+                String updatedJobContent = getJobContentFactory.replaceVarsAndGenericInfo(jobContent,
+                                                                                          commonPropertiesHolder.getVariables(),
+                                                                                          commonPropertiesHolder.getGenericInformation());
+
+                job.setJobContent(updatedJobContent);
+
             }
             return job;
         } catch (JobCreationException jce) {

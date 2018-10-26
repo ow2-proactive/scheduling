@@ -34,7 +34,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk;
 
+import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -109,6 +113,134 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
     }
 
     @Test
+    public void storePreScriptAbsolute() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setPreScript(new SimpleScript("println('pre')", "groovy"));
+        initializer.setPostScript(new SimpleScript("println('post')", "groovy"));
+
+        Map<String, String> genericInfo = new HashMap<>();
+        File file = File.createTempFile("test", ".py");
+        genericInfo.put("PRE_SCRIPT_AS_FILE", file.getAbsolutePath());
+        file.delete();
+        initializer.setGenericInformation(genericInfo);
+
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
+
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("println('hello'); java.lang.Thread.sleep(5); result='hello'",
+                                                                                                                                                  "groovy"))),
+                                                                                    initializer,
+                                                                                    null,
+                                                                                    new NodeDataSpacesURIs("",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           ""),
+                                                                                    "",
+                                                                                    new NodeInfo("", "", "")),
+                                                                    taskOutput.outputStream,
+                                                                    taskOutput.error);
+
+        //Make sure that the execution of the pre-script is skipped
+        assertEquals(String.format("hello%npost%n"), taskOutput.output());
+        assertEquals("hello", result.value());
+
+        //Make sure that the pre-script is stored in a file
+        assertTrue(file.exists());
+        String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+        assertEquals("println('pre')", content);
+        file.delete();
+    }
+
+    @Test
+    public void storePreScriptRelative() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setPreScript(new SimpleScript("println('pre')", "groovy"));
+        initializer.setPostScript(new SimpleScript("println('post')", "groovy"));
+
+        Map<String, String> genericInfo = new HashMap<>();
+        genericInfo.put("PRE_SCRIPT_AS_FILE", "test.py");
+        initializer.setGenericInformation(genericInfo);
+
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
+
+        Path p = Files.createTempDirectory("");
+
+        TaskContext taskContext = new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("println('hello'); java.lang.Thread.sleep(5); result='hello'",
+                                                                                                                "groovy"))),
+                                                  initializer,
+                                                  null,
+                                                  new NodeDataSpacesURIs(p.toString(), "", "", "", "", ""),
+                                                  "",
+                                                  new NodeInfo("", "", ""));
+
+        TaskResultImpl result = new InProcessTaskExecutor().execute(taskContext,
+                                                                    taskOutput.outputStream,
+                                                                    taskOutput.error);
+
+        //Make sure that the execution of the pre-script is skipped
+        assertEquals(String.format("hello%npost%n"), taskOutput.output());
+        assertEquals("hello", result.value());
+
+        //Make sure that the pre-script is stored in a file
+        String uri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+        File file = new File(uri, "test.py");
+        assertTrue(file.exists());
+        String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+        assertEquals("println('pre')", content);
+        file.delete();
+        Files.delete(p);
+    }
+
+    @Test
+    public void storePreScriptWithoutExtension() throws Throwable {
+        TestTaskOutput taskOutput = new TestTaskOutput();
+
+        TaskLauncherInitializer initializer = new TaskLauncherInitializer();
+        initializer.setPreScript(new SimpleScript("println('pre')", "groovy"));
+        initializer.setPostScript(new SimpleScript("println('post')", "groovy"));
+
+        Map<String, String> genericInfo = new HashMap<>();
+        File file = File.createTempFile("test", "");
+        genericInfo.put("PRE_SCRIPT_AS_FILE", file.getAbsolutePath());
+        file.delete();
+        initializer.setGenericInformation(genericInfo);
+
+        initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
+
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("println('hello'); java.lang.Thread.sleep(5); result='hello'",
+                                                                                                                                                  "groovy"))),
+                                                                                    initializer,
+                                                                                    null,
+                                                                                    new NodeDataSpacesURIs("",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           ""),
+                                                                                    "",
+                                                                                    new NodeInfo("", "", "")),
+                                                                    taskOutput.outputStream,
+                                                                    taskOutput.error);
+
+        //Make sure that the execution of the pre-script is skipped
+        assertEquals(String.format("hello%npost%n"), taskOutput.output());
+        assertEquals("hello", result.value());
+
+        //Make sure that the pre-script is stored in a file
+        file = new File(file.getAbsolutePath() + ".groovy");
+        assertTrue(file.exists());
+        String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+        assertEquals("println('pre')", content);
+        file.delete();
+
+    }
+
+    @Test
     public void testPaUserVariableAvailabilityFromScriptEngine() throws Throwable {
         TestTaskOutput taskOutput = new TestTaskOutput();
 
@@ -118,15 +250,20 @@ public class InProcessTaskExecutorTest extends ProActiveTestClean {
         initializer.setJobOwner(jobOwner);
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
 
-        new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("print variables.get('PA_USER')",
-                                                                                                                          "python"))),
-                                                            initializer,
-                                                            null,
-                                                            new NodeDataSpacesURIs("", "", "", "", "", ""),
-                                                            "",
-                                                            new NodeInfo("", "", "")),
-                                            taskOutput.outputStream,
-                                            taskOutput.error);
+        TaskResultImpl result = new InProcessTaskExecutor().execute(new TaskContext(new ScriptExecutableContainer(new TaskScript(new SimpleScript("print variables.get('PA_USER')",
+                                                                                                                                                  "python"))),
+                                                                                    initializer,
+                                                                                    null,
+                                                                                    new NodeDataSpacesURIs("",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           "",
+                                                                                                           ""),
+                                                                                    "",
+                                                                                    new NodeInfo("", "", "")),
+                                                                    taskOutput.outputStream,
+                                                                    taskOutput.error);
 
         assertEquals(jobOwner, taskOutput.output().trim());
     }

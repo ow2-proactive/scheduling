@@ -94,20 +94,4 @@ public class TestJobRuntimeData extends BaseSchedulerDBTest {
         Assert.assertNotNull(internalTask.getExecutionHostName());
     }
 
-    @Test
-    public void submitAndLoadJobContent() throws Exception {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName(this.getClass().getSimpleName());
-        job.addTask(createDefaultTask("task1"));
-        job.setPriority(JobPriority.LOW);
-
-        InternalJob runtimeData = defaultSubmitJobAndLoadInternal(true, job);
-        Job content = dbManager.loadInitalJobContent(runtimeData.getId());
-
-        Assert.assertThat(content.getName(), is(job.getName()));
-        Assert.assertThat(content.getPriority(), is(JobPriority.LOW));
-        Assert.assertTrue(content instanceof TaskFlowJob);
-        Assert.assertThat(((TaskFlowJob) content).getTasks().size(), is(1));
-    }
-
 }

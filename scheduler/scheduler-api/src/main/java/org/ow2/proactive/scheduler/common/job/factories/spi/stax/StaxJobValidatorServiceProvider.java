@@ -25,10 +25,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.stax;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.stream.XMLInputFactory;
@@ -61,18 +59,19 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
     }
 
     @Override
-    public File validateJob(File jobFile) throws JobValidationException {
-        String findSchemaByNamespaceUsed;
+    public void validateJob(InputStream jobInputStream) throws JobValidationException {
         try {
-            findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(jobFile);
-            InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed);
-            ValidationUtil.validate(jobFile, schemaStream);
+            byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
+            try (ByteArrayInputStream jobInputStreamForSchema = new ByteArrayInputStream(bytes)) {
+                String findSchemaByNamespaceUsed = findSchemaByNamespaceUsed(jobInputStreamForSchema);
+                InputStream schemaStream = this.getClass().getResourceAsStream(findSchemaByNamespaceUsed);
+                try (ByteArrayInputStream jobInputStreamForValidation = new ByteArrayInputStream(bytes)) {
+                    ValidationUtil.validate(jobInputStreamForValidation, schemaStream);
+                }
+            }
         } catch (Exception e) {
-            // wrap all occurring exceptions as a schema exception
             throw new JobValidationException(true, e);
         }
-
-        return jobFile;
     }
 
     @Override
@@ -81,26 +80,22 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
         return job;
     }
 
-    private String findSchemaByNamespaceUsed(File file)
+    private String findSchemaByNamespaceUsed(InputStream jobInputStream)
             throws FileNotFoundException, XMLStreamException, JobValidationException {
-        try (InputStream inputStream = new FileInputStream(file)) {
-            XMLStreamReader cursorRoot = xmlInputFactory.createXMLStreamReader(inputStream);
-            try {
-                while (cursorRoot.hasNext()) {
-                    String namespace = advanceCursorAndFindSchema(cursorRoot);
-                    if (namespace != null)
-                        return namespace;
-                }
-                return Schemas.SCHEMA_LATEST.getLocation();
-            } catch (Exception e) {
-                throw new JobValidationException(e.getMessage(), e);
-            } finally {
-                if (cursorRoot != null) {
-                    cursorRoot.close();
-                }
+        XMLStreamReader cursorRoot = xmlInputFactory.createXMLStreamReader(jobInputStream);
+        try {
+            while (cursorRoot.hasNext()) {
+                String namespace = advanceCursorAndFindSchema(cursorRoot);
+                if (namespace != null)
+                    return namespace;
             }
-        } catch (IOException e) {
+            return Schemas.SCHEMA_LATEST.getLocation();
+        } catch (Exception e) {
             throw new JobValidationException(e.getMessage(), e);
+        } finally {
+            if (cursorRoot != null) {
+                cursorRoot.close();
+            }
         }
     }
 
