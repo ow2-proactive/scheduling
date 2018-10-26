@@ -62,6 +62,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand)
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ListJobTasksCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ReSubmitJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobStateCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ChangeJobPriorityCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PauseJobCommand);
@@ -73,6 +74,7 @@ importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.KillJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RemoveJobCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobResultCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobOutputCommand);
+importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.GetJobContentCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.PreemptTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartInErrorTaskCommand);
 importClass(org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.RestartRunningTaskCommand);
@@ -226,6 +228,16 @@ function submit(pathname, variables, genericInfos) {
     }
 }
 
+function resubmit(pathname, variables) {
+    if (typeof variables == 'undefined') {
+        execute(new ReSubmitJobCommand([string(pathname)]));
+    } else {
+        execute(new ReSubmitJobCommand(new Array([string(pathname)], variables)));
+    }
+}
+
+
+
 function submitarchive(pathname, variables) {
      if (typeof variables == 'undefined') {
         execute(new SubmitJobCommand([string(pathname)]));
@@ -237,6 +249,9 @@ function submitarchive(pathname, variables) {
 function jobpriority(jobId, priority) {
     execute(new ChangeJobPriorityCommand('' + jobId, '' + priority));
 }
+
+
+
 
 function pausejob(jobId) {
     execute(new PauseJobCommand('' + jobId));
@@ -341,6 +356,10 @@ function joboutput(jobId, tag) {
         execute(new GetJobOutputCommand('' + jobId, tag));
     }
 
+}
+
+function jobcontent(jobId) {
+    execute(new GetJobContentCommand('' + jobId))
 }
 
 function taskresult(jobId, taskId) {

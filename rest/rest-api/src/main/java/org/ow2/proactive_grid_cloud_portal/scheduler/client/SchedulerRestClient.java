@@ -463,10 +463,9 @@ public class SchedulerRestClient {
         return response.readEntity(JobIdData.class);
     }
 
-    public JobIdData reSubmit(String sessionId, JobId job, Map<String, String> variables,
+    public JobIdData reSubmit(String sessionId, String jobId, Map<String, String> variables,
             Map<String, String> genericInfos) throws NotConnectedRestException {
-        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/jobs/" + job.value() +
-                         "/reSubmit";
+        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/jobs/" + jobId + "/reSubmit";
 
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
                                                            .providerFactory(providerFactory)

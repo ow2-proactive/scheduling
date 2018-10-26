@@ -25,29 +25,34 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import java.util.List;
-
+import org.apache.log4j.Logger;
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
-import org.ow2.proactive_grid_cloud_portal.cli.utils.StringUtility;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.dto.TaskResultData;
 
 
 public class GetJobContentCommand extends AbstractJobTagCommand implements Command {
+
+    private static final Logger LOGGER = Logger.getLogger(GetJobContentCommand.class);
 
     public GetJobContentCommand(String jobId) {
         super(jobId);
     }
 
-    public GetJobContentCommand(String jobId, String tag) {
-        super(jobId, tag);
-    }
-
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            String output = scheduler.getJobContent(currentContext.getSessionId(), jobId);
+            LOGGER.info("output: " + output);
+            resultStack(currentContext).push(output);
+            if (!currentContext.isSilent()) {
+                writeLine(currentContext, "%s", output);
+            }
+        } catch (Exception e) {
+            handleError(String.format("An error occurred while retrieving %s content:", job()), e, currentContext);
+        }
     }
 
 }

@@ -255,7 +255,7 @@ public class CommandSet {
                                                                            .longOpt("resubmit")
                                                                            .description("Re-Submit existing job with new variables values")
                                                                            .hasArgs(true)
-                                                                           .numOfArgs(2)
+                                                                           .numOfArgs(1)
                                                                            .hasOptionalArg(true)
                                                                            .argNames("jobId '[{\"var1\":\"value1\",\"var2\":\"value2\"}]'")
                                                                            .jsCommand("resubmit(job-id,'{\"var1\":\"value1\",\"var2\":\"value2\"}'")

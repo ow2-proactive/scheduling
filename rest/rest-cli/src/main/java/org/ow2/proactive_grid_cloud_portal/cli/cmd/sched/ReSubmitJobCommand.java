@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -46,8 +47,12 @@ import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 
 
 public class ReSubmitJobCommand extends AbstractCommand implements Command {
@@ -72,7 +77,34 @@ public class ReSubmitJobCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        JobIdData newJobId;
+        try {
 
+            if (variables != null) {
+                final Map<String, String> vars = jobKeyValueTransformer.transformVariablesToMap(variables);
+                newJobId = currentContext.getRestClient().reSubmit(currentContext.getSessionId(),
+                                                                   jobId,
+                                                                   vars,
+                                                                   Collections.emptyMap());
+
+            } else {
+                newJobId = scheduler.reSubmit(currentContext.getSessionId(), jobId);
+
+            }
+            writeLine(currentContext, "Job('%s') successfully re-submitted as Job('%d')", jobId, newJobId.getId());
+            resultStack(currentContext).push(jobId);
+        } catch (Exception e) {
+            handleError(String.format("An error occurred while re-submitting Job('%s')%s output:", jobId),
+                        e,
+                        currentContext);
+
+        }
+
+    }
+
+    private Map<String, String> map(String variables) {
+        return jobKeyValueTransformer.transformVariablesToMap(variables);
     }
 
 }

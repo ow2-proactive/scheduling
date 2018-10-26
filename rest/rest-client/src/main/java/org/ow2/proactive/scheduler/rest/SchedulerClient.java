@@ -731,7 +731,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throws NotConnectedException {
         final JobIdData jobIdData;
         try {
-            jobIdData = restApiClient().reSubmit(sid, currentJobId, jobVariables, jobGenericInfos);
+            jobIdData = restApiClient().reSubmit(sid, currentJobId.value(), jobVariables, jobGenericInfos);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         }

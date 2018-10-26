@@ -42,6 +42,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -1287,10 +1288,10 @@ public interface SchedulerRestInterface {
      * @throws PermissionRestException if user does not have rights to access job with <code>jobId</code>
      */
     @GET
-    @Path("jobs/{jobid}/reSubmit")
+    @Path("jobs/{jobid}/path:reSubmit")
     @Produces("application/json")
     JobIdData reSubmit(@HeaderParam("sessionid") String sessionId, @PathParam("jobid")
-    final String jobId, @PathParam("path") PathSegment pathSegment) throws JobCreationRestException,
+    final String jobId, @MatrixParam("path") PathSegment pathSegment) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
