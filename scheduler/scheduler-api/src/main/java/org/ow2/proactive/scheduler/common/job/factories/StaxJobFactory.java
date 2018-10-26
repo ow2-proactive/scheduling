@@ -1860,14 +1860,7 @@ public class StaxJobFactory extends JobFactory {
 
         // Include given variables if any
         if (variables != null) {
-            for (Map.Entry<String, String> variable : variables.entrySet()) {
-                if (System.getProperties()
-                          .entrySet()
-                          .stream()
-                          .noneMatch(entry -> entry.getKey().toString().equals(variable.getKey()))) {
-                    replacements.put(variable.getKey(), variable.getValue());
-                }
-            }
+            replacements.putAll(variables);
         }
         return filterAndUpdate(str, replacements);
     }
