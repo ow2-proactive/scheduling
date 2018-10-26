@@ -56,7 +56,7 @@ public class SharedSessionStoreTestUtils {
 
         // When IAM is used, generate IAMSession
         if (IAMTestUtil.IAM_IS_USED) {
-            session = sessionStore.create(IAMTestUtil.login, IAMTestUtil.password.toCharArray());
+            session = sessionStore.createIAMSession(IAMTestUtil.login, IAMTestUtil.password.toCharArray());
         }
         // Legacy Session
         else {
@@ -79,7 +79,7 @@ public class SharedSessionStoreTestUtils {
 
         // When IAM is used, generate IAMSession
         if (IAMTestUtil.IAM_IS_USED) {
-            session = sessionStore.create(IAMTestUtil.login, IAMTestUtil.password.toCharArray());
+            session = sessionStore.createIAMSession(IAMTestUtil.login, IAMTestUtil.password.toCharArray());
         }
         // Legacy Session
         else {

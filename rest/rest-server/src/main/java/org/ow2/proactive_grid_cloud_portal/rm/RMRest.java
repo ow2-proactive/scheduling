@@ -170,7 +170,7 @@ public class RMRest implements RMRestInterface {
 
         // When authentication is performed against the IAM microservice, generate a JWT as session Id
         if (IAM_IS_USED) {
-            session = sessionStore.create(username, password.toCharArray());
+            session = sessionStore.createIAMSession(username, password.toCharArray());
         }
         // Legacy Session
         else {
@@ -220,7 +220,7 @@ public class RMRest implements RMRestInterface {
 
             // When authentication is performed against the IAM microservice, generate a JWT as session Id
             if (IAM_IS_USED) {
-                session = sessionStore.create(credData.getLogin(), credData.getPassword().toCharArray());
+                session = sessionStore.createIAMSession(credData.getLogin(), credData.getPassword().toCharArray());
             }
             // Legacy Session
             else {
@@ -240,7 +240,7 @@ public class RMRest implements RMRestInterface {
 
             // When authentication is performed against the IAM microservice, generate a JWT as session Id
             if (IAM_IS_USED) {
-                session = sessionStore.create(login, password.toCharArray());
+                session = sessionStore.createIAMSession(login, password.toCharArray());
             }
             // Legacy Session
             else {

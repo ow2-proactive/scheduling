@@ -65,6 +65,8 @@ public class IAMTestUtil {
         config.setProperty(IAMConfiguration.IAM_TOKEN_ENCRYPTION_ENABLED, true);
         config.setProperty(IAMConfiguration.IAM_TOKEN_SIGNATURE_KEY, "");
         config.setProperty(IAMConfiguration.IAM_TOKEN_ENCRYPTION_KEY, "");
+        config.setProperty(IAMConfiguration.PA_REST_SESSION_AS_JWT, true);
+        config.setProperty(IAMConfiguration.SSO_TICKET_MARKER, "");
 
         JwtClaims jwtClaims = new JwtClaims();
         jwtClaims.setJwtId(ssoTicket);
@@ -75,6 +77,7 @@ public class IAMTestUtil {
         when(iamSessionUtil.createNewSessionToken(Matchers.anyString(), Matchers.any())).thenReturn(iamToken);
         when(iamSessionUtil.tokenIsValid(Matchers.anyString())).thenReturn(true);
         when(iamSessionUtil.deleteToken(Matchers.anyString())).thenReturn(true);
+        when(iamSessionUtil.isJWTSession()).thenReturn(true);
 
         SharedSessionStore.getInstance().setIamSessionUtil(iamSessionUtil);
     }

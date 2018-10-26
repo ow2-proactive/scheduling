@@ -29,7 +29,6 @@ import java.util.AbstractMap;
 
 import org.apache.commons.configuration2.Configuration;
 import org.jose4j.jwt.JwtClaims;
-import org.jose4j.jwt.MalformedClaimException;
 import org.ow2.proactive.boot.microservices.iam.IAMStarter;
 
 
@@ -49,9 +48,9 @@ public class IAMSessionUtil {
 
     private String tokenEncryptionKey;
 
-    private String roleAttribute;
+    private boolean isJWTSession;
 
-    private String roleSeparator;
+    private String ticketMarker;
 
     public IAMSessionUtil() {
 
@@ -67,13 +66,13 @@ public class IAMSessionUtil {
 
         tokenEncryptionKey = config.getString(IAMConfiguration.IAM_TOKEN_ENCRYPTION_KEY);
 
-        roleAttribute = config.getString(IAMConfiguration.ROLE_ATTRIBUTE);
+        isJWTSession = config.getBoolean(IAMConfiguration.PA_REST_SESSION_AS_JWT);
 
-        roleSeparator = config.getString(IAMConfiguration.ROLE_SEPARATOR);
+        ticketMarker = config.getString(IAMConfiguration.SSO_TICKET_MARKER);
     }
 
-    public String[] getUserRoles(JwtClaims claims) throws MalformedClaimException {
-        return claims.getStringClaimValue(roleAttribute).split(roleSeparator);
+    public boolean isJWTSession() {
+        return isJWTSession;
     }
 
     public boolean deleteToken(String ssoTicket) {
@@ -89,18 +88,20 @@ public class IAMSessionUtil {
         String sessionToken = new IAMRestClient().getSSOTicket(iamURL + IAMConfiguration.IAM_TICKET_REQUEST,
                                                                username,
                                                                password,
-                                                               null,
-                                                               true);
+                                                               ticketMarker,
+                                                               isJWTSession);
 
-        JwtClaims claims = JWTUtils.parseJWT(sessionToken,
-                                             tokenSignatureEnabled,
-                                             tokenSignatureKey,
-                                             tokenEncryptionEnabled,
-                                             tokenEncryptionKey,
-                                             iamURL,
-                                             iamURL);
+        JwtClaims claims = isJWTSession ? JWTUtils.parseJWT(sessionToken,
+                                                            tokenSignatureEnabled,
+                                                            tokenSignatureKey,
+                                                            tokenEncryptionEnabled,
+                                                            tokenEncryptionKey,
+                                                            iamURL,
+                                                            iamURL)
+                                        : null;
 
         return new AbstractMap.SimpleEntry(sessionToken, claims);
+
     }
 
     public String createServiceToken(String ssoTicket) {

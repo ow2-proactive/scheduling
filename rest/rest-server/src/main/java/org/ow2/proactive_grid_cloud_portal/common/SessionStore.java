@@ -133,13 +133,13 @@ public class SessionStore {
     }
 
     // Create an IAMSession instead of the legacy Session
-    public Session create(String username, char[] password) {
+    public Session createIAMSession(String username, char[] password) {
 
         // Call IAM and create a new JWT
-        AbstractMap.SimpleEntry<String, JwtClaims> jwt = iamSessionUtil.createNewSessionToken(username, password);
+        AbstractMap.SimpleEntry<String, JwtClaims> token = iamSessionUtil.createNewSessionToken(username, password);
 
         // Create an IAMSession using the generated JWT
-        IAMSession iamSession = new IAMSession(jwt.getKey(), jwt.getValue(), schedulerRMProxyFactory, clock);
+        IAMSession iamSession = new IAMSession(token.getKey(), token.getValue(), schedulerRMProxyFactory, clock);
         iamSession.setUserName(username);
 
         // Add IAMSession to SessionStore
@@ -153,10 +153,19 @@ public class SessionStore {
 
         IAMSession iamSession = (IAMSession) get(sessionId);
 
-        JwtClaims jwtClaims = iamSession.getJwtClaims();
-
         try {
-            String ssoTicket = jwtClaims.getJwtId();
+
+            String ssoTicket;
+
+            // SSO ticket is a JWT
+            if (iamSessionUtil.isJWTSession()) {
+                JwtClaims jwtClaims = iamSession.getJwtClaims();
+                ssoTicket = jwtClaims.getJwtId();
+            }
+            // SSO ticket is a ST
+            else {
+                ssoTicket = sessionId;
+            }
 
             if (!iamSessionUtil.tokenIsValid(ssoTicket)) {
                 throw new IAMException("SSO ticket [" + ssoTicket + "] is no longer valid.");
@@ -175,11 +184,19 @@ public class SessionStore {
         IAMSession iamSession = (IAMSession) get(sessionId);
 
         if (iamSession != null) {
-            JwtClaims jwtClaims = iamSession.getJwtClaims();
-
             try {
 
-                String ssoTicket = jwtClaims.getJwtId();
+                String ssoTicket;
+
+                // SSO ticket is a JWT
+                if (iamSessionUtil.isJWTSession()) {
+                    JwtClaims jwtClaims = iamSession.getJwtClaims();
+                    ssoTicket = jwtClaims.getJwtId();
+                }
+                // SSO ticket is a ST
+                else {
+                    ssoTicket = sessionId;
+                }
 
                 if (!iamSessionUtil.deleteToken(ssoTicket)) {
                     throw new IAMException("Error occurred while destroying SSO ticket [" + ssoTicket +

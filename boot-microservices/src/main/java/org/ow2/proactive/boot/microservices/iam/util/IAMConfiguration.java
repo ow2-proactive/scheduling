@@ -68,7 +68,7 @@ public class IAMConfiguration {
 
     public static final String PA_CORE_CLIENT = "iam.pa.core.client";
 
-    public static final String PA_REST_SESSION = "iam.pa.rest.session.id";
+    public static final String PA_REST_SESSION_AS_JWT = "iam.pa.rest.session.as.jwt";
 
     public static final String TOKEN_VALIDATOR_CLASS = "iam.ticket.validator.class";
 
