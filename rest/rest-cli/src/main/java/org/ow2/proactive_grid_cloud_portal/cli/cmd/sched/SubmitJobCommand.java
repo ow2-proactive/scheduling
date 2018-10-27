@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_FILE_EMPTY;
 import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.JobKeyValueTransformer.transformJsonStringToMap;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,9 +56,9 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private String variables;
 
-    private static final Logger logger = null;
+    private String genericInfos;
 
-    private final JobKeyValueTransformer jobKeyValueTransformer;
+    private static final Logger logger = null;
 
     public SubmitJobCommand(String... params) throws NullPointerException {
         Objects.requireNonNull(params);
@@ -65,9 +66,11 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         this.pathname = params[0];
         if (params.length > 1) {
             this.variables = params[1];
-        }
-        this.jobKeyValueTransformer = new JobKeyValueTransformer();
 
+            if (params.length > 2) {
+                this.genericInfos = params[2];
+            }
+        }
     }
 
     @Override
@@ -82,11 +85,14 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
                 if (APPLICATION_XML.getMimeType().equals(contentType)) {
                     jobId = currentContext.getRestClient().submitXml(currentContext.getSessionId(),
                                                                      inputStream,
-                                                                     map(this.variables));
+                                                                     map(this.variables),
+                                                                     map(this.genericInfos));
                 } else {
-                    jobId = currentContext.getRestClient().submitJobArchive(currentContext.getSessionId(),
-                                                                            inputStream,
-                                                                            map(this.variables));
+                    jobId = currentContext.getRestClient()
+                                          .submitJobArchive(currentContext.getSessionId(),
+                                                            inputStream,
+                                                            map(this.variables),
+                                                            map(this.genericInfos));
                 }
             }
             writeLine(currentContext, "Job('%s') successfully submitted: job('%d')", pathname, jobId.getId());
@@ -119,8 +125,8 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     }
 
-    private Map<String, String> map(String variables) {
-        return jobKeyValueTransformer.transformVariablesToMap(variables);
+    private Map<String, String> map(String jsonString) {
+        return transformJsonStringToMap(jsonString);
     }
 
     private Boolean isFileEmpty(String pathname) {

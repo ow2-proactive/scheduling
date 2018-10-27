@@ -25,10 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -181,25 +178,43 @@ public class TestStaxJobFactory {
     @Test
     public void testCreateJobShouldUseGenericInfosMapToCreateJobGenericInfoVariables() throws Exception {
         Map<String, String> genericInfosMap = Maps.newHashMap();
+        String updatedKey = "new_job_generic_info";
         String updatedValue = "new_job_generic_info_value";
 
-        genericInfosMap.put("new_job_generic_info", updatedValue);
+        genericInfosMap.put(updatedKey, updatedValue);
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, null, genericInfosMap);
 
-        assertEquals(updatedValue, testJob.getGenericInformation().get("new_job_generic_info"));
+        assertEquals(updatedValue, testJob.getGenericInformation().get(updatedKey));
     }
 
     @Test
     public void
-            testCreateJobShouldUseGenericInfosMapToCreateJobGenericInfoVariablesOnWorkflowsWithEmptyGenericInfoSection()
+            testCreateJobShouldUseGenericInfosMapToCreateJobGenericInfoOnWorkflowWithEmptyGenericInfoAndVariablesSection()
                     throws Exception {
         Map<String, String> genericInfosMap = Maps.newHashMap();
-        String updatedValue = "new_job_generic_info_value";
+        String genericInfoKey = "generic_info_key";
+        String genericInfoValue = "generic_info_value";
 
-        genericInfosMap.put("new_job_generic_info", updatedValue);
+        genericInfosMap.put(genericInfoKey, genericInfoValue);
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri, null, genericInfosMap);
 
-        assertEquals(updatedValue, testJob.getGenericInformation().get("new_job_generic_info"));
+        assertEquals(genericInfoValue, testJob.getGenericInformation().get(genericInfoKey));
+        assertNull(testJob.getVariables().get(genericInfoKey));
+    }
+
+    @Test
+    public void
+            testCreateJobShouldUseVariablesMapToCreateJobVariablesOnWorkflowWithEmptyGenericInfoAndVariablesSection()
+                    throws Exception {
+        Map<String, String> variablesMap = Maps.newHashMap();
+        String variableKey = "variable_key";
+        String variableValue = "variable_value";
+
+        variablesMap.put(variableKey, variableValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri, variablesMap, null);
+
+        assertEquals(variableValue, testJob.getVariables().get(variableKey).getValue());
+        assertNull(testJob.getGenericInformation().get(variableKey));
     }
 
     @Test

@@ -31,6 +31,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.JobKeyValueTransformer.transformJsonStringToMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -77,9 +78,6 @@ public class SubmitJobCommandTest {
     private File jobFileMock;
 
     @Mock
-    private JobKeyValueTransformer jobKeyValueTransormerMock;
-
-    @Mock
     private JobIdData jobIdDataMock;
 
     @Mock
@@ -112,12 +110,13 @@ public class SubmitJobCommandTest {
 
         Mockito.when(schedulerRestClientMock.submitJobArchive("sessionid",
                                                               fileInputStreamMock,
-                                                              jobKeyValueTransormerMock.transformVariablesToMap("")))
+                                                              transformJsonStringToMap(""),
+                                                              transformJsonStringToMap("")))
                .thenReturn(null);
 
         assertThat(stack.get(0).getMessage(), is("Workflow file path is required"));
 
-        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null);
+        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null, null);
 
         throw stack.get(0);
     }
@@ -133,7 +132,7 @@ public class SubmitJobCommandTest {
         assertThat(stack.get(0).getMessage(), is("Unknown job descriptor type: " + params[0]));
 
         Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap(), anyMap());
 
         throw stack.get(0);
     }
@@ -149,7 +148,7 @@ public class SubmitJobCommandTest {
         assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' does not exist."));
 
         Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap(), anyMap());
 
         throw stack.get(0);
     }
@@ -165,7 +164,7 @@ public class SubmitJobCommandTest {
         assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
 
         Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap(), anyMap());
 
         throw stack.get(0);
     }

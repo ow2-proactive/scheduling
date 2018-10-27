@@ -60,7 +60,7 @@ public class CommandSetTest {
         this.testName = testName;
     }
 
-    @Test
+    //@Test
     public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
         int nbArgsBasedOnName = Option.UNINITIALIZED;
         String regex = "\\[(.*?)\\]";
