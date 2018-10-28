@@ -41,9 +41,6 @@ public class SchedulerFunctionalTestWithCustomConfigAndRestart extends Scheduler
 
     @BeforeClass
     public static void letTheSubclassStartTheScheduler() throws Exception {
-
-        startIAMIfNeeded();
-
         schedulerHelper.log("Scheduler has been started with a custom configuration.");
     }
 

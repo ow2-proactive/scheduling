@@ -25,20 +25,14 @@
  */
 package org.ow2.tests;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.Policy;
-import java.util.concurrent.ExecutionException;
 
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-
-import functionaltests.utils.IAMTHelper;
 
 
 /**
@@ -47,7 +41,7 @@ import functionaltests.utils.IAMTHelper;
  */
 public class ProActiveTest {
 
-    private static final String IAM_LOGIN_METHOD = "RMIAMLoginMethod";
+    private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
 
     static {
         configureSecurityManager();
@@ -79,27 +73,4 @@ public class ProActiveTest {
             System.setProperty(PASchedulerProperties.SCHEDULER_HOME.getKey(), rmHome);
         }
     }
-
-    /**
-     * Start IAM microservice if it is required for authentication
-     *
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ExecutionException
-     * @throws ConfigurationException
-     */
-    public static void startIAMIfNeeded() throws IOException, InterruptedException, ExecutionException,
-            ConfigurationException, GeneralSecurityException {
-
-        //Check if PA is configured to use IAM microservice for authentication
-        if (PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().equals(IAM_LOGIN_METHOD)) {
-
-            String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
-            String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());
-            String bootConfigurationPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_CONFIGURATION_PATH.getValueAsString());
-
-            IAMTHelper.startIAM(proactiveHome, bootMicroservicesPath, bootConfigurationPath);
-        }
-    }
-
 }

@@ -76,8 +76,6 @@ public class RMFunctionalTest extends ProActiveTest {
         CentralPAPropertyRepository.PA_TEST.setValue(true);
         CentralPAPropertyRepository.PA_RUNTIME_PING.setValue(false);
 
-        startIAMIfNeeded();
-
         rmHelper = new RMTHelper();
         try {
             cleanState();
