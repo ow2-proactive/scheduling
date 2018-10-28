@@ -27,10 +27,6 @@ package functionaltests.utils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-
 
 /**
  * Test which either reuses an existing scheduler or start a new one with the default configuration
@@ -43,8 +39,6 @@ public class SchedulerFunctionalTestNoRestart extends SchedulerFunctionalTest {
 
     @BeforeClass
     public static void doNotStartSchedulerIfNotNeeded() throws Exception {
-
-        startIAMIfNeeded();
 
         SchedulerTHelper.log("Start the scheduler only if needed");
         schedulerHelper = new SchedulerTHelper(false);

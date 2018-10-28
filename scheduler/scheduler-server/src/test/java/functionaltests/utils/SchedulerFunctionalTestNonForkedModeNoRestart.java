@@ -43,8 +43,6 @@ public class SchedulerFunctionalTestNonForkedModeNoRestart extends SchedulerFunc
     @BeforeClass
     public static void startDedicatedScheduler() throws Exception {
 
-        startIAMIfNeeded();
-
         schedulerHelper.log("Start Scheduler in non-fork mode.");
         schedulerHelper = new SchedulerTHelper(false,
                                                new File(SchedulerFunctionalTest.class.getResource("/functionaltests/config/scheduler-nonforkedscripttasks.ini")

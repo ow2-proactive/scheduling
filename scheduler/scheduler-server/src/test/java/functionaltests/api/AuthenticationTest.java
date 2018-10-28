@@ -30,7 +30,6 @@ import static org.junit.Assert.fail;
 
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.Set;
 
 import javax.security.auth.login.LoginException;
 
