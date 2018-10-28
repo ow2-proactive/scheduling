@@ -26,7 +26,10 @@
 package org.ow2.tests;
 
 import java.security.Policy;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 49aa1a745e6b0836cc87cdd16cf38778544ad037
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

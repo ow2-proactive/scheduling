@@ -28,7 +28,6 @@ package functionaltests.utils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-
 /**
  * Test which starts a new scheduler with the default configuration, and kill it after the test
  *

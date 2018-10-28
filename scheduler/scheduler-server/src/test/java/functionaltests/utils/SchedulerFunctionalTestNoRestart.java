@@ -28,7 +28,6 @@ package functionaltests.utils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-
 /**
  * Test which either reuses an existing scheduler or start a new one with the default configuration
  *

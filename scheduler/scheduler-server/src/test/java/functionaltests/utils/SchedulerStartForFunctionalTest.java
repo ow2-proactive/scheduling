@@ -29,7 +29,6 @@ import static functionaltests.utils.RMFunctionalTest.NODES_NOT_RECOVERABLE;
 
 import java.io.Serializable;
 import java.net.URI;
-
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;

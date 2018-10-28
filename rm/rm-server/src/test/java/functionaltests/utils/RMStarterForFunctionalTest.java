@@ -28,7 +28,6 @@ package functionaltests.utils;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.concurrent.ExecutionException;
-
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.resourcemanager.RMFactory;
@@ -36,6 +35,9 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.tests.ProActiveTest;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.concurrent.ExecutionException;
 
 
 /**
