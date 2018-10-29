@@ -180,14 +180,12 @@ public class IAMStarter {
 
         String javaCmd = null;
 
-        if (OSFamily.equals(OperatingSystemFamily.LINUX)) {
+        if (OSFamily.equals(OperatingSystemFamily.UNIX) || OSFamily.equals(OperatingSystemFamily.LINUX) ||
+            OSFamily.equals(OperatingSystemFamily.MAC)) {
             javaCmd = "java";
 
         } else if (OSFamily.equals(OperatingSystemFamily.WINDOWS)) {
             javaCmd = "java.exe";
-
-        } else if (OSFamily.equals(OperatingSystemFamily.MAC)) {
-            javaCmd = "java";
         }
 
         String javaPath = paHome + SEPARATOR + "jre" + SEPARATOR + "bin" + SEPARATOR + javaCmd;
@@ -293,10 +291,22 @@ public class IAMStarter {
                  config.getString(IAMConfiguration.IAM_PORT) + config.getString(IAMConfiguration.IAM_CONTEXT);
     }
 
+    /**
+     * returns the URL of the started IAM microservice.
+     *
+     * @return IAM URL
+     * @since version 8.3.0
+     */
     public static String getIamURL() {
         return iamURL;
     }
 
+    /**
+     * returns IAM configuration.
+     *
+     * @return IAM configuration
+     * @since version 8.3.0
+     */
     public static Configuration getConfiguration() {
         return config;
     }

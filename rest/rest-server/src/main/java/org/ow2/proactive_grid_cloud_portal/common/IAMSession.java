@@ -35,9 +35,17 @@ import org.jose4j.jwt.JwtClaims;
  */
 public class IAMSession extends Session {
 
-    // Set of attributes (i.e., claims) included in JWT
+    // Set of claims (i.e., attributes) included in JWT
     private JwtClaims jwtClaims;
 
+    /**
+     * Public constructor of IAMSession.
+     *
+     * @param sessionToken session id provided as a JWT (Json Web Token) or a SSO ticket
+     * @param jwtClaims Set of claims (i.e., attributes) included in JWT (set
+     * @param schedulerRMProxyFactory inherited from (super) Session
+     * @param clock inherited from (super) Session
+     */
     public IAMSession(String sessionToken, JwtClaims jwtClaims, SchedulerRMProxyFactory schedulerRMProxyFactory,
             Clock clock) {
 
@@ -47,6 +55,11 @@ public class IAMSession extends Session {
 
     }
 
+    /**
+     * returns the set of claims (i.e., attributes) included in JWT, or null if the session id is a SSO ticket.
+     *
+     * @return Set of claims (i.e., attributes) included in JWT
+     */
     public JwtClaims getJwtClaims() {
         return this.jwtClaims;
     }

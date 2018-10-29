@@ -85,6 +85,15 @@ public class JWTValidator implements TicketValidator {
         this.jsonWebTokenEncryptionKey = jsonWebTokenEncryptionKey;
     }
 
+    /**
+     * parses and validates a Json Web Token (JWT) acquired from IAM microservice.
+     *
+     * @param jsonWebToken  Json Web Token containing authentication and user information
+     * @param service for which the JWT is generated
+     * @return Assertion containing parsed authentication and user information
+     * @throws TicketValidationException if a problem occurs during the validation process
+     * @since version 8.3.0
+     */
     public Assertion validate(String jsonWebToken, String service) throws TicketValidationException {
 
         // Parse JWT and get attributes

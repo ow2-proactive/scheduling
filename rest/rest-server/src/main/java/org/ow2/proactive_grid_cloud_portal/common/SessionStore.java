@@ -132,7 +132,14 @@ public class SessionStore {
         }
     }
 
-    // Create an IAMSession instead of the legacy Session
+    /**
+     * Create IAM session instead of the legacy session
+     *
+     * @param username user login
+     * @param password user password
+     * @return IAM session
+     * @since version 8.4.0
+     */
     public Session createIAMSession(String username, char[] password) {
 
         // Call IAM and create a new JWT
@@ -148,7 +155,12 @@ public class SessionStore {
         return iamSession;
     }
 
-    // Check that an IAMSession is still valid
+    /**
+     * Check that a IAM session is still valid and renew it by creating a service token in the context of this session
+     *
+     * @param sessionId Id of IAM session to be renewed
+     * @since version 8.4.0
+     */
     public void renewIAMSession(String sessionId) {
 
         IAMSession iamSession = (IAMSession) get(sessionId);
@@ -167,7 +179,7 @@ public class SessionStore {
                 ssoTicket = sessionId;
             }
 
-            if (!iamSessionUtil.tokenIsValid(ssoTicket)) {
+            if (!iamSessionUtil.sessionIsValid(ssoTicket)) {
                 throw new IAMException("SSO ticket [" + ssoTicket + "] is no longer valid.");
             }
 
@@ -178,7 +190,12 @@ public class SessionStore {
         }
     }
 
-    // Delete IAMSession (from IAM ticket registry)
+    /**
+     * Delete IAM session (from IAM registry)
+     *
+     * @param sessionId Id of IAM session to be deleted from IAM
+     * @throws NotConnectedException if the session id is not found in SessionStore
+     */
     public void destroyIAMSession(String sessionId) throws NotConnectedException {
 
         IAMSession iamSession = (IAMSession) get(sessionId);
@@ -198,7 +215,7 @@ public class SessionStore {
                     ssoTicket = sessionId;
                 }
 
-                if (!iamSessionUtil.deleteToken(ssoTicket)) {
+                if (!iamSessionUtil.deleteSession(ssoTicket)) {
                     throw new IAMException("Error occurred while destroying SSO ticket [" + ssoTicket +
                                            "] from IAM ticket registry.");
                 }

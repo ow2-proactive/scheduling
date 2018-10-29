@@ -64,16 +64,36 @@ public class IAMJsonUtils {
 
     private Map principal;
 
+    /**
+     * parses and validates a JSON string containing authentication and user information acquired
+     * from IAM microservice.
+     *
+     * @param json JSON string containing authentication and user information
+     * @throws ParseException if a problem occurs during the parsing process
+     * @since version 8.3.0
+     */
     public void parseAuthenticationJson(String json) throws ParseException {
         JSONObject authenticationJson = (JSONObject) new JSONParser().parse(json);
         Map authentication = (Map<String, String>) authenticationJson.get(AUTHENTICATION_KEY);
         principal = (Map<String, String>) authentication.get(PRINCIPAL_KEY);
     }
 
+    /**
+     * returns the user id parsed from JSON string
+     *
+     * @return user ID
+     * @since version 8.3.0
+     */
     public String getUserId() {
         return (String) principal.get(PRINCIPAL_ID_KEY);
     }
 
+    /**
+     * returns the user attributes parsed from JSON string
+     *
+     * @return user attributes as a Map
+     * @since version 8.3.0
+     */
     public Map<String, String> getUserAttributes() {
         return (Map<String, String>) principal.get(PRINCIPAL_ATTRIBUTES_KEY);
     }
