@@ -92,7 +92,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     /** Maximum wait time of 5 minutes */
     private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
 
-    private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_return_generic_info.xml");
+    private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_print_generic_info.xml");
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
