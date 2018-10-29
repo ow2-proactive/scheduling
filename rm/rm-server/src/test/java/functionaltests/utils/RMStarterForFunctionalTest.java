@@ -46,6 +46,10 @@ public class RMStarterForFunctionalTest {
 
     private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
 
+    private static final String IAM_SERVICE_PATH = "dist/boot";
+
+    private static final String IAM_CONFIG_PATH = "config/iam";
+
     /**
      * Start a Resource Manager.
      * <p/>
@@ -86,10 +90,11 @@ public class RMStarterForFunctionalTest {
         if (PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().equals(IAM_LOGIN_METHOD)) {
 
             String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
-            String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());
-            String bootConfigurationPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_CONFIGURATION_PATH.getValueAsString());
+            String bootMicroservicesPath = PAResourceManagerProperties.getAbsolutePath(IAM_SERVICE_PATH);
+            String bootConfigurationPath = PAResourceManagerProperties.getAbsolutePath(IAM_CONFIG_PATH);
 
             IAMTHelper.startIAM(proactiveHome, bootMicroservicesPath, bootConfigurationPath);
         }
     }
+
 }
