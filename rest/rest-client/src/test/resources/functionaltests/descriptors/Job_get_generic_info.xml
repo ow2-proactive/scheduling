@@ -14,7 +14,7 @@
         <script>
           <code language="groovy">
             <![CDATA[
-print genericInformation.get("job_generic_info")
+result = genericInformation.get("job_generic_info")
 ]]>
           </code>
         </script>

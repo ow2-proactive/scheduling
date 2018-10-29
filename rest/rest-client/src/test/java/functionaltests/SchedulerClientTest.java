@@ -92,7 +92,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     /** Maximum wait time of 5 minutes */
     private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
 
-    private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_print_generic_info.xml");
+    private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_generic_info.xml");
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -401,8 +401,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
 
         // The job generic info must be returned by the task
-        String jobGenericInfoValue = (String) client.getTaskResult(jobId, "task1").getValue();
-        assertEquals(jobSubmissionGenericInfoValue, jobGenericInfoValue);
+        TaskResult taskResult = client.getJobResult(jobId).getResult("task1");
+        Assert.assertEquals(jobSubmissionGenericInfoValue, taskResult.value());
 
         // 2. The job submission generic info is replaced by the job submission variable
         jobSubmissionGenericInfoValue = "${updated_with_job_variable}";
@@ -418,8 +418,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
 
         // The job generic info must be returned by the task
-        jobGenericInfoValue = (String) client.getTaskResult(jobId, "task1").getValue();
-        assertEquals(jobVariableValue, jobGenericInfoValue);
+        taskResult = client.getJobResult(jobId).getResult("task1");
+        Assert.assertEquals(jobVariableValue, taskResult.value());
     }
 
     @Test(timeout = MAX_WAIT_TIME)
