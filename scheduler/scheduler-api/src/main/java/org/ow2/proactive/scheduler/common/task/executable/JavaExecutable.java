@@ -31,7 +31,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.script.ScriptContext;
 
@@ -77,7 +76,6 @@ public abstract class JavaExecutable {
      */
     public void internalInit(JavaStandaloneExecutableInitializer execInitializer, ScriptContext sc) throws Exception {
         this.execInitializer = execInitializer;
-        this.resultMap = new ConcurrentHashMap<>();
         // at this point, the context class loader is the TaskClassLoader
         // see JavaExecutableContainer.getExecutable()
         Map<String, Serializable> arguments = this.execInitializer.getArguments(Thread.currentThread()
@@ -89,6 +87,7 @@ public abstract class JavaExecutable {
         initDataSpaces(sc);
         init(arguments);
         initMetadata(sc);
+        initResultMap(sc);
         initAPIs(sc);
     }
 
@@ -181,6 +180,15 @@ public abstract class JavaExecutable {
      */
     public void initMetadata(ScriptContext sc) {
         this.metadata = (Map<String, String>) sc.getAttribute(SchedulerConstants.RESULT_METADATA_VARIABLE);
+    }
+
+    /**
+     * Initialization of the resultMap.<br>
+     *
+     * @param sc the ScriptContext including as bindings the resultMap map.
+     */
+    public void initResultMap(ScriptContext sc) {
+        this.resultMap = (Map<String, Serializable>) sc.getAttribute(SchedulerConstants.RESULT_MAP_BINDING_NAME);
     }
 
     /**

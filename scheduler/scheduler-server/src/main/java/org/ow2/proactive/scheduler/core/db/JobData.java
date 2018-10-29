@@ -46,6 +46,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
@@ -131,6 +132,8 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_START_TIME", columnList = "START_TIME"),
                                       @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"), })
 public class JobData implements Serializable {
+
+    private static final Logger logger = Logger.getLogger(JobData.class);
 
     private Long id;
 
@@ -270,7 +273,7 @@ public class JobData implements Serializable {
         try {
             internalJob.setResultMap(SerializationUtil.deserializeVariableMap(getResultMap()));
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("error when serializing result map variables " + e);
         }
         return internalJob;
     }

@@ -152,6 +152,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         JobId jobId = client.submit(job);
         final JobResult jobResult = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(2000));
         assertFalse(jobResult.getResultMap().isEmpty());
+        Assert.assertEquals(jobResult.getResultMap().get("myvar"), "myvalue");
     }
 
     @Test(timeout = MAX_WAIT_TIME)

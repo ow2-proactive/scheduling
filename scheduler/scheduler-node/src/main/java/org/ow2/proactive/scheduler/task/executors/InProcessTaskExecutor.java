@@ -36,7 +36,6 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -134,7 +133,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
                                                                                                          nodesFile));
             variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(taskContext));
             Map<String, String> resultMetadata = new HashMap<>();
-            Map<String, Serializable> resultMap = new ConcurrentHashMap<>();
+            Map<String, Serializable> resultMap = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
             userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,

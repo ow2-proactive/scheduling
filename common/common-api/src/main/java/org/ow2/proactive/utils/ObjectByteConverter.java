@@ -38,6 +38,7 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 import org.apache.commons.codec.binary.Base64;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 
 
 /**
@@ -250,6 +251,17 @@ public final class ObjectByteConverter {
         HashMap<String, Serializable> answer = new HashMap<>(input.size());
         for (Map.Entry<String, byte[]> entry : input.entrySet()) {
             answer.put(entry.getKey(), (Serializable) byteArrayToObject(entry.getValue()));
+        }
+        return answer;
+    }
+
+    public static Map<String, byte[]> mapOfSerializableToByteArray(Map<String, Serializable> input) throws IOException {
+        if (input == null) {
+            return null;
+        }
+        HashMap<String, byte[]> answer = new HashMap<>(input.size());
+        for (Map.Entry<String, Serializable> entry : input.entrySet()) {
+            answer.put(entry.getKey(), ObjectToByteConverter.ObjectStream.convert(entry.getValue()));
         }
         return answer;
     }

@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +76,7 @@ import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.scheduler.task.TaskInfoImpl;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.utils.ObjectByteConverter;
 
 import it.sauronsoftware.cron4j.Predictor;
 
@@ -105,7 +107,7 @@ public abstract class InternalJob extends JobState {
     /**
      * Merged map of job results
      */
-    private Map<String, Serializable> resultMap = new ConcurrentHashMap<>();
+    private Map<String, Serializable> resultMap = new HashMap<>();
 
     /**
      * Job descriptor for dependencies management

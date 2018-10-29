@@ -29,7 +29,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -71,7 +70,7 @@ public class JobResultImpl implements JobResult {
     public JobResultImpl() {
         allResults = new HashMap<>();
         preciousResults = new HashMap<>();
-        resultMap = new ConcurrentHashMap<>();
+        resultMap = new HashMap<>();
     }
 
     /**

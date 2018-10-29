@@ -29,8 +29,10 @@ import static org.junit.Assert.assertFalse;
 
 import java.io.Serializable;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -73,7 +75,7 @@ public class TestResultMap extends SchedulerFunctionalTestNoRestart {
 
         JavaTask javaTask = new JavaTask();
         javaTask.setExecutableClassName(TestResultMapTask.class.getName());
-        String TASK_NAME = "task name";
+        String TASK_NAME = "test_result_map";
         javaTask.setName(TASK_NAME);
 
         job.addTask(javaTask);
@@ -86,7 +88,9 @@ public class TestResultMap extends SchedulerFunctionalTestNoRestart {
         JobId jobId = schedulerHelper.submitJob(createJob());
         SchedulerTHelper.log("Job submitted, id " + jobId.toString());
         schedulerHelper.waitForEventJobFinished(jobId);
+        JobResult jobResult = schedulerHelper.getJobResult(jobId);
         assertFalse(schedulerHelper.getJobResult(jobId).getResultMap().isEmpty());
+        Assert.assertEquals(jobResult.getResultMap().get("myResultMapVar"), "myResultMapValue");
     }
 
 }
