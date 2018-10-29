@@ -167,7 +167,7 @@ public class SessionStore {
                 ssoTicket = sessionId;
             }
 
-            if (!iamSessionUtil.tokenIsValid(ssoTicket)) {
+            if (!iamSessionUtil.sessionIsValid(ssoTicket)) {
                 throw new IAMException("SSO ticket [" + ssoTicket + "] is no longer valid.");
             }
 
@@ -198,7 +198,7 @@ public class SessionStore {
                     ssoTicket = sessionId;
                 }
 
-                if (!iamSessionUtil.deleteToken(ssoTicket)) {
+                if (!iamSessionUtil.deleteSession(ssoTicket)) {
                     throw new IAMException("Error occurred while destroying SSO ticket [" + ssoTicket +
                                            "] from IAM ticket registry.");
                 }

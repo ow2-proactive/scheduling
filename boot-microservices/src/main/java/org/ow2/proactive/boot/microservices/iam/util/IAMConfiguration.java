@@ -40,6 +40,10 @@ import org.apache.log4j.Logger;
 
 public class IAMConfiguration {
 
+    /**
+     * All parameters required for IAM
+     *
+     */
     public static final String PROPERTIES_FILE = "application-proactive.properties";
 
     public static final String ARCHIVE_NAME = "iam.archive.name";
@@ -112,6 +116,14 @@ public class IAMConfiguration {
 
     }
 
+    /**
+     * loads the configuration of IAM microservice.
+     *
+     * @param configFile configuration file to load
+     * @return IAM configuration
+     * @throws ConfigurationException If a problem occurs when loading IAM configuration
+     * @since version 8.3.0
+     */
     public static Configuration loadConfig(File configFile) throws ConfigurationException {
 
         Configuration config;

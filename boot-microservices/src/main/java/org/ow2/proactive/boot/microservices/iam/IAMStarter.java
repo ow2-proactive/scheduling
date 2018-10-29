@@ -293,10 +293,22 @@ public class IAMStarter {
                  config.getString(IAMConfiguration.IAM_PORT) + config.getString(IAMConfiguration.IAM_CONTEXT);
     }
 
+    /**
+     * returns the URL of the started IAM microservice.
+     *
+     * @return IAM URL
+     * @since version 8.3.0
+     */
     public static String getIamURL() {
         return iamURL;
     }
 
+    /**
+     * loads IAM configuration from the given file.
+     *
+     * @return IAM configuration
+     * @since version 8.3.0
+     */
     public static Configuration getConfiguration() {
         return config;
     }

@@ -75,8 +75,8 @@ public class IAMTestUtil {
                                                                                                              new JwtClaims());
         IAMSessionUtil iamSessionUtil = mock(IAMSessionUtil.class);
         when(iamSessionUtil.createNewSessionToken(Matchers.anyString(), Matchers.any())).thenReturn(iamToken);
-        when(iamSessionUtil.tokenIsValid(Matchers.anyString())).thenReturn(true);
-        when(iamSessionUtil.deleteToken(Matchers.anyString())).thenReturn(true);
+        when(iamSessionUtil.sessionIsValid(Matchers.anyString())).thenReturn(true);
+        when(iamSessionUtil.deleteSession(Matchers.anyString())).thenReturn(true);
         when(iamSessionUtil.isJWTSession()).thenReturn(true);
 
         SharedSessionStore.getInstance().setIamSessionUtil(iamSessionUtil);

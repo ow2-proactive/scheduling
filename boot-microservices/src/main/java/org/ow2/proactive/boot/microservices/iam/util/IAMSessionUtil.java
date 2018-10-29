@@ -52,6 +52,9 @@ public class IAMSessionUtil {
 
     private String ticketMarker;
 
+    /**
+     * constructor that initializes all parameters needed by IAMSession
+     */
     public IAMSessionUtil() {
 
         config = IAMStarter.getConfiguration();
@@ -71,18 +74,46 @@ public class IAMSessionUtil {
         ticketMarker = config.getString(IAMConfiguration.SSO_TICKET_MARKER);
     }
 
+    /**
+     * indicates whether the format of IAM sessions is JWT (Json Web Token) or not.
+     *
+     * @return boolean indicating whether IAM sessions are generated as JWT.
+     * @since version 8.3.0
+     */
     public boolean isJWTSession() {
         return isJWTSession;
     }
 
-    public boolean deleteToken(String ssoTicket) {
+    /**
+     * deletes IAM sessions by destroying SSO tickets registered in IAM microservice.
+     *
+     * @param ssoTicket SSO ticket to be destroyed
+     * @return boolean indicating whether the SSO ticket is destroyed
+     * @since version 8.3.0
+     */
+    public boolean deleteSession(String ssoTicket) {
         return new IAMRestClient().deleteSSOTicket(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket);
     }
 
-    public boolean tokenIsValid(String ssoTicket) {
+    /**
+     * indicates whether the IAM session is still valid.
+     *
+     * @param ssoTicket SSO ticket of IAMSession to be validated
+     * @return boolean indicating whether IAM session is valid.
+     * @since version 8.3.0
+     */
+    public boolean sessionIsValid(String ssoTicket) {
         return new IAMRestClient().isSSOTicketValid(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket);
     }
 
+    /**
+     * creates a new IAM session given user credentials.
+     *
+     * @param username user login
+     * @param password user password
+     * @return a key-value pair, the key represents the session ID, and the value are JWT claims (when the session token is generated as a JWT).
+     * @since version 8.3.0
+     */
     public AbstractMap.SimpleEntry<String, JwtClaims> createNewSessionToken(String username, char[] password) {
 
         String sessionToken = new IAMRestClient().getSSOTicket(iamURL + IAMConfiguration.IAM_TICKET_REQUEST,
@@ -104,6 +135,14 @@ public class IAMSessionUtil {
 
     }
 
+    /**
+     * creates a service token in the context of a IAM session (that is identified by its SSO ticket).
+     * creating such as service token automatically renews IAM sessions (and its SSO ticket, accordingly)
+     *
+     * @param ssoTicket SSO ticket that identifies IAM session
+     * @return a service token
+     * @since version 8.3.0
+     */
     public String createServiceToken(String ssoTicket) {
         return new IAMRestClient().getServiceToken(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket,
                                                    PA_REST_SERVICE);

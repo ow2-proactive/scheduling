@@ -51,6 +51,16 @@ public class IAMCredentialsValidator implements TicketValidator {
         this.roleAttributeName = roleAttributeName;
     }
 
+    /**
+     * parses and validates a JSON string containing authentication and user information acquired
+     * after validating user credentials against IAM microservice.
+     *
+     * @param iamToken JSON string containing authentication and user information
+     * @param service (not used). It is only added to fit the TicketValidator interface.
+     * @return Assertion containing parsed authentication and user information
+     * @throws TicketValidationException if a problem occurs during the validation process
+     * @since version 8.3.0
+     */
     public Assertion validate(String iamToken, String service) throws TicketValidationException {
 
         IAMJsonUtils iamJsonUtils = new IAMJsonUtils();

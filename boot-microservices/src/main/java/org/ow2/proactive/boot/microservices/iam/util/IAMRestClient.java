@@ -84,6 +84,17 @@ public class IAMRestClient {
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(IAMRestClient.class.getName());
 
+    /**
+     * acquires a SSO ticket from IAM microservice, having as a format a JWT (Json Web Token) or a ST (Service Token).
+     *
+     * @param url URL of IAM server to which the request is addressed
+     * @param username user login
+     * @param password user password
+     * @param ticketMarker marker used to extract SSO ticket from IAM response
+     * @param asJWT boolean indicating whether the SSO ticket is generated as a JWT (Json Web Token)
+     * @return SSO ticket
+     * @since version 8.3.0
+     */
     public String getSSOTicket(String url, String username, char[] password, String ticketMarker, boolean asJWT) {
 
         String ssoTicket = null;
@@ -103,6 +114,8 @@ public class IAMRestClient {
             httpPost.setEntity(new UrlEncodedFormEntity(params));
 
             HttpResponse httpResponse = httpClient.execute(httpPost);
+
+            params = new ArrayList<>();
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_CREATED) ||
                 (null == httpResponse.getEntity())) {
@@ -142,6 +155,14 @@ public class IAMRestClient {
         return ssoTicket;
     }
 
+    /**
+     * acquires a service token from IAM microservice, based on a SSO ticket.
+     *
+     * @param url URL of IAM server to which the request is addressed
+     * @param service service concerned by the ticket
+     * @return service ticket
+     * @since version 8.3.0
+     */
     public String getServiceToken(String url, String service) {
 
         String token;
@@ -172,6 +193,13 @@ public class IAMRestClient {
         return token;
     }
 
+    /**
+     * checks whether a SSO ticket (acquired from IAM microservice) is still valid.
+     *
+     * @param url URL of IAM server to which the request is addressed
+     * @return boolean indicating whether the SSO ticket is valid.
+     * @since version 8.3.0
+     */
     public boolean isSSOTicketValid(String url) {
 
         try (CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build()) {
@@ -183,6 +211,13 @@ public class IAMRestClient {
         }
     }
 
+    /**
+     * removes a SSO ticket acquired from IAM microservice.
+     *
+     * @param url URL of IAM server to which the request is addressed
+     * @return boolean indicating whether the SSO ticket is removed or not.
+     * @since version 8.3.0
+     */
     public boolean deleteSSOTicket(String url) {
 
         try (CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build()) {
@@ -194,6 +229,15 @@ public class IAMRestClient {
         }
     }
 
+    /**
+     * validates user credentials (without creating any sessions) against IAM microservice.
+     *
+     * @param url URL of IAM server to which the request is addressed
+     * @param username user login
+     * @param password user password
+     * @return JSON string containing authentication and user information.
+     * @since version 8.3.0
+     */
     public String validateUserCredentials(String url, String username, char[] password) {
 
         try (CloseableHttpClient httpClient = new CommonHttpClientBuilder().allowAnyCertificate(true).build()) {
