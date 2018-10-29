@@ -125,21 +125,25 @@ public class HsqldbServer extends AbstractIdleService {
 
         String connectionUrl = hibernateProperties.getProperty(PROP_HIBERNATE_CONNECTION_URL);
 
-        String catalogLocation = identifyCatalogLocationFromConnectionUrl(connectionUrl);
-        String catalogName = identifyCatalogNameFromConnectionUrl(connectionUrl);
-        String catalogPassword = hibernateProperties.getProperty(PROP_HIBERNATE_CONNECTION_PASSWORD);
-        String catalogUsername = hibernateProperties.getProperty(PROP_HIBERNATE_CONNECTION_USERNAME);
+        if (connectionUrl.toLowerCase().contains("hsqldb")) {
 
-        Path catalogPath;
-        if (catalogLocation == null) {
-            // Catalog path references a file.
-            // Double resolve is used to get a dedicated folder with the catalog name.
-            catalogPath = defaultLocation.resolve(catalogName).resolve(catalogName);
-        } else {
-            catalogPath = Paths.get(catalogLocation);
+            String catalogLocation = identifyCatalogLocationFromConnectionUrl(connectionUrl);
+            String catalogName = identifyCatalogNameFromConnectionUrl(connectionUrl);
+            String catalogPassword = hibernateProperties.getProperty(PROP_HIBERNATE_CONNECTION_PASSWORD);
+            String catalogUsername = hibernateProperties.getProperty(PROP_HIBERNATE_CONNECTION_USERNAME);
+
+            Path catalogPath;
+            if (catalogLocation == null) {
+                // Catalog path references a file.
+                // Double resolve is used to get a dedicated folder with the catalog name.
+                catalogPath = defaultLocation.resolve(catalogName).resolve(catalogName);
+            } else {
+                catalogPath = Paths.get(catalogLocation);
+            }
+
+            addCatalog(catalogPath, catalogName, catalogUsername, catalogPassword);
         }
 
-        addCatalog(catalogPath, catalogName, catalogUsername, catalogPassword);
     }
 
     public void addCatalog(Path catalogLocation, String catalogName, String catalogUsername, String catalogPassword) {
