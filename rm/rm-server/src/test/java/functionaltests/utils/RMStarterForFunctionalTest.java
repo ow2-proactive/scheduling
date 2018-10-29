@@ -96,5 +96,4 @@ public class RMStarterForFunctionalTest {
             IAMTHelper.startIAM(proactiveHome, bootMicroservicesPath, bootConfigurationPath);
         }
     }
-
 }
