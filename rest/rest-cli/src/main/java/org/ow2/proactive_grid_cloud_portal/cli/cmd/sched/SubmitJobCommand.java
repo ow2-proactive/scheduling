@@ -60,17 +60,18 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
 
     private static final Logger logger = null;
 
-    public SubmitJobCommand(String... params) throws NullPointerException {
-        Objects.requireNonNull(params);
+    public SubmitJobCommand(String pathname) {
+        this(pathname, null, null);
+    }
 
-        this.pathname = params[0];
-        if (params.length > 1) {
-            this.variables = params[1];
+    public SubmitJobCommand(String pathname, String variables) {
+        this(pathname, variables, null);
+    }
 
-            if (params.length > 2) {
-                this.genericInfos = params[2];
-            }
-        }
+    public SubmitJobCommand(String pathname, String variables, String genericInfos) {
+        this.pathname = pathname;
+        this.variables = variables;
+        this.genericInfos = genericInfos;
     }
 
     @Override
