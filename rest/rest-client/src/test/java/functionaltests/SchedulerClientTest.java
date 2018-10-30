@@ -397,7 +397,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
                                                                        jobSubmissionGenericInfoValue);
 
         // Submit a job with the generic informations map
-        JobId jobId = client.submit(jobDescriptor, null, genericInfosMap);
+        JobId jobId = client.submit(jobDescriptor, null, genericInfosMap, null);
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
 
         // The job generic info must be returned by the task
@@ -414,7 +414,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Map<String, String> variablesMap = Collections.singletonMap(jobVariableKey, jobVariableValue);
 
         // Submit a job with the generic informations map
-        jobId = client.submit(jobDescriptor, variablesMap, genericInfosMap);
+        jobId = client.submit(jobDescriptor, variablesMap, genericInfosMap, null);
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
 
         // The job generic info must be returned by the task
