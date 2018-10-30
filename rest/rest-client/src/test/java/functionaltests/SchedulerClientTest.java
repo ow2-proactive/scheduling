@@ -27,11 +27,13 @@ package functionaltests;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
 import static functionaltests.jobs.SimpleJob.TEST_JOB;
+import static org.mockito.Matchers.anyMap;
 
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -90,6 +92,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     /** Maximum wait time of 5 minutes */
     private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
+
+    private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_generic_info.xml");
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -380,6 +384,43 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.removeEventListener();
 
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME * 2)
+    public void testJobSubmissionWithGenericInfos() throws Throwable {
+        ISchedulerClient client = clientInstance();
+
+        // 1. Simply specify a generic info at job submission
+        // Create a generic infos map
+        String jobSubmissionGenericInfoKey = "job_generic_info";
+        String jobSubmissionGenericInfoValue = "!*job generic info value*!";
+        Map<String, String> genericInfosMap = Collections.singletonMap(jobSubmissionGenericInfoKey,
+                                                                       jobSubmissionGenericInfoValue);
+
+        // Submit a job with the generic informations map
+        JobId jobId = client.submit(jobDescriptor, null, genericInfosMap, anyMap());
+        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
+
+        // The job generic info must be returned by the task
+        TaskResult taskResult = client.getJobResult(jobId).getResult("task1");
+        Assert.assertEquals(jobSubmissionGenericInfoValue, taskResult.value());
+
+        // 2. The job submission generic info is replaced by the job submission variable
+        jobSubmissionGenericInfoValue = "${updated_with_job_variable}";
+        genericInfosMap = Collections.singletonMap(jobSubmissionGenericInfoKey, jobSubmissionGenericInfoValue);
+
+        // Create a variables map
+        String jobVariableKey = "updated_with_job_variable";
+        String jobVariableValue = "\" ! %R4";
+        Map<String, String> variablesMap = Collections.singletonMap(jobVariableKey, jobVariableValue);
+
+        // Submit a job with the generic informations map
+        jobId = client.submit(jobDescriptor, variablesMap, genericInfosMap, anyMap());
+        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(10));
+
+        // The job generic info must be returned by the task
+        taskResult = client.getJobResult(jobId).getResult("task1");
+        Assert.assertEquals(jobVariableValue, taskResult.value());
     }
 
     @Test(timeout = MAX_WAIT_TIME)

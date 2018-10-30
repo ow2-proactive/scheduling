@@ -122,12 +122,12 @@ public class SchedulerRestClient {
     }
 
     public JobIdData submitJobArchive(String sessionId, InputStream jobArchive) throws Exception {
-        return submitJobArchive(sessionId, jobArchive, null);
+        return submitJobArchive(sessionId, jobArchive, null, null);
     }
 
-    public JobIdData submitJobArchive(String sessionId, InputStream jobArchive, Map<String, String> variables)
-            throws Exception {
-        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE, variables, null);
+    public JobIdData submitJobArchive(String sessionId, InputStream jobArchive, Map<String, String> variables,
+            Map<String, String> genericInfos) throws Exception {
+        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE, variables, genericInfos);
     }
 
     public boolean pushFile(String sessionId, String space, String path, String fileName, InputStream fileContent)

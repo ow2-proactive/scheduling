@@ -388,8 +388,14 @@ public class StaxJobFactory extends JobFactory {
             }
             // Then add job submission generic informations, resolved using job submission variables
             if (replacementGenericInfos != null) {
-                commonPropertiesHolder.addGenericInformations(replaceGenericInfosInJobGenericInfosMap(replacementGenericInfos,
-                                                                                                      replacementVariables));
+                if (replacementVariables != null) {
+                    for (Map.Entry<String, String> replacementVariable : replacementVariables.entrySet()) {
+                        String variableName = replacementVariable.getKey();
+                        String variableValue = replacementVariable.getValue();
+                        replacementGenericInfos.replace(variableName, variableValue);
+                    }
+                }
+                commonPropertiesHolder.addGenericInformations(replacementGenericInfos);
             }
 
             // Continue to fill the temporary job with xml elements
@@ -621,29 +627,6 @@ public class StaxJobFactory extends JobFactory {
             }
         }
         return updatedVariablesMap;
-    }
-
-    protected Map<String, String> replaceGenericInfosInJobGenericInfosMap(Map<String, String> genericInfosMap,
-            Map<String, String> replacementGenericInfos) throws JobCreationException {
-
-        HashMap<String, String> updatedReplacementGenericInfos = new HashMap<>();
-        HashMap<String, String> updatedGenericInfosMap = new HashMap<>(genericInfosMap);
-
-        // replacements will include at first variables defined in the job
-        updatedReplacementGenericInfos.putAll(updatedGenericInfosMap);
-
-        if (replacementGenericInfos != null) {
-            // overwritten by variables used at job submission
-            updatedReplacementGenericInfos.putAll(replacementGenericInfos);
-        }
-
-        for (Map.Entry<String, String> replacementGenericInfo : updatedReplacementGenericInfos.entrySet()) {
-            // if the variable is already defined in the job, overwrite its value by the replacement variable,
-            // eventually using other variables as pattern replacements
-            String genericInfoValue = replace(replacementGenericInfo.getValue(), updatedReplacementGenericInfos);
-            updatedGenericInfosMap.put(replacementGenericInfo.getKey(), genericInfoValue);
-        }
-        return updatedGenericInfosMap;
     }
 
     /**
