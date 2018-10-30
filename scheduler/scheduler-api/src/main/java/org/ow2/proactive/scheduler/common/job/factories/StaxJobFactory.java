@@ -123,6 +123,8 @@ public class StaxJobFactory extends JobFactory {
      */
     private String relativePathRoot = "./";
 
+    private GetJobContentFactory getJobContentFactory = new GetJobContentFactory();
+
     /**
      * Create a new instance of StaxJobFactory.
      */
@@ -216,7 +218,7 @@ public class StaxJobFactory extends JobFactory {
         Job job;
         try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
             XMLStreamReader xmlsr = xmlInputFactory.createXMLStreamReader(jobInpoutStreamForParsing, FILE_ENCODING);
-            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies);
+            job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies, new String(bytes));
             xmlsr.close();
         }
 
@@ -286,7 +288,7 @@ public class StaxJobFactory extends JobFactory {
      * @throws JobCreationException if an error occurred during job creation process.
      */
     private Job createJob(XMLStreamReader cursorRoot, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos, Map<String, ArrayList<String>> dependencies)
+            Map<String, String> replacementGenericInfos, Map<String, ArrayList<String>> dependencies, String jobContent)
             throws JobCreationException {
 
         String current = null;
@@ -300,7 +302,7 @@ public class StaxJobFactory extends JobFactory {
                     current = cursorRoot.getLocalName();
                     if (XMLTags.JOB.matches(current)) {
                         //first tag of the job.
-                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos);
+                        job = createAndFillJob(cursorRoot, replacementVariables, replacementGenericInfos, jobContent);
                     } else if (XMLTags.TASK.matches(current)) {
                         //once here, the job instance has been created
                         fillJobWithTasks(cursorRoot, job, dependencies);
@@ -342,10 +344,11 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorJob          the streamReader with the cursor on the job element.
      * @param replacementVariables job submission variables map taking priority on those defined in the xml
      * @param replacementGenericInfos job submission generic infos map taking priority on those defined in the xml
+     * @param jobContent contains xml representation of this job
      * @throws JobCreationException if an exception occurs during job creation.
      */
     private Job createAndFillJob(XMLStreamReader cursorJob, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos) throws JobCreationException {
+            Map<String, String> replacementGenericInfos, String jobContent) throws JobCreationException {
 
         // A temporary job
         Job commonPropertiesHolder = new Job() {
@@ -399,13 +402,18 @@ public class StaxJobFactory extends JobFactory {
                         // Add resolved job variables using the job submission variables
                         // the final value of the variable can either be overwritten by a value of the job submission variables map or
                         // use in a pattern such value
-                        commonPropertiesHolder.getVariables()
-                                              .putAll(createJobVariables(cursorJob, replacementVariables));
+                        Map<String, JobVariable> unresolvedJobVariablesMap = createUnresolvedJobVariables(cursorJob);
+                        commonPropertiesHolder.getUnresolvedVariables().putAll(unresolvedJobVariablesMap);
+                        Map<String, JobVariable> jobVariablesMap = replaceVariablesInJobVariablesMap(unresolvedJobVariablesMap,
+                                                                                                     replacementVariables);
+                        commonPropertiesHolder.getVariables().putAll(jobVariablesMap);
 
                     } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                         // Resolve the generic infos in the xml with the resolved variables
                         Map<String, String> resolvedJobVariables = commonPropertiesHolder.getVariablesAsReplacementMap();
-                        Map<String, String> resolvedGenericInformationDefinedInWorkflow = getGenericInformation(cursorJob,
+                        Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformation(cursorJob);
+                        commonPropertiesHolder.setUnresolvedGenericInformation(unresolvedGenericInformationDefinedInWorkflow);
+                        Map<String, String> resolvedGenericInformationDefinedInWorkflow = getGenericInformation(unresolvedGenericInformationDefinedInWorkflow,
                                                                                                                 resolvedJobVariables);
                         // Then add/replace the resolved generic infos in the xml with the job submission ones
                         Map<String, String> submittedGenericInformation = commonPropertiesHolder.getGenericInformation();
@@ -452,12 +460,21 @@ public class StaxJobFactory extends JobFactory {
                 job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
                 job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
                 job.setGenericInformation(commonPropertiesHolder.getGenericInformation());
+                job.setUnresolvedGenericInformation(commonPropertiesHolder.getUnresolvedGenericInformation());
                 job.setInputSpace(commonPropertiesHolder.getInputSpace());
                 job.setOutputSpace(commonPropertiesHolder.getOutputSpace());
                 job.setGlobalSpace(commonPropertiesHolder.getGlobalSpace());
                 job.setUserSpace(commonPropertiesHolder.getUserSpace());
                 job.setVariables(commonPropertiesHolder.getVariables());
+                job.setUnresolvedVariables(commonPropertiesHolder.getUnresolvedVariables());
                 job.setVisualization(commonPropertiesHolder.getVisualization());
+
+                String updatedJobContent = getJobContentFactory.replaceVarsAndGenericInfo(jobContent,
+                                                                                          commonPropertiesHolder.getVariables(),
+                                                                                          commonPropertiesHolder.getGenericInformation());
+
+                job.setJobContent(updatedJobContent);
+
             }
             return job;
         } catch (JobCreationException jce) {
@@ -520,13 +537,12 @@ public class StaxJobFactory extends JobFactory {
      * Leave the method with the cursor at the end of 'ELEMENT_VARIABLES' tag
      *
      * @param cursorVariables the streamReader with the cursor on the 'ELEMENT_VARIABLES' tag.
-     * @param replacementVariables variables taking priority on the one defined in the job
      * @return the map in which the variables were added.
      * @throws JobCreationException
      */
-    private Map<String, JobVariable> createJobVariables(XMLStreamReader cursorVariables,
-            Map<String, String> replacementVariables) throws JobCreationException {
-        HashMap<String, JobVariable> variablesMap = new LinkedHashMap<>();
+    private Map<String, JobVariable> createUnresolvedJobVariables(XMLStreamReader cursorVariables)
+            throws JobCreationException {
+        HashMap<String, JobVariable> unresolvedVariablesMap = new LinkedHashMap<>();
         try {
             int eventType;
             while (cursorVariables.hasNext()) {
@@ -534,17 +550,17 @@ public class StaxJobFactory extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
-                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables, null);
+                            Map<String, String> unresolvedAttributesAsMap = getUnresolvedAttributesAsMap(cursorVariables);
 
-                            String name = attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
-                            String value = attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName());
-                            String model = attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName());
-                            variablesMap.put(name, new JobVariable(name, value, model));
+                            String name = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
+                            String value = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName());
+                            String model = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName());
+                            unresolvedVariablesMap.put(name, new JobVariable(name, value, model));
                         }
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (XMLTags.VARIABLES.matches(cursorVariables.getLocalName())) {
-                            return replaceVariablesInJobVariablesMap(variablesMap, replacementVariables);
+                            return unresolvedVariablesMap;
                         }
                         break;
                     default:
@@ -562,7 +578,7 @@ public class StaxJobFactory extends JobFactory {
             throw new JobCreationException(cursorVariables.getLocalName(), attrtmp, e);
         }
 
-        return variablesMap;
+        return unresolvedVariablesMap;
     }
 
     protected Map<String, JobVariable> replaceVariablesInJobVariablesMap(Map<String, JobVariable> variablesMap,
@@ -581,19 +597,24 @@ public class StaxJobFactory extends JobFactory {
         }
 
         for (Map.Entry<String, String> replacementVariable : updatedReplacementVariables.entrySet()) {
-            if (updatedVariablesMap.containsKey(replacementVariable.getKey())) {
+            String replacementVariableKey = replacementVariable.getKey();
+            if (updatedVariablesMap.containsKey(replacementVariableKey)) {
                 // if the variable is already defined in the job, overwrite its value by the replacement variable,
                 // eventually using other variables as pattern replacements
-                JobVariable jobVariable = updatedVariablesMap.get(replacementVariable.getKey());
-                jobVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
-                if (jobVariable.getModel() != null) {
+                JobVariable jobVariable = updatedVariablesMap.get(replacementVariableKey);
+                JobVariable replacedJobVariable = new JobVariable(jobVariable.getName(),
+                                                                  jobVariable.getValue(),
+                                                                  jobVariable.getModel());
+                replacedJobVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
+                if (replacedJobVariable.getModel() != null) {
                     // model of an existing variable can use other variables as pattern replacements
-                    jobVariable.setModel(replace(jobVariable.getModel(), updatedReplacementVariables));
+                    replacedJobVariable.setModel(replace(replacedJobVariable.getModel(), updatedReplacementVariables));
                 }
+                updatedVariablesMap.put(replacementVariableKey, replacedJobVariable);
             } else {
                 // if the variable is not defined in the job, create a new job variable with an empty model
-                updatedVariablesMap.put(replacementVariable.getKey(),
-                                        new JobVariable(replacementVariable.getKey(),
+                updatedVariablesMap.put(replacementVariableKey,
+                                        new JobVariable(replacementVariableKey,
                                                         replace(replacementVariable.getValue(),
                                                                 updatedReplacementVariables),
                                                         null));
@@ -686,6 +707,17 @@ public class StaxJobFactory extends JobFactory {
         return result.build();
     }
 
+    private Map<String, String> getUnresolvedAttributesAsMap(XMLStreamReader cursorVariables)
+            throws JobCreationException {
+        final ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
+
+        for (int i = 0; i < cursorVariables.getAttributeCount(); i++) {
+            result.put(cursorVariables.getAttributeLocalName(i), cursorVariables.getAttributeValue(i));
+        }
+
+        return result.build();
+    }
+
     /**
      * Get the defined generic information of the entity.
      * Leave the method at the end of 'ELEMENT_COMMON_GENERIC_INFORMATION' tag.
@@ -693,7 +725,7 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorInfo the streamReader with the cursor on the 'ELEMENT_COMMON_GENERIC_INFORMATION' tag.
      * @return the list of generic information as a hashMap.
      */
-    private HashMap<String, String> getGenericInformation(XMLStreamReader cursorInfo, Map<String, String> variables)
+    private HashMap<String, String> getUnresolvedGenericInformation(XMLStreamReader cursorInfo)
             throws JobCreationException {
         HashMap<String, String> infos = new HashMap<>();
         try {
@@ -703,7 +735,7 @@ public class StaxJobFactory extends JobFactory {
                 switch (eventType) {
                     case XMLEvent.START_ELEMENT:
                         if (XMLTags.COMMON_INFO.matches(cursorInfo.getLocalName())) {
-                            Map<String, String> attributesAsMap = getAttributesAsMap(cursorInfo, variables);
+                            Map<String, String> attributesAsMap = getUnresolvedAttributesAsMap(cursorInfo);
 
                             String name = attributesAsMap.get(XMLAttributes.COMMON_NAME.getXMLName());
                             String value = attributesAsMap.get(XMLAttributes.COMMON_VALUE.getXMLName());
@@ -731,6 +763,21 @@ public class StaxJobFactory extends JobFactory {
             }
             throw new JobCreationException(cursorInfo.getLocalName(), attrtmp, e);
         }
+    }
+
+    /**
+     * Get the generic information of the entity, with variables resolved.
+     *
+     * @return the list of generic information as a hashMap.
+     */
+    private HashMap<String, String> getGenericInformation(Map<String, String> unresolvedGenericInformation,
+            Map<String, String> variables) throws JobCreationException {
+        HashMap<String, String> infos = new HashMap<>();
+        for (Map.Entry<String, String> unresolvedGenericInformationValue : unresolvedGenericInformation.entrySet()) {
+            infos.put(unresolvedGenericInformationValue.getKey(),
+                      replace(unresolvedGenericInformationValue.getValue(), variables));
+        }
+        return infos;
     }
 
     /**
@@ -937,7 +984,9 @@ public class StaxJobFactory extends JobFactory {
                             if (job.getGenericInformation() != null)
                                 jobVariablesWithGenericInfos.putAll(job.getGenericInformation());
 
-                            tmpTask.setGenericInformation(getGenericInformation(cursorTask,
+                            Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformation(cursorTask);
+                            tmpTask.setUnresolvedGenericInformation(unresolvedGenericInformationDefinedInWorkflow);
+                            tmpTask.setGenericInformation(getGenericInformation(unresolvedGenericInformationDefinedInWorkflow,
                                                                                 jobVariablesWithGenericInfos));
                         } else if (XMLTags.VARIABLES.matches(current)) {
                             Map<String, TaskVariable> taskVariablesMap = createTaskVariables(cursorTask,
@@ -1811,7 +1860,14 @@ public class StaxJobFactory extends JobFactory {
 
         // Include given variables if any
         if (variables != null) {
-            replacements.putAll(variables);
+            for (Map.Entry<String, String> variable : variables.entrySet()) {
+                String syspropWithVariableName = System.getProperty(variable.getKey());
+                if (syspropWithVariableName != null) {
+                    replacements.put(variable.getKey(), syspropWithVariableName);
+                } else {
+                    replacements.put(variable.getKey(), variable.getValue());
+                }
+            }
         }
         return filterAndUpdate(str, replacements);
     }

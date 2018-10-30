@@ -68,6 +68,8 @@ public enum WebProperties implements PACommonProperties {
 
     WEB_MAX_THREADS("web.max_threads", PropertyType.INTEGER, "100"),
 
+    WEB_IDLE_TIMEOUT("web.idle_timeout", PropertyType.INTEGER, "60000"),
+
     WEB_REDIRECT_HTTP_TO_HTTPS("web.redirect_http_to_https", PropertyType.BOOLEAN, "false"),
 
     METADATA_CONTENT_TYPE("content.type", PropertyType.STRING),

@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.common.task;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -70,6 +71,8 @@ public abstract class CommonAttribute implements Serializable {
 
     /** Common user informations */
     protected Map<String, String> genericInformation = new HashMap<String, String>();
+
+    protected Map<String, String> unresolvedGenericInformation = new LinkedHashMap<>();
 
     /**
      * OnTaskError defines the behavior happening when a task fails.
@@ -170,6 +173,20 @@ public abstract class CommonAttribute implements Serializable {
     }
 
     /**
+     * Returns the generic information without variable replacements.
+     *
+     * @return unresolved generic information.
+     */
+    public Map<String, String> getUnresolvedGenericInformation() {
+        Set<Entry<String, String>> entries = this.unresolvedGenericInformation.entrySet();
+        Map<String, String> result = new LinkedHashMap<>(entries.size());
+        for (Entry<String, String> entry : entries) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
+    /**
      * Add an information to the generic informations map field.
      * This information will be given to the scheduling policy.
      *
@@ -207,6 +224,20 @@ public abstract class CommonAttribute implements Serializable {
             this.genericInformation = genericInformation;
         } else {
             this.genericInformation = new HashMap<>();
+        }
+
+    }
+
+    /**
+     * Set the generic information without variable replacement.
+     *
+     * @param unresolvedGenericInformation the raw generic information to set.
+     */
+    public void setUnresolvedGenericInformation(Map<String, String> unresolvedGenericInformation) {
+        if (unresolvedGenericInformation != null) {
+            this.unresolvedGenericInformation = unresolvedGenericInformation;
+        } else {
+            this.unresolvedGenericInformation = new HashMap<>();
         }
 
     }

@@ -110,6 +110,16 @@ public abstract class Job extends CommonAttribute {
     protected Map<String, JobVariable> variables = Collections.synchronizedMap(new LinkedHashMap());
 
     /**
+     * A map to holds job descriptor variables with their values unresolved against other variables
+     */
+    protected Map<String, JobVariable> unresolvedVariables = Collections.synchronizedMap(new LinkedHashMap());
+
+    /**
+     * represent xml submitted, where variables and genetic info were updated according provided maps
+     */
+    private String jobContent = null;
+
+    /**
      * ProActive Empty Constructor
      */
     public Job() {
@@ -289,6 +299,16 @@ public abstract class Job extends CommonAttribute {
         this.variables = Collections.synchronizedMap(new LinkedHashMap(variables));
     }
 
+    /**
+     * Sets the unresolved variable map for this job.
+     *
+     * @param unresolvedVariables the unresolved variables map
+     */
+    public void setUnresolvedVariables(Map<String, JobVariable> unresolvedVariables) {
+        verifyVariableMap(unresolvedVariables);
+        this.unresolvedVariables = Collections.synchronizedMap(new LinkedHashMap(unresolvedVariables));
+    }
+
     public static void verifyVariableMap(Map<String, ? extends JobVariable> variables) {
         for (Map.Entry<String, ? extends JobVariable> entry : variables.entrySet()) {
             if (!entry.getKey().equals(entry.getValue().getName())) {
@@ -306,6 +326,15 @@ public abstract class Job extends CommonAttribute {
      */
     public Map<String, JobVariable> getVariables() {
         return this.variables;
+    }
+
+    /**
+     * Returns the unresolved variable map of this job.
+     *
+     * @return an unresolved variable map
+     */
+    public Map<String, JobVariable> getUnresolvedVariables() {
+        return this.unresolvedVariables;
     }
 
     /**
@@ -385,4 +414,11 @@ public abstract class Job extends CommonAttribute {
         return Optional.empty();
     }
 
+    public String getJobContent() {
+        return jobContent;
+    }
+
+    public void setJobContent(String jobContent) {
+        this.jobContent = jobContent;
+    }
 }

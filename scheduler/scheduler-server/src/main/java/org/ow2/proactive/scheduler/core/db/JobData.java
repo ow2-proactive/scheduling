@@ -662,7 +662,7 @@ public class JobData implements Serializable {
         JobContent content = new JobContent();
         content.setJobId(id);
         content.setJobData(this);
-        content.setInitJobContent(job);
+        content.setInitJobContent(job.getJobContent());
         getJobContent().add(content);
     }
 
