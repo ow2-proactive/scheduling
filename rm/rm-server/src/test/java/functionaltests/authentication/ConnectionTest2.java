@@ -63,19 +63,13 @@ public class ConnectionTest2 extends RMFunctionalTest {
         log("Test 3");
         log("Connecting to initializing resource manager with waitAndJoin and timeout");
 
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    log("Running resource manager");
-                    rmHelper.getRMAuth();
-                } catch (Exception e) {
-                    log("Failed: unexpected error " + e.getMessage());
-                }
-            }
-        };
-        t.start();
+        try {
+            Thread.sleep(1000);
+            log("Running resource manager");
+            rmHelper.getRMAuth();
+        } catch (Exception e) {
+            log("Failed: unexpected error " + e.getMessage());
+        }
 
         RMConnection.waitAndJoin(RMTHelper.getLocalUrl(), 60000);
         log("Passed");
