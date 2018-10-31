@@ -72,23 +72,36 @@ public class TestLoadJobResult extends BaseSchedulerDBTest {
     @Test
     public void testLoadJobResultMap() throws Throwable {
         TaskFlowJob job = new TaskFlowJob();
-        job.addTask(createDefaultTask("test_result_map"));
+
+        //add first task
+        job.addTask(createDefaultTask("task1"));
+
+        //add second task
+        JavaTask javaTask2 = createDefaultTask("task2");
+        job.addTask(javaTask2);
+
         InternalJob internalJob = defaultSubmitJobAndLoadInternal(true, job);
         internalJob.setNumberOfFinishedTasks(1);
 
+        //add result map to the first task
         TaskResultImpl taskResult = new TaskResultImpl(null, new TestResult(0, "1_1"), null, 0);
         Map<String, Serializable> resultMap = new HashMap();
         resultMap.put("A", "one");
         taskResult.setResultMap(resultMap);
-
         internalJob.getResultMap().putAll(resultMap);
-        InternalTask task1 = internalJob.getTask("test_result_map");
+        InternalTask task1 = internalJob.getTask("task1");
+
         dbManager.updateAfterTaskFinished(internalJob, task1, taskResult);
+
+        InternalTask task2 = internalJob.getTask("task2");
+        dbManager.updateAfterTaskFinished(internalJob,
+                                          task2,
+                                          new TaskResultImpl(null, new TestResult(0, "2_1"), null, 0));
 
         System.out.println("Load result map");
         JobResult result = dbManager.loadJobResult(internalJob.getId());
         Assert.assertNotNull(result.getJobInfo());
-        Assert.assertEquals(1, result.getJobInfo().getTotalNumberOfTasks());
+        Assert.assertEquals(2, result.getJobInfo().getTotalNumberOfTasks());
         assertFalse(result.getResultMap().isEmpty());
         Assert.assertEquals(result.getResultMap().get("A"), "one");
 
