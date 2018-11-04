@@ -424,6 +424,26 @@ public class TestStaxJobFactory {
         assertTrue(taskVariable.isJobInherited());
     }
 
+    @Test
+    public void testUnresolvedJobVariables() throws URISyntaxException, JobCreationException {
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_with_unresolved_generic_info_and_variables.xml"));
+        Map<String, JobVariable> unresolvedVariables = job.getUnresolvedVariables();
+        Map<String, JobVariable> variables = job.getVariables();
+        assertEquals("value1", unresolvedVariables.get("variable1").getValue());
+        assertEquals("value1", variables.get("variable1").getValue());
+        assertEquals("${variable1}", unresolvedVariables.get("variable2").getValue());
+        assertEquals("value1", variables.get("variable2").getValue());
+    }
+
+    @Test
+    public void testUnresolvedGenericInformation() throws URISyntaxException, JobCreationException {
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_with_unresolved_generic_info_and_variables.xml"));
+        Map<String, String> unresolvedGenericInformation = job.getUnresolvedGenericInformation();
+        Map<String, String> genericInformation = job.getGenericInformation();
+        assertEquals("${variable1}", unresolvedGenericInformation.get("info1"));
+        assertEquals("value1", genericInformation.get("info1"));
+    }
+
     private static <K, V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
         // map variable is assumed to contain attributes name/value parsed from XML
 
