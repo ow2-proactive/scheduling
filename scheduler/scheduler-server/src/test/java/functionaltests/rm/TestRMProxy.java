@@ -34,11 +34,9 @@ import java.util.List;
 
 import org.junit.*;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.core.rmproxies.PerUserConnectionRMProxiesManager;
@@ -50,7 +48,6 @@ import org.ow2.proactive.utils.Criteria;
 import org.ow2.proactive.utils.NodeSet;
 import org.ow2.tests.ProActiveTest;
 
-import functionaltests.utils.IAMTHelper;
 import functionaltests.utils.RMTHelper;
 import functionaltests.utils.SchedulerTHelper;
 import functionaltests.utils.TestScheduler;
@@ -76,8 +73,6 @@ public class TestRMProxy extends ProActiveTest {
             SchedulerTHelper.log("Killing previous scheduler.");
             TestScheduler.kill();
         }
-
-        startIAMIfNeeded();
 
         rmHelper = new RMTHelper();
         rmHelper.getResourceManager();

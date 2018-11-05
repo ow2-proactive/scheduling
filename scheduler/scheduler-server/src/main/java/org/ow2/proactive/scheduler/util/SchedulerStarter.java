@@ -67,7 +67,8 @@ import org.objectweb.proactive.extensions.pamr.router.Router;
 import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.boot.microservices.IAMStarter;
+import org.ow2.proactive.boot.microservices.iam.IAMStarter;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -137,8 +138,6 @@ public class SchedulerStarter {
     private static final int DEFAULT_NODES_TIMEOUT = 120 * 1000;
 
     private static final int DISCOVERY_DEFAULT_PORT = 64739;
-
-    private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
 
     private static BroadcastDiscovery discoveryService;
 
@@ -233,8 +232,8 @@ public class SchedulerStarter {
     private static void startBootMicroservices() throws IOException, InterruptedException, ExecutionException,
             ConfigurationException, GeneralSecurityException {
 
-        if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().endsWith("") ||
-            PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().endsWith(IAM_LOGIN_METHOD)) {
+        if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().equals(IAMConfiguration.IAM_LOGIN_METHOD) &&
+            PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().equals(IAMConfiguration.IAM_LOGIN_METHOD)) {
 
             // Do nothing if PA_home or the boot microservices path is not specified
             if (!(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.isSet() &&

@@ -27,18 +27,22 @@ package functionaltests.utils;
 
 import static functionaltests.utils.RMFunctionalTest.NODES_NOT_RECOVERABLE;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.security.GeneralSecurityException;
+import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.LocalInfrastructure;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.scheduler.SchedulerFactory;
@@ -79,6 +83,8 @@ public class SchedulerStartForFunctionalTest implements Serializable {
             throw new IllegalArgumentException("Invalid number of parameters, exactly 3 parameters are expected: localNodes schedPropPath rmPropPath");
         }
 
+        startIAMIfNeeded();
+
         if (args.length == 4) {
             createWithExistingRm(args[1], args[3]);
         } else {
@@ -103,6 +109,7 @@ public class SchedulerStartForFunctionalTest implements Serializable {
         new Thread() {
             public void run() {
                 try {
+
                     RMFactory.startLocal();
 
                     // waiting the initialization
@@ -166,4 +173,25 @@ public class SchedulerStartForFunctionalTest implements Serializable {
         SchedulerConnection.waitAndJoin(schedulerUrl);
     }
 
+    /**
+     * Start IAM microservice if it is required for authentication
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws ConfigurationException
+     */
+    public static void startIAMIfNeeded() throws IOException, InterruptedException, ExecutionException,
+            ConfigurationException, GeneralSecurityException {
+
+        //Check if PA is configured to use IAM microservice for authentication
+        if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().equals(IAMConfiguration.IAM_LOGIN_METHOD)) {
+
+            String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
+            String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());
+            String bootConfigurationPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_CONFIGURATION_PATH.getValueAsString());
+
+            IAMTHelper.startIAM(proactiveHome, bootMicroservicesPath, bootConfigurationPath);
+        }
+    }
 }

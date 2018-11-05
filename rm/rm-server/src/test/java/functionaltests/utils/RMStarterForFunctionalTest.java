@@ -25,6 +25,13 @@
  */
 package functionaltests.utils;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
@@ -36,6 +43,10 @@ import org.ow2.proactive.resourcemanager.frontend.RMConnection;
  */
 public class RMStarterForFunctionalTest {
 
+    private static final String IAM_SERVICE_PATH = "dist/boot";
+
+    private static final String IAM_CONFIG_PATH = "config/iam";
+
     /**
      * Start a Resource Manager.
      * <p/>
@@ -45,6 +56,8 @@ public class RMStarterForFunctionalTest {
         if (args.length < 1) {
             throw new IllegalArgumentException("RMTStarter must be started with one parameter: path to a RM Properties file");
         }
+
+        startIAMIfNeeded();
 
         String RMPropPath = args[0];
         PAResourceManagerProperties.updateProperties(RMPropPath);
@@ -57,5 +70,27 @@ public class RMStarterForFunctionalTest {
         RMConnection.waitAndJoin(null);
 
         System.out.println("Resource Manager successfully created !");
+    }
+
+    /**
+     * Start IAM microservice if it is required for authentication
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws ConfigurationException
+     */
+    public static void startIAMIfNeeded() throws IOException, InterruptedException, ExecutionException,
+            ConfigurationException, GeneralSecurityException {
+
+        //Check if PA is configured to use IAM microservice for authentication
+        if (PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().equals(IAMConfiguration.IAM_LOGIN_METHOD)) {
+
+            String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
+            String bootMicroservicesPath = PAResourceManagerProperties.getAbsolutePath(IAM_SERVICE_PATH);
+            String bootConfigurationPath = PAResourceManagerProperties.getAbsolutePath(IAM_CONFIG_PATH);
+
+            IAMTHelper.startIAM(proactiveHome, bootMicroservicesPath, bootConfigurationPath);
+        }
     }
 }

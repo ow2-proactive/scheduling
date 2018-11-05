@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.boot.microservices.util;
+package org.ow2.proactive.boot.microservices.iam.util;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;

@@ -16,13 +16,16 @@ configurations {
 
 dependencies {
 
-    compile project(':rm:rm-node')
-
-    compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.2'
-
-    compile group: 'com.oneandone', name: 'composite-jks', version: '1.0'
+    compile project(':common:common-api')
 
     iamWar group: "org.ow2.proactive", name: "iam", version: "${schedulingVersion}", ext: "war", changing: true
+
+    compile group: 'org.apache.commons', name: 'commons-configuration2', version: '2.2'
+    compile group: 'com.oneandone', name: 'composite-jks', version: '1.0'
+    compile group: 'org.jasig.cas.client', name: 'cas-client-core', version: '3.5.0'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
+    compile group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.6.4'
 }
 
 task copyIamWar(type: Copy) {

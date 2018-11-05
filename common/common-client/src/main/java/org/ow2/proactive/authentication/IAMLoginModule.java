@@ -30,6 +30,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -40,15 +41,20 @@ import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import org.apache.commons.configuration2.Configuration;
 import org.apache.log4j.Logger;
 import org.jasig.cas.client.util.CommonUtils;
 import org.jasig.cas.client.util.ReflectUtils;
 import org.jasig.cas.client.validation.Assertion;
+import org.jasig.cas.client.validation.Cas30ServiceTicketValidator;
 import org.jasig.cas.client.validation.TicketValidationException;
 import org.jasig.cas.client.validation.TicketValidator;
-import org.ow2.proactive.authentication.iam.IAMRestClient;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.boot.microservices.iam.IAMStarter;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
+import org.ow2.proactive.boot.microservices.iam.util.IAMCredentialsValidator;
+import org.ow2.proactive.boot.microservices.iam.util.IAMRestClient;
 
 
 /**
@@ -77,9 +83,6 @@ public class IAMLoginModule implements LoginModule {
     /** IAM Server URL */
     private String iamServerUrlPrefix;
 
-    /** IAM REST request for tickets */
-    private String iamTicketRequest;
-
     /** IAM Ticket/Token validator */
     private String ticketValidatorClass;
 
@@ -89,14 +92,11 @@ public class IAMLoginModule implements LoginModule {
     /** IAM client service */
     private String service;
 
-    /** IAM assertion */
-    private Assertion assertion;
-
-    /** character used to separate many roles assigned to the user */
-    private String roleSeparator;
-
-    /** Name of the attribute in the CAS assertion that should be used for user role data */
+    /** Attribute used to designate the user role */
     private String roleAttributeName;
+
+    /** Attribute used to separate many roles assigned to the same user */
+    private String roleSeparator;
 
     /** IAM response marker used to get the SSO ticket */
     private String ssoTicketMarker;
@@ -125,52 +125,36 @@ public class IAMLoginModule implements LoginModule {
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
+
         this.subject = subject;
         this.callbackHandler = callbackHandler;
-        this.assertion = null;
-        this.ticketValidatorClass = null;
+        this.iamServerUrlPrefix = IAMStarter.getIamURL();
 
-        CommonUtils.assertNotNull(options, "Options of IAMLoginModule cannot be null");
-        CommonUtils.assertNotEmpty(options.entrySet(), "Options of IAMLoginModule cannot be empty");
+        Configuration config = IAMStarter.getConfiguration();
+        this.ticketValidatorClass = config.getString(IAMConfiguration.TOKEN_VALIDATOR_CLASS);
+        this.roleAttributeName = config.getString(IAMConfiguration.ROLE_ATTRIBUTE);
+        this.roleSeparator = config.getString(IAMConfiguration.ROLE_SEPARATOR);
+        this.ssoTicketMarker = config.getString(IAMConfiguration.SSO_TICKET_MARKER);
+        this.service = config.getString(IAMConfiguration.PA_CORE_CLIENT);
 
-        for (final Map.Entry entry : options.entrySet()) {
+        boolean jsonWebTokenSigned = config.getBoolean(IAMConfiguration.IAM_TOKEN_SIGNATURE_ENABLED);
+        boolean jsonWebTokenEncrypted = config.getBoolean(IAMConfiguration.IAM_TOKEN_ENCRYPTION_ENABLED);
+        String jsonWebTokenSignatureKey = config.getString(IAMConfiguration.IAM_TOKEN_SIGNATURE_KEY);
+        String jsonWebTokenEncryptionKey = config.getString(IAMConfiguration.IAM_TOKEN_ENCRYPTION_KEY);
 
-            String entryKey = (String) entry.getKey();
-            LOG.trace("Processing option " + entryKey);
-
-            switch (entryKey) {
-                case IAM_URL_KEY:
-                    this.iamServerUrlPrefix = (String) entry.getValue();
-                    break;
-                case "iamTicketRequest":
-                    this.iamTicketRequest = (String) entry.getValue();
-                    break;
-                case "service":
-                    this.service = (String) entry.getValue();
-                    break;
-                case "ticketValidatorClass":
-                    this.ticketValidatorClass = (String) entry.getValue();
-                    break;
-                case "roleAttributeName":
-                    this.roleAttributeName = (String) entry.getValue();
-                    break;
-                case "roleSeparator":
-                    this.roleSeparator = (String) entry.getValue();
-                    break;
-                case "ssoTicketMarker":
-                    this.ssoTicketMarker = (String) entry.getValue();
-                    break;
-                default:
-                    break;
-
-            }
-
-            LOG.debug("Set " + entryKey + "=" + entry.getValue());
-
-        }
+        // Pass configuration parameters (as a Map) to token validator classes
+        Map configParams = new HashMap<String, Object>();
+        configParams.put(IAM_URL_KEY, iamServerUrlPrefix);
+        configParams.put("roleAttributeName", roleAttributeName);
+        configParams.put("roleSeparator", roleSeparator);
+        configParams.put("service", service);
+        configParams.put("jsonWebTokenSigned", String.valueOf(jsonWebTokenSigned));
+        configParams.put("jsonWebTokenEncrypted", String.valueOf(jsonWebTokenEncrypted));
+        configParams.put("jsonWebTokenSignatureKey", jsonWebTokenSignatureKey);
+        configParams.put("jsonWebTokenEncryptionKey", jsonWebTokenEncryptionKey);
 
         CommonUtils.assertNotNull(ticketValidatorClass, "ticketValidatorClass is required.");
-        this.ticketValidator = createTicketValidator(ticketValidatorClass, options);
+        this.ticketValidator = createTicketValidator(ticketValidatorClass, configParams);
     }
 
     /**
@@ -206,7 +190,7 @@ public class IAMLoginModule implements LoginModule {
             callbackHandler.handle(callbacks);
             Map<String, Object> params = ((NoCallback) callbacks[0]).get();
             String username = (String) params.get("username");
-            String password = (String) params.get("pw");
+            char[] password = ((String) params.get("pw")).toCharArray();
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -214,7 +198,15 @@ public class IAMLoginModule implements LoginModule {
             CommonUtils.assertNotNull(username, "No username has been specified for authentication");
             CommonUtils.assertNotNull(password, "No password has been specified for authentication");
 
-            assertion = ticketValidator.validate(getServiceToken(username, password), service);
+            String iamToken;
+
+            if (ticketValidator instanceof IAMCredentialsValidator) {
+                iamToken = validateUserCredentials(username, password);
+            } else {
+                iamToken = getServiceToken(username, password);
+            }
+
+            Assertion assertion = ticketValidator.validate(iamToken, service);
 
             CommonUtils.assertNotNull(assertion,
                                       "Empty assertion returned by ticket validator " + this.ticketValidatorClass);
@@ -279,16 +271,18 @@ public class IAMLoginModule implements LoginModule {
      * @param password password of the authenticator.
      * @return Service token including authentication information.
      */
-    private String getServiceToken(String username, String password) {
+    private String getServiceToken(String username, char[] password) {
 
         // Acquire SSO ticket from IAM
-        String ssoTicket = new IAMRestClient().getSSOTicket(iamServerUrlPrefix + iamTicketRequest,
+        String ssoTicket = new IAMRestClient().getSSOTicket(iamServerUrlPrefix + IAMConfiguration.IAM_TICKET_REQUEST,
                                                             username,
                                                             password,
-                                                            ssoTicketMarker);
+                                                            ssoTicketMarker,
+                                                            false);
         // Acquire Service Token (i.e., JWT or CAS ST) based on SSO ticket
-        String serviceToken = new IAMRestClient().getServiceToken(iamServerUrlPrefix + iamTicketRequest + "/" +
-                                                                  ssoTicket, service);
+        String serviceToken = new IAMRestClient().getServiceToken(iamServerUrlPrefix +
+                                                                  IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket,
+                                                                  service);
 
         CommonUtils.assertNotNull(serviceToken, "no service token produced by IAM");
 
@@ -303,31 +297,34 @@ public class IAMLoginModule implements LoginModule {
      * @return Ticket validator with properties set.
      */
     private TicketValidator createTicketValidator(String className, Map<String, ?> propertyMap) {
-        CommonUtils.assertTrue(propertyMap.containsKey(IAM_URL_KEY),
-                               "Required property " + IAM_URL_KEY + " not found.");
 
         Class<TicketValidator> validatorClass = ReflectUtils.loadClass(className);
-        TicketValidator validator = ReflectUtils.newInstance(validatorClass, propertyMap.get(IAM_URL_KEY));
+        TicketValidator validator;
+
+        if (className.equals(Cas30ServiceTicketValidator.class.getName())) {
+            CommonUtils.assertTrue(propertyMap.containsKey(IAM_URL_KEY),
+                                   "Required property " + IAM_URL_KEY + " not found.");
+
+            validator = ReflectUtils.newInstance(validatorClass, propertyMap.get(IAM_URL_KEY));
+        } else {
+            validator = ReflectUtils.newInstance(validatorClass);
+        }
 
         try {
             BeanInfo info = Introspector.getBeanInfo(validatorClass);
 
             for (Map.Entry entry : propertyMap.entrySet()) {
-                if (!IAM_URL_KEY.equals(entry.getKey())) {
-                    String property = (String) entry.getKey();
-                    String value = (String) entry.getValue();
 
-                    LOG.debug("Attempting to set TicketValidator property " + property);
-                    PropertyDescriptor propertyDescriptor = ReflectUtils.getPropertyDescriptor(info, property);
-                    if (propertyDescriptor != null) {
-                        ReflectUtils.setProperty(property,
-                                                 convertIfNecessary(propertyDescriptor, value),
-                                                 validator,
-                                                 info);
-                        LOG.debug("Set " + property + " = " + value);
-                    } else {
-                        LOG.debug("Cannot find property " + property + " on " + className);
-                    }
+                String property = (String) entry.getKey();
+                String value = (String) entry.getValue();
+
+                LOG.debug("Attempting to set TicketValidator property " + property);
+                PropertyDescriptor propertyDescriptor = ReflectUtils.getPropertyDescriptor(info, property);
+                if (propertyDescriptor != null) {
+                    ReflectUtils.setProperty(property, convertIfNecessary(propertyDescriptor, value), validator, info);
+                    LOG.debug("Set " + property + " = " + value);
+                } else {
+                    LOG.debug("Cannot find property " + property + " on " + className);
                 }
             }
 
@@ -363,5 +360,11 @@ public class IAMLoginModule implements LoginModule {
                                                propertyDescriptor.getName() + " of type " +
                                                propertyDescriptor.getPropertyType());
         }
+    }
+
+    private String validateUserCredentials(String username, char[] password) {
+        return new IAMRestClient().validateUserCredentials(IAMStarter.getIamURL() + IAMConfiguration.IAM_USERS_REQUEST,
+                                                           username,
+                                                           password);
     }
 }

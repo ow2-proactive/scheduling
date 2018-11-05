@@ -76,8 +76,10 @@ import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.*;
 import org.ow2.proactive.scheduler.common.exception.*;
 import org.ow2.proactive.scheduler.common.job.*;
@@ -90,19 +92,14 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
-import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
-import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
+import org.ow2.proactive_grid_cloud_portal.common.*;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.*;
-import org.ow2.proactive_grid_cloud_portal.scheduler.util.EventUtil;
-import org.ow2.proactive_grid_cloud_portal.scheduler.util.ValidationUtil;
-import org.ow2.proactive_grid_cloud_portal.scheduler.util.WorkflowVariablesTransformer;
+import org.ow2.proactive_grid_cloud_portal.scheduler.util.*;
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
@@ -142,6 +139,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private static final String PATH_JOBS = "jobs/";
 
     private static final String PATH_TASKS = "/tasks/";
+
+    public static final Boolean IAM_IS_USED = PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString()
+                                                                                          .equals(IAMConfiguration.IAM_LOGIN_METHOD) &&
+                                              PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString()
+                                                                                         .equals(IAMConfiguration.IAM_LOGIN_METHOD);
 
     static {
         sortableTaskAttrMap = createSortableTaskAttrMap();
@@ -1963,6 +1965,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
         }
 
+        // When IAM is used, check whether IAM SSO session is still valid
+        if (IAM_IS_USED) {
+            sessionStore.renewIAMSession(sessionId);
+        }
+
         SchedulerProxyUserInterface schedulerProxy = session.getScheduler();
 
         if (schedulerProxy == null) {
@@ -2601,6 +2608,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             final Scheduler s = checkAccess(sessionId, "disconnect");
             logger.info("disconnection user " + sessionStore.get(sessionId) + " to session " + sessionId);
+
+            if (IAM_IS_USED) {
+                sessionStore.destroyIAMSession(sessionId);
+            }
+
             s.disconnect();
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
@@ -2925,11 +2937,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public String login(@FormParam("username") String username, @FormParam("password") String password)
             throws LoginException, SchedulerRestException {
         try {
-            if ((username == null) || (password == null)) {
+
+            if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
                 throw new LoginException("Empty login/password");
             }
-            Session session = sessionStore.create(username);
+
+            Session session;
+
+            // When authentication is performed against the IAM microservice, generate a JWT as session Id
+            if (IAM_IS_USED) {
+                session = sessionStore.createIAMSession(username, password.toCharArray());
+            }
+            // Legacy Session
+            else {
+                session = sessionStore.create(username);
+            }
+
             session.connectToScheduler(new CredData(username, password));
+
             logger.info("Binding user " + username + " to session " + session.getSessionId());
 
             return session.getSessionId();
@@ -3036,26 +3061,52 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public String loginWithCredential(@MultipartForm LoginForm multipart)
             throws LoginException, KeyException, SchedulerRestException {
         try {
+
             Session session;
+            CredData credData;
             if (multipart.getCredential() != null) {
                 Credentials credentials;
                 try {
-                    session = sessionStore.createUnnamedSession();
                     credentials = Credentials.getCredentials(multipart.getCredential());
+                    String schedulerPrivateKey = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+                    credData = credentials.decrypt(schedulerPrivateKey);
+
+                    // When authentication is performed against the IAM microservice, generate a JWT as session Id
+                    if (IAM_IS_USED) {
+                        session = sessionStore.createIAMSession(credData.getLogin(),
+                                                                credData.getPassword().toCharArray());
+                    }
+                    // Legacy Session
+                    else {
+                        session = sessionStore.createUnnamedSession();
+                    }
+
                     session.connectToScheduler(credentials);
+
                 } catch (IOException e) {
                     throw new LoginException(e.getMessage());
                 }
             } else {
-                if ((multipart.getUsername() == null) || (multipart.getPassword() == null)) {
-                    throw new LoginException("empty login/password");
+                if (StringUtils.isBlank(multipart.getUsername()) || StringUtils.isBlank(multipart.getPassword())) {
+                    throw new LoginException("Empty login/password");
                 }
 
-                session = sessionStore.create(multipart.getUsername());
-                CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
-                                                 CredData.parseDomain(multipart.getUsername()),
-                                                 multipart.getPassword(),
-                                                 multipart.getSshKey());
+                String login = multipart.getUsername();
+                String password = multipart.getPassword();
+                credData = new CredData(CredData.parseLogin(login),
+                                        CredData.parseDomain(login),
+                                        password,
+                                        multipart.getSshKey());
+
+                // When authentication is performed against the IAM microservice, generate a JWT as session Id
+                if (IAM_IS_USED) {
+                    session = sessionStore.createIAMSession(login, password.toCharArray());
+                }
+                // Legacy Session
+                else {
+                    session = sessionStore.create(multipart.getUsername());
+                }
+
                 session.connectToScheduler(credData);
             }
 

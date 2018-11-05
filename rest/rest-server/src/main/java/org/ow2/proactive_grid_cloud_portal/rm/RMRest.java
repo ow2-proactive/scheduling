@@ -70,6 +70,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -80,6 +81,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -87,6 +89,7 @@ import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -95,6 +98,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfigurati
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
@@ -110,6 +114,11 @@ import org.rrd4j.core.RrdDb;
 
 @Path("/rm")
 public class RMRest implements RMRestInterface {
+
+    public static final Boolean IAM_IS_USED = PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString()
+                                                                                          .equals(IAMConfiguration.IAM_LOGIN_METHOD) &&
+                                              PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString()
+                                                                                         .equals(IAMConfiguration.IAM_LOGIN_METHOD);
 
     protected static final String[] dataSources = { //
                                                     // "AverageInactivity", // redundant with AverageActivity
@@ -131,6 +140,12 @@ public class RMRest implements RMRestInterface {
         if (session == null) {
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
         }
+
+        // When IAM is used, check whether IAM SSO session is still valid
+        if (IAM_IS_USED) {
+            sessionStore.renewIAMSession(sessionId);
+        }
+
         RMProxyUserInterface s = session.getRM();
 
         if (s == null) {
@@ -147,10 +162,23 @@ public class RMRest implements RMRestInterface {
     public String rmConnect(@FormParam("username") String username, @FormParam("password") String password)
             throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException {
 
-        Session session = sessionStore.create(username);
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+            throw new LoginException("Empty login/password");
+        }
+
+        Session session;
+
+        // When authentication is performed against the IAM microservice, generate a JWT as session Id
+        if (IAM_IS_USED) {
+            session = sessionStore.createIAMSession(username, password.toCharArray());
+        }
+        // Legacy Session
+        else {
+            session = sessionStore.create(username);
+        }
+
         session.connectToRM(new CredData(CredData.parseLogin(username), CredData.parseDomain(username), password));
         return session.getSessionId();
-
     }
 
     @Override
@@ -159,6 +187,11 @@ public class RMRest implements RMRestInterface {
     @Produces("application/json")
     public void rmDisconnect(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         RMProxyUserInterface rm = checkAccess(sessionId);
+
+        if (IAM_IS_USED) {
+            sessionStore.destroyIAMSession(sessionId);
+        }
+
         rm.disconnect();
         sessionStore.terminate(sessionId);
     }
@@ -178,18 +211,43 @@ public class RMRest implements RMRestInterface {
             NodeException, KeyException, IOException, LoginException, RMException {
 
         Session session;
-        if (multipart.getCredential() != null) {
-            session = sessionStore.createUnnamedSession();
-            Credentials credentials = Credentials.getCredentials(multipart.getCredential());
-            session.connectToRM(credentials);
-        } else {
-            session = sessionStore.create(multipart.getUsername());
-            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
-                                             CredData.parseDomain(multipart.getUsername()),
-                                             multipart.getPassword(),
-                                             multipart.getSshKey());
-            session.connectToRM(credData);
+        CredData credData;
 
+        if (multipart.getCredential() != null) {
+            Credentials credentials = Credentials.getCredentials(multipart.getCredential());
+            String schedulerPrivateKey = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_AUTH_PRIVKEY_PATH.getValueAsString());
+            credData = credentials.decrypt(schedulerPrivateKey);
+
+            // When authentication is performed against the IAM microservice, generate a JWT as session Id
+            if (IAM_IS_USED) {
+                session = sessionStore.createIAMSession(credData.getLogin(), credData.getPassword().toCharArray());
+            }
+            // Legacy Session
+            else {
+                session = sessionStore.createUnnamedSession();
+            }
+
+            session.connectToRM(credentials);
+
+        } else {
+
+            String login = multipart.getUsername();
+            String password = multipart.getPassword();
+            credData = new CredData(CredData.parseLogin(login),
+                                    CredData.parseDomain(login),
+                                    password,
+                                    multipart.getSshKey());
+
+            // When authentication is performed against the IAM microservice, generate a JWT as session Id
+            if (IAM_IS_USED) {
+                session = sessionStore.createIAMSession(login, password.toCharArray());
+            }
+            // Legacy Session
+            else {
+                session = sessionStore.create(multipart.getUsername());
+            }
+
+            session.connectToRM(credData);
         }
 
         return session.getSessionId();

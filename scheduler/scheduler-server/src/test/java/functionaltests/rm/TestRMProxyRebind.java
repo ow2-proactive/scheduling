@@ -97,8 +97,6 @@ public class TestRMProxyRebind extends MultipleRMTBase {
             TestScheduler.kill();
         }
 
-        startIAMIfNeeded();
-
         initConfigs();
     }
 
