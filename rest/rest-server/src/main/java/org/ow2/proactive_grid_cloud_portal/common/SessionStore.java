@@ -186,7 +186,7 @@ public class SessionStore {
             iamSessionUtil.createServiceToken(ssoTicket);
 
         } catch (MalformedClaimException e) {
-            throw new IAMException("SSO token contains malformed session id (jti)");
+            throw new IAMException("SSO token contains malformed session id (jti)", e);
         }
     }
 

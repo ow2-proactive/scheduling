@@ -37,6 +37,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.pnp.PNPConfig;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -58,8 +59,6 @@ import org.ow2.proactive.scheduler.util.SchedulerHsqldbStarter;
  * @author The ProActive Team
  */
 public class SchedulerStartForFunctionalTest implements Serializable {
-
-    private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
 
     public static final int RM_NODE_DEPLOYMENT_TIMEOUT = 100000;
 
@@ -186,7 +185,7 @@ public class SchedulerStartForFunctionalTest implements Serializable {
             ConfigurationException, GeneralSecurityException {
 
         //Check if PA is configured to use IAM microservice for authentication
-        if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().equals(IAM_LOGIN_METHOD)) {
+        if (PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString().equals(IAMConfiguration.IAM_LOGIN_METHOD)) {
 
             String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
             String bootMicroservicesPath = PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_BOOT_MICROSERVICES_PATH.getValueAsString());

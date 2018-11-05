@@ -108,6 +108,8 @@ public class IAMConfiguration {
 
     public static final String PA_HOME_PLACEHOLDER = "${pa.scheduler.home}";
 
+    public static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
+
     private static final Logger LOGGER = Logger.getLogger(IAMConfiguration.class);
 
     private static final ListDelimiterHandler DELIMITER = new DefaultListDelimiterHandler(';');

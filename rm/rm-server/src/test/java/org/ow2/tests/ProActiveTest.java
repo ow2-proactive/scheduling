@@ -41,8 +41,6 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
  */
 public class ProActiveTest {
 
-    private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
-
     static {
         configureSecurityManager();
         configurePAHome();

@@ -178,9 +178,10 @@ public class IAMRestClient {
             HttpResponse httpResponse = httpClient.execute(httpPost);
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) ||
-                (null == httpResponse.getEntity()))
+                (null == httpResponse.getEntity())) {
                 throw new IAMException("Failed to acquire token for the service " + service,
                                        new HTTPException(httpResponse.getStatusLine().getStatusCode()));
+            }
 
             token = EntityUtils.toString(httpResponse.getEntity());
 
@@ -253,9 +254,10 @@ public class IAMRestClient {
             HttpResponse httpResponse = httpClient.execute(httpPost);
 
             if ((httpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) ||
-                (null == httpResponse.getEntity()))
+                (null == httpResponse.getEntity())) {
                 throw new IAMException("Failed to validate credentials of user '" + username,
                                        new HTTPException(httpResponse.getStatusLine().getStatusCode()));
+            }
 
             return EntityUtils.toString(httpResponse.getEntity());
 

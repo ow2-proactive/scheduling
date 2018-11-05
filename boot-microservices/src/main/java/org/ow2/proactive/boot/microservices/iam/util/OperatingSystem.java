@@ -57,9 +57,9 @@ public enum OperatingSystem {
     LINUX_OS("Linux", OperatingSystemFamily.LINUX),
     MAC_OS("Mac OS", OperatingSystemFamily.MAC);
 
-    final private String label;
+    private final String label;
 
-    final private OperatingSystemFamily family;
+    private final OperatingSystemFamily family;
 
     private OperatingSystem(String label, OperatingSystemFamily family) {
         this.label = label;
