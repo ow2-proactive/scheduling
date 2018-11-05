@@ -70,6 +70,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -80,6 +81,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -113,12 +115,10 @@ import org.rrd4j.core.RrdDb;
 @Path("/rm")
 public class RMRest implements RMRestInterface {
 
-    private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
-
     public static final Boolean IAM_IS_USED = PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString()
-                                                                                          .equals(IAM_LOGIN_METHOD) &&
+                                                                                          .equals(IAMConfiguration.IAM_LOGIN_METHOD) &&
                                               PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString()
-                                                                                         .equals(IAM_LOGIN_METHOD);
+                                                                                         .equals(IAMConfiguration.IAM_LOGIN_METHOD);
 
     protected static final String[] dataSources = { //
                                                     // "AverageInactivity", // redundant with AverageActivity
@@ -162,7 +162,7 @@ public class RMRest implements RMRestInterface {
     public String rmConnect(@FormParam("username") String username, @FormParam("password") String password)
             throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException {
 
-        if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
             throw new LoginException("Empty login/password");
         }
 

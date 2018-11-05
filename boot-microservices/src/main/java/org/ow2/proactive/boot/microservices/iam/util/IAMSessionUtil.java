@@ -52,6 +52,8 @@ public class IAMSessionUtil {
 
     private String ticketMarker;
 
+    private IAMRestClient iamRestClient;
+
     /**
      * constructor that initializes all parameters needed by IAMSession
      */
@@ -72,6 +74,8 @@ public class IAMSessionUtil {
         isJWTSession = config.getBoolean(IAMConfiguration.PA_REST_SESSION_AS_JWT);
 
         ticketMarker = config.getString(IAMConfiguration.SSO_TICKET_MARKER);
+
+        iamRestClient = new IAMRestClient();
     }
 
     /**
@@ -92,7 +96,7 @@ public class IAMSessionUtil {
      * @since version 8.3.0
      */
     public boolean deleteSession(String ssoTicket) {
-        return new IAMRestClient().deleteSSOTicket(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket);
+        return iamRestClient.deleteSSOTicket(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket);
     }
 
     /**
@@ -103,7 +107,7 @@ public class IAMSessionUtil {
      * @since version 8.3.0
      */
     public boolean sessionIsValid(String ssoTicket) {
-        return new IAMRestClient().isSSOTicketValid(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket);
+        return iamRestClient.isSSOTicketValid(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket);
     }
 
     /**
@@ -116,11 +120,11 @@ public class IAMSessionUtil {
      */
     public AbstractMap.SimpleEntry<String, JwtClaims> createNewSessionToken(String username, char[] password) {
 
-        String sessionToken = new IAMRestClient().getSSOTicket(iamURL + IAMConfiguration.IAM_TICKET_REQUEST,
-                                                               username,
-                                                               password,
-                                                               ticketMarker,
-                                                               isJWTSession);
+        String sessionToken = iamRestClient.getSSOTicket(iamURL + IAMConfiguration.IAM_TICKET_REQUEST,
+                                                         username,
+                                                         password,
+                                                         ticketMarker,
+                                                         isJWTSession);
 
         JwtClaims claims = isJWTSession ? JWTUtils.parseJWT(sessionToken,
                                                             tokenSignatureEnabled,
@@ -144,7 +148,7 @@ public class IAMSessionUtil {
      * @since version 8.3.0
      */
     public String createServiceToken(String ssoTicket) {
-        return new IAMRestClient().getServiceToken(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket,
-                                                   PA_REST_SERVICE);
+        return iamRestClient.getServiceToken(iamURL + IAMConfiguration.IAM_TICKET_REQUEST + "/" + ssoTicket,
+                                             PA_REST_SERVICE);
     }
 }

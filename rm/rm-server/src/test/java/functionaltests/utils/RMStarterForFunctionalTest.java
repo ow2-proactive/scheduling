@@ -31,11 +31,10 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.RMConnection;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
-import org.ow2.tests.ProActiveTest;
 
 
 /**
@@ -43,8 +42,6 @@ import org.ow2.tests.ProActiveTest;
  *
  */
 public class RMStarterForFunctionalTest {
-
-    private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
 
     private static final String IAM_SERVICE_PATH = "dist/boot";
 
@@ -87,7 +84,7 @@ public class RMStarterForFunctionalTest {
             ConfigurationException, GeneralSecurityException {
 
         //Check if PA is configured to use IAM microservice for authentication
-        if (PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().equals(IAM_LOGIN_METHOD)) {
+        if (PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString().equals(IAMConfiguration.IAM_LOGIN_METHOD)) {
 
             String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
             String bootMicroservicesPath = PAResourceManagerProperties.getAbsolutePath(IAM_SERVICE_PATH);

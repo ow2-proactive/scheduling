@@ -42,12 +42,10 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 public class IAMTestUtil {
 
-    private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
-
     public static final Boolean IAM_IS_USED = PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString()
-                                                                                          .equals(IAM_LOGIN_METHOD) &&
+                                                                                          .equals(IAMConfiguration.IAM_LOGIN_METHOD) &&
                                               PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString()
-                                                                                         .equals(IAM_LOGIN_METHOD);
+                                                                                         .equals(IAMConfiguration.IAM_LOGIN_METHOD);
 
     public static String ssoTicket = "TGT-1-xxxxxxxx";
 

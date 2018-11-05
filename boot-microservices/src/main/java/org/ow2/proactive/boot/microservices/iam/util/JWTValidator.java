@@ -117,7 +117,7 @@ public class JWTValidator implements TicketValidator {
 
             return assertion;
         } catch (MalformedClaimException e) {
-            throw new IAMException("Malformed Json Web Token acquired from IAM [" + jsonWebToken + "]");
+            throw new IAMException("Malformed Json Web Token acquired from IAM [" + jsonWebToken + "]", e);
         }
 
     }

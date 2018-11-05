@@ -37,9 +37,9 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.boot.microservices.iam.exceptions.IAMStarterException;
 import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
-import org.ow2.proactive.boot.microservices.iam.util.OperatingSystem;
-import org.ow2.proactive.boot.microservices.iam.util.OperatingSystemFamily;
 import org.ow2.proactive.boot.microservices.iam.util.SSLUtils;
+import org.ow2.proactive.utils.OperatingSystem;
+import org.ow2.proactive.utils.OperatingSystemFamily;
 
 
 public class IAMStarter {

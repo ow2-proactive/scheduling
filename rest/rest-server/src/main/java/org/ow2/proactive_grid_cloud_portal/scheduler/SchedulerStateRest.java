@@ -76,6 +76,7 @@ import org.objectweb.proactive.utils.StackTraceUtil;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.db.SortOrder;
 import org.ow2.proactive.db.SortParameter;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -139,12 +140,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private static final String PATH_TASKS = "/tasks/";
 
-    private static final String IAM_LOGIN_METHOD = "IAMLoginMethod";
-
     public static final Boolean IAM_IS_USED = PASchedulerProperties.SCHEDULER_LOGIN_METHOD.getValueAsString()
-                                                                                          .equals(IAM_LOGIN_METHOD) &&
+                                                                                          .equals(IAMConfiguration.IAM_LOGIN_METHOD) &&
                                               PAResourceManagerProperties.RM_LOGIN_METHOD.getValueAsString()
-                                                                                         .equals(IAM_LOGIN_METHOD);
+                                                                                         .equals(IAMConfiguration.IAM_LOGIN_METHOD);
 
     static {
         sortableTaskAttrMap = createSortableTaskAttrMap();
@@ -2939,7 +2938,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws LoginException, SchedulerRestException {
         try {
 
-            if ((username == null || username.trim().isEmpty()) || (password == null || password.trim().isEmpty())) {
+            if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
                 throw new LoginException("Empty login/password");
             }
 
@@ -3088,8 +3087,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     throw new LoginException(e.getMessage());
                 }
             } else {
-                if ((multipart.getUsername() == null || multipart.getUsername().trim().isEmpty()) ||
-                    (multipart.getPassword() == null || multipart.getPassword().trim().isEmpty())) {
+                if (StringUtils.isBlank(multipart.getUsername()) || StringUtils.isBlank(multipart.getPassword())) {
                     throw new LoginException("Empty login/password");
                 }
 
