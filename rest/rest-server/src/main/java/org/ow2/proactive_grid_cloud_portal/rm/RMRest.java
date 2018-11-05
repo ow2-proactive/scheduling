@@ -875,19 +875,8 @@ public class RMRest implements RMRestInterface {
     public ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeurl") String nodeUrl, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
-
         RMProxyUserInterface rm = checkAccess(sessionId);
-
-        List<ScriptResult<Object>> results = rm.executeScript(script,
-                                                              scriptEngine,
-                                                              TargetType.NODE_URL.name(),
-                                                              Collections.singleton(nodeUrl));
-
-        if (results.isEmpty()) {
-            throw new IllegalStateException("Empty results from script execution");
-        }
-
-        return results.get(0);
+        return executeScriptAndGetResult(nodeUrl, script, scriptEngine, rm, TargetType.NODE_URL.name());
     }
 
     @Override
@@ -895,16 +884,11 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
-    public List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
+    public ScriptResult<Object> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodesource") String nodeSource, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
-
         RMProxyUserInterface rm = checkAccess(sessionId);
-
-        return rm.executeScript(script,
-                                scriptEngine,
-                                TargetType.NODESOURCE_NAME.name(),
-                                Collections.singleton(nodeSource));
+        return executeScriptAndGetResult(nodeSource, script, scriptEngine, rm, TargetType.NODESOURCE_NAME.name());
     }
 
     @Override
@@ -912,13 +896,27 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("host/script")
     @Produces("application/json")
-    public List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid") String sessionId,
+    public ScriptResult<Object> executeHostScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("host") String host, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
-
         RMProxyUserInterface rm = checkAccess(sessionId);
+        return executeScriptAndGetResult(host, script, scriptEngine, rm, TargetType.HOSTNAME.name());
+    }
 
-        return rm.executeScript(script, scriptEngine, TargetType.HOSTNAME.name(), Collections.singleton(host));
+    private ScriptResult<Object> executeScriptAndGetResult(String targetId, String script, String scriptEngine,
+            RMProxyUserInterface rm, String targetType) {
+        List<ScriptResult<Object>> results = rm.executeScript(script,
+                                                              scriptEngine,
+                                                              targetType,
+                                                              Collections.singleton(targetId));
+        checkEmptyScriptResults(results);
+        return results.get(0);
+    }
+
+    private void checkEmptyScriptResults(List<ScriptResult<Object>> results) {
+        if (results.isEmpty()) {
+            throw new IllegalStateException("Empty results from script execution");
+        }
     }
 
     @GET

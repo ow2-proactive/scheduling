@@ -701,7 +701,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
-    List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
+    ScriptResult<Object> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodesource") String nodeSource, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
@@ -709,9 +709,8 @@ public interface RMRestInterface {
     @GZIP
     @Path("host/script")
     @Produces("application/json")
-    List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid") String sessionId,
-            @FormParam("host") String host, @FormParam("script") String script,
-            @FormParam("scriptEngine") String scriptEngine) throws Throwable;
+    ScriptResult<Object> executeHostScript(@HeaderParam("sessionid") String sessionId, @FormParam("host") String host,
+            @FormParam("script") String script, @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
     @GET
     @GZIP
