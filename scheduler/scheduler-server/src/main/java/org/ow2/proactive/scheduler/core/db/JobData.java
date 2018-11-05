@@ -372,7 +372,7 @@ public class JobData implements Serializable {
 
     @Lob
     @Column(name = "INPUT_SPACE", length = Integer.MAX_VALUE, updatable = false)
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getInputSpace() {
         return inputSpace;
     }
@@ -383,7 +383,7 @@ public class JobData implements Serializable {
 
     @Lob
     @Column(name = "OUT_SPACE", length = Integer.MAX_VALUE, updatable = false)
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getOutputSpace() {
         return outputSpace;
     }
@@ -394,7 +394,7 @@ public class JobData implements Serializable {
 
     @Lob
     @Column(name = "GLOBAL_SPACE", length = Integer.MAX_VALUE, updatable = false)
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getGlobalSpace() {
         return globalSpace;
     }
@@ -405,7 +405,7 @@ public class JobData implements Serializable {
 
     @Lob
     @Column(name = "USER_SPACE", length = Integer.MAX_VALUE, updatable = false)
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getUserSpace() {
         return userSpace;
     }
@@ -416,7 +416,7 @@ public class JobData implements Serializable {
 
     @Lob
     @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE, updatable = false)
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getDescription() {
         return description;
     }

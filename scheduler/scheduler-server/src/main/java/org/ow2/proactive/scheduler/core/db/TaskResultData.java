@@ -177,7 +177,7 @@ public class TaskResultData {
     }
 
     @Lob
-    @Type(type = "org.hibernate.type.BinaryType")
+    @Type(type = "org.hibernate.type.BlobType")
     @Column(name = "RESULT_VALUE", length = Integer.MAX_VALUE)
     public byte[] getSerializedValue() {
         return serializedValue;
@@ -188,7 +188,7 @@ public class TaskResultData {
     }
 
     @Lob
-    @Type(type = "org.hibernate.type.BinaryType")
+    @Type(type = "org.hibernate.type.BlobType")
     @Column(name = "RESULT_EXCEPTION", length = Integer.MAX_VALUE)
     public byte[] getSerializedException() {
         return serializedException;
@@ -227,7 +227,7 @@ public class TaskResultData {
         this.propagatedVariables = executionVariables;
     }
 
-    @Column(name = "RAW", nullable = true)
+    @Column(name = "IS_RAW", nullable = true)
     public Boolean isRaw() {
         if (isRaw == null) {
             return false;

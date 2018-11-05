@@ -120,7 +120,7 @@ public class NodeSourceData implements Serializable {
     }
 
     @Column(length = Integer.MAX_VALUE)
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getInfrastructureType() {
         return infrastructureType;
     }
