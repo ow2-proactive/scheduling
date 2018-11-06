@@ -193,22 +193,22 @@ public final class ObjectByteConverter {
         if (input == null) {
             return null;
         }
-        return input.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey() != null)
-                    .collect(Collectors.toMap(entry -> entry.getKey(),
-                                              entry -> base64StringToByteArray(entry.getValue())));
+        HashMap<String, byte[]> answer = new HashMap<>(input.size());
+        input.forEach((key, value) -> {
+            answer.put(key, base64StringToByteArray(value));
+        });
+        return answer;
     }
 
     public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input) {
         if (input == null) {
             return null;
         }
-        return input.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey() != null)
-                    .collect(Collectors.toMap(entry -> entry.getKey(),
-                                              entry -> base64StringToSerializable(entry.getValue())));
+        HashMap<String, Serializable> answer = new HashMap<>(input.size());
+        input.forEach((key, value) -> {
+            answer.put(key, base64StringToSerializable(value));
+        });
+        return answer;
 
     }
 
@@ -216,28 +216,28 @@ public final class ObjectByteConverter {
         if (input == null) {
             return null;
         }
-        return input.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey() != null)
-                    .collect(Collectors.toMap(entry -> entry.getKey(),
-                                              entry -> (Serializable) byteArrayToObject(entry.getValue())));
+
+        HashMap<String, Serializable> answer = new HashMap<>(input.size());
+        input.forEach((key, value) -> {
+            answer.put(key, (Serializable) byteArrayToObject(value));
+        });
+        return answer;
+
     }
 
     public static Map<String, byte[]> mapOfSerializableToByteArray(Map<String, Serializable> input) {
         if (input == null) {
             return null;
         }
-        return input.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey() != null)
-                    .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
-                        try {
-                            return ObjectToByteConverter.ObjectStream.convert(entry.getValue());
-                        } catch (IOException e) {
-                            throw new RuntimeException("Error when converting variables to byte array ", e);
-                        }
-                    }));
-
+        HashMap<String, byte[]> answer = new HashMap<>(input.size());
+        input.forEach((key, value) -> {
+            try {
+                answer.put(key, ObjectToByteConverter.ObjectStream.convert(value));
+            } catch (IOException e) {
+                throw new RuntimeException("Error when converting variables to byte array ", e);
+            }
+        });
+        return answer;
     }
 
 }
