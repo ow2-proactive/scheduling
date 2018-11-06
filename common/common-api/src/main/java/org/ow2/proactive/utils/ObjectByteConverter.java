@@ -193,14 +193,14 @@ public final class ObjectByteConverter {
         if (input == null) {
             return null;
         }
-        HashMap<String, byte[]> answer = new HashMap<>(input.size());
-        for (Map.Entry<String, String> entry : input.entrySet()) {
-            answer.put(entry.getKey(), base64StringToByteArray(entry.getValue()));
-        }
-        return answer;
+        return input.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(),
+                                                                  entry -> base64StringToByteArray(entry.getValue())));
     }
 
     public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input) {
+        if (input == null) {
+            return null;
+        }
         return input.entrySet()
                     .stream()
                     .collect(Collectors.toMap(entry -> entry.getKey(),
@@ -209,6 +209,9 @@ public final class ObjectByteConverter {
     }
 
     public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input) {
+        if (input == null) {
+            return null;
+        }
         return input.entrySet()
                     .stream()
                     .collect(Collectors.toMap(entry -> entry.getKey(),
@@ -216,6 +219,9 @@ public final class ObjectByteConverter {
     }
 
     public static Map<String, byte[]> mapOfSerializableToByteArray(Map<String, Serializable> input) {
+        if (input == null) {
+            return null;
+        }
         return input.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
             try {
                 return ObjectToByteConverter.ObjectStream.convert(entry.getValue());
