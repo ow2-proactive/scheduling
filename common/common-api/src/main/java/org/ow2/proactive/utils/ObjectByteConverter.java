@@ -73,14 +73,11 @@ public final class ObjectByteConverter {
      * @return a compressed (or not) byteArray representing the Serialization of the given object.
      */
     public static final byte[] objectToByteArray(Object obj, boolean compress) {
-        ByteArrayOutputStream baos = null;
-        ObjectOutputStream oos = null;
         if (obj == null) {
             return null;
         }
-        try {
-            baos = new ByteArrayOutputStream();
-            oos = new ObjectOutputStream(baos);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos)) {
             oos.writeObject(obj);
             oos.flush();
             if (!compress) {
@@ -94,10 +91,9 @@ public final class ObjectByteConverter {
                 compressor.setInput(baos.toByteArray());
                 compressor.finish();
 
-                ByteArrayOutputStream bos = null;
-                try {
-                    // Create an expandable byte array to hold the compressed data.
-                    bos = new ByteArrayOutputStream();
+                // Create an expandable byte array to hold the compressed data.
+                try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+
                     // Compress the data
                     byte[] buf = new byte[512];
                     while (!compressor.finished()) {
@@ -106,29 +102,10 @@ public final class ObjectByteConverter {
                     }
                     // Return the COMPRESSED data
                     return bos.toByteArray();
-                } finally {
-                    if (bos != null) {
-                        bos.close();
-                    }
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not convert to byte array object ", e);
-        } finally {
-            if (oos != null) {
-                try {
-                    oos.close();
-                } catch (IOException e) {
-                    throw new RuntimeException("An error occurred when trying to close the object stream ", e);
-                }
-            }
-            if (baos != null) {
-                try {
-                    baos.close();
-                } catch (IOException e) {
-                    throw new RuntimeException("An error occurred when trying to close the byte array stream ", e);
-                }
-            }
         }
     }
 
@@ -160,10 +137,8 @@ public final class ObjectByteConverter {
             Inflater decompressor = new Inflater();
             decompressor.setInput(input);
 
-            ByteArrayOutputStream bos = null;
-            try {
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
                 // Create an expandable byte array to hold the compressed data.
-                bos = new ByteArrayOutputStream();
                 // Compress the data
                 byte[] buf = new byte[512];
                 while (!decompressor.finished()) {
@@ -176,40 +151,16 @@ public final class ObjectByteConverter {
             } catch (DataFormatException dfe) {
                 //convert into io exception to fit previous behavior
                 throw new RuntimeException("Compressed data format is invalid : " + dfe.getMessage(), dfe);
-            } finally {
-                if (bos != null) {
-                    try {
-                        bos.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException("Could not convert to serialized object ", e);
-                    }
-                }
+            } catch (IOException e) {
+                throw new RuntimeException("Could not convert to serialized object: " + e.getMessage(), e);
             }
         }
         //here, input byteArray is uncompressed if needed
-        ByteArrayInputStream bais = null;
-        ObjectInputStream ois = null;
-        try {
-            bais = new ByteArrayInputStream(input);
-            ois = new ObjectInputStream(bais);
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(input);
+                ObjectInputStream ois = new ObjectInputStream(bais)) {
             return ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("", e);
-        } finally {
-            if (ois != null) {
-                try {
-                    ois.close();
-                } catch (IOException e) {
-                    throw new RuntimeException("An error occurred when trying to close the object stream ", e);
-                }
-            }
-            if (bais != null) {
-                try {
-                    bais.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(" An error occurred when trying to close the byte array stream ", e);
-                }
-            }
+            throw new RuntimeException("Could not uncompress to byte array object: " + e.getMessage(), e);
         }
     }
 
