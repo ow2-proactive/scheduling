@@ -95,6 +95,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfigurati
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
@@ -915,7 +916,7 @@ public class RMRest implements RMRestInterface {
 
     private void checkEmptyScriptResults(List<ScriptResult<Object>> results) {
         if (results.isEmpty()) {
-            throw new IllegalStateException("Empty results from script execution");
+            results.add(new ScriptResult<>(new ScriptException("Empty results from script execution")));
         }
     }
 
