@@ -34,18 +34,12 @@ import org.ow2.proactive.utils.ObjectByteConverter;
 
 public class ObjectUtility {
 
-    public static Object object(byte[] bytes) throws IOException, ClassNotFoundException {
+    public static Object object(byte[] bytes) {
         if (bytes == null) {
             return "[NULL]";
         }
         Object answer;
-        try {
-            answer = ObjectByteConverter.byteArrayToObject(bytes);
-        } catch (ClassNotFoundException cnfe) {
-            return String.format("[De-serialization error : %s]", cnfe.getMessage());
-        } catch (IOException ioe) {
-            return String.format("[De-serialization error : %s]", ioe.getMessage());
-        }
+        answer = ObjectByteConverter.byteArrayToObject(bytes);
         if (answer instanceof byte[]) {
             return "[RAW DATA]";
         }

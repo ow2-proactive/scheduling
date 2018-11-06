@@ -61,7 +61,7 @@ public class JobResultImpl implements JobResult {
 
     private Map<String, TaskResult> exceptionResults;
 
-    JobResultImpl(JobResultData data) throws IOException, ClassNotFoundException {
+    JobResultImpl(JobResultData data) {
         JobIdData id = data.getId();
         jobId = new JobIdImpl(id.getId(), id.getReadableName());
         allResults = createTaskResultMap(data.getAllResults());

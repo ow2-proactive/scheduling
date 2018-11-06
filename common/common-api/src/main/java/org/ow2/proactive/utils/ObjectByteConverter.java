@@ -33,6 +33,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -57,9 +58,8 @@ public final class ObjectByteConverter {
      *
      * @param obj the Serializable object to be compressed
      * @return a byteArray representing the Serialization of the given object.
-     * @throws IOException if an I/O exception occurs when writing the output byte array
      */
-    public static final byte[] objectToByteArray(Object obj) throws IOException {
+    public static final byte[] objectToByteArray(Object obj) {
         return objectToByteArray(obj, false);
     }
 
@@ -68,12 +68,11 @@ public final class ObjectByteConverter {
      * <p>
      * The returned byteArray can be compressed by setting compress boolean argument value to <code>true</code>.
      *
-     * @param obj the Serializable object to be compressed
+     * @param obj      the Serializable object to be compressed
      * @param compress true if the returned byteArray must be also compressed, false if no compression is required.
      * @return a compressed (or not) byteArray representing the Serialization of the given object.
-     * @throws IOException if an I/O exception occurs when writing the output byte array
      */
-    public static final byte[] objectToByteArray(Object obj, boolean compress) throws IOException {
+    public static final byte[] objectToByteArray(Object obj, boolean compress) {
         ByteArrayOutputStream baos = null;
         ObjectOutputStream oos = null;
         if (obj == null) {
@@ -113,12 +112,22 @@ public final class ObjectByteConverter {
                     }
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not convert to byte array object ", e);
         } finally {
             if (oos != null) {
-                oos.close();
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    throw new RuntimeException("An error occurred when trying to close the object stream ", e);
+                }
             }
             if (baos != null) {
-                baos.close();
+                try {
+                    baos.close();
+                } catch (IOException e) {
+                    throw new RuntimeException("An error occurred when trying to close the byte array stream ", e);
+                }
             }
         }
     }
@@ -128,10 +137,8 @@ public final class ObjectByteConverter {
      *
      * @param input the byteArray to be convert as an object.
      * @return the object corresponding to the given byteArray.
-     * @throws IOException if an I/O exception occurs when writing the returned object
-     * @throws ClassNotFoundException if class represented by given byteArray is not found.
      */
-    public static Object byteArrayToObject(byte[] input) throws IOException, ClassNotFoundException {
+    public static Object byteArrayToObject(byte[] input) {
         return byteArrayToObject(input, false);
     }
 
@@ -140,14 +147,11 @@ public final class ObjectByteConverter {
      * <p>
      * The given byteArray can be uncompressed if it has been compressed before.
      *
-     * @param input the byteArray to be convert as an object.
+     * @param input      the byteArray to be convert as an object.
      * @param uncompress true if the given byteArray must be also uncompressed, false if no compression was made on it.
      * @return the object corresponding to the given byteArray.
-     * @throws IOException if an I/O exception occurs when writing the returned object
-     * @throws ClassNotFoundException if class represented by given byteArray is not found.
      */
-    public static Object byteArrayToObject(byte[] input, boolean uncompress)
-            throws IOException, ClassNotFoundException {
+    public static Object byteArrayToObject(byte[] input, boolean uncompress) {
         if (input == null) {
             return null;
         }
@@ -171,10 +175,14 @@ public final class ObjectByteConverter {
                 input = bos.toByteArray();
             } catch (DataFormatException dfe) {
                 //convert into io exception to fit previous behavior
-                throw new IOException("Compressed data format is invalid : " + dfe.getMessage(), dfe);
+                throw new RuntimeException("Compressed data format is invalid : " + dfe.getMessage(), dfe);
             } finally {
                 if (bos != null) {
-                    bos.close();
+                    try {
+                        bos.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException("Could not convert to serialized object ", e);
+                    }
                 }
             }
         }
@@ -185,17 +193,27 @@ public final class ObjectByteConverter {
             bais = new ByteArrayInputStream(input);
             ois = new ObjectInputStream(bais);
             return ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("", e);
         } finally {
             if (ois != null) {
-                ois.close();
+                try {
+                    ois.close();
+                } catch (IOException e) {
+                    throw new RuntimeException("An error occurred when trying to close the object stream ", e);
+                }
             }
             if (bais != null) {
-                bais.close();
+                try {
+                    bais.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(" An error occurred when trying to close the byte array stream ", e);
+                }
             }
         }
     }
 
-    public static String serializableToBase64String(Serializable input) throws IOException {
+    public static String serializableToBase64String(Serializable input) {
         return byteArrayToBase64String(objectToByteArray(input));
     }
 
@@ -213,7 +231,7 @@ public final class ObjectByteConverter {
         return Base64.decodeBase64(input);
     }
 
-    public static Serializable base64StringToSerializable(String input) throws IOException, ClassNotFoundException {
+    public static Serializable base64StringToSerializable(String input) {
         if (input == null) {
             return null;
         }
@@ -231,39 +249,30 @@ public final class ObjectByteConverter {
         return answer;
     }
 
-    public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input)
-            throws IOException, ClassNotFoundException {
-        if (input == null) {
-            return null;
-        }
-        HashMap<String, Serializable> answer = new HashMap<>(input.size());
-        for (Map.Entry<String, String> entry : input.entrySet()) {
-            answer.put(entry.getKey(), base64StringToSerializable(entry.getValue()));
-        }
-        return answer;
+    public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input) {
+        return input.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(entry -> entry.getKey(),
+                                              entry -> base64StringToSerializable(entry.getValue())));
+
     }
 
-    public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input)
-            throws IOException, ClassNotFoundException {
-        if (input == null) {
-            return null;
-        }
-        HashMap<String, Serializable> answer = new HashMap<>(input.size());
-        for (Map.Entry<String, byte[]> entry : input.entrySet()) {
-            answer.put(entry.getKey(), (Serializable) byteArrayToObject(entry.getValue()));
-        }
-        return answer;
+    public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input) {
+        return input.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(entry -> entry.getKey(),
+                                              entry -> (Serializable) byteArrayToObject(entry.getValue())));
     }
 
-    public static Map<String, byte[]> mapOfSerializableToByteArray(Map<String, Serializable> input) throws IOException {
-        if (input == null) {
-            return null;
-        }
-        HashMap<String, byte[]> answer = new HashMap<>(input.size());
-        for (Map.Entry<String, Serializable> entry : input.entrySet()) {
-            answer.put(entry.getKey(), ObjectToByteConverter.ObjectStream.convert(entry.getValue()));
-        }
-        return answer;
+    public static Map<String, byte[]> mapOfSerializableToByteArray(Map<String, Serializable> input) {
+        return input.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+            try {
+                return ObjectToByteConverter.ObjectStream.convert(entry.getValue());
+            } catch (IOException e) {
+                throw new RuntimeException("Error when converting variables to byte array ", e);
+            }
+        }));
+
     }
 
 }

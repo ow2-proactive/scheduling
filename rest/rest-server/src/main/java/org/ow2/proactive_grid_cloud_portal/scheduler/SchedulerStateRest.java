@@ -561,17 +561,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    public Map getJobResultMapAsString(Map source) {
+    public Map getJobResultMapAsString(Map<String, Serializable> source) {
         if (source == null) {
             return null;
         }
-        Map<String, String> converted = new HashMap<>();
-        for (Map.Entry<String, Serializable> entry : ((Map<String, Serializable>) source).entrySet()) {
-            if (entry.getValue() != null) {
-                converted.put(entry.getKey(), entry.getValue().toString());
-            }
-        }
-        return converted;
+        return source.entrySet()
+                     .stream()
+                     .filter(entry -> entry.getValue() != null)
+                     .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue().toString()));
+
     }
 
     /**
