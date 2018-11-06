@@ -193,8 +193,11 @@ public final class ObjectByteConverter {
         if (input == null) {
             return null;
         }
-        return input.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(),
-                                                                  entry -> base64StringToByteArray(entry.getValue())));
+        return input.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey() != null)
+                    .collect(Collectors.toMap(entry -> entry.getKey(),
+                                              entry -> base64StringToByteArray(entry.getValue())));
     }
 
     public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input) {
@@ -203,6 +206,7 @@ public final class ObjectByteConverter {
         }
         return input.entrySet()
                     .stream()
+                    .filter(entry -> entry.getKey() != null)
                     .collect(Collectors.toMap(entry -> entry.getKey(),
                                               entry -> base64StringToSerializable(entry.getValue())));
 
@@ -214,6 +218,7 @@ public final class ObjectByteConverter {
         }
         return input.entrySet()
                     .stream()
+                    .filter(entry -> entry.getKey() != null)
                     .collect(Collectors.toMap(entry -> entry.getKey(),
                                               entry -> (Serializable) byteArrayToObject(entry.getValue())));
     }
@@ -222,13 +227,16 @@ public final class ObjectByteConverter {
         if (input == null) {
             return null;
         }
-        return input.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
-            try {
-                return ObjectToByteConverter.ObjectStream.convert(entry.getValue());
-            } catch (IOException e) {
-                throw new RuntimeException("Error when converting variables to byte array ", e);
-            }
-        }));
+        return input.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getKey() != null)
+                    .collect(Collectors.toMap(entry -> entry.getKey(), entry -> {
+                        try {
+                            return ObjectToByteConverter.ObjectStream.convert(entry.getValue());
+                        } catch (IOException e) {
+                            throw new RuntimeException("Error when converting variables to byte array ", e);
+                        }
+                    }));
 
     }
 
