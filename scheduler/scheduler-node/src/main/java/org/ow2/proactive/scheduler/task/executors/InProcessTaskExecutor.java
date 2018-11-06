@@ -227,6 +227,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
         } else {
             //Needs to be stored in the local space
             String uri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+            p = Paths.get(uri, path);
+            Path hasParent = p.getParent();
+            if (!Files.exists(hasParent)) {
+                FileUtils.forceMkdirParent(new File(uri, path));
+            }
             try (FileWriter fw = new FileWriter(new File(uri, path))) {
                 fw.write(code);
             } catch (IOException e) {
