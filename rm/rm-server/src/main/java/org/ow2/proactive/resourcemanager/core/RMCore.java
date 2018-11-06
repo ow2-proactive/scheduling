@@ -2804,11 +2804,23 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 for (String target : targets) {
                     NodeSource nodeSource = this.deployedNodeSources.get(target);
                     if (nodeSource != null) {
-                        for (RMNode candidateNode : this.allNodes.values()) {
-                            if (candidateNode.getNodeSource().equals(nodeSource)) {
-                                this.selectCandidateNode(selectedRMNodes, candidateNode);
-                            }
-                        }
+                        RMNode selectedRMNode = this.allNodes.values()
+                                                             .stream()
+                                                             .filter(candidateNode -> candidateNode.getNodeSource()
+                                                                                                   .equals(nodeSource))
+                                                             .filter(candidateNode -> !candidateNode.isBusy())
+                                                             .findAny()
+                                                             .orElse(this.allNodes.values()
+                                                                                  .stream()
+                                                                                  .filter(candidateNode -> candidateNode.getNodeSource()
+                                                                                                                        .equals(nodeSource))
+                                                                                  .findAny()
+                                                                                  .orElseThrow(() -> new IllegalArgumentException("Cannot execute script on " +
+                                                                                                                                  target +
+                                                                                                                                  ". Node source " +
+                                                                                                                                  nodeSource +
+                                                                                                                                  " has no node.")));
+                        this.selectCandidateNode(selectedRMNodes, selectedRMNode);
                     }
                 }
                 break;
