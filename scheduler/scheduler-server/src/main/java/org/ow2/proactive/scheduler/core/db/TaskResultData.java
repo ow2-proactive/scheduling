@@ -177,7 +177,6 @@ public class TaskResultData {
     }
 
     @Lob
-    @Type(type = "org.hibernate.type.BlobType")
     @Column(name = "RESULT_VALUE", length = Integer.MAX_VALUE)
     public byte[] getSerializedValue() {
         return serializedValue;
@@ -188,7 +187,6 @@ public class TaskResultData {
     }
 
     @Lob
-    @Type(type = "org.hibernate.type.BlobType")
     @Column(name = "RESULT_EXCEPTION", length = Integer.MAX_VALUE)
     public byte[] getSerializedException() {
         return serializedException;
