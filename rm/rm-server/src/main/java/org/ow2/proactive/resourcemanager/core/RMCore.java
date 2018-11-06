@@ -2788,6 +2788,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         } catch (InvalidScriptException e) {
             logger.error(e.getMessage(), e);
             throw new ScriptException(e);
+        } catch (Exception e) {
+            return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
         }
     }
 
@@ -2800,7 +2802,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         final HashSet<RMNode> selectedRMNodes = new HashSet<>();
         switch (tType) {
             case NODESOURCE_NAME:
-                // If target is a nodesource name select all its nodes
+                // If target is a nodesource name select one node, not busy if possible
                 for (String target : targets) {
                     NodeSource nodeSource = this.deployedNodeSources.get(target);
                     if (nodeSource != null) {
@@ -2818,7 +2820,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                                                                                   .orElseThrow(() -> new IllegalArgumentException("Cannot execute script on " +
                                                                                                                                   target +
                                                                                                                                   ". Node source " +
-                                                                                                                                  nodeSource +
+                                                                                                                                  nodeSource.getName() +
                                                                                                                                   " has no node.")));
                         this.selectCandidateNode(selectedRMNodes, selectedRMNode);
                     }

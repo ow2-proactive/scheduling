@@ -916,7 +916,7 @@ public class RMRest implements RMRestInterface {
 
     private void checkEmptyScriptResults(List<ScriptResult<Object>> results) {
         if (results.isEmpty()) {
-            results.add(new ScriptResult<>(new ScriptException("Empty results from script execution")));
+            results.add(new ScriptResult<>(new ScriptException("No results from script execution")));
         }
     }
 
