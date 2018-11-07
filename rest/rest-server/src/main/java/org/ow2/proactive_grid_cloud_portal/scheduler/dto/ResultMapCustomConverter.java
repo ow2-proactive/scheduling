@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,17 +34,33 @@ import org.dozer.DozerConverter;
 import org.ow2.proactive.utils.ObjectByteConverter;
 
 
-public class StringPropagatedVariablesCustomConverter extends DozerConverter<Map, Map> {
+/**
+ * @author ActiveEon Team
+ * @since 18/10/2018
+ */
+public class ResultMapCustomConverter extends DozerConverter<Map, Map> {
 
-    private static final Logger logger = Logger.getLogger(StringPropagatedVariablesCustomConverter.class);
+    private static final Logger logger = Logger.getLogger(ResultMapCustomConverter.class);
 
-    public StringPropagatedVariablesCustomConverter() {
+    public ResultMapCustomConverter() {
         super(Map.class, Map.class);
     }
 
     @Override
     public Map convertTo(Map source, Map destination) {
-        return null;
+        if (source == null) {
+            return null;
+        }
+
+        Map<String, Serializable> converted = new HashMap<>();
+        for (Map.Entry<String, String> entry : ((Map<String, String>) source).entrySet()) {
+            try {
+                converted.put(entry.getKey(), ObjectByteConverter.base64StringToSerializable(entry.getValue()));
+            } catch (Exception e) {
+                logger.error("Error when serializing variables ", e);
+            }
+        }
+        return converted;
     }
 
     @Override
@@ -53,17 +70,11 @@ public class StringPropagatedVariablesCustomConverter extends DozerConverter<Map
             return null;
         }
         Map<String, String> converted = new HashMap<>();
-        for (Map.Entry<String, byte[]> entry : ((Map<String, byte[]>) source).entrySet()) {
+        for (Map.Entry<String, Serializable> entry : ((Map<String, Serializable>) source).entrySet()) {
             try {
-                Object valueAsObject = ObjectByteConverter.byteArrayToObject(entry.getValue());
-                if (valueAsObject != null) {
-                    converted.put(entry.getKey(), valueAsObject.toString());
-                } else if (entry.getValue() != null) {
-                    logger.debug("Could not convert " + entry.toString());
-                }
+                converted.put(entry.getKey(), ObjectByteConverter.serializableToBase64String(entry.getValue()));
             } catch (Exception e) {
                 logger.error("Error when converting variables to json", e);
-                return null;
             }
         }
         return converted;

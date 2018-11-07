@@ -33,11 +33,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 import org.apache.commons.codec.binary.Base64;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 
 
 /**
@@ -53,12 +55,11 @@ public final class ObjectByteConverter {
 
     /**
      * Convert the given Serializable Object into a byte array.
-     * 
+     *
      * @param obj the Serializable object to be compressed
      * @return a byteArray representing the Serialization of the given object.
-     * @throws IOException if an I/O exception occurs when writing the output byte array
      */
-    public static final byte[] objectToByteArray(Object obj) throws IOException {
+    public static final byte[] objectToByteArray(Object obj) {
         return objectToByteArray(obj, false);
     }
 
@@ -66,21 +67,17 @@ public final class ObjectByteConverter {
      * Convert the given Serializable Object into a byte array.
      * <p>
      * The returned byteArray can be compressed by setting compress boolean argument value to <code>true</code>.
-     * 
-     * @param obj the Serializable object to be compressed
+     *
+     * @param obj      the Serializable object to be compressed
      * @param compress true if the returned byteArray must be also compressed, false if no compression is required.
      * @return a compressed (or not) byteArray representing the Serialization of the given object.
-     * @throws IOException if an I/O exception occurs when writing the output byte array
      */
-    public static final byte[] objectToByteArray(Object obj, boolean compress) throws IOException {
-        ByteArrayOutputStream baos = null;
-        ObjectOutputStream oos = null;
+    public static final byte[] objectToByteArray(Object obj, boolean compress) {
         if (obj == null) {
             return null;
         }
-        try {
-            baos = new ByteArrayOutputStream();
-            oos = new ObjectOutputStream(baos);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos)) {
             oos.writeObject(obj);
             oos.flush();
             if (!compress) {
@@ -94,10 +91,9 @@ public final class ObjectByteConverter {
                 compressor.setInput(baos.toByteArray());
                 compressor.finish();
 
-                ByteArrayOutputStream bos = null;
-                try {
-                    // Create an expandable byte array to hold the compressed data.
-                    bos = new ByteArrayOutputStream();
+                // Create an expandable byte array to hold the compressed data.
+                try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+
                     // Compress the data
                     byte[] buf = new byte[512];
                     while (!compressor.finished()) {
@@ -106,31 +102,20 @@ public final class ObjectByteConverter {
                     }
                     // Return the COMPRESSED data
                     return bos.toByteArray();
-                } finally {
-                    if (bos != null) {
-                        bos.close();
-                    }
                 }
             }
-        } finally {
-            if (oos != null) {
-                oos.close();
-            }
-            if (baos != null) {
-                baos.close();
-            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not convert to byte array object ", e);
         }
     }
 
     /**
      * Convert the given byte array into the corresponding object.
-     * 
+     *
      * @param input the byteArray to be convert as an object.
      * @return the object corresponding to the given byteArray.
-     * @throws IOException if an I/O exception occurs when writing the returned object
-     * @throws ClassNotFoundException if class represented by given byteArray is not found.
      */
-    public static Object byteArrayToObject(byte[] input) throws IOException, ClassNotFoundException {
+    public static Object byteArrayToObject(byte[] input) {
         return byteArrayToObject(input, false);
     }
 
@@ -138,15 +123,12 @@ public final class ObjectByteConverter {
      * Convert the given byte array into the corresponding object.
      * <p>
      * The given byteArray can be uncompressed if it has been compressed before.
-     * 
-     * @param input the byteArray to be convert as an object.
+     *
+     * @param input      the byteArray to be convert as an object.
      * @param uncompress true if the given byteArray must be also uncompressed, false if no compression was made on it.
      * @return the object corresponding to the given byteArray.
-     * @throws IOException if an I/O exception occurs when writing the returned object
-     * @throws ClassNotFoundException if class represented by given byteArray is not found.
      */
-    public static Object byteArrayToObject(byte[] input, boolean uncompress)
-            throws IOException, ClassNotFoundException {
+    public static Object byteArrayToObject(byte[] input, boolean uncompress) {
         if (input == null) {
             return null;
         }
@@ -155,10 +137,8 @@ public final class ObjectByteConverter {
             Inflater decompressor = new Inflater();
             decompressor.setInput(input);
 
-            ByteArrayOutputStream bos = null;
-            try {
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
                 // Create an expandable byte array to hold the compressed data.
-                bos = new ByteArrayOutputStream();
                 // Compress the data
                 byte[] buf = new byte[512];
                 while (!decompressor.finished()) {
@@ -170,31 +150,21 @@ public final class ObjectByteConverter {
                 input = bos.toByteArray();
             } catch (DataFormatException dfe) {
                 //convert into io exception to fit previous behavior
-                throw new IOException("Compressed data format is invalid : " + dfe.getMessage(), dfe);
-            } finally {
-                if (bos != null) {
-                    bos.close();
-                }
+                throw new RuntimeException("Compressed data format is invalid : " + dfe.getMessage(), dfe);
+            } catch (IOException e) {
+                throw new RuntimeException("Could not convert to serialized object: " + e.getMessage(), e);
             }
         }
         //here, input byteArray is uncompressed if needed
-        ByteArrayInputStream bais = null;
-        ObjectInputStream ois = null;
-        try {
-            bais = new ByteArrayInputStream(input);
-            ois = new ObjectInputStream(bais);
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(input);
+                ObjectInputStream ois = new ObjectInputStream(bais)) {
             return ois.readObject();
-        } finally {
-            if (ois != null) {
-                ois.close();
-            }
-            if (bais != null) {
-                bais.close();
-            }
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Could not uncompress to byte array object: " + e.getMessage(), e);
         }
     }
 
-    public static String serializableToBase64String(Serializable input) throws IOException {
+    public static String serializableToBase64String(Serializable input) {
         return byteArrayToBase64String(objectToByteArray(input));
     }
 
@@ -212,7 +182,7 @@ public final class ObjectByteConverter {
         return Base64.decodeBase64(input);
     }
 
-    public static Serializable base64StringToSerializable(String input) throws IOException, ClassNotFoundException {
+    public static Serializable base64StringToSerializable(String input) {
         if (input == null) {
             return null;
         }
@@ -224,21 +194,49 @@ public final class ObjectByteConverter {
             return null;
         }
         HashMap<String, byte[]> answer = new HashMap<>(input.size());
-        for (Map.Entry<String, String> entry : input.entrySet()) {
-            answer.put(entry.getKey(), base64StringToByteArray(entry.getValue()));
-        }
+        input.forEach((key, value) -> {
+            answer.put(key, base64StringToByteArray(value));
+        });
         return answer;
     }
 
-    public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input)
-            throws IOException, ClassNotFoundException {
+    public static Map<String, Serializable> mapOfBase64StringToSerializable(Map<String, String> input) {
         if (input == null) {
             return null;
         }
         HashMap<String, Serializable> answer = new HashMap<>(input.size());
-        for (Map.Entry<String, byte[]> entry : input.entrySet()) {
-            answer.put(entry.getKey(), (Serializable) byteArrayToObject(entry.getValue()));
+        input.forEach((key, value) -> {
+            answer.put(key, base64StringToSerializable(value));
+        });
+        return answer;
+
+    }
+
+    public static Map<String, Serializable> mapOfByteArrayToSerializable(Map<String, byte[]> input) {
+        if (input == null) {
+            return null;
         }
+
+        HashMap<String, Serializable> answer = new HashMap<>(input.size());
+        input.forEach((key, value) -> {
+            answer.put(key, (Serializable) byteArrayToObject(value));
+        });
+        return answer;
+
+    }
+
+    public static Map<String, byte[]> mapOfSerializableToByteArray(Map<String, Serializable> input) {
+        if (input == null) {
+            return null;
+        }
+        HashMap<String, byte[]> answer = new HashMap<>(input.size());
+        input.forEach((key, value) -> {
+            try {
+                answer.put(key, ObjectToByteConverter.ObjectStream.convert(value));
+            } catch (IOException e) {
+                throw new RuntimeException("Error when converting variables to byte array ", e);
+            }
+        });
         return answer;
     }
 

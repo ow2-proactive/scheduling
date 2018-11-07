@@ -27,13 +27,13 @@ package functionaltests;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
 import static functionaltests.jobs.SimpleJob.TEST_JOB;
+import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -78,6 +78,7 @@ import org.ow2.proactive.utils.ObjectByteConverter;
 import com.google.common.io.Files;
 
 import functionaltests.jobs.ErrorTask;
+import functionaltests.jobs.JobResultTask;
 import functionaltests.jobs.LogTask;
 import functionaltests.jobs.MetadataTask;
 import functionaltests.jobs.NonTerminatingJob;
@@ -120,7 +121,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testDisconnect() throws Exception {
         ISchedulerClient client = clientInstance();
         client.disconnect();
-        Assert.assertFalse(client.isConnected());
+        assertFalse(client.isConnected());
         client = clientInstance();
         Assert.assertTrue(client.isConnected());
 
@@ -133,6 +134,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         JobId jobId = submitJob(job, client);
         // should return immediately
         client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void getResultMap() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = createJob(JobResultTask.class);
+        JobId jobId = client.submit(job);
+        final JobResult jobResult = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(2000));
+        assertFalse(jobResult.getResultMap().isEmpty());
+        Assert.assertEquals(jobResult.getResultMap().get("myvar"), "myvalue");
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -163,7 +174,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
         JobState jobState = client.getJobState(jobId.value());
         JobStatus status = jobState.getStatus();
-        Assert.assertFalse(status.isJobAlive());
+        assertFalse(status.isJobAlive());
         Assert.assertEquals(JobStatus.FINISHED, status);
 
         checkJobInfo(jobState.getJobInfo());
