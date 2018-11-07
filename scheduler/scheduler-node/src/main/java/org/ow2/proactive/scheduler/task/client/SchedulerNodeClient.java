@@ -549,7 +549,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     @Override
     public boolean isConnected() {
-        return client.isConnected();
+        try {
+            renewSession();
+            return client.isConnected();
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override

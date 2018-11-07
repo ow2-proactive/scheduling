@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.task.dataspaces.FileSystemException;
@@ -67,7 +68,7 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
     }
 
     /**
-     * Initialize dataSpaceClient and spaceProxy when connect is called. This late initialization will garantee
+     * Initialize dataSpaceClient and spaceProxy when connect is called. This late initialization will guarantee
      * that this object upon restore (from a Serialized source) will be able to reconstruct the needed objects
      * to work properly.
      */
@@ -102,17 +103,17 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
     /**
      * Connects to the dataspace at the default schedulerRestUrl, using the current user credentials
      *
-     * @throws Exception FileSystemException as required by @see RemoteSpace interface.
+     * @throws Exception if any error occurs during the connection.
      */
     public void connect() throws Exception {
         connect(schedulerRestUrl);
     }
 
     /**
-     * Connects to the dataspace at the specified schedulerRestUrl, using the current user credentials
+     * Connects to the server at the specified schedulerRestUrl, using the current user credentials
      *
      * @param url schedulerRestUrl of the scheduler
-     * @throws Exception
+     * @throws Exception if any error occurs during the connection
      */
     public void connect(String url) throws Exception {
         lazyInit();
@@ -120,9 +121,64 @@ public class DataSpaceNodeClient implements RemoteSpace, Serializable {
         this.dataSpaceClient.init(url, schedulerNodeClient);
     }
 
-    private void renewSession() throws FileSystemException {
+    /**
+     * Disconnect from the server
+     *
+     * @throws NotConnectedException if the current session is not connected
+     * @throws PermissionException in case of permission issue
+     */
+    public void disconnect() throws NotConnectedException, PermissionException {
+        renewSession();
+        schedulerNodeClient.disconnect();
+    }
+
+    /**
+     * Check connection with the server
+     *
+     * return true if the current session is connected, false otherwise
+     */
+    public boolean isConnected() {
+        try {
+            renewSession();
+            return schedulerNodeClient.isConnected();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns the connection info, if initialized previously
+     * @return the connection info
+     */
+    public ConnectionInfo getConnectionInfo() {
+        return schedulerNodeClient.getConnectionInfo();
+    }
+
+    /**
+     * Sets the session identifier explicitly. This might run on an uninitialized
+     * client.
+     *
+     * @param sid session identifier
+     */
+    public void setSession(String sid) {
+        schedulerNodeClient.setSession(sid);
+    }
+
+    /**
+     * Retrieves the current session identifier, or null if the session was not initialized yet.
+     *
+     * @return the current session identifier if initialize, null otherwise
+     */
+    public String getSession() {
+        return schedulerNodeClient.getSession();
+    }
+
+    /**
+     * To renew the current server session.
+     */
+    public void renewSession() {
         if (!isInitialized())
-            throw new FileSystemException("Client not connected, call connect() before using the scheduler client");
+            lazyInit();
         try {
             schedulerNodeClient.renewSession();
         } catch (NotConnectedException e) {
