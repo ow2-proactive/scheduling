@@ -29,6 +29,8 @@ import java.io.File;
 import java.net.BindException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -120,12 +122,11 @@ public class JettyStarter {
             HandlerList handlerList = new HandlerList();
 
             if (WebProperties.JETTY_LOG_FILE.isSet()) {
-                String pathToJettyLogFile = FileStorageSupportFactory
-                        .relativeToHomeIfNotAbsolute(WebProperties.JETTY_LOG_FILE.getValueAsString());
+                String pathToJettyLogFile = FileStorageSupportFactory.relativeToHomeIfNotAbsolute(WebProperties.JETTY_LOG_FILE.getValueAsString());
                 File jettyLogFile = new File(pathToJettyLogFile);
                 if (!jettyLogFile.getParentFile().exists() && !jettyLogFile.getParentFile().mkdirs()) {
                     logger.error("Could not create jetty log file in: " +
-                        WebProperties.JETTY_LOG_FILE.getValueAsString());
+                                 WebProperties.JETTY_LOG_FILE.getValueAsString());
                 } else {
                     NCSARequestLog requestLog = new NCSARequestLog(pathToJettyLogFile);
                     requestLog.setAppend(true);
@@ -166,8 +167,7 @@ public class JettyStarter {
         return 8080;
     }
 
-    public Server createHttpServer(int httpPort, int httpsPort, boolean httpsEnabled,
-            boolean redirectHttpToHttps) {
+    public Server createHttpServer(int httpPort, int httpsPort, boolean httpsEnabled, boolean redirectHttpToHttps) {
 
         int maxThreads = 100;
         if (WebProperties.WEB_MAX_THREADS.isSet()) {
@@ -195,11 +195,9 @@ public class JettyStarter {
             sslContextFactory.setKeyStorePath(absolutePathOrRelativeToSchedulerHome(httpsKeystore));
             sslContextFactory.setKeyStorePassword(httpsKeystorePassword);
 
-            if (WebProperties.WEB_HTTPS_TRUSTSTORE.isSet() &&
-                WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.isSet()) {
+            if (WebProperties.WEB_HTTPS_TRUSTSTORE.isSet() && WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.isSet()) {
                 String httpsTrustStore = WebProperties.WEB_HTTPS_TRUSTSTORE.getValueAsString();
-                String httpsTrustStorePassword = WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD
-                        .getValueAsString();
+                String httpsTrustStorePassword = WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.getValueAsString();
                 sslContextFactory.setTrustStorePath(httpsTrustStore);
                 sslContextFactory.setTrustStorePassword(httpsTrustStorePassword);
             }
@@ -213,8 +211,9 @@ public class JettyStarter {
 
             // Connector to listen for HTTPS requests
             ServerConnector httpsConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.toString()),
-                new HttpConnectionFactory(secureHttpConfiguration));
+                                                                 new SslConnectionFactory(sslContextFactory,
+                                                                                          HttpVersion.HTTP_1_1.toString()),
+                                                                 new HttpConnectionFactory(secureHttpConfiguration));
             httpsConnector.setName(HTTPS_CONNECTOR_NAME);
             httpsConnector.setPort(httpsPort);
             httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
@@ -249,8 +248,7 @@ public class JettyStarter {
         }
     }
 
-    private ServerConnector createHttpConnector(Server server, HttpConfiguration httpConfiguration,
-            int httpPort) {
+    private ServerConnector createHttpConnector(Server server, HttpConfiguration httpConfiguration, int httpPort) {
         ServerConnector httpConnector = new ServerConnector(server);
         httpConnector.addConnectionFactory(new HttpConnectionFactory(httpConfiguration));
         httpConnector.setName(HTTP_CONNECTOR_NAME);
@@ -272,8 +270,7 @@ public class JettyStarter {
                 }
             }
         } catch (BindException bindException) {
-            logger.error("Failed to start web applications. Port " + restPort + " is already used",
-                    bindException);
+            logger.error("Failed to start web applications. Port " + restPort + " is already used", bindException);
             System.exit(2);
         } catch (Exception e) {
             logger.error("Failed to start web applications", e);
@@ -301,41 +298,47 @@ public class JettyStarter {
                 Throwable startException = webAppContext.getUnavailableException();
                 if (startException == null) {
                     if (!"/".equals(webAppContext.getContextPath())) {
-                        String applicationUrl = getApplicationUrl(httpProtocol, schedulerHost, restPort,
-                                webAppContext);
+                        String applicationUrl = getApplicationUrl(httpProtocol, schedulerHost, restPort, webAppContext);
                         applicationsUrls.add(applicationUrl);
                         logger.info("The web application " + webAppContext.getContextPath() + " created on " +
-                            applicationUrl);
+                                    applicationUrl);
                     }
                 } else {
                     logger.warn("Failed to start context " + webAppContext.getContextPath(), startException);
                 }
             }
-            logger.info(
-                    "*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort + " ***");
+            logger.info("*** Get started at " + httpProtocol + "://" + schedulerHost + ":" + restPort + " ***");
         }
         return applicationsUrls;
     }
 
     private void addWarsToHandlerList(HandlerList handlerList, String[] virtualHost) {
 
-        List<String> highPriorityServices = PASchedulerProperties.HIGH_PRIORITY_WAR_SERVICES
-                .getValueAsList(",");
+        List<String> highPriorityServices = PASchedulerProperties.HIGH_PRIORITY_WAR_SERVICES.getValueAsList(",");
 
         File warFolder = new File(getSchedulerHome() + FOLDER_TO_DEPLOY);
-        List<File> warFolderContent = Lists
-                .newArrayList(warFolder.listFiles((dir, name) -> !"getstarted".equals(name)));
+        List<File> warFolderContent = Lists.newArrayList(warFolder.listFiles((dir,
+                name) -> !"getstarted".equals(name)));
+        Map<String, File> fileMap = warFolderContent.stream()
+                                                    .collect(Collectors.toMap(file -> FilenameUtils.getBaseName(file.getName())
+                                                                                                   .toLowerCase(),
+                                                                              file -> file));
 
-        if (warFolderContent != null) {
+        if (!warFolderContent.isEmpty()) {
 
-            warFolderContent.stream()
-                    .filter(fileToDeploy -> highPriorityServices.contains(fileToDeploy.getName()))
-                    .forEachOrdered(fileToDeploy -> addWebApp(handlerList, virtualHost, fileToDeploy));
+            highPriorityServices.stream()
+                                .map(String::toLowerCase)
+                                .filter(fileMap::containsKey)
+                                .forEach(priorityServiceName -> {
+                                    logger.debug("Add high priority service: " + priorityServiceName);
+                                    addWebApp(handlerList, virtualHost, fileMap.get(priorityServiceName));
+                                    fileMap.remove(priorityServiceName);
+                                });
 
-            warFolderContent.stream()
-                    .filter(fileToDeploy -> !highPriorityServices.contains(fileToDeploy.getName()))
-                    .forEachOrdered(fileToDeploy -> addWebApp(handlerList, virtualHost, fileToDeploy));
-
+            fileMap.values().forEach(notPriorityService -> {
+                logger.debug("Add low priority service: " + notPriorityService.getName());
+                addWebApp(handlerList, virtualHost, notPriorityService);
+            });
         }
 
         addGetStartedApplication(handlerList, new File(warFolder, "getstarted"), virtualHost);

@@ -287,15 +287,19 @@ public enum PASchedulerProperties implements PACommonProperties {
     //    LOGS_MAX_SIZE("pa.scheduler.logs.maxsize", PropertyType.INTEGER),
 
     // Define the logging format pattern of tasks on the scheduler
-    SCHEDULER_JOB_LOGS_PATTERN("pa.scheduler.job.task.output.logs.pattern", PropertyType.STRING,
+    SCHEDULER_JOB_LOGS_PATTERN(
+            "pa.scheduler.job.task.output.logs.pattern",
+            PropertyType.STRING,
             "[%X{job.id}t%X{task.id}@%X{host};%d{HH:mm:ss}] %m %n"),
 
     /** Defines the cron expression for the db sizes polling */
     SCHEDULER_MEM_MONITORING_FREQ("pa.scheduler.mem.monitoring.freq", PropertyType.STRING),
 
     // Define verbosity of job description when submitted
-    SCHEDULER_JOB_SUBMISSION_DETAILED_LOGGING("pa.scheduler.job.submission.detailed.logging",
-            PropertyType.BOOLEAN, "true"),
+    SCHEDULER_JOB_SUBMISSION_DETAILED_LOGGING(
+            "pa.scheduler.job.submission.detailed.logging",
+            PropertyType.BOOLEAN,
+            "true"),
 
     /* ***************************************************************** */
     /* ************************ OTHER PROPERTIES *********************** */
@@ -315,7 +319,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     CATALOG_REST_URL("pa.catalog.rest.url", PropertyType.STRING),
 
     /** Comma separated string representing the war services to start first when starting the Proactive scheduler, ordered by priority.  */
-    HIGH_PRIORITY_WAR_SERVICES("pa.high.priority.war.services", PropertyType.LIST, "scheduling-api,scheduling-api.war"),
+    HIGH_PRIORITY_WAR_SERVICES("pa.high.priority.war.services", PropertyType.LIST, "scheduling-api"),
 
     /* ***************************************************************** */
     /* ************************** RM PROPERTIES ************************ */
@@ -357,31 +361,33 @@ public enum PASchedulerProperties implements PACommonProperties {
      */
     SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING),
 
-    SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR("pa.scheduler.db.transactions.damping.factor",
-            PropertyType.INTEGER, "2"),
+    SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR("pa.scheduler.db.transactions.damping.factor", PropertyType.INTEGER, "2"),
 
-    SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES("pa.scheduler.db.transactions.maximum.retries",
-            PropertyType.INTEGER, "5"),
+    SCHEDULER_DB_TRANSACTION_MAXIMUM_RETRIES("pa.scheduler.db.transactions.maximum.retries", PropertyType.INTEGER, "5"),
 
-    SCHEDULER_DB_TRANSACTION_SLEEP_DELAY("pa.scheduler.db.transactions.sleep.delay", PropertyType.INTEGER,
-            "1000"),
+    SCHEDULER_DB_TRANSACTION_SLEEP_DELAY("pa.scheduler.db.transactions.sleep.delay", PropertyType.INTEGER, "1000"),
 
-    SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE("pa.scheduler.db.recovery.load.jobs.batch_size",
-            PropertyType.INTEGER, "100"),
+    SCHEDULER_DB_RECOVERY_LOAD_JOBS_BATCH_SIZE(
+            "pa.scheduler.db.recovery.load.jobs.batch_size",
+            PropertyType.INTEGER,
+            "100"),
 
-    SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE("pa.scheduler.db.fetch.batch_size", PropertyType.INTEGER,
-            "50"),
+    SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE("pa.scheduler.db.fetch.batch_size", PropertyType.INTEGER, "50"),
 
     /* ***************************************************************** */
     /* ***************** EMAIL NOTIFICATION PROPERTIES ***************** */
     /* ***************************************************************** */
 
-    EMAIL_NOTIFICATIONS_CONFIGURATION("pa.scheduler.notification.email.configuration", PropertyType.STRING,
+    EMAIL_NOTIFICATIONS_CONFIGURATION(
+            "pa.scheduler.notification.email.configuration",
+            PropertyType.STRING,
             "config/scheduler/emailnotification.properties"),
 
     EMAIL_NOTIFICATIONS_ENABLED("pa.scheduler.notifications.email.enabled", PropertyType.BOOLEAN, "false"),
 
-    EMAIL_NOTIFICATIONS_SENDER_ADDRESS("pa.scheduler.notifications.email.from", PropertyType.STRING,
+    EMAIL_NOTIFICATIONS_SENDER_ADDRESS(
+            "pa.scheduler.notifications.email.from",
+            PropertyType.STRING,
             "example@username.com"),
 
     /* ***************************************************************** */
@@ -401,7 +407,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /* ******************* PORTAL DISPLAY PROPERTIES ******************* */
     /* ***************************************************************** */
 
-    SCHEDULER_PORTAL_CONFIGURATION("pa.scheduler.portal.configuration", PropertyType.STRING,
+    SCHEDULER_PORTAL_CONFIGURATION(
+            "pa.scheduler.portal.configuration",
+            PropertyType.STRING,
             "config/portal/scheduler-portal-display.conf");
 
     /* ***************************************************************************** */
@@ -484,14 +492,17 @@ public enum PASchedulerProperties implements PACommonProperties {
      * @param filename the file containing the properties to be loaded.
      */
     public static void loadProperties(String filename) {
-        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key, PA_SCHEDULER_PROPERTIES_FILEPATH,
-            PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH, filename);
+        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key,
+                                                      PA_SCHEDULER_PROPERTIES_FILEPATH,
+                                                      PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH,
+                                                      filename);
         propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
     }
 
     public static synchronized void load() {
-        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key, PA_SCHEDULER_PROPERTIES_FILEPATH,
-            PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
+        propertiesLoader = new PAPropertiesLazyLoader(SCHEDULER_HOME.key,
+                                                      PA_SCHEDULER_PROPERTIES_FILEPATH,
+                                                      PA_SCHEDULER_PROPERTIES_RELATIVE_FILEPATH);
         propertiesHelper = new PACommonPropertiesHelper(propertiesLoader);
     }
 
