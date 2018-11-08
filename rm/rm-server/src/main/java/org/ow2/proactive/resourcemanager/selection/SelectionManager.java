@@ -561,7 +561,8 @@ public abstract class SelectionManager {
             final Map<String, Serializable> bindings) {
         // TODO: add a specific timeout for script execution
         final long timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
-        final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
+        final List<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
+        final List<String> scriptHosts = new ArrayList<>(nodes.size());
 
         // Execute the script on each selected node
         for (final RMNode node : nodes) {
@@ -587,6 +588,7 @@ public abstract class SelectionManager {
                     return "executing script on " + node.getNodeURL();
                 }
             });
+            scriptHosts.add(node.getHostName());
         }
 
         // Invoke all Callables and get the list of futures
@@ -601,10 +603,9 @@ public abstract class SelectionManager {
         final List<ScriptResult<T>> results = new LinkedList<>();
 
         int index = 0;
-        // waiting for the results
         for (final Future<ScriptResult<T>> future : futures) {
-            final String description = scriptExecutors.get(index++).toString();
-            ScriptResult<T> result = null;
+            final String description = scriptExecutors.get(index).toString();
+            ScriptResult<T> result;
             try {
                 result = future.get();
             } catch (CancellationException e) {
@@ -619,6 +620,7 @@ public abstract class SelectionManager {
                                                                 rex));
             }
             results.add(result);
+            index++;
         }
 
         return results;

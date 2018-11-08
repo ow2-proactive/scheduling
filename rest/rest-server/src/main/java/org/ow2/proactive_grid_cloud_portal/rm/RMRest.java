@@ -38,6 +38,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -72,6 +73,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.jboss.resteasy.annotations.providers.multipart.PartType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -876,20 +878,41 @@ public class RMRest implements RMRestInterface {
     public ScriptResult<Object> executeNodeScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeurl") String nodeUrl, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
+
         RMProxyUserInterface rm = checkAccess(sessionId);
-        return executeScriptAndGetResult(nodeUrl, script, scriptEngine, rm, TargetType.NODE_URL.name());
+
+        List<ScriptResult<Object>> results = rm.executeScript(script,
+                                                              scriptEngine,
+                                                              TargetType.NODE_URL.name(),
+                                                              Collections.singleton(nodeUrl));
+        checkEmptyScriptResults(results);
+
+        return results.get(0);
     }
 
     @Override
     @POST
-    @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
-    public ScriptResult<Object> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
+    public List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodesource") String nodeSource, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
         RMProxyUserInterface rm = checkAccess(sessionId);
-        return executeScriptAndGetResult(nodeSource, script, scriptEngine, rm, TargetType.NODESOURCE_NAME.name());
+
+        List<ScriptResult<Object>> results = rm.executeScript(script,
+                                                              scriptEngine,
+                                                              TargetType.NODESOURCE_NAME.name(),
+                                                              Collections.singleton(nodeSource));
+        checkEmptyScriptResults(results);
+
+        ScriptResult<Object> objectScriptResult = new ScriptResult<>();
+        objectScriptResult.setOutput("tata");
+        ScriptResult<Object> objectScriptResult1 = new ScriptResult<>();
+        objectScriptResult1.setOutput("tati");
+        List<ScriptResult<Object>> res = new LinkedList<>();
+        res.add(objectScriptResult);
+        res.add(objectScriptResult1);
+        return res;
     }
 
     @Override
@@ -898,19 +921,17 @@ public class RMRest implements RMRestInterface {
     @Path("host/script")
     @Produces("application/json")
     public ScriptResult<Object> executeHostScript(@HeaderParam("sessionid") String sessionId,
-            @FormParam("host") String host, @FormParam("script") String script,
+            @FormParam("host") String hostname, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
-        RMProxyUserInterface rm = checkAccess(sessionId);
-        return executeScriptAndGetResult(host, script, scriptEngine, rm, TargetType.HOSTNAME.name());
-    }
 
-    private ScriptResult<Object> executeScriptAndGetResult(String targetId, String script, String scriptEngine,
-            RMProxyUserInterface rm, String targetType) {
+        RMProxyUserInterface rm = checkAccess(sessionId);
+
         List<ScriptResult<Object>> results = rm.executeScript(script,
                                                               scriptEngine,
-                                                              targetType,
-                                                              Collections.singleton(targetId));
+                                                              TargetType.HOSTNAME.name(),
+                                                              Collections.singleton(hostname));
         checkEmptyScriptResults(results);
+
         return results.get(0);
     }
 

@@ -2806,23 +2806,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 for (String target : targets) {
                     NodeSource nodeSource = this.deployedNodeSources.get(target);
                     if (nodeSource != null) {
-                        RMNode selectedRMNode = this.allNodes.values()
-                                                             .stream()
-                                                             .filter(candidateNode -> candidateNode.getNodeSource()
-                                                                                                   .equals(nodeSource))
-                                                             .filter(candidateNode -> !candidateNode.isBusy())
-                                                             .findAny()
-                                                             .orElse(this.allNodes.values()
-                                                                                  .stream()
-                                                                                  .filter(candidateNode -> candidateNode.getNodeSource()
-                                                                                                                        .equals(nodeSource))
-                                                                                  .findAny()
-                                                                                  .orElseThrow(() -> new IllegalArgumentException("Cannot execute script on " +
-                                                                                                                                  target +
-                                                                                                                                  ". Node source " +
-                                                                                                                                  nodeSource.getName() +
-                                                                                                                                  " has no node.")));
-                        this.selectCandidateNode(selectedRMNodes, selectedRMNode);
+                        Set<String> scriptExecutionHostNames = new HashSet<>();
+                        for (RMNode candidateNode : this.allNodes.values()) {
+                            String candidateNodeHostName = candidateNode.getHostName();
+                            if (candidateNode.getNodeSource().equals(nodeSource) &&
+                                !scriptExecutionHostNames.contains(candidateNodeHostName)) {
+                                scriptExecutionHostNames.add(candidateNodeHostName);
+                                this.selectCandidateNode(selectedRMNodes, candidateNode);
+                            }
+                        }
                     }
                 }
                 break;

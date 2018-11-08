@@ -698,10 +698,9 @@ public interface RMRestInterface {
             @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
     @POST
-    @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
-    ScriptResult<Object> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
+    List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodesource") String nodeSource, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable;
 
