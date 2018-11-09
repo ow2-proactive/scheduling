@@ -903,16 +903,18 @@ public class RMRest implements RMRestInterface {
                                                               scriptEngine,
                                                               TargetType.NODESOURCE_NAME.name(),
                                                               Collections.singleton(nodeSource));
+
+        List<ScriptResult<Object>> resultsCopy = new LinkedList<>();
+        for (ScriptResult result : results) {
+            ScriptResult<Object> resultCopy = new ScriptResult<>(result.getResult(), result.getException());
+            resultCopy.setOutput(result.getOutput());
+            resultCopy.setHostname(result.getHostname());
+            resultsCopy.add(resultCopy);
+        }
+
         checkEmptyScriptResults(results);
 
-        ScriptResult<Object> objectScriptResult = new ScriptResult<>();
-        objectScriptResult.setOutput("tata");
-        ScriptResult<Object> objectScriptResult1 = new ScriptResult<>();
-        objectScriptResult1.setOutput("tati");
-        List<ScriptResult<Object>> res = new LinkedList<>();
-        res.add(objectScriptResult);
-        res.add(objectScriptResult1);
-        return res;
+        return resultsCopy;
     }
 
     @Override
