@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.rest.data;
 
 import static org.ow2.proactive.scheduler.task.TaskIdImpl.createTaskId;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,7 +122,7 @@ public class DataUtility {
         return new JobStateImpl(d);
     }
 
-    public static JobResult toJobResult(JobResultData d) {
+    public static JobResult toJobResult(JobResultData d) throws IOException, ClassNotFoundException {
         return new JobResultImpl(d);
     }
 

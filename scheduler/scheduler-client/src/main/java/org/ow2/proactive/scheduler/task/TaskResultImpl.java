@@ -71,6 +71,8 @@ public class TaskResultImpl implements TaskResult {
     /** The value of the result if no exception occurred */
     private transient Serializable value = null;
 
+    private Map<String, Serializable> resultMap = new HashMap<>();
+
     private Map<String, String> metadata = new HashMap<>();
 
     /** The exception thrown by the task as a byte array */
@@ -486,4 +488,14 @@ public class TaskResultImpl implements TaskResult {
     public boolean isRaw() {
         return isRaw;
     }
+
+    @Override
+    public Map<String, Serializable> getResultMap() {
+        return resultMap;
+    }
+
+    public void setResultMap(Map<String, Serializable> resultMap) {
+        this.resultMap = resultMap;
+    }
+
 }

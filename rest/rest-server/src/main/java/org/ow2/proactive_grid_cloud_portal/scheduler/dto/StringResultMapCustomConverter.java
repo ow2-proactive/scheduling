@@ -25,19 +25,23 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dozer.DozerConverter;
-import org.ow2.proactive.utils.ObjectByteConverter;
 
 
-public class StringPropagatedVariablesCustomConverter extends DozerConverter<Map, Map> {
+/**
+ * @author ActiveEon Team
+ * @since 18/10/2018
+ */
+public class StringResultMapCustomConverter extends DozerConverter<Map, Map> {
 
-    private static final Logger logger = Logger.getLogger(StringPropagatedVariablesCustomConverter.class);
+    private static final Logger logger = Logger.getLogger(StringResultMapCustomConverter.class);
 
-    public StringPropagatedVariablesCustomConverter() {
+    public StringResultMapCustomConverter() {
         super(Map.class, Map.class);
     }
 
@@ -53,18 +57,11 @@ public class StringPropagatedVariablesCustomConverter extends DozerConverter<Map
             return null;
         }
         Map<String, String> converted = new HashMap<>();
-        for (Map.Entry<String, byte[]> entry : ((Map<String, byte[]>) source).entrySet()) {
-            try {
-                Object valueAsObject = ObjectByteConverter.byteArrayToObject(entry.getValue());
-                if (valueAsObject != null) {
-                    converted.put(entry.getKey(), valueAsObject.toString());
-                } else if (entry.getValue() != null) {
-                    logger.debug("Could not convert " + entry.toString());
-                }
-            } catch (Exception e) {
-                logger.error("Error when converting variables to json", e);
-                return null;
+        for (Map.Entry<String, Serializable> entry : ((Map<String, Serializable>) source).entrySet()) {
+            if (entry.getValue() != null) {
+                converted.put(entry.getKey(), entry.getValue().toString());
             }
+
         }
         return converted;
     }

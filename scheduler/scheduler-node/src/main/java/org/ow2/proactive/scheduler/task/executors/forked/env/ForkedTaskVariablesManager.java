@@ -65,10 +65,11 @@ public class ForkedTaskVariablesManager implements Serializable {
     }
 
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext, VariablesMap variables,
-            Map<String, String> thirdPartyCredentials, SchedulerNodeClient client, RemoteSpace userSpaceClient,
-            RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
+            Map<String, Serializable> resultMap, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client,
+            RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
+        scriptHandler.addBinding(SchedulerConstants.RESULT_MAP_BINDING_NAME, resultMap);
         scriptHandler.addBinding(SchedulerConstants.GENERIC_INFO_BINDING_NAME,
                                  taskContext.getInitializer().getGenericInformation());
 

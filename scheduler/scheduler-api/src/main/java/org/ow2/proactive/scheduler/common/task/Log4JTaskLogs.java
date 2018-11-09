@@ -177,7 +177,7 @@ public class Log4JTaskLogs implements TaskLogs {
         if (this.serializedAllEvents == null) {
             try {
                 this.serializedAllEvents = ObjectByteConverter.objectToByteArray(this.allEvents, true);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 //create a log4j event with e inside
                 LoggingEvent logError = new LoggingEvent(loggerName,
                                                          Logger.getLogger(loggerName),
@@ -189,7 +189,7 @@ public class Log4JTaskLogs implements TaskLogs {
                 errorEvent.add(logError);
                 try {
                     this.serializedAllEvents = ObjectByteConverter.objectToByteArray(errorEvent, true);
-                } catch (IOException e1) {
+                } catch (Exception e1) {
                     Logger.getLogger(Log4JTaskLogs.class).error("Could not convert to serialized events", e1);
                 }
             }

@@ -96,6 +96,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.utils.FileToBytesConverter;
+import org.ow2.proactive.utils.ObjectByteConverter;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -971,7 +972,6 @@ public class SchedulerDBManager {
             long jobId = jobId(job);
 
             JobInfo jobInfo = job.getJobInfo();
-
             session.getNamedQuery("updateJobDataAfterWorkflowTaskFinished")
                    .setParameter("status", jobInfo.getStatus())
                    .setParameter("finishedTime", jobInfo.getFinishedTime())
@@ -983,6 +983,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("totalNumberOfTasks", jobInfo.getTotalNumberOfTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
+                   .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
@@ -1052,19 +1053,21 @@ public class SchedulerDBManager {
             long jobId = jobId(job);
 
             JobInfo jobInfo = job.getJobInfo();
-
-            final int updateJob = session.getNamedQuery("updateJobDataAfterTaskFinished")
-                                         .setParameter("status", jobInfo.getStatus())
-                                         .setParameter("finishedTime", jobInfo.getFinishedTime())
-                                         .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
-                                         .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
-                                         .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
-                                         .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
-                                         .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
-                                         .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
-                                         .setParameter("lastUpdatedTime", new Date().getTime())
-                                         .setParameter("jobId", jobId)
-                                         .executeUpdate();
+            int updateJob = 0;
+            updateJob = session.getNamedQuery("updateJobDataAfterTaskFinished")
+                               .setParameter("status", jobInfo.getStatus())
+                               .setParameter("finishedTime", jobInfo.getFinishedTime())
+                               .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
+                               .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
+                               .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                               .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                               .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                               .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                               .setParameter("lastUpdatedTime", new Date().getTime())
+                               .setParameter("resultMap",
+                                             ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                               .setParameter("jobId", jobId)
+                               .executeUpdate();
 
             final int notReStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
                                                          " where task.jobData.id = :jobId and task.taskStatus in :taskStatuses ")
@@ -1295,6 +1298,7 @@ public class SchedulerDBManager {
                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
                    .setParameter("lastUpdatedTime", new Date().getTime())
+                   .setParameter("resultMap", ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
@@ -1429,6 +1433,12 @@ public class SchedulerDBManager {
         JobResultImpl jobResult = new JobResultImpl();
         jobResult.setJobInfo(job.createJobInfo(jobId));
 
+        try {
+            jobResult.getResultMap().putAll(ObjectByteConverter.mapOfByteArrayToSerializable(job.getResultMap()));
+        } catch (Exception e) {
+            logger.error("error ", e);
+        }
+
         DBTaskId currentTaskId = null;
 
         List<Object[]> resultList = (List<Object[]>) query.list();
@@ -1487,6 +1497,7 @@ public class SchedulerDBManager {
     /**
      * Load all task results associated with the given job id and task name
      * When a task is executed several times (several attempts), all attempts are stored in the database.
+     *
      * @param jobId    job id
      * @param taskName task name
      * @return a list of task results
@@ -1519,6 +1530,7 @@ public class SchedulerDBManager {
     /**
      * Load all task results associated with the given task id
      * When a task is executed several times (several attempts), all attempts are stored in the database.
+     *
      * @param taskId task id
      * @return a list of task results
      */
