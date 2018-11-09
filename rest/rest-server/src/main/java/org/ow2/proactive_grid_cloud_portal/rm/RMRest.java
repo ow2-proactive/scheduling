@@ -892,6 +892,7 @@ public class RMRest implements RMRestInterface {
 
     @Override
     @POST
+    @GZIP
     @Path("nodesource/script")
     @Produces("application/json")
     public List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
