@@ -57,6 +57,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
+import org.hibernate.type.StandardBasicTypes;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil.HybridEncryptedData;
 import org.ow2.proactive.db.DatabaseManagerException;
@@ -658,6 +659,7 @@ public class SchedulerDBManager {
             Query query = session.createSQLQuery("select ID from JOB_DATA where " +
                                                  "SCHEDULED_TIME_FOR_REMOVAL <> 0 and " +
                                                  "SCHEDULED_TIME_FOR_REMOVAL < :timeLimit")
+                                 .addScalar("ID", StandardBasicTypes.LONG)
                                  .setParameter("timeLimit", time);
             return ((List<Long>) query.list()).stream()
                                               .map(Object::toString)
