@@ -619,6 +619,7 @@ public abstract class SelectionManager {
                 result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description,
                                                                 rex));
             }
+            result.setHostname(scriptHosts.get(index));
             results.add(result);
             index++;
         }
