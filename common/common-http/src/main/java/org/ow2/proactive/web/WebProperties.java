@@ -92,7 +92,13 @@ public enum WebProperties implements PACommonProperties {
 
     WAR_WRAPPER_CONTEXT_ROOT("war.wrapper.context.root", PropertyType.STRING, "/"),
 
-    JETTY_LOG_FILE("jetty.log.file", PropertyType.STRING);
+    JETTY_LOG_FILE("jetty.log.file", PropertyType.STRING),
+
+    /** session cleaning period in seconds **/
+    SESSION_CLEANING_PERIOD("session.cleaning.period", PropertyType.INTEGER, "300"),
+
+    /** session timeout in seconds **/
+    SESSION_TIMEOUT("session.timeout", PropertyType.INTEGER, "3600");
 
     public static final String PA_WEB_PROPERTIES_FILEPATH_PROPERTY_NAME = "pa.portal.configuration.filepath";
 
