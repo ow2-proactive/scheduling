@@ -64,6 +64,10 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         this(pathname, null, null);
     }
 
+    public SubmitJobCommand(String pathname, String variables) {
+        this(pathname, variables, null);
+    }
+
     public SubmitJobCommand(String pathname, String variables, String genericInfos) {
         this.pathname = pathname;
         this.variables = variables;

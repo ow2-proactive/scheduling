@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:proactive:jobdescriptor:3.11"
         xsi:schemaLocation="urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd"
-        name="script_groovy"
+        name="job_get_generic_info"
         priority="normal"
         onTaskError="continueJobExecution"
         maxNumberOfExecution="2"
