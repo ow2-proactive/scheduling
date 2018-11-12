@@ -2355,7 +2355,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 InputPart part1 = multipart.getFormDataMap().get(name).get(0); // "file"
 
                 String fileType = part1.getMediaType().toString().toLowerCase();
-                if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase())) {
+                if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase()) &&
+                    !fileType.contains(MediaType.TEXT_XML.toLowerCase())) {
                     throw new JobCreationRestException("Unknown job descriptor type: " + fileType);
                 }
 
