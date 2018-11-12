@@ -907,7 +907,7 @@ public class RMRest implements RMRestInterface {
 
         List<ScriptResult<Object>> awaitedResults = new LinkedList<>();
 
-        for (ScriptResult result: results) {
+        for (ScriptResult result : results) {
             awaitedResults.add(PAFuture.getFutureValue(result));
         }
 
