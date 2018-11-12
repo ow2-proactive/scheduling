@@ -251,12 +251,35 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testSchedulerNodeClient() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
-                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
+                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy",
+                                null);
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
         Assert.assertNotNull(tres);
         Assert.assertEquals("Hello NodeClientTask I'm HelloTask", tres.value());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testSchedulerNodeClientDisconnect() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node_disconnect.groovy", null, null);
+        JobId jobId = submitJob(job, client);
+        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tres.getOutput().getAllLogs(false));
+        Assert.assertFalse(tres.hadException());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testDataspaceNodeClientDisconnect() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node_space_disconnect.groovy",
+                                null,
+                                null);
+        JobId jobId = submitJob(job, client);
+        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tres.getOutput().getAllLogs(false));
+        Assert.assertFalse(tres.hadException());
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -266,7 +289,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.putThirdPartyCredential("TEST_CREDS", "mypassword_${PA_JOB_ID}");
 
         Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
-                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
+                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy",
+                                "/functionaltests/descriptors/scheduler_client_node_cleaning.groovy");
         JobId jobId = submitJob(job, client);
         JobResult jres = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(5));
         Assert.assertNotNull(jres);
@@ -290,7 +314,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testDataSpaceNodeClientPushPull() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_pull.groovy",
-                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
+                                null);
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
@@ -302,7 +327,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testDataSpaceNodeClientPushDelete() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
-                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
+                                null);
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
@@ -310,27 +336,28 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertEquals("OK", tres.value());
     }
 
-    protected Job nodeClientJob(String groovyScript, String forkScript) throws Exception {
+    protected Job nodeClientJob(String groovyScript, String forkScript, String cleaningScript) throws Exception {
 
         URL scriptURL = SchedulerClientTest.class.getResource(groovyScript);
-        URL forkScriptURL = SchedulerClientTest.class.getResource(forkScript);
 
         TaskFlowJob job = new TaskFlowJob();
         job.setName("NodeClientJob");
         ScriptTask task = new ScriptTask();
         task.setName("NodeClientTask");
-        ForkEnvironment forkEnvironment = new ForkEnvironment();
-        forkEnvironment.setEnvScript(new SimpleScript(IOUtils.toString(forkScriptURL.toURI()), "groovy"));
-        task.setForkEnvironment(forkEnvironment);
+        if (forkScript != null) {
+            ForkEnvironment forkEnvironment = new ForkEnvironment();
+            forkEnvironment.setEnvScript(new SimpleScript(IOUtils.toString(SchedulerClientTest.class.getResource(forkScript)
+                                                                                                    .toURI()),
+                                                          "groovy"));
+            task.setForkEnvironment(forkEnvironment);
+        }
         task.setScript(new TaskScript(new SimpleScript(IOUtils.toString(scriptURL.toURI()), "groovy")));
         //add CleanScript to test external APIs
-        task.setCleaningScript(new SimpleScript("" + "schedulerapi.connect();\n" +
-                                                "print(\"SCHEDULERAPI_URI_LIST_NOT_NULL=\"+(schedulerapi.getGlobalSpaceURIs()!=null));\n" +
-                                                "\n" + "userspaceapi.connect();\n" +
-                                                "print(\"USERSPACE_FILE_LIST_NOT_NULL=\"+(userspaceapi.listFiles(\".\", \"*\")!=null));\n" +
-                                                "\n" + "globalspaceapi.connect();\n" +
-                                                "print(\"GLOBALSPACE_FILE_LIST_NOT_NULL=\"+(globalspaceapi.listFiles(\".\", \"*\")!=null));\n" +
-                                                "print(\"TEST_CREDS=\"+(credentials.get(\"TEST_CREDS\")));\n", "js"));
+        if (cleaningScript != null) {
+            task.setCleaningScript(new SimpleScript(IOUtils.toString(SchedulerClientTest.class.getResource(cleaningScript)
+                                                                                              .toURI()),
+                                                    "groovy"));
+        }
         job.addTask(task);
         return job;
     }
