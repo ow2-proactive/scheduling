@@ -2395,10 +2395,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // return false for non connected clients
         // it should be verified by checkPermissionsMethod but it returns true for
         // local active objects
+        final Client sourceBodyCaller = checkPermissionAndGetClientIsSuccessful();
+        return new BooleanWrapper(!toShutDown && clients.containsKey(sourceBodyCaller.getId()));
+    }
+
+    private Client checkPermissionAndGetClientIsSuccessful() {
         final Request currentRequest = PAActiveObject.getContext().getCurrentRequest();
         String methodName = currentRequest.getMethodName();
-        final Client sourceBodyCaller = checkMethodCallPermission(methodName, currentRequest.getSourceBodyID());
-        return new BooleanWrapper(!toShutDown && clients.containsKey(sourceBodyCaller.getId()));
+        return checkMethodCallPermission(methodName, currentRequest.getSourceBodyID());
     }
 
     /**
@@ -2781,6 +2785,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @ImmediateService
     public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets) {
         try {
@@ -2797,6 +2802,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
+        try {
+            checkPermissionAndGetClientIsSuccessful();
+        } catch (Exception e) {
+            return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
+        }
         // Depending on the target type, select nodes for script execution
         final TargetType tType = TargetType.valueOf(targetType);
         final HashSet<RMNode> selectedRMNodes = new HashSet<>();

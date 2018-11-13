@@ -46,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -557,6 +558,7 @@ public abstract class SelectionManager {
         return filteredList;
     }
 
+    @ImmediateService
     public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes,
             final Map<String, Serializable> bindings) {
         final long allScriptExecutionsTimeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
