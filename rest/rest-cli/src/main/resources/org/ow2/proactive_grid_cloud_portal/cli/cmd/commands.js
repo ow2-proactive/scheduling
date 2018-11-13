@@ -214,11 +214,15 @@ function listcredentials() {
     execute(new ThirdPartyCredentialKeySetCommand());
 }
 
-function submit(pathname, variables) {
-    if (typeof variables == 'undefined') {
-        execute(new SubmitJobCommand([string(pathname)]));
+function submit(pathname, variables, genericInfos) {
+    if (typeof genericInfos == 'undefined') {
+        if (typeof variables == 'undefined') {
+            execute(new SubmitJobCommand('' + pathname));
+        } else {
+            execute(new SubmitJobCommand('' + pathname, '' + variables));
+        }
     } else {
-        execute(new SubmitJobCommand(new Array([string(pathname)], variables)));
+        execute(new SubmitJobCommand('' + pathname, '' + variables, '' + genericInfos));
     }
 }
 

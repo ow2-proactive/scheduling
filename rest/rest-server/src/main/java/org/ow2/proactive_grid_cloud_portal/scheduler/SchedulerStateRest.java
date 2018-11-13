@@ -2197,34 +2197,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Submits a workflow to the scheduler from a workflow URL, creating hence a
-     * new job resource.
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param url
-     *            url to the workflow content
-     * @param pathSegment
-     *            variables of the workflow
-     * @return the <code>jobid</code> of the newly created job
-     * @throws NotConnectedRestException
-     * @throws IOException
-     * @throws JobCreationRestException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
-     */
-    @Override
-    @POST
-    @Path("{path:jobs}")
-    @Produces("application/json")
-    public JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
-            @PathParam("path") PathSegment pathSegment) throws JobCreationRestException, NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, IOException {
-
-        return submitFromUrl(sessionId, url, pathSegment, null);
-    }
-
     private Map<String, String> getMapWithFirstValues(MultivaluedMap<String, String> queryParameters) {
 
         Map<String, String> parameters = new HashMap<String, String>();
@@ -2303,32 +2275,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      *            the form data containing : - fileName the name of the file
      *            that will be created on the DataSpace - fileContent the
      *            content of the file
-     * @return the <code>jobid</code> of the newly created job
-     * @throws IOException
-     *             if the job was not correctly uploaded/stored
-     */
-    @Override
-    @POST
-    @Path("{path:submit}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
-            MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, IOException {
-        return submit(sessionId, pathSegment, multipart, null);
-    }
-
-    /**
-     * Submits a job to the scheduler
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param pathSegment
-     *            variables of the workflow
-     * @param multipart
-     *            the form data containing : - fileName the name of the file
-     *            that will be created on the DataSpace - fileContent the
-     *            content of the file
      * @param contextInfos
      *            the context informations (generic parameters,..)
      * @return the <code>jobid</code> of the newly created job
@@ -2355,7 +2301,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 InputPart part1 = multipart.getFormDataMap().get(name).get(0); // "file"
 
                 String fileType = part1.getMediaType().toString().toLowerCase();
-                if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase())) {
+                if (!fileType.contains(MediaType.APPLICATION_XML.toLowerCase()) &&
+                    !fileType.contains(MediaType.TEXT_XML.toLowerCase())) {
                     throw new JobCreationRestException("Unknown job descriptor type: " + fileType);
                 }
 
