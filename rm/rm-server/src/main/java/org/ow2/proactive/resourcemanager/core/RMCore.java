@@ -2790,10 +2790,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             Set<String> targets) {
         try {
             return this.executeScript(new SimpleScript(script, scriptEngine), targetType, targets);
-        } catch (InvalidScriptException e) {
-            logger.error(e.getMessage(), e);
-            throw new ScriptException(e);
         } catch (Exception e) {
+            logger.error("Error while executing script", e);
             return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
         }
     }
@@ -2805,6 +2803,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             checkPermissionAndGetClientIsSuccessful();
         } catch (Exception e) {
+            logger.error("Error while checking permission to execute script", e);
             return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
         }
         // Depending on the target type, select nodes for script execution

@@ -43,6 +43,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -58,7 +59,6 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyNodesFilter;
@@ -573,14 +573,18 @@ public abstract class SelectionManager {
                     // Execute with a timeout the script by the remote handler
                     // and always async-unlock the node, exceptions will be
                     // treated as ExecutionException
+                    String nodeURL = node.getNodeURL();
                     try {
-                        logger.info("Executing node script on " + node.getNodeURL());
+                        logger.info("Executing node script on " + nodeURL);
                         ScriptResult<T> res = node.executeScript(script, bindings);
                         PAFuture.waitFor(res, allScriptExecutionsTimeout);
-                        logger.info("Node script execution on " + node.getNodeURL() + " terminated");
+                        logger.info("Node script execution on " + nodeURL + " terminated");
                         return res;
+                    } catch (Exception e) {
+                        logger.error("Error while executing script and waiting for script result on " + nodeURL, e);
+                        throw e;
                     } finally {
-                        SelectionManager.this.rmcore.unlockNodes(Collections.singleton(node.getNodeURL()));
+                        SelectionManager.this.rmcore.unlockNodes(Collections.singleton(nodeURL));
                     }
                 }
 
@@ -593,7 +597,7 @@ public abstract class SelectionManager {
         }
 
         // Invoke all Callables and get the list of futures
-        List<Future<ScriptResult<T>>> futures = null;
+        List<Future<ScriptResult<T>>> futures = new LinkedList<>();
         try {
             futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors,
                                                               allScriptExecutionsTimeout,
@@ -604,27 +608,37 @@ public abstract class SelectionManager {
         }
 
         final List<ScriptResult<T>> results = new LinkedList<>();
+        List<RMNode> nodesList = new ArrayList<>(nodes);
 
         int index = 0;
         for (final Future<ScriptResult<T>> future : futures) {
             final String description = scriptExecutors.get(index).toString();
+            String nodeURL = nodesList.get(index).getNodeURL();
+
             ScriptResult<T> result;
             try {
+                logger.info("Awaiting script result on " + nodeURL);
                 result = future.get();
             } catch (CancellationException e) {
+                logger.error("The invoked script was cancelled due to timeout on " + nodeURL, e);
                 result = new ScriptResult<>(new ScriptException("Cancelled due to timeout expiration when " +
                                                                 description, e));
             } catch (InterruptedException e) {
+                logger.error("The invoked script was interrupted on " + nodeURL, e);
                 result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " + description));
             } catch (ExecutionException e) {
                 // Unwrap the root exception
                 Throwable rex = e.getCause();
+                logger.error("There was an issue during script invocation on " + nodeURL, e);
                 result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description,
                                                                 rex));
             }
+
             result.setHostname(scriptHosts.get(index));
             results.add(result);
             index++;
+
+            logger.info("Successfully retrieved script result on " + nodeURL);
         }
 
         return results;
