@@ -60,7 +60,6 @@ public class ScriptResult<E> implements Serializable {
     public ScriptResult() {
         this.result = null;
         this.exception = null;
-        this.hostname = null;
     }
 
     /**
@@ -129,16 +128,16 @@ public class ScriptResult<E> implements Serializable {
     }
 
     /**
-     * Return the script's host name.
-     * @return host name of script execution
+     * Return the name of the host that executes the script
+     * @return script execution host name
      */
     public String getHostname() {
         return hostname;
     }
 
     /**
-     * Sets the name of the host on which the script has executed
-     * @param hostname the script execution host name
+     * Sets the name of the host that executes the script
+     * @param hostname script execution host name
      */
     public void setHostname(String hostname) {
         this.hostname = hostname;

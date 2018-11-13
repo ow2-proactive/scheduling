@@ -559,8 +559,7 @@ public abstract class SelectionManager {
 
     public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes,
             final Map<String, Serializable> bindings) {
-        // TODO: add a specific timeout for script execution
-        final long timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
+        final long allScriptExecutionsTimeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
         final List<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
         final List<String> scriptHosts = new ArrayList<>(nodes.size());
 
@@ -575,7 +574,7 @@ public abstract class SelectionManager {
                     try {
                         logger.info("Executing node script on " + node.getNodeURL());
                         ScriptResult<T> res = node.executeScript(script, bindings);
-                        PAFuture.waitFor(res, timeout);
+                        PAFuture.waitFor(res, allScriptExecutionsTimeout);
                         logger.info("Node script execution on " + node.getNodeURL() + " terminated");
                         return res;
                     } finally {
@@ -594,7 +593,9 @@ public abstract class SelectionManager {
         // Invoke all Callables and get the list of futures
         List<Future<ScriptResult<T>>> futures = null;
         try {
-            futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors, timeout, TimeUnit.MILLISECONDS);
+            futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors,
+                                                              allScriptExecutionsTimeout,
+                                                              TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             logger.warn("Interrupted while waiting, unable to execute all scripts", e);
             Thread.currentThread().interrupt();
