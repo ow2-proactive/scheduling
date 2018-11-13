@@ -38,9 +38,9 @@ public class WorkflowVariablesTransformer {
     public Map<String, String> getWorkflowVariablesFromPathSegment(PathSegment pathSegment) {
         Map<String, String> variables = null;
         MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
-        // Remove any empty keys that might be mistakenly sent to the scheduler to prevent bad behaviour
-        matrixParams.remove("");
         if (matrixParams != null && !matrixParams.isEmpty()) {
+            // Remove any empty keys that might be mistakenly sent to the scheduler to prevent bad behaviour
+            matrixParams.remove("");
             variables = Maps.newHashMap();
             for (String key : matrixParams.keySet()) {
                 String value = matrixParams.getFirst(key) == null ? "" : matrixParams.getFirst(key);
