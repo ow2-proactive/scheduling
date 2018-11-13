@@ -31,6 +31,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
+import static org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.JobKeyValueTransformer.transformJsonStringToMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -77,9 +78,6 @@ public class SubmitJobCommandTest {
     private File jobFileMock;
 
     @Mock
-    private JobKeyValueTransformer jobKeyValueTransormerMock;
-
-    @Mock
     private JobIdData jobIdDataMock;
 
     @Mock
@@ -112,12 +110,13 @@ public class SubmitJobCommandTest {
 
         Mockito.when(schedulerRestClientMock.submitJobArchive("sessionid",
                                                               fileInputStreamMock,
-                                                              jobKeyValueTransormerMock.transformVariablesToMap("")))
+                                                              transformJsonStringToMap(""),
+                                                              transformJsonStringToMap("")))
                .thenReturn(null);
 
         assertThat(stack.get(0).getMessage(), is("Workflow file path is required"));
 
-        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null);
+        Mockito.verify(schedulerRestClientMock, times(0)).submitJobArchive("sessionid", null, null, null);
 
         throw stack.get(0);
     }
@@ -125,15 +124,14 @@ public class SubmitJobCommandTest {
     @Test(expected = JobCreationRestException.class)
     public void testInvalidFilePathProvided() throws Exception {
 
-        params = new String[1];
-        params[0] = "/src/test/java/config/c.xm";
+        String params = "/src/test/java/config/c.xm";
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
-        assertThat(stack.get(0).getMessage(), is("Unknown job descriptor type: " + params[0]));
+        assertThat(stack.get(0).getMessage(), is("Unknown job descriptor type: " + params));
 
         Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap(), anyMap());
 
         throw stack.get(0);
     }
@@ -141,15 +139,14 @@ public class SubmitJobCommandTest {
     @Test(expected = CLIException.class)
     public void testNonExistingFilePathProvided() throws Exception {
 
-        params = new String[1];
-        params[0] = System.getProperty("user.dir") + "/src/test/java/config/c.xml";
+        String params = System.getProperty("user.dir") + "/src/test/java/config/c.xml";
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' does not exist."));
+        assertThat(stack.get(0).getMessage(), is("'" + params + "' does not exist."));
 
         Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap(), anyMap());
 
         throw stack.get(0);
     }
@@ -157,15 +154,14 @@ public class SubmitJobCommandTest {
     @Test(expected = CLIException.class)
     public void testFileIsEmpty() throws Exception {
 
-        params = new String[1];
-        params[0] = System.getProperty("user.dir") + "/src/test/java/config/empty.xml";
+        String params = System.getProperty("user.dir") + "/src/test/java/config/empty.xml";
 
         new SubmitJobCommand(params).execute(currentContextMock);
 
-        assertThat(stack.get(0).getMessage(), is("'" + params[0] + "' is empty."));
+        assertThat(stack.get(0).getMessage(), is("'" + params + "' is empty."));
 
         Mockito.verify(schedulerRestClientMock, times(0))
-               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap());
+               .submitJobArchive(anyString(), convertObjectToInputStream(anyObject()), anyMap(), anyMap());
 
         throw stack.get(0);
     }

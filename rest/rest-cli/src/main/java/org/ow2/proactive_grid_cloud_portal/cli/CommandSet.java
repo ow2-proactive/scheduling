@@ -241,10 +241,10 @@ public class CommandSet {
                                                                         .longOpt("submit")
                                                                         .description("Submit the specified job-description (XML) file")
                                                                         .hasArgs(true)
-                                                                        .numOfArgs(2)
+                                                                        .numOfArgs(3)
                                                                         .hasOptionalArg(true)
-                                                                        .argNames("job-descriptor '[{\"var1\":\"value1\",\"var2\":\"value2\"}]'")
-                                                                        .jsCommand("submit(job-descriptor,'{\"var1\":\"value1\",\"var2\":\"value2\"}'")
+                                                                        .argNames("job-descriptor [ '{\"var1\":\"value1\",...}' ['{\"genericInfo1\":\"value1\",...}'] ]")
+                                                                        .jsCommand("submit( job-descriptor [,'{\"var1\":\"value1\",...}' [,'{\"genericInfo1\":\"value1\",...}'] ] )")
                                                                         .commandClass(SubmitJobCommand.class)
                                                                         .entry();
 

@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.common;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.utils.Sleeper;
+import org.ow2.proactive.web.WebProperties;
 
 
 /**
@@ -54,14 +55,22 @@ public class SessionsCleaner implements Runnable {
         this.sessionStore = sessionStore;
     }
 
+    private long getCleanPeriod() {
+        return WebProperties.SESSION_CLEANING_PERIOD.getValueAsLong() * 1000;
+    }
+
+    private long getTimeoutDelay() {
+        return WebProperties.SESSION_TIMEOUT.getValueAsLong() * 1000;
+    }
+
     public void run() {
         while (!stop) {
             logger.info("cleaning session started, " + sessionStore.size() + " existing session(s) ");
-            int removedSession = sessionStore.terminateExpiredSessions(TIMEOUT_DELAY);
+            int removedSession = sessionStore.terminateExpiredSessions(getTimeoutDelay());
 
             // clean every 5 minutes
             logger.info("cleaning session ended, " + removedSession + " session(s) removed");
-            new Sleeper(CLEAN_PERIOD, logger).sleep();
+            new Sleeper(getCleanPeriod(), logger).sleep();
         }
         logger.info(Thread.currentThread().getName() + " terminated");
     }

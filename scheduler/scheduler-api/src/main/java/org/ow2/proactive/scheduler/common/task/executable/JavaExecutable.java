@@ -61,6 +61,8 @@ public abstract class JavaExecutable {
 
     private Map<String, String> metadata;
 
+    private Map<String, Serializable> resultMap;
+
     private String inputSpace, outputSpace, globalSpace, localSpace, userSpace;
 
     private Synchronization synchronizationAPI;
@@ -85,6 +87,7 @@ public abstract class JavaExecutable {
         initDataSpaces(sc);
         init(arguments);
         initMetadata(sc);
+        initResultMap(sc);
         initAPIs(sc);
     }
 
@@ -177,6 +180,15 @@ public abstract class JavaExecutable {
      */
     public void initMetadata(ScriptContext sc) {
         this.metadata = (Map<String, String>) sc.getAttribute(SchedulerConstants.RESULT_METADATA_VARIABLE);
+    }
+
+    /**
+     * Initialization of the resultMap.<br>
+     *
+     * @param sc the ScriptContext including as bindings the resultMap map.
+     */
+    public void initResultMap(ScriptContext sc) {
+        this.resultMap = (Map<String, Serializable>) sc.getAttribute(SchedulerConstants.RESULT_MAP_BINDING_NAME);
     }
 
     /**
@@ -294,6 +306,10 @@ public abstract class JavaExecutable {
 
     public Map<String, Serializable> getVariables() {
         return this.propagatedVariables;
+    }
+
+    public Map<String, Serializable> getResultMap() {
+        return this.resultMap;
     }
 
     /**

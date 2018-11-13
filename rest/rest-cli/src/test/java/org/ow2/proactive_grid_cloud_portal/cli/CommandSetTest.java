@@ -28,11 +28,8 @@ package org.ow2.proactive_grid_cloud_portal.cli;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,58 +58,30 @@ public class CommandSetTest {
     }
 
     @Test
-    public void testThatArgNamesMatchNumberOfArgs() throws ParseException, IllegalAccessException {
-        int nbArgsBasedOnName = Option.UNINITIALIZED;
-        String regex = "\\[(.*?)\\]";
-        Pattern pattern = Pattern.compile(regex);
-        String optionalArgNames = "";
-        int optionals = 0;
+    public void testNbMandatoryArgsMatchesWithDescription() {
 
-        if (entry.argNames() != null) {
-            String argNames = entry.argNames();
-            Matcher matcher = pattern.matcher(argNames);
+        // In "submit" and "listjobs" cases nb mandatory args does not match with the description
+        if (entry.argNames() != null && !entry.longOpt().equals("submit") && !entry.longOpt().equals("listjobs")) {
+            int nbMandatoryArgs = 0;
+            String mandatoryArgNames = entry.argNames();
 
-            while (matcher.find()) {
-                optionals = matcher.group().split(" ").length;
-                optionalArgNames = matcher.group();
+            // Consider only mandatory arguments, not optional arguments, i.e. starting with '['
+            if (entry.hasOptionalArg()) {
+                mandatoryArgNames = mandatoryArgNames.substring(0, mandatoryArgNames.indexOf("["));
+            }
+            // Unlimited arguments
+            if (mandatoryArgNames.contains("...")) {
+                nbMandatoryArgs = Option.UNLIMITED_VALUES;
+            }
+            // As many mandatory arguments as spaced words
+            else if (!mandatoryArgNames.trim().isEmpty()) {
+                nbMandatoryArgs = mandatoryArgNames.split(" ").length;
             }
 
-            if (!argNames.trim().isEmpty()) {
-                nbArgsBasedOnName = argNames.split(" ").length;
-                if (entry.hasArgs()) {
-                    nbArgsBasedOnName = nbArgsBasedOnName - optionals;
-                } else if (entry.hasOptionalArg()) {
-                    nbArgsBasedOnName = optionals;
-                }
-            }
-
-            if (argNames.contains("...") && !optionalArgNames.contains("|") && !optionalArgNames.contains("...")) {
-                nbArgsBasedOnName = Option.UNLIMITED_VALUES;
-            }
-
+            Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
+                                entry.numOfArgs(),
+                                nbMandatoryArgs);
         }
-
-        if (entry.numOfArgs() != nbArgsBasedOnName) {
-            nbArgsBasedOnName = numberComplexOptionalArgs(entry);
-        }
-
-        Assert.assertEquals("Option '" + entry.longOpt() + "' does not have argNames matching number of args",
-                            entry.numOfArgs(),
-                            nbArgsBasedOnName);
-    }
-
-    public int numberComplexOptionalArgs(CommandSet.Entry entry) {
-        int numberArgs = 0;
-        final String regex = "(\\\\w+)=\\\"([^\\\"]+)\\\"|([^\\\\s]+)";
-
-        final Pattern pattern = Pattern.compile(regex);
-        final Matcher matcher = pattern.matcher(entry.argNames());
-
-        while (matcher.find()) {
-            numberArgs = matcher.group().split(" ").length;
-        }
-        return numberArgs;
-
     }
 
     @Parameterized.Parameters(name = "{1}")

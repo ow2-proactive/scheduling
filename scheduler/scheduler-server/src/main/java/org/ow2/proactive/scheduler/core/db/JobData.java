@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.core.db;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.Fetch;
@@ -64,6 +66,7 @@ import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
+import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.job.InternalJob;
@@ -107,13 +110,14 @@ import com.google.common.collect.Lists;
                                                                              "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                              "numberOfRunningTasks = :numberOfRunningTasks, " +
                                                                              "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                                                                             "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap where id = :jobId"),
                 @NamedQuery(name = "updateJobDataAfterWorkflowTaskFinished", query = "update JobData set status = :status, " +
                                                                                      "finishedTime = :finishedTime, numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                                      "numberOfFinishedTasks = :numberOfFinishedTasks, " +
                                                                                      "numberOfRunningTasks = :numberOfRunningTasks, totalNumberOfTasks =:totalNumberOfTasks, " +
                                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
-                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                                                                                     "numberOfInErrorTasks = :numberOfInErrorTasks, lastUpdatedTime = :lastUpdatedTime, resultMap = :resultMap " +
+                                                                                     "where id = :jobId"),
                 @NamedQuery(name = "updateJobDataTaskRestarted", query = "update JobData set status = :status, " +
                                                                          "numberOfPendingTasks = :numberOfPendingTasks, " +
                                                                          "numberOfRunningTasks = :numberOfRunningTasks, " +
@@ -129,6 +133,8 @@ import com.google.common.collect.Lists;
                                       @Index(name = "JOB_DATA_STATUS", columnList = "STATUS"), })
 public class JobData implements Serializable {
 
+    private static final Logger logger = Logger.getLogger(JobData.class);
+
     private Long id;
 
     private List<TaskData> tasks;
@@ -138,6 +144,8 @@ public class JobData implements Serializable {
     private Map<String, String> genericInformation;
 
     private Map<String, JobDataVariable> variables;
+
+    private Map<String, byte[]> resultMap;
 
     private String owner;
 
@@ -262,6 +270,11 @@ public class JobData implements Serializable {
         internalJob.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalJob.setOnTaskError(OnTaskError.getInstance(this.onTaskErrorString));
         internalJob.setScheduledTimeForRemoval(getScheduledTimeForRemoval());
+        try {
+            internalJob.setResultMap(SerializationUtil.deserializeVariableMap(getResultMap()));
+        } catch (IOException | ClassNotFoundException e) {
+            logger.error("error when serializing result map variables " + e);
+        }
         return internalJob;
     }
 
@@ -302,6 +315,7 @@ public class JobData implements Serializable {
         jobRuntimeData.setTotalNumberOfTasks(job.getTotalNumberOfTasks());
         jobRuntimeData.addJobContent(job.getTaskFlowJob());
         jobRuntimeData.setLastUpdatedTime(job.getSubmittedTime());
+        jobRuntimeData.setResultMap(SerializationUtil.serializeVariableMap(job.getResultMap()));
 
         return jobRuntimeData;
     }
@@ -337,6 +351,16 @@ public class JobData implements Serializable {
 
     public void setVariables(Map<String, JobDataVariable> variables) {
         this.variables = variables;
+    }
+
+    @Column(name = "RESULT_MAP", length = Integer.MAX_VALUE)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Map<String, byte[]> getResultMap() {
+        return resultMap;
+    }
+
+    public void setResultMap(Map<String, byte[]> resultMap) {
+        this.resultMap = resultMap;
     }
 
     @Column(name = "MAX_NUMBER_OF_EXEC", updatable = false, nullable = false)

@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.job;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -57,6 +58,9 @@ public class JobResultImpl implements JobResult {
     /** List of precious results */
     private Map<String, TaskResult> preciousResults = null;
 
+    /** Map of job results which merged in the end of the job */
+    private Map<String, Serializable> resultMap = null;
+
     /** Info of the job at the end */
     private JobInfo jobInfo;
 
@@ -66,6 +70,7 @@ public class JobResultImpl implements JobResult {
     public JobResultImpl() {
         allResults = new HashMap<>();
         preciousResults = new HashMap<>();
+        resultMap = new HashMap<>();
     }
 
     /**
@@ -110,6 +115,7 @@ public class JobResultImpl implements JobResult {
     public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
         //add to all Results
         allResults.put(taskName, taskResult);
+        resultMap.putAll(taskResult.getResultMap());
         //add to precious results if needed
         if (isPrecious) {
             preciousResults.put(taskName, taskResult);
@@ -166,6 +172,13 @@ public class JobResultImpl implements JobResult {
      */
     public Map<String, TaskResult> getPreciousResults() {
         return preciousResults;
+    }
+
+    /**
+     * @see org.ow2.proactive.scheduler.common.job.JobResult#getResultMap()
+     */
+    public Map<String, Serializable> getResultMap() {
+        return resultMap;
     }
 
     /**
