@@ -27,16 +27,8 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.client;
 
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.io.*;
+import java.lang.reflect.*;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.util.List;
@@ -48,13 +40,7 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.Variant;
+import javax.ws.rs.core.*;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
@@ -122,12 +108,12 @@ public class SchedulerRestClient {
     }
 
     public JobIdData submitJobArchive(String sessionId, InputStream jobArchive) throws Exception {
-        return submitJobArchive(sessionId, jobArchive, null);
+        return submitJobArchive(sessionId, jobArchive, null, null);
     }
 
-    public JobIdData submitJobArchive(String sessionId, InputStream jobArchive, Map<String, String> variables)
-            throws Exception {
-        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE, variables, null);
+    public JobIdData submitJobArchive(String sessionId, InputStream jobArchive, Map<String, String> variables,
+            Map<String, String> genericInfos) throws Exception {
+        return submit(sessionId, jobArchive, MediaType.APPLICATION_OCTET_STREAM_TYPE, variables, genericInfos);
     }
 
     public boolean pushFile(String sessionId, String space, String path, String fileName, InputStream fileContent)
@@ -453,7 +439,7 @@ public class SchedulerRestClient {
         // Generic infos
         if (genericInfos != null) {
             for (String key : genericInfos.keySet()) {
-                target = target.queryParam(key, genericInfos.get(key));
+                target = target.queryParamNoTemplate(key, genericInfos.get(key));
             }
         }
 
