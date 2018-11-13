@@ -522,8 +522,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     /**
      * For administrator only, Shutdown the scheduler.<br>
-     * It will terminate every submitted jobs but won't accept new submit.<br>
-     * Use {@link #kill()} if you want to stop the scheduling and exit the
+     * It will freeze and kill the scheduler.<br>
+     * Use {@link #shutdown()} if you want to freeze the scheduling and kill the
      * scheduler.
      *
      * @return true if success, false if not.

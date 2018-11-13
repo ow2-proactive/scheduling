@@ -255,28 +255,7 @@ public class SchedulingService {
     }
 
     public boolean shutdown() {
-        if (status.isDown()) {
-            return false;
-        }
-
-        status = SchedulerStatus.SHUTTING_DOWN;
-        logger.info("Scheduler is shutting down, this may take time to finish every jobs!");
-        listener.schedulerStateUpdated(SchedulerEvent.SHUTTING_DOWN);
-
-        logger.info("Unpause all running and pending jobs!");
-        jobs.unpauseAll();
-
-        infrastructure.schedule(new Runnable() {
-            public void run() {
-                if (jobs.getRunningTasks().isEmpty()) {
-                    listener.schedulerStateUpdated(SchedulerEvent.SHUTDOWN);
-                } else {
-                    infrastructure.schedule(this, 5000);
-                }
-            }
-        }, 5000);
-
-        return true;
+        return freeze() && kill();
     }
 
     /**

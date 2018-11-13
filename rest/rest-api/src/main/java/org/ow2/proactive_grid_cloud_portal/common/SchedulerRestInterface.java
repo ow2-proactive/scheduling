@@ -1536,7 +1536,7 @@ public interface SchedulerRestInterface {
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
-     * kills and shutdowns the scheduler
+     * kills the scheduler
      * 
      * @param sessionId
      *            a valid session id
@@ -1548,6 +1548,21 @@ public interface SchedulerRestInterface {
     @Path("kill")
     @Produces("application/json")
     boolean killScheduler(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException, PermissionRestException;
+
+    /**
+     * shutdown the scheduler
+     *
+     * @param sessionId
+     *            a valid session id
+     * @return true if success, false if not
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     */
+    @PUT
+    @Path("shutdown")
+    @Produces("application/json")
+    boolean shutdownScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
