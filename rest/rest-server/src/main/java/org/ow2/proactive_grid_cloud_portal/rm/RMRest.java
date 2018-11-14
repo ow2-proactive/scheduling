@@ -44,6 +44,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -904,11 +905,9 @@ public class RMRest implements RMRestInterface {
                                                               TargetType.NODESOURCE_NAME.name(),
                                                               Collections.singleton(nodeSource));
 
-        List<ScriptResult<Object>> awaitedResults = new LinkedList<>();
-
-        for (ScriptResult result : results) {
-            awaitedResults.add(PAFuture.getFutureValue(result));
-        }
+        List<ScriptResult<Object>> awaitedResults = results.stream()
+                                                           .map(result -> PAFuture.getFutureValue(result))
+                                                           .collect(Collectors.toList());
 
         checkEmptyScriptResults(awaitedResults);
 
