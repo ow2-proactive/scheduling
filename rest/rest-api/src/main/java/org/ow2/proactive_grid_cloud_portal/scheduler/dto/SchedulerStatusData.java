@@ -54,9 +54,9 @@ public enum SchedulerStatusData {
     PAUSED,
     /**
      * The scheduler is shutting down,
-     * It will terminate all running jobs (during this time, get jobs results is possible),
-     * then it will serialize every remaining jobs results that still are in the finished queue.
-     * Finally, it will shutdown the scheduler.
+     * It will terminate all running tasks.
+     * During this time, get jobs results is possible.
+     * Finally, it will terminate the scheduler.
      */
     SHUTTING_DOWN,
     /**

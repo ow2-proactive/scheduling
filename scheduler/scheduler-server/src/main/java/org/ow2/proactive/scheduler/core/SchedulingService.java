@@ -32,7 +32,6 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -255,7 +254,25 @@ public class SchedulingService {
     }
 
     public boolean shutdown() {
-        return freeze() && kill();
+        if (status.isDown()) {
+            return false;
+        }
+
+        status = SchedulerStatus.SHUTTING_DOWN;
+        logger.info("Scheduler is shutting down, this may take time to finish every running tasks!");
+        listener.schedulerStateUpdated(SchedulerEvent.SHUTTING_DOWN);
+
+        infrastructure.schedule(new Runnable() {
+            public void run() {
+                if (jobs.getRunningTasks().isEmpty()) {
+                    kill();
+                } else {
+                    infrastructure.schedule(this, 5000);
+                }
+            }
+        }, 5000);
+
+        return true;
     }
 
     /**

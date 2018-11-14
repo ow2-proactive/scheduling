@@ -521,10 +521,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean resume() throws NotConnectedException, PermissionException;
 
     /**
-     * For administrator only, Shutdown the scheduler.<br>
-     * It will freeze and kill the scheduler.<br>
-     * Use {@link #shutdown()} if you want to freeze the scheduling and kill the
-     * scheduler.
+     * For administrator only, Terminate the scheduler by terminating running tasks.
      *
      * @return true if success, false if not.
      * @throws NotConnectedException
