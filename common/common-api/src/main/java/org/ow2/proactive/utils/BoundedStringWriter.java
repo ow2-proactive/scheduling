@@ -45,7 +45,7 @@ public class BoundedStringWriter extends Writer {
 
     private final PrintStream outputSink;
 
-    private final StringBuilder content;
+    private StringBuilder content;
 
     private final int maxSize;
 
@@ -74,6 +74,10 @@ public class BoundedStringWriter extends Writer {
             }
         }
         outputSink.print(new String(c, off, len));
+    }
+
+    public void setContentBuffer(StringBuilder builder) {
+        this.content = builder;
     }
 
     /**

@@ -344,6 +344,7 @@ public abstract class Script<E> implements Serializable {
         try {
             fetchUrlIfNeeded();
         } catch (Throwable t) {
+            logger.error("Script could not be fetched", t);
             String stack = Throwables.getStackTraceAsString(t);
             if (t.getMessage() != null) {
                 stack = t.getMessage() + System.lineSeparator() + stack;
@@ -359,8 +360,11 @@ public abstract class Script<E> implements Serializable {
         // SCHEDULING-1532: redirect script output to a buffer (keep the latest DEFAULT_OUTPUT_MAX_SIZE)
         BoundedStringWriter outputBoundedWriter = new BoundedStringWriter(outputSink, DEFAULT_OUTPUT_MAX_SIZE);
         BoundedStringWriter errorBoundedWriter = new BoundedStringWriter(errorSink, DEFAULT_OUTPUT_MAX_SIZE);
-        engine.getContext().setWriter(new PrintWriter(outputBoundedWriter));
-        engine.getContext().setErrorWriter(new PrintWriter(errorBoundedWriter));
+        StringBuilder outputBuffer = new StringBuilder();
+        outputBoundedWriter.setContentBuffer(outputBuffer);
+        errorBoundedWriter.setContentBuffer(outputBuffer);
+        engine.getContext().setWriter(new PrintWriter(outputBoundedWriter, true));
+        engine.getContext().setErrorWriter(new PrintWriter(errorBoundedWriter, true));
         Reader closedInput = new Reader() {
             @Override
             public int read(char[] cbuf, int off, int len) throws IOException {
@@ -386,26 +390,39 @@ public abstract class Script<E> implements Serializable {
             prepareBindings(bindings);
             Object evalResult = engine.eval(getReader());
 
-            engine.getContext().getErrorWriter().flush();
-            engine.getContext().getWriter().flush();
-
             // Add output to the script result
             ScriptResult<E> result = this.getResult(evalResult, bindings);
-            result.setOutput(outputBoundedWriter.toString());
+            captureOutput(engine, outputBuffer, result);
 
             return result;
         } catch (javax.script.ScriptException e) {
+            logger.error("Error during script execution", e);
             // drop exception cause as it might not be serializable
             ScriptException scriptException = new ScriptException(e.getMessage());
             scriptException.setStackTrace(e.getStackTrace());
-            return new ScriptResult<>(scriptException);
+            ScriptResult<E> result = new ScriptResult<>(scriptException);
+            captureOutput(engine, outputBuffer, result);
+            return result;
         } catch (Throwable t) {
+            logger.error("Error during script execution", t);
             String stack = Throwables.getStackTraceAsString(t);
             if (t.getMessage() != null) {
                 stack = t.getMessage() + System.lineSeparator() + stack;
             }
-            return new ScriptResult<>(new Exception(stack));
+            ScriptResult<E> result = new ScriptResult<>(new Exception(stack));
+            captureOutput(engine, outputBuffer, result);
+            return result;
         }
+    }
+
+    private void captureOutput(ScriptEngine engine, StringBuilder outputBuffer, ScriptResult<E> result) {
+        try {
+            engine.getContext().getErrorWriter().flush();
+            engine.getContext().getWriter().flush();
+        } catch (IOException e) {
+            logger.warn("Could not flush the end of the script execution output");
+        }
+        result.setOutput(outputBuffer.toString());
     }
 
     protected void fetchUrlIfNeeded() throws IOException {
