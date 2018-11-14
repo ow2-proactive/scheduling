@@ -144,11 +144,26 @@ public class RMInitialState implements Serializable {
     public RMStateDelta cloneAndFilter(long filter) {
         long actualFilter = computeActualFilter(filter);
 
-        final List<RMEvent> responseEvents = events.getSortedItems()
-                                                   .tailSet(new RMEvent(actualFilter + 1)) // because tailSet returns event which is equal or greater
-                                                   .stream()
-                                                   .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
-                                                   .collect(Collectors.toList());
+        List<RMEvent> responseEvents;
+        if (actualFilter == EMPTY_STATE) {
+            // if client does not know yet anything.
+            // then, we no need to send him removed events.
+            // becuase removed events are needed only when
+            // there is something to remove.
+            responseEvents = events.getSortedItems()
+                                   .tailSet(new RMEvent(actualFilter + 1)) // because tailSet returns event which is equal or greater
+                                   .stream()
+                                   .filter(event -> (event.getEventType() != RMEventType.NODE_REMOVED &&
+                                                     event.getEventType() != RMEventType.NODESOURCE_REMOVED))
+                                   .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
+                                   .collect(Collectors.toList());
+        } else {
+            responseEvents = events.getSortedItems()
+                                   .tailSet(new RMEvent(actualFilter + 1)) // because tailSet returns event which is equal or greater
+                                   .stream()
+                                   .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
+                                   .collect(Collectors.toList());
+        }
 
         RMStateDelta response = new RMStateDelta();
 
