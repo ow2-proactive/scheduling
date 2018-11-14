@@ -581,7 +581,7 @@ public abstract class SelectionManager {
                         logger.info("Node script execution on " + nodeURL + " terminated");
                         return res;
                     } catch (Exception e) {
-                        logger.error("Error while executing script and waiting for script result on " + nodeURL, e);
+                        logger.error("Error while executing node script and waiting for the result on " + nodeURL, e);
                         throw e;
                     } finally {
                         SelectionManager.this.rmcore.unlockNodes(Collections.singleton(nodeURL));
@@ -590,7 +590,7 @@ public abstract class SelectionManager {
 
                 @Override
                 public String toString() {
-                    return "executing script on " + node.getNodeURL();
+                    return "executing node script on " + node.getNodeURL();
                 }
             });
             scriptHosts.add(node.getHostName());
@@ -603,7 +603,7 @@ public abstract class SelectionManager {
                                                               allScriptExecutionsTimeout,
                                                               TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            logger.warn("Interrupted while waiting, unable to execute all scripts", e);
+            logger.warn("Interrupted while waiting, unable to execute all node scripts", e);
             Thread.currentThread().interrupt();
         }
 
@@ -617,20 +617,20 @@ public abstract class SelectionManager {
 
             ScriptResult<T> result;
             try {
-                logger.info("Awaiting script result on " + nodeURL);
+                logger.debug("Awaiting node script result on " + nodeURL);
                 result = future.get();
             } catch (CancellationException e) {
-                logger.error("The invoked script was cancelled due to timeout on " + nodeURL, e);
+                logger.error("The invoked node script was cancelled due to timeout on " + nodeURL, e);
                 result = new ScriptResult<>(new ScriptException("Cancelled due to timeout expiration when " +
                                                                 description, e));
             } catch (InterruptedException e) {
-                logger.error("The invoked script was interrupted on " + nodeURL, e);
+                logger.warn("The invoked node script was interrupted on " + nodeURL, e);
                 result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " + description));
             } catch (ExecutionException e) {
                 // Unwrap the root exception
                 Throwable rex = e.getCause();
-                logger.error("There was an issue during script invocation on " + nodeURL, e);
-                result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description,
+                logger.error("There was an issue during node script invocation on " + nodeURL, e);
+                result = new ScriptResult<>(new ScriptException("Exception occurred in script call when " + description,
                                                                 rex));
             }
 

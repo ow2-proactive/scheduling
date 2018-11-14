@@ -2791,7 +2791,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             return this.executeScript(new SimpleScript(script, scriptEngine), targetType, targets);
         } catch (Exception e) {
-            logger.error("Error while executing script", e);
+            logger.error("Error while executing node script", e);
             return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
         }
     }
@@ -2799,11 +2799,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
         try {
             checkPermissionAndGetClientIsSuccessful();
         } catch (Exception e) {
-            logger.error("Error while checking permission to execute script", e);
+            logger.error("Error while checking permission to execute node script", e);
             return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
         }
         // Depending on the target type, select nodes for script execution
@@ -2848,7 +2849,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 }
                 break;
             default:
-                throw new IllegalArgumentException("Unable to execute script, unknown target type: " + targetType);
+                throw new IllegalArgumentException("Unable to execute node script, unknown target type: " + targetType);
         }
 
         // Return a ProActive future on the list of results
@@ -2866,7 +2867,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // Unlock all previously locked nodes
             this.unselectNodes(selectedRMNodes);
 
-            throw new IllegalStateException("Script cannot be executed atomically since the node is already locked: " +
+            throw new IllegalStateException("Node script cannot be executed atomically since the node is already locked: " +
                                             candidateNode.getNodeURL());
         }
     }
