@@ -140,59 +140,49 @@ public class RMInitialState implements Serializable {
      * Event counter can take values [0, +).
      * So if filter is '-1' then all events will returned.
      *
-     * @param filter
+     * @param counterKnownByClient latest counter associated with event known by client
      * @return RMStateDelta where all the events bigger than 'filter'
      */
-    public RMStateDelta cloneAndFilter(long filter) {
-        long actualFilter = computeActualFilter(filter);
+    public RMStateDelta cloneAndFilter(long counterKnownByClient) {
+        final long effectiveFilter = computeActualFilter(counterKnownByClient);
 
-        List<RMEvent> responseEvents;
-        if (actualFilter == EMPTY_STATE) {
-            // if client does not know yet anything.
-            // then, we no need to send him removed events.
-            // becuase removed events are needed only when
-            // there is something to remove.
-            responseEvents = events.getSortedItems()
-                                   .tailSet(new RMEvent(actualFilter + 1)) // because tailSet returns event which is equal or greater
-                                   .stream()
-                                   .filter(this::isNotRemoved)
-                                   .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
-                                   .collect(Collectors.toList());
-        } else {
-            responseEvents = events.getSortedItems()
-                                   .tailSet(new RMEvent(actualFilter + 1)) // because tailSet returns event which is equal or greater
-                                   .stream()
-                                   .filter(event -> isRemovedButRelevantToClient(actualFilter, event) ||
-                                                    isNotRemoved(event))
-                                   .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
-                                   .collect(Collectors.toList());
-        }
+        final List<RMEvent> responseEvents = events.getSortedItems()
+                                                   .tailSet(new RMEvent(effectiveFilter + 1)) // because tailSet returns event which is equal or greater
+                                                   .stream()
+                                                   .filter(event -> isRemovedButRelevantToClient(effectiveFilter,
+                                                                                                 event) ||
+                                                                    isNotRemoved(event))
+                                                   .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
+                                                   .collect(Collectors.toList());
 
         RMStateDelta response = new RMStateDelta();
 
         response.setNodeSource(getNodeSourceEvents(responseEvents));
         response.setNodesEvents(getNodeEvents(responseEvents));
-        response.setLatestCounter(Math.max(actualFilter, findLargestCounter(responseEvents)));
+        response.setLatestCounter(Math.max(effectiveFilter, findLargestCounter(responseEvents)));
 
         return response;
     }
 
+    /**
+     * @return true if event is not associated to any removed types
+     */
     private boolean isNotRemoved(RMEvent event) {
         return event.getEventType() != RMEventType.NODE_REMOVED &&
                event.getEventType() != RMEventType.NODESOURCE_REMOVED;
     }
 
     /**
-     * @param actualFilter counter value till which client knows about events
+     * @param counterKnownByClient counter value till which client knows about events
      * @param event event on the server
      * @return true if <code>event </code> type is removed
      * but first event associated to current <code>event</code>
      * (associated by nodeUrl or nodeSourceName) already known by client
      */
-    private boolean isRemovedButRelevantToClient(long actualFilter, RMEvent event) {
+    private boolean isRemovedButRelevantToClient(long counterKnownByClient, RMEvent event) {
         return (event.getEventType() == RMEventType.NODE_REMOVED ||
                 event.getEventType() == RMEventType.NODESOURCE_REMOVED) &&
-               event.getFirstCounter() < actualFilter;
+               event.getFirstCounter() < counterKnownByClient;
     }
 
     private long computeActualFilter(long clientFilter) {
