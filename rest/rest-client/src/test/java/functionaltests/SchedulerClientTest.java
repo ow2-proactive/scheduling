@@ -27,11 +27,14 @@ package functionaltests;
 
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
 import static functionaltests.jobs.SimpleJob.TEST_JOB;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.anyMap;
 
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
@@ -77,6 +80,7 @@ import org.ow2.proactive.utils.ObjectByteConverter;
 import com.google.common.io.Files;
 
 import functionaltests.jobs.ErrorTask;
+import functionaltests.jobs.JobResultTask;
 import functionaltests.jobs.LogTask;
 import functionaltests.jobs.MetadataTask;
 import functionaltests.jobs.NonTerminatingJob;
@@ -89,6 +93,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
     /** Maximum wait time of 5 minutes */
     private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
+
+    private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_generic_info.xml");
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -119,7 +125,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testDisconnect() throws Exception {
         ISchedulerClient client = clientInstance();
         client.disconnect();
-        Assert.assertFalse(client.isConnected());
+        assertFalse(client.isConnected());
         client = clientInstance();
         Assert.assertTrue(client.isConnected());
 
@@ -132,6 +138,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         JobId jobId = submitJob(job, client);
         // should return immediately
         client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(3));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void getResultMap() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = createJob(JobResultTask.class);
+        JobId jobId = client.submit(job);
+        final JobResult jobResult = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(2000));
+        assertFalse(jobResult.getResultMap().isEmpty());
+        Assert.assertEquals(jobResult.getResultMap().get("myvar"), "myvalue");
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -162,7 +178,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
         JobState jobState = client.getJobState(jobId.value());
         JobStatus status = jobState.getStatus();
-        Assert.assertFalse(status.isJobAlive());
+        assertFalse(status.isJobAlive());
         Assert.assertEquals(JobStatus.FINISHED, status);
 
         checkJobInfo(jobState.getJobInfo());
@@ -239,12 +255,35 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testSchedulerNodeClient() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
-                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
+                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy",
+                                null);
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
         Assert.assertNotNull(tres);
         Assert.assertEquals("Hello NodeClientTask I'm HelloTask", tres.value());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testSchedulerNodeClientDisconnect() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node_disconnect.groovy", null, null);
+        JobId jobId = submitJob(job, client);
+        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tres.getOutput().getAllLogs(false));
+        Assert.assertFalse(tres.hadException());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testDataspaceNodeClientDisconnect() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node_space_disconnect.groovy",
+                                null,
+                                null);
+        JobId jobId = submitJob(job, client);
+        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tres.getOutput().getAllLogs(false));
+        Assert.assertFalse(tres.hadException());
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -254,7 +293,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.putThirdPartyCredential("TEST_CREDS", "mypassword_${PA_JOB_ID}");
 
         Job job = nodeClientJob("/functionaltests/descriptors/scheduler_client_node.groovy",
-                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy");
+                                "/functionaltests/descriptors/scheduler_client_node_fork.groovy",
+                                "/functionaltests/descriptors/scheduler_client_node_cleaning.groovy");
         JobId jobId = submitJob(job, client);
         JobResult jres = client.waitForJob(jobId, TimeUnit.MINUTES.toMillis(5));
         Assert.assertNotNull(jres);
@@ -278,7 +318,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testDataSpaceNodeClientPushPull() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_pull.groovy",
-                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
+                                null);
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
@@ -290,7 +331,8 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void testDataSpaceNodeClientPushDelete() throws Throwable {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
-                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
+                                null);
         JobId jobId = submitJob(job, client);
         TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
         System.out.println(tres.getOutput().getAllLogs(false));
@@ -298,27 +340,28 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertEquals("OK", tres.value());
     }
 
-    protected Job nodeClientJob(String groovyScript, String forkScript) throws Exception {
+    protected Job nodeClientJob(String groovyScript, String forkScript, String cleaningScript) throws Exception {
 
         URL scriptURL = SchedulerClientTest.class.getResource(groovyScript);
-        URL forkScriptURL = SchedulerClientTest.class.getResource(forkScript);
 
         TaskFlowJob job = new TaskFlowJob();
         job.setName("NodeClientJob");
         ScriptTask task = new ScriptTask();
         task.setName("NodeClientTask");
-        ForkEnvironment forkEnvironment = new ForkEnvironment();
-        forkEnvironment.setEnvScript(new SimpleScript(IOUtils.toString(forkScriptURL.toURI()), "groovy"));
-        task.setForkEnvironment(forkEnvironment);
+        if (forkScript != null) {
+            ForkEnvironment forkEnvironment = new ForkEnvironment();
+            forkEnvironment.setEnvScript(new SimpleScript(IOUtils.toString(SchedulerClientTest.class.getResource(forkScript)
+                                                                                                    .toURI()),
+                                                          "groovy"));
+            task.setForkEnvironment(forkEnvironment);
+        }
         task.setScript(new TaskScript(new SimpleScript(IOUtils.toString(scriptURL.toURI()), "groovy")));
         //add CleanScript to test external APIs
-        task.setCleaningScript(new SimpleScript("" + "schedulerapi.connect();\n" +
-                                                "print(\"SCHEDULERAPI_URI_LIST_NOT_NULL=\"+(schedulerapi.getGlobalSpaceURIs()!=null));\n" +
-                                                "\n" + "userspaceapi.connect();\n" +
-                                                "print(\"USERSPACE_FILE_LIST_NOT_NULL=\"+(userspaceapi.listFiles(\".\", \"*\")!=null));\n" +
-                                                "\n" + "globalspaceapi.connect();\n" +
-                                                "print(\"GLOBALSPACE_FILE_LIST_NOT_NULL=\"+(globalspaceapi.listFiles(\".\", \"*\")!=null));\n" +
-                                                "print(\"TEST_CREDS=\"+(credentials.get(\"TEST_CREDS\")));\n", "js"));
+        if (cleaningScript != null) {
+            task.setCleaningScript(new SimpleScript(IOUtils.toString(SchedulerClientTest.class.getResource(cleaningScript)
+                                                                                              .toURI()),
+                                                    "groovy"));
+        }
         job.addTask(task);
         return job;
     }
@@ -379,6 +422,49 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.removeEventListener();
 
         client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME * 2)
+    public void testJobSubmissionWithGenericInfo() throws Throwable {
+        ISchedulerClient client = clientInstance();
+
+        // Create a generic infos map
+        String jobSubmissionGenericInfoKey = "job_generic_info";
+        String jobSubmissionGenericInfoValue = "!*job generic info value*!";
+        Map<String, String> genericInfosMap = Collections.singletonMap(jobSubmissionGenericInfoKey,
+                                                                       jobSubmissionGenericInfoValue);
+
+        // Submit a job with the generic informations map
+        JobId jobId = client.submit(jobDescriptor, anyMap(), genericInfosMap, anyMap());
+        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));
+
+        // The job generic info must be returned by the task
+        TaskResult taskResult = client.getJobResult(jobId).getResult("task1");
+        Assert.assertEquals(jobSubmissionGenericInfoValue, taskResult.value());
+    }
+
+    @Test(timeout = MAX_WAIT_TIME * 2)
+    public void testJobSubmissionWithGenericInfoResolvedWithVariable() throws Throwable {
+        ISchedulerClient client = clientInstance();
+
+        // The job submission generic info must be replaced by the job submission variable
+        String jobSubmissionGenericInfoKey = "job_generic_info";
+        String jobSubmissionGenericInfoValue = "${updated_with_job_variable}";
+        Map<String, String> genericInfosMap = Collections.singletonMap(jobSubmissionGenericInfoKey,
+                                                                       jobSubmissionGenericInfoValue);
+
+        // Create a variables map
+        String jobVariableKey = "updated_with_job_variable";
+        String jobVariableValue = "!*variable value*!";
+        Map<String, String> variablesMap = Collections.singletonMap(jobVariableKey, jobVariableValue);
+
+        // Submit a job with the generic informations map and the variables map
+        JobId jobId = client.submit(jobDescriptor, variablesMap, genericInfosMap, anyMap());
+        client.waitForJob(jobId, TimeUnit.SECONDS.toMillis(120));
+
+        // The job generic info must be returned by the task
+        TaskResult taskResult = client.getJobResult(jobId).getResult("task1");
+        Assert.assertEquals(jobVariableValue, taskResult.value());
     }
 
     @Test(timeout = MAX_WAIT_TIME)

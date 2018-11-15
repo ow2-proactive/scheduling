@@ -23,31 +23,46 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.scheduler.util;
+package org.ow2.proactive_grid_cloud_portal.scheduler.dto;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-
-import com.google.common.collect.Maps;
+import org.apache.log4j.Logger;
+import org.dozer.DozerConverter;
 
 
-public class WorkflowVariablesTransformer {
+/**
+ * @author ActiveEon Team
+ * @since 18/10/2018
+ */
+public class StringResultMapCustomConverter extends DozerConverter<Map, Map> {
 
-    public Map<String, String> getWorkflowVariablesFromPathSegment(PathSegment pathSegment) {
-        Map<String, String> variables = null;
-        MultivaluedMap<String, String> matrixParams = pathSegment.getMatrixParameters();
-        if (matrixParams != null && !matrixParams.isEmpty()) {
-            // Remove any empty keys that might be mistakenly sent to the scheduler to prevent bad behaviour
-            matrixParams.remove("");
-            variables = Maps.newHashMap();
-            for (String key : matrixParams.keySet()) {
-                String value = matrixParams.getFirst(key) == null ? "" : matrixParams.getFirst(key);
-                variables.put(key, value);
-            }
-        }
-        return variables;
+    private static final Logger logger = Logger.getLogger(StringResultMapCustomConverter.class);
+
+    public StringResultMapCustomConverter() {
+        super(Map.class, Map.class);
     }
 
+    @Override
+    public Map convertTo(Map source, Map destination) {
+        return null;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map convertFrom(Map source, Map destination) {
+        if (source == null) {
+            return null;
+        }
+        Map<String, String> converted = new HashMap<>();
+        for (Map.Entry<String, Serializable> entry : ((Map<String, Serializable>) source).entrySet()) {
+            if (entry.getValue() != null) {
+                converted.put(entry.getKey(), entry.getValue().toString());
+            }
+
+        }
+        return converted;
+    }
 }

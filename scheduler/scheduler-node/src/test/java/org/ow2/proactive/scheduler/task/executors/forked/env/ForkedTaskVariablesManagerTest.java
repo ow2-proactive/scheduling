@@ -80,6 +80,10 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
 
     private String testVariable1Value = "valueForTest1";
 
+    private String testJobResultVariable1Key = "testJobResultVariable1";
+
+    private String testJobResultVariable1Value = "valueForTestJobResultVariable1";
+
     private String testCred1Key = "TestCred1";
 
     private String testCred1Value = "valueForTestCred1";
@@ -108,10 +112,30 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(scriptHandler,
                                                  createTaskContext(null),
                                                  variablesMap,
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.VARIABLES_BINDING_NAME,
                                                  variablesMap);
+
+    }
+
+    @Test
+    public void testAddBindingsToScriptHandlerContainsJobResults()
+            throws InvalidScriptException, NodeException, NoSuchFieldException, IllegalAccessException {
+        ScriptHandler scriptHandler = new ScriptHandler();
+
+        Map<String, Serializable> resultMap = new HashMap<>();
+        resultMap.put(testJobResultVariable1Key, testJobResultVariable1Value);
+
+        validateThatScriptHandlerBindingsContain(scriptHandler,
+                                                 createTaskContext(null),
+                                                 new VariablesMap(),
+                                                 resultMap,
+                                                 new HashMap<String, String>(),
+                                                 new HashMap<String, String>(),
+                                                 SchedulerConstants.RESULT_MAP_BINDING_NAME,
+                                                 resultMap);
 
     }
 
@@ -125,6 +149,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(scriptHandler,
                                                  createTaskContext(null),
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  resultMetadata,
                                                  SchedulerConstants.RESULT_METADATA_VARIABLE,
@@ -149,6 +174,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  taskContext,
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.RESULTS_VARIABLE,
@@ -166,6 +192,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  createTaskContext(null),
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  thirdPartyCredentials,
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.CREDENTIALS_VARIABLE,
@@ -181,6 +208,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  createTaskContext(null),
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  "",
@@ -199,6 +227,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  taskContext,
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
@@ -228,6 +257,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(),
                                                     taskContext,
                                                     new VariablesMap(),
+                                                    new HashMap<>(),
                                                     new HashMap<String, String>(),
                                                     new HashMap<String, String>(),
                                                     SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME,
@@ -257,6 +287,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(),
                                                     taskContext,
                                                     new VariablesMap(),
+                                                    new HashMap<>(),
                                                     new HashMap<String, String>(),
                                                     new HashMap<String, String>(),
                                                     SchedulerConstants.DS_USER_API_BINDING_NAME,
@@ -266,6 +297,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsInstanceOf(new ScriptHandler(),
                                                     taskContext,
                                                     new VariablesMap(),
+                                                    new HashMap<>(),
                                                     new HashMap<String, String>(),
                                                     new HashMap<String, String>(),
                                                     SchedulerConstants.DS_GLOBAL_API_BINDING_NAME,
@@ -290,6 +322,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  taskContext,
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.DS_SCRATCH_BINDING_NAME,
@@ -314,6 +347,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  taskContext,
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.DS_CACHE_BINDING_NAME,
@@ -338,6 +372,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  taskContext,
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.DS_INPUT_BINDING_NAME,
@@ -362,6 +397,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  taskContext,
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.DS_OUTPUT_BINDING_NAME,
@@ -386,6 +422,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  taskContext,
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.DS_USER_BINDING_NAME,
@@ -410,6 +447,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         validateThatScriptHandlerBindingsContain(new ScriptHandler(),
                                                  taskContext,
                                                  new VariablesMap(),
+                                                 new HashMap<>(),
                                                  new HashMap<String, String>(),
                                                  new HashMap<String, String>(),
                                                  SchedulerConstants.DS_GLOBAL_BINDING_NAME,
@@ -446,7 +484,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         Serializable[] parameters = new Serializable[] { "$" + testVariable1Key };
         Script script = new SimpleScript("print 'hello'", "python", parameters);
 
-        // Create a hash map with key as varialbe name and value as variable value.
+        // Create a hash map with key as variable name and value as variable value.
         Map<String, Serializable> variables = new HashMap<>();
         variables.put(testVariable1Key, testVariable1Value);
 
@@ -497,11 +535,13 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
     }
 
     private <T> void validateThatScriptHandlerBindingsContain(ScriptHandler scriptHandler, TaskContext taskContext,
-            VariablesMap variables, Map<String, String> credentials, Map<String, String> resultMetadata, String key,
-            T entry) throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
+            VariablesMap variables, Map<String, Serializable> resultMap, Map<String, String> credentials,
+            Map<String, String> resultMetadata, String key, T entry)
+            throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
         Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler,
                                                                                         taskContext,
                                                                                         variables,
+                                                                                        resultMap,
                                                                                         credentials,
                                                                                         resultMetadata);
 
@@ -510,11 +550,13 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
     }
 
     private <T> void validateThatScriptHandlerBindingsInstanceOf(ScriptHandler scriptHandler, TaskContext taskContext,
-            VariablesMap variables, Map<String, String> credentials, Map<String, String> resultMetadata, String key,
-            Class clazz) throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
+            VariablesMap variables, Map<String, Serializable> resultMap, Map<String, String> credentials,
+            Map<String, String> resultMetadata, String key, Class clazz)
+            throws NoSuchFieldException, IllegalAccessException, InvalidScriptException, NodeException {
         Map<String, Object> scriptHandlerBindings = initializeForkedTaskVariableManager(scriptHandler,
                                                                                         taskContext,
                                                                                         variables,
+                                                                                        resultMap,
                                                                                         credentials,
                                                                                         resultMetadata);
 
@@ -523,8 +565,9 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
     }
 
     private Map<String, Object> initializeForkedTaskVariableManager(ScriptHandler scriptHandler,
-            TaskContext taskContext, VariablesMap variables, Map<String, String> credentials,
-            Map<String, String> resultMetadata) throws IllegalAccessException, NoSuchFieldException {
+            TaskContext taskContext, VariablesMap variables, Map<String, Serializable> resultMap,
+            Map<String, String> credentials, Map<String, String> resultMetadata)
+            throws IllegalAccessException, NoSuchFieldException {
         // Create class
         ForkedTaskVariablesManager forkedTaskVariablesManager = new ForkedTaskVariablesManager();
 
@@ -540,6 +583,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
                                                               taskContext,
                                                               variables,
+                                                              resultMap,
                                                               credentials,
                                                               schedulerNodeClient,
                                                               forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,

@@ -928,6 +928,8 @@ class LiveJobs {
         // to be done before terminating the task, once terminated it is not
         // running anymore..
         job.getRunningTaskDescriptor(taskId);
+        //merge task map result to job map result
+        job.getResultMap().putAll(result.getResultMap());
         ChangedTasksInfo changesInfo = job.terminateTask(errorOccurred, taskId, listener, result.getAction(), result);
 
         boolean jobFinished = job.isFinished();

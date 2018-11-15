@@ -70,7 +70,7 @@ import com.google.common.base.Stopwatch;
 
 /**
  * Run a task through a script handler.
- *
+ * <p>
  * Responsible for:
  * - running the different scripts
  * - variable propagation
@@ -140,6 +140,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
                                                                                                          nodesFile));
             variables.setScopeMap(taskContextVariableExtractor.getScopeVariables(taskContext));
             Map<String, String> resultMetadata = new HashMap<>();
+            Map<String, Serializable> resultMap = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
             userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
@@ -152,6 +153,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
                                                                   taskContext,
                                                                   variables,
+                                                                  resultMap,
                                                                   thirdPartyCredentials,
                                                                   schedulerNodeClient,
                                                                   userSpaceClient,
@@ -185,6 +187,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             executeFlowScript(taskContext.getControlFlowScript(), scriptHandler, output, error, taskResult);
 
             taskResult.setPropagatedVariables(SerializationUtil.serializeVariableMap(variables.getPropagatedVariables()));
+            taskResult.setResultMap(resultMap);
             taskResult.setMetadata(resultMetadata);
 
             return taskResult;
@@ -227,6 +230,11 @@ public class InProcessTaskExecutor implements TaskExecutor {
         } else {
             //Needs to be stored in the local space
             String uri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+            p = Paths.get(uri, path);
+            Path hasParent = p.getParent();
+            if (!Files.exists(hasParent)) {
+                FileUtils.forceMkdirParent(new File(uri, path));
+            }
             try (FileWriter fw = new FileWriter(new File(uri, path))) {
                 fw.write(code);
             } catch (IOException e) {

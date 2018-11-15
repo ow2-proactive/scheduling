@@ -25,26 +25,20 @@
  */
 package org.ow2.proactive_grid_cloud_portal.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-
 import org.ow2.proactive.utils.ObjectByteConverter;
 
 
 public class ObjectUtility {
 
-    public static Object object(byte[] bytes) throws IOException, ClassNotFoundException {
+    public static Object object(byte[] bytes) {
         if (bytes == null) {
             return "[NULL]";
         }
         Object answer;
         try {
             answer = ObjectByteConverter.byteArrayToObject(bytes);
-        } catch (ClassNotFoundException cnfe) {
-            return String.format("[De-serialization error : %s]", cnfe.getMessage());
-        } catch (IOException ioe) {
-            return String.format("[De-serialization error : %s]", ioe.getMessage());
+        } catch (Exception e) {
+            return String.format("[De-serialization error : %s]", e.getMessage());
         }
         if (answer instanceof byte[]) {
             return "[RAW DATA]";
