@@ -395,7 +395,7 @@ public abstract class Script<E> implements Serializable {
             captureOutput(engine, outputBuffer, result);
 
             return result;
-        } catch (javax.script.ScriptException e) { 
+        } catch (javax.script.ScriptException e) {
             // drop exception cause as it might not be serializable
             ScriptException scriptException = new ScriptException(e.getMessage());
             scriptException.setStackTrace(e.getStackTrace());
