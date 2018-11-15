@@ -3,7 +3,7 @@
   "serviceId": "^https://(.+)/studio(\\z|/.*)",
   "name": "ProActive Studio",
   "id": 5,
-  "description": "ProActive Studio",
+  "description": "ProActive portal for workflow design",
   "evaluationOrder": 3,
   "logoutType": "FRONT_CHANNEL",
   "attributeReleasePolicy" : {

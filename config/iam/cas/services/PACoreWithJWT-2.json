@@ -16,7 +16,7 @@
     "@class" : "org.apereo.cas.services.ReturnMappedAttributeReleasePolicy",
     "allowedAttributes" : {
       "@class" : "java.util.TreeMap",
-      "uid" : "uid",
+      "commonName" : "userName",
       "role" : "role"
     }
   }
