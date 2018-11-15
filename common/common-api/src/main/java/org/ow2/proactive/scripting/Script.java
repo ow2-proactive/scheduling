@@ -395,8 +395,7 @@ public abstract class Script<E> implements Serializable {
             captureOutput(engine, outputBuffer, result);
 
             return result;
-        } catch (javax.script.ScriptException e) {
-            logger.error("Error during script execution", e);
+        } catch (javax.script.ScriptException e) { 
             // drop exception cause as it might not be serializable
             ScriptException scriptException = new ScriptException(e.getMessage());
             scriptException.setStackTrace(e.getStackTrace());
@@ -404,7 +403,6 @@ public abstract class Script<E> implements Serializable {
             captureOutput(engine, outputBuffer, result);
             return result;
         } catch (Throwable t) {
-            logger.error("Error during script execution", t);
             String stack = Throwables.getStackTraceAsString(t);
             if (t.getMessage() != null) {
                 stack = t.getMessage() + System.lineSeparator() + stack;
