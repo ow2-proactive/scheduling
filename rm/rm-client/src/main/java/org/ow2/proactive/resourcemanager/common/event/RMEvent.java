@@ -54,7 +54,10 @@ public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, So
     /** event count sent to this client during the session */
     protected long counter;
 
-    protected long firstCounter;
+    /** smallest counter among the set of events with equal nodeUrl or nodeSourceName
+     * smallest possible counter is zero so that is why we initilize it like this
+     * */
+    protected long firstCounter = 0;
 
     /**
      * ProActive empty constructor

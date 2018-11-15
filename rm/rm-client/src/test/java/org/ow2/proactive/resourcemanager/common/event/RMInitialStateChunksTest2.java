@@ -106,8 +106,8 @@ public class RMInitialStateChunksTest2 {
         }
 
         assertEquals(4, accumulatedNodeSourceEvents.size());
-        assertEquals(1200, accumulatedNodeEvents.size());
-        assertEquals(26, numberOfRequests);
+        assertEquals(200, accumulatedNodeEvents.size());
+        assertEquals(6, numberOfRequests);
     }
 
 }

@@ -182,7 +182,7 @@ public class RMInitialState implements Serializable {
     private boolean isRemovedButRelevantToClient(long counterKnownByClient, RMEvent event) {
         return (event.getEventType() == RMEventType.NODE_REMOVED ||
                 event.getEventType() == RMEventType.NODESOURCE_REMOVED) &&
-               event.getFirstCounter() < counterKnownByClient;
+               event.getFirstCounter() <= counterKnownByClient;
     }
 
     private long computeActualFilter(long clientFilter) {

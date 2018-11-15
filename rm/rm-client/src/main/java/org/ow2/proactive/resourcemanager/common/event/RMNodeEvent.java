@@ -126,6 +126,7 @@ public final class RMNodeEvent extends RMEvent {
     public RMNodeEvent(String nodeUrl, long counter) {
         this.nodeUrl = nodeUrl;
         this.counter = counter;
+        this.firstCounter = counter;
 
         this.nodeSource = null;
         this.PADName = null;
@@ -149,6 +150,7 @@ public final class RMNodeEvent extends RMEvent {
         super(eventType);
         this.nodeUrl = nodeUrl;
         this.counter = counter;
+        this.firstCounter = counter;
 
         this.nodeSource = null;
         this.PADName = null;
