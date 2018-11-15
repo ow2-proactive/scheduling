@@ -129,6 +129,8 @@ public class RMInitialState implements Serializable {
     }
 
     protected void update(RMEvent event) {
+        final Optional<RMEvent> existingEvent = events.get(event.getKey());
+        existingEvent.ifPresent(event::updateFirstCounter);
         events.add(event);
         updateCounter(event);
     }
@@ -153,14 +155,15 @@ public class RMInitialState implements Serializable {
             responseEvents = events.getSortedItems()
                                    .tailSet(new RMEvent(actualFilter + 1)) // because tailSet returns event which is equal or greater
                                    .stream()
-                                   .filter(event -> (event.getEventType() != RMEventType.NODE_REMOVED &&
-                                                     event.getEventType() != RMEventType.NODESOURCE_REMOVED))
+                                   .filter(this::isNotRemoved)
                                    .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
                                    .collect(Collectors.toList());
         } else {
             responseEvents = events.getSortedItems()
                                    .tailSet(new RMEvent(actualFilter + 1)) // because tailSet returns event which is equal or greater
                                    .stream()
+                                   .filter(event -> isRemovedButRelevantToClient(actualFilter, event) ||
+                                                    isNotRemoved(event))
                                    .limit(PAResourceManagerProperties.RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE.getValueAsInt())
                                    .collect(Collectors.toList());
         }
@@ -172,6 +175,24 @@ public class RMInitialState implements Serializable {
         response.setLatestCounter(Math.max(actualFilter, findLargestCounter(responseEvents)));
 
         return response;
+    }
+
+    private boolean isNotRemoved(RMEvent event) {
+        return event.getEventType() != RMEventType.NODE_REMOVED &&
+               event.getEventType() != RMEventType.NODESOURCE_REMOVED;
+    }
+
+    /**
+     * @param actualFilter counter value till which client knows about events
+     * @param event event on the server
+     * @return true if <code>event </code> type is removed
+     * but first event associated to current <code>event</code>
+     * (associated by nodeUrl or nodeSourceName) already known by client
+     */
+    private boolean isRemovedButRelevantToClient(long actualFilter, RMEvent event) {
+        return (event.getEventType() == RMEventType.NODE_REMOVED ||
+                event.getEventType() == RMEventType.NODESOURCE_REMOVED) &&
+               event.getFirstCounter() < actualFilter;
     }
 
     private long computeActualFilter(long clientFilter) {
