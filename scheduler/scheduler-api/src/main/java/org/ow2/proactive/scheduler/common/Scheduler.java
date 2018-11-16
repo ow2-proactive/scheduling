@@ -521,7 +521,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean resume() throws NotConnectedException, PermissionException;
 
     /**
-     * For administrator only, Terminate the scheduler by terminating running tasks.
+     * For administrator only, Terminate the scheduler after all currently running tasks are finished.
      *
      * @return true if success, false if not.
      * @throws NotConnectedException
