@@ -52,6 +52,8 @@ import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -257,9 +259,15 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             updateVariablesForTasksToSchedule(taskRetrievedFromPolicy);
 
-            for (EligibleTaskDescriptor etd : taskRetrievedFromPolicy) {
+            for (Iterator<EligibleTaskDescriptor> iterator = taskRetrievedFromPolicy.iterator(); iterator.hasNext();) {
+                EligibleTaskDescriptorImpl taskDescriptor = (EligibleTaskDescriptorImpl) iterator.next();
                 // load and Initialize the executable container
-                loadAndInit(((EligibleTaskDescriptorImpl) etd).getInternal());
+                InternalTask internalTask = taskDescriptor.getInternal();
+                try {
+                    loadAndInit(internalTask);
+                } catch (Exception e) {
+                    handleLoadExecutableContainerError(internalTask, iterator, e);
+                }
             }
 
             while (!taskRetrievedFromPolicy.isEmpty()) {
@@ -607,6 +615,20 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             tlogger.debug(task.getId(), "initializing the executable container");
             ExecutableContainer container = getDBManager().loadExecutableContainer(task);
             task.setExecutableContainer(container);
+        }
+    }
+
+    private void handleLoadExecutableContainerError(InternalTask task, Iterator<EligibleTaskDescriptor> etd,
+            Exception e) {
+        String message = "Error when loading task " + task.toString() +
+                         " definition from the database. See server logs for more details. Killing task " +
+                         task.getId();
+        logger.error(message, e);
+        etd.remove();
+        try {
+            schedulingService.killTask(task.getJobId(), task.getName(), message);
+        } catch (Exception e2) {
+            logger.error("Unable to kill task " + task.getId(), e2);
         }
     }
 

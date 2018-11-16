@@ -83,6 +83,8 @@ class LiveJobs {
 
     private static final TaskResultCreator taskResultCreator = TaskResultCreator.getInstance();
 
+    public static String KILL_TASK_DEFAULT_MESSAGE = "The task has been manually killed.";
+
     public static class JobData {
 
         final InternalJob job;
@@ -873,6 +875,11 @@ class LiveJobs {
     }
 
     TerminationData killTask(JobId jobId, String taskName) throws UnknownJobException, UnknownTaskException {
+        return this.killTask(jobId, taskName, KILL_TASK_DEFAULT_MESSAGE);
+    }
+
+    TerminationData killTask(JobId jobId, String taskName, String message)
+            throws UnknownJobException, UnknownTaskException {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
             throw new UnknownJobException(jobId);
@@ -893,9 +900,8 @@ class LiveJobs {
             TaskResultImpl taskResult = taskResultCreator.getTaskResult(dbManager,
                                                                         jobData.job,
                                                                         task,
-                                                                        new TaskAbortedException("The task has been manually killed."),
-                                                                        new SimpleTaskLogs("",
-                                                                                           "The task has been manually killed."));
+                                                                        new TaskAbortedException(message),
+                                                                        new SimpleTaskLogs("", message));
 
             TerminationData terminationData = createAndFillTerminationData(taskResult,
                                                                            taskData,
@@ -907,7 +913,7 @@ class LiveJobs {
                        terminationData,
                        task,
                        taskResult,
-                       "The task has been manually killed. " + "You also ask to cancel the job in such a situation!",
+                       message + " The job was configured to be cancelled automatically in this situation.",
                        JobStatus.CANCELED);
             } else {
                 terminateTask(jobData, task, true, taskResult, terminationData);
