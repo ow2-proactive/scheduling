@@ -25,10 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -73,6 +70,16 @@ public class TestStaxJobFactory {
 
     private static URI jobDescriptorWithEmptyMetadata;
 
+    private static URI jobDescriptorWithUnresolvedGenericInfoAndVariables;
+
+    private static URI jobDescriptorAttrDefGenericInformationXmlElement;
+
+    private static URI jobDescriptorAttrDefParameterXmlElement;
+
+    private static URI jobDescriptorAttrDefVariableXmlElement;
+
+    private static URI jobDescriptorTaskVariable;
+
     private StaxJobFactory factory;
 
     @BeforeClass
@@ -89,6 +96,21 @@ public class TestStaxJobFactory {
 
         jobDescriptorWithEmptyMetadata = TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/job_with_empty_metadata.xml")
                                                                  .toURI();
+
+        jobDescriptorWithUnresolvedGenericInfoAndVariables = TestStaxJobFactory.class.getResource("job_with_unresolved_generic_info_and_variables.xml")
+                                                                                     .toURI();
+
+        jobDescriptorAttrDefGenericInformationXmlElement = TestStaxJobFactory.class.getResource("job_attr_def_generic_information_xml_element.xml")
+                                                                                   .toURI();
+
+        jobDescriptorAttrDefParameterXmlElement = TestStaxJobFactory.class.getResource("job_attr_def_parameter_xml_element.xml")
+                                                                          .toURI();
+
+        jobDescriptorAttrDefVariableXmlElement = TestStaxJobFactory.class.getResource("job_attr_def_variable_xml_element.xml")
+                                                                         .toURI();
+
+        jobDescriptorTaskVariable = TestStaxJobFactory.class.getResource("task_variables.xml").toURI();
+
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
     }
@@ -154,13 +176,29 @@ public class TestStaxJobFactory {
     }
 
     @Test
+    public void testCreateJobShouldUseVariableMapAndGenericInfoMapToReplaceInJobGenericInfoInEmptyWorkflow()
+            throws Exception {
+        Map<String, String> variablesMap = Maps.newHashMap();
+        String updatedValue = "job_generic_info_updated_using_variables_map";
+        variablesMap.put("job_variable_key", updatedValue);
+
+        Map<String, String> genericInfoMap = Maps.newHashMap();
+        genericInfoMap.put("job_generic_info", "${job_variable_key}");
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri,
+                                                              variablesMap,
+                                                              genericInfoMap);
+
+        assertEquals(updatedValue, testJob.getGenericInformation().get("job_generic_info"));
+    }
+
+    @Test
     public void testCreateJobShouldUseVariableMapAndGenericInfoMapToReplaceInJobGenericInfo() throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
         String updatedValue = "job_generic_info_updated_using_variables_map";
-        variablesMap.put("job_generic_info", updatedValue);
+        variablesMap.put("job_variable_key", updatedValue);
 
         Map<String, String> genericInfoMap = Maps.newHashMap();
-        genericInfoMap.put("job_generic_info", "${job_generic_info}");
+        genericInfoMap.put("job_generic_info", "${job_variable_key}");
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap, genericInfoMap);
 
         assertEquals(updatedValue, testJob.getGenericInformation().get("job_generic_info"));
@@ -181,25 +219,43 @@ public class TestStaxJobFactory {
     @Test
     public void testCreateJobShouldUseGenericInfosMapToCreateJobGenericInfoVariables() throws Exception {
         Map<String, String> genericInfosMap = Maps.newHashMap();
+        String updatedKey = "new_job_generic_info";
         String updatedValue = "new_job_generic_info_value";
 
-        genericInfosMap.put("new_job_generic_info", updatedValue);
+        genericInfosMap.put(updatedKey, updatedValue);
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, null, genericInfosMap);
 
-        assertEquals(updatedValue, testJob.getGenericInformation().get("new_job_generic_info"));
+        assertEquals(updatedValue, testJob.getGenericInformation().get(updatedKey));
     }
 
     @Test
     public void
-            testCreateJobShouldUseGenericInfosMapToCreateJobGenericInfoVariablesOnWorkflowsWithEmptyGenericInfoSection()
+            testCreateJobShouldUseGenericInfosMapToCreateJobGenericInfoOnWorkflowWithEmptyGenericInfoAndVariablesSection()
                     throws Exception {
         Map<String, String> genericInfosMap = Maps.newHashMap();
-        String updatedValue = "new_job_generic_info_value";
+        String genericInfoKey = "generic_info_key";
+        String genericInfoValue = "generic_info_value";
 
-        genericInfosMap.put("new_job_generic_info", updatedValue);
+        genericInfosMap.put(genericInfoKey, genericInfoValue);
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri, null, genericInfosMap);
 
-        assertEquals(updatedValue, testJob.getGenericInformation().get("new_job_generic_info"));
+        assertEquals(genericInfoValue, testJob.getGenericInformation().get(genericInfoKey));
+        assertNull(testJob.getVariables().get(genericInfoKey));
+    }
+
+    @Test
+    public void
+            testCreateJobShouldUseVariablesMapToCreateJobVariablesOnWorkflowWithEmptyGenericInfoAndVariablesSection()
+                    throws Exception {
+        Map<String, String> variablesMap = Maps.newHashMap();
+        String variableKey = "variable_key";
+        String variableValue = "variable_value";
+
+        variablesMap.put(variableKey, variableValue);
+        TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorNoVariablesUri, variablesMap, null);
+
+        assertEquals(variableValue, testJob.getVariables().get(variableKey).getValue());
+        assertNull(testJob.getGenericInformation().get(variableKey));
     }
 
     @Test
@@ -270,7 +326,7 @@ public class TestStaxJobFactory {
     @Test
     public void testJobCreationAttributeOrderDefinitionGenericInformationXmlElement()
             throws URISyntaxException, JobCreationException {
-        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_attr_def_generic_information_xml_element.xml"));
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(jobDescriptorAttrDefGenericInformationXmlElement);
         Map<String, String> genericInformation = job.getTask("task").getGenericInformation();
         assertExpectedKeyValueEntriesMatch(genericInformation);
     }
@@ -278,7 +334,7 @@ public class TestStaxJobFactory {
     @Test
     public void testJobCreationAttributeOrderDefinitionParameterXmlElement()
             throws URISyntaxException, JobCreationException, IOException, ClassNotFoundException {
-        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_attr_def_parameter_xml_element.xml"));
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(jobDescriptorAttrDefParameterXmlElement);
         Map<String, Serializable> arguments = ((JavaTask) job.getTask("task")).getArguments();
         assertExpectedKeyValueEntriesMatch(arguments);
     }
@@ -286,7 +342,7 @@ public class TestStaxJobFactory {
     @Test
     public void testJobCreationAttributeOrderDefinitionVariableXmlElement()
             throws URISyntaxException, JobCreationException {
-        Job job = factory.createJob(getResource("job_attr_def_variable_xml_element.xml"));
+        Job job = factory.createJob(jobDescriptorAttrDefVariableXmlElement);
         Map<String, JobVariable> jobVariables = job.getVariables();
         assertEquals(2, jobVariables.size());
         JobVariable jobVariable = jobVariables.get("name1");
@@ -407,7 +463,7 @@ public class TestStaxJobFactory {
 
     @Test
     public void testTaskVariables() throws URISyntaxException, JobCreationException {
-        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("task_variables.xml"));
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(jobDescriptorTaskVariable);
         Map<String, TaskVariable> taskVariables = job.getTask("task").getVariables();
         assertEquals(2, taskVariables.size());
         TaskVariable taskVariable = taskVariables.get("name1");
@@ -426,7 +482,7 @@ public class TestStaxJobFactory {
 
     @Test
     public void testUnresolvedJobVariables() throws URISyntaxException, JobCreationException {
-        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_with_unresolved_generic_info_and_variables.xml"));
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(jobDescriptorWithUnresolvedGenericInfoAndVariables);
         Map<String, JobVariable> unresolvedVariables = job.getUnresolvedVariables();
         Map<String, JobVariable> variables = job.getVariables();
         assertEquals("value1", unresolvedVariables.get("variable1").getValue());
@@ -437,7 +493,7 @@ public class TestStaxJobFactory {
 
     @Test
     public void testUnresolvedGenericInformation() throws URISyntaxException, JobCreationException {
-        TaskFlowJob job = (TaskFlowJob) factory.createJob(getResource("job_with_unresolved_generic_info_and_variables.xml"));
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(jobDescriptorWithUnresolvedGenericInfoAndVariables);
         Map<String, String> unresolvedGenericInformation = job.getUnresolvedGenericInformation();
         Map<String, String> genericInformation = job.getGenericInformation();
         assertEquals("${variable1}", unresolvedGenericInformation.get("info1"));
@@ -454,11 +510,6 @@ public class TestStaxJobFactory {
         // expected attribute values and parsed ones should be the same, so the symmetric
         // difference between both sets should be empty
         Assert.assertTrue(CollectionUtils.disjunction(EXPECTED_KEY_VALUE_ENTRIES.values(), map.values()).isEmpty());
-    }
-
-    private URI getResource(String filename) throws URISyntaxException {
-        return TestStaxJobFactory.class.getResource("/org/ow2/proactive/scheduler/common/job/factories/" + filename)
-                                       .toURI();
     }
 
 }

@@ -387,10 +387,9 @@ public class StaxJobFactory extends JobFactory {
                                                                                             this::newJobVariable)));
             }
             // Then add job submission generic informations, resolved using job submission variables
-            if (replacementGenericInfos != null) {
-                commonPropertiesHolder.addGenericInformations(replaceGenericInfosInJobGenericInfosMap(replacementGenericInfos,
-                                                                                                      replacementVariables));
-            }
+            if (replacementGenericInfos != null)
+                commonPropertiesHolder.addGenericInformations(getResolvedGenericInformations(replacementGenericInfos,
+                                                                                             replacementVariables));
 
             // Continue to fill the temporary job with xml elements
             while (cursorJob.hasNext()) {
@@ -411,15 +410,16 @@ public class StaxJobFactory extends JobFactory {
                     } else if (XMLTags.COMMON_GENERIC_INFORMATION.matches(current)) {
                         // Resolve the generic infos in the xml with the resolved variables
                         Map<String, String> resolvedJobVariables = commonPropertiesHolder.getVariablesAsReplacementMap();
-                        Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformation(cursorJob);
-                        commonPropertiesHolder.setUnresolvedGenericInformation(unresolvedGenericInformationDefinedInWorkflow);
-                        Map<String, String> resolvedGenericInformationDefinedInWorkflow = getGenericInformation(unresolvedGenericInformationDefinedInWorkflow,
-                                                                                                                resolvedJobVariables);
-                        // Then add/replace the resolved generic infos in the xml with the job submission ones
-                        Map<String, String> submittedGenericInformation = commonPropertiesHolder.getGenericInformation();
-                        resolvedGenericInformationDefinedInWorkflow.putAll(submittedGenericInformation);
-                        // And set them to the temporary job
-                        commonPropertiesHolder.setGenericInformation(resolvedGenericInformationDefinedInWorkflow);
+                        Map<String, String> unresolvedGenericInformationsDefinedInWorkflow = getUnresolvedGenericInformations(cursorJob);
+                        Map<String, String> resolvedGenericInformationsDefinedInWorkflow = getResolvedGenericInformations(unresolvedGenericInformationsDefinedInWorkflow,
+                                                                                                                          resolvedJobVariables);
+                        // Then add/replace the resolved generic infos in the xml with the ones specified at job submission
+                        Map<String, String> submittedGenericInformations = commonPropertiesHolder.getGenericInformation();
+                        resolvedGenericInformationsDefinedInWorkflow.putAll(submittedGenericInformations);
+
+                        // Update the temporary job
+                        commonPropertiesHolder.setGenericInformation(resolvedGenericInformationsDefinedInWorkflow);
+                        commonPropertiesHolder.setUnresolvedGenericInformation(unresolvedGenericInformationsDefinedInWorkflow);
 
                     } else if (XMLTags.JOB_CLASSPATHES.matches(current)) {
                         logger.warn("Element " + XMLTags.JOB_CLASSPATHES.getXMLName() +
@@ -623,29 +623,6 @@ public class StaxJobFactory extends JobFactory {
         return updatedVariablesMap;
     }
 
-    protected Map<String, String> replaceGenericInfosInJobGenericInfosMap(Map<String, String> genericInfosMap,
-            Map<String, String> replacementGenericInfos) throws JobCreationException {
-
-        HashMap<String, String> updatedReplacementGenericInfos = new HashMap<>();
-        HashMap<String, String> updatedGenericInfosMap = new HashMap<>(genericInfosMap);
-
-        // replacements will include at first variables defined in the job
-        updatedReplacementGenericInfos.putAll(updatedGenericInfosMap);
-
-        if (replacementGenericInfos != null) {
-            // overwritten by variables used at job submission
-            updatedReplacementGenericInfos.putAll(replacementGenericInfos);
-        }
-
-        for (Map.Entry<String, String> replacementGenericInfo : updatedReplacementGenericInfos.entrySet()) {
-            // if the variable is already defined in the job, overwrite its value by the replacement variable,
-            // eventually using other variables as pattern replacements
-            String genericInfoValue = replace(replacementGenericInfo.getValue(), updatedReplacementGenericInfos);
-            updatedGenericInfosMap.put(replacementGenericInfo.getKey(), genericInfoValue);
-        }
-        return updatedGenericInfosMap;
-    }
-
     /**
       * Create a map of variables from XML variables.
       * Leave the method with the cursor at the end of 'ELEMENT_VARIABLES' tag
@@ -725,7 +702,7 @@ public class StaxJobFactory extends JobFactory {
      * @param cursorInfo the streamReader with the cursor on the 'ELEMENT_COMMON_GENERIC_INFORMATION' tag.
      * @return the list of generic information as a hashMap.
      */
-    private HashMap<String, String> getUnresolvedGenericInformation(XMLStreamReader cursorInfo)
+    private HashMap<String, String> getUnresolvedGenericInformations(XMLStreamReader cursorInfo)
             throws JobCreationException {
         HashMap<String, String> infos = new HashMap<>();
         try {
@@ -770,10 +747,10 @@ public class StaxJobFactory extends JobFactory {
      *
      * @return the list of generic information as a hashMap.
      */
-    private HashMap<String, String> getGenericInformation(Map<String, String> unresolvedGenericInformation,
+    private HashMap<String, String> getResolvedGenericInformations(Map<String, String> unresolvedGenericInformations,
             Map<String, String> variables) throws JobCreationException {
         HashMap<String, String> infos = new HashMap<>();
-        for (Map.Entry<String, String> unresolvedGenericInformationValue : unresolvedGenericInformation.entrySet()) {
+        for (Map.Entry<String, String> unresolvedGenericInformationValue : unresolvedGenericInformations.entrySet()) {
             infos.put(unresolvedGenericInformationValue.getKey(),
                       replace(unresolvedGenericInformationValue.getValue(), variables));
         }
@@ -984,10 +961,10 @@ public class StaxJobFactory extends JobFactory {
                             if (job.getGenericInformation() != null)
                                 jobVariablesWithGenericInfos.putAll(job.getGenericInformation());
 
-                            Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformation(cursorTask);
+                            Map<String, String> unresolvedGenericInformationDefinedInWorkflow = getUnresolvedGenericInformations(cursorTask);
                             tmpTask.setUnresolvedGenericInformation(unresolvedGenericInformationDefinedInWorkflow);
-                            tmpTask.setGenericInformation(getGenericInformation(unresolvedGenericInformationDefinedInWorkflow,
-                                                                                jobVariablesWithGenericInfos));
+                            tmpTask.setGenericInformation(getResolvedGenericInformations(unresolvedGenericInformationDefinedInWorkflow,
+                                                                                         jobVariablesWithGenericInfos));
                         } else if (XMLTags.VARIABLES.matches(current)) {
                             Map<String, TaskVariable> taskVariablesMap = createTaskVariables(cursorTask,
                                                                                              tmpTask.getVariablesOverriden(job));

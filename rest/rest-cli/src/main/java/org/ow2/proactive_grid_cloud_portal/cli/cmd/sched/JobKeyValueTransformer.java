@@ -38,27 +38,27 @@ import com.google.common.collect.Maps;
 
 
 public class JobKeyValueTransformer {
-    private final static String USAGE = " The correct format is [ submit('workflow.xml','{\"var1\":\"value1\",\"var2\":\"value2\"}') ]";
+    private final static String USAGE = " The correct format is [ '{\"key1\":\"value1\",...}' ]";
 
-    public Map<String, String> transformVariablesToMap(String jsonVariables) {
-        Map<String, String> jobVariables = Maps.newHashMap();
-        if (jsonVariables != null) {
+    public static Map<String, String> transformJsonStringToMap(String jsonString) {
+        Map<String, String> jsonMap = Maps.newHashMap();
+        if (jsonString != null) {
             try {
-                jobVariables = (JSONObject) new JSONParser().parse(jsonVariables);
-                validateJSONVariables(jobVariables);
+                jsonMap = (JSONObject) new JSONParser().parse(jsonString);
+                validateJsonMap(jsonMap);
             } catch (ParseException | IllegalArgumentException e) {
 
                 throw new CLIException(REASON_INVALID_ARGUMENTS, e.getMessage() + USAGE);
             }
         }
-        return jobVariables;
+        return jsonMap;
     }
 
-    private void validateJSONVariables(Map<String, String> jsonVariables) {
-        if (jsonVariables.size() == 0) {
+    private static void validateJsonMap(Map<String, String> jsonMap) {
+        if (jsonMap.size() == 0) {
             throw new IllegalArgumentException("empty json ");
         } else {
-            for (String key : jsonVariables.keySet()) {
+            for (String key : jsonMap.keySet()) {
                 if (key.length() == 0) {
                     throw new IllegalArgumentException("empty key ");
                 }

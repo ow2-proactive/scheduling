@@ -28,8 +28,10 @@ package org.ow2.proactive.scheduler.rest.data;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toJobInfo;
 import static org.ow2.proactive.scheduler.rest.data.DataUtility.toTaskResult;
 
-import java.util.HashMap;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
@@ -37,6 +39,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.utils.ObjectByteConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobResultData;
@@ -54,6 +57,8 @@ public class JobResultImpl implements JobResult {
 
     private Map<String, TaskResult> preciousResults;
 
+    private Map<String, Serializable> resultMap;
+
     private Map<String, TaskResult> exceptionResults;
 
     JobResultImpl(JobResultData data) {
@@ -62,16 +67,15 @@ public class JobResultImpl implements JobResult {
         allResults = createTaskResultMap(data.getAllResults());
         preciousResults = createTaskResultMap(data.getPreciousResults());
         exceptionResults = createTaskResultMap(data.getExceptionResults());
+        resultMap = ObjectByteConverter.mapOfBase64StringToSerializable(data.getSerializedResultMap());
         jobInfo = data.getJobInfo();
     }
 
     private Map<String, TaskResult> createTaskResultMap(Map<String, TaskResultData> inputDataMap) {
-        Map<String, TaskResult> map = new HashMap<>();
-        for (String taskName : inputDataMap.keySet()) {
-            TaskResultData taskResultData = inputDataMap.get(taskName);
-            map.put(taskName, toTaskResult(jobId, taskResultData));
-        }
-        return map;
+        return inputDataMap.entrySet()
+                           .stream()
+                           .collect(Collectors.toMap(Map.Entry::getKey,
+                                                     entry -> toTaskResult(jobId, entry.getValue())));
     }
 
     @Override
@@ -102,6 +106,11 @@ public class JobResultImpl implements JobResult {
     @Override
     public Map<String, TaskResult> getPreciousResults() {
         return preciousResults;
+    }
+
+    @Override
+    public Map<String, Serializable> getResultMap() {
+        return resultMap;
     }
 
     @Override
