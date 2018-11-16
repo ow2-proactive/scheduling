@@ -43,9 +43,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -57,7 +59,6 @@ import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.resourcemanager.rmnode.RMNode;
-import org.ow2.proactive.resourcemanager.rmnode.RMNodeImpl;
 import org.ow2.proactive.resourcemanager.selection.policies.ShufflePolicy;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyHandler;
 import org.ow2.proactive.resourcemanager.selection.topology.TopologyNodesFilter;
@@ -557,11 +558,12 @@ public abstract class SelectionManager {
         return filteredList;
     }
 
+    @ImmediateService
     public <T> List<ScriptResult<T>> executeScript(final Script<T> script, final Collection<RMNode> nodes,
             final Map<String, Serializable> bindings) {
-        // TODO: add a specific timeout for script execution
-        final long timeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
-        final ArrayList<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
+        final long allScriptExecutionsTimeout = PAResourceManagerProperties.RM_EXECUTE_SCRIPT_TIMEOUT.getValueAsLong();
+        final List<Callable<ScriptResult<T>>> scriptExecutors = new ArrayList<>(nodes.size());
+        final List<String> scriptHosts = new ArrayList<>(nodes.size());
 
         // Execute the script on each selected node
         for (final RMNode node : nodes) {
@@ -571,54 +573,72 @@ public abstract class SelectionManager {
                     // Execute with a timeout the script by the remote handler
                     // and always async-unlock the node, exceptions will be
                     // treated as ExecutionException
+                    String nodeURL = node.getNodeURL();
                     try {
-                        logger.info("Executing node script on " + node.getNodeURL());
+                        logger.info("Executing node script on " + nodeURL);
                         ScriptResult<T> res = node.executeScript(script, bindings);
-                        PAFuture.waitFor(res, timeout);
-                        logger.info("Node script execution on " + node.getNodeURL() + " terminated");
+                        PAFuture.waitFor(res, allScriptExecutionsTimeout);
+                        logger.info("Node script execution on " + nodeURL + " terminated");
                         return res;
+                    } catch (Exception e) {
+                        logger.error("Error while executing node script and waiting for the result on " + nodeURL, e);
+                        throw e;
                     } finally {
-                        SelectionManager.this.rmcore.unlockNodes(Collections.singleton(node.getNodeURL()));
+                        SelectionManager.this.rmcore.unlockNodes(Collections.singleton(nodeURL));
                     }
                 }
 
                 @Override
                 public String toString() {
-                    return "executing script on " + node.getNodeURL();
+                    return "executing node script on " + node.getNodeURL();
                 }
             });
+            scriptHosts.add(node.getHostName());
         }
 
         // Invoke all Callables and get the list of futures
-        List<Future<ScriptResult<T>>> futures = null;
+        List<Future<ScriptResult<T>>> futures = new LinkedList<>();
         try {
-            futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors, timeout, TimeUnit.MILLISECONDS);
+            futures = this.scriptExecutorThreadPool.invokeAll(scriptExecutors,
+                                                              allScriptExecutionsTimeout,
+                                                              TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            logger.warn("Interrupted while waiting, unable to execute all scripts", e);
+            logger.warn("Interrupted while waiting, unable to execute all node scripts", e);
             Thread.currentThread().interrupt();
         }
 
         final List<ScriptResult<T>> results = new LinkedList<>();
+        List<RMNode> nodesList = new ArrayList<>(nodes);
 
         int index = 0;
-        // waiting for the results
         for (final Future<ScriptResult<T>> future : futures) {
-            final String description = scriptExecutors.get(index++).toString();
-            ScriptResult<T> result = null;
+            final String description = scriptExecutors.get(index).toString();
+            String nodeURL = nodesList.get(index).getNodeURL();
+
+            ScriptResult<T> result;
             try {
+                logger.debug("Awaiting node script result on " + nodeURL);
                 result = future.get();
             } catch (CancellationException e) {
+                logger.error("The invoked node script was cancelled due to timeout on " + nodeURL, e);
                 result = new ScriptResult<>(new ScriptException("Cancelled due to timeout expiration when " +
                                                                 description, e));
             } catch (InterruptedException e) {
+                logger.warn("The invoked node script was interrupted on " + nodeURL, e);
                 result = new ScriptResult<>(new ScriptException("Cancelled due to interruption when " + description));
             } catch (ExecutionException e) {
                 // Unwrap the root exception
                 Throwable rex = e.getCause();
-                result = new ScriptResult<>(new ScriptException("Exception occured in script call when " + description,
+                logger.error("There was an issue during node script invocation on " + nodeURL, e);
+                result = new ScriptResult<>(new ScriptException("Exception occurred in script call when " + description,
                                                                 rex));
             }
+
+            result.setHostname(scriptHosts.get(index));
             results.add(result);
+            index++;
+
+            logger.info("Successfully retrieved script result on " + nodeURL);
         }
 
         return results;
