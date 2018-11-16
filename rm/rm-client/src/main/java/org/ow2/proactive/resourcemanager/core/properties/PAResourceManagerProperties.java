@@ -79,8 +79,9 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /**
      * Timeout in ms for remote script execution using
      * {@code SelectionManager#executeScript(org.ow2.proactive.scripting.Script, java.util.HashMap)}
+     * Default is 10 minutes for the script execution to complete.
      */
-    RM_EXECUTE_SCRIPT_TIMEOUT("pa.rm.execute.script.timeout", PropertyType.INTEGER, "180000"),
+    RM_EXECUTE_SCRIPT_TIMEOUT("pa.rm.execute.script.timeout", PropertyType.INTEGER, "600000"),
 
     /**
      * If set to non-null value the resource manager executes only selection scripts from
