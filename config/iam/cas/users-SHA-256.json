@@ -1,11 +1,11 @@
 {
-  "@class" : "java.util.LinkedHashMap",  
-  "tobias" : {
+  "@class" : "java.util.LinkedHashMap",
+  "bob" : {
     "@class" : "org.apereo.cas.adaptors.generic.CasUserAccount",
     "password" : "e0374e589a7c697dabef1493a04808fdad59fcb9580988d8523f43bc2cbc9481",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "Tobias Wiens",
+      "commonName" : "Bob",
       "role" : "user"
     },
     "status" : "OK",
@@ -16,7 +16,7 @@
     "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "user",
+      "commonName" : "user",
       "role" : "user"
     },
     "status" : "OK",
@@ -27,7 +27,7 @@
     "password" : "998ed4d621742d0c2d85ed84173db569afa194d4597686cae947324aa58ab4bb",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "administrator",
+      "commonName" : "administrator",
       "role" : "admin, nsadmins"
     },
     "status" : "OK",
@@ -38,7 +38,7 @@
     "password" : "ae5e45864de387d1c80696592a8eb66825e4a84f47b2088b1fb32d1df6c275a9",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "rm",
+      "commonName" : "rm",
       "role" : "admin, nsadmins"
     },
     "status" : "OK",
@@ -49,7 +49,7 @@
     "password" : "10553b998e1f360567789e3209a6782db4a549813e2e8d76e78faac6f9b1db79",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "scheduler",
+      "commonName" : "scheduler",
       "role" : "user"
     },
     "status" : "OK",
@@ -60,7 +60,7 @@
     "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "radmin",
+      "commonName" : "radmin",
       "role" : "rmcoreadmins"
     },
     "status" : "OK",
@@ -71,7 +71,7 @@
     "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "nsadmin",
+      "commonName" : "nsadmin",
       "role" : "nsadmins"
     },
     "status" : "OK",
@@ -82,7 +82,7 @@
     "password" : "b14ebc2510c9b27ec843ae98686260cc691338edf2db0a2d625fa50a1f4ebba7",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "demo",
+      "commonName" : "demo",
       "role" : "admin"
     },
     "status" : "OK",
@@ -93,7 +93,7 @@
     "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "guest",
+      "commonName" : "guest",
       "role" : "guests"
     },
     "status" : "OK",
@@ -104,7 +104,7 @@
     "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "test_executor",
+      "commonName" : "test_executor",
       "role" : "admin"
     },
     "status" : "OK",
@@ -115,7 +115,7 @@
     "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "test",
+      "commonName" : "test",
       "role" : ""
     },
     "status" : "OK",
@@ -126,7 +126,7 @@
     "password" : "7b3a14bbc93a55cef6d46833d1fd88b530ec8275886c1b9aa5aec16f83614513",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "watcher",
+      "commonName" : "watcher",
       "role" : "watchers"
     },
     "status" : "OK",
@@ -137,7 +137,7 @@
     "password" : "5741419e48642ffe1ce6f186c120765cf4a91c6e9bd69ff37858e6cc0f237e94",
     "attributes" : {
       "@class" : "java.util.LinkedHashMap",
-      "cn" : "provider",
+      "commonName" : "provider",
       "role" : "providers"
     },
     "status" : "OK",
