@@ -670,7 +670,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public boolean shutdown() throws NotConnectedException, PermissionException {
         boolean isShutdown = false;
         try {
-            isShutdown = restApi().killScheduler(sid);
+            isShutdown = restApi().shutdownScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
