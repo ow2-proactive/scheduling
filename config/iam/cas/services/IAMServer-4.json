@@ -4,5 +4,5 @@
   "name": "IAM Microservice",
   "id": 4,
   "description": "ProActive Identity and Access Management microservice",
-  "evaluationOrder": 3
+  "evaluationOrder": 4
 }
