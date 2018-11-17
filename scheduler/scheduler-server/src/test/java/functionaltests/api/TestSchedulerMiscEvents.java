@@ -111,13 +111,12 @@ public class TestSchedulerMiscEvents extends SchedulerFunctionalTestNoRestart {
         schedulerHelper.waitForEventSchedulerState(SchedulerEvent.RESUMED);
 
         assertTrue(!schedAdminInterface.start());
-        log("waiting scheduler shutting down event");
+
         assertTrue(schedAdminInterface.shutdown());
-
+        log("waiting scheduler shuttingdown event");
         schedulerHelper.waitForEventSchedulerState(SchedulerEvent.SHUTTING_DOWN);
-
-        log("waiting scheduler shutted down event");
-        schedulerHelper.waitForEventSchedulerState(SchedulerEvent.SHUTDOWN);
+        log("waiting scheduler killed event");
+        schedulerHelper.waitForEventSchedulerState(SchedulerEvent.KILLED);
 
         schedulerHelper.killScheduler(); // to make sure other tests get a clean Scheduler
     }

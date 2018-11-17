@@ -38,11 +38,13 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -99,6 +101,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
@@ -940,10 +943,7 @@ public class RMRest implements RMRestInterface {
                                                               scriptEngine,
                                                               TargetType.NODE_URL.name(),
                                                               Collections.singleton(nodeUrl));
-
-        if (results.isEmpty()) {
-            throw new IllegalStateException("Empty results from script execution");
-        }
+        checkEmptyScriptResults(results);
 
         return results.get(0);
     }
@@ -956,13 +956,20 @@ public class RMRest implements RMRestInterface {
     public List<ScriptResult<Object>> executeNodeSourceScript(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodesource") String nodeSource, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
-
         RMProxyUserInterface rm = checkAccess(sessionId);
 
-        return rm.executeScript(script,
-                                scriptEngine,
-                                TargetType.NODESOURCE_NAME.name(),
-                                Collections.singleton(nodeSource));
+        List<ScriptResult<Object>> results = rm.executeScript(script,
+                                                              scriptEngine,
+                                                              TargetType.NODESOURCE_NAME.name(),
+                                                              Collections.singleton(nodeSource));
+
+        List<ScriptResult<Object>> awaitedResults = results.stream()
+                                                           .map(result -> PAFuture.getFutureValue(result))
+                                                           .collect(Collectors.toList());
+
+        checkEmptyScriptResults(awaitedResults);
+
+        return awaitedResults;
     }
 
     @Override
@@ -970,13 +977,25 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("host/script")
     @Produces("application/json")
-    public List<ScriptResult<Object>> executeHostScript(@HeaderParam("sessionid") String sessionId,
-            @FormParam("host") String host, @FormParam("script") String script,
+    public ScriptResult<Object> executeHostScript(@HeaderParam("sessionid") String sessionId,
+            @FormParam("host") String hostname, @FormParam("script") String script,
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
 
         RMProxyUserInterface rm = checkAccess(sessionId);
 
-        return rm.executeScript(script, scriptEngine, TargetType.HOSTNAME.name(), Collections.singleton(host));
+        List<ScriptResult<Object>> results = rm.executeScript(script,
+                                                              scriptEngine,
+                                                              TargetType.HOSTNAME.name(),
+                                                              Collections.singleton(hostname));
+        checkEmptyScriptResults(results);
+
+        return results.get(0);
+    }
+
+    private void checkEmptyScriptResults(List<ScriptResult<Object>> results) {
+        if (results.isEmpty()) {
+            results.add(new ScriptResult<>(new ScriptException("No results from script execution")));
+        }
     }
 
     @GET

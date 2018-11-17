@@ -336,6 +336,7 @@ public class RMNodeImpl extends AbstractRMNode {
             }
             return this.handler.handle(script);
         } catch (NodeException e) {
+            logger.error("Could not contact node when executing script " + getNodeURL(), e);
             return new ScriptResult<>(e);
         } finally {
             try {
