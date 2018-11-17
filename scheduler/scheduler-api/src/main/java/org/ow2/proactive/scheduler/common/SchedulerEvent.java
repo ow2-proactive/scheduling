@@ -49,6 +49,7 @@ public enum SchedulerEvent {
     /** The scheduler has just been resumed. */
     RESUMED("Resumed"),
     /** The scheduler has just been shutdown. */
+    @Deprecated
     SHUTDOWN("Shutdown"),
     /** The scheduler is shutting down. */
     SHUTTING_DOWN("Shutting down"),

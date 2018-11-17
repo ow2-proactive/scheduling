@@ -2863,6 +2863,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * shutdown the scheduler
+     *
+     * @param sessionId
+     *            a valid session id
+     * @return true if success, false if not
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     */
+    @Override
+    @PUT
+    @Path("shutdown")
+    @Produces("application/json")
+    public boolean shutdownScheduler(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "shutdown");
+            return s.shutdown();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    /**
      * Reconnect a new Resource Manager to the scheduler. Can be used if the
      * resource manager has crashed.
      *
