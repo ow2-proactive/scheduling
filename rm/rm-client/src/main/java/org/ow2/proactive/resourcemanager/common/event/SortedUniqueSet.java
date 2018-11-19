@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.common.event;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -60,6 +61,15 @@ public class SortedUniqueSet<T extends SortedUniqueSet.Unique & Comparable<T> & 
 
         items.put(toAdd.getKey(), toAdd);
         sortedItems.add(toAdd);
+    }
+
+    public Optional<T> get(String key) {
+        final T value = items.get(key);
+        if (value != null) {
+            return Optional.of(value);
+        } else {
+            return Optional.empty();
+        }
     }
 
     public boolean remove(T toRemove) {

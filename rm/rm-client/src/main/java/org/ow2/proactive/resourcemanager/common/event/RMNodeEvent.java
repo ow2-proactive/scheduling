@@ -126,6 +126,31 @@ public final class RMNodeEvent extends RMEvent {
     public RMNodeEvent(String nodeUrl, long counter) {
         this.nodeUrl = nodeUrl;
         this.counter = counter;
+        this.firstCounter = counter;
+
+        this.nodeSource = null;
+        this.PADName = null;
+        this.VnName = null;
+        this.hostName = null;
+        this.VMName = null;
+        this.nodeState = null;
+        this.previousNodeState = null;
+        this.nodeProvider = null;
+        this.nodeOwner = null;
+        this.description = null;
+        this.defaultJMXUrl = null;
+        this.proactiveJMXUrl = null;
+        this.isLocked = false;
+        this.lockTime = -1;
+        this.nodeLocker = null;
+    }
+
+    // for test purpose
+    public RMNodeEvent(String nodeUrl, long counter, RMEventType eventType) {
+        super(eventType);
+        this.nodeUrl = nodeUrl;
+        this.counter = counter;
+        this.firstCounter = counter;
 
         this.nodeSource = null;
         this.PADName = null;
