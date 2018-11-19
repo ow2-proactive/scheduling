@@ -54,6 +54,11 @@ public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, So
     /** event count sent to this client during the session */
     protected long counter;
 
+    /** smallest counter among the set of events with equal nodeUrl or nodeSourceName
+     * smallest possible counter is zero so that is why we initilize it like this
+     * */
+    protected long firstCounter = 0;
+
     /**
      * ProActive empty constructor
      */
@@ -70,6 +75,14 @@ public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, So
     public RMEvent(RMEventType type) {
         this.type = type;
         this.timeStamp = System.currentTimeMillis();
+    }
+
+    void updateFirstCounter(RMEvent another) {
+        this.firstCounter = Math.min(this.firstCounter, another.firstCounter);
+    }
+
+    public long getFirstCounter() {
+        return firstCounter;
     }
 
     /**
@@ -131,6 +144,7 @@ public class RMEvent implements Serializable, Cloneable, Comparable<RMEvent>, So
      */
     public void setCounter(long counter) {
         this.counter = counter;
+        this.firstCounter = counter;
     }
 
     /**
