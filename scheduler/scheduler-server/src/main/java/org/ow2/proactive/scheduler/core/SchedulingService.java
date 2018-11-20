@@ -614,13 +614,18 @@ public class SchedulingService {
     }
 
     public boolean killTask(final JobId jobId, final String taskName) throws UnknownJobException, UnknownTaskException {
+        return killTask(jobId, taskName, LiveJobs.KILL_TASK_DEFAULT_MESSAGE);
+    }
+
+    public boolean killTask(final JobId jobId, final String taskName, final String message)
+            throws UnknownJobException, UnknownTaskException {
         try {
             if (status.isUnusable()) {
                 return false;
             }
 
             return infrastructure.getClientOperationsThreadPool().submit(() -> {
-                TerminationData terminationData = jobs.killTask(jobId, taskName);
+                TerminationData terminationData = jobs.killTask(jobId, taskName, message);
                 boolean taskKilled = terminationData.taskTerminated(jobId, taskName);
                 submitTerminationDataHandler(terminationData);
                 wakeUpSchedulingThread();
