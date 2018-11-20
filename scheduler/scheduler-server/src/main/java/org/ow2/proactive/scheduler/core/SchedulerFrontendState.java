@@ -1139,7 +1139,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     return;
             }
             dispatchJobStateUpdated(owner, notification);
-            new JobEmailNotification(js, notification).checkAndSend();
+            new JobEmailNotification(js, notification).checkAndSendAsync();
         }
     }
 
