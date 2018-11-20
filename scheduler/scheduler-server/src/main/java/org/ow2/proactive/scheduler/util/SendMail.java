@@ -29,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.addons.email.EmailSender;
@@ -36,6 +38,14 @@ import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
 public class SendMail {
+
+    private static Logger logger = Logger.getLogger(SendMail.class);
+
+    private final ExecutorService asyncMailSender;
+
+    public SendMail() {
+        this.asyncMailSender = Executors.newCachedThreadPool();
+    }
 
     /**
      * Throws EmailException whenever configuration is wrong
@@ -45,14 +55,20 @@ public class SendMail {
      * @param body email body
      */
     public void sender(String to, String subject, String body) {
-        final Properties properties = EmailConfiguration.getConfiguration().getProperties();
+        this.asyncMailSender.submit(() -> {
+            try {
+                final Properties properties = EmailConfiguration.getConfiguration().getProperties();
 
-        EmailSender.Builder builder = new EmailSender.Builder(properties);
-        builder.setFrom(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString());
-        builder.addRecipient(to);
-        builder.setSubject(subject);
-        builder.setBody(body);
-        builder.build().sendPlainTextEmail();
+                EmailSender.Builder builder = new EmailSender.Builder(properties);
+                builder.setFrom(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString());
+                builder.addRecipient(to);
+                builder.setSubject(subject);
+                builder.setBody(body);
+                builder.build().sendPlainTextEmail();
+            } catch (Exception e) {
+                logger.error("Email '" + subject + "' could not be sent to " + to, e);
+            }
+        });
     }
 
 }
