@@ -108,11 +108,14 @@ public class JobEmailNotification {
         if (!jobStatusList.contains(eventType.toString().toLowerCase())) {
             return false;
         }
+
+        String emailTarget = null;
         try {
-            sender.sender(getTo(), getSubject(), getBody());
+            emailTarget = getTo();
+            sender.sender(emailTarget, getSubject(), getBody());
             return true;
         } catch (EmailException e) {
-            throw new JobEmailNotificationException("Error sending email: " + e.getMessage(), e);
+            throw new JobEmailNotificationException(emailTarget, "Error sending email: " + e.getMessage(), e);
         }
     }
 
@@ -121,10 +124,11 @@ public class JobEmailNotification {
             try {
                 boolean sent = doCheckAndSend();
                 if (sent) {
-                    jlogger.info(jobState.getId(), "sent notification email for finished job");
+                    jlogger.info(jobState.getId(), "sent notification email for finished job to " + getTo());
                 }
             } catch (JobEmailNotificationException e) {
-                jlogger.warn(jobState.getId(), "failed to send email notification: " + e.getMessage());
+                jlogger.warn(jobState.getId(),
+                             "failed to send email notification to " + e.getEmailTarget() + ": " + e.getMessage());
                 logger.trace("Stack trace:", e);
             }
         });
