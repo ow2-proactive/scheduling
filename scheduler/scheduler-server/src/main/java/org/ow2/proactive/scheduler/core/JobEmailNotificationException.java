@@ -27,11 +27,18 @@ package org.ow2.proactive.scheduler.core;
 
 public class JobEmailNotificationException extends Exception {
 
+    private String emailTarget;
+
     public JobEmailNotificationException(String message) {
         super(message);
     }
 
-    public JobEmailNotificationException(String message, Exception cause) {
+    public JobEmailNotificationException(String emailTarget, String message, Exception cause) {
         super(message, cause);
+        this.emailTarget = emailTarget;
+    }
+
+    public String getEmailTarget() {
+        return emailTarget;
     }
 }
