@@ -906,7 +906,7 @@ public class RMRest implements RMRestInterface {
                                                               Collections.singleton(nodeSource));
 
         List<ScriptResult<Object>> awaitedResults = results.stream()
-                                                           .map(result -> PAFuture.getFutureValue(result))
+                                                           .map(PAFuture::getFutureValue)
                                                            .collect(Collectors.toList());
 
         checkEmptyScriptResults(awaitedResults);
