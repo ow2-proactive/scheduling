@@ -83,6 +83,8 @@ public class HsqldbServer extends AbstractIdleService {
     // this property is not a common HSQLDB property but a custom one to configure catalog options
     protected static final String PROP_HSQLDB_SERVER_CATALOGS_OPTION_LINE = "server.catalogs.option_line";
 
+    public static final String HSQLDB = "hsqldb";
+
     /*
      * Instance variables.
      */
@@ -125,7 +127,7 @@ public class HsqldbServer extends AbstractIdleService {
 
         String connectionUrl = hibernateProperties.getProperty(PROP_HIBERNATE_CONNECTION_URL);
 
-        if (connectionUrl.toLowerCase().contains("hsqldb")) {
+        if (connectionUrl.toLowerCase().contains(HSQLDB)) {
 
             String catalogLocation = identifyCatalogLocationFromConnectionUrl(connectionUrl);
             String catalogName = identifyCatalogNameFromConnectionUrl(connectionUrl);

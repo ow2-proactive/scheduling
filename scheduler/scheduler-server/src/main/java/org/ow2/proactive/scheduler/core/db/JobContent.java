@@ -59,7 +59,7 @@ import org.ow2.proactive.scheduler.util.ByteCompressionUtils;
 @NamedQueries({ @NamedQuery(name = "deleteJobContentInBulk", query = "delete from JobContent where id in :jobIdList"),
                 @NamedQuery(name = "loadJobContent", query = "from JobContent as content where content.jobId = :id"),
                 @NamedQuery(name = "countJobContent", query = "select count (*) from JobContent") })
-@Table(name = "JOB_CONTENT", indexes = { @Index(name = "INITIAL_JOB_INDEX", columnList = "JOB_ID") })
+@Table(name = "JOB_CONTENT")
 public class JobContent implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(JobContent.class);
