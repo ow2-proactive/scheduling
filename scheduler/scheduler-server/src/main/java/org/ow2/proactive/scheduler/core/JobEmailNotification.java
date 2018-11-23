@@ -165,8 +165,12 @@ public class JobEmailNotification {
         String status = jobState.getStatus().toString();
         String hostname = "UNKNOWN";
         List<TaskState> tasks = jobState.getTasks();
-        String allTaskStatusesString = String.join(System.lineSeparator(), tasks.stream().map(task -> task.getId().getReadableName() + " (" + task.getId().toString() + ") Status: " +
-                task.getStatus().toString()).collect(Collectors.toList()));
+        String allTaskStatusesString = String.join(System.lineSeparator(),
+                                                   tasks.stream()
+                                                        .map(task -> task.getId().getReadableName() + " (" +
+                                                                     task.getId().toString() + ") Status: " +
+                                                                     task.getStatus().toString())
+                                                        .collect(Collectors.toList()));
         try {
             hostname = InetAddress.getLocalHost().getCanonicalHostName();
         } catch (UnknownHostException e) {
