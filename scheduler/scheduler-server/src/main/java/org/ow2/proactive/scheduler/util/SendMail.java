@@ -55,6 +55,19 @@ public class SendMail {
         builder.build().sendPlainTextEmail();
     }
 
+    public void sender(String[] to, String subject, String body) {
+        final Properties properties = EmailConfiguration.getConfiguration().getProperties();
+
+        EmailSender.Builder builder = new EmailSender.Builder(properties);
+        builder.setFrom(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString());
+        for (String t : to) {
+            builder.addRecipient(t);
+        }
+        builder.setSubject(subject);
+        builder.setBody(body);
+        builder.build().sendPlainTextEmail();
+    }
+
 }
 
 class EmailConfiguration {
