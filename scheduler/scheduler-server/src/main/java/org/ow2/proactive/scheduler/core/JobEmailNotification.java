@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.addons.email.exception.EmailException;
@@ -115,7 +116,7 @@ public class JobEmailNotification {
             sender.sender(getTo(), getSubject(), getBody());
             return true;
         } catch (EmailException e) {
-            throw new JobEmailNotificationException(Arrays.toString(getTo()),
+            throw new JobEmailNotificationException(String.join(",", getTo()),
                                                     "Error sending email: " + e.getMessage(),
                                                     e);
         }
@@ -144,13 +145,13 @@ public class JobEmailNotification {
         return from;
     }
 
-    private String[] getTo() throws JobEmailNotificationException {
+    private List<String> getTo() throws JobEmailNotificationException {
         String to = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_EMAIL);
         if (to == null) {
             throw new JobEmailNotificationException("Recipient address is not set in generic information");
         }
         String[] toList = to.split("\\s*,\\s*");
-        return toList;
+        return Arrays.asList(toList);
     }
 
     private String getSubject() {
@@ -164,16 +165,13 @@ public class JobEmailNotification {
         String status = jobState.getStatus().toString();
         String hostname = "UNKNOWN";
         List<TaskState> tasks = jobState.getTasks();
-        StringBuilder taskStatus = new StringBuilder();
-        for (TaskState task : tasks) {
-            taskStatus.append(task.getId().getReadableName() + " (" + task.getId().toString() + ") Status: " +
-                              task.getStatus().toString() + "\n");
-        }
+        String allTaskStatusesString = String.join(System.lineSeparator(), tasks.stream().map(task -> task.getId().getReadableName() + " (" + task.getId().toString() + ") Status: " +
+                task.getStatus().toString()).collect(Collectors.toList()));
         try {
             hostname = InetAddress.getLocalHost().getCanonicalHostName();
         } catch (UnknownHostException e) {
             logger.debug("Could not get hostname", e);
         }
-        return String.format(BODY_TEMPLATE, jobID, status, taskStatus.toString(), hostname);
+        return String.format(BODY_TEMPLATE, jobID, status, allTaskStatusesString, hostname);
     }
 }
