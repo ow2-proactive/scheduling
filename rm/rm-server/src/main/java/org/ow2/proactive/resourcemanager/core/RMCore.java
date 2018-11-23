@@ -2067,8 +2067,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return new BooleanWrapper(false);
         }
 
-        this.disconnectNodeSourceClient(nodeSourceName, nodeSource);
-
         logger.info(NODE_SOURCE_STRING + nodeSourceName + HAS_BEEN_SUCCESSFULLY + evt.getEventType().getDescription());
 
         this.monitoring.nodeSourceEvent(evt);
@@ -2109,15 +2107,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private boolean nodeSourceCanBeRemoved(String nodeSourceName) {
         return allNodes.values().stream().noneMatch(rmNode -> rmNode.getNodeSourceName().equals(nodeSourceName));
-    }
-
-    private void disconnectNodeSourceClient(String nodeSourceName, NodeSource nodeSource) {
-        UniqueID id = Client.getId(nodeSource);
-        if (id != null) {
-            this.disconnect(id);
-        } else {
-            logger.error("Cannot extract the body id of the node source " + nodeSourceName);
-        }
     }
 
     private void finalizeShutdown() {
