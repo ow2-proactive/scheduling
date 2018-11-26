@@ -61,8 +61,8 @@ public class SendMail {
 
         EmailSender.Builder builder = new EmailSender.Builder(properties);
         builder.setFrom(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString());
-        for (String t : to) {
-            builder.addRecipient(t);
+        for (String address : to) {
+            builder.addRecipient(address);
         }
         builder.setSubject(subject);
         builder.setBody(body);
