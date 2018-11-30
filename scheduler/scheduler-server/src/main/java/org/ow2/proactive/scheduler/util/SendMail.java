@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.util;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -50,6 +51,17 @@ public class SendMail {
         EmailSender.Builder builder = new EmailSender.Builder(properties);
         builder.setFrom(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString());
         builder.addRecipient(to);
+        builder.setSubject(subject);
+        builder.setBody(body);
+        builder.build().sendPlainTextEmail();
+    }
+
+    public void sender(List<String> to, String subject, String body) {
+        final Properties properties = EmailConfiguration.getConfiguration().getProperties();
+
+        EmailSender.Builder builder = new EmailSender.Builder(properties);
+        builder.setFrom(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString());
+        to.forEach(address -> builder.addRecipient(address));
         builder.setSubject(subject);
         builder.setBody(body);
         builder.build().sendPlainTextEmail();

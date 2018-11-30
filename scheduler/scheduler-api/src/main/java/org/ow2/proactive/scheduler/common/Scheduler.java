@@ -521,10 +521,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean resume() throws NotConnectedException, PermissionException;
 
     /**
-     * For administrator only, Shutdown the scheduler.<br>
-     * It will terminate every submitted jobs but won't accept new submit.<br>
-     * Use {@link #kill()} if you want to stop the scheduling and exit the
-     * scheduler.
+     * For administrator only, Terminate the scheduler after all currently running tasks are finished.
      *
      * @return true if success, false if not.
      * @throws NotConnectedException

@@ -28,7 +28,7 @@ dependencies {
     runtime 'jsr223:jsr223-docker-compose:0.2.8'
     runtime 'jsr223:jsr223-perl:0.1.0'
     runtime 'jsr223:jsr223-powershell:0.2.1'
-    runtime 'jsr223:jsr223-cpython:0.1.2'
+    runtime 'jsr223:jsr223-cpython:0.1.4'
     runtime 'jsr223:jsr223-scala:0.1.4'
     runtime ('jsr223:jsr223-kubernetes:0.1.5'){
             exclude module : 'gson'

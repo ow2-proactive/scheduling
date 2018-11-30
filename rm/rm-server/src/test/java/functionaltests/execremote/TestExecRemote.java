@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
@@ -78,19 +79,21 @@ public final class TestExecRemote extends RMFunctionalTest {
         RMInitialState state = ((RMMonitorEventReceiver) rmHelper.getResourceManager()).getInitialState();
         String hostname = state.getNodeEvents().get(0).getHostName();
         HashSet<String> nodesUrls = new HashSet<>();
+        Set<String> nodesHosts = new HashSet<>();
         for (RMNodeEvent ne : state.getNodeEvents()) {
             nodesUrls.add(ne.getNodeUrl());
+            nodesHosts.add(ne.getHostName());
         }
 
         simpleScript(nodesUrls);
         selectionScript(nodesUrls);
         processBuilderScript(miscDir, isLinux, valueToEcho, nodesUrls);
         processBuilderWithDSScript(miscDir, isLinux, valueToEcho, nodesUrls);
-        scriptOnNodeSource(nsName, nodesUrls);
+        scriptOnNodeSource(nsName, nodesHosts);
         scriptOnHost(hostname);
     }
 
-    private void scriptOnNodeSource(String nsName, HashSet<String> nodesUrls) throws Exception {
+    private void scriptOnNodeSource(String nsName, Set<String> nodesHosts) throws Exception {
         RMTHelper.log("Test 6 - Execute script on a specified nodesource name");
         SimpleScript script = new SimpleScript(TestExecRemote.simpleScriptContent, "javascript");
         HashSet<String> targets = new HashSet<>(1);
@@ -100,7 +103,7 @@ public final class TestExecRemote extends RMFunctionalTest {
                                                                                          TargetType.NODESOURCE_NAME.toString(),
                                                                                          targets);
 
-        assertEquals("The size of result list must equal to size of nodesource", nodesUrls.size(), results.size());
+        assertEquals("The size of result list must equal to size of nodesource", nodesHosts.size(), results.size());
         for (ScriptResult<Object> res : results) {
             Throwable exception = res.getException();
             if (exception != null) {

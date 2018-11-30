@@ -2067,8 +2067,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             return new BooleanWrapper(false);
         }
 
-        this.disconnectNodeSourceClient(nodeSourceName, nodeSource);
-
         logger.info(NODE_SOURCE_STRING + nodeSourceName + HAS_BEEN_SUCCESSFULLY + evt.getEventType().getDescription());
 
         this.monitoring.nodeSourceEvent(evt);
@@ -2109,15 +2107,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
     private boolean nodeSourceCanBeRemoved(String nodeSourceName) {
         return allNodes.values().stream().noneMatch(rmNode -> rmNode.getNodeSourceName().equals(nodeSourceName));
-    }
-
-    private void disconnectNodeSourceClient(String nodeSourceName, NodeSource nodeSource) {
-        UniqueID id = Client.getId(nodeSource);
-        if (id != null) {
-            this.disconnect(id);
-        } else {
-            logger.error("Cannot extract the body id of the node source " + nodeSourceName);
-        }
     }
 
     private void finalizeShutdown() {
@@ -2395,10 +2384,14 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // return false for non connected clients
         // it should be verified by checkPermissionsMethod but it returns true for
         // local active objects
+        final Client sourceBodyCaller = checkPermissionAndGetClientIsSuccessful();
+        return new BooleanWrapper(!toShutDown && clients.containsKey(sourceBodyCaller.getId()));
+    }
+
+    private Client checkPermissionAndGetClientIsSuccessful() {
         final Request currentRequest = PAActiveObject.getContext().getCurrentRequest();
         String methodName = currentRequest.getMethodName();
-        final Client sourceBodyCaller = checkMethodCallPermission(methodName, currentRequest.getSourceBodyID());
-        return new BooleanWrapper(!toShutDown && clients.containsKey(sourceBodyCaller.getId()));
+        return checkMethodCallPermission(methodName, currentRequest.getSourceBodyID());
     }
 
     /**
@@ -2781,31 +2774,43 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
+    @ImmediateService
     public List<ScriptResult<Object>> executeScript(String script, String scriptEngine, String targetType,
             Set<String> targets) {
         try {
             return this.executeScript(new SimpleScript(script, scriptEngine), targetType, targets);
-        } catch (InvalidScriptException e) {
-            logger.error(e.getMessage(), e);
-            throw new ScriptException(e);
+        } catch (Exception e) {
+            logger.error("Error while executing node script", e);
+            return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
         }
     }
 
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
+        try {
+            checkPermissionAndGetClientIsSuccessful();
+        } catch (Exception e) {
+            logger.error("Error while checking permission to execute node script", e);
+            return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
+        }
         // Depending on the target type, select nodes for script execution
         final TargetType tType = TargetType.valueOf(targetType);
         final HashSet<RMNode> selectedRMNodes = new HashSet<>();
         switch (tType) {
             case NODESOURCE_NAME:
-                // If target is a nodesource name select all its nodes
+                // If target is a nodesource name select one node, not busy if possible
                 for (String target : targets) {
                     NodeSource nodeSource = this.deployedNodeSources.get(target);
                     if (nodeSource != null) {
+                        Set<String> scriptExecutionHostNames = new HashSet<>();
                         for (RMNode candidateNode : this.allNodes.values()) {
-                            if (candidateNode.getNodeSource().equals(nodeSource)) {
+                            String candidateNodeHostName = candidateNode.getHostName();
+                            if (candidateNode.getNodeSource().equals(nodeSource) &&
+                                !scriptExecutionHostNames.contains(candidateNodeHostName)) {
+                                scriptExecutionHostNames.add(candidateNodeHostName);
                                 this.selectCandidateNode(selectedRMNodes, candidateNode);
                             }
                         }
@@ -2833,7 +2838,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 }
                 break;
             default:
-                throw new IllegalArgumentException("Unable to execute script, unknown target type: " + targetType);
+                throw new IllegalArgumentException("Unable to execute node script, unknown target type: " + targetType);
         }
 
         // Return a ProActive future on the list of results
@@ -2851,7 +2856,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             // Unlock all previously locked nodes
             this.unselectNodes(selectedRMNodes);
 
-            throw new IllegalStateException("Script cannot be executed atomically since the node is already locked: " +
+            throw new IllegalStateException("Node script cannot be executed atomically since the node is already locked: " +
                                             candidateNode.getNodeURL());
         }
     }

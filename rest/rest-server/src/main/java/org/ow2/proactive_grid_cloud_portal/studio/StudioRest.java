@@ -326,7 +326,7 @@ public class StudioRest implements StudioInterface {
     public JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException {
-        return scheduler().submit(sessionId, pathSegment, multipart);
+        return scheduler().submit(sessionId, pathSegment, multipart, null);
     }
 
     @Override

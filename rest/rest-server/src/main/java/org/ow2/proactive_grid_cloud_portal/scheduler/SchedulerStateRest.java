@@ -529,6 +529,50 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     /**
+     * Returns the job results map associated to the job referenced by the id
+     * <code>jobid</code>
+     *
+     * @param sessionId
+     *            a valid session id
+     * @return the job results map of the corresponding job
+     */
+    @Override
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/resultmap")
+    @Produces("application/json")
+    public Map<String, String> jobResultMap(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/resultmap");
+            JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
+            if (jobResult == null) {
+                return null;
+            } else {
+                return getJobResultMapAsString(jobResult.getResultMap());
+            }
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    public Map getJobResultMapAsString(Map<String, Serializable> source) {
+        if (source == null) {
+            return null;
+        }
+        return source.entrySet()
+                     .stream()
+                     .filter(entry -> entry.getValue() != null)
+                     .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue().toString()));
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -2153,34 +2197,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Submits a workflow to the scheduler from a workflow URL, creating hence a
-     * new job resource.
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param url
-     *            url to the workflow content
-     * @param pathSegment
-     *            variables of the workflow
-     * @return the <code>jobid</code> of the newly created job
-     * @throws NotConnectedRestException
-     * @throws IOException
-     * @throws JobCreationRestException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
-     */
-    @Override
-    @POST
-    @Path("{path:jobs}")
-    @Produces("application/json")
-    public JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
-            @PathParam("path") PathSegment pathSegment) throws JobCreationRestException, NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, IOException {
-
-        return submitFromUrl(sessionId, url, pathSegment, null);
-    }
-
     private Map<String, String> getMapWithFirstValues(MultivaluedMap<String, String> queryParameters) {
 
         Map<String, String> parameters = new HashMap<String, String>();
@@ -2246,32 +2262,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } finally {
             FileUtils.deleteQuietly(tmpWorkflowFile);
         }
-    }
-
-    /**
-     * Submits a job to the scheduler
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param pathSegment
-     *            variables of the workflow
-     * @param multipart
-     *            the form data containing : - fileName the name of the file
-     *            that will be created on the DataSpace - fileContent the
-     *            content of the file
-     * @return the <code>jobid</code> of the newly created job
-     * @throws IOException
-     *             if the job was not correctly uploaded/stored
-     */
-    @Override
-    @POST
-    @Path("{path:submit}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
-            MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, IOException {
-        return submit(sessionId, pathSegment, multipart, null);
     }
 
     /**
@@ -2853,6 +2843,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "kill");
             return s.kill();
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    /**
+     * shutdown the scheduler
+     *
+     * @param sessionId
+     *            a valid session id
+     * @return true if success, false if not
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     */
+    @Override
+    @PUT
+    @Path("shutdown")
+    @Produces("application/json")
+    public boolean shutdownScheduler(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "shutdown");
+            return s.shutdown();
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {

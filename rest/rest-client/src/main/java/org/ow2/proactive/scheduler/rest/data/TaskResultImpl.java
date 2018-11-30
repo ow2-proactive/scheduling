@@ -57,6 +57,8 @@ public class TaskResultImpl implements TaskResult {
 
     private Map<String, byte[]> propagatedVariables;
 
+    private Map<String, Serializable> resultMap = new HashMap<>();
+
     private Map<String, String> metadata = new HashMap<>();
 
     private boolean isRaw;
@@ -88,7 +90,7 @@ public class TaskResultImpl implements TaskResult {
         try {
             Throwable unserializedException = (Throwable) ObjectByteConverter.byteArrayToObject(serializedException);
             return unserializedException;
-        } catch (ClassCastException | IOException | ClassNotFoundException e) {
+        } catch (ClassCastException e) {
             // If an error occurs during deserialization, a string is returned
             // in that case return the custom made server-side exception
             return new TaskRestException(exceptionMessage);
@@ -117,6 +119,11 @@ public class TaskResultImpl implements TaskResult {
     @Override
     public boolean isRaw() {
         return isRaw;
+    }
+
+    @Override
+    public Map<String, Serializable> getResultMap() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -222,6 +222,21 @@ public interface SchedulerRestInterface {
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 
     /**
+     * Returns the job results map associated to the job referenced by the id
+     * <code>jobid</code>
+     *
+     * @param sessionId
+     *            a valid session id
+     * @return the job results map of the corresponding job
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/resultmap")
+    @Produces("application/json")
+    Map<String, String> jobResultMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+
+    /**
      * Returns the job info associated to the job referenced by the id
      * <code>jobid</code>
      * 
@@ -1240,25 +1255,6 @@ public interface SchedulerRestInterface {
 
     /**
      * Submits a job to the scheduler
-     * 
-     * @param sessionId
-     *            a valid session id
-     * @param pathSegment
-     *            variables of the workflow
-     * @param multipart
-     *            a form with the job file as form data
-     * @return the <code>jobid</code> of the newly created job
-     */
-    @POST
-    @Path("{path:submit}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
-    JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
-            MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, IOException;
-
-    /**
-     * Submits a job to the scheduler
      *
      * @param sessionId
      *            a valid session id
@@ -1297,30 +1293,6 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     String submitPlannings(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             Map<String, String> jobContentXmlString) throws JobCreationRestException, NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, IOException;
-
-    /**
-     * Submits a workflow to the scheduler from a workflow URL, creating hence a
-     * new job resource.
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param url
-     *            url to the workflow content
-     * @param pathSegment
-     *            variables of the workflow
-     * @return the <code>jobid</code> of the newly created job
-     * @throws NotConnectedRestException
-     * @throws IOException
-     * @throws JobCreationRestException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
-     */
-    @POST
-    @Path("jobs")
-    @Produces("application/json")
-    JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
-            @PathParam("path") PathSegment pathSegment) throws JobCreationRestException, NotConnectedRestException,
             PermissionRestException, SubmissionClosedRestException, IOException;
 
     /**
@@ -1564,7 +1536,7 @@ public interface SchedulerRestInterface {
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
-     * kills and shutdowns the scheduler
+     * kills the scheduler
      * 
      * @param sessionId
      *            a valid session id
@@ -1576,6 +1548,21 @@ public interface SchedulerRestInterface {
     @Path("kill")
     @Produces("application/json")
     boolean killScheduler(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException, PermissionRestException;
+
+    /**
+     * shutdown the scheduler
+     *
+     * @param sessionId
+     *            a valid session id
+     * @return true if success, false if not
+     * @throws NotConnectedRestException
+     * @throws PermissionRestException
+     */
+    @PUT
+    @Path("shutdown")
+    @Produces("application/json")
+    boolean shutdownScheduler(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
 
     /**
@@ -1980,7 +1967,7 @@ public interface SchedulerRestInterface {
      * 
      * @param sessionId
      *            current session
-     * @param jobid
+     * @param jobId
      *            id of the job that needs to be updated
      * @param startAt
      *            its value should be ISO 8601 compliant

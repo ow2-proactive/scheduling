@@ -85,6 +85,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ResumeJobCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedHelpCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedJsHelpCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SchedStatsCommand;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.ShutdownCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StartCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.StopCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.sched.SubmitJobCommand;
@@ -241,10 +242,10 @@ public class CommandSet {
                                                                         .longOpt("submit")
                                                                         .description("Submit the specified job-description (XML) file")
                                                                         .hasArgs(true)
-                                                                        .numOfArgs(2)
+                                                                        .numOfArgs(3)
                                                                         .hasOptionalArg(true)
-                                                                        .argNames("job-descriptor '[{\"var1\":\"value1\",\"var2\":\"value2\"}]'")
-                                                                        .jsCommand("submit(job-descriptor,'{\"var1\":\"value1\",\"var2\":\"value2\"}'")
+                                                                        .argNames("job-descriptor [ '{\"var1\":\"value1\",...}' ['{\"genericInfo1\":\"value1\",...}'] ]")
+                                                                        .jsCommand("submit( job-descriptor [,'{\"var1\":\"value1\",...}' [,'{\"genericInfo1\":\"value1\",...}'] ] )")
                                                                         .commandClass(SubmitJobCommand.class)
                                                                         .entry();
 
@@ -295,6 +296,14 @@ public class CommandSet {
                                                                                 .jsCommand("kill()")
                                                                                 .commandClass(KillCommand.class)
                                                                                 .entry();
+
+    public static final CommandSet.Entry SCHEDULER_SHUTDOWN = CommandSetEntryBuilder.newInstance()
+                                                                                    .opt("shutdown")
+                                                                                    .longOpt("shutdownscheduler")
+                                                                                    .description("Shutdown the Scheduler")
+                                                                                    .jsCommand("shutdown()")
+                                                                                    .commandClass(ShutdownCommand.class)
+                                                                                    .entry();
 
     public static final CommandSet.Entry SCHEDULER_STATS = CommandSetEntryBuilder.newInstance()
                                                                                  .opt("sstats")
@@ -965,10 +974,11 @@ public class CommandSet {
     public static final CommandSet.Entry[] SCHEDULER_ONLY = new CommandSet.Entry[] { SCHEDULER_START, SCHEDULER_STOP,
                                                                                      SCHEDULER_PAUSE, SCHEDULER_RESUME,
                                                                                      SCHEDULER_FREEZE, SCHEDULER_KILL,
-                                                                                     LINK_RM, SCHEDULER_STATS, JOB_LIST,
-                                                                                     SUBMIT, JOB_STATE, JOB_OUTPUT,
-                                                                                     JOB_RESULT, JOB_PRIORITY,
-                                                                                     JOB_PAUSE, JOB_RESUME,
+                                                                                     SCHEDULER_SHUTDOWN, LINK_RM,
+                                                                                     SCHEDULER_STATS, JOB_LIST, SUBMIT,
+                                                                                     JOB_STATE, JOB_OUTPUT, JOB_RESULT,
+                                                                                     JOB_PRIORITY, JOB_PAUSE,
+                                                                                     JOB_RESUME,
                                                                                      JOB_RESUME_ALL_PAUSED_TASKS,
                                                                                      JOB_RESTART_ALL_IN_ERROR_TASKS,
                                                                                      JOB_RESUME_ALL_PAUSED_TASKS_AND_RESTART_ALL_IN_ERROR_TASKS,

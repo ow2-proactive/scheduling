@@ -54,9 +54,11 @@ import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -670,7 +672,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     public boolean shutdown() throws NotConnectedException, PermissionException {
         boolean isShutdown = false;
         try {
-            isShutdown = restApi().killScheduler(sid);
+            isShutdown = restApi().shutdownScheduler(sid);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -803,24 +805,46 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public JobId submitFromCatalog(String catalogRestURL, String bucketName, String workflowName,
-            Map<String, String> variables, Map<String, String> genericInfos)
+            Map<String, String> variables, Map<String, String> genericInfo)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
-
-        JobIdData jobIdData = null;
 
         HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" + bucketName + "/resources/" + workflowName +
                                       "/raw");
-        httpGet.addHeader("sessionid", sid);
+        return submitFromCatalog(httpGet, variables, genericInfo);
 
-        try (CloseableHttpClient httpclient = HttpClients.createDefault();
-                CloseableHttpResponse response = httpclient.execute(httpGet)) {
+    }
 
-            jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables, genericInfos);
-        } catch (Exception e) {
-            throwNCEOrPEOrSCEOrJCE(e);
-        }
-        return jobId(jobIdData);
+    @Override
+    public JobId submitFromCatalog(String catalogRestURL, String calledWorkflow)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
 
+        return submitFromCatalog(catalogRestURL, calledWorkflow, new HashMap<>());
+
+    }
+
+    @Override
+    public JobId submitFromCatalog(String catalogRestURL, String calledWorkflow, Map<String, String> variables)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+
+        return submitFromCatalog(catalogRestURL,
+                                 getBucketFromCalledWorkflow(calledWorkflow),
+                                 getNameFromCalledWorkflow(calledWorkflow),
+                                 variables,
+                                 null);
+    }
+
+    @Override
+    public JobId submitFromCatalog(String catalogRestURL, String calledWorkflow, Map<String, String> variables,
+            Map<String, String> genericInfo)
+            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+
+        Optional<String> revision = getRevisionFromCalledWorkflow(calledWorkflow);
+
+        HttpGet httpGet = new HttpGet(catalogRestURL + "/buckets/" + getBucketFromCalledWorkflow(calledWorkflow) +
+                                      "/resources/" + getNameFromCalledWorkflow(calledWorkflow) +
+                                      revision.map(r -> "/revisions/" + r).orElse("") + "/raw");
+
+        return this.submitFromCatalog(httpGet, variables, genericInfo);
     }
 
     @Override
@@ -1319,6 +1343,50 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throw new NotConnectedException("Session " + sid + " is not connected");
         } catch (UnknownJobRestException e) {
             throw new UnknownJobException("Job id " + jobId + " not found");
+        }
+    }
+
+    private JobId submitFromCatalog(HttpGet httpGet, Map<String, String> variables, Map<String, String> genericInfos)
+            throws SubmissionClosedException, JobCreationException, NotConnectedException, PermissionException {
+        JobIdData jobIdData = null;
+
+        httpGet.addHeader("sessionid", sid);
+
+        try (CloseableHttpClient httpclient = HttpClients.createDefault();
+                CloseableHttpResponse response = httpclient.execute(httpGet)) {
+
+            jobIdData = restApiClient().submitXml(sid, response.getEntity().getContent(), variables, genericInfos);
+        } catch (Exception e) {
+            throwNCEOrPEOrSCEOrJCE(e);
+        }
+        return jobId(jobIdData);
+    }
+
+    private String getBucketFromCalledWorkflow(String calledWorkflow) {
+        try {
+            return calledWorkflow.split("/")[0];
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Impossible to parse the PA:CATALOG_OBJECT: %s, parsing error when getting the workflow bucket",
+                                                     calledWorkflow),
+                                       e);
+        }
+    }
+
+    private String getNameFromCalledWorkflow(String calledWorkflow) {
+        try {
+            return calledWorkflow.split("/")[1];
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Impossible to parse the PA:CATALOG_OBJECT: %s, parsing error when getting the workflow name",
+                                                     calledWorkflow),
+                                       e);
+        }
+    }
+
+    private Optional<String> getRevisionFromCalledWorkflow(String calledWorkflow) {
+        try {
+            return Optional.of(calledWorkflow.split("/")[2]);
+        } catch (Exception e) {
+            return Optional.empty();
         }
     }
 }

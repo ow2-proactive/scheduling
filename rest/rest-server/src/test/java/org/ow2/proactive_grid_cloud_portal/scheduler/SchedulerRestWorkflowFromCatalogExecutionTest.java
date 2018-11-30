@@ -88,7 +88,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         when(scheduler.submit(Matchers.<Job> any())).thenReturn(new JobIdImpl(77L, "job"));
 
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
-        JobIdData jobId = schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+        JobIdData jobId = schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment(), null);
 
         Assert.assertNotNull(jobId);
         Assert.assertEquals(77L, jobId.getId());
@@ -104,7 +104,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
         Runnable runnable = () -> {
             try {
                 String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
-                schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+                schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment(), null);
                 successfullySubmitted.incrementAndGet();
             } catch (Exception e) {
                 fail(e.getMessage());
@@ -130,7 +130,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
 
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/workflow";
 
-        JobIdData response = schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+        JobIdData response = schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment(), null);
 
         verify(scheduler).submit(argumentCaptor.capture());
         Job interceptedJob = argumentCaptor.getValue();
@@ -160,7 +160,8 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
 
         JobIdData response = schedulerRest.submitFromUrl(sessionId,
                                                          workflowUrl,
-                                                         getOneVariablePathSegment("var1", "value1"));
+                                                         getOneVariablePathSegment("var1", "value1"),
+                                                         null);
 
         verify(scheduler).submit(argumentCaptor.capture());
         Job interceptedJob = argumentCaptor.getValue();
@@ -188,7 +189,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     @Test(expected = JobCreationRestException.class)
     public void testWhenSubmittingACorruptWorkflowThenThrowException() throws Exception {
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/corrupt";
-        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment(), null);
     }
 
     @Test
@@ -201,7 +202,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     @Test(expected = IOException.class)
     public void testWhenSubmittingUsingAnInvalidWorkflowUrlThenThrowException() throws Exception {
         String workflowUrl = getBaseUriTestWorkflowsServer() + "/nonexistent";
-        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment(), null);
     }
 
     @Test
@@ -220,7 +221,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     @Test(expected = JobCreationRestException.class)
     public void testWhenSubmittingUsingANullWorkflowUrlThenThrowException() throws Exception {
         String workflowUrl = null;
-        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment());
+        schedulerRest.submitFromUrl(sessionId, workflowUrl, getEmptyPathSegment(), null);
     }
 
     @Test
@@ -233,7 +234,7 @@ public class SchedulerRestWorkflowFromCatalogExecutionTest extends RestTestServe
     @Test(expected = NotConnectedRestException.class)
     public void testWhenExceptionSubmittingATemplateWithoutValidSessionIdThenThrowException() throws Exception {
         String sessionId = "invalidSessionId";
-        schedulerRest.submitFromUrl(sessionId, null, getEmptyPathSegment());
+        schedulerRest.submitFromUrl(sessionId, null, getEmptyPathSegment(), null);
     }
 
     @Test(expected = NotConnectedRestException.class)
