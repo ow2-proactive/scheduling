@@ -141,6 +141,11 @@ configure(javaSubprojects) {
         testCompile 'ObjectFaker:ObjectFaker:0.1'
         testCompile 'com.jayway.awaitility:awaitility:1.6.0'
         testCompile 'org.apache.commons:commons-lang3:3.4'
+
+        compile 'org.postgresql:postgresql:42.0.0'
+        compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.11'
+
+
     }
 
     test {
