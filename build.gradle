@@ -142,9 +142,9 @@ configure(javaSubprojects) {
         testCompile 'com.jayway.awaitility:awaitility:1.6.0'
         testCompile 'org.apache.commons:commons-lang3:3.4'
 
-        compile 'org.postgresql:postgresql:42.0.0'
-        compile 'mysql:mysql-connector-java:8.0.11'
-
+        testCompile 'org.postgresql:postgresql:42.0.0'
+        testCompile 'mysql:mysql-connector-java:8.0.11'
+        testCompile 'com.microsoft.sqlserver:mssql-jdbc:7.1.2.jre8-preview'
 
     }
 
