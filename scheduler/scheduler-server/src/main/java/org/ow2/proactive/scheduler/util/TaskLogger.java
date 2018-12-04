@@ -25,6 +25,10 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.ow2.proactive.scheduler.common.task.TaskId;
@@ -118,6 +122,17 @@ public class TaskLogger {
     public void error(TaskId id, String message) {
         updateMdcWithTaskLogFilename(id);
         logger.error(format(id, message));
+        MDC.remove(FileAppender.FILE_NAME);
+    }
+
+    public void close(TaskId id) {
+        updateMdcWithTaskLogFilename(id);
+        logger.debug(format(id, "closing logger"));
+        for (Appender appender : (List<Appender>) Collections.list(logger.getAllAppenders())) {
+            if (appender != null && appender instanceof FileAppender) {
+                appender.close();
+            }
+        }
         MDC.remove(FileAppender.FILE_NAME);
     }
 
