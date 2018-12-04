@@ -169,13 +169,15 @@ public class RMProxyActiveObject {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes).booleanValue();
-            } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript))
+                TaskLogger.getInstance().close(taskId);
+            } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript)) {
                 handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId, creds, store);
-            else {
+            } else {
                 TaskLogger.getInstance().error(taskId,
                                                "Unauthorized clean script: " + System.getProperty("line.separator") +
                                                        cleaningScript.fetchScript());
                 releaseNodes(nodes).booleanValue();
+                TaskLogger.getInstance().close(taskId);
             }
         }
     }
@@ -296,6 +298,7 @@ public class RMProxyActiveObject {
         }
         printCleaningScriptInformations(nodes, sResult, taskId);
         releaseNodes(nodes);
+        TaskLogger.getInstance().close(taskId);
     }
 
     private void printCleaningScriptInformations(NodeSet nodes, ScriptResult<?> sResult, TaskId taskId) {

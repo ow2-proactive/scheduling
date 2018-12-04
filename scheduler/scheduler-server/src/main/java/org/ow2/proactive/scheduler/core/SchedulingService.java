@@ -912,6 +912,7 @@ public class SchedulingService {
     void terminateJobHandling(final JobId jobId) {
         try {
             listenJobLogsSupport.cleanLoggers(jobId);
+            jlogger.close(jobId);
 
             // auto remove
             if (SchedulingService.SCHEDULER_AUTO_REMOVED_JOB_DELAY > 0) {

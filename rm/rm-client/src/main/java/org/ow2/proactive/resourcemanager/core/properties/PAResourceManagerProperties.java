@@ -323,7 +323,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /**
      * Defines the maximum number of RMEvents which can be sent to the client in one request.
      */
-    RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE("pa.rm.rest.monitoring.maximum.chunk.size", PropertyType.INTEGER, "100");
+    RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE("pa.rm.rest.monitoring.maximum.chunk.size", PropertyType.INTEGER, "100"),
+
+    /**
+     * Defines the buffer size used in asynchronous appenders
+     */
+    RM_LOG4J_ASYNC_APPENDER_BUFFER_SIZE("pa.rm.log4j.async.appender.buffer.size", PropertyType.INTEGER, "1024");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
