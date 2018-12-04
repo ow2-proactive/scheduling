@@ -28,6 +28,7 @@ package functionaltests.db.schedulerdb;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 
@@ -271,8 +272,8 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
                 Assert.assertEquals("Unexpected tasks number", tasksNumber, state.getTasks().size());
                 Assert.assertEquals(JobType.TASKSFLOW, state.getType());
                 Assert.assertEquals(DEFAULT_USER_NAME, state.getOwner());
-                Assert.assertEquals(job.getDescription(), state.getDescription());
-                Assert.assertEquals(job.getProjectName(), state.getProjectName());
+                Assert.assertEquals(job.getDescription(), Objects.toString(state.getDescription(), ""));
+                Assert.assertEquals(job.getProjectName(), Objects.toString(state.getProjectName(), ""));
                 Assert.assertEquals(job.getInputSpace(), state.getInputSpace());
                 Assert.assertEquals(job.getOutputSpace(), state.getOutputSpace());
                 Assert.assertEquals(job.getOnTaskErrorProperty().getValue(), state.getOnTaskErrorProperty().getValue());
