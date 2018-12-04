@@ -628,7 +628,12 @@ public class SchedulerDBManager {
     }
 
     private void removeJobScripts(Session session, long jobId) {
+        // This query competes with "deleteJobData" query.
+        // So Oracle 12c can stuck in deadlock.
+        // It is definitely something to improve.
+        // For now, we added "additionalDelayRandomized" in TransactionHelper.
         session.getNamedQuery("updateTaskDataJobScripts").setParameter("jobId", jobId).executeUpdate();
+
         session.getNamedQuery("deleteScriptData").setParameter("jobId", jobId).executeUpdate();
         session.getNamedQuery("deleteSelectionScriptData").setParameter("jobId", jobId).executeUpdate();
     }

@@ -767,6 +767,7 @@ public class TaskData {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "TASK_DATA_DEPENDENCIES", joinColumns = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
                                                                       @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") }, indexes = { @Index(name = "TASK_DATA_DEP_JOB_ID", columnList = "JOB_ID"),
+                                                                                                                                                          @Index(name = "TASK_DATA_DEP_TASK_ID_JOB_ID", columnList = "TASK_ID,JOB_ID"),
                                                                                                                                                           @Index(name = "TASK_DATA_DEP_TASK_ID", columnList = "TASK_ID"), })
     @BatchSize(size = 100)
     public List<DBTaskId> getDependentTasks() {
@@ -780,6 +781,7 @@ public class TaskData {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "TASK_DATA_JOINED_BRANCHES", joinColumns = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
                                                                          @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") }, indexes = { @Index(name = "TASK_DATA_JB_JOB_ID", columnList = "JOB_ID"),
+                                                                                                                                                             @Index(name = "TASK_DATA_JB_TASK_ID_JOB_ID", columnList = "TASK_ID,JOB_ID"),
                                                                                                                                                              @Index(name = "TASK_DATA_JB_TASK_ID", columnList = "TASK_ID"), })
     @BatchSize(size = 100)
     public List<DBTaskId> getJoinedBranches() {
@@ -902,7 +904,7 @@ public class TaskData {
 
     @Lob
     @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE, updatable = false)
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getDescription() {
         return description;
     }
