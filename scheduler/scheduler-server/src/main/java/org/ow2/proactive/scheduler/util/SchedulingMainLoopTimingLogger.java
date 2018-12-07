@@ -26,7 +26,7 @@
 package org.ow2.proactive.scheduler.util;
 
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -36,13 +36,13 @@ import com.google.common.collect.Maps;
 
 public class SchedulingMainLoopTimingLogger {
 
-    private final Map<String, TimingModel> allTimings;
+    private final TreeMap<String, TimingModel> allTimings;
 
     private final Logger logger;
 
     public SchedulingMainLoopTimingLogger(Logger logger) {
         this.logger = logger;
-        this.allTimings = Maps.newHashMap();
+        this.allTimings = Maps.newTreeMap();
     }
 
     public void start(String nameOfTiming) {
@@ -55,13 +55,12 @@ public class SchedulingMainLoopTimingLogger {
     }
 
     public void printTimingsINFOLevel() {
-        List<String> loggingStrings = allTimings.entrySet()
-                                                .stream()
-                                                .map(timing -> timing.getValue().getLoggingString(timing.getKey()))
-                                                .collect(Collectors.toList());
+        List<String> loggingStrings = allTimings.entrySet().stream()
+                .map(timing -> timing.getValue().getLoggingString(timing.getKey()))
+                .collect(Collectors.toList());
         if (!loggingStrings.isEmpty()) {
             logger.info("SchedulingMainLoopTiming::" + System.getProperty("line.separator") +
-                        String.join(System.getProperty("line.separator"), loggingStrings));
+                String.join(System.getProperty("line.separator"), loggingStrings));
         }
     }
 
@@ -87,8 +86,8 @@ class TimingModel {
     }
 
     public String getLoggingString(String methodName) {
-        return "Max:" + max + "ms;Total:" + total + "ms;Average:" + getAverage() + "ms;Times:" + counter + ";" +
-               methodName;
+        return "Max:" + max + "ms;Total:" + total + "ms;Average:" + getAverage() + "ms;Times:" + counter +
+            ";" + methodName;
     }
 
     private void add(long time) {
