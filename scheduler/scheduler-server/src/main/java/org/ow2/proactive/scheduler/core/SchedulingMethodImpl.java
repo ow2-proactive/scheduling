@@ -163,7 +163,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of tasks that have been started
      */
     public int schedule() {
-        schedulingMainLoopTimingLogger = new SchedulingMainLoopTimingLogger(logger);
+        schedulingMainLoopTimingLogger = new SchedulingMainLoopTimingLogger(Logger.getLogger(SchedulingMethodImpl.class));
 
         Policy currentPolicy = schedulingService.getPolicy();
 
