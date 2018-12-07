@@ -55,12 +55,13 @@ public class SchedulingMainLoopTimingLogger {
     }
 
     public void printTimingsINFOLevel() {
-        List<String> loggingStrings = allTimings.entrySet().stream()
-                .map(timing -> timing.getValue().getLoggingString(timing.getKey()))
-                .collect(Collectors.toList());
+        List<String> loggingStrings = allTimings.entrySet()
+                                                .stream()
+                                                .map(timing -> timing.getValue().getLoggingString(timing.getKey()))
+                                                .collect(Collectors.toList());
         if (!loggingStrings.isEmpty()) {
             logger.info("SchedulingMainLoopTiming::" + System.getProperty("line.separator") +
-                String.join(System.getProperty("line.separator"), loggingStrings));
+                        String.join(System.getProperty("line.separator"), loggingStrings));
         }
     }
 
@@ -86,8 +87,8 @@ class TimingModel {
     }
 
     public String getLoggingString(String methodName) {
-        return "Max:" + max + "ms;Total:" + total + "ms;Average:" + getAverage() + "ms;Times:" + counter +
-            ";" + methodName;
+        return "Max:" + max + "ms;Total:" + total + "ms;Average:" + getAverage() + "ms;Times:" + counter + ";" +
+               methodName;
     }
 
     private void add(long time) {
