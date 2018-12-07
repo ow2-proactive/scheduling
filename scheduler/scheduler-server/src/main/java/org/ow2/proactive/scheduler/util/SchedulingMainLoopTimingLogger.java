@@ -25,8 +25,8 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
@@ -36,13 +36,13 @@ import com.google.common.collect.Maps;
 
 public class SchedulingMainLoopTimingLogger {
 
-    private final TreeMap<String, TimingModel> allTimings;
+    private final LinkedHashMap<String, TimingModel> allTimings;
 
     private final Logger logger;
 
     public SchedulingMainLoopTimingLogger(Logger logger) {
         this.logger = logger;
-        this.allTimings = Maps.newTreeMap();
+        this.allTimings = Maps.newLinkedHashMap();
     }
 
     public void start(String nameOfTiming) {
