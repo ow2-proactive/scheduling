@@ -115,7 +115,7 @@ public class SchedulingMainLoopTimingLoggerTest {
     }
 
     private void assertTimingPerMethod(String loggingString, String method) {
-        assertThat(loggingString, containsString(method + "["));
+        assertThat(loggingString, containsString(method));
         assertThat(loggingString, containsString("Max:"));
         assertThat(loggingString, containsString("Total:"));
         assertThat(loggingString, containsString("Average:"));
