@@ -52,8 +52,6 @@ import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
-import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
-import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobType;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
@@ -75,6 +73,7 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.internal.TaskRecoveryData;
 import org.ow2.proactive.scheduler.util.JobLogger;
+import org.ow2.proactive.scheduler.util.SchedulingMainLoopTimingLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
@@ -119,6 +118,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private CheckEligibleTaskDescriptorScript checkEligibleTaskDescriptorScript;
 
+    private SchedulingMainLoopTimingLogger schedulingMainLoopTimingLogger;
+
     public SchedulingMethodImpl(SchedulingService schedulingService) throws Exception {
         this.schedulingService = schedulingService;
         this.checkEligibleTaskDescriptorScript = new CheckEligibleTaskDescriptorScript();
@@ -162,6 +163,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of tasks that have been started
      */
     public int schedule() {
+        schedulingMainLoopTimingLogger = new SchedulingMainLoopTimingLogger(Logger.getLogger(SchedulingMethodImpl.class));
+
         Policy currentPolicy = schedulingService.getPolicy();
 
         //Number of time to retry an active object creation before leaving scheduling loop
@@ -180,29 +183,39 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             return 0;
         }
 
-        return startTasks(currentPolicy, jobMap, toUnlock);
+        int tasksStarted = startTasks(currentPolicy, jobMap, toUnlock);
+
+        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
+
+        return tasksStarted;
     }
 
     private int startTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Map<JobId, JobDescriptor> toUnlock) {
         try {
             List<JobDescriptor> descriptors = new ArrayList<>(jobMap.values());
 
+            schedulingMainLoopTimingLogger.start("getFreeResources");
             //get rmState and update it in scheduling policy
             Set<String> freeResources = getFreeResources(currentPolicy);
             //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
                 return 0;
             }
+            schedulingMainLoopTimingLogger.end("getFreeResources");
 
+            schedulingMainLoopTimingLogger.start("getOrderedTasks");
             // ask the policy all the tasks to be schedule according to the jobs list.
             LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy = currentPolicy.getOrderedTasks(descriptors);
+            schedulingMainLoopTimingLogger.end("getOrderedTasks");
 
             //if there is no task to scheduled, return without starting any task
             if (fullListOfTaskRetrievedFromPolicy == null || fullListOfTaskRetrievedFromPolicy.isEmpty()) {
                 return 0;
             }
 
+            schedulingMainLoopTimingLogger.start("unlockResources");
             toUnlock = unlockResources(toUnlock);
+            schedulingMainLoopTimingLogger.end("unlockResources");
 
             return getNumberOfTaskStarted(currentPolicy, jobMap, freeResources, fullListOfTaskRetrievedFromPolicy);
         } finally {
@@ -257,7 +270,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 loggingEligibleTasksDetails(fullListOfTaskRetrievedFromPolicy, taskRetrievedFromPolicy);
             }
 
+            schedulingMainLoopTimingLogger.start("updateVariablesForTasksToSchedule");
+
             updateVariablesForTasksToSchedule(taskRetrievedFromPolicy);
+
+            schedulingMainLoopTimingLogger.end("updateVariablesForTasksToSchedule");
+
+            schedulingMainLoopTimingLogger.start("loadAndInit");
 
             for (Iterator<EligibleTaskDescriptor> iterator = taskRetrievedFromPolicy.iterator(); iterator.hasNext();) {
                 EligibleTaskDescriptorImpl taskDescriptor = (EligibleTaskDescriptorImpl) iterator.next();
@@ -270,6 +289,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             }
 
+            schedulingMainLoopTimingLogger.end("loadAndInit");
+
             while (!taskRetrievedFromPolicy.isEmpty()) {
 
                 if (freeResources.isEmpty()) {
@@ -280,6 +301,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 LinkedList<EligibleTaskDescriptor> tasksToSchedule = new LinkedList<>();
                 int neededResourcesNumber = 0;
 
+                schedulingMainLoopTimingLogger.start("getNextcompatibleTasks");
+
                 while (!taskRetrievedFromPolicy.isEmpty() && neededResourcesNumber == 0) {
                     //the loop will search for next compatible task until it find something
                     neededResourcesNumber = getNextcompatibleTasks(jobMap,
@@ -287,6 +310,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                    freeResources.size(),
                                                                    tasksToSchedule);
                 }
+
+                schedulingMainLoopTimingLogger.end("getNextcompatibleTasks");
+
                 if (logger.isDebugEnabled()) {
                     logger.debug("tasksToSchedule : " + tasksToSchedule);
                 }
@@ -296,7 +322,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     break;
                 }
 
+                schedulingMainLoopTimingLogger.start("getRMNodes");
                 NodeSet nodeSet = getRMNodes(jobMap, neededResourcesNumber, tasksToSchedule, freeResources);
+                schedulingMainLoopTimingLogger.end("getRMNodes");
 
                 if (nodeSet != null) {
                     freeResources.removeAll(nodeSet.getAllNodesUrls());
@@ -315,9 +343,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             //create launcher and try to start the task
                             node = nodeSet.get(0);
 
+                            schedulingMainLoopTimingLogger.start("createExecution");
+
                             if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
                                 numberOfTaskStarted++;
                             }
+                            schedulingMainLoopTimingLogger.end("createExecution");
 
                         }
 
@@ -325,8 +356,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         if (tasksToSchedule.isEmpty()) {
                             //get back unused nodes to the RManager
                             if (!nodeSet.isEmpty()) {
+                                schedulingMainLoopTimingLogger.start("releaseNodes");
                                 releaseNodes(currentJob, nodeSet);
                                 freeResources.addAll(nodeSet.getAllNodesUrls());
+                                schedulingMainLoopTimingLogger.end("releaseNodes");
                             }
                             //and leave the loop
                             break;
@@ -493,6 +526,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
 
             try {
+                schedulingMainLoopTimingLogger.start("setCriteria");
                 Criteria criteria = new Criteria(neededResourcesNumber);
                 criteria.setTopology(descriptor);
                 // resolve script variables (if any) in the list of selection
@@ -515,8 +549,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                 criteria.setComputationDescriptors(computationDescriptors);
 
+                schedulingMainLoopTimingLogger.end("setCriteria");
+
+                schedulingMainLoopTimingLogger.start("getNodeSetWithCriteria");
                 nodeSet = getRMProxiesManager().getUserRMProxy(currentJob.getOwner(), currentJob.getCredentials())
                                                .getNodes(criteria);
+                schedulingMainLoopTimingLogger.end("getNodeSetWithCriteria");
             } catch (TopologyDisabledException tde) {
                 jlogger.warn(currentJob.getId(), "will be canceled as the topology is disabled");
                 schedulingService.simulateJobStartAndCancelIt(tasksToSchedule, "Topology is disabled");
@@ -524,7 +562,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             }
             //the following line is used to unwrap the future, warning when moving or removing
             //it may also throw a ScriptException which is a RuntimeException
+            schedulingMainLoopTimingLogger.start("waitForNodeSetWithCriteria");
+
             PAFuture.waitFor(nodeSet, true);
+            schedulingMainLoopTimingLogger.end("waitForNodeSetWithCriteria");
+
             logger.debug("provided nodes " + nodeSet.size());
             return nodeSet;
 
@@ -661,7 +703,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 try {
 
                     // create launcher
+                    schedulingMainLoopTimingLogger.start("createLauncher");
+
                     launcher = task.createLauncher(node);
+
+                    schedulingMainLoopTimingLogger.end("createLauncher");
 
                     activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
 
@@ -690,12 +736,19 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                         dotaskActionTimeout = PASchedulerProperties.SCHEDULER_STARTTASK_TIMEOUT.getValueAsInt();
                     }
 
+                    schedulingMainLoopTimingLogger.start("areNodesRecoverable");
                     boolean taskRecoverable = getRMProxiesManager().getRmProxy().areNodesRecoverable(nodes);
+                    schedulingMainLoopTimingLogger.end("areNodesRecoverable");
+
+                    schedulingMainLoopTimingLogger.start("terminateNotificationNodeURL");
                     String terminateNotificationNodeURL = PAActiveObject.getActiveObjectNode(terminateNotification)
                                                                         .getNodeInformation()
                                                                         .getURL();
                     TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL,
                                                                              taskRecoverable);
+                    schedulingMainLoopTimingLogger.start("terminateNotificationNodeURL");
+
+                    schedulingMainLoopTimingLogger.start("submitWithTimeout");
 
                     threadPool.submitWithTimeout(new TimedDoTaskAction(job,
                                                                        taskDescriptor,
@@ -707,6 +760,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
                                                  dotaskActionTimeout,
                                                  TimeUnit.MILLISECONDS);
+
+                    schedulingMainLoopTimingLogger.end("submitWithTimeout");
 
                     // we advertise here that the task is started, however
                     // this is not entirely true: the only thing we are sure
@@ -722,7 +777,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                     // SchedulingMethodImpl#createExecution may happen to be
                     // called a second time for the task that is currently being
                     // started by the TimedDoTaskAction.
+                    schedulingMainLoopTimingLogger.start("finalizeStarting");
                     finalizeStarting(job, task, node, launcher);
+                    schedulingMainLoopTimingLogger.end("finalizeStarting");
                     return true;
                 } catch (Exception t) {
                     try {
