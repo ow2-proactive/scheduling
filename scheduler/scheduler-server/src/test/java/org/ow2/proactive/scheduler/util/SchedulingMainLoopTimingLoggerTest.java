@@ -57,8 +57,8 @@ public class SchedulingMainLoopTimingLoggerTest {
     @Test
     public void testNoStart() {
         schedulingMainLoopTimingLogger.end("method1");
-        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger, Mockito.times(0)).info("");
+        schedulingMainLoopTimingLogger.printTimingsDEBUGLevel();
+        verify(logger, Mockito.times(0)).debug("");
 
     }
 
@@ -67,8 +67,8 @@ public class SchedulingMainLoopTimingLoggerTest {
         schedulingMainLoopTimingLogger.start("method1");
         Thread.sleep(100);
         schedulingMainLoopTimingLogger.end("method1");
-        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).info(loggingCaptor.capture());
+        schedulingMainLoopTimingLogger.printTimingsDEBUGLevel();
+        verify(logger).debug(loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method1");
 
@@ -82,8 +82,8 @@ public class SchedulingMainLoopTimingLoggerTest {
             schedulingMainLoopTimingLogger.end("method1");
         }
 
-        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).info(loggingCaptor.capture());
+        schedulingMainLoopTimingLogger.printTimingsDEBUGLevel();
+        verify(logger).debug(loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method1");
 
@@ -107,8 +107,8 @@ public class SchedulingMainLoopTimingLoggerTest {
             schedulingMainLoopTimingLogger.end("method_semi_long3");
         }
 
-        schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).info(loggingCaptor.capture());
+        schedulingMainLoopTimingLogger.printTimingsDEBUGLevel();
+        verify(logger).debug(loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method_long_long_long_one1");
 
