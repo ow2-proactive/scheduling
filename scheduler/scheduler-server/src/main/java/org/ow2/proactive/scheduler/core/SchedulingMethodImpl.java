@@ -94,7 +94,7 @@ import com.google.common.collect.ImmutableList;
 public final class SchedulingMethodImpl implements SchedulingMethod {
 
     /** Scheduler logger */
-    public static final Logger logger = Logger.getLogger(SchedulingService.class);
+    public static final Logger logger = Logger.getLogger(SchedulingMethodImpl.class);
 
     public static final TaskLogger tlogger = TaskLogger.getInstance();
 
@@ -163,7 +163,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      * @return the number of tasks that have been started
      */
     public int schedule() {
-        schedulingMainLoopTimingLogger = new SchedulingMainLoopTimingLogger(Logger.getLogger(SchedulingMethodImpl.class));
+        schedulingMainLoopTimingLogger = new SchedulingMainLoopTimingLogger(logger);
 
         Policy currentPolicy = schedulingService.getPolicy();
 
