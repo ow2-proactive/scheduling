@@ -281,21 +281,9 @@ final class TerminationData {
         if (taskToTerminate.terminationStatus == ABORTED || taskResult == null) {
             List<InternalTask> iDependences = taskData.getTask().getIDependences();
             if (iDependences != null) {
-                Set<TaskId> parentIds = new HashSet<>(iDependences.size());
-                for (InternalTask parentTask : iDependences) {
-                    parentIds.addAll(InternalTaskParentFinder.getInstance()
-                                                             .getFirstNotSkippedParentTaskIds(parentTask));
-                }
-
-                // Batch fetching of parent tasks results
-                Map<TaskId, TaskResult> taskResults = new HashMap<>();
-                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
-                    taskResults.putAll(service.getInfrastructure()
-                                              .getDBManager()
-                                              .loadTasksResults(taskData.getTask().getJobId(), parentsSubList));
-                }
-                getResultsFromListOfTaskResults(variablesMap.getInheritedMap(), taskResults);
+                taskData.getTask().updateParentTasksResults(service);
+                getResultsFromListOfTaskResults(variablesMap.getInheritedMap(),
+                                                taskData.getTask().getParentTasksResults());
             } else {
                 if (internalJob != null) {
                     for (Map.Entry<String, JobVariable> jobVariableEntry : internalJob.getVariables().entrySet()) {
