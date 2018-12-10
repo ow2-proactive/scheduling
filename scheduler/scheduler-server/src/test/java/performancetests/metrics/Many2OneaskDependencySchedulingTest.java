@@ -44,7 +44,7 @@ import performancetests.recovery.PerformanceTestBase;
 
 
 @RunWith(Parameterized.class)
-public class ReplicatedlTaskSchedulingTest extends PerformanceTestBase {
+public class Many2OneaskDependencySchedulingTest extends PerformanceTestBase {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
@@ -58,7 +58,7 @@ public class ReplicatedlTaskSchedulingTest extends PerformanceTestBase {
     // time limit in milliseconds
     private final int timeLimit;
 
-    public ReplicatedlTaskSchedulingTest(int numberOfTasks, int numberOfNodes, int timeLimit) {
+    public Many2OneaskDependencySchedulingTest(int numberOfTasks, int numberOfNodes, int timeLimit) {
         this.numberOfTasks = numberOfTasks;
         this.numberOfNodes = numberOfNodes;
         this.timeLimit = timeLimit;
@@ -82,7 +82,7 @@ public class ReplicatedlTaskSchedulingTest extends PerformanceTestBase {
 
         final long timeToMeasure = jobState.getFinishedTime() - jobState.getStartTime();
 
-        LOGGER.info(makeCSVString(ReplicatedlTaskSchedulingTest.class.getSimpleName(),
+        LOGGER.info(makeCSVString(Many2OneaskDependencySchedulingTest.class.getSimpleName(),
                                   numberOfTasks,
                                   timeLimit,
                                   timeToMeasure,
