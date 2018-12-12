@@ -32,14 +32,16 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -50,8 +52,7 @@ import org.ow2.tests.ProActiveTestClean;
 
 public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
 
-    @Rule
-    public TemporaryFolder fakeSchedulerHome = new TemporaryFolder();
+    private static File fakeSchedulerHome;
 
     private JobLogger jobLogger;
 
@@ -61,15 +62,19 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
 
     private TaskId taskId;
 
-    @Before
-    public void setUp() {
-        PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.updateProperty(fakeSchedulerHome.getRoot().getAbsolutePath() +
+    @BeforeClass
+    public static void setUpClass() throws IOException {
+        fakeSchedulerHome = Files.createTempDirectory(ServerJobAndTaskLogs.class.getSimpleName()).toFile();
+        PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.updateProperty(fakeSchedulerHome.getAbsolutePath() +
                                                                          File.separator + "logs");
         // set a very small limit so that only 1 line would fit
         PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.updateProperty("10");
 
         ServerJobAndTaskLogs.getInstance().configure();
+    }
 
+    @Before
+    public void setUp() {
         jobLogger = JobLogger.getInstance();
         Logger.getLogger(JobLogger.class).setLevel(Level.INFO);
         taskLogger = TaskLogger.getInstance();
@@ -93,12 +98,20 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         checkDoesNotContain(jobId, taskId, "first");
     }
 
+    @After
+    public void after() {
+        jobLogger.close(jobId);
+        taskLogger.close(taskId);
+    }
+
     @Test
     public void jobLogDeletion() throws Exception {
         jobLogger.info(jobId, "first job log");
         taskLogger.info(taskId, "first task log");
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
+
+        Thread.sleep(100);
 
         assertTrue(new File(ServerJobAndTaskLogs.getInstance().getLogsLocation(),
                             JobLogger.getJobLogRelativePath(jobId)).exists());
@@ -123,14 +136,17 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        assertEquals(1, fakeSchedulerHome.getRoot().list().length);
+        //Thread.sleep(2000);
+        System.out.println(fakeSchedulerHome);
+        assertEquals(1, fakeSchedulerHome.list().length);
 
         ServerJobAndTaskLogs.getInstance().removeLogsDirectory();
 
-        assertEquals(0, fakeSchedulerHome.getRoot().list().length);
+        assertEquals(0, fakeSchedulerHome.list().length);
     }
 
-    private void checkContains(JobId jobId, TaskId taskId, String word) {
+    private void checkContains(JobId jobId, TaskId taskId, String word) throws InterruptedException {
+        Thread.sleep(100);
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    containsString(word + " job log"));
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
@@ -138,7 +154,8 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         assertThat(ServerJobAndTaskLogs.getInstance().getTaskLog(taskId), containsString(word + " task log"));
     }
 
-    private void checkDoesNotContain(JobId jobId, TaskId taskId, String word) {
+    private void checkDoesNotContain(JobId jobId, TaskId taskId, String word) throws InterruptedException {
+        Thread.sleep(100);
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    not(containsString(word + " job log")));
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
