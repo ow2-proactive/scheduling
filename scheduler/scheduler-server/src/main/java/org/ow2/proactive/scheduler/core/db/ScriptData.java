@@ -50,6 +50,9 @@ import org.ow2.proactive.scripting.SimpleScript;
                 @NamedQuery(name = "deleteScriptDataInBulk", query = "delete from ScriptData where taskData.id.jobId in :jobIdList"),
                 @NamedQuery(name = "countScriptData", query = "select count (*) from ScriptData") })
 @BatchSize(size = 100)
+@Table(name = "SCRIPT_DATA", indexes = { @Index(name = "SCRIPT_DATA_JOB_ID", columnList = "JOB_ID"),
+                                         @Index(name = "SCRIPT_DATA_TASK_ID_JOB_ID", columnList = "TASK_ID,JOB_ID"),
+                                         @Index(name = "SCRIPT_DATA_TASK_ID", columnList = "TASK_ID") })
 public class ScriptData {
 
     private long id;

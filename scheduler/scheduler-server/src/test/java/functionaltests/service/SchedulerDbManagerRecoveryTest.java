@@ -45,6 +45,7 @@ import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scheduler.util.HsqldbServer;
 import org.ow2.tests.ProActiveTest;
 
 import functionaltests.utils.Jobs;
@@ -205,10 +206,12 @@ public class SchedulerDbManagerRecoveryTest extends ProActiveTest {
                                                                                        configureFilename)
                                                                           .toURI()));
 
-        String jdbcUrl = "jdbc:hsqldb:file:" + dbFolder.getRoot().getAbsolutePath() +
-                         ";create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false";
+        if (config.getProperty("hibernate.connection.url").contains(HsqldbServer.HSQLDB)) {
+            String jdbcUrl = "jdbc:hsqldb:file:" + dbFolder.getRoot().getAbsolutePath() +
+                             ";create=true;hsqldb.tx=mvcc;hsqldb.write_delay=false";
 
-        config.setProperty("hibernate.connection.url", jdbcUrl);
+            config.setProperty("hibernate.connection.url", jdbcUrl);
+        }
 
         return new SchedulerDBManager(config, wipeOnStartup);
     }

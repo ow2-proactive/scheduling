@@ -948,6 +948,8 @@ class LiveJobs {
             terminationData.addJobToTerminate(job.getId());
         }
 
+        task.setTaskResult(result);
+
         // Update database
         if (result.getAction() != null) {
             dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, result);

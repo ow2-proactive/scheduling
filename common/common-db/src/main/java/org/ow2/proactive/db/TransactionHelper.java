@@ -25,11 +25,12 @@
  */
 package org.ow2.proactive.db;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.exception.LockAcquisitionException;
 import org.objectweb.proactive.utils.Sleeper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
@@ -39,6 +40,8 @@ public class TransactionHelper {
     private static final Logger logger = Logger.getLogger(TransactionHelper.class);
 
     private final SessionFactory sessionFactory;
+
+    private final Random random = new Random(System.currentTimeMillis());
 
     public TransactionHelper(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -102,7 +105,15 @@ public class TransactionHelper {
                 logger.warn(String.format("Database operation failed. Automatic retry in %d ms (attempt %d)", delay, i),
                             exception);
 
-                new Sleeper(delay, logger).sleep();
+                // Consider, 2 threads start simultaneously 2 transactions.
+                // And these transactions compete for the same resources and stuck in deadlock.
+                // Then both of them are rollbacked, and sleep 1 second, and try again, and deadlock occurs again.
+                // Thus to make our system more robust, we add this additional sleeping time,
+                // which is uniformly distributed from 0 to 1 second.
+                // So we order these transactions randomly.
+                final int additionalDelayRandomized = (int) (delay * random.nextFloat());
+
+                new Sleeper(delay + additionalDelayRandomized, logger).sleep();
 
                 delay *= dampingFactor;
             }
