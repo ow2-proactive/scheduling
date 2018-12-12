@@ -30,7 +30,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
@@ -62,7 +61,7 @@ public class TaskLoggerTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testFileAppender() throws IOException {
+    public void testFileAppender() throws Exception {
         JobId jobId = new JobIdImpl(1123, "readableName");
         TaskId taskId = TaskIdImpl.createTaskId(jobId, "taskreadableName", 123123);
 
@@ -76,6 +75,7 @@ public class TaskLoggerTest extends ProActiveTestClean {
         } catch (Exception e) {
             Assert.fail(e);
         }
+        Thread.sleep(100);
         assertTrue(FileUtils.readFileToString(logFile, Charset.defaultCharset()).contains("HelloWorld"));
 
     }
