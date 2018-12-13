@@ -161,6 +161,8 @@ public class JobEmailNotification {
                              "failed to send email notification to " + e.getEmailTarget() + ": " + e.getMessage());
                 logger.trace("Stack trace:", e);
             } catch (Exception e) {
+                jlogger.warn(jobState.getId(),
+                        "failed to send email notification: " + e.getMessage());
                 logger.trace("Stack trace:", e);
             }
         });
