@@ -144,7 +144,7 @@ public class TestStaxJobFactory {
     @Test
     public void testCreateJobShouldUseVariableMapParameterToReplaceVariableValue() throws Exception {
         Map<String, String> variablesMap = Maps.newHashMap();
-        variablesMap.put("from_create_job_parameter", "from_create_job_parameter_value");
+        variablesMap.put("from_create_job_parameter_given", "from_create_job_parameter_value");
 
         TaskFlowJob testJob = (TaskFlowJob) factory.createJob(jobDescriptorUri, variablesMap);
 
