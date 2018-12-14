@@ -134,9 +134,11 @@ public class JobEmailNotification {
         try {
             if (withAttachment) {
                 String attachment = getAttachment();
-                sender.sender(getTo(), getSubject(), getBody(), attachment, getAttachmentName());
                 if (attachment != null) {
+                    sender.sender(getTo(), getSubject(), getBody(), attachment, getAttachmentName());
                     FileUtils.deleteQuietly(new File(attachment));
+                } else {
+                    sender.sender(getTo(), getSubject(), getBody());
                 }
             } else {
                 sender.sender(getTo(), getSubject(), getBody());
@@ -152,6 +154,20 @@ public class JobEmailNotification {
     public void checkAndSendAsync(boolean withAttachment) {
         this.asyncMailSender.submit(() -> {
             try {
+                if (withAttachment) {
+                    JobId jobID = jobState.getId();
+
+                    JobResult result = dbManager.loadJobResult(jobID);
+
+                    while (result == null) {
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+                            logger.info("Stack trace: ", e);
+                        }
+                    }
+                }
+
                 boolean sent = doCheckAndSend(withAttachment);
                 if (sent) {
                     jlogger.info(jobState.getId(), "sent notification email for finished job to " + getTo());
@@ -161,8 +177,7 @@ public class JobEmailNotification {
                              "failed to send email notification to " + e.getEmailTarget() + ": " + e.getMessage());
                 logger.trace("Stack trace:", e);
             } catch (Exception e) {
-                jlogger.warn(jobState.getId(),
-                        "failed to send email notification: " + e.getMessage());
+                jlogger.warn(jobState.getId(), "failed to send email notification: " + e.getMessage());
                 logger.trace("Stack trace:", e);
             }
         });
@@ -213,22 +228,35 @@ public class JobEmailNotification {
     private String getAttachment() throws NotConnectedException, UnknownJobException, PermissionException, IOException {
         JobId jobID = jobState.getId();
         List<TaskState> tasks = jobState.getTasks();
-        JobResult result = dbManager.loadJobResult(jobID);
-        String allRes = String.join(System.lineSeparator(),
-                                    tasks.stream()
-                                         .map(task -> "Task " + task.getId().toString() + " (" +
-                                                      task.getId().getReadableName() + ") :" + System.lineSeparator() +
-                                                      result.getAllResults().get(task.getId()).getOutput().getAllLogs())
-                                         .collect(Collectors.toList()));
         String attachLogPath = null;
-        File file = File.createTempFile("job_logs", ".log");
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write(allRes);
-            attachLogPath = file.getAbsolutePath();
-        } catch (IOException e) {
-            jlogger.warn(jobState.getId(), "Failed to create attachment for email notification: " + e.getMessage());
-            logger.warn("Error creating attachment for email notification: " + e.getMessage(), e);
+
+        try {
+            JobResult result = dbManager.loadJobResult(jobID);
+
+            String allRes = String.join(System.lineSeparator(),
+                                        tasks.stream()
+                                             .map(task -> "Task " + task.getId().toString() + " (" +
+                                                          task.getId().getReadableName() + ") :" +
+                                                          System.lineSeparator() + result.getAllResults()
+                                                                                         .get(task.getId()
+                                                                                                  .getReadableName())
+                                                                                         .getOutput()
+                                                                                         .getAllLogs())
+                                             .collect(Collectors.toList()));
+
+            File file = File.createTempFile("job_logs", ".log");
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write(allRes);
+                attachLogPath = file.getAbsolutePath();
+            } catch (IOException e) {
+                jlogger.warn(jobState.getId(), "Failed to create attachment for email notification: " + e.getMessage());
+                logger.warn("Error creating attachment for email notification: " + e.getMessage(), e);
+
+            }
+        } catch (Exception e) {
+            logger.warn("Error creating attachment for email notification: ", e);
         }
+
         return attachLogPath;
     }
 
