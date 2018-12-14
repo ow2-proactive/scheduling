@@ -145,6 +145,14 @@ import org.apache.commons.lang3.StringUtils;
  * {@link #setEnableSubstitutionInVariables(boolean) enableSubstitutionInVariables}
  * property to <b>true</b>.
  *
+ * NOTICE: this class has been modified to support suffix StrMatcher able to match the ending
+ * of variable patterns with no suffixes, such as:
+ * $variable
+ *
+ * An issue still remains where two variable definitions are glued without any intermediate character, such as:
+ * $var1$var2
+ *
+ *
  * @version $Id$
  * @since 2.2
  */
@@ -793,7 +801,7 @@ public class StrSubstitutor {
         int pos = offset;
         while (pos < bufEnd) {
             final int startMatchLen = pfxMatcher.isMatch(chars, pos, offset, bufEnd);
-            if (startMatchLen == 0) {
+            if (startMatchLen < 0) {
                 pos++;
             } else {
                 // found variable start marker
@@ -810,16 +818,16 @@ public class StrSubstitutor {
                     pos += startMatchLen;
                     int endMatchLen = 0;
                     int nestedVarCount = 0;
-                    while (pos < bufEnd) {
+                    while (pos <= bufEnd) {
                         if (substitutionInVariablesEnabled &&
-                            (endMatchLen = pfxMatcher.isMatch(chars, pos, offset, bufEnd)) != 0) {
+                            (endMatchLen = pfxMatcher.isMatch(chars, pos, offset, bufEnd)) >= 0) {
                             // found a nested variable start
                             nestedVarCount++;
                             pos += endMatchLen;
                             continue;
                         }
                         endMatchLen = suffMatcher.isMatch(chars, pos, offset, bufEnd);
-                        if (endMatchLen == 0) {
+                        if (endMatchLen < 0) {
                             pos++;
                         } else {
                             // found variable end marker
@@ -842,11 +850,11 @@ public class StrSubstitutor {
                                     for (int i = 0; i < varNameExprChars.length; i++) {
                                         // if there's any nested variable when nested variable substitution disabled, then stop resolving name and default value.
                                         if (!substitutionInVariablesEnabled &&
-                                            pfxMatcher.isMatch(varNameExprChars, i, i, varNameExprChars.length) != 0) {
+                                            pfxMatcher.isMatch(varNameExprChars, i, i, varNameExprChars.length) >= 0) {
                                             break;
                                         }
                                         if ((valueDelimiterMatchLen = valueDelimMatcher.isMatch(varNameExprChars,
-                                                                                                i)) != 0) {
+                                                                                                i)) >= 0) {
                                             varName = varNameExpr.substring(0, i);
                                             varDefaultValue = varNameExpr.substring(i + valueDelimiterMatchLen);
                                             break;
