@@ -12,6 +12,8 @@ dependencies {
 
     compile project(':common:common-api')
 
+    compile 'org.apache.commons:commons-lang3:3.5'
+
     runtime 'com.fasterxml.woodstox:woodstox-core:5.0.1'
     runtime 'msv:relaxngDatatype:20050913'
     runtime 'msv:xsdlib:20050913'

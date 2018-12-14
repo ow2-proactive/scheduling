@@ -31,7 +31,7 @@ variables = ## Definition of variables which can be reused throughout this descr
 variable = ## Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}
     element variable { variableName, variableValue, variableModel?}
 variableName = ## Name of a variable
-    attribute name  { xsd:string }
+    attribute name  { xsd:NCName }
 variableValue = ## The patterns ${variable_name} will be replaced by this value
     attribute value { xsd:string }
 variableModel = ## Model definition of the variable
@@ -51,7 +51,7 @@ genericInformation = ## Definition of any information you would like to get in t
 info = ## Information that you can get in the policy through the job content
 	element info {infoName, infoValue}
 infoName = ## Name of the information variable
-	attribute name { xsd:string }
+	attribute name { xsd:NCName }
 infoValue = ## Value of the information variable
 	attribute value {xsd:string}
 projectName = ## Name of the project related to this job. It is also used in the policy to group some jobs together
@@ -99,7 +99,7 @@ taskVariables = ## Definition of variables which can be used throughout the task
 taskVariable = ## Definition of one variable, the variable can be reused (even in another following variable definition) by using the syntax ${name_of_variable}
     element variable { taskVariableName, taskVariableValue, taskVariableInheritance?, taskVariableModel?}
 taskVariableName = ## Name of a variable
-    attribute name  { xsd:string }
+    attribute name  { xsd:NCName }
 taskVariableValue = ## The patterns ${variable_name} will be replaced by this value
     attribute value { xsd:string }
 taskVariableInheritance = ## States whether variable value is inherited from parents

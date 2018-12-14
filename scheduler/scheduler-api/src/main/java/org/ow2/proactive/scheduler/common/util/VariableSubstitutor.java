@@ -29,6 +29,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.util.text.StrMatcher;
+import org.ow2.proactive.scheduler.common.util.text.StrSubstitutor;
 import org.ow2.proactive.scripting.Script;
 
 
@@ -40,9 +42,23 @@ import org.ow2.proactive.scripting.Script;
  */
 public class VariableSubstitutor {
 
-    // Maximum depth allowed in recursive variable replacements to avoid infinite loops.
-    // This is not configurable as it should cover all use cases.
-    public static final int MAXIMUM_DEPTH = 5;
+    public static final String SUBSITUTE_PREFIX = "${";
+
+    public static final String SUBSITUTE_PREFIX_SIMPLE = "$";
+
+    public static final String SUBSTITUTE_SUFFIX = "}";
+
+    private static final char DOLLAR = '$';
+
+    private static final char LCB = '{';
+
+    private static final char RCB = '}';
+
+    private static final char DASH = '-';
+
+    private static final char DOT = '.';
+
+    private static final char UND = '_';
 
     // non-instantiable
     private VariableSubstitutor() {
@@ -82,12 +98,13 @@ public class VariableSubstitutor {
      */
     public static Map<String, Serializable> resolveVariables(Map<String, Serializable> variables,
             Map<String, Serializable> dictionary) {
+
+        StrSubstitutor substitutor = buildSubstitutor(dictionary);
+
         Map<String, Serializable> resolvedVariables = new HashMap<>();
         for (Map.Entry<String, Serializable> entry : variables.entrySet()) {
-            String resolvedValue;
             if (entry.getValue() instanceof String) {
-                resolvedValue = filterAndUpdate(entry.getValue().toString(), dictionary);
-                resolvedVariables.put(entry.getKey(), resolvedValue);
+                resolvedVariables.put(entry.getKey(), substitutor.replace((String) entry.getValue()));
             } else {
                 resolvedVariables.put(entry.getKey(), entry.getValue());
             }
@@ -110,8 +127,8 @@ public class VariableSubstitutor {
         }
 
         String output = input;
-        Map<String, String> substitutes = buildSubstitutes(variables);
-        output = replaceRecursively(output, substitutes);
+        StrSubstitutor substitutor = buildSubstitutor(variables);
+        output = replaceRecursively(output, substitutor);
 
         return output;
     }
@@ -120,25 +137,11 @@ public class VariableSubstitutor {
      * Replace the given string with a list of substitutions recursively. Recursion will be limited to MAXIMUM_DEPTH.
      *
      * @param value       string used to apply replacement
-     * @param substitutes map of substitutions
+     * @param substitutor substitution handler
      * @return a new string where all replacements were performed
      */
-    private static String replaceRecursively(final String value, Map<String, String> substitutes) {
-        boolean anyReplacement;
-        String output = value;
-        int depthCount = 0;
-        do {
-            anyReplacement = false;
-            depthCount++;
-            for (Map.Entry<String, String> replacement : substitutes.entrySet()) {
-                if (replacement.getValue() != null) {
-                    String newOutput = output.replace(replacement.getKey(), replacement.getValue());
-                    anyReplacement = anyReplacement || !newOutput.equals(output);
-                    output = newOutput;
-                }
-            }
-        } while (anyReplacement && depthCount < MAXIMUM_DEPTH);
-        return output;
+    private static String replaceRecursively(final String value, StrSubstitutor substitutor) {
+        return substitutor.replace(value);
     }
 
     /**
@@ -162,7 +165,8 @@ public class VariableSubstitutor {
         }
     }
 
-    public static Map<String, String> buildSubstitutes(Map<? extends Serializable, ? extends Serializable> variables) {
+    public static StrSubstitutor buildSubstitutor(Map<? extends Serializable, ? extends Serializable> variables) {
+
         Map<String, String> replacements = new HashMap<>();
 
         if (variables != null) {
@@ -171,14 +175,74 @@ public class VariableSubstitutor {
                     String key = variable.getKey().toString();
                     String value = variable.getValue().toString();
 
-                    replacements.put("$" + key, value);
-                    replacements.put("$" + key.toUpperCase().replace(".", "_"), value);
-                    replacements.put("${" + key + "}", value);
+                    replacements.put(key, value);
+                    replacements.put(key.toUpperCase().replace(".", "_"), value);
                 }
             }
         }
 
-        return replacements;
+        StrSubstitutor substitutor = new StrSubstitutor(replacements, SUBSITUTE_PREFIX, SUBSTITUTE_SUFFIX, (char) 0);
+
+        // match the beginning of a variable, can either be $ or ${
+        substitutor.setVariablePrefixMatcher(new StrMatcher() {
+            @Override
+            public int isMatch(char[] buffer, int pos, int bufferStart, int bufferEnd) {
+                if (pos + 1 == bufferEnd) {
+                    return -1;
+                }
+                char firstChar = buffer[pos];
+                char secondChar = buffer[pos + 1];
+                if (firstChar == DOLLAR) {
+                    if (secondChar == LCB) {
+                        // dollar with a {
+                        return 2;
+                    }
+                    // dollar and the beginning of a NCName
+                    if (Character.isLetterOrDigit(secondChar)) {
+                        return 1;
+                    }
+                    switch (secondChar) {
+                        case DASH:
+                        case DOT:
+                        case UND:
+                            return 1;
+                    }
+                }
+                // no match
+                return -1;
+            }
+        });
+
+        // match the end of a variable, can be an explicit }, the end of a NCName or the buffer end
+        substitutor.setVariableSuffixMatcher(new StrMatcher() {
+            @Override
+            public int isMatch(char[] buffer, int pos, int bufferStart, int bufferEnd) {
+                char aChar = buffer[pos];
+                // end of the buffer is the end of a variable
+                if (pos == bufferEnd) {
+                    return 0;
+                }
+                // any character part of a NCName is not an end
+                if (Character.isLetterOrDigit(aChar)) {
+                    return -1;
+                }
+                switch (aChar) {
+                    case DASH:
+                    case DOT:
+                    case UND:
+                        return -1;
+                }
+                // an explicit }
+                if (aChar == RCB) {
+                    return 1;
+                }
+                // anything else is the end of a variable
+                return 0;
+            }
+        });
+        substitutor.setEnableSubstitutionInVariables(true);
+
+        return substitutor;
     }
 
 }
