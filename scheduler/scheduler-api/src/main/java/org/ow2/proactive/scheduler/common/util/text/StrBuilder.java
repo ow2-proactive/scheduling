@@ -2538,7 +2538,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
         final int len = size;
         final char[] buf = buffer;
         for (int i = startIndex; i < len; i++) {
-            if (matcher.isMatch(buf, i, startIndex, len) > 0) {
+            if (matcher.isMatch(buf, i, startIndex, len) >= 0) {
                 return i;
             }
         }
@@ -2657,7 +2657,7 @@ public class StrBuilder implements CharSequence, Appendable, Serializable, Build
         final char[] buf = buffer;
         final int endIndex = startIndex + 1;
         for (int i = startIndex; i >= 0; i--) {
-            if (matcher.isMatch(buf, i, 0, endIndex) > 0) {
+            if (matcher.isMatch(buf, i, 0, endIndex) >= 0) {
                 return i;
             }
         }
