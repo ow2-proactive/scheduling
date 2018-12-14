@@ -54,7 +54,7 @@ public class SchedulingMainLoopTimingLogger {
         allTimings.getOrDefault(nameOfTiming, new TimingModel()).end();
     }
 
-    public void printTimingsDEBUGLevel() {
+    public void printTimingsINFOLevel() {
         List<String> loggingStrings = allTimings.entrySet()
                                                 .stream()
                                                 .map(timing -> timing.getValue().getLoggingString(timing.getKey()))

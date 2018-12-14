@@ -186,7 +186,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         int tasksStarted = startTasks(currentPolicy, jobMap, toUnlock);
 
         if (tasksStarted > 0) {
-            schedulingMainLoopTimingLogger.printTimingsDEBUGLevel();
+            schedulingMainLoopTimingLogger.printTimingsINFOLevel();
         }
 
         return tasksStarted;
