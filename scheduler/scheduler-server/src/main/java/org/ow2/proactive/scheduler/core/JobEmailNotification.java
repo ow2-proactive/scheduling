@@ -154,20 +154,6 @@ public class JobEmailNotification {
     public void checkAndSendAsync(boolean withAttachment) {
         this.asyncMailSender.submit(() -> {
             try {
-                if (withAttachment) {
-                    JobId jobID = jobState.getId();
-
-                    JobResult result = dbManager.loadJobResult(jobID);
-
-                    while (result == null) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            logger.info("Stack trace: ", e);
-                        }
-                    }
-                }
-
                 boolean sent = doCheckAndSend(withAttachment);
                 if (sent) {
                     jlogger.info(jobState.getId(), "sent notification email for finished job to " + getTo());
@@ -232,6 +218,14 @@ public class JobEmailNotification {
 
         try {
             JobResult result = dbManager.loadJobResult(jobID);
+
+            while (result == null) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    logger.info("Stack trace: ", e);
+                }
+            }
 
             String allRes = String.join(System.lineSeparator(),
                                         tasks.stream()
