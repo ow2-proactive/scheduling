@@ -161,7 +161,7 @@ public class JobEmailNotification {
 
                     while (result == null) {
                         try {
-                            wait();
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             logger.info("Stack trace: ", e);
                         }
