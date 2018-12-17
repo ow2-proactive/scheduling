@@ -69,6 +69,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ClientJobState;
@@ -220,6 +221,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     private final Map<JobId, ClientJobState> jobsMap;
 
+    private SchedulerDBManager dbManager = null;
+
     SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper) {
         this.identifications = new HashMap<>();
         this.credentials = new HashMap<>();
@@ -230,6 +233,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         this.sessionTimer = new Timer("SessionTimer");
         this.sState = sState;
         recover(sState);
+    }
+
+    SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper, SchedulerDBManager dbManager) {
+        this(sState, jmxHelper);
+        this.dbManager = dbManager;
     }
 
     /**
@@ -1101,6 +1109,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     @Override
     public synchronized void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         ClientJobState js = jobsMap.get(notification.getData().getJobId());
+        boolean withAttachment = false;
         synchronized (js) {
             js.update(notification.getData());
             switch (notification.getEventType()) {
@@ -1119,11 +1128,13 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     sState.pendingToFinished(js);
                     // set this job finished, user can get its result
                     jobs.get(notification.getData().getJobId()).setFinished(true);
+                    withAttachment = true;
                     break;
                 case JOB_RUNNING_TO_FINISHED:
                     sState.runningToFinished(js);
                     // set this job finished, user can get its result
                     jobs.get(notification.getData().getJobId()).setFinished(true);
+                    withAttachment = true;
                     break;
                 case JOB_REMOVE_FINISHED:
                     // removing jobs from the global list : this job is no more managed
@@ -1139,7 +1150,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     return;
             }
             dispatchJobStateUpdated(owner, notification);
-            new JobEmailNotification(js, notification).checkAndSendAsync();
+            new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
         }
     }
 
