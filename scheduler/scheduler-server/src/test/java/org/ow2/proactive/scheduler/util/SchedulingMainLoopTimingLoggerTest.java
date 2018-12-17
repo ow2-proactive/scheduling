@@ -68,7 +68,7 @@ public class SchedulingMainLoopTimingLoggerTest {
         Thread.sleep(100);
         schedulingMainLoopTimingLogger.end("method1");
         schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).debug(loggingCaptor.capture());
+        verify(logger).info(loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method1");
 
@@ -83,7 +83,7 @@ public class SchedulingMainLoopTimingLoggerTest {
         }
 
         schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).debug(loggingCaptor.capture());
+        verify(logger).info(loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method1");
 
@@ -108,7 +108,7 @@ public class SchedulingMainLoopTimingLoggerTest {
         }
 
         schedulingMainLoopTimingLogger.printTimingsINFOLevel();
-        verify(logger).debug(loggingCaptor.capture());
+        verify(logger).info(loggingCaptor.capture());
         String loggingString = loggingCaptor.getAllValues().get(0);
         assertTimingPerMethod(loggingString, "method_long_long_long_one1");
 
