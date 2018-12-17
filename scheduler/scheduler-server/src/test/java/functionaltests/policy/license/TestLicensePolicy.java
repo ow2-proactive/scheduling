@@ -41,7 +41,44 @@ import functionaltests.utils.SchedulerFunctionalTestLicensePolicy;
 
 public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
 
-    private static URL jobDescriptor = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_license_policy.xml");
+    private static URL JobSimpleJobLicensePolicy = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_job_license_policy.xml");
+
+    private static URL JobSimpleTaskLicensePolicy = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_task_license_policy.xml");
+
+    /**
+     * Tests that two independent jobs do not run at the same time, due to license limitation.
+     *
+     * @throws Exception
+     */
+
+    @Test
+    public void testLicensePolicyAtJobLevel() throws Throwable {
+
+        JobId jobId0 = schedulerHelper.submitJob(new File(JobSimpleJobLicensePolicy.toURI()).getAbsolutePath());
+        JobId jobId1 = schedulerHelper.submitJob(new File(JobSimpleJobLicensePolicy.toURI()).getAbsolutePath());
+
+        log("Waiting for jobs finished");
+        schedulerHelper.waitForEventJobFinished(jobId0);
+        schedulerHelper.waitForEventJobFinished(jobId1);
+
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+
+        while (true) {
+            Thread.sleep(1000);
+            System.out.println("COUCOU " + scheduler.getJobState(jobId0).getStatus().toString() + " " +
+                               scheduler.getJobState(jobId1).getStatus().toString());
+        }
+
+        /*
+         * JobState jobState0 = scheduler.getJobState(jobId0);
+         * JobState jobState1 = scheduler.getJobState(jobId1);
+         * 
+         * boolean jobsExecutedOneByOne = (jobState0.getFinishedTime() < jobState1.getStartTime())
+         * ||
+         * (jobState1.getFinishedTime() < jobState0.getStartTime());
+         * Assert.assertTrue(jobsExecutedOneByOne);
+         */
+    }
 
     /**
      * Tests that two independent tasks do not run at the same time, due to license limitation.
@@ -50,9 +87,9 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
      */
 
     @Test
-    public void testLicensePolicy() throws Throwable {
+    public void testLicensePolicyAtTaskLevel() throws Throwable {
 
-        JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+        JobId jobId = schedulerHelper.submitJob(new File(JobSimpleTaskLicensePolicy.toURI()).getAbsolutePath());
 
         log("Waiting for job finished");
         schedulerHelper.waitForEventJobFinished(jobId);

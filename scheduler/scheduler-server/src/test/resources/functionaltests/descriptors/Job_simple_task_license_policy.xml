@@ -19,7 +19,7 @@
         >
           <code language="groovy">
             <![CDATA[
-println ""
+sleep(5000)
 ]]>
           </code>
         </script>
@@ -35,7 +35,7 @@ println ""
         >
           <code language="groovy">
             <![CDATA[
-println ""
+sleep(5000)
 ]]>
           </code>
         </script>
