@@ -349,7 +349,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
 //        final JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
 
-        assertFalse(jobId.value().equals(jobId1.value()));
+//        assertFalse(jobId.value().equals(jobId1.value()));
     }
 
     protected Job nodeClientJob(String groovyScript, String forkScript, String cleaningScript) throws Exception {
