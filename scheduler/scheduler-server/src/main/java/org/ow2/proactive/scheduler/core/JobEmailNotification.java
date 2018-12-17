@@ -217,13 +217,6 @@ public class JobEmailNotification {
         String attachLogPath = null;
 
         try {
-            while (dbManager.loadJobResult(jobID) == null) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    logger.info("Stack trace: ", e);
-                }
-            }
 
             JobResult result = dbManager.loadJobResult(jobID);
 
