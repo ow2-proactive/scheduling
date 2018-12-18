@@ -43,6 +43,8 @@ import org.ow2.proactive.utils.NodeSet;
  */
 public class ExecuterInformationData implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = Logger.getLogger(ExecuterInformationData.class);
 
     private long taskId;
