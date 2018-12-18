@@ -46,6 +46,8 @@ public class SchedulerFunctionalTestLicensePolicy extends SchedulerFunctionalTes
         schedulerHelper = new SchedulerTHelper(false,
                                                new File(SchedulerFunctionalTestLicensePolicy.class.getResource("/functionaltests/config/functionalTSchedulerProperties-licensepolicy.ini")
                                                                                                   .toURI()).getAbsolutePath());
+
+        schedulerHelper.addExtraNodes(4);
     }
 
 }

@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
@@ -53,13 +54,13 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
     private static final String REQUIRED_LICENSES = "REQUIRED_LICENSES";
 
     // A map of fixed size lists. A map entry per software license and a list per map entry to handle jobs using this software license.
-    private static Map<String, LinkedBlockingQueue<JobDescriptorImpl>> eligibleJobsDescriptorsLicenses = null;
+    private Map<String, LinkedBlockingQueue<JobDescriptorImpl>> eligibleJobsDescriptorsLicenses = null;
 
     // A map of fixed size lists. A map entry per software license and a list per map entry to handle tasks using this software license.
-    private static Map<String, LinkedBlockingQueue<EligibleTaskDescriptor>> eligibleTasksDescriptorsLicenses = null;
+    private Map<String, LinkedBlockingQueue<EligibleTaskDescriptor>> eligibleTasksDescriptorsLicenses = null;
 
     // Will be initialize with the license properties file which includes the maximum licenses numbers per software
-    private static Properties properties = null;
+    private Properties properties = null;
 
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
@@ -80,7 +81,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         return filteredOrderedTasksDescFromParentPolicy;
     }
 
-    private static void initializeJobsLicenses() {
+    private void initializeJobsLicenses() {
         if (eligibleJobsDescriptorsLicenses == null) {
             // Map initialization
             eligibleJobsDescriptorsLicenses = new HashMap<String, LinkedBlockingQueue<JobDescriptorImpl>>();
@@ -97,7 +98,11 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         }
     }
 
-    private static void initializeTasksLicenses() {
+    private boolean containsJob(final LinkedBlockingQueue<JobDescriptorImpl> jobList, final JobId jobId) {
+        return jobList.stream().anyMatch(jd -> jd.getJobId().equals(jobId));
+    }
+
+    private void initializeTasksLicenses() {
         if (eligibleTasksDescriptorsLicenses == null) {
             // Map initialization
             eligibleTasksDescriptorsLicenses = new HashMap<String, LinkedBlockingQueue<EligibleTaskDescriptor>>();
@@ -114,7 +119,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         }
     }
 
-    private static boolean isJobExecutableUsingLicense(JobDescriptorImpl job) {
+    private boolean isJobExecutableUsingLicense(JobDescriptorImpl job) {
 
         logger.debug("Analysing job: " + ((JobDescriptorImpl) job).getInternal().getName());
 
@@ -127,21 +132,24 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         if (requiredLicenses != null) {
 
             initializeJobsLicenses();
-            logger.debug("Need to check licenses with " + properties.toString());
+            logger.debug("Need for job to check licenses " + requiredLicenses + " with " +
+                         eligibleJobsDescriptorsLicenses);
 
             // Do not execute if one of the required license can not be obtained
             final String[] requiredLicensesArray = requiredLicenses.split(",");
             for (int i = 0; i < requiredLicensesArray.length; i++) {
 
                 final String currentRequiredLicense = requiredLicensesArray[i];
-                if (!canGetJobLicense(currentRequiredLicense)) {
+                if (!canGetJobLicense(currentRequiredLicense, job)) {
                     logger.debug("License for " + currentRequiredLicense + " not available, keep job pending");
                     return false;
                 }
             }
             // Can be executed! Give it all required software licenses
             for (int i = 0; i < requiredLicensesArray.length; i++) {
-                eligibleJobsDescriptorsLicenses.get(requiredLicensesArray[i]).add(job);
+                if (!containsJob(eligibleJobsDescriptorsLicenses.get(requiredLicensesArray[i]), job.getJobId())) {
+                    eligibleJobsDescriptorsLicenses.get(requiredLicensesArray[i]).add(job);
+                }
             }
             logger.debug("All licenses are available, executing job");
             return true;
@@ -152,7 +160,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
     }
 
-    private static boolean isTaskExecutableUsingLicense(EligibleTaskDescriptor task) {
+    private boolean isTaskExecutableUsingLicense(EligibleTaskDescriptor task) {
 
         logger.debug("Analysing task: " + ((EligibleTaskDescriptorImpl) task).getInternal().getName());
 
@@ -173,7 +181,8 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         if (requiredLicenses != null) {
 
             initializeTasksLicenses();
-            logger.debug("Need to check licenses with " + properties.toString());
+            logger.debug("Need for task to check licenses " + requiredLicenses + " with " +
+                         eligibleTasksDescriptorsLicenses);
 
             // Do not execute if one of the required license can not be obtained
             final String[] requiredLicensesArray = requiredLicenses.split(",");
@@ -198,7 +207,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
     }
 
-    private static void removeFinishedJobs(LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense) {
+    private void removeFinishedJobs(LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense) {
         Iterator<JobDescriptorImpl> iter = eligibleJobsDescriptorsLicense.iterator();
         JobDescriptorImpl currentJob;
         while (iter.hasNext()) {
@@ -210,7 +219,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         }
     }
 
-    private static boolean canGetJobLicense(String currentRequiredLicense) {
+    private boolean canGetJobLicense(String currentRequiredLicense, JobDescriptorImpl job) {
 
         // If the required software is not specified in the license properties file
         if (!eligibleJobsDescriptorsLicenses.containsKey(currentRequiredLicense))
@@ -218,6 +227,9 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
         // if there are still remaining licenses return true
         LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense = eligibleJobsDescriptorsLicenses.get(currentRequiredLicense);
+        if (containsJob(eligibleJobsDescriptorsLicense, job.getJobId())) {
+            return true;
+        }
         if (eligibleJobsDescriptorsLicense.remainingCapacity() > 0) {
             return true;
         }
@@ -232,8 +244,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         }
     }
 
-    private static void
-            removeFinishedTasks(LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense) {
+    private void removeFinishedTasks(LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense) {
         Iterator<EligibleTaskDescriptor> iter = eligibleTasksDescriptorsLicense.iterator();
         EligibleTaskDescriptorImpl currentTask;
         while (iter.hasNext()) {
@@ -245,7 +256,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         }
     }
 
-    private static boolean canGetTaskLicense(String currentRequiredLicense) {
+    private boolean canGetTaskLicense(String currentRequiredLicense) {
 
         // If the required software is not specified in the license properties file
         if (!eligibleTasksDescriptorsLicenses.containsKey(currentRequiredLicense))

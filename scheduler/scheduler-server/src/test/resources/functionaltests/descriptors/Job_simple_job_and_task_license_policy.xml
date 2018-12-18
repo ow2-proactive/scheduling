@@ -9,15 +9,15 @@
         maxNumberOfExecution="2"
 >
   <variables>
-    <variable name="LICENSES" value=""/>
-    <variable name="LICENSES_2" value=""/>
+    <variable name="LICENSES_JOB" value=""/>
+    <variable name="LICENSES_TASK" value=""/>
   </variables>
+  <genericInformation>
+    <info name="REQUIRED_LICENSES" value="${LICENSES_JOB}"/>
+  </genericInformation>
   <taskFlow>
     <task name="Groovy_Task"
     >
-      <genericInformation>
-        <info name="REQUIRED_LICENSES" value="${LICENSES}"/>
-      </genericInformation>
       <scriptExecutable>
         <script
         >
@@ -32,7 +32,7 @@ sleep(5000)
     <task name="Groovy_Task2"
     >
       <genericInformation>
-        <info name="REQUIRED_LICENSES" value="${LICENSES_2}"/>
+        <info name="REQUIRED_LICENSES" value="${LICENSES_TASK}"/>
       </genericInformation>
       <scriptExecutable>
         <script
