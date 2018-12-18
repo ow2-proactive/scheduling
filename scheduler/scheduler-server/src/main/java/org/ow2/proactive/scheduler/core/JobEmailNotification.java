@@ -25,6 +25,10 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -34,13 +38,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.addons.email.exception.EmailException;
+import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
+import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.task.TaskState;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SendMail;
@@ -71,6 +82,8 @@ public class JobEmailNotification {
 
     private final ExecutorService asyncMailSender;
 
+    private SchedulerDBManager dbManager = null;
+
     public JobEmailNotification(JobState js, NotificationData<JobInfo> notification, SendMail sender) {
         this.asyncMailSender = Executors.newCachedThreadPool();
         this.jobState = js;
@@ -82,7 +95,13 @@ public class JobEmailNotification {
         this(js, notification, new SendMail());
     }
 
-    public boolean doCheckAndSend() throws JobEmailNotificationException {
+    public JobEmailNotification(JobState js, NotificationData<JobInfo> notification, SchedulerDBManager dbManager) {
+        this(js, notification);
+        this.dbManager = dbManager;
+    }
+
+    public boolean doCheckAndSend(boolean withAttachment)
+            throws JobEmailNotificationException, IOException, UnknownJobException, PermissionException {
         String jobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
         List<String> jobStatusList = new ArrayList<>();
         if (jobStatus != null) {
@@ -113,7 +132,17 @@ public class JobEmailNotification {
         }
 
         try {
-            sender.sender(getTo(), getSubject(), getBody());
+            if (withAttachment) {
+                String attachment = getAttachment();
+                if (attachment != null) {
+                    sender.sender(getTo(), getSubject(), getBody(), attachment, getAttachmentName());
+                    FileUtils.deleteQuietly(new File(attachment));
+                } else {
+                    sender.sender(getTo(), getSubject(), getBody());
+                }
+            } else {
+                sender.sender(getTo(), getSubject(), getBody());
+            }
             return true;
         } catch (EmailException e) {
             throw new JobEmailNotificationException(String.join(",", getTo()),
@@ -122,16 +151,19 @@ public class JobEmailNotification {
         }
     }
 
-    public void checkAndSendAsync() {
+    public void checkAndSendAsync(boolean withAttachment) {
         this.asyncMailSender.submit(() -> {
             try {
-                boolean sent = doCheckAndSend();
+                boolean sent = doCheckAndSend(withAttachment);
                 if (sent) {
                     jlogger.info(jobState.getId(), "sent notification email for finished job to " + getTo());
                 }
             } catch (JobEmailNotificationException e) {
                 jlogger.warn(jobState.getId(),
                              "failed to send email notification to " + e.getEmailTarget() + ": " + e.getMessage());
+                logger.trace("Stack trace:", e);
+            } catch (Exception e) {
+                jlogger.warn(jobState.getId(), "failed to send email notification: " + e.getMessage());
                 logger.trace("Stack trace:", e);
             }
         });
@@ -178,4 +210,47 @@ public class JobEmailNotification {
         }
         return String.format(BODY_TEMPLATE, jobID, status, allTaskStatusesString, hostname);
     }
+
+    private String getAttachment() throws NotConnectedException, UnknownJobException, PermissionException, IOException {
+        JobId jobID = jobState.getId();
+        List<TaskState> tasks = jobState.getTasks();
+        String attachLogPath = null;
+
+        try {
+
+            JobResult result = dbManager.loadJobResult(jobID);
+
+            String allRes = String.join(System.lineSeparator(),
+                                        tasks.stream()
+                                             .map(task -> "Task " + task.getId().toString() + " (" +
+                                                          task.getId().getReadableName() + ") :" +
+                                                          System.lineSeparator() + result.getAllResults()
+                                                                                         .get(task.getId()
+                                                                                                  .getReadableName())
+                                                                                         .getOutput()
+                                                                                         .getAllLogs())
+                                             .collect(Collectors.toList()));
+
+            File file = File.createTempFile("job_logs", ".log");
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write(allRes);
+                attachLogPath = file.getAbsolutePath();
+            } catch (IOException e) {
+                jlogger.warn(jobState.getId(), "Failed to create attachment for email notification: " + e.getMessage());
+                logger.warn("Error creating attachment for email notification: " + e.getMessage(), e);
+
+            }
+        } catch (Exception e) {
+            logger.warn("Error creating attachment for email notification: ", e);
+        }
+
+        return attachLogPath;
+    }
+
+    private String getAttachmentName() {
+        JobId jobID = jobState.getId();
+        String fileName = "job_" + jobID.value() + "_log.log";
+        return fileName;
+    }
+
 }
