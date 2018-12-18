@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -50,6 +51,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -220,18 +222,20 @@ public class JobEmailNotification {
 
             JobResult result = dbManager.loadJobResult(jobID);
 
-            String allRes = String.join(System.lineSeparator(),
-                                        tasks.stream()
-                                             .map(task -> "Task " + task.getId().toString() + " (" +
-                                                          task.getId().getReadableName() + ") :" +
-                                                          System.lineSeparator() + result.getAllResults()
-                                                                                         .get(task.getId()
-                                                                                                  .getReadableName())
-                                                                                         .getOutput()
-                                                                                         .getAllLogs())
-                                             .collect(Collectors.toList()));
+            Stream<TaskResult> preResult = tasks.stream().map(task -> result.getAllResults()
+                                                                            .get(task.getId().getReadableName()));
 
-            File file = File.createTempFile("job_logs", ".log");
+            Stream<TaskResult> resNonNull = preResult.filter(r -> r != null && r.getOutput() != null);
+
+            Stream<String> resStream = resNonNull.map(taskResult -> "Task " + taskResult.getTaskId().toString() + " (" +
+                                                                    taskResult.getTaskId().getReadableName() + ") :" +
+                                                                    System.lineSeparator() +
+                                                                    taskResult.getOutput().getAllLogs());
+
+            String allRes = String.join(System.lineSeparator(),
+                                        resStream.filter(r -> r != null).collect(Collectors.toList()));
+
+            File file = File.createTempFile("job_logs", ".txt");
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
                 writer.write(allRes);
                 attachLogPath = file.getAbsolutePath();
@@ -249,7 +253,7 @@ public class JobEmailNotification {
 
     private String getAttachmentName() {
         JobId jobID = jobState.getId();
-        String fileName = "job_" + jobID.value() + "_log.log";
+        String fileName = "job_" + jobID.value() + "_log.txt";
         return fileName;
     }
 
