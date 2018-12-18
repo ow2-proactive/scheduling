@@ -253,7 +253,7 @@ public class JobEmailNotification {
 
     private String getAttachmentName() {
         JobId jobID = jobState.getId();
-        String fileName = "job_" + jobID.value() + "_log.log";
+        String fileName = "job_" + jobID.value() + "_log.txt";
         return fileName;
     }
 
