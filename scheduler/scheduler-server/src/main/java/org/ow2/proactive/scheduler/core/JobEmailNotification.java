@@ -106,7 +106,7 @@ public class JobEmailNotification {
             throws JobEmailNotificationException, IOException, UnknownJobException, PermissionException {
         String jobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
         List<String> jobStatusList = new ArrayList<>();
-        if (jobStatus != null && ! "all".equals(jobStatus.toLowerCase())) {
+        if (jobStatus != null && !"all".equals(jobStatus.toLowerCase())) {
             jobStatusList = Arrays.asList(jobStatus.toLowerCase().split("\\s*,\\s*"));
         }
 
