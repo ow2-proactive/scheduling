@@ -107,7 +107,22 @@ public class JobEmailNotification {
         String jobStatus = jobState.getGenericInformation().get(GENERIC_INFORMATION_KEY_NOTIFICATION_EVENT);
         List<String> jobStatusList = new ArrayList<>();
         if (jobStatus != null) {
-            jobStatusList = Arrays.asList(jobStatus.toLowerCase().split("\\s*,\\s*"));
+            if ("all".equals(jobStatus.toLowerCase())) {
+                jobStatusList = Stream.of("JOB_CHANGE_PRIORITY",
+                                          "JOB_IN_ERROR",
+                                          "JOB_PAUSED",
+                                          "JOB_PENDING_TO_FINISHED",
+                                          "JOB_PENDING_TO_RUNNING",
+                                          "JOB_RESTARTED_FROM_ERROR",
+                                          "JOB_RESUMED",
+                                          "JOB_RUNNING_TO_FINISHED",
+                                          "JOB_SUBMITTED")
+                                      .map(status -> status.toLowerCase())
+                                      .collect(Collectors.toList());
+            } else {
+                //get the events that require an email notification, events are comma separated and case irrelevant
+                jobStatusList = Arrays.asList(jobStatus.toLowerCase().split("\\s*,\\s*"));
+            }
         }
 
         switch (eventType) {
