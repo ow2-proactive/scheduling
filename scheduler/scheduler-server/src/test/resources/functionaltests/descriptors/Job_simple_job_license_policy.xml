@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="urn:proactive:jobdescriptor:3.11" xsi:schemaLocation="urn:proactive:jobdescriptor:3.11 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.11/schedulerjob.xsd"  name="Untitled Workflow 1"  priority="normal" onTaskError="continueJobExecution"  maxNumberOfExecution="2" >
+  <variables>
+    <variable name="LICENSES" value=""/>
+  </variables>
+  <genericInformation>
+    <info name="REQUIRED_LICENSES" value="${LICENSES}"/>
+  </genericInformation>
+  <taskFlow>
+    <task name="Groovy_Task" >
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+sleep(5000)
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <metadata>
+        <positionTop>
+          422
+        </positionTop>
+        <positionLeft>
+          646.5
+        </positionLeft>
+      </metadata>
+    </task>
+    <task name="Groovy_Task2" >
+      <depends>
+        <task ref="Groovy_Task"/>
+      </depends>
+      <scriptExecutable>
+        <script>
+          <code language="groovy">
+            <![CDATA[
+sleep(5000)
+]]>
+          </code>
+        </script>
+      </scriptExecutable>
+      <metadata>
+        <positionTop>
+          550
+        </positionTop>
+        <positionLeft>
+          646.5
+        </positionLeft>
+      </metadata>
+    </task>
+  </taskFlow>
+</job>
