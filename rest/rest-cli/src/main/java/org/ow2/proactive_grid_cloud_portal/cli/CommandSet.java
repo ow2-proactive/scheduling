@@ -258,7 +258,7 @@ public class CommandSet {
                                                                            .numOfArgs(1)
                                                                            .hasOptionalArg(true)
                                                                            .argNames("jobId '[{\"var1\":\"value1\",\"var2\":\"value2\"}]'")
-                                                                           .jsCommand("resubmit(job-id,'{\"var1\":\"value1\",\"var2\":\"value2\"}'")
+                                                                           .jsCommand("resubmit(job-id [,'{\"var1\":\"value1\",\"var2\":\"value2\"}'])")
                                                                            .commandClass(ReSubmitJobCommand.class)
                                                                            .entry();
 
@@ -997,12 +997,12 @@ public class CommandSet {
     public static final CommandSet.Entry[] SCHEDULER_ONLY = new CommandSet.Entry[] { SCHEDULER_START, SCHEDULER_STOP,
                                                                                      SCHEDULER_PAUSE, SCHEDULER_RESUME,
                                                                                      SCHEDULER_FREEZE, SCHEDULER_KILL,
-                                                                                     SCHEDULER_SHUTDOWN,
-                                                                                     LINK_RM, SCHEDULER_STATS, JOB_LIST,
-                                                                                     SUBMIT, RE_SUBMIT, JOB_STATE,
-                                                                                     JOB_OUTPUT, JOB_CONTENT,
-                                                                                     JOB_RESULT, JOB_PRIORITY,
-                                                                                     JOB_PAUSE, JOB_RESUME,
+                                                                                     SCHEDULER_SHUTDOWN, LINK_RM,
+                                                                                     SCHEDULER_STATS, JOB_LIST, SUBMIT,
+                                                                                     RE_SUBMIT, JOB_STATE, JOB_OUTPUT,
+                                                                                     JOB_CONTENT, JOB_RESULT,
+                                                                                     JOB_PRIORITY, JOB_PAUSE,
+                                                                                     JOB_RESUME,
                                                                                      JOB_RESUME_ALL_PAUSED_TASKS,
                                                                                      JOB_RESTART_ALL_IN_ERROR_TASKS,
                                                                                      JOB_RESUME_ALL_PAUSED_TASKS_AND_RESTART_ALL_IN_ERROR_TASKS,

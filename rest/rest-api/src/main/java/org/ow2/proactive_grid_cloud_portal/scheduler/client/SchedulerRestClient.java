@@ -31,6 +31,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -465,7 +466,7 @@ public class SchedulerRestClient {
 
     public JobIdData reSubmit(String sessionId, String jobId, Map<String, String> variables,
             Map<String, String> genericInfos) throws NotConnectedRestException {
-        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/jobs/" + jobId + "/reSubmit";
+        String uriTmpl = restEndpointURL + addSlashIfMissing(restEndpointURL) + "scheduler/jobs/" + jobId + "/resubmit";
 
         ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine)
                                                            .providerFactory(providerFactory)

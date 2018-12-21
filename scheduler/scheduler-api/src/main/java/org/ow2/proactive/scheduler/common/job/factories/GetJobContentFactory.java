@@ -59,14 +59,10 @@ public class GetJobContentFactory {
             Map<String, String> genericInformation) {
         final int end = jobContent.indexOf(XMLTags.TASK_FLOW.getXMLName());
 
-        String replacedJobContent = replaceTagContent(jobContent,
-                                                      XMLTags.VARIABLES,
-                                                      newVariablesContent(variables),
-                                                      end);
-        replacedJobContent = replaceTagContent(replacedJobContent,
-                                               XMLTags.COMMON_GENERIC_INFORMATION,
-                                               newGenericInfoContent(genericInformation),
-                                               end);
+        String replacedJobContent = replaceVarsContent(jobContent, newVariablesContent(variables), end);
+        replacedJobContent = replaceGenericInfoContent(replacedJobContent,
+                                                       newGenericInfoContent(genericInformation),
+                                                       end);
 
         return replacedJobContent;
     }
@@ -88,31 +84,100 @@ public class GetJobContentFactory {
                              pair.getValue());
     }
 
-    private String replaceTagContent(String jobContent, XMLTags tag, String newContent, int end) {
+    private String replaceVarsContent(String jobContent, String newContent, int end) {
         final String firstHalf = jobContent.substring(0, end);
 
         /*
          * because tasks can contain variables as well we modify original string
          * only till the provided end
          */
-        final String untouchablePart = jobContent.substring(end);
+        String untouchablePart = jobContent.substring(end);
 
-        final Optional<Matcher> openMatcher = indexOfPattern(firstHalf, tag.getOpenTagPattern());
-        if (!openMatcher.isPresent()) {
-            return jobContent;
+        Optional<Matcher> openMatcher = indexOfPattern(firstHalf, XMLTags.VARIABLES.getOpenTagPattern());
+        Optional<Matcher> closeMatcher = indexOfPattern(firstHalf, XMLTags.VARIABLES.getCloseTagPattern());
+
+        // if job already had variables - we just replace their content
+        if (openMatcher.isPresent() && closeMatcher.isPresent()) {
+            int afterOpenTag = openMatcher.get().end();
+            int beforeCloseTag = closeMatcher.get().start();
+            String beforeNewContent = firstHalf.substring(0, afterOpenTag) + System.lineSeparator();
+            String afterNewContent = TWO_SPACES_INDENT + firstHalf.substring(beforeCloseTag);
+            return beforeNewContent + newContent + afterNewContent + untouchablePart;
+        } else {
+            Optional<Integer> afterOpenTag = afterOpenTag(firstHalf, XMLTags.JOB);
+            return afterOpenTag.map(index -> insertContent(firstHalf,
+                                                           XMLTags.VARIABLES.withContent(newContent),
+                                                           index) +
+                                             untouchablePart)
+                               .orElse(jobContent);
         }
-        final int afterOpenTag = openMatcher.get().end();
+    }
 
-        final Optional<Matcher> closeMatcher = indexOfPattern(firstHalf, tag.getCloseTagPattern());
-        if (!closeMatcher.isPresent()) {
-            return jobContent;
+    private String replaceGenericInfoContent(String jobContent, String newContent, int end) {
+        final String firstHalf = jobContent.substring(0, end);
+
+        String untouchablePart = jobContent.substring(end);
+
+        Optional<Matcher> openMatcher = indexOfPattern(firstHalf, XMLTags.COMMON_GENERIC_INFORMATION.getOpenTagPattern());
+        Optional<Matcher> closeMatcher = indexOfPattern(firstHalf, XMLTags.COMMON_GENERIC_INFORMATION.getCloseTagPattern());
+
+        // when job already had generic info, then just replace it with new content
+        if (openMatcher.isPresent() && closeMatcher.isPresent()) {
+            int afterOpenTag = openMatcher.get().end();
+            int beforeCloseTag = closeMatcher.get().start();
+            return insertContent(firstHalf, newContent, afterOpenTag, beforeCloseTag) + untouchablePart;
+        } else {
+            // if job did not have generic info before
+            // we try to put it after job description if it exsits
+            // then we try to put after variables, if they exist
+            XMLTags[] xmlTags = { XMLTags.COMMON_DESCRIPTION, XMLTags.VARIABLES };
+            for (XMLTags xmlTag : xmlTags) {
+                final Optional<Integer> afterCloseTag = afterCloseTag(firstHalf, xmlTag);
+                if (afterCloseTag.isPresent()) {
+                    return insertContent(firstHalf,
+                                         XMLTags.COMMON_GENERIC_INFORMATION.withContent(newContent),
+                                         afterCloseTag.get()) +
+                           untouchablePart;
+                }
+            }
+
+            // if neither variables not job description exist then we add just after job tag
+            Optional<Integer> afterOpenTag = afterOpenTag(firstHalf, XMLTags.JOB);
+            return afterOpenTag.map(index -> insertContent(firstHalf,
+                                                           XMLTags.COMMON_GENERIC_INFORMATION.withContent(newContent),
+                                                           index) +
+                                             untouchablePart)
+                               .orElse(jobContent);
         }
-        final int beforeCloseTag = closeMatcher.get().start();
 
-        final String beforeNewContent = firstHalf.substring(0, afterOpenTag) + System.lineSeparator();
-        final String afterNewContent = TWO_SPACES_INDENT + firstHalf.substring(beforeCloseTag);
+    }
 
-        return beforeNewContent + newContent + afterNewContent + untouchablePart;
+    private String insertContent(String all, String content, int index) {
+        String left = all.substring(0, index) + System.lineSeparator();
+        String right = TWO_SPACES_INDENT + all.substring(index);
+        StringBuilder result = new StringBuilder();
+        result.append(left);
+        result.append(content);
+        result.append(right);
+        return result.toString();
+    }
+
+    private String insertContent(String all, String content, int index, int index2) {
+        String left = all.substring(0, index);
+        String right = TWO_SPACES_INDENT + all.substring(index2);
+        StringBuilder result = new StringBuilder();
+        result.append(left);
+        result.append(content);
+        result.append(right);
+        return result.toString();
+    }
+
+    private Optional<Integer> afterOpenTag(String content, XMLTags tag) {
+        return indexOfPattern(content, tag.getOpenTagPattern()).map(Matcher::end);
+    }
+
+    private Optional<Integer> afterCloseTag(String content, XMLTags tag) {
+        return indexOfPattern(content, tag.getCloseTagPattern()).map(Matcher::end);
     }
 
     private Optional<Matcher> indexOfPattern(String content, String pattern) {

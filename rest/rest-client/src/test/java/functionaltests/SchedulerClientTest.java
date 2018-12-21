@@ -343,13 +343,13 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test
     public void testReSubmitJob() throws Exception {
         ISchedulerClient client = clientInstance();
-//        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
-//                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
-//        final JobId jobId = submitJob(job, client);
+        //        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
+        //                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
+        //        final JobId jobId = submitJob(job, client);
 
-//        final JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
+        //        final JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
 
-//        assertFalse(jobId.value().equals(jobId1.value()));
+        //        assertFalse(jobId.value().equals(jobId1.value()));
     }
 
     protected Job nodeClientJob(String groovyScript, String forkScript, String cleaningScript) throws Exception {

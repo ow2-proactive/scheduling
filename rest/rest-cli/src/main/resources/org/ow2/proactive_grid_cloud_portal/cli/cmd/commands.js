@@ -228,11 +228,11 @@ function submit(pathname, variables, genericInfos) {
     }
 }
 
-function resubmit(pathname, variables) {
+function resubmit(pathname, variables, genericInfos) {
     if (typeof variables == 'undefined') {
         execute(new ReSubmitJobCommand([string(pathname)]));
     } else {
-        execute(new ReSubmitJobCommand(new Array([string(pathname)], variables)));
+        execute(new ReSubmitJobCommand(new Array([string(pathname)], variables, genericInfos)));
     }
 }
 

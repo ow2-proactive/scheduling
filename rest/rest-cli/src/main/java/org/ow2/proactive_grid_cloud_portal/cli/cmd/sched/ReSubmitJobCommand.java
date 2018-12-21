@@ -25,22 +25,9 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.apache.http.entity.ContentType.APPLICATION_XML;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_FILE_EMPTY;
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.net.URLConnection;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
@@ -49,20 +36,15 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.AbstractCommand;
 import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
-import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 
 
 public class ReSubmitJobCommand extends AbstractCommand implements Command {
+
     private final String jobId;
 
     private String variables;
 
-    private static final Logger logger = null;
-
-    private final JobKeyValueTransformer jobKeyValueTransformer;
+    private String genericInfos;
 
     public ReSubmitJobCommand(String... params) throws NullPointerException {
         Objects.requireNonNull(params);
@@ -71,40 +53,31 @@ public class ReSubmitJobCommand extends AbstractCommand implements Command {
         if (params.length > 1) {
             this.variables = params[1];
         }
-        this.jobKeyValueTransformer = new JobKeyValueTransformer();
-
+        if (params.length > 2) {
+            this.genericInfos = params[2];
+        }
     }
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
-        JobIdData newJobId;
+
         try {
-
-            if (variables != null) {
-                final Map<String, String> vars = jobKeyValueTransformer.transformVariablesToMap(variables);
-                newJobId = currentContext.getRestClient().reSubmit(currentContext.getSessionId(),
-                                                                   jobId,
-                                                                   vars,
-                                                                   Collections.emptyMap());
-
-            } else {
-                newJobId = scheduler.reSubmit(currentContext.getSessionId(), jobId);
-
-            }
+            JobIdData newJobId = currentContext.getRestClient()
+                                               .reSubmit(currentContext.getSessionId(),
+                                                         jobId,
+                                                         JobKeyValueTransformer.transformJsonStringToMap(variables),
+                                                         JobKeyValueTransformer.transformJsonStringToMap(genericInfos));
             writeLine(currentContext, "Job('%s') successfully re-submitted as Job('%d')", jobId, newJobId.getId());
             resultStack(currentContext).push(jobId);
         } catch (Exception e) {
-            handleError(String.format("An error occurred while re-submitting Job('%s')%s output:", jobId),
+            handleError(String.format("An error occurred while re-submitting Job('%s') output %s:",
+                                      jobId,
+                                      e.getMessage()),
                         e,
                         currentContext);
 
         }
 
-    }
-
-    private Map<String, String> map(String variables) {
-        return jobKeyValueTransformer.transformVariablesToMap(variables);
     }
 
 }
