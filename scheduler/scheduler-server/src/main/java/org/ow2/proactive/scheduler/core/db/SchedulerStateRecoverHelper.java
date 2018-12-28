@@ -130,7 +130,7 @@ public class SchedulerStateRecoverHelper {
             }
         }
 
-        finishedJobs.addAll(dbManager.loadFinishedJobs(false, loadJobPeriod));
+        //        finishedJobs.addAll(dbManager.loadFinishedJobs(false, loadJobPeriod));
         logger.info("[Recovering counters] " + " Pending: " + pendingJobs.size() + " Running: " + runningJobs.size() +
                     " Finished: " + finishedJobs.size());
 

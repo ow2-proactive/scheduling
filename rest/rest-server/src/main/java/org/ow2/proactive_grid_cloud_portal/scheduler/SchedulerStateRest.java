@@ -3173,11 +3173,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     private static <T> List<T> map(List<?> toMaps, Class<T> type) {
-        List<T> result = new ArrayList<>(toMaps.size());
-        for (Object toMap : toMaps) {
-            result.add(mapper.map(toMap, type));
-        }
-        return result;
+        return toMaps.stream().map(toMap -> mapper.map(toMap, type)).collect(Collectors.toList());
     }
 
     /**

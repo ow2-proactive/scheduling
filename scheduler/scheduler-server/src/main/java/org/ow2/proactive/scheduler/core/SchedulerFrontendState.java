@@ -26,16 +26,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -280,8 +271,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     private void prepare(Set<JobState> jobStates, ClientJobState js, boolean finished) {
         jobStates.add(js);
-        UserIdentificationImpl uIdent = new UserIdentificationImpl(js.getOwner());
-        IdentifiedJob ij = new IdentifiedJob(js.getId(), uIdent, js.getGenericInformation());
+        IdentifiedJob ij = toIdentifiedJob(js);
         jobs.put(js.getId(), ij);
         jobsMap.put(js.getId(), js);
         ij.setFinished(finished);
@@ -599,9 +589,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         IdentifiedJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            String msg = "The job represented by this ID '" + jobId + "' is unknown !";
-            logger.info(msg);
-            throw new UnknownJobException(msg);
+
+            ClientJobState clientJobState = getClientJobState(jobId);
+            if (clientJobState != null) {
+                ij = toIdentifiedJob(clientJobState);
+            } else {
+                String msg = "The job represented by this ID '" + jobId + "' is unknown !";
+                logger.info(msg);
+                throw new UnknownJobException(msg);
+            }
         }
 
         return ij;
@@ -1245,12 +1241,29 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return PASchedulerProperties.getPropertiesAsHashMap();
     }
 
+    synchronized ClientJobState getClientJobState(JobId jobId) {
+        if (!jobsMap.containsKey(jobId)) {
+            List<InternalJob> internalJobs = dbManager.loadInternalJob(Arrays.asList(jobId.longValue()));
+            if (!internalJobs.isEmpty()) {
+                InternalJob internalJob = internalJobs.get(0);
+                ClientJobState clientJobState = new ClientJobState(internalJob);
+                jobsMap.put(jobId, clientJobState);
+            }
+        }
+        return jobsMap.get(jobId);
+    }
+
+    private IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
+        UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner());
+        return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
+    }
+
     synchronized TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
             throws UnknownJobException, NotConnectedException, PermissionException {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
-        ClientJobState jobState = jobsMap.get(jobId);
+        ClientJobState jobState = getClientJobState(jobId);
         synchronized (jobState) {
             try {
                 final TaskStatesPage tasksPaginated = jobState.getTasksPaginated(offset, limit);
