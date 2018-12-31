@@ -177,4 +177,17 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
                           tasksExecutedOneByOne);
     }
 
+    @Test
+    public void testLicensePolicyJobAndTaskUseSameLicenseAndFinish() throws Throwable {
+
+        JobId jobId = schedulerHelper.submitJob(new File(JobSimpleJobAndTaskLicensePolicy.toURI()).getAbsolutePath(),
+                                                ImmutableMap.of("LICENSES_JOB",
+                                                                "software_A",
+                                                                "LICENSES_TASK",
+                                                                "software_A"));
+        log("Waiting for job finished");
+        schedulerHelper.waitForEventJobFinished(jobId);
+        Assert.assertTrue(true);
+    }
+
 }

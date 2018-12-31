@@ -137,16 +137,17 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
             // Do not execute if one of the required license can not be obtained
             final String[] requiredLicensesArray = requiredLicenses.split(",");
-            for (int i = 0; i < requiredLicensesArray.length; i++) {
+            final int nbRequiredLicenses = requiredLicensesArray.length;
+            for (int i = 0; i < nbRequiredLicenses; i++) {
 
                 final String currentRequiredLicense = requiredLicensesArray[i];
-                if (!canGetJobLicense(currentRequiredLicense, job)) {
+                if (!canGetJobLicense(currentRequiredLicense, job.getJobId())) {
                     logger.debug("License for " + currentRequiredLicense + " not available, keep job pending");
                     return false;
                 }
             }
             // Can be executed! Give it all required software licenses
-            for (int i = 0; i < requiredLicensesArray.length; i++) {
+            for (int i = 0; i < nbRequiredLicenses; i++) {
                 if (!containsJob(eligibleJobsDescriptorsLicenses.get(requiredLicensesArray[i]), job.getJobId())) {
                     eligibleJobsDescriptorsLicenses.get(requiredLicensesArray[i]).add(job);
                 }
@@ -186,17 +187,30 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
             // Do not execute if one of the required license can not be obtained
             final String[] requiredLicensesArray = requiredLicenses.split(",");
-            for (int i = 0; i < requiredLicensesArray.length; i++) {
+            final int nbRequiredLicenses = requiredLicensesArray.length;
+            boolean[] jobAlreadyUseLicense = new boolean[nbRequiredLicenses];
+
+            for (int i = 0; i < nbRequiredLicenses; i++) {
 
                 final String currentRequiredLicense = requiredLicensesArray[i];
+
+                // If the license is already obtained at the job level, use it without getting a new one
+                LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense = eligibleJobsDescriptorsLicenses.get(currentRequiredLicense);
+                if (containsJob(eligibleJobsDescriptorsLicense,
+                                ((EligibleTaskDescriptorImpl) task).getInternal().getJobId())) {
+                    jobAlreadyUseLicense[i] = true;
+                    continue;
+                }
+
                 if (!canGetTaskLicense(currentRequiredLicense)) {
                     logger.debug("License for " + currentRequiredLicense + " not available, keep task pending");
                     return false;
                 }
             }
             // Can be executed! Give it all required software licenses
-            for (int i = 0; i < requiredLicensesArray.length; i++) {
-                eligibleTasksDescriptorsLicenses.get(requiredLicensesArray[i]).add(task);
+            for (int i = 0; i < nbRequiredLicenses; i++) {
+                if (!jobAlreadyUseLicense[i])
+                    eligibleTasksDescriptorsLicenses.get(requiredLicensesArray[i]).add(task);
             }
             logger.debug("All licenses are available, executing task");
             return true;
@@ -219,7 +233,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         }
     }
 
-    private boolean canGetJobLicense(String currentRequiredLicense, JobDescriptorImpl job) {
+    private boolean canGetJobLicense(String currentRequiredLicense, JobId jobId) {
 
         // If the required software is not specified in the license properties file
         if (!eligibleJobsDescriptorsLicenses.containsKey(currentRequiredLicense))
@@ -227,7 +241,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
         // if there are still remaining licenses return true
         LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense = eligibleJobsDescriptorsLicenses.get(currentRequiredLicense);
-        if (containsJob(eligibleJobsDescriptorsLicense, job.getJobId())) {
+        if (containsJob(eligibleJobsDescriptorsLicense, jobId)) {
             return true;
         }
         if (eligibleJobsDescriptorsLicense.remainingCapacity() > 0) {
