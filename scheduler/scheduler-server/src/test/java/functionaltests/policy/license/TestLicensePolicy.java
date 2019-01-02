@@ -56,7 +56,7 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
      */
 
     @Test
-    public void testLicensePolicyAtJobLevelExclusiveSingleLicense() throws Throwable {
+    public void testJobsUseSameLicenseExclusiveExecution() throws Throwable {
 
         JobId jobId0 = schedulerHelper.submitJob(new File(JobSimpleJobLicensePolicy.toURI()).getAbsolutePath(),
                                                  ImmutableMap.of("LICENSES", "software_A"));
@@ -77,7 +77,7 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
     }
 
     @Test
-    public void testLicensePolicyAtJobLevelNonExclusiveSingleLicense() throws Throwable {
+    public void testJobsUseDistinctLicensesParallelExecution() throws Throwable {
 
         JobId jobId0 = schedulerHelper.submitJob(new File(JobSimpleJobLicensePolicy.toURI()).getAbsolutePath(),
                                                  ImmutableMap.of("LICENSES", "software_A"));
@@ -104,7 +104,7 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
      */
 
     @Test
-    public void testLicensePolicyAtTaskLevelExclusiveSingleLicense() throws Throwable {
+    public void testTasksUseSameLicenseExclusiveExecution() throws Throwable {
 
         JobId jobId = schedulerHelper.submitJob(new File(JobSimpleTaskLicensePolicy.toURI()).getAbsolutePath(),
                                                 ImmutableMap.of("LICENSES", "software_A", "LICENSES_2", "software_A"));
@@ -122,7 +122,7 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
     }
 
     @Test
-    public void testLicensePolicyAtTaskLevelNonExclusiveSingleLicense() throws Throwable {
+    public void testTasksUseDistinctLicensesParallelExecution() throws Throwable {
 
         JobId jobId = schedulerHelper.submitJob(new File(JobSimpleTaskLicensePolicy.toURI()).getAbsolutePath(),
                                                 ImmutableMap.of("LICENSES", "software_A", "LICENSES_2", "software_B"));
@@ -140,7 +140,7 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
     }
 
     @Test
-    public void testLicensePolicyJobAndTaskLevelExclusiveSingleLicenseAtTaskLevel() throws Throwable {
+    public void testInterleavedTasksExecution() throws Throwable {
 
         JobId jobId0 = schedulerHelper.submitJob(new File(JobSimpleJobAndTaskLicensePolicy.toURI()).getAbsolutePath(),
                                                  ImmutableMap.of("LICENSES_JOB",
@@ -178,7 +178,7 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
     }
 
     @Test
-    public void testLicensePolicyJobAndTaskUseSameLicenseAndFinish() throws Throwable {
+    public void testTaskUseShareSameLicenseOfItsJobAndFinish() throws Throwable {
 
         JobId jobId = schedulerHelper.submitJob(new File(JobSimpleJobAndTaskLicensePolicy.toURI()).getAbsolutePath(),
                                                 ImmutableMap.of("LICENSES_JOB",
@@ -188,6 +188,28 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
         log("Waiting for job finished");
         schedulerHelper.waitForEventJobFinished(jobId);
         Assert.assertTrue(true);
+    }
+
+    @Test
+    public void testJobAndTaskUseSameLicenseExclusiveExecution() throws Throwable {
+
+        JobId jobId0 = schedulerHelper.submitJob(new File(JobSimpleTaskLicensePolicy.toURI()).getAbsolutePath(),
+                                                 ImmutableMap.of("LICENSES", "software_A", "LICENSES_2", "software_B"));
+
+        JobId jobId1 = schedulerHelper.submitJob(new File(JobSimpleJobLicensePolicy.toURI()).getAbsolutePath(),
+                                                 ImmutableMap.of("LICENSES", "software_A"));
+
+        log("Waiting for jobs finished");
+        schedulerHelper.waitForEventJobFinished(jobId0);
+        schedulerHelper.waitForEventJobFinished(jobId1);
+
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+        TaskState taskStateJob0 = scheduler.getJobState(jobId0).getTasks().get(0);
+        JobState jobState1 = scheduler.getJobState(jobId1);
+
+        boolean taskAndJobExecutedOneByOne = (taskStateJob0.getFinishedTime() < jobState1.getStartTime()) ||
+                                             (jobState1.getFinishedTime() < taskStateJob0.getStartTime());
+        Assert.assertTrue(taskAndJobExecutedOneByOne);
     }
 
 }

@@ -138,10 +138,13 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             // Do not execute if one of the required license can not be obtained
             final String[] requiredLicensesArray = requiredLicenses.split(",");
             final int nbRequiredLicenses = requiredLicensesArray.length;
+            String currentRequiredLicense;
             for (int i = 0; i < nbRequiredLicenses; i++) {
 
-                final String currentRequiredLicense = requiredLicensesArray[i];
-                if (!canGetJobLicense(currentRequiredLicense, job.getJobId())) {
+                currentRequiredLicense = requiredLicensesArray[i];
+
+                if (!canGetJobLicense(currentRequiredLicense, job.getJobId()) ||
+                    !canGetTaskLicense(currentRequiredLicense)) {
                     logger.debug("License for " + currentRequiredLicense + " not available, keep job pending");
                     return false;
                 }
@@ -189,28 +192,29 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             final String[] requiredLicensesArray = requiredLicenses.split(",");
             final int nbRequiredLicenses = requiredLicensesArray.length;
             boolean[] jobAlreadyUseLicense = new boolean[nbRequiredLicenses];
+            String currentRequiredLicense;
 
             for (int i = 0; i < nbRequiredLicenses; i++) {
 
-                final String currentRequiredLicense = requiredLicensesArray[i];
+                currentRequiredLicense = requiredLicensesArray[i];
 
                 // If the license is already obtained at the job level, use it without getting a new one
                 LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense = eligibleJobsDescriptorsLicenses.get(currentRequiredLicense);
                 if (containsJob(eligibleJobsDescriptorsLicense,
                                 ((EligibleTaskDescriptorImpl) task).getInternal().getJobId())) {
                     jobAlreadyUseLicense[i] = true;
-                    continue;
                 }
 
-                if (!canGetTaskLicense(currentRequiredLicense)) {
+                else if (!canGetTaskLicense(currentRequiredLicense)) {
                     logger.debug("License for " + currentRequiredLicense + " not available, keep task pending");
                     return false;
                 }
             }
             // Can be executed! Give it all required software licenses
             for (int i = 0; i < nbRequiredLicenses; i++) {
-                if (!jobAlreadyUseLicense[i])
+                if (!jobAlreadyUseLicense[i]) {
                     eligibleTasksDescriptorsLicenses.get(requiredLicensesArray[i]).add(task);
+                }
             }
             logger.debug("All licenses are available, executing task");
             return true;
