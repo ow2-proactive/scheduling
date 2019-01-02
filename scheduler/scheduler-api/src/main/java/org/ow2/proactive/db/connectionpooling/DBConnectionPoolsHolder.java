@@ -87,7 +87,6 @@ public class DBConnectionPoolsHolder {
      * @param dbConnectionDetails
      * @param queryStr
      * @return a cached result set for a given query to an external DB
-     * @throws SQLException
      */
 
     public ResultSet executeQuery(DBConnectionDetails dbConnectionDetails, String queryStr) {
