@@ -55,6 +55,9 @@ public class DBConnectionPoolsHolder {
     private static final int CACHE_EXPIRATION_MINUTES = Integer.parseInt(System.getProperty("external.db.pool.cache.expiration.minutes",
                                                                                             "10"));
 
+    private DBConnectionPoolsHolder() {
+    }
+
     private static final Logger logger = Logger.getLogger(DBConnectionPoolsHolder.class);
 
     private final LoadingCache<DBConnectionDetails, HikariDataSource> dbConnectionPoolMap = CacheBuilder.newBuilder()
@@ -83,9 +86,10 @@ public class DBConnectionPoolsHolder {
      *
      * @param dbConnectionDetails
      * @param queryStr
-     * @return a cached result set of a given query to an external DB
+     * @return a cached result set for a given query to an external DB
      * @throws SQLException
      */
+
     public ResultSet executeQuery(DBConnectionDetails dbConnectionDetails, String queryStr) {
         ResultSet resultSet = null;
         try (Connection pooledConnection = dbConnectionPoolMap.get(dbConnectionDetails).getConnection();
@@ -113,7 +117,7 @@ public class DBConnectionPoolsHolder {
      *
      * @param dbConnectionDetails
      * @param updateStr
-     * @return @return either (1) the row count for SQL Data Manipulation Language (DML) statements
+     * @return either (1) the row count for SQL Data Manipulation Language (DML) statements
      *         or (2) 0 for SQL statements that return nothing
      */
     public int executeUpdate(DBConnectionDetails dbConnectionDetails, String updateStr) {
