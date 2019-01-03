@@ -144,7 +144,7 @@ public class JobEmailNotification {
             logger.debug("Notification emails disabled, doing nothing");
             return false;
         }
-        if (!jobStatusList.contains(eventType.toString().toLowerCase()) ||
+        if (!jobStatusList.contains(eventType.toString().toLowerCase()) &&
             !jobStatusList.contains(eventType.name().toLowerCase())) {
             return false;
         }
