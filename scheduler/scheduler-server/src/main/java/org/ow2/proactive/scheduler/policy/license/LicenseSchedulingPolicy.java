@@ -40,7 +40,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 
 
 /**
- * 
+ *
  * This Policy is designed to manage software licenses.
  * When a task contains the generic information REQUIRE_LICENSES,
  * this policy will check if there is an available license per
@@ -59,15 +59,19 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
     // A map of fixed size lists. A map entry per software license and a list per map entry to handle tasks using this software license.
     private Map<String, LinkedBlockingQueue<EligibleTaskDescriptor>> eligibleTasksDescriptorsLicenses = null;
 
+    private Map<String, Integer> remainingTokens = null;
+
     // Will be initialize with the license properties file which includes the maximum licenses numbers per software
     private Properties properties = null;
 
     @Override
     public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
 
+        initialize();
+
         // Keep only executable jobs according to their required licenses
         List<JobDescriptor> filteredJobDescList = jobDescList.stream()
-                                                             .filter(jobDesc -> isJobExecutableUsingLicense((JobDescriptorImpl) jobDesc))
+                                                             .filter(jobDesc -> takeRequiredTokensAndReturnTrue((JobDescriptorImpl) jobDesc))
                                                              .collect(Collectors.toList());
 
         // Get the ordered tasks from the filtered jobs according to the parent policy
@@ -75,26 +79,37 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
         // Keep only executable tasks according to their required licenses
         LinkedList<EligibleTaskDescriptor> filteredOrderedTasksDescFromParentPolicy = orderedTasksDescFromParentPolicy.stream()
-                                                                                                                      .filter(taskDesc -> isTaskExecutableUsingLicense(taskDesc))
+                                                                                                                      .filter(taskDesc -> takeRequiredTokensAndReturnTrue(taskDesc))
                                                                                                                       .collect(Collectors.toCollection(LinkedList::new));
 
         return filteredOrderedTasksDescFromParentPolicy;
     }
 
-    private void initializeJobsLicenses() {
-        if (eligibleJobsDescriptorsLicenses == null) {
-            // Map initialization
-            eligibleJobsDescriptorsLicenses = new HashMap<String, LinkedBlockingQueue<JobDescriptorImpl>>();
-            // Retrieve properties from the license properties file ...
+    private void initialize() {
+
+        if (remainingTokens == null) {
+
+            logger.debug("Retrieve properties from the license properties file");
             properties = LicenseConfiguration.getConfiguration().getProperties();
-            // ... and per software license, create a list handling all jobs using a this software license
-            Enumeration e = properties.propertyNames();
-            while (e.hasMoreElements()) {
-                String software = (String) e.nextElement();
-                int numberOfLicenses = Integer.parseInt(properties.getProperty(software));
-                eligibleJobsDescriptorsLicenses.put(software,
-                                                    new LinkedBlockingQueue<JobDescriptorImpl>(numberOfLicenses));
+
+            logger.debug("Initializing maps");
+            eligibleJobsDescriptorsLicenses = new HashMap<String, LinkedBlockingQueue<JobDescriptorImpl>>(properties.size());
+            eligibleTasksDescriptorsLicenses = new HashMap<String, LinkedBlockingQueue<EligibleTaskDescriptor>>(properties.size());
+            remainingTokens = new HashMap<String, Integer>(properties.size());
+
+            Enumeration propertyNames = properties.propertyNames();
+            while (propertyNames.hasMoreElements()) {
+                String software = (String) propertyNames.nextElement();
+                int maxNbTokens = Integer.parseInt(properties.getProperty(software));
+                eligibleJobsDescriptorsLicenses.put(software, new LinkedBlockingQueue<JobDescriptorImpl>(maxNbTokens));
+                eligibleTasksDescriptorsLicenses.put(software,
+                                                     new LinkedBlockingQueue<EligibleTaskDescriptor>(maxNbTokens));
+                remainingTokens.put(software, maxNbTokens);
             }
+
+            logger.debug("eligibleJobsDescriptorsLicenses initialized: " + eligibleJobsDescriptorsLicenses);
+            logger.debug("eligibleTasksDescriptorsLicenses initialized: " + eligibleTasksDescriptorsLicenses);
+            logger.debug("remainingTokens initialized: " + remainingTokens);
         }
     }
 
@@ -102,24 +117,53 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         return jobList.stream().anyMatch(jd -> jd.getJobId().equals(jobId));
     }
 
-    private void initializeTasksLicenses() {
-        if (eligibleTasksDescriptorsLicenses == null) {
-            // Map initialization
-            eligibleTasksDescriptorsLicenses = new HashMap<String, LinkedBlockingQueue<EligibleTaskDescriptor>>();
-            // Retrieve properties from the license properties file ...
-            properties = LicenseConfiguration.getConfiguration().getProperties();
-            // ... and per software license, create a list handling all tasks using a this software license
-            Enumeration e = properties.propertyNames();
-            while (e.hasMoreElements()) {
-                String software = (String) e.nextElement();
-                int numberOfLicenses = Integer.parseInt(properties.getProperty(software));
-                eligibleTasksDescriptorsLicenses.put(software,
-                                                     new LinkedBlockingQueue<EligibleTaskDescriptor>(numberOfLicenses));
+    private void removeFinishedJobsAndReleaseTokens(
+            LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense, String requiredLicense) {
+        Iterator<JobDescriptorImpl> iter = eligibleJobsDescriptorsLicense.iterator();
+        JobDescriptorImpl currentJob;
+        int currentNbTokens = remainingTokens.get(requiredLicense);
+        while (iter.hasNext()) {
+            currentJob = iter.next();
+
+            if (!currentJob.getInternal().getStatus().isJobAlive()) {
+                logger.debug("releasing token for license " + requiredLicense + " given to job " +
+                             currentJob.getJobId());
+                iter.remove();
+                currentNbTokens++;
             }
+        }
+        remainingTokens.put(requiredLicense, currentNbTokens);
+    }
+
+    private boolean canGetLicenseFromJobs(String currentRequiredLicense, final JobId jobId) {
+
+        if (!eligibleJobsDescriptorsLicenses.containsKey(currentRequiredLicense)) {
+            logger.debug("The required software is not specified in the license properties file, return false");
+            return false;
+        }
+
+        LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense = eligibleJobsDescriptorsLicenses.get(currentRequiredLicense);
+        if (jobId != null && containsJob(eligibleJobsDescriptorsLicense, jobId)) {
+            logger.debug("The job already hold a token, return true");
+            return true;
+        }
+
+        if (remainingTokens.get(currentRequiredLicense) > 0) {
+            logger.debug("There are still remaining licenses, return true");
+            return true;
+        } else {
+            logger.debug("Removing all terminated jobs and check again if there are remaining licenses");
+            removeFinishedJobsAndReleaseTokens(eligibleJobsDescriptorsLicense, currentRequiredLicense);
+
+            if (remainingTokens.get(currentRequiredLicense) > 0) {
+                logger.debug("There are remaining licenses after releasing tokens, return true");
+                return true;
+            }
+            return false;
         }
     }
 
-    private boolean isJobExecutableUsingLicense(JobDescriptorImpl job) {
+    private boolean takeRequiredTokensAndReturnTrue(JobDescriptorImpl job) {
 
         logger.debug("Analysing job: " + ((JobDescriptorImpl) job).getInternal().getName());
 
@@ -131,28 +175,26 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         // If it requires software licenses
         if (requiredLicenses != null) {
 
-            initializeJobsLicenses();
-            logger.debug("Need for job to check licenses " + requiredLicenses + " with " +
-                         eligibleJobsDescriptorsLicenses);
+            logger.debug("Need for job to check licenses " + requiredLicenses);
 
             // Do not execute if one of the required license can not be obtained
-            final String[] requiredLicensesArray = requiredLicenses.split(",");
-            final int nbRequiredLicenses = requiredLicensesArray.length;
-            String currentRequiredLicense;
-            for (int i = 0; i < nbRequiredLicenses; i++) {
+            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split(",")));
+            for (String requiredLicense : requiredLicensesSet) {
 
-                currentRequiredLicense = requiredLicensesArray[i];
+                logger.debug("Considering license " + requiredLicense);
 
-                if (!canGetJobLicense(currentRequiredLicense, job.getJobId()) ||
-                    !canGetTaskLicense(currentRequiredLicense)) {
-                    logger.debug("License for " + currentRequiredLicense + " not available, keep job pending");
+                if (!canGetLicenseFromJobs(requiredLicense, job.getJobId()) &&
+                    !canGetLicensesFromTasks(requiredLicense)) {
+                    logger.debug("License for " + requiredLicense + " not available, keep job pending");
                     return false;
                 }
             }
-            // Can be executed! Give it all required software licenses
-            for (int i = 0; i < nbRequiredLicenses; i++) {
-                if (!containsJob(eligibleJobsDescriptorsLicenses.get(requiredLicensesArray[i]), job.getJobId())) {
-                    eligibleJobsDescriptorsLicenses.get(requiredLicensesArray[i]).add(job);
+            // Can get a new token for each required license !
+            for (String requiredLicense : requiredLicensesSet) {
+                if (!containsJob(eligibleJobsDescriptorsLicenses.get(requiredLicense), job.getJobId())) {
+
+                    eligibleJobsDescriptorsLicenses.get(requiredLicense).add(job);
+                    remainingTokens.put(requiredLicense, remainingTokens.get(requiredLicense) - 1);
                 }
             }
             logger.debug("All licenses are available, executing job");
@@ -164,7 +206,48 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
     }
 
-    private boolean isTaskExecutableUsingLicense(EligibleTaskDescriptor task) {
+    private void removeFinishedTasksAndReleaseTokens(
+            LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense, String requiredLicense) {
+        Iterator<EligibleTaskDescriptor> iter = eligibleTasksDescriptorsLicense.iterator();
+        EligibleTaskDescriptorImpl currentTask;
+        int currentNbTokens = remainingTokens.get(requiredLicense);
+        while (iter.hasNext()) {
+            currentTask = (EligibleTaskDescriptorImpl) iter.next();
+
+            if (!currentTask.getInternal().isTaskAlive()) {
+                logger.debug("releasing token for license " + requiredLicense + " given to task " +
+                             currentTask.getTaskId() + " of job " + currentTask.getJobId());
+                iter.remove();
+                currentNbTokens++;
+            }
+        }
+        remainingTokens.put(requiredLicense, currentNbTokens);
+    }
+
+    private boolean canGetLicensesFromTasks(String currentRequiredLicense) {
+
+        if (!eligibleTasksDescriptorsLicenses.containsKey(currentRequiredLicense)) {
+            logger.debug("The required software is not specified in the license properties file, return false");
+            return false;
+        }
+
+        LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense = eligibleTasksDescriptorsLicenses.get(currentRequiredLicense);
+        if (remainingTokens.get(currentRequiredLicense) > 0) {
+            logger.debug("There are still remaining licenses, return true");
+            return true;
+        } else {
+            logger.debug("Removing all terminated tasks and check again if there are remaining licenses");
+            removeFinishedTasksAndReleaseTokens(eligibleTasksDescriptorsLicense, currentRequiredLicense);
+
+            if (remainingTokens.get(currentRequiredLicense) > 0) {
+                logger.debug("There are remaining licenses after releasing tokens, return true");
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private boolean takeRequiredTokensAndReturnTrue(EligibleTaskDescriptor task) {
 
         logger.debug("Analysing task: " + ((EligibleTaskDescriptorImpl) task).getInternal().getName());
 
@@ -184,36 +267,36 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
         // If it requires software licenses
         if (requiredLicenses != null) {
 
-            initializeTasksLicenses();
-            logger.debug("Need for task to check licenses " + requiredLicenses + " with " +
-                         eligibleTasksDescriptorsLicenses);
+            logger.debug("Need for task to check licenses " + requiredLicenses);
 
             // Do not execute if one of the required license can not be obtained
-            final String[] requiredLicensesArray = requiredLicenses.split(",");
-            final int nbRequiredLicenses = requiredLicensesArray.length;
-            boolean[] jobAlreadyUseLicense = new boolean[nbRequiredLicenses];
-            String currentRequiredLicense;
+            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split(",")));
+            boolean[] jobAlreadyUseLicense = new boolean[requiredLicensesSet.size()];
+            int licenseInd = 0;
+            for (String requiredLicense : requiredLicensesSet) {
 
-            for (int i = 0; i < nbRequiredLicenses; i++) {
-
-                currentRequiredLicense = requiredLicensesArray[i];
+                logger.debug("Considering license " + requiredLicense);
 
                 // If the license is already obtained at the job level, use it without getting a new one
-                LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense = eligibleJobsDescriptorsLicenses.get(currentRequiredLicense);
+                LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense = eligibleJobsDescriptorsLicenses.get(requiredLicense);
                 if (containsJob(eligibleJobsDescriptorsLicense,
                                 ((EligibleTaskDescriptorImpl) task).getInternal().getJobId())) {
-                    jobAlreadyUseLicense[i] = true;
+                    jobAlreadyUseLicense[licenseInd] = true;
                 }
 
-                else if (!canGetTaskLicense(currentRequiredLicense)) {
-                    logger.debug("License for " + currentRequiredLicense + " not available, keep task pending");
+                else if (!canGetLicenseFromJobs(requiredLicense, null) && !canGetLicensesFromTasks(requiredLicense)) {
+                    logger.debug("License for " + requiredLicense + " not available, keep task pending");
                     return false;
                 }
+
+                licenseInd++;
             }
-            // Can be executed! Give it all required software licenses
-            for (int i = 0; i < nbRequiredLicenses; i++) {
-                if (!jobAlreadyUseLicense[i]) {
-                    eligibleTasksDescriptorsLicenses.get(requiredLicensesArray[i]).add(task);
+            // Can get a new token for each required license !
+            licenseInd = 0;
+            for (String requiredLicense : requiredLicensesSet) {
+                if (!jobAlreadyUseLicense[licenseInd++]) {
+                    eligibleTasksDescriptorsLicenses.get(requiredLicense).add(task);
+                    remainingTokens.put(requiredLicense, remainingTokens.get(requiredLicense) - 1);
                 }
             }
             logger.debug("All licenses are available, executing task");
@@ -223,77 +306,6 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             return true;
         }
 
-    }
-
-    private void removeFinishedJobs(LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense) {
-        Iterator<JobDescriptorImpl> iter = eligibleJobsDescriptorsLicense.iterator();
-        JobDescriptorImpl currentJob;
-        while (iter.hasNext()) {
-            currentJob = iter.next();
-
-            if (!currentJob.getInternal().getStatus().isJobAlive()) {
-                iter.remove();
-            }
-        }
-    }
-
-    private boolean canGetJobLicense(String currentRequiredLicense, JobId jobId) {
-
-        // If the required software is not specified in the license properties file
-        if (!eligibleJobsDescriptorsLicenses.containsKey(currentRequiredLicense))
-            return false;
-
-        // if there are still remaining licenses return true
-        LinkedBlockingQueue<JobDescriptorImpl> eligibleJobsDescriptorsLicense = eligibleJobsDescriptorsLicenses.get(currentRequiredLicense);
-        if (containsJob(eligibleJobsDescriptorsLicense, jobId)) {
-            return true;
-        }
-        if (eligibleJobsDescriptorsLicense.remainingCapacity() > 0) {
-            return true;
-        }
-        // otherwise remove all terminated jobs and check again if there are remaining licenses
-        else {
-            removeFinishedJobs(eligibleJobsDescriptorsLicense);
-
-            if (eligibleJobsDescriptorsLicense.remainingCapacity() > 0) {
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private void removeFinishedTasks(LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense) {
-        Iterator<EligibleTaskDescriptor> iter = eligibleTasksDescriptorsLicense.iterator();
-        EligibleTaskDescriptorImpl currentTask;
-        while (iter.hasNext()) {
-            currentTask = (EligibleTaskDescriptorImpl) iter.next();
-
-            if (!currentTask.getInternal().isTaskAlive()) {
-                iter.remove();
-            }
-        }
-    }
-
-    private boolean canGetTaskLicense(String currentRequiredLicense) {
-
-        // If the required software is not specified in the license properties file
-        if (!eligibleTasksDescriptorsLicenses.containsKey(currentRequiredLicense))
-            return false;
-
-        // if there are still remaining licenses return true
-        LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense = eligibleTasksDescriptorsLicenses.get(currentRequiredLicense);
-        if (eligibleTasksDescriptorsLicense.remainingCapacity() > 0) {
-            return true;
-        }
-        // otherwise remove all terminated tasks and check again if there are remaining licenses
-        else {
-            removeFinishedTasks(eligibleTasksDescriptorsLicense);
-
-            if (eligibleTasksDescriptorsLicense.remainingCapacity() > 0) {
-                return true;
-            }
-            return false;
-        }
     }
 
 }
