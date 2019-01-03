@@ -722,7 +722,7 @@ public class SchedulerDBManager {
             logger.info("Loading Jobs from database");
 
             Query query;
-            if (period > 0L) {
+            if (period >= 0L) {
                 query = session.getNamedQuery("loadJobsWithPeriod")
                                .setParameter("minSubmittedTime", System.currentTimeMillis() - period)
                                .setParameterList("status", status)
