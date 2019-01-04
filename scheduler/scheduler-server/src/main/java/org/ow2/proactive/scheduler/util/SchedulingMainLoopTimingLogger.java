@@ -54,14 +54,14 @@ public class SchedulingMainLoopTimingLogger {
         allTimings.getOrDefault(nameOfTiming, new TimingModel()).end();
     }
 
-    public void printTimingsDEBUGLevel() {
+    public void printTimingsINFOLevel() {
         List<String> loggingStrings = allTimings.entrySet()
                                                 .stream()
                                                 .map(timing -> timing.getValue().getLoggingString(timing.getKey()))
                                                 .collect(Collectors.toList());
         if (!loggingStrings.isEmpty()) {
-            logger.debug("SchedulingMainLoopTiming::" + System.getProperty("line.separator") +
-                         String.join(System.getProperty("line.separator"), loggingStrings));
+            logger.info("SchedulingMainLoopTiming::" + System.getProperty("line.separator") +
+                        String.join(System.getProperty("line.separator"), loggingStrings));
         }
     }
 

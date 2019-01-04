@@ -320,7 +320,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             RecoveredSchedulerState recoveredState = new SchedulerStateRecoverHelper(dbManager).recover(loadJobPeriod,
                                                                                                         rmProxy);
 
-            this.frontendState = new SchedulerFrontendState(recoveredState.getSchedulerState(), jmxHelper);
+            this.frontendState = new SchedulerFrontendState(recoveredState.getSchedulerState(), jmxHelper, dbManager);
 
             SchedulingInfrastructure infrastructure = new SchedulingInfrastructureImpl(dbManager,
                                                                                        rmProxiesManager,
