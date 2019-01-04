@@ -58,8 +58,6 @@ public class DBConnectionPoolsHolder {
     private DBConnectionPoolsHolder() {
     }
 
-    private static final Logger logger = Logger.getLogger(DBConnectionPoolsHolder.class);
-
     private final LoadingCache<DBConnectionDetails, HikariDataSource> dbConnectionPoolMap = CacheBuilder.newBuilder()
                                                                                                         .maximumSize(CACHE_MAXIMUM_SIZE)
                                                                                                         .expireAfterAccess(CACHE_EXPIRATION_MINUTES,
@@ -68,7 +66,7 @@ public class DBConnectionPoolsHolder {
                                                                                                             public HikariDataSource
                                                                                                                     load(DBConnectionDetails key)
                                                                                                                             throws SQLException {
-                                                                                                                logger.info("New connection to an external DB is created " +
+                                                                                                                System.out.println("New connection to an external DB is created " +
                                                                                                                             key.toString());
                                                                                                                 return dbConnectionPoolFactory.generateConnectionPool(key);
                                                                                                             }
