@@ -43,6 +43,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 
 import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
 
+
 /**
  * @author ActiveEon Team
  * @since 04/01/2019
@@ -72,15 +73,16 @@ public class TestSchedulerDBConnectionPooling extends SchedulerFunctionalTestNon
         //check events reception
         log("Job terminated, id " + id.toString());
 
-        assertThat(schedulerHelper.getJobResult(id).getResult("DB_task1").getOutput().getAllLogs(), containsString("New connection to an external DB is created"));
+        assertThat(schedulerHelper.getJobResult(id).getResult("DB_task1").getOutput().getAllLogs(),
+                   containsString("New connection to an external DB is created"));
 
         log("Test 2 : Next submissions...");
 
         for (int i = 0; i < 10; i++) {
             id = schedulerHelper.testJobSubmission(jobDescriptorPath);
-            assertThat(schedulerHelper.getJobResult(id).getResult("DB_task1").getOutput().getAllLogs(), not(containsString("New connection to an external DB is created")));
+            assertThat(schedulerHelper.getJobResult(id).getResult("DB_task1").getOutput().getAllLogs(),
+                       not(containsString("New connection to an external DB is created")));
         }
-
 
     }
 }

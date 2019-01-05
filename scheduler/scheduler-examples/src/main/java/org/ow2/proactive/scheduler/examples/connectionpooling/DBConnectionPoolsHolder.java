@@ -67,7 +67,7 @@ public class DBConnectionPoolsHolder {
                                                                                                                     load(DBConnectionDetails key)
                                                                                                                             throws SQLException {
                                                                                                                 System.out.println("New connection to an external DB is created " +
-                                                                                                                            key.toString());
+                                                                                                                                   key.toString());
                                                                                                                 return dbConnectionPoolFactory.generateConnectionPool(key);
                                                                                                             }
                                                                                                         });
