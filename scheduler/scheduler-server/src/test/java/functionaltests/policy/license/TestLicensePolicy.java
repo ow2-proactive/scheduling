@@ -26,6 +26,7 @@
 package functionaltests.policy.license;
 
 import static functionaltests.utils.SchedulerTHelper.log;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.net.URL;
@@ -35,6 +36,7 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.python.google.common.collect.ImmutableMap;
 
@@ -48,6 +50,8 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
     private static URL JobSimpleTaskLicensePolicy = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_task_license_policy.xml");
 
     private static URL JobSimpleJobAndTaskLicensePolicy = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_job_and_task_license_policy.xml");
+
+    private static URL JobSimpleNoRunnableTaskLicensePolicy = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_no_runnable_task_license_policy.xml");
 
     /**
      * Tests that two independent jobs do not run at the same time, due to license limitation.
@@ -210,6 +214,25 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
         boolean taskAndJobExecutedOneByOne = (taskStateJob0.getFinishedTime() < jobState1.getStartTime()) ||
                                              (jobState1.getFinishedTime() < taskStateJob0.getStartTime());
         Assert.assertTrue(taskAndJobExecutedOneByOne);
+    }
+
+    @Test
+    public void testNonRunnableTaskNotBlockingTokens() throws Throwable {
+
+        JobId jobId0 = schedulerHelper.submitJob(new File(JobSimpleNoRunnableTaskLicensePolicy.toURI()).getAbsolutePath(),
+                                                 ImmutableMap.of("LICENSES", "software_A", "LICENSES_2", "software_B"));
+
+        log("Waiting for job submitted");
+        schedulerHelper.waitForEventJobSubmitted(jobId0);
+
+        JobId jobId1 = schedulerHelper.submitJob(new File(JobSimpleTaskLicensePolicy.toURI()).getAbsolutePath(),
+                                                 ImmutableMap.of("LICENSES", "software_A", "LICENSES_2", "software_B"));
+
+        log("Waiting for job finished");
+        schedulerHelper.waitForEventJobFinished(jobId1);
+
+        Scheduler scheduler = schedulerHelper.getSchedulerInterface();
+        assertEquals(JobStatus.PENDING, scheduler.getJobState(jobId0).getStatus());
     }
 
 }
