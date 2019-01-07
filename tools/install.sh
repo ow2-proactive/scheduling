@@ -331,7 +331,7 @@ if [[ "$OLD_PADIR" == "" ]]; then
 else
     USER="$(stat -c "%U" "$OLD_PADIR")"
     GROUP="$(stat -c "%G" "$OLD_PADIR")"
-    echo "Previous installation belonged to user $USER with group $GROUP"
+    echo "Previous installation was owned by user $USER with group $GROUP"
 fi
 
 init_and_ignores
@@ -515,7 +515,7 @@ if [[ "$OLD_PADIR" == "" ]]; then
     echo "$NETWORK_OUTPUT"
 
 
-    if confirm "Do you want to change the network interface used? [y/N] " "n" ; then
+    if confirm "Do you want to change the network interface used by the ProActive server? [y/N] " "n" ; then
          ITF_ARRAY=( $( echo "$NETWORK_OUTPUT" | grep -e 'MAC:' | awk '{ print $1 }' ) )
          echo "Available interfaces : " "${ITF_ARRAY[@]}"
          ITF_SELECTED=false
@@ -578,7 +578,7 @@ if which git > /dev/null 2>&1; then
         echo ""
         echo "Detected an existing ProActive Scheduler installation at $OLD_PADIR"
 
-        echo  "Copying addons and data files from previous installation..."
+        echo  "Copying addons and data files from the previous installation..."
         echo ""
 
         rsync $RSYNC_PROGRESS -a $OLD_PADIR/{addons,data} $PA_ROOT/default/
@@ -614,10 +614,10 @@ if which git > /dev/null 2>&1; then
 
                 if (( $? != 0 )); then
                     echo ""
-                    echo "A conflict occurred, cd to $PA_ROOT/default/ and follow the instructions displayed by Git to resolve them."
-                    echo "Additionally, if a conflict occurs on the file $PA_ROOT/default/config/proactive-scheduler,"
-                    echo "you will need to manually copy the modified file after conflicts are resolved by using the command:"
-                    echo "cp $PA_ROOT/default/config/proactive-scheduler /etc/init.d/"
+                    echo "A conflict occurred, cd to $PA_ROOT/default/ and follow the instructions displayed by Git to resolve the issues."
+                    echo "Additionally, if a conflict occurred on the file $PA_ROOT/default/tools/proactive-scheduler,"
+                    echo "you will need to manually copy the modified file after conflicts have been resolved by using the command:"
+                    echo "cp $PA_ROOT/default/tools/proactive-scheduler /etc/init.d/"
                     CONFLICT=true
                     read -n 1 -s -r -p "Press any key to continue"
                 fi

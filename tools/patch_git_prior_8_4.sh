@@ -4,8 +4,8 @@ if [ "$#" -ne 2 ]; then
     SCRIPT_NAME=`basename "$0"`
     echo "$SCRIPT_NAME"
     echo "Can be used to patch a ProActive installation git versioning when migrating from a version prior to 8.4.0 to 8.4.0 or above."
-    echo "You must specify a ProActive installation path and a folder containing the original extracted archive corresponding to your version"
-    echo "This command must be run as the user owning the ProActive installation directory."
+    echo "Please specify a ProActive installation path and a folder containing the original extracted archive corresponding to your version"
+    echo "This command must run as the user owning the ProActive installation directory."
     echo ""
     echo "The command will delete all the git history and create a new one, based on the differences between your"
     echo "ProActive installation and the default configuration files of the same ProActive version."
@@ -99,7 +99,7 @@ echo "This command will patch the ProActive installation in $PA_DIR using the un
 if confirm "Proceed? [Y/n] "; then
 
     echo "Zipping current content of config folder to $(pwd)/config.zip."
-    echo "If any problem occurs, in order to restore the previous state, you must:"
+    echo "If any problem occurs, in order to restore the previous state, please follow the following steps:"
     echo " 1) unzip the config.zip file into $PA_DIR/"
     echo " 2) delete the folder $PA_DIR/.git"
     echo " 3) make sure all file belong to the correct user and not to root"
