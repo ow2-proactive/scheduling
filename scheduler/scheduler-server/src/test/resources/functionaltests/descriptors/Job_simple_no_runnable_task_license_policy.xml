@@ -18,6 +18,13 @@
       <genericInformation>
         <info name="REQUIRED_LICENSES" value="${LICENSES}"/>
       </genericInformation>
+      <selection>
+        <script>
+          <code language="groovy">
+            selected = false
+          </code>
+        </script>
+      </selection>
       <scriptExecutable>
         <script
         >
@@ -34,6 +41,13 @@ sleep(5000)
       <genericInformation>
         <info name="REQUIRED_LICENSES" value="${LICENSES_2}"/>
       </genericInformation>
+      <selection>
+        <script>
+          <code language="groovy">
+            selected = false
+          </code>
+        </script>
+      </selection>
       <scriptExecutable>
         <script
         >
