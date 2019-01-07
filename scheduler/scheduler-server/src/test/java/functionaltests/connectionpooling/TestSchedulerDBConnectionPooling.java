@@ -32,13 +32,8 @@ import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 import org.junit.Test;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 
 import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
@@ -51,8 +46,6 @@ import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
 public class TestSchedulerDBConnectionPooling extends SchedulerFunctionalTestNonForkedModeNoRestart {
 
     private static URL jobDescriptor = TestSchedulerDBConnectionPooling.class.getResource("/functionaltests/connectionpooling/DBConnectionPooling.xml");
-
-    private static int TIMEOUT = 300; // in seconds
 
     /**
      * Tests that the pooled connection to the scheduler DB is done using HikariCP framework.
