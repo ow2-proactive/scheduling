@@ -196,6 +196,8 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** File encoding used by the scheduler */
     FILE_ENCODING(PAProperties.KEY_PA_FILE_ENCODING, PropertyType.STRING, "UTF-8"),
 
+    SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE("pa.scheduler.finishedjobs.lru.cache.size", PropertyType.INTEGER, "100"),
+
     /* ***************************************************************** */
     /* ************************ TASKS PROPERTIES *********************** */
     /* ***************************************************************** */

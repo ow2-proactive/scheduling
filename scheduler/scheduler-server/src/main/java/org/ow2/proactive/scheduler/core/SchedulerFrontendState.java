@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE;
+
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -212,6 +214,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     private final Map<JobId, ClientJobState> jobsMap;
 
+    private final LinkedHashMap<JobId, ClientJobState> finishedJobsLRUCache;
+
     private SchedulerDBManager dbManager = null;
 
     SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper) {
@@ -220,6 +224,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         this.dirtyList = new HashSet<>();
         this.jmxHelper = jmxHelper;
         this.jobsMap = new HashMap<>();
+        this.finishedJobsLRUCache = new LinkedHashMap<JobId, ClientJobState>() {
+            public boolean removeEldestEntry(Map.Entry eldest) {
+                return size() > SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE.getValueAsInt();
+            }
+        };
         this.jobs = new HashMap<>();
         this.sessionTimer = new Timer("SessionTimer");
         this.sState = sState;
@@ -1136,6 +1145,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     // removing jobs from the global list : this job is no more managed
                     sState.removeFinished(js);
                     jobsMap.remove(js.getId());
+                    finishedJobsLRUCache.remove(js.getId());
                     jobs.remove(notification.getData().getJobId());
                     logger.debug("HOUSEKEEPING removed the finished job " + js.getId() +
                                  " from the SchedulerFrontEndState");
@@ -1243,14 +1253,18 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     synchronized ClientJobState getClientJobState(JobId jobId) {
         if (!jobsMap.containsKey(jobId)) {
-            List<InternalJob> internalJobs = dbManager.loadInternalJob(Arrays.asList(jobId.longValue()));
-            if (!internalJobs.isEmpty()) {
-                InternalJob internalJob = internalJobs.get(0);
-                ClientJobState clientJobState = new ClientJobState(internalJob);
-                jobsMap.put(jobId, clientJobState);
+            if (!finishedJobsLRUCache.containsKey(jobId)) {
+                List<InternalJob> internalJobs = dbManager.loadInternalJob(Arrays.asList(jobId.longValue()));
+                if (!internalJobs.isEmpty()) {
+                    InternalJob internalJob = internalJobs.get(0);
+                    ClientJobState clientJobState = new ClientJobState(internalJob);
+                    finishedJobsLRUCache.put(jobId, clientJobState);
+                }
             }
+            return finishedJobsLRUCache.get(jobId);
+        } else {
+            return jobsMap.get(jobId);
         }
-        return jobsMap.get(jobId);
     }
 
     private IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
