@@ -224,7 +224,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         this.dirtyList = new HashSet<>();
         this.jmxHelper = jmxHelper;
         this.jobsMap = new HashMap<>();
-        this.finishedJobsLRUCache = new LinkedHashMap<JobId, ClientJobState>() {
+        this.finishedJobsLRUCache = new LinkedHashMap<JobId, ClientJobState>(10, 0.75f, true) {
             public boolean removeEldestEntry(Map.Entry eldest) {
                 return size() > SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE.getValueAsInt();
             }
