@@ -36,7 +36,10 @@ import org.apache.log4j.Level;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.executable.JavaExecutable;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.utils.ThreadReader;
+import org.ow2.proactive.utils.CookieBasedProcessTreeKiller;
 import org.ow2.proactive.utils.OperatingSystem;
 import org.ow2.proactive.utils.OperatingSystemFamily;
 
@@ -68,6 +71,8 @@ public class JavaSpawnExecutable extends JavaExecutable {
 
     public String home;
 
+    boolean forkMode = "true".equals(System.getProperty(PASchedulerProperties.TASK_FORK.getKey()));
+
     @Override
     public void init(Map<String, Serializable> args) throws Exception {
         super.init(args);
@@ -81,29 +86,49 @@ public class JavaSpawnExecutable extends JavaExecutable {
     @Override
     public Serializable execute(TaskResult... results) throws Throwable {
 
-        org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
+        CookieBasedProcessTreeKiller processTreeKiller = null;
         Process process = null;
+        org.apache.log4j.Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
+        try {
+            ProcessBuilder builder = new ProcessBuilder(getNativeExecLauncher(false));
+            builder.directory(getExecutablePath(launchersDir).getParentFile().getCanonicalFile());
+            Map<String, String> environment = builder.environment();
 
-        process = Runtime.getRuntime().exec(getNativeExecLauncher(false),
-                                            null,
-                                            getExecutablePath(launchersDir).getParentFile().getCanonicalFile());
+            String cookieSuffix = "JavaExecutable_Job" + getVariables().get(SchedulerVars.PA_JOB_ID) + "Task" +
+                                  getVariables().get(SchedulerVars.PA_TASK_ID);
 
-        // redirect streams
-        BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            // In non-fork mode the child process must be managed by a process tree killer
+            if (!forkMode) {
+                processTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller(cookieSuffix, environment);
+            }
 
-        Thread tsout = new Thread(new ThreadReader(sout, System.out));
-        Thread tserr = new Thread(new ThreadReader(serr, System.err));
-        tsout.setDaemon(true);
-        tserr.setDaemon(true);
-        tsout.start();
-        tserr.start();
+            process = builder.start();
 
-        process.waitFor();
+            // redirect streams
+            BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
-        Thread.sleep(sleep * 1000); // we sleep 2 sec
+            Thread tsout = new Thread(new ThreadReader(sout, getOut()));
+            Thread tserr = new Thread(new ThreadReader(serr, getErr()));
+            tsout.setDaemon(true);
+            tserr.setDaemon(true);
+            tsout.start();
+            tserr.start();
+
+            process.waitFor();
+
+            Thread.sleep(sleep * 1000); // we sleep 2 sec
+
+        } catch (InterruptedException e) {
+            getOut().println("Process Interrupted");
+        } finally {
+            if (processTreeKiller != null) {
+                processTreeKiller.kill();
+            }
+        }
 
         return true;
+
     }
 
     /**
@@ -125,9 +150,9 @@ public class JavaSpawnExecutable extends JavaExecutable {
             case MAC:
                 String executable = null;
                 if (alternate) {
-                    executable = getExecutablePath(nativeLinuxExecLauncher2).getName();
+                    executable = getExecutableReference(nativeLinuxExecLauncher2);
                 } else {
-                    executable = getExecutablePath(nativeLinuxExecLauncher).getName();
+                    executable = getExecutableReference(nativeLinuxExecLauncher);
                 }
                 // TODO runAsMe mode for this Test
                 nativeExecLauncher = new String[] { "/bin/sh", executable };
@@ -136,15 +161,23 @@ public class JavaSpawnExecutable extends JavaExecutable {
             case WINDOWS:
                 if (alternate) {
                     nativeExecLauncher = new String[] { "cmd.exe", "/C",
-                                                        getExecutablePath(nativeWindowsExecLauncher2).getName() };
+                                                        getExecutableReference(nativeWindowsExecLauncher2) };
                 } else {
                     nativeExecLauncher = new String[] { "cmd.exe", "/C",
-                                                        getExecutablePath(nativeWindowsExecLauncher).getName() };
+                                                        getExecutableReference(nativeWindowsExecLauncher) };
 
                 }
 
         }
         return nativeExecLauncher;
+    }
+
+    private String getExecutableReference(String execLauncher) throws URISyntaxException {
+        if (forkMode) {
+            return getExecutablePath(execLauncher).getName();
+        } else {
+            return getExecutablePath(execLauncher).getAbsolutePath();
+        }
     }
 
     private File getExecutablePath(String launcherPath) throws URISyntaxException {

@@ -28,7 +28,6 @@ package functionaltests.job.taskkill;
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
@@ -41,12 +40,11 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
-import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
 
-import functionaltests.utils.SchedulerFunctionalTestWithRestart;
+import functionaltests.utils.SchedulerFunctionalTestNonForkModeWithRestart;
 
 
 /**
@@ -57,14 +55,14 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  *
  * It will run an iteration of test; each iteration will test the ProcessTreeKiller for killed jobs and for normally terminated jobs
  * At each test it will start a single job
- * The job will contain a JavaTask, a Native Task and a Forked Java Task
+ * The job will contain a JavaTask and a Native Task in non-forked mode
  *
  * Each task will run a native script (bash or dos), which will run a set 4 detached native executables
  * The test will check that those detached processes have been killed by the PTK (by listing all processes with the given
- * name and counting the number of processes
+ * name and counting the number of processes)
  *
  */
-public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
+public class TestProcessTreeKillerNonForked extends SchedulerFunctionalTestNonForkModeWithRestart {
 
     @Rule
     public Timeout testTimeout = new Timeout(10, TimeUnit.MINUTES);
@@ -91,16 +89,14 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             String task1Name = "TestPTK1";
             task1.setName(task1Name);
 
-            String workingDir = new File(TestProcessTreeKillerUtil.launchersDir.toURI()).getParentFile()
-                                                                                        .getCanonicalPath();
-            task1.setForkEnvironment(new ForkEnvironment(workingDir));
+            // In non-forked mode, the java executable which spawns processes manages its own process tree killer
             JavaSpawnExecutable executable = new JavaSpawnExecutable();
             executable.home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
             task1.setCommandLine(executable.getNativeExecLauncher(false));
             job1.addTask(task1);
 
             String task2Name = "TestTK2";
-            TaskFlowJob job2 = TestProcessTreeKillerUtil.createJavaExecutableJob(task2Name, true);
+            TaskFlowJob job2 = TestProcessTreeKillerUtil.createJavaExecutableJob(task2Name, false);
 
             log("************** Test with Job Killing *************");
             //submit three jobs
@@ -152,8 +148,8 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             String task4Name = "TestPTK4";
             task4.setName(task4Name);
 
-            task4.setForkEnvironment(new ForkEnvironment(workingDir));
             task4.setCommandLine(executable.getNativeExecLauncher(true));
+            task4.setPreciousLogs(true);
             job4.addTask(task4);
 
             //submit three jobs
