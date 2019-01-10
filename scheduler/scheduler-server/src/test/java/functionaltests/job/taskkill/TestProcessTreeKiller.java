@@ -168,23 +168,15 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
 
             //we should have 1 time (2 jobs) number of detached processes as the first job won't spawn any process
 
-            log("************** Waiting for first job (NativeExecutable) to finish *************");
+            log("************** Waiting for both jobs to finish *************");
             //wait for the first job to finish normally
 
             schedulerHelper.waitForEventJobFinished(id1);
+            schedulerHelper.waitForEventJobFinished(id2);
 
-            log("************** First job finished *************");
+            log("************** Both jobs finished *************");
 
             int runningDetachedProcNumber = TestProcessTreeKillerUtil.countProcesses();
-            log("************** number of processes : " + runningDetachedProcNumber);
-            assertEquals(TestProcessTreeKillerUtil.detachedProcNumber, runningDetachedProcNumber);
-
-            log("************** Waiting for second job (JavaExecutable) to finish *************");
-            //wait for the second job to finish normally
-            schedulerHelper.waitForEventJobFinished(id2);
-            log("************** Second job finished *************");
-
-            runningDetachedProcNumber = TestProcessTreeKillerUtil.countProcesses();
             log("************** number of processes : " + runningDetachedProcNumber);
             assertEquals(0, runningDetachedProcNumber);
 

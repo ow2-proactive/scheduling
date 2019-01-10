@@ -51,7 +51,7 @@ public class TestProcessTreeKillerUtil {
 
     private static final String windowsSleepName = "TestSleep.exe";
 
-    static final int NB_ITERATIONS = 1;
+    static final int NB_ITERATIONS = 5;
 
     public static URL launchersDir = TestProcessTreeKillerUtil.class.getResource("/functionaltests/executables/TestSleep.exe");
 
