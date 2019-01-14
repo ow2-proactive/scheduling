@@ -1,5 +1,9 @@
 #!/bin/sh
 
+SCRIPT_DIR=$(dirname "$0")
+cd "$SCRIPT_DIR"
+echo "Running in $SCRIPT_DIR"
+
 echo "Process tree killer test : detached commands launcher 2"
 
 nohup /bin/sh PTK_process2.sh &
