@@ -73,7 +73,13 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             Enumeration propertyNames = properties.propertyNames();
             while (propertyNames.hasMoreElements()) {
                 String software = (String) propertyNames.nextElement();
-                int nbTokens = Integer.parseInt(properties.getProperty(software));
+                int nbTokens;
+                try {
+                    nbTokens = Integer.parseInt(properties.getProperty(software));
+                } catch (NumberFormatException e) {
+                    logger.debug("Fatal error, cannot parse token number from the license properties file");
+                    throw e;
+                }
 
                 if (nbTokens > 0) {
                     licenseSynchronization.addSoftware(software, nbTokens);
@@ -106,7 +112,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             }
         }
         licenseSynchronization.setNbTokens(requiredLicense, currentNbTokens);
-        licenseSynchronization.getAndPutForJobsLicensePersist(requiredLicense);
+        licenseSynchronization.markJobLicenseChange(requiredLicense);
         licenseSynchronization.persist();
     }
 
@@ -127,7 +133,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             }
         }
         licenseSynchronization.setNbTokens(requiredLicense, currentNbTokens);
-        licenseSynchronization.getAndPutForTasksLicensePersist(requiredLicense);
+        licenseSynchronization.markTaskLicenseChange(requiredLicense);
         licenseSynchronization.persist();
     }
 
@@ -181,8 +187,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
             for (String requiredLicense : requiredLicensesSet) {
                 if (!licenseSynchronization.containsJobId(requiredLicense, jobId)) {
                     licenseSynchronization.addJobToLicense(requiredLicense, jobId);
-                    licenseSynchronization.acquireToken(requiredLicense);
-                    licenseSynchronization.getAndPutForJobsLicensePersist(requiredLicense);
+                    licenseSynchronization.markJobLicenseChange(requiredLicense);
                 }
             }
             logger.debug("Job eligible since it can get all tokens");
@@ -297,8 +302,7 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
                                                                                              .value())) {
 
                     licenseSynchronization.addTaskToLicense(requiredLicense, task.getTaskId().toString());
-                    licenseSynchronization.acquireToken(requiredLicense);
-                    licenseSynchronization.getAndPutForTasksLicensePersist(requiredLicense);
+                    licenseSynchronization.markTaskLicenseChange(requiredLicense);
                 } else {
                     logger.debug("The license " + requiredLicense +
                                  " is already obtained at the job level, use it without getting a new token");

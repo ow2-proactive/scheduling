@@ -32,8 +32,6 @@ import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 import jdbm.PrimaryHashMap;
@@ -56,9 +54,9 @@ public class LicenseSynchronization {
     /**
      * JDBM database tables
      */
-    private static final String JOBS_LICENSECES = "jobsLicenses";
+    private static final String JOBS_LICENSES = "jobsLicenses";
 
-    private static final String TASKS_LICENSECES = "tasksLicenses";
+    private static final String TASKS_LICENSES = "tasksLicenses";
 
     private static final String REMAINING_TOKENS = "remainingTokens";
 
@@ -97,8 +95,8 @@ public class LicenseSynchronization {
         close();
         try {
             recordManager = createRecordManager(storeFile.getCanonicalPath());
-            persistedJobsLicenses = recordManager.hashMap(JOBS_LICENSECES);
-            persistedTasksLicenses = recordManager.hashMap(TASKS_LICENSECES);
+            persistedJobsLicenses = recordManager.hashMap(JOBS_LICENSES);
+            persistedTasksLicenses = recordManager.hashMap(TASKS_LICENSES);
             remainingTokens = recordManager.hashMap(REMAINING_TOKENS);
 
             recordManager.commit();
@@ -144,9 +142,10 @@ public class LicenseSynchronization {
 
     void addJobToLicense(String license, String jobId) {
         persistedJobsLicenses.get(license).add(jobId);
+        remainingTokens.put(license, remainingTokens.get(license) - 1);
     }
 
-    void getAndPutForJobsLicensePersist(String license) {
+    void markJobLicenseChange(String license) {
         // Record Manager mark as dirty (uncommited) entries which have be modified via a put call
         // Thus, such operation as persistedJobsLicenses.get(license).dosomething() will not be committed
         // by the following trick, we mark the entry as dirty and commit
@@ -159,9 +158,10 @@ public class LicenseSynchronization {
 
     void addTaskToLicense(String license, String taskId) {
         persistedTasksLicenses.get(license).add(taskId);
+        remainingTokens.put(license, remainingTokens.get(license) - 1);
     }
 
-    void getAndPutForTasksLicensePersist(String license) {
+    void markTaskLicenseChange(String license) {
         // Record Manager mark as dirty (uncommited) entries which have be modified via a put call
         // Thus, such operation as persistedTasksLicenses.get(license).dosomething() will not be committed
         // by the following trick, we mark the entry as dirty and commit
@@ -178,10 +178,6 @@ public class LicenseSynchronization {
 
     void setNbTokens(String license, int currentNbTokens) {
         remainingTokens.put(license, currentNbTokens);
-    }
-
-    void acquireToken(String license) {
-        remainingTokens.put(license, remainingTokens.get(license) - 1);
     }
 
     public boolean close() {

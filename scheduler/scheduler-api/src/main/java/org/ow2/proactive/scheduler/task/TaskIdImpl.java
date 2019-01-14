@@ -223,6 +223,10 @@ public final class TaskIdImpl implements TaskId {
      */
     public static TaskId makeTaskId(String str) {
         String[] strSplitted = str.split("t");
+
+        if (!str.contains("t") || strSplitted.length != 2) {
+            throw new IllegalArgumentException("A valid task id must be supplied");
+        }
         JobId jobId = JobIdImpl.makeJobId(strSplitted[0]);
         long taskId = Long.parseLong(strSplitted[1]);
         return new TaskIdImpl(jobId, taskId);

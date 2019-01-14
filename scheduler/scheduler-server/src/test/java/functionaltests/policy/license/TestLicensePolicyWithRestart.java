@@ -61,9 +61,11 @@ public class TestLicensePolicyWithRestart extends SchedulerFunctionalTestLicense
         JobId jobId3 = schedulerHelper.submitJob(new File(JobSimpleJobLicensePolicy.toURI()).getAbsolutePath(),
                                                  ImmutableMap.of("LICENSES", "software_B"));
 
+        log("Waiting for jobs running");
+        schedulerHelper.waitForEventJobRunning(jobId0);
+        schedulerHelper.waitForEventJobRunning(jobId1);
+
         log("Waiting for jobs submitted");
-        schedulerHelper.waitForEventJobSubmitted(jobId0);
-        schedulerHelper.waitForEventJobSubmitted(jobId1);
         schedulerHelper.waitForEventJobSubmitted(jobId2);
         schedulerHelper.waitForEventJobSubmitted(jobId3);
 
