@@ -393,6 +393,9 @@ public enum PASchedulerProperties implements PACommonProperties {
 
     LICENSE_SCHEDULING_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),
 
+    /** location of the jdbm database for persistent license registrations */
+    LICENSE_SCHEDULING_POLICY_DATABASE("pa.scheduler.license.policy.db", PropertyType.STRING, "data/licenses"),
+
     /* ***************************************************************** */
     /* ***************** SYNCHRONIZATION STORE PROPERTIES ************** */
     /* ***************************************************************** */

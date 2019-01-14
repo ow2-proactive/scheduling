@@ -53,12 +53,6 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
 
     private static URL JobSimpleNoRunnableTaskLicensePolicy = TestLicensePolicy.class.getResource("/functionaltests/descriptors/Job_simple_no_runnable_task_license_policy.xml");
 
-    /**
-     * Tests that two independent jobs do not run at the same time, due to license limitation.
-     *
-     * @throws Exception
-     */
-
     @Test
     public void testJobsUseSameLicenseExclusiveExecution() throws Throwable {
 
@@ -234,5 +228,4 @@ public class TestLicensePolicy extends SchedulerFunctionalTestLicensePolicy {
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
         assertEquals(JobStatus.PENDING, scheduler.getJobState(jobId0).getStatus());
     }
-
 }

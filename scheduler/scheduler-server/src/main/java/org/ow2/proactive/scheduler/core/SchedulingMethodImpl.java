@@ -166,6 +166,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         schedulingMainLoopTimingLogger = new SchedulingMainLoopTimingLogger(logger);
 
         Policy currentPolicy = schedulingService.getPolicy();
+        currentPolicy.setSchedulingService(schedulingService);
 
         //Number of time to retry an active object creation before leaving scheduling loop
         activeObjectCreationRetryTimeNumber = ACTIVEOBJECT_CREATION_RETRY_TIME_NUMBER;
