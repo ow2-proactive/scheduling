@@ -669,7 +669,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized Set<TaskId> getJobTasks(JobId jobId) {
-        JobState jobState = jobsMap.get(jobId);
+        JobState jobState = getClientJobState(jobId);
         synchronized (jobState) {
             if (jobState == null) {
                 return Collections.emptySet();
@@ -688,7 +688,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
-        ClientJobState jobState = jobsMap.get(jobId);
+        ClientJobState jobState = getClientJobState(jobId);
         ClientJobState jobStateCopy;
         synchronized (jobState) {
             try {
@@ -706,10 +706,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
-        if (jobsMap.get(jobId) == null) {
+        if (getClientJobState(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
-        JobState jobState = jobsMap.get(jobId);
+        JobState jobState = getClientJobState(jobId);
         synchronized (jobState) {
             TaskState ts = jobState.getHMTasks().get(taskId);
             if (ts == null) {
@@ -726,7 +726,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
 
-        if (jobsMap.get(jobId) == null) {
+        if (getClientJobState(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
         TaskId taskId = null;
@@ -738,7 +738,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         if (taskId == null) {
             throw new UnknownTaskException(taskName, jobId);
         }
-        JobState jobState = jobsMap.get(jobId);
+        JobState jobState = getClientJobState(jobId);
         synchronized (jobState) {
             TaskState ts = jobState.getHMTasks().get(taskId);
             if (ts == null) {
@@ -749,7 +749,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized TaskId getTaskId(JobId jobId, String taskName) throws UnknownTaskException, UnknownJobException {
-        if (jobsMap.get(jobId) == null) {
+        if (getClientJobState(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
         TaskId taskId = null;
@@ -1114,7 +1114,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     @Override
     public synchronized void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
-        ClientJobState js = jobsMap.get(notification.getData().getJobId());
+        ClientJobState js = getClientJobState(notification.getData().getJobId());
         boolean withAttachment = false;
         synchronized (js) {
             js.update(notification.getData());
@@ -1169,7 +1169,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     @Override
     public synchronized void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
-        JobState jobState = jobsMap.get(notification.getData().getJobId());
+        JobState jobState = getClientJobState(notification.getData().getJobId());
         synchronized (jobState) {
             jobState.update(notification.getData());
             switch (notification.getEventType()) {
@@ -1270,7 +1270,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     private IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
         UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner());
-        return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
+        IdentifiedJob identifiedJob = new IdentifiedJob(clientJobState.getId(),
+                                                        uIdent,
+                                                        clientJobState.getGenericInformation());
+        identifiedJob.setFinished(true); // because wherenever there is job in jobsMap, but not in jobs, it is always finished
+        return identifiedJob;
     }
 
     synchronized TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
