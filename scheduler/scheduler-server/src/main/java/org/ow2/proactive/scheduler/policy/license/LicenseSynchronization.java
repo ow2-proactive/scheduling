@@ -104,7 +104,7 @@ public class LicenseSynchronization {
                 logger.info("Loading of job database successful after clean.");
             }
 
-        } catch (Throwable e) {
+        } catch (Exception e) {
             if (firstAttempt) {
                 logger.error("Error occurred when loading the database " + storeFile.getAbsolutePath() +
                              ", now cleaning it and retrying.", e);
@@ -119,8 +119,8 @@ public class LicenseSynchronization {
     }
 
     void addSoftware(String software, int nbTokens) {
-        persistedJobsLicenses.put(software, new LinkedBlockingQueue<String>(nbTokens));
-        persistedTasksLicenses.put(software, new LinkedBlockingQueue<String>(nbTokens));
+        persistedJobsLicenses.put(software, new LinkedBlockingQueue<>(nbTokens));
+        persistedTasksLicenses.put(software, new LinkedBlockingQueue<>(nbTokens));
         remainingTokens.put(software, nbTokens);
     }
 
@@ -128,7 +128,7 @@ public class LicenseSynchronization {
         try {
             recordManager.commit();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -169,6 +169,9 @@ public class LicenseSynchronization {
     }
 
     int getRemainingTokens(String license) {
+        if (!remainingTokens.containsKey(license)) {
+            logger.error("License " + license + " does not exist in the remainingTokens map, whereas it should be.");
+        }
         return remainingTokens.get(license);
     }
 
@@ -180,7 +183,7 @@ public class LicenseSynchronization {
         remainingTokens.put(license, currentNbTokens);
     }
 
-    public boolean close() {
+    public void close() {
         if (recordManager != null) {
             try {
                 logger.info("Closing Record Manager");
@@ -190,7 +193,6 @@ public class LicenseSynchronization {
                 logger.warn("Error when closing Record Manager", e);
             }
         }
-        return true;
     }
 
     private void cleanDataBase() {
