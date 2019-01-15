@@ -225,6 +225,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         this.jmxHelper = jmxHelper;
         this.jobsMap = new HashMap<>();
         this.finishedJobsLRUCache = new LinkedHashMap<JobId, ClientJobState>(10, 0.75f, true) {
+            @Override
             public boolean removeEldestEntry(Map.Entry eldest) {
                 return size() > SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE.getValueAsInt();
             }
@@ -1132,13 +1133,13 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 case JOB_PENDING_TO_FINISHED:
                     sState.pendingToFinished(js);
                     // set this job finished, user can get its result
-                    jobs.get(notification.getData().getJobId()).setFinished(true);
+                    jobs.remove(notification.getData().getJobId()).setFinished(true);
                     withAttachment = true;
                     break;
                 case JOB_RUNNING_TO_FINISHED:
                     sState.runningToFinished(js);
                     // set this job finished, user can get its result
-                    jobs.get(notification.getData().getJobId()).setFinished(true);
+                    jobs.remove(notification.getData().getJobId()).setFinished(true);
                     withAttachment = true;
                     break;
                 case JOB_REMOVE_FINISHED:
