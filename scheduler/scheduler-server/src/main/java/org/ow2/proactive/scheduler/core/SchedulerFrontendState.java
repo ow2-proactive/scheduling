@@ -596,13 +596,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized IdentifiedJob getIdentifiedJob(JobId jobId) throws UnknownJobException {
-        IdentifiedJob ij = jobs.get(jobId);
+        IdentifiedJob identifiedJob = jobs.get(jobId);
 
-        if (ij == null) {
+        if (identifiedJob == null) {
 
             ClientJobState clientJobState = getClientJobState(jobId);
             if (clientJobState != null) {
-                ij = toIdentifiedJob(clientJobState);
+                identifiedJob = toIdentifiedJob(clientJobState);
+                identifiedJob.setFinished(true); // because wherenever there is job in jobsMap, but not in jobs, it is always finished
             } else {
                 String msg = "The job represented by this ID '" + jobId + "' is unknown !";
                 logger.info(msg);
@@ -610,7 +611,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             }
         }
 
-        return ij;
+        return identifiedJob;
 
     }
 
@@ -1270,11 +1271,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     private IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
         UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner());
-        IdentifiedJob identifiedJob = new IdentifiedJob(clientJobState.getId(),
-                                                        uIdent,
-                                                        clientJobState.getGenericInformation());
-        identifiedJob.setFinished(true); // because wherenever there is job in jobsMap, but not in jobs, it is always finished
-        return identifiedJob;
+        return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
     }
 
     synchronized TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
