@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 
 
 /**
@@ -212,6 +213,23 @@ public final class TaskIdImpl implements TaskId {
     @Override
     public String toString() {
         return jobId.value() + 't' + value();
+    }
+
+    /**
+     * Make a new TaskId with the given arguments.
+     *
+     * @param str the string on which to base the id.
+     * @return the new taskId
+     */
+    public static TaskId makeTaskId(String str) {
+        String[] strSplitted = str.split("t");
+
+        if (!str.contains("t") || strSplitted.length != 2) {
+            throw new IllegalArgumentException("A valid task id must be supplied");
+        }
+        JobId jobId = JobIdImpl.makeJobId(strSplitted[0]);
+        long taskId = Long.parseLong(strSplitted[1]);
+        return new TaskIdImpl(jobId, taskId);
     }
 
 }

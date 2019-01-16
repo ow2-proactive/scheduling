@@ -466,6 +466,14 @@ public class SchedulingService {
         });
     }
 
+    public boolean isJobAlive(JobId jobId) {
+        return jobs.isJobAlive(jobId);
+    }
+
+    public boolean isTaskAlive(TaskId taskId) {
+        return jobs.isTaskAlive(taskId);
+    }
+
     public void submitJob(InternalJob job) {
         try {
             infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job)).get();

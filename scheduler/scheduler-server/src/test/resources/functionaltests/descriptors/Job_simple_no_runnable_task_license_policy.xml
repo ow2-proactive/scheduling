@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:proactive:jobdescriptor:3.8"
         xsi:schemaLocation="urn:proactive:jobdescriptor:3.8 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.8/schedulerjob.xsd"
-        name="job_simple_task_license_policy"
+        name="job_simple_no_runnable_task_license_policy"
         priority="normal"
         onTaskError="continueJobExecution"
         maxNumberOfExecution="2"

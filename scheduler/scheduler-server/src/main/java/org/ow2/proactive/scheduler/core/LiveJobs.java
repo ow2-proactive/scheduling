@@ -182,6 +182,33 @@ class LiveJobs {
         return false;
     }
 
+    boolean isJobAlive(JobId jobId) {
+        if (!jobs.containsKey(jobId)) {
+            return false;
+        }
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            return false;
+        }
+        try {
+            return jobData.job.getStatus().isJobAlive();
+        } finally {
+            jobData.unlock();
+        }
+    }
+
+    boolean isTaskAlive(TaskId taskId) {
+        JobData jobData = lockJob(taskId.getJobId());
+        if (jobData == null) {
+            return false;
+        }
+        try {
+            return jobData.job.getHMTasks().get(taskId).isTaskAlive();
+        } finally {
+            jobData.unlock();
+        }
+    }
+
     void changeJobPriority(JobId jobId, JobPriority priority) {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
