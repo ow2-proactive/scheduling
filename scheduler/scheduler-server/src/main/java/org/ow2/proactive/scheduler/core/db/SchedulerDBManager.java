@@ -768,8 +768,8 @@ public class SchedulerDBManager {
         return tasks.stream().collect(Collectors.groupingBy(taskData -> taskData.getJobData().getId()));
     }
 
-    public List<InternalJob> loadInternalJob(List<Long> ids) {
-        return executeReadOnlyTransaction(session -> loadInternalJobs(false, session, ids));
+    public List<InternalJob> loadInternalJob(Long id) {
+        return executeReadOnlyTransaction(session -> loadInternalJobs(false, session, Collections.singletonList(id)));
     }
 
     // Executed in a transaction from the caller

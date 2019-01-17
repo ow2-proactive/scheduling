@@ -1256,7 +1256,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     synchronized ClientJobState getClientJobState(JobId jobId) {
         if (!jobsMap.containsKey(jobId)) {
             if (!finishedJobsLRUCache.containsKey(jobId)) {
-                List<InternalJob> internalJobs = dbManager.loadInternalJob(Arrays.asList(jobId.longValue()));
+                List<InternalJob> internalJobs = dbManager.loadInternalJob(jobId.longValue());
                 if (!internalJobs.isEmpty()) {
                     InternalJob internalJob = internalJobs.get(0);
                     ClientJobState clientJobState = new ClientJobState(internalJob);
@@ -1269,7 +1269,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    private IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
+    IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
         UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner());
         return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
     }
