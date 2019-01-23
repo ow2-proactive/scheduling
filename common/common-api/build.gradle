@@ -3,7 +3,7 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.5.2'
     compile "org.objectweb.proactive:programming-annotation:${programmingVersion}"
     compile "org.objectweb.proactive:programming-util:${programmingVersion}"
-    compile 'org.ow2.proactive:process-tree-killer:1.0.0'
+    compile 'org.ow2.proactive:process-tree-killer:1.0.1'
 
     testRuntime 'org.jruby:jruby-complete:9.0.5.0'
     testRuntime 'org.python:jython-standalone:2.7.0'
