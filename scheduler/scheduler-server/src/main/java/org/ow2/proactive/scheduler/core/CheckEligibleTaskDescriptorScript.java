@@ -96,6 +96,11 @@ public class CheckEligibleTaskDescriptorScript {
 
         String scriptContent = script.fetchScript();
 
+        if (scriptContent == null) {
+            // script could not be fetched, it may be because the script is stored in the catalog and the catalog is not started yet
+            return true;
+        }
+
         return (scriptContent != null) && (scriptContent.contains(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME) ||
                                            scriptContent.contains(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME) ||
                                            scriptContent.contains(SchedulerConstants.DS_USER_API_BINDING_NAME));
