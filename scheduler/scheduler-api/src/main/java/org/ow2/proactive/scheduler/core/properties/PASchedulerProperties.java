@@ -358,7 +358,7 @@ public enum PASchedulerProperties implements PACommonProperties {
      * and 'm' (minutes).
      * If property isn't set then all finished jobs are loaded. 
      */
-    SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING, "0"),
+    SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING, "0m"),
 
     SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR("pa.scheduler.db.transactions.damping.factor", PropertyType.INTEGER, "2"),
 
