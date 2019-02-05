@@ -101,19 +101,19 @@ public class TopologicalTaskSorter {
     private static class EntryUnitWork {
         private final Entry entry;
 
-        private final boolean fisrt;
+        private final boolean first;
 
-        public EntryUnitWork(Entry entry, boolean fisrt) {
+        public EntryUnitWork(Entry entry, boolean first) {
             this.entry = entry;
-            this.fisrt = fisrt;
+            this.first = first;
         }
 
         public Entry getEntry() {
             return entry;
         }
 
-        public boolean isFisrt() {
-            return fisrt;
+        public boolean isFirst() {
+            return first;
         }
     }
 
@@ -124,7 +124,7 @@ public class TopologicalTaskSorter {
             final EntryUnitWork entryUnitWork = stack.removeFirst();
             Entry newEntry = entryUnitWork.getEntry();
 
-            if (entryUnitWork.isFisrt()) {
+            if (entryUnitWork.isFirst()) {
                 if (markedTemporarily.contains(newEntry)) {
                     throw new IllegalArgumentException("The graph contains a cycle");
                 }
