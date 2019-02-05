@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core.db;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -93,9 +94,58 @@ public class TopologicalTaskSorter {
 
     private List<Entry> sort() {
         while (!unmarked.isEmpty()) {
-            visit(unmarked.iterator().next());
+            visitNonRec(unmarked.iterator().next());
         }
         return result;
+    }
+
+    private static class EntryUnitWork {
+        private final Entry entry;
+
+        private final boolean fisrt;
+
+        public EntryUnitWork(Entry entry, boolean fisrt) {
+            this.entry = entry;
+            this.fisrt = fisrt;
+        }
+
+        public Entry getEntry() {
+            return entry;
+        }
+
+        public boolean isFisrt() {
+            return fisrt;
+        }
+    }
+
+    private void visitNonRec(Entry entry) {
+        LinkedList<EntryUnitWork> stack = new LinkedList<>();
+        stack.addFirst(new EntryUnitWork(entry, true));
+        while (!stack.isEmpty()) {
+            final EntryUnitWork entryUnitWork = stack.removeFirst();
+            Entry newEntry = entryUnitWork.getEntry();
+
+            if (entryUnitWork.isFisrt()) {
+                if (markedTemporarily.contains(newEntry)) {
+                    throw new IllegalArgumentException("The graph contains a cycle");
+                }
+                if (unmarked.contains(newEntry)) {
+                    markedTemporarily.add(newEntry);
+                    stack.addFirst(new EntryUnitWork(newEntry, false));
+                    Set<Entry> children = entryChildren.get(newEntry);
+                    if (children != null) {
+                        for (Entry child : children) {
+                            stack.addFirst(new EntryUnitWork(child, true));
+                        }
+                    }
+                }
+            } else {
+                unmarked.remove(newEntry);
+                markedTemporarily.remove(newEntry);
+                result.add(0, newEntry);
+            }
+
+        }
     }
 
     private void visit(Entry selected) {
