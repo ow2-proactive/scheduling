@@ -93,9 +93,68 @@ public class TopologicalTaskSorter {
 
     private List<Entry> sort() {
         while (!unmarked.isEmpty()) {
-            visitNonRec(unmarked.iterator().next());
+            iterativeVisit(unmarked.iterator().next());
         }
         return result;
+    }
+
+    /**
+     * This method replaces 'visit' method. Instead of using recursion,
+     * this method uses iteration. To understand this method you need to look
+     * first 'visit' method. 'iterativeVisit' is just non-recusrsive version
+     * of 'visit'.
+     *
+     * Let's consider 'visit' method. It is recursive method which executes some actions
+     * both on direct and backward ways of the recursion.
+     * visit(entry) {
+     *     doSomethingFirst(entry) // <- direct way, first part of job
+     *     for (kid : entry.kids()) {
+     *         visit(kid);
+     *     }
+     *     doSomethingSecond(entry) // <- backward way, second part of job
+     * }
+     *
+     * So to transform this method, we still will use Stack.
+     * However, every time we pop from stack, we should
+     * understand if we need to do first or second part of job.
+     * That is why we will create EntryUnitWork class, where we have entry
+     * itself and flag which marks if we need to do first part of job or second.
+     */
+    private void iterativeVisit(Entry entry) {
+        LinkedList<EntryUnitWork> stack = new LinkedList<>();
+        stack.addFirst(new EntryUnitWork(entry, true));
+        while (!stack.isEmpty()) {
+            final EntryUnitWork entryUnitWork = stack.removeFirst();
+            Entry newEntry = entryUnitWork.getEntry();
+
+            if (entryUnitWork.isFirst()) {
+                // doing first part of job
+                if (markedTemporarily.contains(newEntry)) {
+                    throw new IllegalArgumentException("The graph contains a cycle");
+                }
+                if (unmarked.contains(newEntry)) {
+                    markedTemporarily.add(newEntry);
+                    // we put in the stack our second part of the job
+                    // which will be shadowed (because it is stack)
+                    // by the kids' first part unit of work.
+                    // So we execute our second part of job, only when
+                    // we will pop all kids units of work.
+                    stack.addFirst(new EntryUnitWork(newEntry, false));
+                    Set<Entry> children = entryChildren.get(newEntry);
+                    if (children != null) {
+                        for (Entry child : children) {
+                            stack.addFirst(new EntryUnitWork(child, true));
+                        }
+                    }
+                }
+            } else {
+                // doing second part of job
+                unmarked.remove(newEntry);
+                markedTemporarily.remove(newEntry);
+                result.add(0, newEntry);
+            }
+
+        }
     }
 
     private static class EntryUnitWork {
@@ -117,36 +176,8 @@ public class TopologicalTaskSorter {
         }
     }
 
-    private void visitNonRec(Entry entry) {
-        LinkedList<EntryUnitWork> stack = new LinkedList<>();
-        stack.addFirst(new EntryUnitWork(entry, true));
-        while (!stack.isEmpty()) {
-            final EntryUnitWork entryUnitWork = stack.removeFirst();
-            Entry newEntry = entryUnitWork.getEntry();
 
-            if (entryUnitWork.isFirst()) {
-                if (markedTemporarily.contains(newEntry)) {
-                    throw new IllegalArgumentException("The graph contains a cycle");
-                }
-                if (unmarked.contains(newEntry)) {
-                    markedTemporarily.add(newEntry);
-                    stack.addFirst(new EntryUnitWork(newEntry, false));
-                    Set<Entry> children = entryChildren.get(newEntry);
-                    if (children != null) {
-                        for (Entry child : children) {
-                            stack.addFirst(new EntryUnitWork(child, true));
-                        }
-                    }
-                }
-            } else {
-                unmarked.remove(newEntry);
-                markedTemporarily.remove(newEntry);
-                result.add(0, newEntry);
-            }
-
-        }
-    }
-
+    @Deprecated
     private void visit(Entry selected) {
         if (markedTemporarily.contains(selected)) {
             throw new IllegalArgumentException("The graph contains a cycle");
