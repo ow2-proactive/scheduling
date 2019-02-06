@@ -176,7 +176,6 @@ public class TopologicalTaskSorter {
         }
     }
 
-
     @Deprecated
     private void visit(Entry selected) {
         if (markedTemporarily.contains(selected)) {

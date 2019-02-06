@@ -85,18 +85,18 @@ public class TopologicalTaskSorterTest {
     }
 
     @Test
-    public void testEmpty()  {
+    public void testEmpty() {
         List<Entry> sorted = TopologicalTaskSorter.sort(Collections.<Entry> emptyList());
         assertEquals(0, sorted.size());
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNull()  {
+    public void testNull() {
         TopologicalTaskSorter.sort(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCycle()  {
+    public void testCycle() {
         TestEntry e1 = new TestEntry(1);
         TestEntry e2 = new TestEntry(2);
         TestEntry e3 = new TestEntry(3);
@@ -109,7 +109,7 @@ public class TopologicalTaskSorterTest {
     }
 
     @Test
-    public void testSort()  {
+    public void testSort() {
         for (int i = 0; i < 100; i++) {
             testSortRandomized();
         }
@@ -143,9 +143,7 @@ public class TopologicalTaskSorterTest {
         assertBefore(sorted, e1, e4);
     }
 
-
-
-    public void testSortRandomized()  {
+    public void testSortRandomized() {
         TestEntry e1 = new TestEntry(1);
         TestEntry e2 = new TestEntry(2);
         TestEntry e3 = new TestEntry(3);
@@ -179,7 +177,7 @@ public class TopologicalTaskSorterTest {
     }
 
     @Test
-    public void testBigGraph()  {
+    public void testBigGraph() {
         List<Entry> entries = new ArrayList<>();
         TestEntry e = new TestEntry(0);
         entries.add(e);
