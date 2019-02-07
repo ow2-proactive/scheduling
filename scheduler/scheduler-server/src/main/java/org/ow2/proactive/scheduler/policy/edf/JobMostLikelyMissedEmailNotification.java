@@ -35,6 +35,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -51,6 +53,8 @@ public class JobMostLikelyMissedEmailNotification {
 
     private static final JobLogger jlogger = JobLogger.getInstance();
 
+    private final ExecutorService asyncMailSender;
+
     private final InternalJob internalJob;
 
     private final Date finishingTime;
@@ -60,6 +64,7 @@ public class JobMostLikelyMissedEmailNotification {
     private Duration jobExecutionTime = null;
 
     JobMostLikelyMissedEmailNotification(InternalJob internalJob, Date finishingTime, Date deadline) {
+        this.asyncMailSender = Executors.newCachedThreadPool();
         this.internalJob = internalJob;
         this.finishingTime = finishingTime;
         this.deadline = deadline;
@@ -67,9 +72,7 @@ public class JobMostLikelyMissedEmailNotification {
 
     JobMostLikelyMissedEmailNotification(InternalJob internalJob, Date finishingTime, Date deadline,
             Duration jobExecutionTime) {
-        this.internalJob = internalJob;
-        this.finishingTime = finishingTime;
-        this.deadline = deadline;
+        this(internalJob, finishingTime, deadline);
         this.jobExecutionTime = jobExecutionTime;
     }
 
@@ -79,17 +82,19 @@ public class JobMostLikelyMissedEmailNotification {
             return;
         }
 
-        try {
-            new SendMail().sender(getTo(), getSubject(), getBody());
-            jlogger.info(internalJob.getId(), "sent 'most-likely-missed' email for not started yet job");
-        } catch (JobEmailNotificationException e) {
-            LOGGER.trace(String.format("'most-likely-missed' email was not sent, because GI '%s' was not set for the job %s.",
-                                       GENERIC_INFORMATION_KEY_EMAIL,
-                                       internalJob.getId().value()));
-        } catch (IOException e) {
-            jlogger.warn(internalJob.getId(), "failed to send email notification: " + e.getMessage());
-            LOGGER.warn("Error sending email: " + e.getMessage(), e);
-        }
+        this.asyncMailSender.submit(() -> {
+            try {
+                new SendMail().sender(getTo(), getSubject(), getBody());
+                jlogger.info(internalJob.getId(), "sent 'most-likely-missed' email for not started yet job");
+            } catch (JobEmailNotificationException e) {
+                LOGGER.trace(String.format("'most-likely-missed' email was not sent, because GI '%s' was not set for the job %s.",
+                                           GENERIC_INFORMATION_KEY_EMAIL,
+                                           internalJob.getId().value()));
+            } catch (IOException e) {
+                jlogger.warn(internalJob.getId(), "failed to send email notification: " + e.getMessage());
+                LOGGER.warn("Error sending email: " + e.getMessage(), e);
+            }
+        });
     }
 
     private String getTo() throws JobEmailNotificationException {

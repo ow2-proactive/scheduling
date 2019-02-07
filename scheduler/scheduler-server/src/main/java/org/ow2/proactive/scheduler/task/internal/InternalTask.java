@@ -152,6 +152,17 @@ public abstract class InternalTask extends TaskState {
     private transient InternalTask replicatedFrom;
 
     @XmlTransient
+    private transient TaskResult taskResult = null;
+
+    public TaskResult getTaskResult() {
+        return taskResult;
+    }
+
+    public void setTaskResult(TaskResult taskResult) {
+        this.taskResult = taskResult;
+    }
+
+    @XmlTransient
     private transient Map<String, Serializable> updatedVariables;
 
     protected InternalTask(InternalJob internalJob) {
@@ -815,11 +826,6 @@ public abstract class InternalTask extends TaskState {
         return parentTasksResults;
     }
 
-    /** Set the results of the parent tasks */
-    public void setParentTasksResults(Map<TaskId, TaskResult> parentTasksResults) {
-        this.parentTasksResults = parentTasksResults;
-    }
-
     /** Remove all the results of the parent tasks */
     public void removeParentTasksResults() {
         if (parentTasksResults != null) {
@@ -1190,6 +1196,41 @@ public abstract class InternalTask extends TaskState {
     }
 
     /**
+     * Fetch the results of parent tasks from memory or from the database
+     * @param schedulingService used to load results from the database
+     */
+    public synchronized void updateParentTasksResults(SchedulingService schedulingService) {
+        if (internalTasksDependencies != null && parentTasksResults == null) {
+            Set<TaskId> parentIds = new HashSet<>(internalTasksDependencies.size());
+            for (InternalTask parentTask : internalTasksDependencies) {
+                parentIds.addAll(InternalTaskParentFinder.getInstance().getFirstNotSkippedParentTaskIds(parentTask));
+            }
+
+            parentTasksResults = new HashMap<>();
+
+            // Load parent task results from memory
+            for (InternalTask parentTask : internalTasksDependencies) {
+                if (parentIds.contains(parentTask.getId()) && parentTask.getTaskResult() != null) {
+                    parentTasksResults.put(parentTask.getId(), parentTask.getTaskResult());
+                    parentIds.remove(parentTask.getId());
+                }
+            }
+
+            // Batch fetching in database of parent tasks results not accessible in memory
+            if (parentIds.size() > 0) {
+                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
+                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
+
+                    parentTasksResults.putAll(schedulingService.getInfrastructure()
+                                                               .getDBManager()
+                                                               .loadTasksResults(internalJob.getId(), parentsSubList));
+
+                }
+            }
+        }
+    }
+
+    /**
      * Updates the runtime variables for this task. Variables are updated using the following order:
      * 1) job variables
      * 2) task variables
@@ -1204,27 +1245,10 @@ public abstract class InternalTask extends TaskState {
             updatedVariables.putAll(internalJob.getVariablesAsReplacementMap());
             updatedVariables.putAll(getScopeVariables());
 
-            if (internalTasksDependencies != null) {
-                Set<TaskId> parentIds = new HashSet<>(internalTasksDependencies.size());
-                for (InternalTask parentTask : internalTasksDependencies) {
-                    parentIds.addAll(InternalTaskParentFinder.getInstance()
-                                                             .getFirstNotSkippedParentTaskIds(parentTask));
-                }
+            updateParentTasksResults(schedulingService);
 
-                parentTasksResults = new HashMap<>();
-
-                // Batch fetching of parent tasks results
-                for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                       PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
-
-                    parentTasksResults.putAll(schedulingService.getInfrastructure()
-                                                               .getDBManager()
-                                                               .loadTasksResults(internalJob.getId(), parentsSubList));
-
-                }
-                if (!parentIds.isEmpty()) {
-                    updateVariablesWithTaskResults(parentTasksResults);
-                }
+            if (parentTasksResults != null && !parentTasksResults.isEmpty()) {
+                updateVariablesWithTaskResults(parentTasksResults);
             }
 
             updatedVariables.putAll(getSystemVariables());

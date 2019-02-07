@@ -49,6 +49,7 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -73,6 +74,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -287,6 +289,8 @@ public class TaskData {
     private String workingDir;
 
     private ExecuterInformationData executerInformationData;
+
+    private static final Logger logger = Logger.getLogger(TaskData.class);
 
     @Column(name = "JAVA_HOME", length = Integer.MAX_VALUE)
     @Lob
@@ -542,7 +546,10 @@ public class TaskData {
 
         // set the scheduledTime if the START_AT property exists
         Map<String, String> genericInfos = taskData.getGenericInformation();
-        if (genericInfos != null && genericInfos.containsKey(CommonAttribute.GENERIC_INFO_START_AT_KEY)) {
+        if (genericInfos != null && genericInfos.containsKey(CommonAttribute.GENERIC_INFO_START_AT_KEY) &&
+            !genericInfos.get(CommonAttribute.GENERIC_INFO_START_AT_KEY)
+                         .contains(VariableSubstitutor.SUBSITUTE_PREFIX_SIMPLE)) {
+            // parse the START_AT if it's available and not dynamically defined
             long scheduledTime = ISO8601DateUtil.toDate(genericInfos.get(CommonAttribute.GENERIC_INFO_START_AT_KEY))
                                                 .getTime();
             taskData.setScheduledTime(scheduledTime);
@@ -767,6 +774,7 @@ public class TaskData {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "TASK_DATA_DEPENDENCIES", joinColumns = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
                                                                       @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") }, indexes = { @Index(name = "TASK_DATA_DEP_JOB_ID", columnList = "JOB_ID"),
+                                                                                                                                                          @Index(name = "TASK_DATA_DEP_TASK_ID_JOB_ID", columnList = "TASK_ID,JOB_ID"),
                                                                                                                                                           @Index(name = "TASK_DATA_DEP_TASK_ID", columnList = "TASK_ID"), })
     @BatchSize(size = 100)
     public List<DBTaskId> getDependentTasks() {
@@ -780,6 +788,7 @@ public class TaskData {
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "TASK_DATA_JOINED_BRANCHES", joinColumns = { @JoinColumn(name = "JOB_ID", referencedColumnName = "TASK_ID_JOB"),
                                                                          @JoinColumn(name = "TASK_ID", referencedColumnName = "TASK_ID_TASK") }, indexes = { @Index(name = "TASK_DATA_JB_JOB_ID", columnList = "JOB_ID"),
+                                                                                                                                                             @Index(name = "TASK_DATA_JB_TASK_ID_JOB_ID", columnList = "TASK_ID,JOB_ID"),
                                                                                                                                                              @Index(name = "TASK_DATA_JB_TASK_ID", columnList = "TASK_ID"), })
     @BatchSize(size = 100)
     public List<DBTaskId> getJoinedBranches() {
@@ -902,7 +911,7 @@ public class TaskData {
 
     @Lob
     @Column(name = "DESCRIPTION", length = Integer.MAX_VALUE, updatable = false)
-    @Type(type = "org.hibernate.type.TextType")
+    @Type(type = "org.hibernate.type.MaterializedClobType")
     public String getDescription() {
         return description;
     }

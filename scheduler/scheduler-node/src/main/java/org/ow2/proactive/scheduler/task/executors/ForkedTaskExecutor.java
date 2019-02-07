@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.processbuilder.OSProcessBuilder;
+import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -87,10 +88,14 @@ public class ForkedTaskExecutor implements TaskExecutor {
 
             TaskId taskId = context.getTaskId();
 
-            String cookieNameSuffix = "Job" + taskId.getJobId().value() + "Task" + taskId.value();
-
-            taskProcessTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller(cookieNameSuffix,
-                                                                                             processBuilder.environment());
+            if (context.getInitializer().getGenericInformation() == null ||
+                !"true".equalsIgnoreCase(context.getInitializer()
+                                                .getGenericInformation()
+                                                .get(SchedulerConstants.DISABLE_PROCESS_TREE_KILLER_GENERIC_INFO))) {
+                String cookieNameSuffix = "Job" + taskId.getJobId().value() + "Task" + taskId.value();
+                taskProcessTreeKiller = CookieBasedProcessTreeKiller.createProcessChildrenKiller(cookieNameSuffix,
+                                                                                                 processBuilder.environment());
+            }
 
             process = processBuilder.start();
             processStreamsReader = new ProcessStreamsReader(taskId.toString(), process, outputSink, errorSink);

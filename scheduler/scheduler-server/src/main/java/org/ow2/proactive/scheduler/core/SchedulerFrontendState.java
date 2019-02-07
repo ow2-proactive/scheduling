@@ -25,17 +25,10 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE;
+
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -69,6 +62,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ClientJobState;
@@ -220,16 +214,31 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     private final Map<JobId, ClientJobState> jobsMap;
 
+    private final LinkedHashMap<JobId, ClientJobState> finishedJobsLRUCache;
+
+    private SchedulerDBManager dbManager = null;
+
     SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper) {
         this.identifications = new HashMap<>();
         this.credentials = new HashMap<>();
         this.dirtyList = new HashSet<>();
         this.jmxHelper = jmxHelper;
         this.jobsMap = new HashMap<>();
+        this.finishedJobsLRUCache = new LinkedHashMap<JobId, ClientJobState>(10, 0.75f, true) {
+            @Override
+            public boolean removeEldestEntry(Map.Entry eldest) {
+                return size() > SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE.getValueAsInt();
+            }
+        };
         this.jobs = new HashMap<>();
         this.sessionTimer = new Timer("SessionTimer");
         this.sState = sState;
         recover(sState);
+    }
+
+    SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper, SchedulerDBManager dbManager) {
+        this(sState, jmxHelper);
+        this.dbManager = dbManager;
     }
 
     /**
@@ -272,8 +281,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      */
     private void prepare(Set<JobState> jobStates, ClientJobState js, boolean finished) {
         jobStates.add(js);
-        UserIdentificationImpl uIdent = new UserIdentificationImpl(js.getOwner());
-        IdentifiedJob ij = new IdentifiedJob(js.getId(), uIdent, js.getGenericInformation());
+        IdentifiedJob ij = toIdentifiedJob(js);
         jobs.put(js.getId(), ij);
         jobsMap.put(js.getId(), js);
         ij.setFinished(finished);
@@ -588,15 +596,22 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized IdentifiedJob getIdentifiedJob(JobId jobId) throws UnknownJobException {
-        IdentifiedJob ij = jobs.get(jobId);
+        IdentifiedJob identifiedJob = jobs.get(jobId);
 
-        if (ij == null) {
-            String msg = "The job represented by this ID '" + jobId + "' is unknown !";
-            logger.info(msg);
-            throw new UnknownJobException(msg);
+        if (identifiedJob == null) {
+
+            ClientJobState clientJobState = getClientJobState(jobId);
+            if (clientJobState != null) {
+                identifiedJob = toIdentifiedJob(clientJobState);
+                identifiedJob.setFinished(true); // because wherenever there is job in jobsMap, but not in jobs, it is always finished
+            } else {
+                String msg = "The job represented by this ID '" + jobId + "' is unknown !";
+                logger.info(msg);
+                throw new UnknownJobException(msg);
+            }
         }
 
-        return ij;
+        return identifiedJob;
 
     }
 
@@ -655,7 +670,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized Set<TaskId> getJobTasks(JobId jobId) {
-        JobState jobState = jobsMap.get(jobId);
+        JobState jobState = getClientJobState(jobId);
         synchronized (jobState) {
             if (jobState == null) {
                 return Collections.emptySet();
@@ -674,7 +689,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
-        ClientJobState jobState = jobsMap.get(jobId);
+        ClientJobState jobState = getClientJobState(jobId);
         ClientJobState jobStateCopy;
         synchronized (jobState) {
             try {
@@ -692,10 +707,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
-        if (jobsMap.get(jobId) == null) {
+        if (getClientJobState(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
-        JobState jobState = jobsMap.get(jobId);
+        JobState jobState = getClientJobState(jobId);
         synchronized (jobState) {
             TaskState ts = jobState.getHMTasks().get(taskId);
             if (ts == null) {
@@ -712,7 +727,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
 
-        if (jobsMap.get(jobId) == null) {
+        if (getClientJobState(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
         TaskId taskId = null;
@@ -724,7 +739,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         if (taskId == null) {
             throw new UnknownTaskException(taskName, jobId);
         }
-        JobState jobState = jobsMap.get(jobId);
+        JobState jobState = getClientJobState(jobId);
         synchronized (jobState) {
             TaskState ts = jobState.getHMTasks().get(taskId);
             if (ts == null) {
@@ -735,7 +750,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     synchronized TaskId getTaskId(JobId jobId, String taskName) throws UnknownTaskException, UnknownJobException {
-        if (jobsMap.get(jobId) == null) {
+        if (getClientJobState(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
         TaskId taskId = null;
@@ -1100,7 +1115,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     @Override
     public synchronized void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
-        ClientJobState js = jobsMap.get(notification.getData().getJobId());
+        ClientJobState js = getClientJobState(notification.getData().getJobId());
+        boolean withAttachment = false;
         synchronized (js) {
             js.update(notification.getData());
             switch (notification.getEventType()) {
@@ -1118,17 +1134,20 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 case JOB_PENDING_TO_FINISHED:
                     sState.pendingToFinished(js);
                     // set this job finished, user can get its result
-                    jobs.get(notification.getData().getJobId()).setFinished(true);
+                    jobs.remove(notification.getData().getJobId()).setFinished(true);
+                    withAttachment = true;
                     break;
                 case JOB_RUNNING_TO_FINISHED:
                     sState.runningToFinished(js);
                     // set this job finished, user can get its result
-                    jobs.get(notification.getData().getJobId()).setFinished(true);
+                    jobs.remove(notification.getData().getJobId()).setFinished(true);
+                    withAttachment = true;
                     break;
                 case JOB_REMOVE_FINISHED:
                     // removing jobs from the global list : this job is no more managed
                     sState.removeFinished(js);
                     jobsMap.remove(js.getId());
+                    finishedJobsLRUCache.remove(js.getId());
                     jobs.remove(notification.getData().getJobId());
                     logger.debug("HOUSEKEEPING removed the finished job " + js.getId() +
                                  " from the SchedulerFrontEndState");
@@ -1139,7 +1158,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     return;
             }
             dispatchJobStateUpdated(owner, notification);
-            new JobEmailNotification(js, notification).checkAndSend();
+            new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
         }
     }
 
@@ -1151,7 +1170,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     @Override
     public synchronized void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
-        JobState jobState = jobsMap.get(notification.getData().getJobId());
+        JobState jobState = getClientJobState(notification.getData().getJobId());
         synchronized (jobState) {
             jobState.update(notification.getData());
             switch (notification.getEventType()) {
@@ -1234,12 +1253,33 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return PASchedulerProperties.getPropertiesAsHashMap();
     }
 
+    synchronized ClientJobState getClientJobState(JobId jobId) {
+        if (!jobsMap.containsKey(jobId)) {
+            if (!finishedJobsLRUCache.containsKey(jobId)) {
+                List<InternalJob> internalJobs = dbManager.loadInternalJob(jobId.longValue());
+                if (!internalJobs.isEmpty()) {
+                    InternalJob internalJob = internalJobs.get(0);
+                    ClientJobState clientJobState = new ClientJobState(internalJob);
+                    finishedJobsLRUCache.put(jobId, clientJobState);
+                }
+            }
+            return finishedJobsLRUCache.get(jobId);
+        } else {
+            return jobsMap.get(jobId);
+        }
+    }
+
+    IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
+        UserIdentificationImpl uIdent = new UserIdentificationImpl(clientJobState.getOwner());
+        return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
+    }
+
     synchronized TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
             throws UnknownJobException, NotConnectedException, PermissionException {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
-        ClientJobState jobState = jobsMap.get(jobId);
+        ClientJobState jobState = getClientJobState(jobId);
         synchronized (jobState) {
             try {
                 final TaskStatesPage tasksPaginated = jobState.getTasksPaginated(offset, limit);

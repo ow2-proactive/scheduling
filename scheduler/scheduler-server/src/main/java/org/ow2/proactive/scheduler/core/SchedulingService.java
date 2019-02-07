@@ -466,6 +466,14 @@ public class SchedulingService {
         });
     }
 
+    public boolean isJobAlive(JobId jobId) {
+        return jobs.isJobAlive(jobId);
+    }
+
+    public boolean isTaskAlive(TaskId taskId) {
+        return jobs.isTaskAlive(taskId);
+    }
+
     public void submitJob(InternalJob job) {
         try {
             infrastructure.getClientOperationsThreadPool().submit(new SubmitHandler(this, job)).get();
@@ -614,13 +622,18 @@ public class SchedulingService {
     }
 
     public boolean killTask(final JobId jobId, final String taskName) throws UnknownJobException, UnknownTaskException {
+        return killTask(jobId, taskName, LiveJobs.KILL_TASK_DEFAULT_MESSAGE);
+    }
+
+    public boolean killTask(final JobId jobId, final String taskName, final String message)
+            throws UnknownJobException, UnknownTaskException {
         try {
             if (status.isUnusable()) {
                 return false;
             }
 
             return infrastructure.getClientOperationsThreadPool().submit(() -> {
-                TerminationData terminationData = jobs.killTask(jobId, taskName);
+                TerminationData terminationData = jobs.killTask(jobId, taskName, message);
                 boolean taskKilled = terminationData.taskTerminated(jobId, taskName);
                 submitTerminationDataHandler(terminationData);
                 wakeUpSchedulingThread();

@@ -142,4 +142,9 @@ public class SchedulerConstants {
      */
     public static String SCHEDULER_DATASPACE_APPLICATION_ID = "0";
 
+    /**
+     * This generic information can be used to disable Process Tree Killer execution
+     */
+    public static String DISABLE_PROCESS_TREE_KILLER_GENERIC_INFO = "DISABLE_PTK";
+
 }

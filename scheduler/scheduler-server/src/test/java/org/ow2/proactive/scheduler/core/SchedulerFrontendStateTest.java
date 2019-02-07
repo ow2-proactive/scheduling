@@ -27,9 +27,17 @@ package org.ow2.proactive.scheduler.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -41,12 +49,18 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.UniqueID;
+import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.jmx.mbean.RuntimeDataMBeanImpl;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.ClientJobState;
+import org.ow2.proactive.scheduler.job.IdentifiedJob;
+import org.ow2.proactive.scheduler.job.InternalJob;
+import org.ow2.proactive.scheduler.job.InternalTaskFlowJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scheduler.job.JobInfoImpl;
 import org.ow2.proactive.scheduler.job.UserIdentificationImpl;
 import org.ow2.tests.ProActiveTestClean;
 import org.python.google.common.collect.Lists;
@@ -113,5 +127,68 @@ public class SchedulerFrontendStateTest extends ProActiveTestClean {
 
         assertEquals(schedulerFrontendState.getIdentifiedJob(jobId).getJobId(), (jobId));
 
+    }
+
+    ClientJobState createClientJobState(long id) {
+        JobIdImpl jobId = new JobIdImpl(id, "job name" + id);
+        ClientJobState jobState = mock(ClientJobState.class);
+        when(jobState.getId()).thenReturn(jobId);
+        return jobState;
+    }
+
+    @Test
+    public void testLRUCache() throws Exception {
+        SchedulerJMXHelper mockJMX = mock(SchedulerJMXHelper.class);
+        when(mockJMX.getSchedulerRuntimeMBean()).thenReturn(new RuntimeDataMBeanImpl(null));
+
+        SchedulerStateImpl<ClientJobState> schedulerStateImpl = new SchedulerStateImpl<>();
+
+        final ClientJobState clientJobState0 = createClientJobState(10l);
+        final ClientJobState clientJobState01 = createClientJobState(11l);
+        final ClientJobState clientJobState1 = createClientJobState(1l);
+        final ClientJobState clientJobState2 = createClientJobState(2l);
+
+        schedulerStateImpl.setFinishedJobs(new Vector());
+        schedulerStateImpl.setRunningJobs(new Vector(Lists.newArrayList(clientJobState1)));
+        schedulerStateImpl.setPendingJobs(new Vector(Lists.newArrayList(clientJobState2)));
+        SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE.updateProperty("1");
+
+        SchedulerDBManager dbManager = mock(SchedulerDBManager.class);
+        SchedulerFrontendState schedulerFrontendState = new SchedulerFrontendState(schedulerStateImpl,
+                                                                                   mockJMX,
+                                                                                   dbManager);
+
+        InternalJob internalJob = spy(new InternalTaskFlowJob());
+        JobInfoImpl jobInfo = mock(JobInfoImpl.class);
+        doReturn(jobInfo).when(internalJob).getJobInfo();
+        doReturn(clientJobState0.getId()).when(jobInfo).getJobId();
+        doReturn(clientJobState0.getId()).when(internalJob).getId();
+        doReturn(Collections.singletonList(internalJob)).when(dbManager).loadInternalJob(10l);
+
+        InternalJob internalJob1 = spy(new InternalTaskFlowJob());
+        JobInfoImpl jobInfo1 = mock(JobInfoImpl.class);
+        doReturn(jobInfo1).when(internalJob1).getJobInfo();
+        doReturn(clientJobState01.getId()).when(jobInfo1).getJobId();
+        doReturn(clientJobState01.getId()).when(internalJob1).getId();
+        doReturn(Collections.singletonList(internalJob1)).when(dbManager).loadInternalJob(11l);
+
+        assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState0.getId()).getJobId(),
+                     clientJobState0.getId());
+        assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState0.getId()).getJobId(),
+                     clientJobState0.getId());
+
+        assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState01.getId()).getJobId(),
+                     clientJobState01.getId());
+        assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState01.getId()).getJobId(),
+                     clientJobState01.getId());
+        assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState01.getId()).getJobId(),
+                     clientJobState01.getId());
+
+        assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState0.getId()).getJobId(),
+                     clientJobState0.getId());
+        assertEquals(schedulerFrontendState.getIdentifiedJob(clientJobState0.getId()).getJobId(),
+                     clientJobState0.getId());
+
+        verify(dbManager, times(3)).loadInternalJob(anyLong());
     }
 }

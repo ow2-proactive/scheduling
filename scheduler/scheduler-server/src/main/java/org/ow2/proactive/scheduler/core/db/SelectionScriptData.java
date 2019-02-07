@@ -46,8 +46,9 @@ import org.ow2.proactive.scripting.SelectionScript;
 @NamedQueries({ @NamedQuery(name = "deleteSelectionScriptData", query = "delete from SelectionScriptData where taskData.id.jobId = :jobId"),
                 @NamedQuery(name = "deleteSelectionScriptDataInBulk", query = "delete from SelectionScriptData where taskData.id.jobId in :jobIdList"),
                 @NamedQuery(name = "countSelectionScriptData", query = "select count (*) from SelectionScriptData") })
-@Table(name = "SELECTION_SCRIPT_DATA", indexes = { @Index(name = "SELECTION_SCRIPT_DATA_JOB_ID", columnList = "JOB_ID"),
-                                                   @Index(name = "SELECTION_SCRIPT_DATA_TASK_ID", columnList = "TASK_ID") })
+@Table(name = "SELECTION_SCRIPT_DATA", indexes = { @Index(name = "SSD_DATA_JOB_ID", columnList = "JOB_ID"),
+                                                   @Index(name = "SSD_TASK_ID_JOB_ID", columnList = "TASK_ID,JOB_ID"),
+                                                   @Index(name = "SSD_TASK_ID", columnList = "TASK_ID") })
 @BatchSize(size = 100)
 public class SelectionScriptData {
 

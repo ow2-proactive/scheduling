@@ -584,7 +584,7 @@ public abstract class SelectionManager {
                         logger.error("Error while executing node script and waiting for the result on " + nodeURL, e);
                         throw e;
                     } finally {
-                        SelectionManager.this.rmcore.unlockNodes(Collections.singleton(nodeURL));
+                        SelectionManager.this.rmcore.unlockNodes(Collections.singleton(nodeURL)).getBooleanValue();
                     }
                 }
 

@@ -34,7 +34,7 @@ import org.ow2.proactive.scheduler.common.job.JobVariable;
 @NamedQueries({ @NamedQuery(name = "deleteJobDataVariable", query = "delete from JobDataVariable where jobData.id = :jobId"),
                 @NamedQuery(name = "deleteJobDataVariableInBulk", query = "delete from JobDataVariable where jobData.id in :jobIdList"),
                 @NamedQuery(name = "countJobDataVariable", query = "select count (*) from JobDataVariable") })
-@Table(name = "JOB_DATA_VARIABLE")
+@Table(name = "JOB_DATA_VARIABLE", indexes = { @Index(name = "JOB_DATA_VARIABLE_JOB_ID", columnList = "JOB_ID") })
 public class JobDataVariable {
 
     private long id;
