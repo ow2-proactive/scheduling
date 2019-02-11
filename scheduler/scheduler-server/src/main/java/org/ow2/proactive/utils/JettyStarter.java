@@ -26,10 +26,12 @@
 package org.ow2.proactive.utils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.BindException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+
+import javax.servlet.DispatcherType;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -60,7 +62,7 @@ import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFact
 
 public class JettyStarter {
 
-    protected static final String FOLDER_TO_DEPLOY = "/dist/war/";
+    private static final String FOLDER_TO_DEPLOY = "/dist/war/";
 
     public static final String HTTP_CONNECTOR_NAME = "http";
 
@@ -207,26 +209,29 @@ public class JettyStarter {
             secureHttpConfiguration.setSendServerVersion(false);
 
             // Connector to listen for HTTPS requests
-            ServerConnector httpsConnector = new ServerConnector(server,
-                                                                 new SslConnectionFactory(sslContextFactory,
-                                                                                          HttpVersion.HTTP_1_1.toString()),
-                                                                 new HttpConnectionFactory(secureHttpConfiguration));
-            httpsConnector.setName(HTTPS_CONNECTOR_NAME);
-            httpsConnector.setPort(httpsPort);
-            httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
+            try (ServerConnector httpsConnector = new ServerConnector(server,
+                                                                      new SslConnectionFactory(sslContextFactory,
+                                                                                               HttpVersion.HTTP_1_1.toString()),
+                                                                      new HttpConnectionFactory(secureHttpConfiguration))) {
 
-            if (redirectHttpToHttps) {
-                // The next two settings allow !403 errors to be redirected to HTTPS
-                httpConfiguration.setSecureScheme("https");
-                httpConfiguration.setSecurePort(httpsPort);
+                httpsConnector.setName(HTTPS_CONNECTOR_NAME);
+                httpsConnector.setPort(httpsPort);
+                httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
 
-                // Connector to listen for HTTP requests that are redirected to HTTPS
-                ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
+                if (redirectHttpToHttps) {
+                    // The next two settings allow !403 errors to be redirected to HTTPS
+                    httpConfiguration.setSecureScheme("https");
+                    httpConfiguration.setSecurePort(httpsPort);
 
-                connectors = new Connector[] { httpConnector, httpsConnector };
-            } else {
-                connectors = new Connector[] { httpsConnector };
+                    // Connector to listen for HTTP requests that are redirected to HTTPS
+                    ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
+
+                    connectors = new Connector[] { httpConnector, httpsConnector };
+                } else {
+                    connectors = new Connector[] { httpsConnector };
+                }
             }
+
         } else {
             ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
             httpConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
@@ -331,6 +336,10 @@ public class JettyStarter {
     private void addWarFile(HandlerList handlerList, File file, String[] virtualHost) {
         String contextPath = "/" + FilenameUtils.getBaseName(file.getName());
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
+
+        // Add authentication CAS
+        addCASFilters(webApp);
+
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using war file " + file);
@@ -340,11 +349,15 @@ public class JettyStarter {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
 
+        // Add authentication CAS
+        addCASFilters(webApp);
+
         // Don't scan classes for annotations. Saves 1 second at startup.
         webApp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "^$");
         webApp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", "^$");
 
         webApp.setDescriptor(new File(file, "/WEB-INF/web.xml").getAbsolutePath());
+
         webApp.setResourceBase(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using exploded war " + file);
@@ -353,6 +366,10 @@ public class JettyStarter {
     private void addStaticFolder(HandlerList handlerList, File file, String[] virtualHost) {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
+
+        // Add authentication CAS
+        addCASFilters(webApp);
+
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using folder " + file);
@@ -375,6 +392,65 @@ public class JettyStarter {
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);
         return webApp;
+    }
+
+    /**
+     * Add IAM Filters for authentication and authorization
+     */
+    private void addCASFilters(WebAppContext webApp) {
+
+        String context = webApp.getContextPath();
+
+        if (!(context.equals("/rest") || context.equals("/scheduling-api"))) {
+
+            // set a jetty context-param to remove jessionid context-param
+            webApp.setInitParameter("org.eclipse.jetty.servlet.SessionIdPathParameterName", "none");
+
+            // set context-param
+            webApp.setInitParameter("configurationStrategy", "SYSTEM_PROPERTIES");
+
+            // Add SingleSignOutHttpSessionListener
+            webApp.addEventListener(new org.jasig.cas.client.session.SingleSignOutHttpSessionListener());
+
+            // Add CAS Single Sign Out Filter
+            webApp.addFilter(org.jasig.cas.client.session.SingleSignOutFilter.class,
+                             "/*",
+                             EnumSet.of(DispatcherType.REQUEST,
+                                        DispatcherType.INCLUDE,
+                                        DispatcherType.FORWARD,
+                                        DispatcherType.ASYNC,
+                                        DispatcherType.ERROR));
+
+            // Add CAS Authentication Filter
+            webApp.addFilter(org.jasig.cas.client.authentication.AuthenticationFilter.class,
+                             "/*",
+                             EnumSet.of(DispatcherType.REQUEST,
+                                        DispatcherType.INCLUDE,
+                                        DispatcherType.FORWARD,
+                                        DispatcherType.ASYNC,
+                                        DispatcherType.ERROR));
+
+            // Add CAS Validation Filter
+            webApp.addFilter(org.jasig.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter.class,
+                             "/*",
+                             EnumSet.of(DispatcherType.REQUEST,
+                                        DispatcherType.INCLUDE,
+                                        DispatcherType.FORWARD,
+                                        DispatcherType.ASYNC,
+                                        DispatcherType.ERROR));
+
+            // Add CAS HttpServletRequest Wrapper Filter
+            webApp.addFilter(org.jasig.cas.client.util.HttpServletRequestWrapperFilter.class,
+                             "/*",
+                             EnumSet.of(DispatcherType.REQUEST,
+                                        DispatcherType.INCLUDE,
+                                        DispatcherType.FORWARD,
+                                        DispatcherType.ASYNC,
+                                        DispatcherType.ERROR));
+
+            logger.debug("IAM authentication and authorization filters added to web application " +
+                         webApp.getContextPath());
+        }
     }
 
     private boolean isWarFile(File file) {

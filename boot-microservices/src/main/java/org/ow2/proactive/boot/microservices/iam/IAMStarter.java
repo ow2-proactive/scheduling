@@ -40,6 +40,7 @@ import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.boot.microservices.iam.util.SSLUtils;
 import org.ow2.proactive.utils.OperatingSystem;
 import org.ow2.proactive.utils.OperatingSystemFamily;
+import org.ow2.proactive.web.WebProperties;
 
 
 public class IAMStarter {
@@ -61,6 +62,8 @@ public class IAMStarter {
     private static Configuration config = new BaseConfiguration();
 
     private static String iamURL;
+
+    private static String proactiveURL;
 
     private IAMStarter() {
 
@@ -99,8 +102,9 @@ public class IAMStarter {
             // load IAM configuration
             loadIAMConfiguration(iamConfigurationPath);
 
-            // build IAM URL from the loaded config
+            // build IAM and PA URLs
             buildIamUrl();
+            buildPAUrl(paHome);
 
             // build java command to launch IAM
             buildJavaCommand(paHome);
@@ -274,7 +278,7 @@ public class IAMStarter {
 
         System.setProperty(IAMConfiguration.IAM_URL, iamURL);
         System.setProperty(IAMConfiguration.IAM_LOGIN, iamURL + IAMConfiguration.IAM_LOGIN_PAGE);
-        System.setProperty(IAMConfiguration.PA_SERVER_NAME, "https://localhost:8443");
+        System.setProperty(IAMConfiguration.PA_SERVER_NAME, proactiveURL);
 
         LOGGER.debug("IAM and PA URLs set as system properties");
         LOGGER.debug(IAMConfiguration.IAM_URL + ": " + System.getProperty(IAMConfiguration.IAM_URL));
@@ -289,6 +293,30 @@ public class IAMStarter {
     private static void buildIamUrl() {
         iamURL = IAMConfiguration.IAM_PROTOCOL + config.getString(IAMConfiguration.IAM_HOST) + ":" +
                  config.getString(IAMConfiguration.IAM_PORT) + config.getString(IAMConfiguration.IAM_CONTEXT);
+    }
+
+    /**
+     * build PA URL
+     */
+    private static void buildPAUrl(String paHome) {
+
+        // load web properties at first
+        System.setProperty(WebProperties.REST_HOME.getKey(), paHome);
+        WebProperties.load();
+
+        // build PA url
+        String protocol;
+        int paPort;
+
+        if (WebProperties.WEB_HTTPS.getValueAsBoolean()) {
+            protocol = "https";
+            paPort = WebProperties.WEB_HTTPS_PORT.getValueAsInt();
+        } else {
+            protocol = "http";
+            paPort = WebProperties.WEB_HTTP_PORT.getValueAsInt();
+        }
+
+        proactiveURL = protocol + "://" + config.getString(IAMConfiguration.IAM_HOST) + ":" + paPort;
     }
 
     /**
