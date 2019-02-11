@@ -337,8 +337,8 @@ public class JettyStarter {
         String contextPath = "/" + FilenameUtils.getBaseName(file.getName());
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
 
-        // Add authentication CAS
-        addCASFilters(webApp);
+        // Add IAM authentication and authorization filters
+        addIAMFilters(webApp);
 
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
@@ -349,8 +349,8 @@ public class JettyStarter {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
 
-        // Add authentication CAS
-        addCASFilters(webApp);
+        // Add IAM authentication and authorization filters
+        addIAMFilters(webApp);
 
         // Don't scan classes for annotations. Saves 1 second at startup.
         webApp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "^$");
@@ -367,8 +367,8 @@ public class JettyStarter {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
 
-        // Add authentication CAS
-        addCASFilters(webApp);
+        // Add IAM authentication and authorization filters
+        addIAMFilters(webApp);
 
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
@@ -397,7 +397,7 @@ public class JettyStarter {
     /**
      * Add IAM Filters for authentication and authorization
      */
-    private void addCASFilters(WebAppContext webApp) {
+    private void addIAMFilters(WebAppContext webApp) {
 
         String context = webApp.getContextPath();
 
