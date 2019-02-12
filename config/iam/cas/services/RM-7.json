@@ -1,0 +1,12 @@
+{
+  "@class": "org.apereo.cas.services.RegexRegisteredService",
+  "serviceId": "^https://(.+)/rm(\\z|/.*)",
+  "name": "ProActive Resource Manager",
+  "id": 7,
+  "description": "ProActive portal for resource management",
+  "evaluationOrder": 3,
+  "logoutType": "FRONT_CHANNEL",
+  "attributeReleasePolicy" : {
+    "@class" : "org.jasig.cas.services.ReturnAllAttributeReleasePolicy"
+  }
+}

@@ -401,7 +401,8 @@ public class JettyStarter {
 
         String context = webApp.getContextPath();
 
-        if (!(context.equals("/rest") || context.equals("/scheduling-api"))) {
+        if ((context.equals("/studio") || context.equals("/scheduler") || context.equals("/rm") ||
+             context.equals("/automation-dashboard"))) {
 
             // set a jetty context-param to remove jessionid from URLs
             webApp.setInitParameter("org.eclipse.jetty.servlet.SessionIdPathParameterName", "none");

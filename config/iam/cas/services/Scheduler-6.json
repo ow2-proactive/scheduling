@@ -1,0 +1,12 @@
+{
+  "@class": "org.apereo.cas.services.RegexRegisteredService",
+  "serviceId": "^https://(.+)/scheduler(\\z|/.*)",
+  "name": "ProActive Scheduler Portal",
+  "id": 6,
+  "description": "ProActive job console",
+  "evaluationOrder": 3,
+  "logoutType": "FRONT_CHANNEL",
+  "attributeReleasePolicy" : {
+    "@class" : "org.jasig.cas.services.ReturnAllAttributeReleasePolicy"
+  }
+}
