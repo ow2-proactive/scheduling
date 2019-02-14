@@ -1081,8 +1081,10 @@ public class SchedulingService {
         private List<Long> removeFromContext(List<JobId> jobIdList) {
             List<Long> longList = new ArrayList<>(jobIdList.size());
             for (JobId jobId : jobIdList) {
-                TerminationData terminationData = jobs.removeJob(jobId);
-                submitTerminationDataHandler(terminationData);
+                if (jobs.isJobAlive(jobId)) {
+                    TerminationData terminationData = jobs.removeJob(jobId);
+                    submitTerminationDataHandler(terminationData);
+                }
             }
             List<InternalJob> jobsFromDB;
             if (!jobIdList.isEmpty()) {
