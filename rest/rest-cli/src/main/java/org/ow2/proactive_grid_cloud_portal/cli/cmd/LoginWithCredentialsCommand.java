@@ -67,7 +67,7 @@ public class LoginWithCredentialsCommand extends AbstractLoginCommand implements
                                    String.format("File does not exist: %s", credentials.getAbsolutePath()));
         }
         if (warn) {
-            writeLine(currentContext, "Using the default credentials file: %s", credentials.getAbsolutePath());
+            writeLine(currentContext, "Using the default credentials file: %s \n", credentials.getAbsolutePath());
         }
         HttpPost request = new HttpPost(currentContext.getResourceUrl("login"));
         MultipartEntity entity = new MultipartEntity();
