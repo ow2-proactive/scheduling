@@ -1104,7 +1104,7 @@ class LiveJobs {
     public JobData lockJob(JobId jobId) {
         JobData jobData = jobs.get(jobId);
         if (jobData == null) {
-            jlogger.info(jobId, "does not exist");
+            jlogger.info(jobId, "is terminated");
             return null;
         }
         jobData.jobLock.lock();
@@ -1119,7 +1119,7 @@ class LiveJobs {
     private JobData checkJobAccess(JobId jobId) {
         JobData jobData = jobs.get(jobId);
         if (jobData == null) {
-            logger.warn("Job " + jobId + " does not exist or has been removed.");
+            logger.warn("Job " + jobId + " is terminated or has been removed.");
             return null;
         }
         if (!jobData.jobLock.isHeldByCurrentThread()) {
