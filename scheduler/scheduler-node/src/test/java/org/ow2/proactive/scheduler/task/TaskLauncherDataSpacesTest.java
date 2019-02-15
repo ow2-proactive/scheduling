@@ -60,6 +60,7 @@ public class TaskLauncherDataSpacesTest extends TaskLauncherTestAbstract {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
+
     private TestTaskLauncherFactory taskLauncherFactory;
 
     @Before
