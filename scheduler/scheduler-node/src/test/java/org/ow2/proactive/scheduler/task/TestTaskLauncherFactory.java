@@ -51,7 +51,7 @@ public class TestTaskLauncherFactory extends ProActiveForkedTaskLauncherFactory 
     private TaskFileDataspaces dataSpaces;
 
     public TestTaskLauncherFactory() {
-        this(new File(System.getProperty("java.io.tmpdir"), UUID.randomUUID().toString()));
+        this(new File(System.getProperty("java.io.tmpdir"), String.valueOf(UUID.randomUUID().hashCode())));
     }
 
     public TestTaskLauncherFactory(Semaphore taskRunning) {

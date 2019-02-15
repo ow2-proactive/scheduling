@@ -33,6 +33,7 @@ import static org.ow2.proactive.scheduler.task.TaskAssertions.assertTaskResultOk
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 
@@ -59,11 +60,12 @@ public class TaskLauncherDataSpacesTest extends TaskLauncherTestAbstract {
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
 
+
     private TestTaskLauncherFactory taskLauncherFactory;
 
     @Before
     public void setUp() throws Exception {
-        taskLauncherFactory = new TestTaskLauncherFactory(tmpFolder.newFolder());
+        taskLauncherFactory = new TestTaskLauncherFactory();
     }
 
     @Test
