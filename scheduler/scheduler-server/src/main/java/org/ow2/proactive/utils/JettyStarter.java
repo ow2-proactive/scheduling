@@ -55,6 +55,8 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.boot.microservices.iam.IAMStarter;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.web.WebProperties;
 import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFactory;
@@ -147,6 +149,8 @@ public class JettyStarter {
                 redirectHandler.setVirtualHosts(httpVirtualHost);
                 handlerList.addHandler(redirectHandler);
             }
+
+            addIAMSystemProperties();
 
             addWarsToHandlerList(handlerList, defaultVirtualHost);
             server.setHandler(handlerList);
@@ -392,6 +396,24 @@ public class JettyStarter {
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);
         return webApp;
+    }
+
+    /**
+     * add IAM and PA URLs to system properties
+     */
+    private static void addIAMSystemProperties() {
+
+        System.setProperty(IAMConfiguration.IAM_URL, IAMStarter.getIamURL());
+        System.setProperty(IAMConfiguration.IAM_LOGIN, IAMStarter.getIamURL() + IAMConfiguration.IAM_LOGIN_PAGE);
+        System.setProperty(IAMConfiguration.PA_SERVER_NAME,
+                           IAMConfiguration.IAM_PROTOCOL + IAMStarter.getConfiguration()
+                                                                     .getString(IAMConfiguration.IAM_HOST) +
+                                                            ":" + WebProperties.WEB_HTTPS_PORT.getValueAsString());
+
+        logger.debug("IAM and PA web URLs set as system properties");
+        logger.debug(IAMConfiguration.IAM_URL + ": " + System.getProperty(IAMConfiguration.IAM_URL));
+        logger.debug(IAMConfiguration.IAM_LOGIN + ": " + System.getProperty(IAMConfiguration.IAM_LOGIN));
+        logger.debug(IAMConfiguration.PA_SERVER_NAME + ": " + System.getProperty(IAMConfiguration.PA_SERVER_NAME));
     }
 
     /**

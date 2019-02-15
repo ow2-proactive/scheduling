@@ -17,7 +17,6 @@ configurations {
 dependencies {
 
     compile project(':common:common-api')
-    compile project(':common:common-http')
 
     iamWar group: "org.ow2.proactive", name: "iam", version: "${schedulingVersion}", ext: "war", changing: true
 
