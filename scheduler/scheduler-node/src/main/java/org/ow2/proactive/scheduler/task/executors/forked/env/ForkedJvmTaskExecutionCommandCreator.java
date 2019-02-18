@@ -37,7 +37,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperty;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
-import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
@@ -56,7 +55,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     private static final Logger logger = Logger.getLogger(ForkedJvmTaskExecutionCommandCreator.class);
 
     private static final String JAVA_HOME_POSTFIX_JAVA_EXECUTABLE = File.separatorChar + "bin" + File.separatorChar +
-                                                                    "java";
+            "java";
 
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
@@ -76,7 +75,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
      *                   TaskContext.
      */
     public List<String> createForkedJvmTaskExecutionCommand(TaskContext taskContext,
-            ScriptResult forkEnvironmentScriptResult, String serializedContextAbsolutePath) throws Exception {
+                                                            ScriptResult forkEnvironmentScriptResult, String serializedContextAbsolutePath) throws Exception {
         if (taskContext == null) {
             return new ArrayList<>(0);
         }
@@ -96,14 +95,14 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         // The following code forwards the PAMR configuration the forked JVM. Though the general use-case involves to
         // write a custom fork environment script to configure properly the properties, this avoids a common misconfiguration issues.
         forwardProActiveProperties(jvmArguments,
-                                   PAMRConfig.PA_NET_ROUTER_ADDRESS,
-                                   PAMRConfig.PA_NET_ROUTER_PORT,
-                                   PAMRConfig.PA_PAMR_SOCKET_FACTORY,
-                                   PAMRConfig.PA_PAMRSSH_KEY_DIR,
-                                   PAMRConfig.PA_PAMRSSH_REMOTE_ADDRESS,
-                                   PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME,
-                                   PAMRConfig.PA_PAMRSSH_REMOTE_PORT,
-                                   CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL);
+                PAMRConfig.PA_NET_ROUTER_ADDRESS,
+                PAMRConfig.PA_NET_ROUTER_PORT,
+                PAMRConfig.PA_PAMR_SOCKET_FACTORY,
+                PAMRConfig.PA_PAMRSSH_KEY_DIR,
+                PAMRConfig.PA_PAMRSSH_REMOTE_ADDRESS,
+                PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME,
+                PAMRConfig.PA_PAMRSSH_REMOTE_PORT,
+                CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL);
 
         configureLogging(jvmArguments, variables);
 
@@ -125,7 +124,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
 
             for (String classpathEntry : forkEnvironment.getAdditionalClasspath()) {
                 classpath.append(File.pathSeparatorChar)
-                         .append(VariableSubstitutor.filterAndUpdate(classpathEntry, variables));
+                        .append(VariableSubstitutor.filterAndUpdate(classpathEntry, variables));
             }
 
             if (!Strings.isNullOrEmpty(forkEnvironment.getJavaHome())) {
@@ -160,7 +159,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         String log4jFileUrl = null;
         String schedulerHome = getSchedulerHome(variables);
         String log4jConfig = schedulerHome + File.separator + "config" + File.separator + "log" + File.separator +
-                             "scriptengines.properties";
+                "scriptengines.properties";
 
         if (new File(log4jConfig).exists()) {
             try {
@@ -184,17 +183,9 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     private String getSchedulerHome(Map<String, Serializable> variables) {
         String schedulerHome;
         schedulerHome = System.getProperty(CentralPAPropertyRepository.PA_HOME.getName());
-
         if (schedulerHome == null) {
-            if (PASchedulerProperties.SCHEDULER_HOME.getValueAsString() != null) {
-                schedulerHome = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
-            } else if (PAResourceManagerProperties.RM_HOME.getValueAsString() != null) {
-                schedulerHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
-            } else {
-                schedulerHome = (String) variables.get("PA_SCHEDULER_HOME");
-            }
+            schedulerHome = (String) variables.get("PA_SCHEDULER_HOME");
         }
-
         return schedulerHome;
     }
 
