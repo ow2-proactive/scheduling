@@ -515,11 +515,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
         jlogger.info(job.getId(),
                      "submitted: name '" + job.getName() + "', tasks '" + job.getTotalNumberOfTasks() + "', owner '" +
+
                                   job.getOwner() + "'");
-        try {
-            jlogger.info(job.getId(), job.display());
-        } catch (Exception e) {
-            jlogger.error(job.getId(), "Error while displaying the job :", e);
+        if (jlogger.isTraceEnabled()) {
+            try {
+                jlogger.trace(job.getId(), job.display());
+            } catch (Exception e) {
+                jlogger.error(job.getId(), "Error while displaying the job :", e);
+            }
         }
     }
 
@@ -1117,48 +1120,50 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     public synchronized void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         ClientJobState js = getClientJobState(notification.getData().getJobId());
         boolean withAttachment = false;
-        synchronized (js) {
-            js.update(notification.getData());
-            switch (notification.getEventType()) {
-                case JOB_PENDING_TO_RUNNING:
-                    sState.pendingToRunning(js);
-                    break;
-                case JOB_PAUSED:
-                case JOB_IN_ERROR:
-                case JOB_RESUMED:
-                case JOB_RESTARTED_FROM_ERROR:
-                case JOB_CHANGE_PRIORITY:
-                case TASK_REPLICATED:
-                case TASK_SKIPPED:
-                    break;
-                case JOB_PENDING_TO_FINISHED:
-                    sState.pendingToFinished(js);
-                    // set this job finished, user can get its result
-                    jobs.remove(notification.getData().getJobId()).setFinished(true);
-                    withAttachment = true;
-                    break;
-                case JOB_RUNNING_TO_FINISHED:
-                    sState.runningToFinished(js);
-                    // set this job finished, user can get its result
-                    jobs.remove(notification.getData().getJobId()).setFinished(true);
-                    withAttachment = true;
-                    break;
-                case JOB_REMOVE_FINISHED:
-                    // removing jobs from the global list : this job is no more managed
-                    sState.removeFinished(js);
-                    jobsMap.remove(js.getId());
-                    finishedJobsLRUCache.remove(js.getId());
-                    jobs.remove(notification.getData().getJobId());
-                    logger.debug("HOUSEKEEPING removed the finished job " + js.getId() +
-                                 " from the SchedulerFrontEndState");
-                    break;
-                default:
-                    logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                                notification.getEventType());
-                    return;
+        if (js != null) {
+            synchronized (js) {
+                js.update(notification.getData());
+                switch (notification.getEventType()) {
+                    case JOB_PENDING_TO_RUNNING:
+                        sState.pendingToRunning(js);
+                        break;
+                    case JOB_PAUSED:
+                    case JOB_IN_ERROR:
+                    case JOB_RESUMED:
+                    case JOB_RESTARTED_FROM_ERROR:
+                    case JOB_CHANGE_PRIORITY:
+                    case TASK_REPLICATED:
+                    case TASK_SKIPPED:
+                        break;
+                    case JOB_PENDING_TO_FINISHED:
+                        sState.pendingToFinished(js);
+                        // set this job finished, user can get its result
+                        jobs.remove(notification.getData().getJobId()).setFinished(true);
+                        withAttachment = true;
+                        break;
+                    case JOB_RUNNING_TO_FINISHED:
+                        sState.runningToFinished(js);
+                        // set this job finished, user can get its result
+                        jobs.remove(notification.getData().getJobId()).setFinished(true);
+                        withAttachment = true;
+                        break;
+                    case JOB_REMOVE_FINISHED:
+                        // removing jobs from the global list : this job is no more managed
+                        sState.removeFinished(js);
+                        jobsMap.remove(js.getId());
+                        finishedJobsLRUCache.remove(js.getId());
+                        jobs.remove(notification.getData().getJobId());
+                        logger.debug("HOUSEKEEPING removed the finished job " + js.getId() +
+                                     " from the SchedulerFrontEndState");
+                        break;
+                    default:
+                        logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                                    notification.getEventType());
+                        return;
+                }
+                dispatchJobStateUpdated(owner, notification);
+                new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
             }
-            dispatchJobStateUpdated(owner, notification);
-            new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
         }
     }
 
