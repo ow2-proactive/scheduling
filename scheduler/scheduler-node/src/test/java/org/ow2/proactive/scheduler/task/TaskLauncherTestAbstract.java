@@ -32,9 +32,12 @@ import org.junit.Before;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.TaskTerminateNotification;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.tests.ProActiveTestClean;
 
 
@@ -57,6 +60,17 @@ public class TaskLauncherTestAbstract extends ProActiveTestClean {
 
     @Before
     public void setup() {
+
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
+            if (PASchedulerProperties.SCHEDULER_HOME.getValueAsString() != null) {
+                System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
+                                   PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+            } else if (PAResourceManagerProperties.RM_HOME.getValueAsString() != null) {
+                System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
+                                   PAResourceManagerProperties.RM_HOME.getValueAsString());
+            }
+        }
+
         taskResult = new TaskTerminateNotificationVerifier();
     }
 

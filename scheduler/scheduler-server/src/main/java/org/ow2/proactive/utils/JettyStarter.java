@@ -150,6 +150,7 @@ public class JettyStarter {
                 handlerList.addHandler(redirectHandler);
             }
 
+            // Add system properties that will be needed by IAM filters
             addIAMSystemProperties();
 
             addWarsToHandlerList(handlerList, defaultVirtualHost);
@@ -399,7 +400,7 @@ public class JettyStarter {
     }
 
     /**
-     * add IAM and PA URLs to system properties
+     * add IAM and PA web URLs to system properties
      */
     private static void addIAMSystemProperties() {
 

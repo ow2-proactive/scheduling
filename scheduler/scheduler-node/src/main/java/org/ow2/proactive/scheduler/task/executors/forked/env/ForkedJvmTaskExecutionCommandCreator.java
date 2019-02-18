@@ -81,7 +81,7 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         }
         Map<String, Serializable> variables = taskContextVariableExtractor.getAllVariables(taskContext);
         String javaHome = System.getProperty("java.home");
-        List<String> jvmArguments = new ArrayList<>(1);
+        ArrayList<String> jvmArguments = new ArrayList<>(1);
 
         ForkEnvironment forkEnvironment = null;
         if (taskContext.getInitializer() != null) {
@@ -91,6 +91,18 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         // set the task fork property so that script engines have a mean to know
         // if they are running in a forked task or not
         jvmArguments.add(PASchedulerProperties.TASK_FORK.getCmdLine() + "true");
+
+        // The following code forwards the PAMR configuration the forked JVM. Though the general use-case involves to
+        // write a custom fork environment script to configure properly the properties, this avoids a common misconfiguration issues.
+        forwardProActiveProperties(jvmArguments,
+                                   PAMRConfig.PA_NET_ROUTER_ADDRESS,
+                                   PAMRConfig.PA_NET_ROUTER_PORT,
+                                   PAMRConfig.PA_PAMR_SOCKET_FACTORY,
+                                   PAMRConfig.PA_PAMRSSH_KEY_DIR,
+                                   PAMRConfig.PA_PAMRSSH_REMOTE_ADDRESS,
+                                   PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME,
+                                   PAMRConfig.PA_PAMRSSH_REMOTE_PORT,
+                                   CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL);
 
         configureLogging(jvmArguments, variables);
 
@@ -120,22 +132,6 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
             }
         }
 
-        // The following code forwards the PAMR configuration the forked JVM. Though the general use-case involves to
-        // write a custom fork environment script to configure properly the properties, this avoids a common misconfiguration issues.
-        forwardProActiveProperties(jvmArguments,
-                                   PAMRConfig.PA_NET_ROUTER_ADDRESS,
-                                   PAMRConfig.PA_NET_ROUTER_PORT,
-                                   PAMRConfig.PA_PAMR_SOCKET_FACTORY,
-                                   PAMRConfig.PA_PAMRSSH_KEY_DIR,
-                                   PAMRConfig.PA_PAMRSSH_REMOTE_ADDRESS,
-                                   PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME,
-                                   PAMRConfig.PA_PAMRSSH_REMOTE_PORT,
-                                   CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL,
-                                   CentralPAPropertyRepository.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS,
-                                   CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOLS_ORDER,
-                                   CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP,
-                                   CentralPAPropertyRepository.PA_NET_USE_IP_ADDRESS);
-
         List<String> prefixes = javaPrefixCommandExtractor.extractJavaPrefixCommandToCommandListFromScriptResult(forkEnvironmentScriptResult);
 
         List<String> javaCommand = new ArrayList<>(prefixes.size() + 3 + jvmArguments.size() + 2);
@@ -151,21 +147,15 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
         return javaCommand;
     }
 
-    private void forwardProActiveProperties(List<String> jvmArguments, PAProperty... propertiesToForward) {
+    private void forwardProActiveProperties(ArrayList<String> jvmArguments, PAProperty... propertiesToForward) {
         for (PAProperty property : propertiesToForward) {
-            if (property.isSet() && !propertyDefinedByScript(jvmArguments, property)) {
+            if (property.isSet()) {
                 jvmArguments.add(property.getCmdLine() + property.getValueAsString());
             }
         }
     }
 
-    private boolean propertyDefinedByScript(List<String> jvmArguments, PAProperty property) {
-        return jvmArguments.stream().anyMatch(s ->
-
-        s.contains(property.getCmdLine()));
-    }
-
-    private void configureLogging(List<String> jvmArguments, Map<String, Serializable> variables) {
+    private void configureLogging(ArrayList<String> jvmArguments, Map<String, Serializable> variables) {
         String log4jFileUrl = null;
         String schedulerHome = getSchedulerHome(variables);
         String log4jConfig = schedulerHome + File.separator + "config" + File.separator + "log" + File.separator +
