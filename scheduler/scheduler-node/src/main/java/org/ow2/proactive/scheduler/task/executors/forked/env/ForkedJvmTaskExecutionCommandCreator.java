@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperty;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.utils.OneJar;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
@@ -183,9 +184,17 @@ public class ForkedJvmTaskExecutionCommandCreator implements Serializable {
     private String getSchedulerHome(Map<String, Serializable> variables) {
         String schedulerHome;
         schedulerHome = System.getProperty(CentralPAPropertyRepository.PA_HOME.getName());
+
         if (schedulerHome == null) {
-            schedulerHome = (String) variables.get("PA_SCHEDULER_HOME");
+            if (PASchedulerProperties.SCHEDULER_HOME.getValueAsString() != null) {
+                schedulerHome = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
+            } else if (PAResourceManagerProperties.RM_HOME.getValueAsString() != null) {
+                schedulerHome = PAResourceManagerProperties.RM_HOME.getValueAsString();
+            } else {
+                schedulerHome = (String) variables.get("PA_SCHEDULER_HOME");
+            }
         }
+
         return schedulerHome;
     }
 
