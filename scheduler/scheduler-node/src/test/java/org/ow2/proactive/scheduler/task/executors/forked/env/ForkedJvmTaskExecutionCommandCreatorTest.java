@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
@@ -105,6 +106,9 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
 
     @Test
     public void testExecCommandUsesClassPathSystemProperties() throws Exception {
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) != null) {
+            System.clearProperty(CentralPAPropertyRepository.PA_HOME.getName());
+        }
         javaCommandContainsOrNot(Arrays.asList(new String[] { "-cp", System.getProperty("java.class.path") }),
                                  createForkEnvironment(),
                                  true);
