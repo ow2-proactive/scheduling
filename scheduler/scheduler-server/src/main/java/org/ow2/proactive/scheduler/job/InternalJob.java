@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -492,6 +493,7 @@ public abstract class InternalJob extends JobState {
             getJobDescriptor().terminate(taskId, taskIsPaused);
         }
 
+        updateAllTasksFromSubmittedToPending();
         return changesInfo;
     }
 
@@ -784,13 +786,21 @@ public abstract class InternalJob extends JobState {
         setNumberOfRunningTasks(0);
         setStatus(JobStatus.RUNNING);
 
-        List<InternalTask> internalTasks = getITasks();
-        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>(internalTasks.size());
+        updateAllTasksFromSubmittedToPending();
+    }
 
-        for (InternalTask internalTask : internalTasks) {
-            internalTask.setStatus(TaskStatus.PENDING);
-            taskStatus.put(internalTask.getId(), TaskStatus.PENDING);
+    private void updateAllTasksFromSubmittedToPending() {
+        final Set<TaskId> eligibleTaskIds = getJobDescriptor().getEligibleTasks()
+                                                              .stream()
+                                                              .map(TaskDescriptor::getTaskId)
+                                                              .collect(Collectors.toSet());
+        for (InternalTask internalTask : getITasks()) {
+            if (internalTask.getStatus().equals(TaskStatus.SUBMITTED) &&
+                eligibleTaskIds.contains(internalTask.getId())) {
+                internalTask.setStatus(TaskStatus.PENDING);
+            }
         }
+
     }
 
     /**
