@@ -44,8 +44,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -324,6 +326,17 @@ public class ForkedTaskExecutorTest {
 
     @Before
     public void setUp() throws Exception {
+
+        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
+            if (PASchedulerProperties.SCHEDULER_HOME.getValueAsString() != null) {
+                System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
+                                   PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
+            } else if (PAResourceManagerProperties.RM_HOME.getValueAsString() != null) {
+                System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
+                                   PAResourceManagerProperties.RM_HOME.getValueAsString());
+            }
+        }
+
         oldJavaHome = System.getProperty("java.home");
     }
 
