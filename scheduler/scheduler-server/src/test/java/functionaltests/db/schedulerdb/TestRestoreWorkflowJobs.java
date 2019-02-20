@@ -79,12 +79,12 @@ public class TestRestoreWorkflowJobs extends BaseSchedulerDBTest {
                                                          .withFinished(task("T", TaskStatus.FINISHED).checkFinished(),
                                                                        true)
                                                          .withPending(task("T1", TaskStatus.PENDING), true)
-                                                         .withPending(task("T1*1", TaskStatus.SUBMITTED), true)
-                                                         .withPending(task("T2", TaskStatus.PENDING), true)
-                                                         .withPending(task("T3", TaskStatus.PENDING), true)
+                                                         .withPending(task("T1*1", TaskStatus.PENDING), true)
+                                                         .withPending(task("T2", TaskStatus.SUBMITTED), true)
+                                                         .withPending(task("T3", TaskStatus.SUBMITTED), true)
                                                          .withPending(task("T2*1", TaskStatus.SUBMITTED), true)
                                                          .withPending(task("T3*1", TaskStatus.SUBMITTED), true)
-                                                         .withPending(task("T4", TaskStatus.PENDING), true)
+                                                         .withPending(task("T4", TaskStatus.SUBMITTED), true)
                                                          .withEligible("T1", "T1*1");
 
         checkRecoveredState(recoverHelper.recover(-1), state().withRunning(expectedJob));

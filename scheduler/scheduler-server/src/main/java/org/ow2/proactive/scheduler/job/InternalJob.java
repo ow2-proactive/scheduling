@@ -678,6 +678,7 @@ public abstract class InternalJob extends JobState {
      */
     public void recoverTask(TaskId id) {
         getJobDescriptor().recoverTask(id);
+        updateAllTasksFromSubmittedToPending();
     }
 
     /**
@@ -785,6 +786,10 @@ public abstract class InternalJob extends JobState {
         setNumberOfPendingTasks(getTotalNumberOfTasks());
         setNumberOfRunningTasks(0);
         setStatus(JobStatus.RUNNING);
+
+        for (InternalTask internalTask : getITasks()) {
+            internalTask.setStatus(TaskStatus.SUBMITTED);
+        }
 
         updateAllTasksFromSubmittedToPending();
     }
