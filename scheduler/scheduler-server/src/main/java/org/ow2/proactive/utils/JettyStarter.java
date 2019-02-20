@@ -436,41 +436,31 @@ public class JettyStarter {
             // Add SingleSignOutHttpSessionListener
             webApp.addEventListener(new org.jasig.cas.client.session.SingleSignOutHttpSessionListener());
 
+            EnumSet dispatchers = EnumSet.of(DispatcherType.REQUEST,
+                                             DispatcherType.INCLUDE,
+                                             DispatcherType.FORWARD,
+                                             DispatcherType.ASYNC,
+                                             DispatcherType.ERROR);
+
+            String targetedContextPath = "/*";
+
             // Add CAS Single Sign Out Filter
-            webApp.addFilter(org.jasig.cas.client.session.SingleSignOutFilter.class,
-                             "/*",
-                             EnumSet.of(DispatcherType.REQUEST,
-                                        DispatcherType.INCLUDE,
-                                        DispatcherType.FORWARD,
-                                        DispatcherType.ASYNC,
-                                        DispatcherType.ERROR));
+            webApp.addFilter(org.jasig.cas.client.session.SingleSignOutFilter.class, targetedContextPath, dispatchers);
 
             // Add CAS Authentication Filter
             webApp.addFilter(org.jasig.cas.client.authentication.AuthenticationFilter.class,
-                             "/*",
-                             EnumSet.of(DispatcherType.REQUEST,
-                                        DispatcherType.INCLUDE,
-                                        DispatcherType.FORWARD,
-                                        DispatcherType.ASYNC,
-                                        DispatcherType.ERROR));
+                             targetedContextPath,
+                             dispatchers);
 
             // Add CAS Validation Filter
             webApp.addFilter(org.jasig.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter.class,
-                             "/*",
-                             EnumSet.of(DispatcherType.REQUEST,
-                                        DispatcherType.INCLUDE,
-                                        DispatcherType.FORWARD,
-                                        DispatcherType.ASYNC,
-                                        DispatcherType.ERROR));
+                             targetedContextPath,
+                             dispatchers);
 
             // Add CAS HttpServletRequest Wrapper Filter
             webApp.addFilter(org.jasig.cas.client.util.HttpServletRequestWrapperFilter.class,
-                             "/*",
-                             EnumSet.of(DispatcherType.REQUEST,
-                                        DispatcherType.INCLUDE,
-                                        DispatcherType.FORWARD,
-                                        DispatcherType.ASYNC,
-                                        DispatcherType.ERROR));
+                             targetedContextPath,
+                             dispatchers);
 
             logger.debug("IAM authentication and authorization filters added to web application " +
                          webApp.getContextPath());
