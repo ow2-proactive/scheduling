@@ -2709,7 +2709,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
                 result &= operation.apply(rmnode);
             } catch (Exception e) {
-                logger.error("Exception during mapOnNodeUrlSet.", e);
+                logger.error("Error during " + operationName + " on node " + url, e);
                 result = false;
             }
         }
