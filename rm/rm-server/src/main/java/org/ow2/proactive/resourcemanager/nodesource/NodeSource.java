@@ -620,6 +620,11 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     public void acquireNodes(int n, Map<String, ?> nodeConfiguration) {
+        if (toShutdown) {
+            logger.warn("[" + name + "] acquireNodes request discarded because node source is shutting down");
+            return;
+        }
+
         infrastructureManager.acquireNodes(n, nodeConfiguration);
     }
 
@@ -637,6 +642,11 @@ public class NodeSource implements InitActive, RunActive {
     }
 
     public void acquireAllNodes(Map<String, ?> nodeConfiguration) {
+        if (toShutdown) {
+            logger.warn("[" + name + "] acquireAllNodes request discarded because node source is shutting down");
+            return;
+        }
+
         infrastructureManager.acquireAllNodes(nodeConfiguration);
     }
 
@@ -680,6 +690,9 @@ public class NodeSource implements InitActive, RunActive {
 
         if (this.nodes.size() == 0) {
             this.shutdownNodeSourceServices(initiator);
+        } else {
+            logger.debug("[" + this.name + "] actual shutdown is skipped, because there are still some nodes " +
+                         this.nodes.size());
         }
         return new BooleanWrapper(true);
     }

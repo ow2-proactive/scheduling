@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.core.db.TopologicalTaskSorter;
 import org.ow2.proactive.scheduler.core.db.TopologicalTaskSorter.Entry;
@@ -86,18 +85,18 @@ public class TopologicalTaskSorterTest {
     }
 
     @Test
-    public void testEmpty() throws Exception {
+    public void testEmpty() {
         List<Entry> sorted = TopologicalTaskSorter.sort(Collections.<Entry> emptyList());
         assertEquals(0, sorted.size());
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNull() throws Exception {
+    public void testNull() {
         TopologicalTaskSorter.sort(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCycle() throws Exception {
+    public void testCycle() {
         TestEntry e1 = new TestEntry(1);
         TestEntry e2 = new TestEntry(2);
         TestEntry e3 = new TestEntry(3);
@@ -110,13 +109,41 @@ public class TopologicalTaskSorterTest {
     }
 
     @Test
-    public void testSort() throws Exception {
+    public void testSort() {
         for (int i = 0; i < 100; i++) {
             testSortRandomized();
         }
     }
 
-    public void testSortRandomized() throws Exception {
+    /**
+     * Test diamond structure.
+     *     e1
+     *    /  \
+     *  e2   e3
+     *   \  /
+     *    e4
+     */
+    @Test
+    public void testDiamond() {
+        TestEntry e1 = new TestEntry(1);
+        TestEntry e2 = new TestEntry(2);
+        TestEntry e3 = new TestEntry(3);
+        TestEntry e4 = new TestEntry(4);
+        List<Entry> input = Arrays.asList(e1, e2, e3, e4);
+        e2.addParent(e1);
+        e3.addParent(e1);
+        e4.addParent(e2);
+        e4.addParent(e3);
+
+        final List<Entry> sorted = TopologicalTaskSorter.sort(input);
+        assertBefore(sorted, e1, e2);
+        assertBefore(sorted, e1, e3);
+        assertBefore(sorted, e2, e4);
+        assertBefore(sorted, e3, e4);
+        assertBefore(sorted, e1, e4);
+    }
+
+    public void testSortRandomized() {
         TestEntry e1 = new TestEntry(1);
         TestEntry e2 = new TestEntry(2);
         TestEntry e3 = new TestEntry(3);
@@ -149,8 +176,8 @@ public class TopologicalTaskSorterTest {
         assertBefore(sorted, e9, e4);
     }
 
-    @Ignore("Should work when TopologicalTaskSorter will use an iterative method")
-    public void testBigGraph() throws Exception {
+    @Test
+    public void testBigGraph() {
         List<Entry> entries = new ArrayList<>();
         TestEntry e = new TestEntry(0);
         entries.add(e);
