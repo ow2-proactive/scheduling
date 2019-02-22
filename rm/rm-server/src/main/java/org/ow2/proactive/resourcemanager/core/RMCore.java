@@ -2652,12 +2652,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     public BooleanWrapper lockNodes(Set<String> urls, final Client caller) {
-        return mapOnNodeUrlSet(urls, new Predicate<RMNode>() {
-            @Override
-            public boolean apply(RMNode node) {
-                return internalLockNode(node, caller);
-            }
-        }, "lock");
+        return mapOnNodeUrlSet(urls, node -> internalLockNode(node, caller), "lock");
     }
 
     boolean internalLockNode(RMNode rmNode, Client lockInitiator) {
@@ -2696,27 +2691,27 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @Override
     public BooleanWrapper unlockNodes(Set<String> urls) {
-        return mapOnNodeUrlSet(urls, new Predicate<RMNode>() {
-            @Override
-            public boolean apply(RMNode node) {
-                return internalUnlockNode(node);
-            }
-        }, "unlock");
+        return mapOnNodeUrlSet(urls, this::internalUnlockNode, "unlock");
     }
 
     public BooleanWrapper mapOnNodeUrlSet(Set<String> nodeUrls, Predicate<RMNode> operation, String operationName) {
         boolean result = true;
 
         for (String url : nodeUrls) {
-            RMNode rmnode = getNodeByUrlIncludingDeployingNodes(url);
+            try {
+                RMNode rmnode = getNodeByUrlIncludingDeployingNodes(url);
 
-            if (rmnode == null) {
-                logger.warn("Cannot " + operationName + ", unknown node: " + url);
-                result &= false;
-                continue;
+                if (rmnode == null) {
+                    logger.warn("Cannot " + operationName + ", unknown node: " + url);
+                    result = false;
+                    continue;
+                }
+
+                result &= operation.apply(rmnode);
+            } catch (Exception e) {
+                logger.error("Error during " + operationName + " on node " + url, e);
+                result = false;
             }
-
-            result &= operation.apply(rmnode);
         }
 
         return new BooleanWrapper(result);
