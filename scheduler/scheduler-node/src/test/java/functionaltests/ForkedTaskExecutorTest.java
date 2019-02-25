@@ -326,17 +326,6 @@ public class ForkedTaskExecutorTest {
 
     @Before
     public void setUp() throws Exception {
-
-        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            if (PASchedulerProperties.SCHEDULER_HOME.getValueAsString() != null) {
-                System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
-                                   PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
-            } else if (PAResourceManagerProperties.RM_HOME.getValueAsString() != null) {
-                System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
-                                   PAResourceManagerProperties.RM_HOME.getValueAsString());
-            }
-        }
-
         oldJavaHome = System.getProperty("java.home");
     }
 

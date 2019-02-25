@@ -60,17 +60,6 @@ public class TaskLauncherTestAbstract extends ProActiveTestClean {
 
     @Before
     public void setup() {
-
-        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) == null) {
-            if (PASchedulerProperties.SCHEDULER_HOME.getValueAsString() != null) {
-                System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
-                                   PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
-            } else if (PAResourceManagerProperties.RM_HOME.getValueAsString() != null) {
-                System.setProperty(CentralPAPropertyRepository.PA_HOME.getName(),
-                                   PAResourceManagerProperties.RM_HOME.getValueAsString());
-            }
-        }
-
         taskResult = new TaskTerminateNotificationVerifier();
     }
 

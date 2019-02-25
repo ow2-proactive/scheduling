@@ -106,12 +106,20 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
 
     @Test
     public void testExecCommandUsesClassPathSystemProperties() throws Exception {
-        if (System.getProperty(CentralPAPropertyRepository.PA_HOME.getName()) != null) {
-            System.clearProperty(CentralPAPropertyRepository.PA_HOME.getName());
+        // before test (clear 'proactive.home' system property)
+        String proactiveHomeProperty = CentralPAPropertyRepository.PA_HOME.getName();
+        String proactiveHomeValue = System.getProperty(proactiveHomeProperty);
+        if (proactiveHomeValue != null) {
+            System.clearProperty(proactiveHomeProperty);
         }
+
+        // test
         javaCommandContainsOrNot(Arrays.asList(new String[] { "-cp", System.getProperty("java.class.path") }),
                                  createForkEnvironment(),
                                  true);
+
+        // after test (reset 'proactive.home')
+        System.setProperty(proactiveHomeProperty, proactiveHomeValue);
     }
 
     @Test
