@@ -120,10 +120,9 @@ public class RMRest implements RMRestInterface {
                                                     // "ToBeReleasedNodesCo", // useless info
                                                     "BusyNodesCount", //
                                                     "FreeNodesCount", //
-                                                    "DownNodesCount", //
-                                                    "AvailableNodesCount", //
-                                                    "AverageActivity", //
-                                                    "NumberPendingTasks",
+                                                    "DeployingNodesCount", "DownNodesCount", //
+                                                    "NumberPendingTasks", "AvailableNodesCount", //
+                                                    "AverageActivity" //
             // "MaxFreeNodes" // redundant with AvailableNodesCount
     };
 

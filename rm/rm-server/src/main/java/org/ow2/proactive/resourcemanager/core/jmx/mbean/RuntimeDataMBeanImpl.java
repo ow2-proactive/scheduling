@@ -105,6 +105,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * @see RuntimeDataMBean#getDeployingNodesCount()
      */
+    @Chronological
     public int getDeployingNodesCount() {
         return this.rmStatisticsHolder.getStatistics().getDeployingNodesCount();
     }
