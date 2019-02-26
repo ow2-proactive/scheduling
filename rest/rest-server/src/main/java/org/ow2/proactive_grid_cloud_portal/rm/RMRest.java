@@ -82,6 +82,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.db.RrdDbUtil;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -122,6 +123,7 @@ public class RMRest implements RMRestInterface {
                                                     "DownNodesCount", //
                                                     "AvailableNodesCount", //
                                                     "AverageActivity", //
+                                                    "NumberPendingTasks",
             // "MaxFreeNodes" // redundant with AvailableNodesCount
     };
 
@@ -759,9 +761,11 @@ public class RMRest implements RMRestInterface {
             range = range.substring(0, dataSources.length);
         }
         // complete range if too short
-        while (range.length() < dataSources.length) {
-            range += 'a';
+        StringBuilder rangeBuilder = new StringBuilder(range);
+        while (rangeBuilder.length() < dataSources.length) {
+            rangeBuilder.append('a');
         }
+        range = rangeBuilder.toString();
 
         StatHistoryCacheEntry cache = StatHistoryCaching.getInstance().getEntry(range);
         // found unexpired cache entry matching the parameters: return it immediately
@@ -769,7 +773,7 @@ public class RMRest implements RMRestInterface {
             return cache.getValue();
         }
 
-        long l1 = System.currentTimeMillis();
+        long currentTimeMillis = System.currentTimeMillis();
 
         ObjectName on = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME);
         AttributeList attrs = rm.getMBeanAttributes(on, new String[] { "StatisticHistory" });
@@ -801,35 +805,7 @@ public class RMRest implements RMRestInterface {
         for (int i = 0; i < dataSources.length; i++) {
             String dataSource = dataSources[i];
             char zone = range.charAt(i);
-            long timeStart;
-
-            switch (zone) {
-                default:
-                case 'a': // 1 minute
-                    timeStart = timeEnd - 60;
-                    break;
-                case 'm': // 10 minute
-                    timeStart = timeEnd - 60 * 10;
-                    break;
-                case 'h': // 1 hours
-                    timeStart = timeEnd - 60 * 60;
-                    break;
-                case 'H': // 8 hours
-                    timeStart = timeEnd - 60 * 60 * 8;
-                    break;
-                case 'd': // 1 day
-                    timeStart = timeEnd - 60 * 60 * 24;
-                    break;
-                case 'w': // 1 week
-                    timeStart = timeEnd - 60 * 60 * 24 * 7;
-                    break;
-                case 'M': // 1 month
-                    timeStart = timeEnd - 60 * 60 * 24 * 28;
-                    break;
-                case 'y': // 1 year
-                    timeStart = timeEnd - 60 * 60 * 24 * 365;
-                    break;
-            }
+            long timeStart = timeEnd - RrdDbUtil.msInZone(zone);
 
             FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
             req.setFilter(dataSource);
@@ -843,8 +819,9 @@ public class RMRest implements RMRestInterface {
                 } else {
                     result.append(formatter.format(values[j]));
                 }
-                if (j < values.length - 1)
+                if (j < values.length - 1) {
                     result.append(',');
+                }
             }
             result.append(']');
             if (i < dataSources.length - 1)
@@ -857,7 +834,7 @@ public class RMRest implements RMRestInterface {
 
         String ret = result.toString();
 
-        StatHistoryCaching.getInstance().addEntry(range, l1, ret);
+        StatHistoryCaching.getInstance().addEntry(range, currentTimeMillis, ret);
 
         return ret;
     }

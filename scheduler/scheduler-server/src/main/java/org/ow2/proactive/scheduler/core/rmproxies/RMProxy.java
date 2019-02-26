@@ -177,4 +177,13 @@ public class RMProxy {
             return false;
         }
     }
+
+    public boolean setTotalNumberOfPendingTasks(int totalNumberOfPendingTasks) {
+        if (proxyActiveObject != null) {
+            return proxyActiveObject.setTotalNumberOfPendingTasks(totalNumberOfPendingTasks);
+        } else {
+            logger.warn("Didn't find RM to set total number of pending tasks");
+            return false;
+        }
+    }
 }

@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.cmd.Ps;
+import org.ow2.proactive.db.RrdDbUtil;
 import org.ow2.proactive.resourcemanager.utils.RRDSigarDataStore;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
@@ -105,35 +106,7 @@ public class SigarProcesses implements SigarProcessesMXBean {
             String dataSource = RRDSigarDataStore.toDataStoreName(attrs[i] + "-" + objectName);
 
             char zone = range.charAt(0);
-            long timeStart;
-
-            switch (zone) {
-                default:
-                case 'a': // 1 minute
-                    timeStart = timeEnd - 60;
-                    break;
-                case 'm': // 10 minute
-                    timeStart = timeEnd - 60 * 10;
-                    break;
-                case 'h': // 1 hours
-                    timeStart = timeEnd - 60 * 60;
-                    break;
-                case 'H': // 8 hours
-                    timeStart = timeEnd - 60 * 60 * 8;
-                    break;
-                case 'd': // 1 day
-                    timeStart = timeEnd - 60 * 60 * 24;
-                    break;
-                case 'w': // 1 week
-                    timeStart = timeEnd - 60 * 60 * 24 * 7;
-                    break;
-                case 'M': // 1 month
-                    timeStart = timeEnd - 60 * 60 * 24 * 28;
-                    break;
-                case 'y': // 1 year
-                    timeStart = timeEnd - 60 * 60 * 24 * 365;
-                    break;
-            }
+            long timeStart = timeEnd - RrdDbUtil.msInZone(zone);
 
             FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
             req.setFilter(dataSource);

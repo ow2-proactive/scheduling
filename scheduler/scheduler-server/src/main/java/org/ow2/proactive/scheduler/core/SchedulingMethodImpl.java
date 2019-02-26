@@ -190,6 +190,13 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             schedulingMainLoopTimingLogger.printTimingsINFOLevel();
         }
 
+        final int totalNumberOfPendingTasks = jobMap.values()
+                                                    .stream()
+                                                    .map(JobDescriptor::getEligibleTasks)
+                                                    .mapToInt(Collection::size)
+                                                    .sum();
+        getRMProxiesManager().getRmProxy().setTotalNumberOfPendingTasks(totalNumberOfPendingTasks);
+
         return tasksStarted;
     }
 

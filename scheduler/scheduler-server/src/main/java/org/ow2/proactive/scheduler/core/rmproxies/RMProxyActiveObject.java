@@ -329,4 +329,9 @@ public class RMProxyActiveObject {
         return rm.areNodesRecoverable(nodes);
     }
 
+    @ImmediateService
+    public boolean setTotalNumberOfPendingTasks(int totalNumberOfPendingTasks) {
+        rm.setTotalNumberOfPendingTasks(totalNumberOfPendingTasks);
+        return true;
+    }
 }

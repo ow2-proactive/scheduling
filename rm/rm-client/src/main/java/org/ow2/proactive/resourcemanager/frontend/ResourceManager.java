@@ -557,4 +557,5 @@ public interface ResourceManager {
      */
     boolean areNodesRecoverable(NodeSet nodes);
 
+    void setTotalNumberOfPendingTasks(int totalNumberOfPendingTasks);
 }

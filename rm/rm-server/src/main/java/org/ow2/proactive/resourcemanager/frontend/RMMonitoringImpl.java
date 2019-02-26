@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.PendingTasksListener;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.*;
@@ -68,7 +69,7 @@ import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
  * @since ProActive Scheduling 0.9
  */
 @ActiveObject
-public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive, RunActive {
+public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive, RunActive, PendingTasksListener {
     private static final Logger logger = Logger.getLogger(RMMonitoringImpl.class);
 
     // Attributes
@@ -416,6 +417,11 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         RMMonitoringImpl.rmStatistics.nodeEvent(event);
         RMDBManager.getInstance().saveNodeHistory(new NodeHistory(event));
         queueEvent(event);
+    }
+
+    @Override
+    public void notifyPendingTasksCount(int count) {
+        RMMonitoringImpl.rmStatistics.notifyPendingTasksCount(count);
     }
 
     /**

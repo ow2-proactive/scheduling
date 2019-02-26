@@ -2984,6 +2984,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return true;
     }
 
+    @Override
+    public void setTotalNumberOfPendingTasks(int totalNumberOfPendingTasks) {
+        this.monitoring.notifyPendingTasksCount(totalNumberOfPendingTasks);
+    }
+
     /**
      * Add the information of the given node to the database.
      *
