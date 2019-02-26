@@ -1,0 +1,12 @@
+{
+  "@class": "org.apereo.cas.services.RegexRegisteredService",
+  "serviceId": "^https://(.+)/automation-dashboard(\\z|/.*)",
+  "name": "ProActive Automation Dashboard",
+  "id": 8,
+  "description": "ProActive dashboard for workflow automation",
+  "evaluationOrder": 3,
+  "logoutType": "FRONT_CHANNEL",
+  "attributeReleasePolicy" : {
+    "@class" : "org.jasig.cas.services.ReturnAllAttributeReleasePolicy"
+  }
+}

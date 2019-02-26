@@ -26,10 +26,12 @@
 package org.ow2.proactive.utils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.BindException;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+
+import javax.servlet.DispatcherType;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
@@ -53,6 +55,8 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.ow2.proactive.boot.microservices.iam.IAMStarter;
+import org.ow2.proactive.boot.microservices.iam.util.IAMConfiguration;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.web.WebProperties;
 import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFactory;
@@ -60,13 +64,21 @@ import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFact
 
 public class JettyStarter {
 
-    protected static final String FOLDER_TO_DEPLOY = "/dist/war/";
+    private static final String FOLDER_TO_DEPLOY = "/dist/war/";
 
     public static final String HTTP_CONNECTOR_NAME = "http";
 
     public static final String HTTPS_CONNECTOR_NAME = "https";
 
     private static final Logger logger = Logger.getLogger(JettyStarter.class);
+
+    private static final String IAM_FILTERS_CONTEXT_PATH = "/*";
+
+    private static final EnumSet IAM_FILTERS_DISPATCHERS = EnumSet.of(DispatcherType.REQUEST,
+                                                                      DispatcherType.INCLUDE,
+                                                                      DispatcherType.FORWARD,
+                                                                      DispatcherType.ASYNC,
+                                                                      DispatcherType.ERROR);
 
     /**
      * To run Jetty in standalone mode
@@ -146,6 +158,9 @@ public class JettyStarter {
                 handlerList.addHandler(redirectHandler);
             }
 
+            // Add system properties that will be needed by IAM filters
+            addIAMSystemProperties();
+
             addWarsToHandlerList(handlerList, defaultVirtualHost);
             server.setHandler(handlerList);
 
@@ -207,26 +222,29 @@ public class JettyStarter {
             secureHttpConfiguration.setSendServerVersion(false);
 
             // Connector to listen for HTTPS requests
-            ServerConnector httpsConnector = new ServerConnector(server,
-                                                                 new SslConnectionFactory(sslContextFactory,
-                                                                                          HttpVersion.HTTP_1_1.toString()),
-                                                                 new HttpConnectionFactory(secureHttpConfiguration));
-            httpsConnector.setName(HTTPS_CONNECTOR_NAME);
-            httpsConnector.setPort(httpsPort);
-            httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
+            try (ServerConnector httpsConnector = new ServerConnector(server,
+                                                                      new SslConnectionFactory(sslContextFactory,
+                                                                                               HttpVersion.HTTP_1_1.toString()),
+                                                                      new HttpConnectionFactory(secureHttpConfiguration))) {
 
-            if (redirectHttpToHttps) {
-                // The next two settings allow !403 errors to be redirected to HTTPS
-                httpConfiguration.setSecureScheme("https");
-                httpConfiguration.setSecurePort(httpsPort);
+                httpsConnector.setName(HTTPS_CONNECTOR_NAME);
+                httpsConnector.setPort(httpsPort);
+                httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
 
-                // Connector to listen for HTTP requests that are redirected to HTTPS
-                ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
+                if (redirectHttpToHttps) {
+                    // The next two settings allow !403 errors to be redirected to HTTPS
+                    httpConfiguration.setSecureScheme("https");
+                    httpConfiguration.setSecurePort(httpsPort);
 
-                connectors = new Connector[] { httpConnector, httpsConnector };
-            } else {
-                connectors = new Connector[] { httpsConnector };
+                    // Connector to listen for HTTP requests that are redirected to HTTPS
+                    ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
+
+                    connectors = new Connector[] { httpConnector, httpsConnector };
+                } else {
+                    connectors = new Connector[] { httpsConnector };
+                }
             }
+
         } else {
             ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
             httpConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
@@ -331,6 +349,10 @@ public class JettyStarter {
     private void addWarFile(HandlerList handlerList, File file, String[] virtualHost) {
         String contextPath = "/" + FilenameUtils.getBaseName(file.getName());
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
+
+        // Add IAM authentication and authorization filters
+        addIAMFilters(webApp);
+
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using war file " + file);
@@ -340,11 +362,15 @@ public class JettyStarter {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
 
+        // Add IAM authentication and authorization filters
+        addIAMFilters(webApp);
+
         // Don't scan classes for annotations. Saves 1 second at startup.
         webApp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "^$");
         webApp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", "^$");
 
         webApp.setDescriptor(new File(file, "/WEB-INF/web.xml").getAbsolutePath());
+
         webApp.setResourceBase(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using exploded war " + file);
@@ -353,6 +379,10 @@ public class JettyStarter {
     private void addStaticFolder(HandlerList handlerList, File file, String[] virtualHost) {
         String contextPath = "/" + file.getName();
         WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
+
+        // Add IAM authentication and authorization filters
+        addIAMFilters(webApp);
+
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using folder " + file);
@@ -375,6 +405,68 @@ public class JettyStarter {
         webApp.setContextPath(contextPath);
         webApp.setVirtualHosts(virtualHost);
         return webApp;
+    }
+
+    /**
+     * add IAM and PA web URLs to system properties
+     */
+    private static void addIAMSystemProperties() {
+
+        System.setProperty(IAMConfiguration.IAM_URL, IAMStarter.getIamURL());
+        System.setProperty(IAMConfiguration.IAM_LOGIN, IAMStarter.getIamURL() + IAMConfiguration.IAM_LOGIN_PAGE);
+        System.setProperty(IAMConfiguration.PA_SERVER_NAME,
+                           IAMConfiguration.IAM_PROTOCOL + IAMStarter.getConfiguration()
+                                                                     .getString(IAMConfiguration.IAM_HOST) +
+                                                            ":" + WebProperties.WEB_HTTPS_PORT.getValueAsString());
+
+        logger.debug("IAM and PA web URLs set as system properties");
+        logger.debug(IAMConfiguration.IAM_URL + ": " + System.getProperty(IAMConfiguration.IAM_URL));
+        logger.debug(IAMConfiguration.IAM_LOGIN + ": " + System.getProperty(IAMConfiguration.IAM_LOGIN));
+        logger.debug(IAMConfiguration.PA_SERVER_NAME + ": " + System.getProperty(IAMConfiguration.PA_SERVER_NAME));
+    }
+
+    /**
+     * Add IAM authentication and authorization filters to PA microservices webapp contexts
+     */
+    private void addIAMFilters(WebAppContext webApp) {
+
+        String context = webApp.getContextPath();
+
+        if ((context.equals("/studio") || context.equals("/scheduler") || context.equals("/rm") ||
+             context.equals("/automation-dashboard"))) {
+
+            // set a jetty context-param to remove jessionid from URLs
+            webApp.setInitParameter("org.eclipse.jetty.servlet.SessionIdPathParameterName", "none");
+
+            // set context-param to acquire filters' configurations from system properties
+            webApp.setInitParameter("configurationStrategy", "SYSTEM_PROPERTIES");
+
+            // Add SingleSignOutHttpSessionListener
+            webApp.addEventListener(new org.jasig.cas.client.session.SingleSignOutHttpSessionListener());
+
+            // Add CAS Single Sign Out Filter
+            webApp.addFilter(org.jasig.cas.client.session.SingleSignOutFilter.class,
+                             IAM_FILTERS_CONTEXT_PATH,
+                             IAM_FILTERS_DISPATCHERS);
+
+            // Add CAS Authentication Filter
+            webApp.addFilter(org.jasig.cas.client.authentication.AuthenticationFilter.class,
+                             IAM_FILTERS_CONTEXT_PATH,
+                             IAM_FILTERS_DISPATCHERS);
+
+            // Add CAS Validation Filter
+            webApp.addFilter(org.jasig.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter.class,
+                             IAM_FILTERS_CONTEXT_PATH,
+                             IAM_FILTERS_DISPATCHERS);
+
+            // Add CAS HttpServletRequest Wrapper Filter
+            webApp.addFilter(org.jasig.cas.client.util.HttpServletRequestWrapperFilter.class,
+                             IAM_FILTERS_CONTEXT_PATH,
+                             IAM_FILTERS_DISPATCHERS);
+
+            logger.debug("IAM authentication and authorization filters added to web application " +
+                         webApp.getContextPath());
+        }
     }
 
     private boolean isWarFile(File file) {

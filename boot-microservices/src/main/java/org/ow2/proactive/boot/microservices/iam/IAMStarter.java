@@ -99,9 +99,6 @@ public class IAMStarter {
             // load IAM configuration
             loadIAMConfiguration(iamConfigurationPath);
 
-            // build IAM URL from the loaded config
-            buildIamUrl();
-
             // build java command to launch IAM
             buildJavaCommand(paHome);
 
@@ -123,11 +120,12 @@ public class IAMStarter {
             /*
              * IAM post-startup operations
              */
+
+            // build IAM URL
+            buildIamUrl();
+
             // add SSL certificate to the current JVM instance truststore
             addSSLCertificate(paHome);
-
-            // add system properties needed by web microservices (IAM clients)
-            addIAMSystemProperties();
 
             started = true;
         }
@@ -265,22 +263,6 @@ public class IAMStarter {
                                          config.getString(IAMConfiguration.SSL_CERTTIFICATE_PASS));
 
         LOGGER.debug("SSL certificate [" + sslCertificatePath + "] successfully added to the current JVM truststore.");
-    }
-
-    /**
-     * add IAM and PA URLs to system properties
-     */
-    private static void addIAMSystemProperties() {
-
-        System.setProperty(IAMConfiguration.IAM_URL, iamURL);
-        System.setProperty(IAMConfiguration.IAM_LOGIN, iamURL + IAMConfiguration.IAM_LOGIN_PAGE);
-        System.setProperty(IAMConfiguration.PA_SERVER_NAME, "https://localhost:8443");
-
-        LOGGER.debug("IAM and PA URLs set as system properties");
-        LOGGER.debug(IAMConfiguration.IAM_URL + ": " + System.getProperty(IAMConfiguration.IAM_URL));
-        LOGGER.debug(IAMConfiguration.IAM_LOGIN + ": " + System.getProperty(IAMConfiguration.IAM_LOGIN));
-        LOGGER.debug(IAMConfiguration.PA_SERVER_NAME + ": " + System.getProperty(IAMConfiguration.PA_SERVER_NAME));
-
     }
 
     /**

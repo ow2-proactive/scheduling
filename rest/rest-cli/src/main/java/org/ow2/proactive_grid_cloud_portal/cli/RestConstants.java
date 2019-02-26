@@ -30,7 +30,7 @@ import java.io.File;
 
 public class RestConstants {
 
-    public static final String DFLT_REST_SCHEDULER_URL = "http://localhost:8080/rest";
+    public static final String DFLT_REST_SCHEDULER_URL = "https://localhost:8443/rest";
 
     public static final String SCHEDULER_RESOURCE_TYPE = "scheduler";
 
