@@ -190,13 +190,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             schedulingMainLoopTimingLogger.printTimingsINFOLevel();
         }
 
-        final int totalNumberOfPendingTasks = jobMap.values()
-                                                    .stream()
-                                                    .map(JobDescriptor::getEligibleTasks)
-                                                    .mapToInt(Collection::size)
-                                                    .sum();
-        getRMProxiesManager().getRmProxy().setTotalNumberOfPendingTasks(totalNumberOfPendingTasks);
-
         return tasksStarted;
     }
 
@@ -208,14 +201,21 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //get rmState and update it in scheduling policy
             Set<String> freeResources = getFreeResources(currentPolicy);
             //if there is no free resources, stop it right now without starting any task
-            if (freeResources.isEmpty()) {
-                return 0;
-            }
+
             schedulingMainLoopTimingLogger.end("getFreeResources");
 
             schedulingMainLoopTimingLogger.start("getOrderedTasks");
             // ask the policy all the tasks to be schedule according to the jobs list.
             LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy = currentPolicy.getOrderedTasks(descriptors);
+
+            // eligible by policy
+            final int eligibleByPolicyTaskNumber = fullListOfTaskRetrievedFromPolicy.size();
+            getRMProxiesManager().getRmProxy().setTotalNumberOfPendingTasks(eligibleByPolicyTaskNumber);
+
+            if (freeResources.isEmpty()) {
+                return 0;
+            }
+
             schedulingMainLoopTimingLogger.end("getOrderedTasks");
 
             //if there is no task to scheduled, return without starting any task
