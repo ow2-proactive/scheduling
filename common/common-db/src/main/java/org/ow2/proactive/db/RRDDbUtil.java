@@ -23,10 +23,33 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive;
+package org.ow2.proactive.db;
 
-public interface PendingTasksListener {
+public class RRDDbUtil {
 
-    void notifyPendingTasksCount(int count);
-
+    /**
+     * @param zone on the possible zone: a, m, h, H, d, w, M, y.
+     * @return number of milliseconds according to the existing zones
+     */
+    public static long msInZone(char zone) {
+        switch (zone) {
+            default:
+            case 'a': // 1 minute
+                return 60;
+            case 'm': // 10 minute
+                return 60 * 10;
+            case 'h': // 1 hours
+                return 60 * 60;
+            case 'H': // 8 hours
+                return 60 * 60 * 8;
+            case 'd': // 1 day
+                return 60 * 60 * 24;
+            case 'w': // 1 week
+                return 60 * 60 * 24 * 7;
+            case 'M': // 1 month
+                return 60 * 60 * 24 * 28;
+            case 'y': // 1 year
+                return 60 * 60 * 24 * 365;
+        }
+    }
 }

@@ -330,8 +330,8 @@ public class RMProxyActiveObject {
     }
 
     @ImmediateService
-    public boolean setTotalNumberOfPendingTasks(int totalNumberOfPendingTasks) {
-        rm.setTotalNumberOfPendingTasks(totalNumberOfPendingTasks);
+    public boolean setPendingTasksCount(int pendingTasksCount) {
+        rm.setPendingTasksCount(pendingTasksCount);
         return true;
     }
 }

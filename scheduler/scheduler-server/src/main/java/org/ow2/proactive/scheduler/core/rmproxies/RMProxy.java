@@ -178,9 +178,9 @@ public class RMProxy {
         }
     }
 
-    public boolean setTotalNumberOfPendingTasks(int totalNumberOfPendingTasks) {
+    public boolean setPendingTasksCount(int pendingTasksCount) {
         if (proxyActiveObject != null) {
-            return proxyActiveObject.setTotalNumberOfPendingTasks(totalNumberOfPendingTasks);
+            return proxyActiveObject.setPendingTasksCount(pendingTasksCount);
         } else {
             logger.warn("Didn't find RM to set total number of pending tasks");
             return false;

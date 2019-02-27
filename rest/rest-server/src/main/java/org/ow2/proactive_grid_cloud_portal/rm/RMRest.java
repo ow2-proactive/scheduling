@@ -38,7 +38,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -82,7 +81,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.RrdDbUtil;
+import org.ow2.proactive.db.RRDDbUtil;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
@@ -121,7 +120,7 @@ public class RMRest implements RMRestInterface {
                                                     "BusyNodesCount", //
                                                     "FreeNodesCount", //
                                                     "DeployingNodesCount", "DownNodesCount", //
-                                                    "NumberPendingTasks", "AvailableNodesCount", //
+                                                    "PendingTasksCount", "AvailableNodesCount", //
                                                     "AverageActivity" //
             // "MaxFreeNodes" // redundant with AvailableNodesCount
     };
@@ -804,7 +803,7 @@ public class RMRest implements RMRestInterface {
         for (int i = 0; i < dataSources.length; i++) {
             String dataSource = dataSources[i];
             char zone = range.charAt(i);
-            long timeStart = timeEnd - RrdDbUtil.msInZone(zone);
+            long timeStart = timeEnd - RRDDbUtil.msInZone(zone);
 
             FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
             req.setFilter(dataSource);

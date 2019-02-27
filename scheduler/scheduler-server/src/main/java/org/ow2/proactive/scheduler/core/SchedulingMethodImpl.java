@@ -200,7 +200,6 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             schedulingMainLoopTimingLogger.start("getFreeResources");
             //get rmState and update it in scheduling policy
             Set<String> freeResources = getFreeResources(currentPolicy);
-            //if there is no free resources, stop it right now without starting any task
 
             schedulingMainLoopTimingLogger.end("getFreeResources");
 
@@ -210,8 +209,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             // eligible by policy
             final int eligibleByPolicyTaskNumber = fullListOfTaskRetrievedFromPolicy.size();
-            getRMProxiesManager().getRmProxy().setTotalNumberOfPendingTasks(eligibleByPolicyTaskNumber);
+            getRMProxiesManager().getRmProxy().setPendingTasksCount(eligibleByPolicyTaskNumber);
 
+            //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
                 return 0;
             }

@@ -102,8 +102,8 @@ public final class AtomicRMStatisticsHolder {
         return this.readonlyStatistics.get();
     }
 
-    public void notifyPendingTasksCount(int count) {
-        this.writeonlyStatistics.notifyPendingTasksCount(count);
+    public void setPendingTasksCount(int count) {
+        this.writeonlyStatistics.setPendingTasksCount(count);
         this.swapAndUpdate();
     }
 }

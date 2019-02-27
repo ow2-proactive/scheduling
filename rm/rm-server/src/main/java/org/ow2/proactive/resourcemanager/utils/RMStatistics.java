@@ -442,7 +442,7 @@ public final class RMStatistics {
         return this.availableNodesCount;
     }
 
-    public int getNumberPendingTasks() {
+    public int getPendingTasksCount() {
         return this.pendingTasksCount;
     }
 
@@ -588,7 +588,7 @@ public final class RMStatistics {
         return (((double) v2 / total) * 100);
     }
 
-    public void notifyPendingTasksCount(int count) {
-        this.pendingTasksCount = count;
+    public void setPendingTasksCount(int pendingTasksCount) {
+        this.pendingTasksCount = pendingTasksCount;
     }
 }
