@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.cmd.Ps;
-import org.ow2.proactive.db.RRDDbUtil;
+import org.ow2.proactive.resourcemanager.common.util.RRDDbUtil;
 import org.ow2.proactive.resourcemanager.utils.RRDSigarDataStore;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
