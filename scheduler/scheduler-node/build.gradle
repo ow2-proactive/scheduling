@@ -45,6 +45,20 @@ task stub(type: StubTask) {
 }
 serialver.dependsOn stub
 
+test {
+    exclude 'functionaltests/**'
+    exclude 'unittests/**'
+    exclude 'unitTests/**'
+    exclude 'performancetests/**'
+
+    if(Boolean.valueOf(System.getProperty("java.awt.headless"))){
+        exclude 'org/ow2/proactive_grid_cloud_portal/cli/**'
+    }
+    systemProperties << ['java.security.policy': file("$rootDir/config/security.java.policy-server").absolutePath]
+    systemProperties << ['file.encoding': 'UTF-8']
+    systemProperties << ['proactive.home': rootDir.absolutePath]
+}
+
 task('functionalTest', type: Test).configure rootProject.schedulingFunctionalTestConfiguration
 
 ext.oneJarManifest = manifest {

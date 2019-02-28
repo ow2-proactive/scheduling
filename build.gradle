@@ -198,6 +198,7 @@ ext.schedulingFunctionalTestConfiguration = {
         include 'functionaltests/RegressionTestSuite*'
     }
 
+    systemProperties << ['proactive.home': rootDir.absolutePath]
     systemProperties << ['pa.rm.home': rootDir.absolutePath]
     systemProperties << ['pa.scheduler.home': rootDir.absolutePath]
     systemProperties << ['proactive.communication.protocol': 'pnp']
