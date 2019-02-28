@@ -31,6 +31,7 @@ import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -200,15 +201,25 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             schedulingMainLoopTimingLogger.start("getFreeResources");
             //get rmState and update it in scheduling policy
             Set<String> freeResources = getFreeResources(currentPolicy);
-            //if there is no free resources, stop it right now without starting any task
-            if (freeResources.isEmpty()) {
-                return 0;
-            }
+
             schedulingMainLoopTimingLogger.end("getFreeResources");
 
             schedulingMainLoopTimingLogger.start("getOrderedTasks");
             // ask the policy all the tasks to be schedule according to the jobs list.
             LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy = currentPolicy.getOrderedTasks(descriptors);
+
+            //if there is no free resources, stop it right now without starting any task
+            if (freeResources.isEmpty()) {
+
+                final int eligibleByPolicy = fullListOfTaskRetrievedFromPolicy.stream()
+                                                                              .mapToInt(TaskDescriptor::getNumberOfNodesNeeded)
+                                                                              .sum();
+                // eligible by policy
+                getRMProxiesManager().getRmProxy().setPendingTasksCount(eligibleByPolicy);
+
+                return 0;
+            }
+
             schedulingMainLoopTimingLogger.end("getOrderedTasks");
 
             //if there is no task to scheduled, return without starting any task
@@ -264,6 +275,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         int numberOfTaskStarted = 0;
 
         VariableBatchSizeIterator progressiveIterator = new VariableBatchSizeIterator(fullListOfTaskRetrievedFromPolicy);
+
+        Set<EligibleTaskDescriptor> rest = new HashSet<>(fullListOfTaskRetrievedFromPolicy);
 
         while (progressiveIterator.hasMoreElements() && !freeResources.isEmpty()) {
 
@@ -349,6 +362,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                             schedulingMainLoopTimingLogger.start("createExecution");
 
                             if (createExecution(nodeSet, node, currentJob, internalTask, taskDescriptor)) {
+                                rest.remove(taskDescriptor);
                                 numberOfTaskStarted++;
                             }
                             schedulingMainLoopTimingLogger.end("createExecution");
@@ -400,6 +414,12 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 break;
             }
         }
+
+        // number of nodes needed to start all pending tasks
+        final int pendingTasksCount = rest.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
+
+        getRMProxiesManager().getRmProxy().setPendingTasksCount(pendingTasksCount);
+
         return numberOfTaskStarted;
     }
 

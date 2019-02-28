@@ -99,6 +99,8 @@ public final class RMStatistics {
     /** A time stamp used for cumulative times computation */
     private long previousTimeStamp;
 
+    private int pendingTasksCount;
+
     /**
      * Creates a new instance of the this class.
      */
@@ -119,6 +121,7 @@ public final class RMStatistics {
         this.maxBusyNodes = 0;
         this.maxToBeRemovedNodes = 0;
         this.maxDownNodes = 0;
+        this.pendingTasksCount = 0;
 
         // Initialize all cumulative times
         this.cumulativeInactivityTime = 0;
@@ -160,6 +163,7 @@ public final class RMStatistics {
         this.cumulativeInactivityTime = rmStatistics.cumulativeInactivityTime;
         this.cumulativeActivityTime = rmStatistics.cumulativeActivityTime;
         this.previousTimeStamp = rmStatistics.previousTimeStamp;
+        this.pendingTasksCount = rmStatistics.pendingTasksCount;
         return this;
     }
 
@@ -438,6 +442,10 @@ public final class RMStatistics {
         return this.availableNodesCount;
     }
 
+    public int getPendingTasksCount() {
+        return this.pendingTasksCount;
+    }
+
     /**
      * Returns the current number of nodes in {@link NodeState#CONFIGURING} state.
      * @return the current number of nodes in {@link NodeState#CONFIGURING} state.
@@ -580,4 +588,7 @@ public final class RMStatistics {
         return (((double) v2 / total) * 100);
     }
 
+    public void setPendingTasksCount(int pendingTasksCount) {
+        this.pendingTasksCount = pendingTasksCount;
+    }
 }

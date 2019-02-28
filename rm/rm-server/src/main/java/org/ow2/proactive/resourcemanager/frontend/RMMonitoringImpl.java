@@ -418,6 +418,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         queueEvent(event);
     }
 
+    public void setPendingTasksCount(int count) {
+        RMMonitoringImpl.rmStatistics.setPendingTasksCount(count);
+    }
+
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeSourceEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent)
      */
