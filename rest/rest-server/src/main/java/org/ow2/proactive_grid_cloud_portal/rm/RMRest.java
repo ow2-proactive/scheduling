@@ -81,7 +81,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.db.RRDDbUtil;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
