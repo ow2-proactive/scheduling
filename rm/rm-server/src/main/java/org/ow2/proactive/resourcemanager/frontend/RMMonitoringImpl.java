@@ -409,6 +409,10 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         }
     }
 
+    public void nodeEventOnlyForStatistic(RMNodeEvent event) {
+        rmStatistics.nodeEvent(event);
+    }
+
     /**
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
