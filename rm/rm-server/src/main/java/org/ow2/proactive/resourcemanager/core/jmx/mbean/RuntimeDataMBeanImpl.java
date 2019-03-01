@@ -33,7 +33,7 @@ import javax.management.StandardMBean;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.jmx.Chronological;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
-import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
+import org.ow2.proactive.resourcemanager.utils.RMStatistics;
 
 
 /**
@@ -51,7 +51,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     /**
      * The reference on the statistics holder.
      */
-    protected final AtomicRMStatisticsHolder rmStatisticsHolder;
+    protected final RMStatistics rmStatisticsHolder;
 
     protected int internalClientsCount = 0;
 
@@ -63,7 +63,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      * JMX design patterns for Management Interfaces, or if <var>this</var> does not
      * implement the specified interface.
      */
-    public RuntimeDataMBeanImpl(final AtomicRMStatisticsHolder rmStatisticsHolder) throws NotCompliantMBeanException {
+    public RuntimeDataMBeanImpl(final RMStatistics rmStatisticsHolder) throws NotCompliantMBeanException {
         super(RuntimeDataMBean.class);
         this.rmStatisticsHolder = rmStatisticsHolder;
     }
@@ -72,7 +72,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getStatus()
      */
     public String getStatus() {
-        return this.rmStatisticsHolder.getStatistics().getRMStatus();
+        return this.rmStatisticsHolder.getRMStatus();
     }
 
     /**
@@ -80,28 +80,28 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     @Chronological
     public int getAvailableNodesCount() {
-        return this.rmStatisticsHolder.getStatistics().getAvailableNodesCount();
+        return this.rmStatisticsHolder.getAvailableNodesCount();
     }
 
     /**
      * @see RuntimeDataMBean#getConfiguringNodesCount()
      */
     public int getConfiguringNodesCount() {
-        return this.rmStatisticsHolder.getStatistics().getConfiguringNodesCount();
+        return this.rmStatisticsHolder.getConfiguringNodesCount();
     }
 
     /**
      * @see  RuntimeDataMBean#getLostNodesCount()
      */
     public int getLostNodesCount() {
-        return this.rmStatisticsHolder.getStatistics().getLostNodesCount();
+        return this.rmStatisticsHolder.getLostNodesCount();
     }
 
     /**
      * @see RuntimeDataMBean#getDeployingNodesCount()
      */
     public int getDeployingNodesCount() {
-        return this.rmStatisticsHolder.getStatistics().getDeployingNodesCount();
+        return this.rmStatisticsHolder.getDeployingNodesCount();
     }
 
     /**
@@ -109,7 +109,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     @Chronological
     public int getFreeNodesCount() {
-        return this.rmStatisticsHolder.getStatistics().getFreeNodesCount();
+        return this.rmStatisticsHolder.getFreeNodesCount();
     }
 
     /**
@@ -117,7 +117,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     @Chronological
     public int getBusyNodesCount() {
-        return this.rmStatisticsHolder.getStatistics().getBusyNodesCount();
+        return this.rmStatisticsHolder.getBusyNodesCount();
     }
 
     /**
@@ -125,7 +125,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     @Chronological
     public int getToBeReleasedNodesCount() {
-        return this.rmStatisticsHolder.getStatistics().getToBeRemovedNodesCount();
+        return this.rmStatisticsHolder.getToBeRemovedNodesCount();
     }
 
     /**
@@ -133,28 +133,28 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     @Chronological
     public int getDownNodesCount() {
-        return this.rmStatisticsHolder.getStatistics().getDownNodesCount();
+        return this.rmStatisticsHolder.getDownNodesCount();
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxConfiguringNodes()
      */
     public int getMaxConfiguringNodes() {
-        return this.rmStatisticsHolder.getStatistics().getMaxConfiguringNodes();
+        return this.rmStatisticsHolder.getMaxConfiguringNodes();
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxLostNodes()
      */
     public int getMaxLostNodes() {
-        return this.rmStatisticsHolder.getStatistics().getMaxLostNodes();
+        return this.rmStatisticsHolder.getMaxLostNodes();
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxDeployingNodes()
      */
     public int getMaxDeployingNodes() {
-        return this.rmStatisticsHolder.getStatistics().getMaxDeployingNodes();
+        return this.rmStatisticsHolder.getMaxDeployingNodes();
     }
 
     /**
@@ -162,28 +162,28 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     @Chronological
     public int getMaxFreeNodes() {
-        return this.rmStatisticsHolder.getStatistics().getMaxFreeNodes();
+        return this.rmStatisticsHolder.getMaxFreeNodes();
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxBusyNodes()
      */
     public int getMaxBusyNodes() {
-        return this.rmStatisticsHolder.getStatistics().getMaxBusyNodes();
+        return this.rmStatisticsHolder.getMaxBusyNodes();
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxToBeReleasedNodes()
      */
     public int getMaxToBeReleasedNodes() {
-        return this.rmStatisticsHolder.getStatistics().getToBeRemovedNodesCount();
+        return this.rmStatisticsHolder.getToBeRemovedNodesCount();
     }
 
     /**
      * @see org.ow2.proactive.resourcemanager.core.jmx.mbean.RuntimeDataMBean#getMaxDownNodes()
      */
     public int getMaxDownNodes() {
-        return this.rmStatisticsHolder.getStatistics().getMaxDownNodes();
+        return this.rmStatisticsHolder.getMaxDownNodes();
     }
 
     /**
@@ -191,7 +191,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     @Chronological
     public double getAverageActivity() {
-        return this.rmStatisticsHolder.getStatistics().getActivityTimePercentage();
+        return this.rmStatisticsHolder.getActivityTimePercentage();
     }
 
     /**
@@ -199,7 +199,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
      */
     @Chronological
     public double getAverageInactivity() {
-        return this.rmStatisticsHolder.getStatistics().getInactivityTimePercentage();
+        return this.rmStatisticsHolder.getInactivityTimePercentage();
     }
 
     /**

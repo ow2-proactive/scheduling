@@ -167,7 +167,7 @@ public final class RMStatistics {
      * Handle incoming node events of the Resource Manager
      * @param event incoming event
      */
-    public void nodeEvent(final RMNodeEvent event) {
+    public synchronized void nodeEvent(final RMNodeEvent event) {
         // Update cumulative times based on activity and inactivity during the last time interval
         final long currentTimeStamp = System.nanoTime();
         final long timeInterval = currentTimeStamp - this.previousTimeStamp;
@@ -305,7 +305,7 @@ public final class RMStatistics {
      * Handle incoming Resource Manager events
      * @param event The Resource Manager event
      */
-    public void rmEvent(RMEvent event) {
+    public synchronized void rmEvent(RMEvent event) {
         this.rmStatus = event.getEventType();
     }
 
@@ -313,105 +313,105 @@ public final class RMStatistics {
     // INTERNAL METHODS
     ////////////////////////////
 
-    private void incrementConfiguringNodesCount() {
+    private synchronized void incrementConfiguringNodesCount() {
         // Increment and update configuring nodes max value
         if (++this.configuringNodesCount > this.maxConfiguringNodes) {
             this.maxConfiguringNodes = this.configuringNodesCount;
         }
     }
 
-    private void incrementDeployingNodesCount() {
+    private synchronized void incrementDeployingNodesCount() {
         // Increment and update deploying nodes max value
         if (++this.deployingNodesCount > this.maxDeployingNodes) {
             this.maxDeployingNodes = this.deployingNodesCount;
         }
     }
 
-    private void incrementLostNodesCount() {
+    private synchronized void incrementLostNodesCount() {
         // Increment and update lost nodes max value
         if (++this.lostNodesCount > this.maxLostNodes) {
             this.maxLostNodes = this.lostNodesCount;
         }
     }
 
-    private void incrementFreeNodesCount() {
+    private synchronized void incrementFreeNodesCount() {
         // Increment and update free nodes max value		
         if (++this.freeNodesCount > this.maxFreeNodes) {
             this.maxFreeNodes = this.freeNodesCount;
         }
     }
 
-    private void incrementBusyNodesCount() {
+    private synchronized void incrementBusyNodesCount() {
         // Increment and update busy nodes max value		
         if (++this.busyNodesCount > this.maxBusyNodes) {
             this.maxBusyNodes = this.busyNodesCount;
         }
     }
 
-    private void incrementToBeRemovedNodesCount() {
+    private synchronized void incrementToBeRemovedNodesCount() {
         // Increment and update toBeReleased nodes max value		
         if (++this.toBeRemovedNodesCount > this.maxToBeRemovedNodes) {
             this.maxToBeRemovedNodes = this.toBeRemovedNodesCount;
         }
     }
 
-    private void incrementDownNodesCount() {
+    private synchronized void incrementDownNodesCount() {
         // Increment and update down nodes max value
         if (++this.downNodesCount > this.maxDownNodes) {
             this.maxDownNodes = this.downNodesCount;
         }
     }
 
-    private void decrementAvailableNodesCount() {
+    private synchronized void decrementAvailableNodesCount() {
         // Decrement available nodes count (keep always >= 0)
         if (this.availableNodesCount > 0) {
             this.availableNodesCount--;
         }
     }
 
-    private void decrementConfiguringNodesCount() {
+    private synchronized void decrementConfiguringNodesCount() {
         // Decrement configuring nodes count (keep always >= 0)
         if (this.configuringNodesCount > 0) {
             this.configuringNodesCount--;
         }
     }
 
-    private void decrementDeployingNodesCount() {
+    private synchronized void decrementDeployingNodesCount() {
         // Decrement deploying nodes count (keep always >= 0)
         if (this.deployingNodesCount > 0) {
             this.deployingNodesCount--;
         }
     }
 
-    private void decrementLostNodesCount() {
+    private synchronized void decrementLostNodesCount() {
         // Decrement lost nodes count (keep always >= 0)
         if (this.lostNodesCount > 0) {
             this.lostNodesCount--;
         }
     }
 
-    private void decrementFreeNodesCount() {
+    private synchronized void decrementFreeNodesCount() {
         // Decrement free nodes count (keep always >= 0)
         if (this.freeNodesCount > 0) {
             this.freeNodesCount--;
         }
     }
 
-    private void decrementBusyNodesCount() {
+    private synchronized void decrementBusyNodesCount() {
         // Decrement busy nodes count (keep always >= 0)
         if (this.busyNodesCount > 0) {
             this.busyNodesCount--;
         }
     }
 
-    private void decrementToBeRemovedNodesCount() {
+    private synchronized void decrementToBeRemovedNodesCount() {
         // Decrement toBeReleased nodes count (keep always >= 0)
         if (this.toBeRemovedNodesCount > 0) {
             this.toBeRemovedNodesCount--;
         }
     }
 
-    private void decrementDownNodesCount() {
+    private synchronized void decrementDownNodesCount() {
         // Decrement down nodes count (keep always >= 0)
         if (this.downNodesCount > 0) {
             this.downNodesCount--;
@@ -426,7 +426,7 @@ public final class RMStatistics {
      * Returns the current status of the resource manager. 
      * @return the current status of the resource manager
      */
-    public String getRMStatus() {
+    public synchronized String getRMStatus() {
         return this.rmStatus.toString();
     }
 
@@ -434,7 +434,7 @@ public final class RMStatistics {
      * Returns the current number of available nodes.
      * @return the current number of available nodes
      */
-    public int getAvailableNodesCount() {
+    public synchronized int getAvailableNodesCount() {
         return this.availableNodesCount;
     }
 
@@ -442,7 +442,7 @@ public final class RMStatistics {
      * Returns the current number of nodes in {@link NodeState#CONFIGURING} state.
      * @return the current number of nodes in {@link NodeState#CONFIGURING} state.
      */
-    public int getConfiguringNodesCount() {
+    public synchronized int getConfiguringNodesCount() {
         return this.configuringNodesCount;
     }
 
@@ -450,7 +450,7 @@ public final class RMStatistics {
      * Returns the current number of nodes in {@link NodeState#DEPLOYING} state.
      * @return the current number of nodes in {@link NodeState#DEPLOYING} state.
      */
-    public int getDeployingNodesCount() {
+    public synchronized int getDeployingNodesCount() {
         return this.deployingNodesCount;
     }
 
@@ -458,7 +458,7 @@ public final class RMStatistics {
      * Returns the current number of nodes in {@link NodeState#LOST} state.
      * @return the current number of nodes in {@link NodeState#LOST} state.
      */
-    public int getLostNodesCount() {
+    public synchronized int getLostNodesCount() {
         return this.lostNodesCount;
     }
 
@@ -466,7 +466,7 @@ public final class RMStatistics {
      * Returns the current number of nodes in {@link NodeState#FREE} state.
      * @return the current number of free nodes
      */
-    public int getFreeNodesCount() {
+    public synchronized int getFreeNodesCount() {
         return this.freeNodesCount;
     }
 
@@ -474,7 +474,7 @@ public final class RMStatistics {
      * Returns the current number of nodes in {@link NodeState#BUSY} state.
      * @return the current number of busy nodes
      */
-    public int getBusyNodesCount() {
+    public synchronized int getBusyNodesCount() {
         return this.busyNodesCount;
     }
 
@@ -482,7 +482,7 @@ public final class RMStatistics {
      * Returns the current number of nodes in {@link NodeState#TO_BE_REMOVED} state.
      * @return the current number of busy nodes
      */
-    public int getToBeRemovedNodesCount() {
+    public synchronized int getToBeRemovedNodesCount() {
         return this.toBeRemovedNodesCount;
     }
 
@@ -490,7 +490,7 @@ public final class RMStatistics {
      * Returns the current number of nodes in {@link NodeState#DOWN} state.
      * @return the current number of down nodes
      */
-    public int getDownNodesCount() {
+    public synchronized int getDownNodesCount() {
         return this.downNodesCount;
     }
 
@@ -498,7 +498,7 @@ public final class RMStatistics {
      * Returns the maximum number of configuring nodes.
      * @return the maximum number of configuring nodes.
      */
-    public int getMaxConfiguringNodes() {
+    public synchronized int getMaxConfiguringNodes() {
         return this.maxConfiguringNodes;
     }
 
@@ -506,7 +506,7 @@ public final class RMStatistics {
      * Returns the maximum number of deploying nodes.
      * @return the maximum number of deploying nodes.
      */
-    public int getMaxDeployingNodes() {
+    public synchronized int getMaxDeployingNodes() {
         return this.maxDeployingNodes;
     }
 
@@ -514,7 +514,7 @@ public final class RMStatistics {
      * Returns the maximum number of lost nodes.
      * @return the maximum number of lost nodes.
      */
-    public int getMaxLostNodes() {
+    public synchronized int getMaxLostNodes() {
         return this.maxLostNodes;
     }
 
@@ -522,7 +522,7 @@ public final class RMStatistics {
      * Returns the maximum number of free nodes.
      * @return the maximum number of free nodes
      */
-    public int getMaxFreeNodes() {
+    public synchronized int getMaxFreeNodes() {
         return this.maxFreeNodes;
     }
 
@@ -530,7 +530,7 @@ public final class RMStatistics {
      * Returns the maximum number of busy nodes.
      * @return the maximum number of busy nodes
      */
-    public int getMaxBusyNodes() {
+    public synchronized int getMaxBusyNodes() {
         return this.maxBusyNodes;
     }
 
@@ -538,7 +538,7 @@ public final class RMStatistics {
      * Returns the maximum number of toBeReleased nodes.
      * @return the maximum number of toBeReleased nodes
      */
-    public int getMaxToBeReleasedNodes() {
+    public synchronized int getMaxToBeReleasedNodes() {
         return this.maxBusyNodes;
     }
 
@@ -546,7 +546,7 @@ public final class RMStatistics {
      * Returns the maximum number of down nodes.
      * @return the maximum number of down nodes
      */
-    public int getMaxDownNodes() {
+    public synchronized int getMaxDownNodes() {
         return this.maxDownNodes;
     }
 
@@ -554,7 +554,7 @@ public final class RMStatistics {
      * Returns the nodes activity time percentage.
      * @return the nodes activity time percentage
      */
-    public double getActivityTimePercentage() {
+    public synchronized double getActivityTimePercentage() {
         final long lastInterval = System.nanoTime() - this.previousTimeStamp;
         final long v1 = this.cumulativeActivityTime + (lastInterval * this.busyNodesCount);
         final long v2 = this.cumulativeInactivityTime + (lastInterval * this.freeNodesCount);
@@ -569,7 +569,7 @@ public final class RMStatistics {
      * Returns the nodes inactivity time percentage.
      * @return the nodes inactivity time percentage
      */
-    public double getInactivityTimePercentage() {
+    public synchronized double getInactivityTimePercentage() {
         final long lastInterval = System.nanoTime() - this.previousTimeStamp;
         final long v1 = this.cumulativeActivityTime + (lastInterval * this.busyNodesCount);
         final long v2 = this.cumulativeInactivityTime + (lastInterval * this.freeNodesCount);
