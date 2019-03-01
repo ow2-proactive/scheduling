@@ -65,6 +65,33 @@
             <param-value>org.atmosphere.cache.UUIDBroadcasterCache</param-value>
         </init-param>
 
+        <!-- ************************** Enhance Atmosphere Framework performance ************-->
+        <init-param>
+            <param-name>org.atmosphere.cpr.AtmosphereInterceptor.disableDefaults</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.cpr.AtmosphereInterceptor.disable</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.cpr.AtmosphereInitializer.disabled</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.cpr.scanClassPath</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.disableOnStateEvent</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>org.atmosphere.interceptor.JavaScriptProtocol.enforceAtmosphereProtocol</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <!-- *********************************************************************************-->
+
         <load-on-startup>0</load-on-startup>
         <async-supported>true</async-supported>
     </servlet>

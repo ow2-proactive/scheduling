@@ -19,6 +19,8 @@ dependencies {
     compile "org.ow2.proactive:emailnotification-addons:${schedulingVersion}"
 
     compile 'org.eclipse.jetty:jetty-webapp:9.2.24.v20180105'
+    compile 'org.eclipse.jetty:jetty-quickstart:9.2.24.v20180105'
+
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"
 
     compile project(':common:common-api')
@@ -31,8 +33,6 @@ dependencies {
     compile project(':rm:rm-server')
     compile project(':rm:rm-client')
     compile project(':rest:rest-server')
-
-
 
 
     testCompile "com.google.jimfs:jimfs:1.1"
