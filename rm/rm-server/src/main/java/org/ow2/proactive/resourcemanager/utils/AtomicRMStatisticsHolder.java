@@ -69,7 +69,7 @@ public final class AtomicRMStatisticsHolder {
      * Transmits the incoming node events to the statistics.
      * @param event incoming event
      */
-    public void nodeEvent(final RMNodeEvent event) {
+    public synchronized void nodeEvent(final RMNodeEvent event) {
         this.writeonlyStatistics.nodeEvent(event);
         this.swapAndUpdate();
     }
@@ -78,7 +78,7 @@ public final class AtomicRMStatisticsHolder {
      * Transmits the incoming Resource Manager events to the statistics.
      * @param event incoming event
      */
-    public void rmEvent(final RMEvent event) {
+    public synchronized void rmEvent(final RMEvent event) {
         this.writeonlyStatistics.rmEvent(event);
         this.swapAndUpdate();
     }
@@ -86,7 +86,7 @@ public final class AtomicRMStatisticsHolder {
     /**
      * Atomically swaps in and out, then updates the out.
      */
-    private void swapAndUpdate() {
+    private synchronized void swapAndUpdate() {
         // First atomically replace read-only by write-only
         final RMStatistics oldReadonlyStatistics = this.readonlyStatistics.getAndSet(this.writeonlyStatistics);
         // reuse old and update its values
@@ -98,11 +98,11 @@ public final class AtomicRMStatisticsHolder {
      * the caller of this method has called <code>startReadStatistics</code>.
      * @return the resource manager statistics
      */
-    public RMStatistics getStatistics() {
+    public synchronized RMStatistics getStatistics() {
         return this.readonlyStatistics.get();
     }
 
-    public void setPendingTasksCount(int count) {
+    public synchronized void setPendingTasksCount(int count) {
         this.writeonlyStatistics.setPendingTasksCount(count);
         this.swapAndUpdate();
     }
