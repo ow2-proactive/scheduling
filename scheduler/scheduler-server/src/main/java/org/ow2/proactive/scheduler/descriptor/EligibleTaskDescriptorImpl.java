@@ -67,11 +67,11 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
 
     /** list of parent tasks for this task (null if jobType!=TASK_FLOW) */
     @XmlTransient
-    private Vector<TaskDescriptor> parents;
+    private transient Vector<TaskDescriptor> parents;
 
     /** list of ordered children tasks for this task (null if jobType!=TASK_FLOW) */
     @XmlTransient
-    private Vector<TaskDescriptor> children;
+    private transient Vector<TaskDescriptor> children;
 
     /**
      * Get a new eligible task descriptor using a taskDescriptor.
