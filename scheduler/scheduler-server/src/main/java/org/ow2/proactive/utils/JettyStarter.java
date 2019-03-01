@@ -26,7 +26,6 @@
 package org.ow2.proactive.utils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.BindException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.quickstart.QuickStartWebApp;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -60,7 +60,7 @@ import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorageSupportFact
 
 public class JettyStarter {
 
-    protected static final String FOLDER_TO_DEPLOY = "/dist/war/";
+    private static final String FOLDER_TO_DEPLOY = "/dist/war/";
 
     public static final String HTTP_CONNECTOR_NAME = "http";
 
@@ -207,26 +207,29 @@ public class JettyStarter {
             secureHttpConfiguration.setSendServerVersion(false);
 
             // Connector to listen for HTTPS requests
-            ServerConnector httpsConnector = new ServerConnector(server,
-                                                                 new SslConnectionFactory(sslContextFactory,
-                                                                                          HttpVersion.HTTP_1_1.toString()),
-                                                                 new HttpConnectionFactory(secureHttpConfiguration));
-            httpsConnector.setName(HTTPS_CONNECTOR_NAME);
-            httpsConnector.setPort(httpsPort);
-            httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
+            try (ServerConnector httpsConnector = new ServerConnector(server,
+                                                                      new SslConnectionFactory(sslContextFactory,
+                                                                                               HttpVersion.HTTP_1_1.toString()),
+                                                                      new HttpConnectionFactory(secureHttpConfiguration))) {
 
-            if (redirectHttpToHttps) {
-                // The next two settings allow !403 errors to be redirected to HTTPS
-                httpConfiguration.setSecureScheme("https");
-                httpConfiguration.setSecurePort(httpsPort);
+                httpsConnector.setName(HTTPS_CONNECTOR_NAME);
+                httpsConnector.setPort(httpsPort);
+                httpsConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
 
-                // Connector to listen for HTTP requests that are redirected to HTTPS
-                ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
+                if (redirectHttpToHttps) {
+                    // The next two settings allow !403 errors to be redirected to HTTPS
+                    httpConfiguration.setSecureScheme("https");
+                    httpConfiguration.setSecurePort(httpsPort);
 
-                connectors = new Connector[] { httpConnector, httpsConnector };
-            } else {
-                connectors = new Connector[] { httpsConnector };
+                    // Connector to listen for HTTP requests that are redirected to HTTPS
+                    ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
+
+                    connectors = new Connector[] { httpConnector, httpsConnector };
+                } else {
+                    connectors = new Connector[] { httpsConnector };
+                }
             }
+
         } else {
             ServerConnector httpConnector = createHttpConnector(server, httpConfiguration, httpPort);
             httpConnector.setIdleTimeout(WebProperties.WEB_IDLE_TIMEOUT.getValueAsLong());
@@ -277,7 +280,7 @@ public class JettyStarter {
     }
 
     private String getApplicationUrl(String httpProtocol, String schedulerHost, int restPort,
-            WebAppContext webAppContext) {
+            QuickStartWebApp webAppContext) {
         return httpProtocol + "://" + schedulerHost + ":" + restPort + webAppContext.getContextPath();
     }
 
@@ -287,11 +290,11 @@ public class JettyStarter {
         ArrayList<String> applicationsUrls = new ArrayList<>();
         if (handlerList.getHandlers() != null) {
             for (Handler handler : handlerList.getHandlers()) {
-                if (!(handler instanceof WebAppContext)) {
+                if (!(handler instanceof QuickStartWebApp)) {
                     continue;
                 }
 
-                WebAppContext webAppContext = (WebAppContext) handler;
+                QuickStartWebApp webAppContext = (QuickStartWebApp) handler;
                 Throwable startException = webAppContext.getUnavailableException();
                 if (startException == null) {
                     if (!"/".equals(webAppContext.getContextPath())) {
@@ -330,7 +333,7 @@ public class JettyStarter {
 
     private void addWarFile(HandlerList handlerList, File file, String[] virtualHost) {
         String contextPath = "/" + FilenameUtils.getBaseName(file.getName());
-        WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
+        WebAppContext webApp = createWebAppContext(contextPath, virtualHost, true);
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using war file " + file);
@@ -338,13 +341,12 @@ public class JettyStarter {
 
     private void addExplodedWebApp(HandlerList handlerList, File file, String[] virtualHost) {
         String contextPath = "/" + file.getName();
-        WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
+        WebAppContext webApp = createWebAppContext(contextPath, virtualHost, true);
 
         // Don't scan classes for annotations. Saves 1 second at startup.
         webApp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern", "^$");
         webApp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern", "^$");
 
-        webApp.setDescriptor(new File(file, "/WEB-INF/web.xml").getAbsolutePath());
         webApp.setResourceBase(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using exploded war " + file);
@@ -352,7 +354,7 @@ public class JettyStarter {
 
     private void addStaticFolder(HandlerList handlerList, File file, String[] virtualHost) {
         String contextPath = "/" + file.getName();
-        WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
+        WebAppContext webApp = createWebAppContext(contextPath, virtualHost, false);
         webApp.setWar(file.getAbsolutePath());
         handlerList.addHandler(webApp);
         logger.debug("Deploying " + contextPath + " using folder " + file);
@@ -361,14 +363,26 @@ public class JettyStarter {
     private void addGetStartedApplication(HandlerList handlerList, File file, String[] virtualHost) {
         if (file.exists()) {
             String contextPath = "/";
-            WebAppContext webApp = createWebAppContext(contextPath, virtualHost);
+            WebAppContext webApp = createWebAppContext(contextPath, virtualHost, false);
             webApp.setWar(file.getAbsolutePath());
             handlerList.addHandler(webApp);
         }
     }
 
-    private WebAppContext createWebAppContext(String contextPath, String[] virtualHost) {
-        WebAppContext webApp = new WebAppContext();
+    private WebAppContext createWebAppContext(String contextPath, String[] virtualHost, boolean quickstart) {
+
+        WebAppContext webApp;
+        if (quickstart) {
+            webApp = new QuickStartWebApp();
+
+            // Parameters that may optimize webapp deployment
+            ((QuickStartWebApp) webApp).setAutoPreconfigure(true);
+            webApp.setInitParameter("org.eclipse.jetty.jsp.precompiled", "true");
+
+        } else {
+            webApp = new WebAppContext();
+        }
+
         webApp.setParentLoaderPriority(true);
         // The following setting allows to avoid conflicts between server jackson jars and individual war jackson versions.
         webApp.addServerClass("com.fasterxml.jackson.");
