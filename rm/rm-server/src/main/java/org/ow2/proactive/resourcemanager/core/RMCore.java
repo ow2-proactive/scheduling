@@ -2236,7 +2236,11 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
-    private void registerAndEmitNodeEvent(final RMNodeEvent event) {
+    public void nodeEventOnlyForStatistic(RMNodeEvent event) {
+        monitoring.nodeEventOnlyForStatistic(event);
+    }
+
+    public void registerAndEmitNodeEvent(final RMNodeEvent event) {
         this.monitoring.nodeEvent(event);
     }
 
