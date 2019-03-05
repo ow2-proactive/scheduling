@@ -238,6 +238,28 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeState = state;
     }
 
+    public RMNodeEvent(RMEventType eventType, NodeState state, NodeState previousState) {
+        super(eventType);
+
+        this.nodeUrl = null;
+        this.nodeSource = null;
+        this.PADName = null;
+        this.VnName = null;
+        this.hostName = null;
+        this.VMName = null;
+        this.nodeProvider = null;
+        this.nodeOwner = null;
+        this.description = null;
+        this.defaultJMXUrl = null;
+        this.proactiveJMXUrl = null;
+        this.isLocked = false;
+        this.lockTime = -1;
+        this.nodeLocker = null;
+
+        this.nodeState = state;
+        this.previousNodeState = previousState;
+    }
+
     @Override
     public String getKey() {
         return getNodeUrl();

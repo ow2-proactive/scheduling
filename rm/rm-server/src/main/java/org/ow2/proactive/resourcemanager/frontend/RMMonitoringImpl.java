@@ -51,7 +51,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.utils.AtomicRMStatisticsHolder;
+import org.ow2.proactive.resourcemanager.utils.RMStatistics;
 
 
 /**
@@ -79,7 +79,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     private transient ExecutorService eventDispatcherThreadPool;
 
     /** Resource Manager's statistics */
-    public static final AtomicRMStatisticsHolder rmStatistics = new AtomicRMStatisticsHolder();
+    public static final RMStatistics rmStatistics = new RMStatistics();
 
     // ----------------------------------------------------------------------//
     // CONSTRUTORS
