@@ -38,7 +38,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -88,6 +87,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
+import org.ow2.proactive.resourcemanager.common.util.RRDDbUtil;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -119,9 +119,9 @@ public class RMRest implements RMRestInterface {
                                                     // "ToBeReleasedNodesCo", // useless info
                                                     "BusyNodesCount", //
                                                     "FreeNodesCount", //
-                                                    "DownNodesCount", //
-                                                    "AvailableNodesCount", //
-                                                    "AverageActivity", //
+                                                    "DeployingNodesCount", "DownNodesCount", //
+                                                    "PendingTasksCount", "AvailableNodesCount", //
+                                                    "AverageActivity" //
             // "MaxFreeNodes" // redundant with AvailableNodesCount
     };
 
@@ -759,9 +759,11 @@ public class RMRest implements RMRestInterface {
             range = range.substring(0, dataSources.length);
         }
         // complete range if too short
-        while (range.length() < dataSources.length) {
-            range += 'a';
+        StringBuilder rangeBuilder = new StringBuilder(range);
+        while (rangeBuilder.length() < dataSources.length) {
+            rangeBuilder.append('a');
         }
+        range = rangeBuilder.toString();
 
         StatHistoryCacheEntry cache = StatHistoryCaching.getInstance().getEntry(range);
         // found unexpired cache entry matching the parameters: return it immediately
@@ -769,7 +771,7 @@ public class RMRest implements RMRestInterface {
             return cache.getValue();
         }
 
-        long l1 = System.currentTimeMillis();
+        long currentTimeMillis = System.currentTimeMillis();
 
         ObjectName on = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME);
         AttributeList attrs = rm.getMBeanAttributes(on, new String[] { "StatisticHistory" });
@@ -801,35 +803,7 @@ public class RMRest implements RMRestInterface {
         for (int i = 0; i < dataSources.length; i++) {
             String dataSource = dataSources[i];
             char zone = range.charAt(i);
-            long timeStart;
-
-            switch (zone) {
-                default:
-                case 'a': // 1 minute
-                    timeStart = timeEnd - 60;
-                    break;
-                case 'm': // 10 minute
-                    timeStart = timeEnd - 60 * 10;
-                    break;
-                case 'h': // 1 hours
-                    timeStart = timeEnd - 60 * 60;
-                    break;
-                case 'H': // 8 hours
-                    timeStart = timeEnd - 60 * 60 * 8;
-                    break;
-                case 'd': // 1 day
-                    timeStart = timeEnd - 60 * 60 * 24;
-                    break;
-                case 'w': // 1 week
-                    timeStart = timeEnd - 60 * 60 * 24 * 7;
-                    break;
-                case 'M': // 1 month
-                    timeStart = timeEnd - 60 * 60 * 24 * 28;
-                    break;
-                case 'y': // 1 year
-                    timeStart = timeEnd - 60 * 60 * 24 * 365;
-                    break;
-            }
+            long timeStart = timeEnd - RRDDbUtil.msInZone(zone);
 
             FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
             req.setFilter(dataSource);
@@ -843,8 +817,9 @@ public class RMRest implements RMRestInterface {
                 } else {
                     result.append(formatter.format(values[j]));
                 }
-                if (j < values.length - 1)
+                if (j < values.length - 1) {
                     result.append(',');
+                }
             }
             result.append(']');
             if (i < dataSources.length - 1)
@@ -857,7 +832,7 @@ public class RMRest implements RMRestInterface {
 
         String ret = result.toString();
 
-        StatHistoryCaching.getInstance().addEntry(range, l1, ret);
+        StatHistoryCaching.getInstance().addEntry(range, currentTimeMillis, ret);
 
         return ret;
     }
