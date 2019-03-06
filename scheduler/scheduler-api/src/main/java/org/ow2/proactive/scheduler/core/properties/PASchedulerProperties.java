@@ -154,6 +154,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** path to the public key file which is used to encrypt credentials for authentication */
     SCHEDULER_AUTH_PUBKEY_PATH("pa.scheduler.auth.pubkey.path", PropertyType.STRING, "config/authentication/keys/pub.key"),
 
+    /** a domain name (windows active directory) which can be configured globally at the scheduler level **/
+    SCHEDULER_AUTH_GLOBAL_DOMAIN("pa.scheduler.auth.global.domain", PropertyType.STRING),
+
     /** 
      * LDAP Authentication configuration file path, used to set LDAP configuration properties
      * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)

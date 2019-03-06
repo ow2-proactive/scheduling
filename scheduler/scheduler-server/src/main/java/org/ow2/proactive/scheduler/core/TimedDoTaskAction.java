@@ -162,6 +162,11 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
     private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException {
         CredData decryptedUserCredentials = job.getCredentials().decrypt(corePrivateKey);
 
+        if (PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.isSet() &&
+            decryptedUserCredentials.getDomain() == null) {
+            decryptedUserCredentials.setDomain(PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.getValueAsString());
+        }
+
         enrichWithThirdPartyCredentials(decryptedUserCredentials);
 
         PublicKey nodePublicKey = launcher.generatePublicKey();
