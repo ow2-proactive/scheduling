@@ -29,17 +29,23 @@ public class RRDDbUtil {
 
     /**
      * @param zone on the possible zone: a, m, h, H, d, w, M, y.
-     * @return number of milliseconds according to the existing zones
+     * @return number of seconds according to the existing zones
      */
-    public static long msInZone(char zone) {
+    public static long secondsInZone(char zone) {
         switch (zone) {
             default:
             case 'a': // 1 minute
                 return 60;
-            case 'm': // 10 minute
+            case 'm': // 10 minutes
                 return 60 * 10;
-            case 'h': // 1 hours
+            case 't': // 30 minutes
+                return 60 * 30;
+            case 'h': // 1 hour
                 return 60 * 60;
+            case 'j': // 2 hours
+                return 60 * 60 * 2;
+            case 'k': // 4 hours
+                return 60 * 60 * 4;
             case 'H': // 8 hours
                 return 60 * 60 * 8;
             case 'd': // 1 day

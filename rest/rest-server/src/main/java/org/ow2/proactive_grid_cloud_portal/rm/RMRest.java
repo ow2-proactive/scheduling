@@ -803,7 +803,7 @@ public class RMRest implements RMRestInterface {
         for (int i = 0; i < dataSources.length; i++) {
             String dataSource = dataSources[i];
             char zone = range.charAt(i);
-            long timeStart = timeEnd - RRDDbUtil.msInZone(zone);
+            long timeStart = timeEnd - RRDDbUtil.secondsInZone(zone);
 
             FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
             req.setFilter(dataSource);
