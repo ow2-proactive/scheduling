@@ -115,7 +115,7 @@ import org.rrd4j.core.RrdDb;
 public class RMRest implements RMRestInterface {
 
     protected static final String[] dataSources = { "AvailableNodesCount", "FreeNodesCount", "PendingTasksCount",
-                                                    "BusyNodesCount", "DeployingNodesCount", "ConfigNodesCount", // it is Config and not Configuring because RRDDataStore limits name 20 characters
+                                                    "BusyNodesCount", "DeployingNodesCount", "ConfiguringNodesCount", // it is Config and not Configuring because RRDDataStore limits name 20 characters
                                                     "DownNodesCount", "LostNodesCount", "AverageActivity" };
 
     private SessionStore sessionStore = SharedSessionStore.getInstance();

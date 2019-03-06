@@ -1,5 +1,5 @@
 dependencies {
-    compile 'org.rrd4j:rrd4j:2.2.1'
+    compile 'org.rrd4j:rrd4j:3.5'
     compile group: 'net.sf.jpam', name: 'jpam', version: '1.1'
 
     compile "org.objectweb.proactive:programming-core:${programmingVersion}"

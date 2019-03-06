@@ -29,7 +29,7 @@ dependencies {
     compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.17.Final'
     compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.17.Final'
 
-    compile 'org.rrd4j:rrd4j:2.2.1'
+    compile 'org.rrd4j:rrd4j:3.5'
     compile 'net.sf.dozer:dozer:5.5.1'
     compile 'commons-io:commons-io:2.5'
     compile 'commons-codec:commons-codec:1.10'

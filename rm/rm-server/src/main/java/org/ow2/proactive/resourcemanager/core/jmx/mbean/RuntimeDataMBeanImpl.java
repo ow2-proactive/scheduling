@@ -87,10 +87,10 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     }
 
     /**
-     * @see RuntimeDataMBean#getConfigNodesCount()
+     * @see RuntimeDataMBean#getConfiguringNodesCount()
      */
     @Chronological
-    public int getConfigNodesCount() {
+    public int getConfiguringNodesCount() {
         return this.rmStatistics.getConfiguringNodesCount();
     }
 

@@ -85,10 +85,6 @@ public class RRDDataStore extends Thread {
                     mbean.getClass().getMethod("get" + attrInfo.getName()).getAnnotation(Chronological.class) != null) {
 
                     String sourceName = attrInfo.getName();
-                    if (sourceName.length() > 20) {
-                        // only 20 symbols allowed in data source name
-                        sourceName = sourceName.substring(0, 19);
-                    }
                     dataSources.put(sourceName, attrInfo.getName());
                 }
             } catch (Exception e) {
