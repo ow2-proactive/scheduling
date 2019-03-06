@@ -95,6 +95,45 @@ copy_configs()
     cd "$OLD_PWD"
 }
 
+install_binaries()
+{
+    if ! which rsync > /dev/null 2>&1; then
+        echo "rsync is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+           $PKG_TOOL -y install rsync
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+
+    if ! which zip > /dev/null 2>&1; then
+        echo "zip is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+           $PKG_TOOL -y install zip
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+
+    if ! which unzip > /dev/null 2>&1; then
+        echo "unzip is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+           $PKG_TOOL -y install unzip
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+
+    if ! which git > /dev/null 2>&1; then
+        echo "Git is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+            $PKG_TOOL -y install git
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+}
+
 echo "This command will patch the ProActive installation in $PA_DIR using the unmodified same version package in $ORIGINAL_DIR. The original configuration files and git history are stored in an archive file for backup purpose."
 if confirm "Proceed? [Y/n] "; then
 
@@ -105,6 +144,8 @@ if confirm "Proceed? [Y/n] "; then
     echo " 3) make sure all file belong to the correct user and not to root"
     echo ""
     echo "Beginning the patch procedure..."
+
+    install_binaries
 
     OLD_PWD=$(pwd)
 

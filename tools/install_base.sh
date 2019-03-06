@@ -205,6 +205,45 @@ config/web/truststore
     cd "$OLD_PWD"
 }
 
+install_binaries()
+{
+    if ! which rsync > /dev/null 2>&1; then
+        echo "rsync is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+           $PKG_TOOL -y install rsync
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+
+    if ! which zip > /dev/null 2>&1; then
+        echo "zip is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+           $PKG_TOOL -y install zip
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+
+    if ! which unzip > /dev/null 2>&1; then
+        echo "unzip is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+           $PKG_TOOL -y install unzip
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+
+    if ! which git > /dev/null 2>&1; then
+        echo "Git is not installed on this computer and is required by the ProActive installation."
+        if confirm "Do you want to install it? [Y/n] " ; then
+            $PKG_TOOL -y install git
+        else
+           echo "Installation aborted."; exit 1 ;
+        fi
+    fi
+}
+
 initial_commit()
 {
     OLD_PWD=$(pwd)
@@ -242,16 +281,8 @@ if [ ! -f "$INSTALL_PADIR/jre/bin/java" ]; then
     fi
 fi
 
-if ! which git > /dev/null 2>&1; then
-     echo "Git is not installed on this computer and is required by the ProActive installation."
-     if confirm "Do you want to install it? [Y/n] " ; then
-         if [[ "$OS" == "RedHat" ]]; then
-            $PKG_TOOL -y install git
-         elif [[ "$OS" == "Debian" ]]; then
-            $PKG_TOOL -y install git
-         fi
-     fi
-fi
+install_binaries
+
 
 # stopping service
 
