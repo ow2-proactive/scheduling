@@ -34,10 +34,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 /**
  * This class represents the statistics of the Resource Manager. Different kind of 
  * values are collected by interpreting incoming events from the Resource Manager.
- * <p>
- * An instance of this class must not be accessed and modified concurrently.
- * The concurrency is handled by the {@link AtomicRMStatisticsHolder} class. 
- * 
+ *
  * @author The ProActive Team
  * @since ProActive Scheduling 1.1
  */
