@@ -31,6 +31,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CRONParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CatalogObjectParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.JSONParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DateTimeParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DoubleParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.FloatParserValidator;
@@ -116,6 +117,8 @@ public class ModelValidator implements Validator<String> {
                 return new SPELParserValidator(removePrefix(model));
             } else if (uppercaseModel.startsWith(CatalogObjectParserValidator.CATALOG_OBJECT_TYPE)) {
                 return new CatalogObjectParserValidator(removePrefix(model));
+            } else if (uppercaseModel.startsWith(JSONParserValidator.JSON_TYPE)) {
+                return new JSONParserValidator(removePrefix(model));
             } else {
                 throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
             }

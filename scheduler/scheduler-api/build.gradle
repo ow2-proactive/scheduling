@@ -7,6 +7,10 @@ dependencies {
     compile 'msv:msv:20050913'
     compile 'commons-io:commons-io:2.5'
     compile group: 'org.springframework', name: 'spring-expression', version: '4.2.5.RELEASE'
+    compile group: 'org.codehaus.jackson', name: 'jackson-core-asl', version: '1.9.12'
+    compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.5.0'
+
+
 
     compile 'joda-time:joda-time:2.9.1'
 
