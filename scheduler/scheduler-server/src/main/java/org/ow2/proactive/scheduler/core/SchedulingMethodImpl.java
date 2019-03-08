@@ -182,6 +182,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
         // we wait for next scheduling loop and don't start any task
         if (jobMap.isEmpty()) {
+            getRMProxiesManager().getRmProxy().setPendingTasksCount(0);
             return 0;
         }
 
@@ -224,6 +225,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             //if there is no task to scheduled, return without starting any task
             if (fullListOfTaskRetrievedFromPolicy == null || fullListOfTaskRetrievedFromPolicy.isEmpty()) {
+                getRMProxiesManager().getRmProxy().setPendingTasksCount(0);
                 return 0;
             }
 
