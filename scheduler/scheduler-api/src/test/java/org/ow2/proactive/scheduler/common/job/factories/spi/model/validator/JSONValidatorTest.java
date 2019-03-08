@@ -44,11 +44,7 @@ public class JSONValidatorTest {
 
     @Test
     public void testJSONOKMultiple() throws ValidationException {
-        String value = "{\n" +
-                "  \"type\": \"string\", \n" +
-                "  \"minLength\": 3,\n" +
-                "  \"maxLength\": 7\n" +
-                "}";
+        String value = "{\n" + "  \"type\": \"string\", \n" + "  \"minLength\": 3,\n" + "  \"maxLength\": 7\n" + "}";
         Assert.assertEquals(value, new JSONValidator().validate(value, null));
     }
 
@@ -60,24 +56,19 @@ public class JSONValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue1() throws ValidationException {
-        String value = "{\n" +
-                "  type: \"string\", \n" +
-                "}";
+        String value = "{\n" + "  type: \"string\", \n" + "}";
         new JSONValidator().validate(value, null);
     }
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue2() throws ValidationException {
-        String value = "[\n" +
-                "  \"type\": \"string\", \n" +
-                "]";
+        String value = "[\n" + "  \"type\": \"string\", \n" + "]";
         new JSONValidator().validate(value, null);
     }
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue3() throws ValidationException {
-        String value = "{\n" +
-                "    123 : \"Variable1\"\n";
+        String value = "{\n" + "    123 : \"Variable1\"\n";
         new JSONValidator().validate(value, null);
     }
 
@@ -89,9 +80,7 @@ public class JSONValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void testJSONWithInvalidValue5() throws ValidationException {
-        String value = "{\n" +
-                "  \"test\" : 62GE\n" +
-                "}";
+        String value = "{\n" + "  \"test\" : 62GE\n" + "}";
         new JSONValidator().validate(value, null);
     }
 }

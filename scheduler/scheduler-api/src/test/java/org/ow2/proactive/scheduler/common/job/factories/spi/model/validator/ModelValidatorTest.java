@@ -136,8 +136,7 @@ public class ModelValidatorTest {
 
     @Test
     public void testModelValidatorJSON() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + JSONParserValidator.JSON_TYPE,
-                JSONParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + JSONParserValidator.JSON_TYPE, JSONParserValidator.class);
     }
 
     public void createAndCheckValidator(String model, Class expectedClass) throws ModelSyntaxException {

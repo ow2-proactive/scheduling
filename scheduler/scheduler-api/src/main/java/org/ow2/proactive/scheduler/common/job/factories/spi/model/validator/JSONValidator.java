@@ -25,15 +25,15 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
-
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
 /**
@@ -41,6 +41,8 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @since 06/03/2019
  */
 public class JSONValidator implements Validator<String> {
+
+    public static final String JSON_EMPTY_MODEL = "^[/{][/}]$";
 
     public JSONValidator() {
         /**
@@ -51,17 +53,23 @@ public class JSONValidator implements Validator<String> {
     @Override
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
 
-        if (!isValidJSON(parameterValue)) {
-            throw new ValidationException("Expected value should match JSON format, received " + parameterValue);
+        Pattern pattern = Pattern.compile(JSON_EMPTY_MODEL);
+        Matcher matcher = pattern.matcher(parameterValue);
+
+        try {
+            if ((parameterValue.matches(JSON_EMPTY_MODEL) && matcher.find()) || !isValidJSON(parameterValue)) {
+                throw new ValidationException("Expected value should match JSON format, received " + parameterValue);
+            }
+        } catch (Exception er) {
+            throw new ValidationException(er);
         }
         return parameterValue;
     }
 
     public boolean isValidJSON(final String json) {
-        boolean valid = false;
+        boolean valid;
         try {
-            final JsonParser parser = new ObjectMapper().getJsonFactory()
-                    .createJsonParser(json);
+            final JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(json);
             while (parser.nextToken() != null) {
             }
             valid = true;

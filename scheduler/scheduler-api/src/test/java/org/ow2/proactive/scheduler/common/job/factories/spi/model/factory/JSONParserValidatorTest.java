@@ -23,7 +23,6 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 
 import org.junit.Assert;
@@ -31,8 +30,6 @@ import org.junit.Test;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ConversionException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
-
-
 
 
 /**
@@ -43,20 +40,13 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class JSONParserValidatorTest {
 
     @Test
-    public void testJSONParserValidatorOK()
-            throws ModelSyntaxException, ValidationException, ConversionException {
-        String value = "{\n" +
-                "  \"type\": \"string\", \n" +
-                "  \"minLength\": 3,\n" +
-                "  \"maxLength\": 7\n" +
-                "}";
-        Assert.assertEquals(value,
-                new JSONParserValidator(JSONParserValidator.JSON_TYPE).parseAndValidate(value));
+    public void testJSONParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
+        String value = "{\n" + "  \"type\": \"string\", \n" + "  \"minLength\": 3,\n" + "  \"maxLength\": 7\n" + "}";
+        Assert.assertEquals(value, new JSONParserValidator(JSONParserValidator.JSON_TYPE).parseAndValidate(value));
     }
 
     @Test(expected = ValidationException.class)
-    public void testJSONParserValidatorKO()
-            throws ModelSyntaxException, ValidationException, ConversionException {
+    public void testJSONParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "\"test\" : 123";
         new JSONParserValidator(JSONParserValidator.JSON_TYPE).parseAndValidate(value);
     }
