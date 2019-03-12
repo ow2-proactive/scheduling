@@ -146,8 +146,10 @@ public class NodesRecoveryManager {
                 recoveredEligibleNodes.add(node);
             }
             if (node != null) {
-                final RMNodeEvent event = new RMNodeEvent(RMEventType.NODE_ADDED, node.getState());
-                this.rmCore.nodeEventOnlyForStatistic(event);
+                final RMNodeEvent event = node.createNodeEvent(RMEventType.NODE_ADDED,
+                                                               null,
+                                                               node.getProvider().getName());
+                this.rmCore.registerAndEmitNodeEvent(event);
             }
         }
         this.rmCore.setEligibleNodesToRecover(recoveredEligibleNodes);
