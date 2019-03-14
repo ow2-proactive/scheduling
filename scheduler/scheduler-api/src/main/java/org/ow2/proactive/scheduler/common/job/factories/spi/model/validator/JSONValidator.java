@@ -42,8 +42,6 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
  */
 public class JSONValidator implements Validator<String> {
 
-    //    public static final String JSON_NEEDED_CAR_REGEX = "[0-9a-zA-Z\{\}\":]";
-
     public JSONValidator() {
         /**
          * ProActive Empty constructor.
@@ -58,7 +56,8 @@ public class JSONValidator implements Validator<String> {
                 throw new ValidationException("Expected value should match JSON format, received " + parameterValue);
             }
         } catch (ValidationException er) {
-            throw new ValidationException(er);
+            throw new ValidationException("Validator error from JsonParser: Expected value should match JSON format, received " +
+                                          parameterValue);
         }
         return parameterValue;
     }
@@ -71,9 +70,9 @@ public class JSONValidator implements Validator<String> {
             }
             valid = true;
         } catch (JsonParseException jpe) {
-            throw new ValidationException("Validator error for JSON type : " + jpe); //jpe.printStackTrace();
+            throw new ValidationException("Validator error for JSON type : " + jpe);
         } catch (IOException ioe) {
-            throw new ValidationException("Validator I/O error for JSON type : " + ioe); //ioe.printStackTrace();
+            throw new ValidationException("Validator I/O error for JSON type : " + ioe);
         }
 
         return valid;
