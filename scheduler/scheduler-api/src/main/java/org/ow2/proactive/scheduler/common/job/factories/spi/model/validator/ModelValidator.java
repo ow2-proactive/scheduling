@@ -31,11 +31,11 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.BooleanParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CRONParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.CatalogObjectParserValidator;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.JSONParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DateTimeParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.DoubleParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.FloatParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.IntegerParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.JSONParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ListParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.LongParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelFromURLParserValidator;

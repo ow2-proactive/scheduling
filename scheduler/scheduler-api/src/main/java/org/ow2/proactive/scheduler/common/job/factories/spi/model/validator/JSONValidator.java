@@ -42,7 +42,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
  */
 public class JSONValidator implements Validator<String> {
 
-//    public static final String JSON_NEEDED_CAR_REGEX = "[0-9a-zA-Z\{\}\":]";
+    //    public static final String JSON_NEEDED_CAR_REGEX = "[0-9a-zA-Z\{\}\":]";
 
     public JSONValidator() {
         /**
@@ -63,7 +63,7 @@ public class JSONValidator implements Validator<String> {
         return parameterValue;
     }
 
-    public boolean isValidJSON(final String json) {
+    public boolean isValidJSON(final String json) throws ValidationException {
         boolean valid;
         try {
             final JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(json);
