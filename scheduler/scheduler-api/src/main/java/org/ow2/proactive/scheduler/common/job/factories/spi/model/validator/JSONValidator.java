@@ -42,7 +42,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
  */
 public class JSONValidator implements Validator<String> {
 
-    public static final String JSON_EMPTY_MODEL = "^[/{][/}]$";
+//    public static final String JSON_NEEDED_CAR_REGEX = "[0-9a-zA-Z\{\}\":]";
 
     public JSONValidator() {
         /**
@@ -53,14 +53,11 @@ public class JSONValidator implements Validator<String> {
     @Override
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
 
-        Pattern pattern = Pattern.compile(JSON_EMPTY_MODEL);
-        Matcher matcher = pattern.matcher(parameterValue);
-
         try {
-            if ((parameterValue.matches(JSON_EMPTY_MODEL) && matcher.find()) || !isValidJSON(parameterValue)) {
+            if (!isValidJSON(parameterValue)) {
                 throw new ValidationException("Expected value should match JSON format, received " + parameterValue);
             }
-        } catch (Exception er) {
+        } catch (ValidationException er) {
             throw new ValidationException(er);
         }
         return parameterValue;
@@ -74,9 +71,9 @@ public class JSONValidator implements Validator<String> {
             }
             valid = true;
         } catch (JsonParseException jpe) {
-            throw new RuntimeException("Validator error for JSON type : " + jpe); //jpe.printStackTrace();
+            throw new ValidationException("Validator error for JSON type : " + jpe); //jpe.printStackTrace();
         } catch (IOException ioe) {
-            throw new RuntimeException("Validator I/O error for JSON type : " + ioe); //ioe.printStackTrace();
+            throw new ValidationException("Validator I/O error for JSON type : " + ioe); //ioe.printStackTrace();
         }
 
         return valid;

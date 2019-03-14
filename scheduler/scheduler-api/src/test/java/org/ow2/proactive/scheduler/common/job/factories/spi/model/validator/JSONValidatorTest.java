@@ -48,7 +48,7 @@ public class JSONValidatorTest {
         Assert.assertEquals(value, new JSONValidator().validate(value, null));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void testJSONWithEmptyValue() throws ValidationException {
         String value = "{}";
         new JSONValidator().validate(value, null);
