@@ -326,7 +326,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             getAcquiredNodesName().remove(node.getNodeInformation().getName());
             this.removeNode(node);
         } catch (Exception e) {
-            logger.warn("Exception occurred while removing node " + node);
+            logger.warn("Exception occurred while removing node " + node, e);
         } finally {
             writeLock.unlock();
         }
