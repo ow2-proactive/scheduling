@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
@@ -48,23 +47,13 @@ public class JSONValidator implements Validator<String> {
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
 
         try {
-            checkValidJson(parameterValue);
-        } catch (ValidationException er) {
-            throw new ValidationException("Validator error from JsonParser: Expected value should match JSON format, received ",
-                                          parameterValue);
-        }
-        return parameterValue;
-    }
-
-    private void checkValidJson(final String json) throws ValidationException {
-        try {
-            final JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(json);
+            final JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(parameterValue);
             while (parser.nextToken() != null) {
             }
         } catch (Exception jpe) {
-            throw new ValidationException("Validator error for JSON type ", jpe);
+            throw new ValidationException("Invalid JSON: " + jpe.getMessage(), jpe);
         }
 
-        return;
+        return parameterValue;
     }
 }
