@@ -62,6 +62,20 @@ public class JobLogger {
         MDC.remove(FileAppender.FILE_NAME);
     }
 
+    public boolean isDebugEnabled() {
+        return logger.isDebugEnabled();
+    }
+
+    public void trace(JobId id, String message) {
+        updateMdcWithTaskLogFilename(id);
+        logger.trace(PREFIX + id + " " + message);
+        MDC.remove(FileAppender.FILE_NAME);
+    }
+
+    public boolean isTraceEnabled() {
+        return logger.isTraceEnabled();
+    }
+
     public void warn(JobId id, String message) {
         updateMdcWithTaskLogFilename(id);
         logger.warn(PREFIX + id + " " + message);

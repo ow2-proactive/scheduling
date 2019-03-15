@@ -33,6 +33,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyException;
 import java.util.List;
@@ -44,6 +45,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
@@ -121,10 +124,10 @@ public class JobEmailNotificationTest extends ProActiveTestClean {
     }
 
     private static boolean sendNotification(JobState jobState, SchedulerEvent event, SendMail sender)
-            throws JobEmailNotificationException {
+            throws JobEmailNotificationException, UnknownJobException, IOException, PermissionException {
         NotificationData<JobInfo> notification = getNotification(jobState, event);
         JobEmailNotification emailNotification = new JobEmailNotification(jobState, notification, sender);
-        return emailNotification.doCheckAndSend();
+        return emailNotification.doCheckAndSend(false);
     }
 
     @Before

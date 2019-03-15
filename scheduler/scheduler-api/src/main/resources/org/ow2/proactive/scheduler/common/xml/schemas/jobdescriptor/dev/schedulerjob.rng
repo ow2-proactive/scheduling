@@ -83,7 +83,7 @@
   <define name="variableName">
     <attribute name="name">
       <doc:documentation>Name of a variable</doc:documentation>
-      <data type="string"/>
+      <data type="NCName"/>
     </attribute>
   </define>
   <define name="variableValue">
@@ -160,7 +160,7 @@
   <define name="infoName">
     <attribute name="name">
       <doc:documentation>Name of the information variable</doc:documentation>
-      <data type="string"/>
+      <data type="NCName"/>
     </attribute>
   </define>
   <define name="infoValue">
@@ -296,7 +296,7 @@
   <define name="taskVariableName">
     <attribute name="name">
       <doc:documentation>Name of a variable</doc:documentation>
-      <data type="string"/>
+      <data type="NCName"/>
     </attribute>
   </define>
   <define name="taskVariableValue">

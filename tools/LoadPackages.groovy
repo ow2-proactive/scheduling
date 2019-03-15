@@ -70,7 +70,6 @@ class LoadPackages {
 
 
     def run() {
-        println "Executing " + this.SCRIPT_NAME + " ..."
         writeToOutput(" Automatic deployment of proactive packages ...")
 
         writeToOutput(" Variables : ")
@@ -84,6 +83,7 @@ class LoadPackages {
         if (examples_dir.exists()) {
             writeToOutput(this.EXAMPLES_DIR_PATH + " already exists, delete it to redeploy packages.")
             writeToOutput("Terminated.")
+            println "Workflow and utility packages already loaded"
             return
         }
 
@@ -92,8 +92,10 @@ class LoadPackages {
         if (!examples_zip.exists()) {
             writeToOutput(this.EXAMPLES_ZIP_PATH + " not found!")
             return
-
         }
+
+        println "Loading workflow and utility packages..."
+
         unzipFile(examples_zip, this.EXAMPLES_DIR_PATH)
         writeToOutput(this.EXAMPLES_ZIP_PATH + " extracted!")
 
@@ -112,7 +114,7 @@ class LoadPackages {
 
         writeToOutput(" ... proactive packages deployed!")
         writeToOutput(" Terminated.")
-        println "... " + this.SCRIPT_NAME + " done"
+        println "Packages successfully loaded"
     }
 }
 instance = null;

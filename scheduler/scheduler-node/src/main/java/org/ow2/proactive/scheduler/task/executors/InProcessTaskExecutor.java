@@ -210,7 +210,15 @@ public class InProcessTaskExecutor implements TaskExecutor {
             path = path + "." + extension;
         }
 
-        String code = script.fetchScript().trim();
+        String fetchedScript = null;
+
+        try {
+            fetchedScript = script.fetchScriptWithExceptionHandling();
+        } catch (IOException e) {
+            throw new TaskException("Error fetching script from url " + script.getScriptUrl(), e);
+        }
+
+        String code = fetchedScript.trim();
 
         Path p = Paths.get(path);
 

@@ -24,6 +24,7 @@ out
 
 /tools
 !/tools/startup.groovy
+!/tools/*.sh
 
 /TEST_SCHEDULER_DB
 /.nb-gradle/private/

@@ -446,6 +446,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
+    public void setPendingTasksCount(int pendingTasksCount) {
+        this.target.setPendingTasksCount(pendingTasksCount);
+    }
+
+    @Override
     public StringWrapper getRMThreadDump() {
         return target.getRMThreadDump();
     }
