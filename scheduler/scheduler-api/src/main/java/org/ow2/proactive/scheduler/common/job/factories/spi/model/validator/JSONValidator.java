@@ -25,11 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.codehaus.jackson.JsonParseException;
+import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
@@ -52,29 +48,23 @@ public class JSONValidator implements Validator<String> {
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
 
         try {
-            if (!isValidJSON(parameterValue)) {
-                throw new ValidationException("Expected value should match JSON format, received " + parameterValue);
-            }
+            checkValidJson(parameterValue);
         } catch (ValidationException er) {
-            throw new ValidationException("Validator error from JsonParser: Expected value should match JSON format, received " +
+            throw new ValidationException("Validator error from JsonParser: Expected value should match JSON format, received ",
                                           parameterValue);
         }
         return parameterValue;
     }
 
-    public boolean isValidJSON(final String json) throws ValidationException {
-        boolean valid;
+    private void checkValidJson(final String json) throws ValidationException {
         try {
             final JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(json);
             while (parser.nextToken() != null) {
             }
-            valid = true;
-        } catch (JsonParseException jpe) {
-            throw new ValidationException("Validator error for JSON type : " + jpe);
-        } catch (IOException ioe) {
-            throw new ValidationException("Validator I/O error for JSON type : " + ioe);
+        } catch (Exception jpe) {
+            throw new ValidationException("Validator error for JSON type ", jpe);
         }
 
-        return valid;
+        return;
     }
 }
