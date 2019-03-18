@@ -200,6 +200,11 @@ public class NodesRecoveryManager {
         RMNode rmNode = nodeSource.internalAddNodeAfterRecovery(node, rmNodeData);
         this.rmCore.registerAvailableNode(rmNode);
         if (node != null) {
+            try {
+                RMCore.topologyManager.addNode(rmNode.getNode());
+            } catch (Exception e) {
+                logger.error("Error occurred when adding recovered node to the topology", e);
+            }
             this.nodesLockRestorationManager.handle(rmNode, rmNodeData.getProvider());
         } else {
             this.triggerDownNodeHookIfNecessary(nodeSource, rmNodeData, nodeUrl, previousState);
