@@ -36,6 +36,8 @@ public class RRDDbUtil {
             default:
             case 'a': // 1 minute
                 return 60;
+            case 'n': // 5 minutes
+                return 60 * 5;
             case 'm': // 10 minutes
                 return 60 * 10;
             case 't': // 30 minutes
