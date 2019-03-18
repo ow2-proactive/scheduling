@@ -134,6 +134,11 @@ public class ModelValidatorTest {
                                 CatalogObjectParserValidator.class);
     }
 
+    @Test
+    public void testModelValidatorJSON() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + JSONParserValidator.JSON_TYPE, JSONParserValidator.class);
+    }
+
     public void createAndCheckValidator(String model, Class expectedClass) throws ModelSyntaxException {
         ModelValidator validator = new ModelValidator(model);
         Assert.assertEquals(expectedClass, validator.createParserValidator().getClass());
