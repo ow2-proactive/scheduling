@@ -1066,6 +1066,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     @Override
+    public void updateNeededNodes(int needed) {
+        this.jmxHelper.getSchedulerRuntimeMBean().setNeededNodes(needed);
+    }
+
+    @Override
     public synchronized void schedulerStateUpdated(SchedulerEvent eventType) {
         switch (eventType) {
             case STARTED:

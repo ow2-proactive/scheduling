@@ -208,6 +208,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
         getRMProxiesManager().getRmProxy().setPendingTasksCount(nodesNeeded);
 
+        schedulingService.getListener().updateNeededNodes(nodesNeeded);
+
     }
 
     private int startTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Map<JobId, JobDescriptor> toUnlock) {
