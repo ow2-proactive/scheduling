@@ -202,6 +202,9 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
     private void updateStatsAboutPendingEligibleAndNeededNodes(Collection<? extends TaskDescriptor> taskDescriptors) {
         // Pending eligible
+        final int pendingEligible = taskDescriptors.size();
+
+        schedulingService.getListener().updatePendingEligibleTasks(pendingEligible);
 
         // Needed nodes
         final int nodesNeeded = taskDescriptors.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
