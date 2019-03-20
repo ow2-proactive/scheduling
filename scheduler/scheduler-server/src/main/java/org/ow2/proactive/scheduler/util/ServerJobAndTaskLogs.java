@@ -53,6 +53,8 @@ public class ServerJobAndTaskLogs {
         return LazyHolder.INSTANCE;
     }
 
+    static final JobLogger jlogger = JobLogger.getInstance();
+
     public void configure() {
         if (logsLocationIsSet()) {
             if (isCleanStart()) {
@@ -91,6 +93,7 @@ public class ServerJobAndTaskLogs {
     }
 
     public void remove(JobId jobId, String jobOwner) {
+        jlogger.close(jobId);
         removeFolderLog(jobId.value());
         removeVisualizationFile(jobId.value());
         removePreciousLogs(jobId, jobOwner);
@@ -146,6 +149,7 @@ public class ServerJobAndTaskLogs {
 
             while (logFolder.exists()) {
                 logger.warn("Could not remove logs folder " + logFolder + " , retrying...");
+                displayFolderContents(logFolder);
                 org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
                 try {
                     Thread.sleep(1000);
@@ -154,7 +158,12 @@ public class ServerJobAndTaskLogs {
                 }
             }
         }
+    }
 
+    private void displayFolderContents(File logFolder) {
+        for (File file : org.apache.commons.io.FileUtils.listFiles(logFolder, null, true)) {
+            logger.warn("Remaining file or folder : " + file);
+        }
     }
 
     /**
