@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -182,7 +183,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
         // we wait for next scheduling loop and don't start any task
         if (jobMap.isEmpty()) {
-            getRMProxiesManager().getRmProxy().setPendingTasksCount(0);
+            updateStatsAboutPendingEligibleAndNeededNodes();
             return 0;
         }
 
@@ -193,6 +194,28 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         return tasksStarted;
+    }
+
+    private void updateStatsAboutPendingEligibleAndNeededNodes() {
+        updateStatsAboutPendingEligibleAndNeededNodes(Collections.EMPTY_LIST);
+    }
+
+    private void
+            updateStatsAboutPendingEligibleAndNeededNodes(Collection<? extends TaskDescriptor> eligibleByPolicyTasks) {
+        // Pending eligible
+        final int pendingEligible = eligibleByPolicyTasks.size();
+
+        schedulingService.getListener().updatePendingEligibleTasks(pendingEligible);
+
+        // Needed nodes
+        final int neededNodes = eligibleByPolicyTasks.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
+
+        // for statistics used in RM portal
+        getRMProxiesManager().getRmProxy().setNeededNodes(neededNodes);
+
+        // for statistics used in Scheduling portal
+        schedulingService.getListener().updateNeededNodes(neededNodes);
+
     }
 
     private int startTasks(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap, Map<JobId, JobDescriptor> toUnlock) {
@@ -212,12 +235,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
 
-                final int eligibleByPolicy = fullListOfTaskRetrievedFromPolicy.stream()
-                                                                              .mapToInt(TaskDescriptor::getNumberOfNodesNeeded)
-                                                                              .sum();
-                // eligible by policy
-                getRMProxiesManager().getRmProxy().setPendingTasksCount(eligibleByPolicy);
-
+                updateStatsAboutPendingEligibleAndNeededNodes(fullListOfTaskRetrievedFromPolicy);
                 return 0;
             }
 
@@ -225,7 +243,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             //if there is no task to scheduled, return without starting any task
             if (fullListOfTaskRetrievedFromPolicy == null || fullListOfTaskRetrievedFromPolicy.isEmpty()) {
-                getRMProxiesManager().getRmProxy().setPendingTasksCount(0);
+                updateStatsAboutPendingEligibleAndNeededNodes();
                 return 0;
             }
 
@@ -418,9 +436,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         // number of nodes needed to start all pending tasks
-        final int pendingTasksCount = rest.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
-
-        getRMProxiesManager().getRmProxy().setPendingTasksCount(pendingTasksCount);
+        updateStatsAboutPendingEligibleAndNeededNodes(rest);
 
         return numberOfTaskStarted;
     }

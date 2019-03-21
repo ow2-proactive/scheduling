@@ -330,8 +330,8 @@ public class RMProxyActiveObject {
     }
 
     @ImmediateService
-    public boolean setPendingTasksCount(int pendingTasksCount) {
-        rm.setPendingTasksCount(pendingTasksCount);
+    public boolean setNeededNodes(int neededNodes) {
+        rm.setNeededNodes(neededNodes);
         return true;
     }
 }

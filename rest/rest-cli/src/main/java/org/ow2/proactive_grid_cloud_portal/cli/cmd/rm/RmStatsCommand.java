@@ -49,7 +49,7 @@ public class RmStatsCommand extends AbstractCommand implements Command {
                                                                      "MaxFreeNodes", "AverageInactivity", "Status",
                                                                      "DownNodesCount", "AverageActivity",
                                                                      "MaxDownNodes", "ConfiguringNodesCount",
-                                                                     "MaxToBeReleasedNodes", "PendingTasksCount" };
+                                                                     "MaxToBeReleasedNodes", "NeededNodesCount" };
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {

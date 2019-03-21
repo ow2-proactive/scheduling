@@ -244,4 +244,8 @@ public interface RuntimeDataMBean {
      * @throws IOException when data base cannot be read
      */
     byte[] getStatisticHistory() throws IOException;
+
+    int getNeededNodes();
+
+    int getPendingEligibleTasks();
 }

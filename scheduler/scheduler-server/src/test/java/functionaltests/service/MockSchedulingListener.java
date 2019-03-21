@@ -79,6 +79,16 @@ public class MockSchedulingListener implements SchedulerStateUpdate {
     }
 
     @Override
+    public void updateNeededNodes(int needed) {
+
+    }
+
+    @Override
+    public void updatePendingEligibleTasks(int eligible) {
+
+    }
+
+    @Override
     public void jobUpdatedFullData(JobState jobState) {
         System.out.println("Updated " + jobState.getName() + " " + jobState.getJobInfo().getJobId());
         events.add(SchedulerEvent.JOB_UPDATED);
