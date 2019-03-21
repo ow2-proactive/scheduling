@@ -200,18 +200,21 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         updateStatsAboutPendingEligibleAndNeededNodes(Collections.EMPTY_LIST);
     }
 
-    private void updateStatsAboutPendingEligibleAndNeededNodes(Collection<? extends TaskDescriptor> taskDescriptors) {
+    private void
+            updateStatsAboutPendingEligibleAndNeededNodes(Collection<? extends TaskDescriptor> eligibleByPolicyTasks) {
         // Pending eligible
-        final int pendingEligible = taskDescriptors.size();
+        final int pendingEligible = eligibleByPolicyTasks.size();
 
         schedulingService.getListener().updatePendingEligibleTasks(pendingEligible);
 
         // Needed nodes
-        final int nodesNeeded = taskDescriptors.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
+        final int neededNodes = eligibleByPolicyTasks.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
 
-        getRMProxiesManager().getRmProxy().setPendingTasksCount(nodesNeeded);
+        // for statistics used in RM portal
+        getRMProxiesManager().getRmProxy().setNeededNodes(neededNodes);
 
-        schedulingService.getListener().updateNeededNodes(nodesNeeded);
+        // for statistics used in Scheduling portal
+        schedulingService.getListener().updateNeededNodes(neededNodes);
 
     }
 

@@ -114,7 +114,7 @@ import org.rrd4j.core.RrdDb;
 @Path("/rm")
 public class RMRest implements RMRestInterface {
 
-    protected static final String[] dataSources = { "AvailableNodesCount", "FreeNodesCount", "PendingTasksCount",
+    protected static final String[] dataSources = { "AvailableNodesCount", "FreeNodesCount", "NeededNodes",
                                                     "BusyNodesCount", "DeployingNodesCount", "ConfigNodesCount", // it is Config and not Configuring because RRDDataStore limits name 20 characters
                                                     "DownNodesCount", "LostNodesCount", "AverageActivity" };
 
