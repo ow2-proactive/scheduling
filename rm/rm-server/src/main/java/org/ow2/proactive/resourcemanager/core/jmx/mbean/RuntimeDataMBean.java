@@ -68,7 +68,7 @@ public interface RuntimeDataMBean {
      */
     int getAvailableNodesCount();
 
-    int getNeededNodes();
+    int getNeededNodesCount();
 
     /**
      * Returns the current number of nodes in {@link NodeState#CONFIGURING} state.

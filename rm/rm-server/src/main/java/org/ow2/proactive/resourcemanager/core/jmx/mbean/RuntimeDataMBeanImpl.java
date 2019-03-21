@@ -82,7 +82,7 @@ public class RuntimeDataMBeanImpl extends StandardMBean implements RuntimeDataMB
     }
 
     @Chronological
-    public int getNeededNodes() {
+    public int getNeededNodesCount() {
         return this.rmStatistics.getNeededNodes();
     }
 
