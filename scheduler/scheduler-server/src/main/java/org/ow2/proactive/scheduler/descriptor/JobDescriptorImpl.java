@@ -154,7 +154,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         for (InternalTask td : job.getITasks()) {
             //if this task is a first task, put it in eligible tasks list
             EligibleTaskDescriptor lt = new EligibleTaskDescriptorImpl(td);
-
+            ((EligibleTaskDescriptorImpl) lt).getInternal().setStatus(TaskStatus.SUBMITTED);
             if (isEntryPoint(td, nonEligibleTaskNames)) {
                 eligibleTasks.put(td.getId(), lt);
             }
@@ -241,6 +241,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         for (Entry<TaskId, InternalTask> it : tree.entrySet()) {
             TaskId itId = it.getValue().getId();
             EligibleTaskDescriptorImpl td = new EligibleTaskDescriptorImpl(it.getValue());
+            td.getInternal().setStatus(TaskStatus.SUBMITTED);
             acc.put(itId, td);
         }
 
@@ -420,6 +421,7 @@ public class JobDescriptorImpl implements JobDescriptor {
         for (Entry<TaskId, InternalTask> it : tree.entrySet()) {
             TaskId itId = it.getValue().getTaskInfo().getTaskId();
             EligibleTaskDescriptorImpl td = new EligibleTaskDescriptorImpl(it.getValue());
+            td.getInternal().setStatus(TaskStatus.SUBMITTED);
             acc.put(itId, td);
         }
 

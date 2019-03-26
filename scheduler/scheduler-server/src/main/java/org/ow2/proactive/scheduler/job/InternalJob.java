@@ -783,14 +783,6 @@ public abstract class InternalJob extends JobState {
         setNumberOfPendingTasks(getTotalNumberOfTasks());
         setNumberOfRunningTasks(0);
         setStatus(JobStatus.RUNNING);
-
-        List<InternalTask> internalTasks = getITasks();
-        HashMap<TaskId, TaskStatus> taskStatus = new HashMap<>(internalTasks.size());
-
-        for (InternalTask internalTask : internalTasks) {
-            internalTask.setStatus(TaskStatus.PENDING);
-            taskStatus.put(internalTask.getId(), TaskStatus.PENDING);
-        }
     }
 
     /**
@@ -876,7 +868,7 @@ public abstract class InternalJob extends JobState {
                 if ((task.getStatus() != TaskStatus.FINISHED) && (task.getStatus() != TaskStatus.RUNNING) &&
                     (task.getStatus() != TaskStatus.SKIPPED) && (task.getStatus() != TaskStatus.FAULTY) &&
                     (task.getStatus() != TaskStatus.IN_ERROR)) {
-                    task.setStatus(TaskStatus.PENDING);
+                    task.setStatus(TaskStatus.SUBMITTED);
                     updatedTasks.add(task.getId());
                 }
             }
@@ -908,7 +900,7 @@ public abstract class InternalJob extends JobState {
         if (internalTask.getStatus() == TaskStatus.IN_ERROR) {
             newWaitingTask();
             setNumberOfInErrorTasks(getNumberOfInErrorTasks() - 1);
-            internalTask.setStatus(TaskStatus.PENDING);
+            internalTask.setStatus(TaskStatus.SUBMITTED);
             getJobDescriptor().unpause(internalTask.getId());
         }
     }

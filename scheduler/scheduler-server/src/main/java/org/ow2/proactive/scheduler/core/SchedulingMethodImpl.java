@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -226,6 +227,8 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             // ask the policy all the tasks to be schedule according to the jobs list.
             LinkedList<EligibleTaskDescriptor> fullListOfTaskRetrievedFromPolicy = currentPolicy.getOrderedTasks(descriptors);
 
+            setPendingStatusesToAllEligibleTasks(fullListOfTaskRetrievedFromPolicy);
+
             //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
 
@@ -251,6 +254,22 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 schedulingService.unlockJobsToSchedule(toUnlock.values());
             }
         }
+    }
+
+    private void setPendingStatusesToAllEligibleTasks(List<EligibleTaskDescriptor> eligibleTasks) {
+        List<EligibleTaskDescriptorImpl> notPendingYet = eligibleTasks.stream()
+                                                                      .map(task -> (EligibleTaskDescriptorImpl) task)
+                                                                      .filter(task -> !task.getInternal()
+                                                                                           .getStatus()
+                                                                                           .equals(TaskStatus.PENDING))
+                                                                      .collect(Collectors.toList());
+
+        notPendingYet.forEach(task -> task.getInternal().setStatus(TaskStatus.PENDING));
+
+        notPendingYet.forEach(task -> {
+            getDBManager().updateTaskStatus(task, TaskStatus.PENDING);
+        });
+
     }
 
     private int getNumberOfTaskStarted(Policy currentPolicy, Map<JobId, JobDescriptor> jobMap,
