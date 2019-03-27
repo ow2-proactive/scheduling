@@ -346,7 +346,7 @@ public abstract class InternalJob extends JobState {
             task.setStatus(TaskStatus.PAUSED);
             getJobDescriptor().pause(task.getId());
         } else {
-            task.setStatus(TaskStatus.PENDING);
+            task.setStatus(TaskStatus.SUBMITTED);
         }
     }
 

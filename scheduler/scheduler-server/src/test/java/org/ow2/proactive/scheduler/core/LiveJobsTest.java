@@ -574,6 +574,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception());
+
         liveJobs.taskTerminatedWithResult(taskId, result);
 
         assertThat(taskInfoImpl.getNumberOfExecutionLeft(), is(9));
