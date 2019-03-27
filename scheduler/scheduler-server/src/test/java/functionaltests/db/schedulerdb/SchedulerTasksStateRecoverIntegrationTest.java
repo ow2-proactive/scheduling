@@ -56,7 +56,7 @@ public class SchedulerTasksStateRecoverIntegrationTest extends BaseSchedulerDBTe
 
         JobStateMatcher expectedJob;
 
-        expectedJob = job(job.getId(), JobStatus.STALLED).withPending(task("task1", TaskStatus.PENDING), true)
+        expectedJob = job(job.getId(), JobStatus.STALLED).withPending(task("task1", TaskStatus.SUBMITTED), true)
                                                          .withEligible("task1");
 
         RecoveredSchedulerState state;

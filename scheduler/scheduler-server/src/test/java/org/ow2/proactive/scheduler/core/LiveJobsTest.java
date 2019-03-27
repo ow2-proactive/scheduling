@@ -548,7 +548,6 @@ public class LiveJobsTest extends ProActiveTestClean {
         TaskId taskId = TaskIdImpl.createTaskId(id, "task-name", 0L);
         internalTask.setId(taskId);
         internalTask.setName("task-name");
-        internalTask.setStatus(TaskStatus.RUNNING);
         internalTask.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
         TaskInfoImpl taskInfoImpl = (TaskInfoImpl) internalTask.getTaskInfo();
         taskInfoImpl.setNumberOfExecutionLeft(10);
@@ -559,7 +558,6 @@ public class LiveJobsTest extends ProActiveTestClean {
         TaskId taskId2 = TaskIdImpl.createTaskId(id, "task-name2", 1L);
         internalTask2.setId(taskId2);
         internalTask2.setName("task-name2");
-        internalTask2.setStatus(TaskStatus.RUNNING);
         internalTask2.setExecuterInformation(Mockito.mock(ExecuterInformation.class));
         TaskInfoImpl taskInfoImpl2 = (TaskInfoImpl) internalTask2.getTaskInfo();
         taskInfoImpl2.setNumberOfExecutionLeft(10);
@@ -574,6 +572,7 @@ public class LiveJobsTest extends ProActiveTestClean {
         liveJobs.taskStarted(job, job.getTask("task-name"), null);
 
         TaskResultImpl result = new TaskResultImpl(taskId, new Exception());
+
         liveJobs.taskTerminatedWithResult(taskId, result);
 
         assertThat(taskInfoImpl.getNumberOfExecutionLeft(), is(9));
@@ -582,7 +581,7 @@ public class LiveJobsTest extends ProActiveTestClean {
 
         assertThat(taskInfoImpl2.getNumberOfExecutionLeft(), is(10));
 
-        assertThat(taskInfoImpl2.getStatus(), is(TaskStatus.PENDING));
+        assertThat(taskInfoImpl2.getStatus(), is(TaskStatus.SUBMITTED));
 
         assertThat(job.getStatus(), is(JobStatus.STALLED));
 
