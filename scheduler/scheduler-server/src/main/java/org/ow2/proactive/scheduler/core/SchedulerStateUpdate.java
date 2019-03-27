@@ -89,6 +89,4 @@ public interface SchedulerStateUpdate {
 
     void updateNeededNodes(int needed);
 
-    void updatePendingEligibleTasks(int eligible);
-
 }

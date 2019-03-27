@@ -183,7 +183,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         // If there are some jobs which could not be locked it is not possible to do any priority scheduling decision,
         // we wait for next scheduling loop and don't start any task
         if (jobMap.isEmpty()) {
-            updateStatsAboutPendingEligibleAndNeededNodes();
+            updateNeededNodes();
             return 0;
         }
 
@@ -196,17 +196,11 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         return tasksStarted;
     }
 
-    private void updateStatsAboutPendingEligibleAndNeededNodes() {
-        updateStatsAboutPendingEligibleAndNeededNodes(Collections.EMPTY_LIST);
+    private void updateNeededNodes() {
+        updateNeededNodes(Collections.EMPTY_LIST);
     }
 
-    private void
-            updateStatsAboutPendingEligibleAndNeededNodes(Collection<? extends TaskDescriptor> eligibleByPolicyTasks) {
-        // Pending eligible
-        final int pendingEligible = eligibleByPolicyTasks.size();
-
-        schedulingService.getListener().updatePendingEligibleTasks(pendingEligible);
-
+    private void updateNeededNodes(Collection<? extends TaskDescriptor> eligibleByPolicyTasks) {
         // Needed nodes
         final int neededNodes = eligibleByPolicyTasks.stream().mapToInt(TaskDescriptor::getNumberOfNodesNeeded).sum();
 
@@ -235,7 +229,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //if there is no free resources, stop it right now without starting any task
             if (freeResources.isEmpty()) {
 
-                updateStatsAboutPendingEligibleAndNeededNodes(fullListOfTaskRetrievedFromPolicy);
+                updateNeededNodes(fullListOfTaskRetrievedFromPolicy);
                 return 0;
             }
 
@@ -243,7 +237,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
 
             //if there is no task to scheduled, return without starting any task
             if (fullListOfTaskRetrievedFromPolicy == null || fullListOfTaskRetrievedFromPolicy.isEmpty()) {
-                updateStatsAboutPendingEligibleAndNeededNodes();
+                updateNeededNodes();
                 return 0;
             }
 
@@ -436,7 +430,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
 
         // number of nodes needed to start all pending tasks
-        updateStatsAboutPendingEligibleAndNeededNodes(rest);
+        updateNeededNodes(rest);
 
         return numberOfTaskStarted;
     }
