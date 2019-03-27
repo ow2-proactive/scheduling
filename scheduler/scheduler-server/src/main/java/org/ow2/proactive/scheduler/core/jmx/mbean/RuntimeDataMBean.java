@@ -247,5 +247,4 @@ public interface RuntimeDataMBean {
 
     int getNeededNodes();
 
-    int getPendingEligibleTasks();
 }

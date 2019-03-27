@@ -57,8 +57,6 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
 
     private int neededNodes;
 
-    private int pendingEligibleTasks;
-
     public RuntimeDataMBeanImpl(SchedulerDBManager dbManager) throws NotCompliantMBeanException {
         super(RuntimeDataMBean.class);
         this.schedulerClients = new SchedulerUsers();
@@ -326,12 +324,4 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         this.neededNodes = neededNodes;
     }
 
-    @Override
-    public int getPendingEligibleTasks() {
-        return pendingEligibleTasks;
-    }
-
-    public void setPendingEligibleTasks(int eligible) {
-        this.pendingEligibleTasks = eligible;
-    }
 }
