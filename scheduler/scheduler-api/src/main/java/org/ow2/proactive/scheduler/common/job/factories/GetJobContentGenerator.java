@@ -38,7 +38,7 @@ import org.ow2.proactive.scheduler.common.job.JobVariable;
  * Factory used to create a job content as merge between submitted xml
  * and provided <code>variables</code> and <code>genericInfo</code> maps.
  */
-public class GetJobContentFactory {
+public class GetJobContentGenerator {
 
     private static final String FOUR_SPACES_INDENT = "    ";
 
@@ -98,18 +98,31 @@ public class GetJobContentFactory {
 
         // if job already had variables - we just replace their content
         if (openMatcher.isPresent() && closeMatcher.isPresent()) {
+            int beforeOpenTag = openMatcher.get().start();
             int afterOpenTag = openMatcher.get().end();
             int beforeCloseTag = closeMatcher.get().start();
-            String beforeNewContent = firstHalf.substring(0, afterOpenTag) + System.lineSeparator();
-            String afterNewContent = TWO_SPACES_INDENT + firstHalf.substring(beforeCloseTag);
-            return beforeNewContent + newContent + afterNewContent + untouchablePart;
+            int afterCloseTag = closeMatcher.get().end();
+
+            if (!newContent.isEmpty()) {
+                String beforeNewContent = firstHalf.substring(0, afterOpenTag) + System.lineSeparator();
+                String afterNewContent = TWO_SPACES_INDENT + firstHalf.substring(beforeCloseTag);
+                return beforeNewContent + newContent + afterNewContent + untouchablePart;
+            } else {
+                String beforeNewContent = firstHalf.substring(0, beforeOpenTag) + System.lineSeparator();
+                String afterNewContent = TWO_SPACES_INDENT + firstHalf.substring(afterCloseTag);
+                return beforeNewContent + afterNewContent + untouchablePart;
+            }
         } else {
-            Optional<Integer> afterOpenTag = afterOpenTag(firstHalf, XMLTags.JOB);
-            return afterOpenTag.map(index -> insertContent(firstHalf,
-                                                           XMLTags.VARIABLES.withContent(newContent),
-                                                           index) +
-                                             untouchablePart)
-                               .orElse(jobContent);
+            if (!newContent.isEmpty()) {
+                Optional<Integer> afterOpenTag = afterOpenTag(firstHalf, XMLTags.JOB);
+                return afterOpenTag.map(index -> insertContent(firstHalf,
+                                                               XMLTags.VARIABLES.withContent(newContent),
+                                                               index) +
+                                                 untouchablePart)
+                                   .orElse(jobContent);
+            } else {
+                return jobContent;
+            }
         }
     }
 
@@ -118,14 +131,22 @@ public class GetJobContentFactory {
 
         String untouchablePart = jobContent.substring(end);
 
-        Optional<Matcher> openMatcher = indexOfPattern(firstHalf, XMLTags.COMMON_GENERIC_INFORMATION.getOpenTagPattern());
-        Optional<Matcher> closeMatcher = indexOfPattern(firstHalf, XMLTags.COMMON_GENERIC_INFORMATION.getCloseTagPattern());
+        Optional<Matcher> openMatcher = indexOfPattern(firstHalf,
+                                                       XMLTags.COMMON_GENERIC_INFORMATION.getOpenTagPattern());
+        Optional<Matcher> closeMatcher = indexOfPattern(firstHalf,
+                                                        XMLTags.COMMON_GENERIC_INFORMATION.getCloseTagPattern());
 
         // when job already had generic info, then just replace it with new content
         if (openMatcher.isPresent() && closeMatcher.isPresent()) {
+            int beforeOpenTag = openMatcher.get().start();
             int afterOpenTag = openMatcher.get().end();
             int beforeCloseTag = closeMatcher.get().start();
-            return insertContent(firstHalf, newContent, afterOpenTag, beforeCloseTag) + untouchablePart;
+            int afterCloseTag = closeMatcher.get().end();
+            if (!newContent.isEmpty()) {
+                return insertContent(firstHalf, newContent, afterOpenTag, beforeCloseTag) + untouchablePart;
+            } else {
+                return insertContent(firstHalf, "", beforeOpenTag, afterCloseTag) + untouchablePart;
+            }
         } else {
             // if job did not have generic info before
             // we try to put it after job description if it exsits
@@ -143,11 +164,16 @@ public class GetJobContentFactory {
 
             // if neither variables not job description exist then we add just after job tag
             Optional<Integer> afterOpenTag = afterOpenTag(firstHalf, XMLTags.JOB);
-            return afterOpenTag.map(index -> insertContent(firstHalf,
-                                                           XMLTags.COMMON_GENERIC_INFORMATION.withContent(newContent),
-                                                           index) +
-                                             untouchablePart)
-                               .orElse(jobContent);
+            if (!newContent.isEmpty()) {
+                return afterOpenTag.map(index -> insertContent(firstHalf,
+                                                               XMLTags.COMMON_GENERIC_INFORMATION.withContent(newContent),
+                                                               index) +
+                                                 untouchablePart)
+                                   .orElse(jobContent);
+            } else {
+                return jobContent;
+            }
+
         }
 
     }
@@ -192,11 +218,15 @@ public class GetJobContentFactory {
     }
 
     private String newVariablesContent(Map<String, JobVariable> variables) {
-        return variables.values()
-                        .stream()
-                        .map(this::variableContent)
-                        .map(s -> s + System.lineSeparator())
-                        .reduce("", String::concat);
+        if (!variables.isEmpty()) {
+            return variables.values()
+                            .stream()
+                            .map(this::variableContent)
+                            .map(s -> s + System.lineSeparator())
+                            .reduce("", String::concat);
+        } else {
+            return "";
+        }
     }
 
     private String variableContent(JobVariable jobVariable) {

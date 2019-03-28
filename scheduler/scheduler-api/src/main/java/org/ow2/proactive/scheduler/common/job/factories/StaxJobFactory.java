@@ -123,7 +123,7 @@ public class StaxJobFactory extends JobFactory {
      */
     private String relativePathRoot = "./";
 
-    private GetJobContentFactory getJobContentFactory = new GetJobContentFactory();
+    private GetJobContentGenerator getJobContentFactory = new GetJobContentGenerator();
 
     /**
      * Create a new instance of StaxJobFactory.
