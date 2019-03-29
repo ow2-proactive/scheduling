@@ -37,7 +37,7 @@ import org.ow2.proactive.resourcemanager.utils.RMNodeStarter;
 
 public class CleanupTimeoutGetterTest {
 
-    private static final long CLEANUP_TIME_DEFAULT_SECONDS = 10;
+    private static final long CLEANUP_TIME_DEFAULT_SECONDS = 20;
 
     private static final String CLEANUP_TIME_PROPERTY_NAME = RMNodeStarter.SECONDS_TASK_CLEANUP_TIMEOUT_PROP_NAME;
 
