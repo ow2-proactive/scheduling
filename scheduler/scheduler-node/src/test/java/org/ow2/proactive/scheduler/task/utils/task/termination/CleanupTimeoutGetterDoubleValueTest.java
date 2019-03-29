@@ -36,7 +36,7 @@ import org.junit.Test;
 
 public class CleanupTimeoutGetterDoubleValueTest {
 
-    private static final long CLEANUP_TIME_DEFAULT_SECONDS = 10;
+    private static final long CLEANUP_TIME_DEFAULT_SECONDS = 20;
 
     @Test
     public void testThatDefaultTimeoutIsReturnedDoubled() {
