@@ -42,7 +42,7 @@ public class JobKeyValueTransformer {
 
     public static Map<String, String> transformJsonStringToMap(String jsonString) {
         Map<String, String> jsonMap = Maps.newHashMap();
-        if (jsonString != null) {
+        if (jsonString != null && !jsonString.equals("undefined")) {
             try {
                 jsonMap = (JSONObject) new JSONParser().parse(jsonString);
                 validateJsonMap(jsonMap);

@@ -68,11 +68,15 @@ public class GetJobContentGenerator {
     }
 
     private String newGenericInfoContent(Map<String, String> genericInformation) {
-        return genericInformation.entrySet()
-                                 .stream()
-                                 .map(this::genericInfoContent)
-                                 .map(s -> s + System.lineSeparator())
-                                 .reduce("", String::concat);
+        if (!genericInformation.isEmpty()) {
+            return genericInformation.entrySet()
+                                     .stream()
+                                     .map(this::genericInfoContent)
+                                     .map(s -> s + System.lineSeparator())
+                                     .reduce("", String::concat);
+        } else {
+            return "";
+        }
     }
 
     private String genericInfoContent(Map.Entry<String, String> pair) {
@@ -191,11 +195,7 @@ public class GetJobContentGenerator {
     private String insertContent(String all, String content, int index, int index2) {
         String left = all.substring(0, index);
         String right = TWO_SPACES_INDENT + all.substring(index2);
-        StringBuilder result = new StringBuilder();
-        result.append(left);
-        result.append(content);
-        result.append(right);
-        return result.toString();
+        return left + System.lineSeparator() + content + right;
     }
 
     private Optional<Integer> afterOpenTag(String content, XMLTags tag) {

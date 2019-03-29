@@ -91,7 +91,9 @@ import functionaltests.jobs.VariableTask;
 
 public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
-    /** Maximum wait time of 5 minutes */
+    /**
+     * Maximum wait time of 5 minutes
+     */
     private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
 
     private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_generic_info.xml");
@@ -343,13 +345,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     @Test
     public void testReSubmitJob() throws Exception {
         ISchedulerClient client = clientInstance();
-        //        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
-        //                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy");
-        //        final JobId jobId = submitJob(job, client);
+        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
+                                null);
+        JobId jobId = submitJob(job, client);
+        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
 
-        //        final JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
+        String jobContent = client.getJobContent(jobId);
+        String jobContent1 = client.getJobContent(jobId1);
 
-        //        assertFalse(jobId.value().equals(jobId1.value()));
+        assertEquals(jobContent, jobContent1);
     }
 
     protected Job nodeClientJob(String groovyScript, String forkScript, String cleaningScript) throws Exception {

@@ -84,7 +84,7 @@ public class TestWorkflowReSubmission extends SchedulerFunctionalTestWithRestart
     }
 
     @Test
-    public void testEmptyInfo() throws Throwable {
+    public void testAddVars() throws Throwable {
 
         JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
 
@@ -104,4 +104,45 @@ public class TestWorkflowReSubmission extends SchedulerFunctionalTestWithRestart
         assertFalse(jobContent1.contains("<genericInformation>"));
     }
 
+    @Test
+    public void testAddInfo() throws Throwable {
+
+        JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+
+        Map<String, String> info = new HashMap<>();
+        info.put("x", "50");
+        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, null, info);
+
+        schedulerHelper.waitForEventJobFinished(jobId);
+        schedulerHelper.waitForEventJobFinished(jobId1);
+
+        String jobContent = schedulerHelper.getSchedulerInterface().getJobContent(jobId);
+        String jobContent1 = schedulerHelper.getSchedulerInterface().getJobContent(jobId1);
+
+        assertFalse(jobContent.contains("<variables>"));
+        assertFalse(jobContent.contains("<genericInformation>"));
+        assertFalse(jobContent1.contains("<variables>"));
+        assertTrue(jobContent1.contains("<genericInformation>"));
+    }
+
+    @Test
+    public void testAddVarsAddInfo() throws Throwable {
+
+        JobId jobId = schedulerHelper.submitJob(new File(jobDescriptor.toURI()).getAbsolutePath());
+
+        Map<String, String> vars = new HashMap<>();
+        vars.put("x", "50");
+        JobId jobId1 = schedulerHelper.getSchedulerInterface().reSubmit(jobId, vars, vars);
+
+        schedulerHelper.waitForEventJobFinished(jobId);
+        schedulerHelper.waitForEventJobFinished(jobId1);
+
+        String jobContent = schedulerHelper.getSchedulerInterface().getJobContent(jobId);
+        String jobContent1 = schedulerHelper.getSchedulerInterface().getJobContent(jobId1);
+
+        assertFalse(jobContent.contains("<variables>"));
+        assertFalse(jobContent.contains("<genericInformation>"));
+        assertTrue(jobContent1.contains("<variables>"));
+        assertTrue(jobContent1.contains("<genericInformation>"));
+    }
 }
