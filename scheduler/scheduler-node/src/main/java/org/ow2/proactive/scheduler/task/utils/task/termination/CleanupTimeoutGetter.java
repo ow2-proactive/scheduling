@@ -33,7 +33,7 @@ public class CleanupTimeoutGetter {
 
     private static final Logger LOGGER = Logger.getLogger(CleanupTimeoutGetter.class);
 
-    private static final long CLEANUP_TIME_DEFAULT_SECONDS = 10;
+    private static final long CLEANUP_TIME_DEFAULT_SECONDS = 20;
 
     public long getCleanupTimeSeconds() {
         try {
