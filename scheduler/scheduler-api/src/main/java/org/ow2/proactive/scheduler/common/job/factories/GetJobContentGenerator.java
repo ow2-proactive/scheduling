@@ -49,11 +49,11 @@ public class GetJobContentGenerator {
     private static final String TAG_WITH_THREE_ATTRIBUTES = "<%s %s=\"%s\" %s=\"%s\" %s=\"%s\" />";
 
     /**
-     * @param jobContent xml representation of the submitted job
-     * @param variables provided during job submit
+     * @param jobContent         xml representation of the submitted job
+     * @param variables          provided during job submit
      * @param genericInformation provided during job submit
      * @return new job content where 'variables' and 'genericInformation' tags content are replaced
-     *  by provided <code>variables</code> and <code>genericInformation</code> respectively.
+     * by provided <code>variables</code> and <code>genericInformation</code> respectively.
      */
     public String replaceVarsAndGenericInfo(String jobContent, Map<String, JobVariable> variables,
             Map<String, String> genericInformation) {
@@ -88,6 +88,60 @@ public class GetJobContentGenerator {
                              pair.getValue());
     }
 
+    private String replaceGenericInfoContent(String jobContent, String newContent, int end) {
+        final String firstHalf = jobContent.substring(0, end);
+
+        String untouchablePart = jobContent.substring(end);
+
+        Optional<Matcher> openMatcher = indexOfPattern(firstHalf,
+                                                       XMLTags.COMMON_GENERIC_INFORMATION.getOpenTagPattern());
+        Optional<Matcher> closeMatcher = indexOfPattern(firstHalf,
+                                                        XMLTags.COMMON_GENERIC_INFORMATION.getCloseTagPattern());
+
+        // when job already had generic info, then just replace it with new content
+        if (openMatcher.isPresent() && closeMatcher.isPresent()) {
+            int beforeOpenTag = openMatcher.get().start();
+            int afterOpenTag = openMatcher.get().end();
+            int beforeCloseTag = closeMatcher.get().start();
+            int afterCloseTag = closeMatcher.get().end();
+            if (!newContent.isEmpty()) {
+                return insertContent(firstHalf, newContent, afterOpenTag, beforeCloseTag) + untouchablePart;
+            } else {
+                String left = firstHalf.substring(0, beforeOpenTag);
+                String right = firstHalf.substring(afterCloseTag + 1).trim();
+                return left + right + untouchablePart;
+            }
+        } else {
+            if (!newContent.isEmpty()) { // if job did not have generic info before
+                // we try to put it after job description if it exsits
+                // then we try to put after variables, if they exist
+                XMLTags[] xmlTags = { XMLTags.COMMON_DESCRIPTION, XMLTags.VARIABLES };
+                for (XMLTags xmlTag : xmlTags) {
+                    final Optional<Integer> afterCloseTag = afterCloseTag(firstHalf, xmlTag);
+                    if (afterCloseTag.isPresent()) {
+                        return insertContent(firstHalf,
+                                             XMLTags.COMMON_GENERIC_INFORMATION.withContent(newContent),
+                                             afterCloseTag.get()) +
+                               untouchablePart;
+                    }
+                }
+
+                // if neither variables not job description exist then we add just after job tag
+                Optional<Integer> afterOpenTag = afterOpenTag(firstHalf, XMLTags.JOB);
+
+                return afterOpenTag.map(index -> insertContent(firstHalf,
+                                                               XMLTags.COMMON_GENERIC_INFORMATION.withContent(newContent),
+                                                               index) +
+                                                 untouchablePart)
+                                   .orElse(jobContent);
+            } else {
+                return jobContent;
+            }
+
+        }
+
+    }
+
     private String replaceVarsContent(String jobContent, String newContent, int end) {
         final String firstHalf = jobContent.substring(0, end);
 
@@ -112,8 +166,8 @@ public class GetJobContentGenerator {
                 String afterNewContent = TWO_SPACES_INDENT + firstHalf.substring(beforeCloseTag);
                 return beforeNewContent + newContent + afterNewContent + untouchablePart;
             } else {
-                String beforeNewContent = firstHalf.substring(0, beforeOpenTag) + System.lineSeparator();
-                String afterNewContent = TWO_SPACES_INDENT + firstHalf.substring(afterCloseTag);
+                String beforeNewContent = firstHalf.substring(0, beforeOpenTag);
+                String afterNewContent = firstHalf.substring(afterCloseTag + 1).trim();
                 return beforeNewContent + afterNewContent + untouchablePart;
             }
         } else {
@@ -128,58 +182,6 @@ public class GetJobContentGenerator {
                 return jobContent;
             }
         }
-    }
-
-    private String replaceGenericInfoContent(String jobContent, String newContent, int end) {
-        final String firstHalf = jobContent.substring(0, end);
-
-        String untouchablePart = jobContent.substring(end);
-
-        Optional<Matcher> openMatcher = indexOfPattern(firstHalf,
-                                                       XMLTags.COMMON_GENERIC_INFORMATION.getOpenTagPattern());
-        Optional<Matcher> closeMatcher = indexOfPattern(firstHalf,
-                                                        XMLTags.COMMON_GENERIC_INFORMATION.getCloseTagPattern());
-
-        // when job already had generic info, then just replace it with new content
-        if (openMatcher.isPresent() && closeMatcher.isPresent()) {
-            int beforeOpenTag = openMatcher.get().start();
-            int afterOpenTag = openMatcher.get().end();
-            int beforeCloseTag = closeMatcher.get().start();
-            int afterCloseTag = closeMatcher.get().end();
-            if (!newContent.isEmpty()) {
-                return insertContent(firstHalf, newContent, afterOpenTag, beforeCloseTag) + untouchablePart;
-            } else {
-                return insertContent(firstHalf, "", beforeOpenTag, afterCloseTag) + untouchablePart;
-            }
-        } else {
-            // if job did not have generic info before
-            // we try to put it after job description if it exsits
-            // then we try to put after variables, if they exist
-            XMLTags[] xmlTags = { XMLTags.COMMON_DESCRIPTION, XMLTags.VARIABLES };
-            for (XMLTags xmlTag : xmlTags) {
-                final Optional<Integer> afterCloseTag = afterCloseTag(firstHalf, xmlTag);
-                if (afterCloseTag.isPresent()) {
-                    return insertContent(firstHalf,
-                                         XMLTags.COMMON_GENERIC_INFORMATION.withContent(newContent),
-                                         afterCloseTag.get()) +
-                           untouchablePart;
-                }
-            }
-
-            // if neither variables not job description exist then we add just after job tag
-            Optional<Integer> afterOpenTag = afterOpenTag(firstHalf, XMLTags.JOB);
-            if (!newContent.isEmpty()) {
-                return afterOpenTag.map(index -> insertContent(firstHalf,
-                                                               XMLTags.COMMON_GENERIC_INFORMATION.withContent(newContent),
-                                                               index) +
-                                                 untouchablePart)
-                                   .orElse(jobContent);
-            } else {
-                return jobContent;
-            }
-
-        }
-
     }
 
     private String insertContent(String all, String content, int index) {
