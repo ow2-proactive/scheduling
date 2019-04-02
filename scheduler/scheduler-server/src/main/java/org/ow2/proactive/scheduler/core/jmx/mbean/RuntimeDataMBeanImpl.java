@@ -102,6 +102,36 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         return (int) dbManager.getFinishedJobsCount();
     }
 
+    @Override
+    public int getStalledJobsCount() {
+        return (int) dbManager.getStalledJobsCount();
+    }
+
+    @Override
+    public int getPausedJobsCount() {
+        return (int) dbManager.getPausedJobsCount();
+    }
+
+    @Override
+    public int getInErrorJobsCount() {
+        return (int) dbManager.getInErrorJobsCount();
+    }
+
+    @Override
+    public int getKilledJobsCount() {
+        return (int) dbManager.getKilledJobCount();
+    }
+
+    @Override
+    public int getCancelledJobsCount() {
+        return (int) dbManager.getCancelledJobsCount();
+    }
+
+    @Override
+    public int getFailedJobsCount() {
+        return (int) dbManager.getFailedJobsCount();
+    }
+
     /**
      * @return current number of pending jobs
      */

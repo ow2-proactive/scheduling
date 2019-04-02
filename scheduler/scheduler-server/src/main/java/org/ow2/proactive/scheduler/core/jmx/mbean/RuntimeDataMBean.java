@@ -38,71 +38,63 @@ import java.io.IOException;
 public interface RuntimeDataMBean {
 
     /**
-     * Returns the state of the scheduler.
-     *
      * @return The state of the scheduler.
      */
     String getStatus();
 
     /**
-     * Returns the number of users connected to the scheduler.
-     *
      * @return the number of users connected to the scheduler.
      */
     int getConnectedUsersCount();
 
     /**
-     * Returns the total number of jobs.
-     *
      * @return the total number of jobs.
      */
     int getTotalJobsCount();
 
     /**
-     * Returns the number of pending jobs of the scheduler.
-     *
      * @return The number of pending jobs of the scheduler.
      */
     int getPendingJobsCount();
 
     /**
-     * Returns the number of running jobs of the scheduler.
-     *
      * @return The number of running jobs of the scheduler.
      */
     int getRunningJobsCount();
 
     /**
-     * Returns the number of finished jobs of the scheduler.
-     *
      * @return The number of finished jobs of the scheduler.
      */
     int getFinishedJobsCount();
 
+    int getStalledJobsCount();
+
+    int getPausedJobsCount();
+
+    int getInErrorJobsCount();
+
+    int getKilledJobsCount();
+
+    int getCancelledJobsCount();
+
+    int getFailedJobsCount();
+
     /**
-     * Returns the total number of Tasks.
-     *
      * @return the total number of Tasks.
      */
     int getTotalTasksCount();
 
     /**
-     * Returns the number of pending Tasks of the scheduler.
-     *
      * @return The number of pending Tasks of the scheduler.
      */
     int getPendingTasksCount();
 
     /**
-     * Returns the number of running Tasks of the scheduler.
-     *
      * @return The number of running Tasks of the scheduler.
      */
     int getRunningTasksCount();
 
     /**
-     * Returns the number of finished Tasks of the scheduler.
-     *
      * @return The number of finished Tasks of the scheduler.
      */
     int getFinishedTasksCount();
