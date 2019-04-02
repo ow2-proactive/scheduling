@@ -1291,8 +1291,9 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/{path:resubmit}")
     @Produces("application/json")
     JobIdData reSubmit(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos) throws JobCreationRestException,
-            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
+            @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException, UnknownJobRestException;
 
     /**
      * submit a planned workflow

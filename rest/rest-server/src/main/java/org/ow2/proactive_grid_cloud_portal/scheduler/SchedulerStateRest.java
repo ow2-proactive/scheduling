@@ -2283,7 +2283,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public JobIdData reSubmit(String sessionId, String jobId, PathSegment pathSegment, UriInfo contextInfos)
             throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
-            SubmissionClosedRestException, IOException {
+            SubmissionClosedRestException, IOException, UnknownJobRestException {
         Scheduler scheduler = checkAccess(sessionId, "reSubmit");
 
         File tmpJobFile = File.createTempFile("job", "d");
@@ -2291,19 +2291,20 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         JobId newJobId;
 
         try {
-            final String jobContent = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
+            String jobContent = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
             FileUtils.write(tmpJobFile, jobContent, Charset.forName("UTF-8"));
         } catch (NotConnectedException e) {
-            e.printStackTrace();
+            throw new NotConnectedRestException(e);
         } catch (UnknownJobException e) {
-            e.printStackTrace();
+            throw new UnknownJobRestException(e);
         } catch (PermissionException e) {
-            e.printStackTrace();
+            throw new PermissionRestException(e);
         } catch (SubmissionClosedException e) {
-            e.printStackTrace();
+            throw new SubmissionClosedRestException(e);
         } catch (JobCreationException e) {
-            e.printStackTrace();
+            throw new JobCreationRestException(e);
         }
+
         // Get the job submission variables
         Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
 
