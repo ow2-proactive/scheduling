@@ -1870,4 +1870,27 @@ public class SchedulerDBManager {
         return transactionHelper;
     }
 
+    public long getStalledJobsCount() {
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.STALLED));
+    }
+
+    public long getPausedJobsCount() {
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.PAUSED));
+    }
+
+    public long getInErrorJobsCount() {
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.IN_ERROR));
+    }
+
+    public long getKilledJobCount() {
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.KILLED));
+    }
+
+    public long getCancelledJobsCount() {
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.CANCELED));
+    }
+
+    public long getFailedJobsCount() {
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.FAILED));
+    }
 }
