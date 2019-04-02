@@ -278,10 +278,31 @@ public abstract class Script<E> implements Serializable {
             ScriptContentAndEngineName fetchedInformation = null;
             try {
                 fetchedInformation = getScriptContentAndEngineName();
+                return fetchedInformation.getScriptContent();
             } catch (Exception e) {
                 logger.trace("Could not fetch script at " + url, e);
+                return null;
             }
+        }
+        return script;
+    }
+
+    /**
+     * If the script is defined by an url, in fetchImmediately=false mode, retrieve and return the script content from the url.
+     *
+     * The script internal definition will not be modified, thus allowing fetching again the url prior to execution.
+     *
+     * Otherwise, return the inline script definition
+     *
+     * @return the script.
+     * @throws IOException when the script cannot be accessed
+     */
+    public String fetchScriptWithExceptionHandling() throws IOException {
+        if (script == null && url != null) {
+            ScriptContentAndEngineName fetchedInformation = null;
+            fetchedInformation = getScriptContentAndEngineName();
             return fetchedInformation.getScriptContent();
+
         }
         return script;
     }

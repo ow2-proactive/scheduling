@@ -451,4 +451,9 @@ public class SchedulerFrontendTest extends ProActiveTestClean {
         Properties properties = SchedulerPortalConfiguration.getConfiguration().getProperties();
         assertEquals("[properties]", properties.getProperty("execution-list-extra-columns"));
     }
+
+    @Test
+    public void testGetTaskPaginated() {
+
+    }
 }

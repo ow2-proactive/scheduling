@@ -106,6 +106,8 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.util.WorkflowVariablesTrans
 import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
+import com.google.common.base.Charsets;
+
 
 /**
  * This class exposes the Scheduler as a RESTful service.
@@ -3173,11 +3175,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     private static <T> List<T> map(List<?> toMaps, Class<T> type) {
-        List<T> result = new ArrayList<>(toMaps.size());
-        for (Object toMap : toMaps) {
-            result.add(mapper.map(toMap, type));
-        }
-        return result;
+        return toMaps.stream().map(toMap -> mapper.map(toMap, type)).collect(Collectors.toList());
     }
 
     /**
@@ -3492,8 +3490,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws JobCreationRestException, IOException {
         if (StringUtils.isBlank(workflowUrl))
             throw new JobCreationRestException("Cannot create workflow without url");
-        HttpResourceDownloader httpResourceDownloader = HttpResourceDownloader.getInstance();
-        return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
+        if (workflowUrl.startsWith("http")) {
+            HttpResourceDownloader httpResourceDownloader = HttpResourceDownloader.getInstance();
+            return httpResourceDownloader.getResource(sessionId, workflowUrl, String.class);
+        } else {
+            URL nonHttpURL = new URL(workflowUrl);
+            return IOUtils.toString(nonHttpURL.openStream(), Charsets.UTF_8);
+        }
     }
 
     protected static Map<String, String> createSortableTaskAttrMap() {

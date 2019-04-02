@@ -49,13 +49,13 @@ public class TestChildProcessOfNodeKilled extends SchedulerFunctionalTestWithCus
 
         schedulerHelper.killNode(tNode.getNode().getNodeInformation().getURL());
 
-        TestProcessTreeKiller.waitUntilAllForkedProcessesAreKilled();
+        TestProcessTreeKillerUtil.waitUntilAllForkedProcessesAreKilled();
     }
 
     private void startJobForkingProcesses() throws Exception {
-        TaskFlowJob jobForkingProcesses = TestProcessTreeKiller.createJavaExecutableJob("test", false);
+        TaskFlowJob jobForkingProcesses = TestProcessTreeKillerUtil.createJavaExecutableJob("test", false);
         schedulerHelper.submitJob(jobForkingProcesses);
-        TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(TestProcessTreeKiller.detachedProcNumber);
+        TestProcessTreeKillerUtil.waitUntilForkedProcessesAreRunning(TestProcessTreeKillerUtil.detachedProcNumber);
     }
 
     private TestNode startSchedulerAndRMWithOneNode() throws Exception {

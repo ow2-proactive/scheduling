@@ -27,21 +27,25 @@ package org.ow2.proactive.scheduler.policy.license;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.common.task.TaskStatus;
+import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
+import org.ow2.proactive.scheduler.descriptor.JobDescriptorImpl;
+import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.policy.ExtendedSchedulerPolicy;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.utils.NodeSet;
 
 
 /**
- * 
+ *
  * This Policy is designed to manage software licenses.
- * When a task contains the generic information REQUIRE_LICENSES,
- * this policy will check if there is an available license per
- * software to return true
+ * When a job/task contains the generic information REQUIRE_LICENSES,
+ * this policy will check if there are available tokens per required license.
  *
  */
 public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
@@ -50,103 +54,265 @@ public class LicenseSchedulingPolicy extends ExtendedSchedulerPolicy {
 
     private static final String REQUIRED_LICENSES = "REQUIRED_LICENSES";
 
-    // A map of fixed size lists. A map entry per software license and a list per map entry to handle tasks using this software license.
-    private static Map<String, LinkedBlockingQueue<EligibleTaskDescriptor>> eligibleTasksDescriptorsLicenses = null;
+    // Will be initialize with the license properties file which includes the number of tokens per license
+    private Properties properties = null;
 
-    // Will be initialize with the license properties file which includes the maximum licenses numbers per software
-    private static Properties properties = null;
+    // For DB persistence
+    private LicenseSynchronization licenseSynchronization = null;
 
-    private static void initialize() {
-        if (eligibleTasksDescriptorsLicenses == null) {
-            // Map initialization
-            eligibleTasksDescriptorsLicenses = new HashMap<String, LinkedBlockingQueue<EligibleTaskDescriptor>>();
-            // Retrieve properties from the license properties file ...
+    private void initialize() {
+
+        if (properties == null) {
+
+            logger.debug("Retrieve properties from the license properties file");
             properties = LicenseConfiguration.getConfiguration().getProperties();
-            // ... and per software license, create a list handling all tasks using a this software license
-            Enumeration e = properties.propertyNames();
-            while (e.hasMoreElements()) {
-                String software = (String) e.nextElement();
-                int numberOfLicenses = Integer.parseInt(properties.getProperty(software));
-                eligibleTasksDescriptorsLicenses.put(software,
-                                                     new LinkedBlockingQueue<EligibleTaskDescriptor>(numberOfLicenses));
+
+            logger.debug("Initializing LicenseSynchronization");
+            licenseSynchronization = new LicenseSynchronization();
+
+            Enumeration propertyNames = properties.propertyNames();
+            while (propertyNames.hasMoreElements()) {
+                String software = (String) propertyNames.nextElement();
+                int nbTokens;
+                try {
+                    nbTokens = Integer.parseInt(properties.getProperty(software));
+                } catch (NumberFormatException e) {
+                    logger.debug("Fatal error, cannot parse token number from the license properties file");
+                    throw e;
+                }
+
+                if (nbTokens > 0) {
+                    licenseSynchronization.addSoftware(software, nbTokens);
+                } else {
+                    // In order to distinguish the case where there is no more token (all are used)
+                    // and the case where it is set to <= 0 in the config file
+                    licenseSynchronization.addSoftware(software, -1);
+                }
             }
+            licenseSynchronization.persist();
         }
     }
 
-    @Override
-    public boolean isTaskExecutable(NodeSet selectedNodes, EligibleTaskDescriptor task) {
+    private void removeFinishedJobsAndReleaseTokens(String requiredLicense) {
 
-        logger.debug("Selected Nodes: " + selectedNodes);
+        LinkedBlockingQueue<String> eligibleJobsDescriptorsLicense = licenseSynchronization.getPersistedJobsLicense(requiredLicense);
 
-        logger.debug("Analysing task: " + ((EligibleTaskDescriptorImpl) task).getInternal().getName());
+        Iterator<String> iter = eligibleJobsDescriptorsLicense.iterator();
+        String currentJobId;
+        int currentNbTokens = licenseSynchronization.getRemainingTokens(requiredLicense);
+        while (iter.hasNext()) {
+            currentJobId = iter.next();
 
-        // Retrieve required licenses names from the task generic informations
-        final String requiredLicenses = ((EligibleTaskDescriptorImpl) task).getInternal()
-                                                                           .getRuntimeGenericInformation()
-                                                                           .get(REQUIRED_LICENSES);
+            if (!schedulingService.isJobAlive(JobIdImpl.makeJobId(currentJobId))) {
+                logger.debug("Releasing token for license " + requiredLicense + " given to job " + currentJobId);
+                iter.remove();
+                currentNbTokens++;
+            } else {
+                logger.debug("Job " + currentJobId + " is still alive, cannot release its token");
+            }
+        }
+        licenseSynchronization.setNbTokens(requiredLicense, currentNbTokens);
+        licenseSynchronization.markJobLicenseChange(requiredLicense);
+        licenseSynchronization.persist();
+    }
+
+    private void removeFinishedTasksAndReleaseTokens(String requiredLicense) {
+
+        LinkedBlockingQueue<String> eligibleTasksDescriptorsLicense = licenseSynchronization.getPersistedTasksLicense(requiredLicense);
+
+        Iterator<String> iter = eligibleTasksDescriptorsLicense.iterator();
+        String currentTaskId;
+        int currentNbTokens = licenseSynchronization.getRemainingTokens(requiredLicense);
+        while (iter.hasNext()) {
+            currentTaskId = iter.next();
+
+            if (!schedulingService.isTaskAlive(TaskIdImpl.makeTaskId(currentTaskId))) {
+                logger.debug("releasing token for license " + requiredLicense + " given to task " + currentTaskId);
+                iter.remove();
+                currentNbTokens++;
+            }
+        }
+        licenseSynchronization.setNbTokens(requiredLicense, currentNbTokens);
+        licenseSynchronization.markTaskLicenseChange(requiredLicense);
+        licenseSynchronization.persist();
+    }
+
+    private boolean canGetToken(String currentRequiredLicense) {
+
+        if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) == -1) {
+            logger.debug("No token specified in the config file, return false");
+            return false;
+        } else if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) > 0) {
+            logger.debug("There are still remaining licenses, return true");
+            return true;
+        } else { // == 0
+            logger.debug("Removing all terminated jobs/tasks and check again if there are remaining licenses");
+            removeFinishedJobsAndReleaseTokens(currentRequiredLicense);
+            removeFinishedTasksAndReleaseTokens(currentRequiredLicense);
+
+            if (licenseSynchronization.getRemainingTokens(currentRequiredLicense) > 0) {
+                logger.debug("There are remaining licenses after releasing tokens, return true");
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private boolean acquireTokensForJob(JobDescriptorImpl job) {
+
+        // Retrieve required licenses names from the job generic informations
+        final String requiredLicenses = job.getInternal().getRuntimeGenericInformation().get(REQUIRED_LICENSES);
+        final String jobId = job.getJobId().value();
 
         // If it requires software licenses
         if (requiredLicenses != null) {
 
-            initialize();
-            logger.debug("Need to check licenses with " + properties.toString());
+            logger.debug("For job considering licenses " + requiredLicenses);
 
-            // Iterate over required software licenses
-            final String[] requiredLicensesArray = requiredLicenses.split(",");
-            for (int i = 0; i < requiredLicensesArray.length; i++) {
-                // Retrieve the current software license name and its available number
-                final String currentRequiredLicense = requiredLicensesArray[i];
+            // Do not execute if one of the required license can not be obtained
+            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split(",")));
+            for (String requiredLicense : requiredLicensesSet) {
 
-                // To be executed (ie return true), a task must get a license per requiring software license
-                if (!canGetLicense(currentRequiredLicense)) {
-                    logger.debug("License for " + currentRequiredLicense + " not available, keep task pending");
+                if (!licenseSynchronization.containsLicense(requiredLicense)) {
+                    logger.debug("The required software is not specified in the license properties file, keep job pending");
+                    return false;
+                }
+
+                if (!licenseSynchronization.containsJobId(requiredLicense, jobId) && !canGetToken(requiredLicense)) {
+                    logger.debug("Token for " + requiredLicense + " not available, keep job pending");
                     return false;
                 }
             }
-            // Here we manage to give a license for all required software licenses
-            for (int i = 0; i < requiredLicensesArray.length; i++) {
-                eligibleTasksDescriptorsLicenses.get(requiredLicensesArray[i]).add(task);
+            // Can get a new token for each required license !
+            for (String requiredLicense : requiredLicensesSet) {
+                if (!licenseSynchronization.containsJobId(requiredLicense, jobId)) {
+                    licenseSynchronization.addJobToLicense(requiredLicense, jobId);
+                    licenseSynchronization.markJobLicenseChange(requiredLicense);
+                }
             }
-            logger.debug("All licenses are available, executing task");
+            logger.debug("Job eligible since it can get all tokens");
+            licenseSynchronization.persist();
             return true;
 
         } else {
+            logger.debug("Job eligible since it does not require any license");
             return true;
         }
 
     }
 
-    private void removeFinishedTasks(LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense) {
-        Iterator<EligibleTaskDescriptor> iter = eligibleTasksDescriptorsLicense.iterator();
-        EligibleTaskDescriptorImpl current_task;
-        while (iter.hasNext()) {
-            current_task = (EligibleTaskDescriptorImpl) iter.next();
-
-            if (!current_task.getInternal().isTaskAlive()) {
-                iter.remove();
-            }
+    private String getRequiredLicenses(EligibleTaskDescriptor task) {
+        // Do not consider the runtime GIs to test if REQUIRED_LICENSES is specified at the task level
+        // since these inherit from the job level ones
+        // And if REQUIRED_LICENSES is specified at the task level (i.e. in the unresolved GIs)
+        // Consider the runtime GIs to get the resolved REQUIRED_LICENSES
+        final InternalTask internTask = ((EligibleTaskDescriptorImpl) task).getInternal();
+        if (internTask.getGenericInformation().get(REQUIRED_LICENSES) != null) {
+            // Retrieve required licenses names from the task generic informations
+            return internTask.getRuntimeGenericInformation().get(REQUIRED_LICENSES);
+        } else {
+            logger.debug("Task eligible since it does not require any license");
+            return null;
         }
     }
 
-    private boolean canGetLicense(String currentRequiredLicense) {
+    private boolean notRequireLicenseOrLicenseExists(EligibleTaskDescriptor task) {
 
-        // If the required software is not specified in the license properties file
-        if (!eligibleTasksDescriptorsLicenses.containsKey(currentRequiredLicense))
-            return false;
+        String requiredLicenses = getRequiredLicenses(task);
 
-        LinkedBlockingQueue<EligibleTaskDescriptor> eligibleTasksDescriptorsLicense = eligibleTasksDescriptorsLicenses.get(currentRequiredLicense);
-        // if there are still remaining licenses return true
-        if (eligibleTasksDescriptorsLicense.remainingCapacity() > 0) {
+        // If it requires software licenses
+        if (requiredLicenses != null) {
+
+            logger.debug("For task considering licenses " + requiredLicenses);
+
+            // Do not execute if one of the required license can not be obtained
+            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split(",")));
+            for (String requiredLicense : requiredLicensesSet) {
+
+                if (!licenseSynchronization.containsLicense(requiredLicense)) {
+                    logger.debug("Task not eligible since no token exists for this license");
+                    return false;
+                }
+            }
+            logger.debug("Task eligible since all required licenses are specified in the properties file");
+            return true;
+
+        } else {
+            logger.debug("Task eligible since it does not require any license");
             return true;
         }
-        // otherwise remove all terminated tasks and check again if there are remaining licenses
-        else {
-            removeFinishedTasks(eligibleTasksDescriptorsLicense);
+    }
 
-            if (eligibleTasksDescriptorsLicense.remainingCapacity() > 0) {
-                return true;
+    /*
+     * Here we only keep tasks which, either do not require license, or require licenses specified
+     * in the license configuration file.
+     * We do not consider available tokens number yet at task level (i.e. we consider we have an
+     * infinite
+     * number of tokens for each license).
+     * By this way, we wont reserve tokens for non running tasks (blocking selection script, ...).
+     * We only consider tokens number at job level.
+     */
+    @Override
+    public LinkedList<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobDescList) {
+
+        initialize();
+
+        // Keep only executable jobs according to their required license tokens
+        List<JobDescriptor> filteredJobDescList = jobDescList.stream()
+                                                             .filter(jobDesc -> acquireTokensForJob((JobDescriptorImpl) jobDesc))
+                                                             .collect(Collectors.toList());
+
+        // Retrieve the ordered tasks from the filtered jobs according to the parent policy
+        LinkedList<EligibleTaskDescriptor> orderedTasksDescFromParentPolicy = super.getOrderedTasks(filteredJobDescList);
+
+        // Keep only tasks which, either does not require license, or require licenses specified in the config file (without considering tokens)
+        LinkedList<EligibleTaskDescriptor> filteredOrderedTasksDescFromParentPolicy = orderedTasksDescFromParentPolicy.stream()
+                                                                                                                      .filter(taskDesc -> notRequireLicenseOrLicenseExists(taskDesc))
+                                                                                                                      .collect(Collectors.toCollection(LinkedList::new));
+
+        return filteredOrderedTasksDescFromParentPolicy;
+    }
+
+    /* A task is executable if it does not require any license or if it can get tokens */
+    @Override
+    public boolean isTaskExecutable(NodeSet selectedNodes, EligibleTaskDescriptor task) {
+
+        // If it requires software licenses
+        String requiredLicenses = getRequiredLicenses(task);
+        if (requiredLicenses != null) {
+
+            logger.debug("Try to get tokens for licenses " + requiredLicenses);
+            final HashSet<String> requiredLicensesSet = new HashSet<String>(Arrays.asList(requiredLicenses.split(",")));
+            for (String requiredLicense : requiredLicensesSet) {
+
+                if (!licenseSynchronization.containsJobId(requiredLicense,
+                                                          ((EligibleTaskDescriptorImpl) task).getInternal()
+                                                                                             .getJobId()
+                                                                                             .value()) &&
+                    !canGetToken(requiredLicense)) {
+                    logger.debug("Token for " + requiredLicense + " not available, keep task pending");
+                    return false;
+                }
             }
-            return false;
+            logger.debug("Task can be executed since all tokens are available for licenses " + requiredLicenses);
+            for (String requiredLicense : requiredLicensesSet) {
+                if (!licenseSynchronization.containsJobId(requiredLicense,
+                                                          ((EligibleTaskDescriptorImpl) task).getInternal()
+                                                                                             .getJobId()
+                                                                                             .value())) {
+
+                    licenseSynchronization.addTaskToLicense(requiredLicense, task.getTaskId().toString());
+                    licenseSynchronization.markTaskLicenseChange(requiredLicense);
+                } else {
+                    logger.debug("The license " + requiredLicense +
+                                 " is already obtained at the job level, use it without getting a new token");
+                }
+            }
+            licenseSynchronization.persist();
+            return true;
+        } else {
+            logger.debug("Executable since it does not require any license");
+            return true;
         }
     }
 

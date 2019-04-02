@@ -22,6 +22,7 @@ class LoadPackage {
     private final String GLOBAL_SPACE_PATH
     private final String SCHEDULER_REST_URL
     private final String SCHEDULER_HOME
+    private final String SCHEDULER_VERSION
     private final File WORKFLOW_TEMPLATES_DIR
     private final String WORKFLOW_TEMPLATES_DIR_PATH
     private final String CATALOG_URL
@@ -39,6 +40,7 @@ class LoadPackage {
         this.GLOBAL_SPACE_PATH = binding.variables.get("pa.scheduler.dataspace.defaultglobal.localpath")
         this.SCHEDULER_REST_URL = binding.variables.get("pa.scheduler.rest.url")
         this.SCHEDULER_HOME = binding.variables.get("pa.scheduler.home")
+        this.SCHEDULER_VERSION = org.ow2.proactive.utils.Version.PA_VERSION
         this.sessionId = binding.variables.get("pa.scheduler.session.id")
 
         // User variables
@@ -209,6 +211,21 @@ class LoadPackage {
 
     }
 
+    def createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, File object_file) {
+        def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
+        post.addHeader("Accept", "application/json")
+        post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)
+        post.addHeader("sessionId", this.sessionId)
+
+        def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
+        builder.setBoundary(boundary);
+        builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
+        builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file))
+        post.setEntity(builder.build())
+
+        return getHttpClientBuilder().build().execute(post)
+    }
+
     def pushObject(object, package_dir, bucket_resources_list, bucket_name) {
         def metadata_map = object.get("metadata")
 
@@ -225,7 +242,7 @@ class LoadPackage {
         if (!object_found) {
             // Retrieve object metadata
             def kind = metadata_map.get("kind")
-            def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage"), "UTF-8")
+            def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage") + " (" + SCHEDULER_VERSION + ")", "UTF-8")
             def contentType = metadata_map.get("contentType")
 
             // For POST queries
@@ -234,22 +251,25 @@ class LoadPackage {
 
             // POST QUERY
             def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources?name=" + object_name + "&kind=" + kind + "&commitMessage=" + commitMessageEncoded + "&objectContentType=" + contentType
-            def post = new org.apache.http.client.methods.HttpPost(query_push_obj_query)
-            post.addHeader("Accept", "application/json")
-            post.addHeader("Content-Type", org.apache.http.entity.ContentType.MULTIPART_FORM_DATA.getMimeType() + ";boundary=" + boundary)
-            post.addHeader("sessionId", this.sessionId)
+            createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, object_file)
+            writeToOutput(" " + object_file.getName() + " created!")
+        } else {
+            // Retrieve object metadata
+            def commitMessageEncoded = java.net.URLEncoder.encode(metadata_map.get("commitMessage") + " (" + SCHEDULER_VERSION + ")", "UTF-8")
 
-            def builder = org.apache.http.entity.mime.MultipartEntityBuilder.create()
-            builder.setBoundary(boundary);
-            builder.setMode(org.apache.http.entity.mime.HttpMultipartMode.BROWSER_COMPATIBLE)
-            builder.addPart("file", new org.apache.http.entity.mime.content.FileBody(object_file))
-            post.setEntity(builder.build())
+            // For POST queries
+            this.class.getClass().getResource(new File(this.SCHEDULER_HOME, "dist/lib/httpclient-4.5.2.jar").absolutePath);
+            def boundary = "---------------" + UUID.randomUUID().toString();
 
-            def result = getHttpClientBuilder().build().execute(post)
-            writeToOutput(" " + object_file.getName() + " pushed!")
+            // POST QUERY
+            def query_push_obj_query = this.CATALOG_URL + "/buckets/" + bucket_name + "/resources/"+ object_name + "/revisions?commitMessage=" + commitMessageEncoded
+            createAndExecuteQueryWithFileAttachment(query_push_obj_query, boundary, object_file)
+            writeToOutput(" " + object_file.getName() + " updated!")
         }
         return object_file
     }
+
+
 
     def createBucketIfNotExist(bucket){
 

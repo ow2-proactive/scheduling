@@ -154,6 +154,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** path to the public key file which is used to encrypt credentials for authentication */
     SCHEDULER_AUTH_PUBKEY_PATH("pa.scheduler.auth.pubkey.path", PropertyType.STRING, "config/authentication/keys/pub.key"),
 
+    /** a domain name (windows active directory) which can be configured globally at the scheduler level **/
+    SCHEDULER_AUTH_GLOBAL_DOMAIN("pa.scheduler.auth.global.domain", PropertyType.STRING),
+
     /** 
      * LDAP Authentication configuration file path, used to set LDAP configuration properties
      * If this file path is relative, the path is evaluated from the Scheduler dir (ie application's root dir)
@@ -195,6 +198,8 @@ public enum PASchedulerProperties implements PACommonProperties {
 
     /** File encoding used by the scheduler */
     FILE_ENCODING(PAProperties.KEY_PA_FILE_ENCODING, PropertyType.STRING, "UTF-8"),
+
+    SCHEDULER_FINISHED_JOBS_LRU_CACHE_SIZE("pa.scheduler.finishedjobs.lru.cache.size", PropertyType.INTEGER, "1000"),
 
     /* ***************************************************************** */
     /* ************************ TASKS PROPERTIES *********************** */
@@ -356,7 +361,7 @@ public enum PASchedulerProperties implements PACommonProperties {
      * and 'm' (minutes).
      * If property isn't set then all finished jobs are loaded. 
      */
-    SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING),
+    SCHEDULER_DB_LOAD_JOB_PERIOD("pa.scheduler.db.load.job.period", PropertyType.STRING, "0m"),
 
     SCHEDULER_DB_TRANSACTION_DAMPING_FACTOR("pa.scheduler.db.transactions.damping.factor", PropertyType.INTEGER, "2"),
 
@@ -392,6 +397,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /* ***************************************************************** */
 
     LICENSE_SCHEDULING_POLICY_CONFIGURATION("pa.scheduler.license.policy.configuration", PropertyType.STRING),
+
+    /** location of the jdbm database for persistent license registrations */
+    LICENSE_SCHEDULING_POLICY_DATABASE("pa.scheduler.license.policy.db", PropertyType.STRING, "data/licenses"),
 
     /* ***************************************************************** */
     /* ***************** SYNCHRONIZATION STORE PROPERTIES ************** */

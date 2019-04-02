@@ -28,11 +28,7 @@ package functionaltests.job.taskkill;
 import static functionaltests.utils.SchedulerTHelper.log;
 import static org.junit.Assert.assertEquals;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
@@ -40,15 +36,12 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
-import org.objectweb.proactive.utils.OperatingSystem;
 import org.ow2.proactive.process_tree_killer.ProcessTree;
-import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
-import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.NativeTask;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskLauncher;
@@ -73,18 +66,6 @@ import functionaltests.utils.SchedulerFunctionalTestWithRestart;
  */
 public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
 
-    public static URL launchersDir = TestProcessTreeKiller.class.getResource("/functionaltests/executables/TestSleep.exe");
-
-    private final static int wait_kill_time = 60000;
-
-    public static final int detachedProcNumber = 4;
-
-    private static final int NB_ITERATIONS = 1;
-
-    private static final String unixSleepName = "sleep";
-
-    private static final String windowsSleepName = "TestSleep.exe";
-
     @Rule
     public Timeout testTimeout = new Timeout(10, TimeUnit.MINUTES);
 
@@ -94,7 +75,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
 
         Logger.getLogger(ProcessTree.class).setLevel(Level.DEBUG);
         Logger.getLogger(TaskLauncher.class).setLevel(Level.DEBUG);
-        for (int i = 0; i < NB_ITERATIONS; i++) {
+        for (int i = 0; i < TestProcessTreeKillerUtil.NB_ITERATIONS; i++) {
             log("***************************************************");
             log("************** Iteration " + i + " *************************");
             log("***************************************************");
@@ -110,7 +91,8 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             String task1Name = "TestPTK1";
             task1.setName(task1Name);
 
-            String workingDir = new File(TestProcessTreeKiller.launchersDir.toURI()).getParentFile().getCanonicalPath();
+            String workingDir = new File(TestProcessTreeKillerUtil.launchersDir.toURI()).getParentFile()
+                                                                                        .getCanonicalPath();
             task1.setForkEnvironment(new ForkEnvironment(workingDir));
             JavaSpawnExecutable executable = new JavaSpawnExecutable();
             executable.home = PASchedulerProperties.SCHEDULER_HOME.getValueAsString();
@@ -118,7 +100,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             job1.addTask(task1);
 
             String task2Name = "TestTK2";
-            TaskFlowJob job2 = createJavaExecutableJob(task2Name, true);
+            TaskFlowJob job2 = TestProcessTreeKillerUtil.createJavaExecutableJob(task2Name, true);
 
             log("************** Test with Job Killing *************");
             //submit three jobs
@@ -128,7 +110,8 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             schedulerHelper.waitForEventTaskRunning(id2, task2Name);
 
             log("************** All 2 tasks running *************");
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber * 2);
+            TestProcessTreeKillerUtil.waitUntilForkedProcessesAreRunning(TestProcessTreeKillerUtil.detachedProcNumber *
+                                                                         2);
             //we should have 2 times (2 jobs) number of detached processes
 
             //kill the first job
@@ -137,7 +120,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             schedulerHelper.waitForEventJobFinished(id1);
             log("************** First job killed *************");
 
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber);
+            TestProcessTreeKillerUtil.waitUntilForkedProcessesAreRunning(TestProcessTreeKillerUtil.detachedProcNumber);
 
             //kill the second job
             log("************** Waiting for the second job (JavaExecutable) to be killed *************");
@@ -145,7 +128,7 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
             schedulerHelper.waitForEventJobFinished(id2);
             log("************** Second job killed *************");
 
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(0);
+            TestProcessTreeKillerUtil.waitUntilForkedProcessesAreRunning(0);
 
             JobResult res = schedulerHelper.getJobResult(id1);
             assertEquals(JobStatus.KILLED, res.getJobInfo().getStatus());
@@ -181,27 +164,19 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
 
             log("************** All 2 tasks running *************");
 
-            TestProcessTreeKiller.waitUntilForkedProcessesAreRunning(detachedProcNumber);
+            TestProcessTreeKillerUtil.waitUntilForkedProcessesAreRunning(TestProcessTreeKillerUtil.detachedProcNumber);
 
             //we should have 1 time (2 jobs) number of detached processes as the first job won't spawn any process
 
-            log("************** Waiting for first job (NativeExecutable) to finish *************");
+            log("************** Waiting for both jobs to finish *************");
             //wait for the first job to finish normally
 
             schedulerHelper.waitForEventJobFinished(id1);
-
-            log("************** First job finished *************");
-
-            int runningDetachedProcNumber = countProcesses();
-            log("************** number of processes : " + runningDetachedProcNumber);
-            assertEquals(detachedProcNumber, runningDetachedProcNumber);
-
-            log("************** Waiting for second job (JavaExecutable) to finish *************");
-            //wait for the second job to finish normally
             schedulerHelper.waitForEventJobFinished(id2);
-            log("************** Second job finished *************");
 
-            runningDetachedProcNumber = countProcesses();
+            log("************** Both jobs finished *************");
+
+            int runningDetachedProcNumber = TestProcessTreeKillerUtil.countProcesses();
             log("************** number of processes : " + runningDetachedProcNumber);
             assertEquals(0, runningDetachedProcNumber);
 
@@ -214,91 +189,4 @@ public class TestProcessTreeKiller extends SchedulerFunctionalTestWithRestart {
         }
     }
 
-    public static TaskFlowJob createJavaExecutableJob(String name, boolean forked) throws UserException {
-        TaskFlowJob job = new TaskFlowJob();
-        job.setName(name);
-        job.setDescription("A command that spawns processes");
-
-        JavaTask task = new JavaTask();
-        if (forked) {
-            task.setForkEnvironment(new ForkEnvironment());
-        }
-        task.addArgument("sleep", 3);
-        task.addArgument("tname", name);
-        task.addArgument("home", PASchedulerProperties.SCHEDULER_HOME.getValueAsString());
-        task.setName(name);
-        task.setExecutableClassName(JavaSpawnExecutable.class.getName());
-        job.addTask(task);
-        return job;
-    }
-
-    /*
-     * Process are killed asynchronously, need wait some time
-     */
-    public static void waitUntilForkedProcessesAreRunning(int expectedNumber) throws Exception {
-        log("************** Waiting until " + expectedNumber + " processes are left *************");
-        int runningDetachedProcNumber = 0;
-        long stopTime = System.currentTimeMillis() + wait_kill_time;
-        while (System.currentTimeMillis() < stopTime) {
-            runningDetachedProcNumber = countProcesses();
-
-            if (runningDetachedProcNumber == expectedNumber) {
-                break;
-            } else {
-                Thread.sleep(500);
-            }
-        }
-        assertEquals(expectedNumber, runningDetachedProcNumber);
-        log("************** " + expectedNumber + " processes are now running *************");
-    }
-
-    public static void waitUntilAllForkedProcessesAreKilled() throws Exception {
-        waitUntilForkedProcessesAreRunning(0);
-    }
-
-    /*
-     * Process are killed asynchronously, need wait some time
-     */
-    public static int countProcesses() throws Exception {
-        switch (OperatingSystem.getOperatingSystem()) {
-            case windows:
-                return getProcessNumberWindows(windowsSleepName);
-            case unix:
-                return getProcessNumber(unixSleepName);
-            default:
-                throw new IllegalStateException("Unsupported operating system");
-        }
-    }
-
-    public static int getProcessNumber(String executableName) throws IOException {
-        int toReturn = 0;
-        String line;
-        ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", "ps -f -u $(whoami)");
-        processBuilder.redirectErrorStream();
-        Process p = processBuilder.start();
-        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        log("Scanning processes");
-        while ((line = input.readLine()) != null) {
-            log("Process: " + line);
-            if (line.contains(executableName)) {
-                toReturn++;
-            }
-        }
-        input.close();
-        return toReturn;
-    }
-
-    public static int getProcessNumberWindows(String executableName) throws IOException {
-        int toReturn = 0;
-        String line;
-        Process p = Runtime.getRuntime().exec("tasklist");
-        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        while ((line = input.readLine()) != null) {
-            if (line.toLowerCase().contains(executableName.toLowerCase())) {
-                toReturn++;
-            }
-        }
-        input.close();
-        return toReturn;
-    }
 }

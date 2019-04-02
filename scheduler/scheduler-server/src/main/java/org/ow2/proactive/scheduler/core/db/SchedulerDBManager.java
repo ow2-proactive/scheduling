@@ -722,7 +722,7 @@ public class SchedulerDBManager {
             logger.info("Loading Jobs from database");
 
             Query query;
-            if (period > 0L) {
+            if (period >= 0L) {
                 query = session.getNamedQuery("loadJobsWithPeriod")
                                .setParameter("minSubmittedTime", System.currentTimeMillis() - period)
                                .setParameterList("status", status)
@@ -766,6 +766,10 @@ public class SchedulerDBManager {
                                   .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE);
         List<TaskData> tasks = tasksQuery.list();
         return tasks.stream().collect(Collectors.groupingBy(taskData -> taskData.getJobData().getId()));
+    }
+
+    public List<InternalJob> loadInternalJob(Long id) {
+        return executeReadOnlyTransaction(session -> loadInternalJobs(false, session, Collections.singletonList(id)));
     }
 
     // Executed in a transaction from the caller

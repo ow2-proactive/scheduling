@@ -43,10 +43,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Policy;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.security.auth.login.LoginException;
 
@@ -278,6 +278,14 @@ public class RMNodeStarter {
 
     private static KeyPairProducer keyPairProducer = new KeyPairProducer();
 
+    private ResourceManager resourceManager = null;
+
+    private String nodeName;
+
+    private ConcurrentHashMap<String, Node> nodes;
+
+    private SigarExposer sigarExposer;
+
     public RMNodeStarter() {
 
     }
@@ -474,7 +482,9 @@ public class RMNodeStarter {
 
     public boolean createNodesAndConnect(final String nodeName) {
 
-        Map<String, Node> nodes = createNodes(nodeName);
+        this.nodeName = nodeName;
+
+        this.nodes = createNodes(nodeName);
 
         Tools.logAvailableScriptEngines(logger);
 
@@ -487,7 +497,7 @@ public class RMNodeStarter {
             rmURL = tryBroadcastDiscoveryOrExit();
         }
 
-        connectToResourceManager(nodeName, nodes);
+        connectToResourceManager(this.nodeName, this.nodes);
 
         return true;
     }
@@ -504,8 +514,8 @@ public class RMNodeStarter {
         return createdNodeNames;
     }
 
-    private Map<String, Node> createNodes(String nodeName) {
-        Map<String, Node> nodes = new HashMap<>(workers);
+    private ConcurrentHashMap<String, Node> createNodes(String nodeName) {
+        ConcurrentHashMap<String, Node> nodes = new ConcurrentHashMap<>(workers);
         List<String> createdNodeNames = getWorkersNodeNames(nodeName, workers);
         for (int nodeIndex = 0; nodeIndex < workers; nodeIndex++) {
             Node node = createLocalNode(createdNodeNames.get(nodeIndex));
@@ -528,13 +538,13 @@ public class RMNodeStarter {
     }
 
     private void connectToResourceManager(String nodeName, Map<String, Node> nodes) {
-        ResourceManager rm = this.registerInRM(credentials, rmURL, nodeName, nodes.values());
+        this.resourceManager = this.registerInRM(credentials, rmURL, nodeName, nodes.values());
         resetReconnectionAttemptsLeft();
-        pingAllNodes(nodes, rm);
+        pingAllNodes();
     }
 
-    private void pingAllNodes(Map<String, Node> nodes, ResourceManager rm) {
-        if (rm != null) {
+    private void pingAllNodes() {
+        if (this.resourceManager != null) {
             logger.info("Connected to the resource manager at " + rmURL);
 
             // NB_OF_ADD_NODE_ATTEMPTS is used here to disable pinging
@@ -542,30 +552,30 @@ public class RMNodeStarter {
 
                 while (numberOfReconnectionAttemptsLeft >= 0) {
                     try {
-                        pingAllNodesIndefinitely(nodes, rm);
+                        pingAllNodesIndefinitely();
                     } catch (NotConnectedException e) {
                         logger.warn("Authentication issue, reconnecting to the Resource Manager");
-                        rm = reconnectToResourceManager();
+                        this.resourceManager = reconnectToResourceManager();
                     } catch (ProActiveRuntimeException e) {
                         logger.warn("Node disconnected from the Resource Manager, reconnection in progress");
-                        rm = reconnectToResourceManager();
+                        this.resourceManager = reconnectToResourceManager();
                     } catch (Throwable e) {
                         logger.error(ExitStatus.RM_NO_PING.description, e);
                     } finally {
-                        if (nodes.size() > 0) {
+                        if (nodes.size() > 0 && this.resourceManager == null) {
                             try {
                                 logger.warn("Disconnected from the resource manager");
-                                logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
                                 logger.warn("Number of attempts left is " + numberOfReconnectionAttemptsLeft);
 
-                                numberOfReconnectionAttemptsLeft--;
-
                                 if (numberOfReconnectionAttemptsLeft != 0) {
+                                    logger.warn("Node will try to reconnect in " + PING_DELAY_IN_MS + " ms");
                                     Thread.sleep(PING_DELAY_IN_MS);
                                 }
                             } catch (InterruptedException ignored) {
                                 logger.debug("Ignored interrupted exception", ignored);
                             }
+                        } else if (nodes.size() > 0) {
+                            // reconnection successful
                         } else {
                             // if we are here it means all nodes have been removed by the resource manager
                             logger.error(ExitStatus.ALL_NODES_REMOVED.description);
@@ -598,20 +608,8 @@ public class RMNodeStarter {
         }
     }
 
-    private ResourceManager reconnectToResourceManager() {
-        try {
-            // trying to reconnect to the resource manager
-            RMAuthentication auth = RMConnection.waitAndJoin(rmURL, WAIT_ON_JOIN_TIMEOUT_IN_MS);
-            return auth.login(credentials);
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-
-        return null;
-    }
-
-    private void pingAllNodesIndefinitely(Map<String, Node> nodes, ResourceManager rm) {
-        while (allNodesAreAvailable(nodes, rm)) {
+    private void pingAllNodesIndefinitely() {
+        while (allNodesAreAvailable()) {
             try {
                 if (numberOfReconnectionAttemptsLeft < NB_OF_RECONNECTION_ATTEMPTS) {
                     logger.info("Node successfully reconnected to the resource manager");
@@ -629,19 +627,19 @@ public class RMNodeStarter {
         numberOfReconnectionAttemptsLeft = NB_OF_RECONNECTION_ATTEMPTS;
     }
 
-    private boolean allNodesAreAvailable(Map<String, Node> nodes, ResourceManager rm) {
-        if (rm == null) {
+    private boolean allNodesAreAvailable() {
+        if (this.resourceManager == null) {
             throw new NotConnectedException("No connection to RM");
         }
 
-        Set<String> unknownNodeUrls = PAFuture.getFutureValue(rm.setNodesAvailable(ImmutableSet.copyOf(nodes.keySet())),
+        Set<String> unknownNodeUrls = PAFuture.getFutureValue(this.resourceManager.setNodesAvailable(ImmutableSet.copyOf(nodes.keySet())),
                                                               nodeAvailabilityReportTimeoutDelay);
 
         for (String unknownNodeUrl : unknownNodeUrls) {
-            killWorkerNodeIfRemovedByUser(nodes, unknownNodeUrl);
+            killWorkerNodeIfRemovedByUser(this.nodes, unknownNodeUrl);
         }
 
-        int nodeCount = nodes.size();
+        int nodeCount = this.nodes.size();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Node count is equal to " + nodeCount);
@@ -1209,17 +1207,32 @@ public class RMNodeStarter {
      * at the given URL, logs with provided credentials and adds the local node to
      * the Resource Manager. Handles all errors/exceptions.
      */
-    protected ResourceManager registerInRM(final Credentials credentials, final String rmURL, final String nodeName,
-            final Collection<Node> nodes) {
+    protected ResourceManager registerInRM(final Credentials credentials, final String rmURL, String nodeName,
+            Collection<Node> nodes) {
 
-        RMAuthentication auth = joinResourceManager(rmURL);
-        final ResourceManager rm = loginToResourceManager(credentials, auth);
-        SigarExposer sigarExposer = null;
+        RMAuthentication rmAuth = joinResourceManager(rmURL);
+        ResourceManager rm = loginToResourceManager(credentials, rmAuth);
 
+        startMonitoring(rmAuth);
+
+        for (final Node node : nodes) {
+            nodeSetJmxUrl(sigarExposer, node);
+            addNodeToResourceManager(rmURL, node, rm);
+        }
+
+        return rm;
+    }
+
+    private void startMonitoring(RMAuthentication auth) {
         if (!disabledMonitoring) {
+            if (sigarExposer != null) {
+                logger.info("Shutting down previous JMX monitoring.");
+                sigarExposer.shutdown();
+            }
             // initializing JMX server with Sigar beans
             sigarExposer = new SigarExposer(nodeName);
             final RMAuthentication rmAuth = auth;
+            logger.info("Starting JMX monitoring.");
             sigarExposer.boot(auth, false, new PermissionChecker() {
                 @Override
                 public boolean checkPermission(Credentials cred) {
@@ -1229,7 +1242,7 @@ public class RMNodeStarter {
                         if (NB_OF_ADD_NODE_ATTEMPTS == 0)
                             return true;
 
-                        boolean isAdmin = rm.isNodeAdmin(nodes.iterator().next().getNodeInformation().getURL())
+                        boolean isAdmin = rm.isNodeAdmin(nodes.values().iterator().next().getNodeInformation().getURL())
                                             .getBooleanValue();
                         if (!isAdmin) {
                             throw new SecurityException("Permission denied");
@@ -1247,13 +1260,6 @@ public class RMNodeStarter {
         } else {
             logger.info("JMX monitoring is disabled.");
         }
-
-        for (final Node node : nodes) {
-            nodeSetJmxUrl(sigarExposer, node);
-            addNodeToResourceManager(rmURL, node, rm);
-        }
-
-        return rm;
     }
 
     private void nodeSetJmxUrl(SigarExposer sigarExposer, Node node) {
@@ -1267,6 +1273,23 @@ public class RMNodeStarter {
         } catch (Exception e) {
             logger.error("", e);
         }
+    }
+
+    private ResourceManager reconnectToResourceManager() {
+        try {
+            numberOfReconnectionAttemptsLeft--;
+            // trying to reconnect to the resource manager
+            ResourceManager rm = null;
+            RMAuthentication rmAuth = RMConnection.waitAndJoin(rmURL, WAIT_ON_JOIN_TIMEOUT_IN_MS);
+            rm = rmAuth.login(credentials);
+
+            startMonitoring(rmAuth);
+            return rm;
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        return null;
     }
 
     private void addNodeToResourceManager(String rmURL, Node node, ResourceManager rm) {

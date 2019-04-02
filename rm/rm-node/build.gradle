@@ -1,5 +1,5 @@
 dependencies {
-    compile 'org.ow2.proactive:process-tree-killer:1.0.0'
+    compile 'org.ow2.proactive:process-tree-killer:1.0.1'
     compile 'org.jvnet.winp:winp:1.24'
     compile 'net.java.dev.jna:jna:4.1.0'
     compile 'commons-io:commons-io:2.5'
@@ -24,11 +24,11 @@ dependencies {
     runtime 'org.python:jython-standalone:2.7.0'
 
     runtime 'org.codehaus.groovy:groovy-all:2.4.12'
-    runtime 'jsr223:jsr223-nativeshell:0.4.6'
-    runtime 'jsr223:jsr223-docker-compose:0.3.1'
-    runtime 'jsr223:jsr223-perl:0.1.0'
+    runtime 'jsr223:jsr223-nativeshell:0.4.7'
+    runtime 'jsr223:jsr223-docker-compose:0.3.2'
+    runtime 'jsr223:jsr223-perl:0.1.1'
     runtime 'jsr223:jsr223-powershell:0.2.1'
-    runtime 'jsr223:jsr223-cpython:0.1.4'
+    runtime 'jsr223:jsr223-cpython:0.1.6'
     runtime 'jsr223:jsr223-scala:0.1.4'
     runtime ('jsr223:jsr223-kubernetes:0.1.5'){
             exclude module : 'gson'

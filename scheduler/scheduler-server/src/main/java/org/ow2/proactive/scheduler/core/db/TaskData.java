@@ -49,6 +49,7 @@ import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.apache.log4j.Logger;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -73,6 +74,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.usage.TaskUsage;
 import org.ow2.proactive.scheduler.common.util.ISO8601DateUtil;
+import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -287,6 +289,8 @@ public class TaskData {
     private String workingDir;
 
     private ExecuterInformationData executerInformationData;
+
+    private static final Logger logger = Logger.getLogger(TaskData.class);
 
     @Column(name = "JAVA_HOME", length = Integer.MAX_VALUE)
     @Lob
@@ -542,7 +546,10 @@ public class TaskData {
 
         // set the scheduledTime if the START_AT property exists
         Map<String, String> genericInfos = taskData.getGenericInformation();
-        if (genericInfos != null && genericInfos.containsKey(CommonAttribute.GENERIC_INFO_START_AT_KEY)) {
+        if (genericInfos != null && genericInfos.containsKey(CommonAttribute.GENERIC_INFO_START_AT_KEY) &&
+            !genericInfos.get(CommonAttribute.GENERIC_INFO_START_AT_KEY)
+                         .contains(VariableSubstitutor.SUBSITUTE_PREFIX_SIMPLE)) {
+            // parse the START_AT if it's available and not dynamically defined
             long scheduledTime = ISO8601DateUtil.toDate(genericInfos.get(CommonAttribute.GENERIC_INFO_START_AT_KEY))
                                                 .getTime();
             taskData.setScheduledTime(scheduledTime);

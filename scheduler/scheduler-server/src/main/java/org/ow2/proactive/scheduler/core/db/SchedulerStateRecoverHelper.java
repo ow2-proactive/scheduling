@@ -118,7 +118,7 @@ public class SchedulerStateRecoverHelper {
                     job.setNumberOfPendingTasks(job.getNumberOfPendingTasks() + job.getNumberOfRunningTasks());
                     job.setNumberOfRunningTasks(0);
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.error("Failed to recover job " + job.getId() + " " + job.getName() +
                              " job might be in a inconsistent state", e);
                 jobLogger.error(job.getId(), "Failed to recover job, job might be in an inconsistent state", e);

@@ -73,7 +73,7 @@ public class TaskLauncherDataSpacesTest extends TaskLauncherTestAbstract {
 
         TaskLauncherInitializer initializer = new TaskLauncherInitializer();
         initializer.setTaskId(TaskIdImpl.createTaskId(JobIdImpl.makeJobId("1000"), "job", 1000L));
-        initializer.setTaskInputFiles(singletonList(new InputSelector(new FileSelector("input_$PA_JOB_ID.txt"),
+        initializer.setTaskInputFiles(singletonList(new InputSelector(new FileSelector("input_${PA_JOB_ID}.txt"),
                                                                       InputAccessMode.TransferFromInputSpace)));
 
         File inputFile = new File(taskLauncherFactory.getDataSpaces().getInputURI(), "input_1000.txt");
@@ -81,6 +81,10 @@ public class TaskLauncherDataSpacesTest extends TaskLauncherTestAbstract {
 
         TaskResult taskResult = runTaskLauncher(createLauncherWithInjectedMocks(initializer, taskLauncherFactory),
                                                 executableContainer);
+
+        if (taskResult.hadException()) {
+            taskResult.getException().printStackTrace();
+        }
 
         assertFalse(taskResult.hadException());
         assertTrue(taskResult.getOutput().getAllLogs(false).contains("input_1000.txt"));

@@ -37,6 +37,7 @@ import functionaltests.db.schedulerdb.TestJobRemove;
 import functionaltests.db.schedulerdb.TestMultipleTasks;
 import functionaltests.job.taskkill.TestJobKilled;
 import functionaltests.job.taskkill.TestProcessTreeKiller;
+import functionaltests.job.taskkill.TestProcessTreeKillerNonForked;
 import functionaltests.recover.RunningTaskRecoveryWhenNodesAreReservedInBatchTest;
 import functionaltests.recover.RunningTaskRecoveryWithDownNodeTest;
 import functionaltests.recover.RunningTaskRecoveryWithForkedTaskExecutorTest;
@@ -70,7 +71,7 @@ import functionaltests.workflow.complex.TestWorkflowReplicateJobs3;
                       TestJobLegacySchemas.class,
 
                       // Tests with scheduler restart
-                      TestProcessTreeKiller.class,
+                      TestProcessTreeKiller.class, TestProcessTreeKillerNonForked.class,
 
                       // Tests in non forked mode without scheduler restart
                       TestWorkflowSubmission.class, TestWorkflowComplexJobs.class, TestWorkflowComplexJobs2.class,

@@ -178,11 +178,16 @@ public class SchedulerStarter {
     }
 
     protected static void start(CommandLine commandLine) throws Exception {
+
+        long startTime = System.nanoTime();
+
         ProActiveConfiguration.load(); // force properties loading to find out if PAMR router should be started
 
         if (!commandLine.hasOption(OPTION_NO_ROUTER)) {
             startRouter();
         }
+
+        LOGGER.info("Activeeon ProActive version " + getSchedulerVersion());
 
         hsqldbServer = new SchedulerHsqldbStarter();
         hsqldbServer.startIfNeeded();
@@ -205,12 +210,20 @@ public class SchedulerStarter {
         }
 
         if (!commandLine.hasOption(OPTION_NO_REST)) {
+            long jettyStartTime = System.nanoTime();
             startJetty(rmURL, schedulerURL);
+            long jettyEndTime = System.nanoTime();
+            LOGGER.debug("Jetty started in " +
+                         String.valueOf(((double) jettyEndTime - jettyStartTime) / 1_000_000_000) + " seconds");
         }
 
         addShutdownMessageHook();
 
         executeStartScripts();
+
+        long endTime = System.nanoTime();
+        LOGGER.info("ProActive started in " + String.valueOf(((double) endTime - startTime) / 1_000_000_000) +
+                    " seconds");
     }
 
     public static void startJetty(String rmUrl, String scheduleUrl) {
@@ -274,7 +287,7 @@ public class SchedulerStarter {
             throws URISyntaxException, InternalSchedulerException, ParseException, SocketException,
             UnknownHostException, IllegalArgumentException {
         String policyFullName = getPolicyFullName(commandLine);
-        LOGGER.info("Scheduler version is " + getSchedulerVersion());
+
         LOGGER.info("Starting the scheduler...");
         SchedulerAuthenticationInterface sai = null;
         try {

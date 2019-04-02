@@ -29,12 +29,7 @@ import java.security.KeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.collections4.ListUtils;
 import org.apache.log4j.Logger;
@@ -118,28 +113,17 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
             //if job is TASKSFLOW, preparing the list of parameters for this task.
             int resultSize = taskDescriptor.getParents().size();
             if ((job.getType() == JobType.TASKSFLOW) && (resultSize > 0) && task.handleResultsArguments()) {
+                InternalTask internalTask = ((EligibleTaskDescriptorImpl) taskDescriptor).getInternal();
+                internalTask.updateParentTasksResults(schedulingService);
 
                 Set<TaskId> parentIds = new LinkedHashSet<>(resultSize);
                 for (int i = 0; i < resultSize; i++) {
-                    parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(((EligibleTaskDescriptorImpl) taskDescriptor.getParents()
-                                                                                                                                          .get(i)).getInternal()));
+                    InternalTask parentTask = ((EligibleTaskDescriptorImpl) taskDescriptor.getParents()
+                                                                                          .get(i)).getInternal();
+                    parentIds.addAll(internalTaskParentFinder.getFirstNotSkippedParentTaskIds(parentTask));
                 }
 
                 params = new TaskResult[parentIds.size()];
-
-                // If parentTaskResults is null after a system failure (a very rare case)
-                if (task.getParentTasksResults() == null) {
-                    Map<TaskId, TaskResult> taskResults = new HashMap<>();
-                    // Batch fetching of parent tasks results
-                    for (List<TaskId> parentsSubList : ListUtils.partition(new ArrayList<>(parentIds),
-                                                                           PASchedulerProperties.SCHEDULER_DB_FETCH_TASK_RESULTS_BATCH_SIZE.getValueAsInt())) {
-                        taskResults.putAll(schedulingService.getInfrastructure()
-                                                            .getDBManager()
-                                                            .loadTasksResults(job.getId(), parentsSubList));
-                    }
-                    // store the parent tasks results in InternalTask for future executions.
-                    task.setParentTasksResults(taskResults);
-                }
 
                 int i = 0;
                 for (TaskId taskId : parentIds) {
@@ -177,6 +161,11 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
 
     private void createAndSetCredentials() throws KeyException, NoSuchAlgorithmException {
         CredData decryptedUserCredentials = job.getCredentials().decrypt(corePrivateKey);
+
+        if (PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.isSet() &&
+            decryptedUserCredentials.getDomain() == null) {
+            decryptedUserCredentials.setDomain(PASchedulerProperties.SCHEDULER_AUTH_GLOBAL_DOMAIN.getValueAsString());
+        }
 
         enrichWithThirdPartyCredentials(decryptedUserCredentials);
 

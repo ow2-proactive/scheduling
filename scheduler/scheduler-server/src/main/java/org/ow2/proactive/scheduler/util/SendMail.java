@@ -67,6 +67,18 @@ public class SendMail {
         builder.build().sendPlainTextEmail();
     }
 
+    public void sender(List<String> to, String subject, String body, String fileToAttach, String fileName) {
+        final Properties properties = EmailConfiguration.getConfiguration().getProperties();
+
+        EmailSender.Builder builder = new EmailSender.Builder(properties);
+        builder.setFrom(PASchedulerProperties.EMAIL_NOTIFICATIONS_SENDER_ADDRESS.getValueAsString());
+        to.forEach(address -> builder.addRecipient(address));
+        builder.setSubject(subject);
+        builder.setBody(body);
+        builder.setAttachmentPath(fileToAttach);
+        builder.setAttachmentName(fileName);
+        builder.build().sendPlainTextEmailWithAttachment();
+    }
 }
 
 class EmailConfiguration {

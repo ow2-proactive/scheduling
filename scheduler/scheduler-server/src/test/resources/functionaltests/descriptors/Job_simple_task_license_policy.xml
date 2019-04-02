@@ -3,23 +3,27 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="urn:proactive:jobdescriptor:3.8"
         xsi:schemaLocation="urn:proactive:jobdescriptor:3.8 http://www.activeeon.com/public_content/schemas/proactive/jobdescriptor/3.8/schedulerjob.xsd"
-        name="Untitled Workflow 1"
+        name="job_simple_task_license_policy"
         priority="normal"
         onTaskError="continueJobExecution"
         maxNumberOfExecution="2"
 >
+  <variables>
+    <variable name="LICENSES" value=""/>
+    <variable name="LICENSES_2" value=""/>
+  </variables>
   <taskFlow>
     <task name="Groovy_Task"
     >
       <genericInformation>
-        <info name="REQUIRED_LICENSES" value="software_A,software_B"/>
+        <info name="REQUIRED_LICENSES" value="${LICENSES}"/>
       </genericInformation>
       <scriptExecutable>
         <script
         >
           <code language="groovy">
             <![CDATA[
-println ""
+sleep(5000)
 ]]>
           </code>
         </script>
@@ -28,14 +32,14 @@ println ""
     <task name="Groovy_Task2"
     >
       <genericInformation>
-        <info name="REQUIRED_LICENSES" value="software_A,software_B"/>
+        <info name="REQUIRED_LICENSES" value="${LICENSES_2}"/>
       </genericInformation>
       <scriptExecutable>
         <script
         >
           <code language="groovy">
             <![CDATA[
-println ""
+sleep(5000)
 ]]>
           </code>
         </script>

@@ -182,6 +182,33 @@ class LiveJobs {
         return false;
     }
 
+    boolean isJobAlive(JobId jobId) {
+        if (!jobs.containsKey(jobId)) {
+            return false;
+        }
+        JobData jobData = lockJob(jobId);
+        if (jobData == null) {
+            return false;
+        }
+        try {
+            return jobData.job.getStatus().isJobAlive();
+        } finally {
+            jobData.unlock();
+        }
+    }
+
+    boolean isTaskAlive(TaskId taskId) {
+        JobData jobData = lockJob(taskId.getJobId());
+        if (jobData == null) {
+            return false;
+        }
+        try {
+            return jobData.job.getHMTasks().get(taskId).isTaskAlive();
+        } finally {
+            jobData.unlock();
+        }
+    }
+
     void changeJobPriority(JobId jobId, JobPriority priority) {
         JobData jobData = lockJob(jobId);
         if (jobData == null) {
@@ -948,6 +975,8 @@ class LiveJobs {
             terminationData.addJobToTerminate(job.getId());
         }
 
+        task.setTaskResult(result);
+
         // Update database
         if (result.getAction() != null) {
             dbManager.updateAfterWorkflowTaskFinished(job, changesInfo, result);
@@ -1075,7 +1104,7 @@ class LiveJobs {
     public JobData lockJob(JobId jobId) {
         JobData jobData = jobs.get(jobId);
         if (jobData == null) {
-            jlogger.info(jobId, "does not exist");
+            jlogger.info(jobId, "is terminated");
             return null;
         }
         jobData.jobLock.lock();
@@ -1090,7 +1119,7 @@ class LiveJobs {
     private JobData checkJobAccess(JobId jobId) {
         JobData jobData = jobs.get(jobId);
         if (jobData == null) {
-            logger.warn("Job " + jobId + " does not exist or has been removed.");
+            logger.warn("Job " + jobId + " is terminated or has been removed.");
             return null;
         }
         if (!jobData.jobLock.isHeldByCurrentThread()) {

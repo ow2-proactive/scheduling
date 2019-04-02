@@ -38,6 +38,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
 import org.ow2.proactive.scheduler.common.Scheduler;
+import org.ow2.proactive.scheduler.core.SchedulingService;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptor;
 import org.ow2.proactive.utils.NodeSet;
@@ -54,6 +55,8 @@ import org.ow2.proactive.utils.NodeSet;
 public abstract class Policy implements Serializable {
 
     protected static final Logger logger = Logger.getLogger(Policy.class);
+
+    protected SchedulingService schedulingService = null;
 
     /**
      * Resources manager state. Can be used in an inherit policy to be aware
@@ -109,6 +112,10 @@ public abstract class Policy implements Serializable {
      */
     public final void setRMState(RMState state) {
         this.RMState = state;
+    }
+
+    public final void setSchedulingService(SchedulingService schedulingService) {
+        this.schedulingService = schedulingService;
     }
 
     /**
