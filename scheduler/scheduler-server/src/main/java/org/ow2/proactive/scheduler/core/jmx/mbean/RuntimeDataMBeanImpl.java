@@ -55,6 +55,8 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     /** Current Scheduler status typed as scheduler event */
     private volatile SchedulerEvent schedulerStatus;
 
+    private int neededNodes;
+
     public RuntimeDataMBeanImpl(SchedulerDBManager dbManager) throws NotCompliantMBeanException {
         super(RuntimeDataMBean.class);
         this.schedulerClients = new SchedulerUsers();
@@ -312,4 +314,14 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     public byte[] getStatisticHistory() throws IOException {
         return SchedulerJMXHelper.getInstance().getDataStore().getBytes();
     }
+
+    @Override
+    public int getNeededNodes() {
+        return neededNodes;
+    }
+
+    public void setNeededNodes(int neededNodes) {
+        this.neededNodes = neededNodes;
+    }
+
 }

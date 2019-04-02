@@ -83,6 +83,7 @@ import org.ow2.proactive.scheduler.common.usage.JobUsage;
 import org.ow2.proactive.scheduler.core.account.SchedulerAccount;
 import org.ow2.proactive.scheduler.core.db.TaskData.DBTaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.descriptor.EligibleTaskDescriptorImpl;
 import org.ow2.proactive.scheduler.job.ChangedTasksInfo;
 import org.ow2.proactive.scheduler.job.InternalJob;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
@@ -911,14 +912,6 @@ public class SchedulerDBManager {
                    .setParameter("jobId", jobId)
                    .executeUpdate();
 
-            if (taskStatusToPending) {
-                JobData job1 = session.load(JobData.class, jobId);
-                session.getNamedQuery("updateTaskDataStatusToPending")
-                       .setParameter("taskStatus", TaskStatus.PENDING)
-                       .setParameter("job", job1)
-                       .executeUpdate();
-            }
-
             DBTaskId taskId = taskId(task);
 
             TaskInfo taskInfo = task.getTaskInfo();
@@ -1229,6 +1222,22 @@ public class SchedulerDBManager {
             for (TaskState task : job.getTasks()) {
                 updateScheduledTime(job.getId().longValue(), task.getId().longValue(), scheduledTime);
             }
+
+            return null;
+        });
+    }
+
+    public void updateTaskStatus(final EligibleTaskDescriptorImpl task, final TaskStatus newStatus) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+
+            final DBTaskId dbTaskId = taskId(task.getInternal());
+
+            Query query = session.createQuery("update TaskData task set task.taskStatus = :newStatus " +
+                                              "where task.id = :taskId")
+                                 .setParameter("newStatus", newStatus)
+                                 .setParameter("taskId", dbTaskId);
+
+            query.executeUpdate();
 
             return null;
         });

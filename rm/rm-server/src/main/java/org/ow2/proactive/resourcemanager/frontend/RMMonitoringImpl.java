@@ -422,8 +422,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
         queueEvent(event);
     }
 
-    public void setPendingTasksCount(int count) {
-        RMMonitoringImpl.rmStatistics.setPendingTasksCount(count);
+    public void setNeededNodes(int neededNodes) {
+        RMMonitoringImpl.rmStatistics.setNeededNodes(neededNodes);
     }
 
     /**

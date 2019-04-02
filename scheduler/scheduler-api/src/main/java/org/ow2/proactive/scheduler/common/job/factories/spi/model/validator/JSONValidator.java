@@ -23,24 +23,37 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.scheduler.task.utils.task.termination;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.spy;
-
-import org.junit.Test;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
 
-public class CleanupTimeoutGetterDoubleValueTest {
+/**
+ * @author ActiveEon Team
+ * @since 06/03/2019
+ */
+public class JSONValidator implements Validator<String> {
 
-    private static final long CLEANUP_TIME_DEFAULT_SECONDS = 20;
+    public JSONValidator() {
+        /**
+         * ProActive Empty constructor.
+         */
+    }
 
-    @Test
-    public void testThatDefaultTimeoutIsReturnedDoubled() {
-        CleanupTimeoutGetter cleanupTimeoutGetter = new CleanupTimeoutGetterDoubleValue();
-        assertThat(cleanupTimeoutGetter.getCleanupTimeSeconds(), is(CLEANUP_TIME_DEFAULT_SECONDS * 2));
+    @Override
+    public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
+
+        try {
+            final JsonParser parser = new ObjectMapper().getJsonFactory().createJsonParser(parameterValue);
+            while (parser.nextToken() != null) {
+            }
+        } catch (Exception jpe) {
+            throw new ValidationException("Invalid JSON: " + jpe.getMessage(), jpe);
+        }
+
+        return parameterValue;
     }
 }
