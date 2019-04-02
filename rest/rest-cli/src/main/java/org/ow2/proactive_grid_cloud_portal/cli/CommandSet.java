@@ -253,7 +253,7 @@ public class CommandSet {
 
     public static final CommandSet.Entry RE_SUBMIT = CommandSetEntryBuilder.newInstance()
                                                                            .longOpt("resubmit")
-                                                                           .description("Re-Submit existing job with new variables values")
+                                                                           .description("Re-Submit existing job with new variables and generic information values")
                                                                            .hasArgs(true)
                                                                            .numOfArgs(1)
                                                                            .hasOptionalArg(true)
