@@ -608,8 +608,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     /**
      *
      * @param currentJobId id of the already submitted job
-     * @param jobVariables new job variables while is used to replace job variables of the submitted job
-     * @param jobGenericInfos new generic information while is used to replace generic info of the submitted job
+     * @param jobVariables new job variables which is merged to existing job variables of the submitted job
+     * @param jobGenericInfos new generic information which is merged to existing generic info of the submitted job
      * @return job id of the newly submitted job
      * @throws UnknownJobException if <code>currentJobId</code> does not correspond to any submitted job
      * @throws PermissionException if user cannot access job with <code>currentJobId</code>

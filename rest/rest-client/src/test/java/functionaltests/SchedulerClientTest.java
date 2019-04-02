@@ -371,13 +371,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         vars.put("myvar", "myvalue");
         JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap());
 
-        String jobContent = client.getJobContent(jobId);
         String jobContent1 = client.getJobContent(jobId1);
-
-        assertNotEquals(jobContent, jobContent1);
-
-        assertFalse(jobContent.contains("<variables>"));
-        assertFalse(jobContent.contains("<genericInformation>"));
 
         assertTrue(jobContent1.contains("<variables>"));
         assertTrue(jobContent1.contains("myvar"));
@@ -396,13 +390,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         infos.put("myinfo", "myvalue");
         JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), infos);
 
-        String jobContent = client.getJobContent(jobId);
         String jobContent1 = client.getJobContent(jobId1);
-
-        assertNotEquals(jobContent, jobContent1);
-
-        assertFalse(jobContent.contains("<variables>"));
-        assertFalse(jobContent.contains("<genericInformation>"));
 
         assertFalse(jobContent1.contains("<variables>"));
         assertTrue(jobContent1.contains("<genericInformation>"));
@@ -411,7 +399,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     }
 
     @Test
-    public void testReSubmitJobRemoveVars() throws Exception {
+    public void testReSubmitJobReplaceVarValue() throws Exception {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
                                 "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
@@ -421,20 +409,99 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
 
         JobId jobId = submitJob(job, client);
 
-        final String jobContent2 = client.getJobContent(jobId);
+        Map<String, String> vars = new HashMap<>();
+        vars.put("originalVar", "newValue");
 
-        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), Collections.emptyMap());
+        JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap());
 
-        String jobContent = client.getJobContent(jobId);
         String jobContent1 = client.getJobContent(jobId1);
 
-        assertNotEquals(jobContent, jobContent1);
+        assertTrue(jobContent1.contains("<variables>"));
+        assertTrue(jobContent1.contains("originalVar"));
+        assertTrue(jobContent1.contains("newValue"));
+        assertFalse(jobContent1.contains("originalValue"));
+        assertFalse(jobContent1.contains("<genericInformation>"));
+    }
 
-        assertTrue(jobContent.contains("<variables>"));
-        assertFalse(jobContent.contains("<genericInformation>"));
+    @Test
+    public void testReSubmitJobReplaceInfoValue() throws Exception {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
+                                null);
 
+        Map<String, String> info = new HashMap<>();
+        info.put("originalVar", "originalValue");
+        job.setGenericInformation(info);
+
+        JobId jobId = submitJob(job, client);
+
+        Map<String, String> info1 = new HashMap<>();
+        info1.put("originalVar", "newValue");
+
+        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), info1);
+
+        String jobContent1 = client.getJobContent(jobId1);
+
+        assertTrue(jobContent1.contains("<genericInformation>"));
+        assertTrue(jobContent1.contains("originalVar"));
+        assertTrue(jobContent1.contains("newValue"));
+        assertFalse(jobContent1.contains("originalValue"));
         assertFalse(jobContent1.contains("<variables>"));
-        assertFalse(jobContent.contains("<genericInformation>"));
+    }
+
+    @Test
+    public void testReSubmitJobMargeVar() throws Exception {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
+                                null);
+
+        job.getVariables().put("originalVar", new JobVariable("originalVar", "originalValue"));
+
+        JobId jobId = submitJob(job, client);
+
+        Map<String, String> vars = new HashMap<>();
+        vars.put("newVar", "newValue");
+
+        JobId jobId1 = client.reSubmit(jobId, vars, Collections.emptyMap());
+
+        String jobContent1 = client.getJobContent(jobId1);
+
+        assertTrue(jobContent1.contains("<variables>"));
+        assertTrue(jobContent1.contains("originalVar"));
+        assertTrue(jobContent1.contains("originalValue"));
+        assertTrue(jobContent1.contains("newVar"));
+        assertTrue(jobContent1.contains("newValue"));
+        assertFalse(jobContent1.contains("<genericInformation>"));
+    }
+
+    @Test
+    public void testReSubmitJobMargeInfo() throws Exception {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/dataspace_client_node_push_delete.groovy",
+                                "/functionaltests/descriptors/dataspace_client_node_fork.groovy",
+                                null);
+
+        Map<String, String> info = new HashMap<>();
+        info.put("originalVar", "originalValue");
+        job.setGenericInformation(info);
+
+        JobId jobId = submitJob(job, client);
+
+        Map<String, String> info1 = new HashMap<>();
+        info1.put("newVar", "newValue");
+
+        JobId jobId1 = client.reSubmit(jobId, Collections.emptyMap(), info1);
+
+        String jobContent1 = client.getJobContent(jobId1);
+
+        assertTrue(jobContent1.contains("<genericInformation>"));
+        assertTrue(jobContent1.contains("originalVar"));
+        assertTrue(jobContent1.contains("originalValue"));
+        assertTrue(jobContent1.contains("newVar"));
+        assertTrue(jobContent1.contains("newValue"));
+        assertFalse(jobContent1.contains("<variables>"));
     }
 
     protected Job nodeClientJob(String groovyScript, String forkScript, String cleaningScript) throws Exception {
