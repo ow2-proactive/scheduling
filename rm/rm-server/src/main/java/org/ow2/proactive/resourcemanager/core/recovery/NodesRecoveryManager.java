@@ -38,6 +38,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.event.RMEventType;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.db.NodeSourceData;
@@ -143,6 +145,12 @@ public class NodesRecoveryManager {
             if (this.isEligible(node)) {
                 recoveredEligibleNodes.add(node);
             }
+            if (node != null) {
+                final RMNodeEvent event = node.createNodeEvent(RMEventType.NODE_ADDED,
+                                                               null,
+                                                               node.getProvider().getName());
+                this.rmCore.registerAndEmitNodeEvent(event);
+            }
         }
         this.rmCore.setEligibleNodesToRecover(recoveredEligibleNodes);
         this.logNodeRecoverySummary(nodeSourceName, recoveredNodeStatesCounter, recoveredEligibleNodes.size());
@@ -192,6 +200,11 @@ public class NodesRecoveryManager {
         RMNode rmNode = nodeSource.internalAddNodeAfterRecovery(node, rmNodeData);
         this.rmCore.registerAvailableNode(rmNode);
         if (node != null) {
+            try {
+                RMCore.topologyManager.addNode(rmNode.getNode());
+            } catch (Exception e) {
+                logger.error("Error occurred when adding recovered node to the topology", e);
+            }
             this.nodesLockRestorationManager.handle(rmNode, rmNodeData.getProvider());
         } else {
             this.triggerDownNodeHookIfNecessary(nodeSource, rmNodeData, nodeUrl, previousState);

@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.core.recovery;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.ProActiveException;
@@ -124,4 +125,23 @@ public class FakeDownNodeForRecovery implements Node, Serializable {
         return "";
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        FakeDownNodeForRecovery that = (FakeDownNodeForRecovery) o;
+        return name.equals(that.name) && url.equals(that.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, url);
+    }
+
+    @Override
+    public String toString() {
+        return getNodeInformation().getURL();
+    }
 }

@@ -33,6 +33,7 @@ import org.ow2.proactive.scheduler.common.TaskDescriptor;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.utils.TaskIdWrapper;
 
 
 /**
@@ -229,7 +230,9 @@ public class EligibleTaskDescriptorImpl implements EligibleTaskDescriptor {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof TaskDescriptor) {
-            return ((TaskDescriptor) obj).getTaskId().equals(getTaskId());
+            final TaskIdWrapper wrapObj = TaskIdWrapper.wrap(((TaskDescriptor) obj).getTaskId());
+            final TaskIdWrapper wrapThis = TaskIdWrapper.wrap(this.getTaskId());
+            return wrapObj.equals(wrapThis);
         }
 
         return false;

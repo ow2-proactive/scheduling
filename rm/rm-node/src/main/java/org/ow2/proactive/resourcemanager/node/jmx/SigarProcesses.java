@@ -106,7 +106,7 @@ public class SigarProcesses implements SigarProcessesMXBean {
             String dataSource = RRDSigarDataStore.toDataStoreName(attrs[i] + "-" + objectName);
 
             char zone = range.charAt(0);
-            long timeStart = timeEnd - RRDDbUtil.msInZone(zone);
+            long timeStart = timeEnd - RRDDbUtil.secondsInZone(zone);
 
             FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
             req.setFilter(dataSource);
