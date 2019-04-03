@@ -55,14 +55,9 @@ public class JobKeyValueTransformer {
     }
 
     private static void validateJsonMap(Map<String, String> jsonMap) {
-        if (jsonMap.size() == 0) {
-            throw new IllegalArgumentException("empty json ");
-        } else {
-            for (String key : jsonMap.keySet()) {
-                if (key.length() == 0) {
-                    throw new IllegalArgumentException("empty key ");
-                }
-
+        for (String key : jsonMap.keySet()) {
+            if (key.length() == 0) {
+                throw new IllegalArgumentException("empty key ");
             }
         }
     }

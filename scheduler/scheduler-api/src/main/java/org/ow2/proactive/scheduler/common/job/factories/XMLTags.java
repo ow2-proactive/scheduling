@@ -203,7 +203,7 @@ public enum XMLTags {
     }
 
     public String withContent(String content) {
-        return "  <" + this.xmlName + ">\n" + content + "  </" + this.xmlName + ">\n";
+        return "  <" + this.xmlName + ">\n" + content + "  </" + this.xmlName + ">";
     }
 
     /**

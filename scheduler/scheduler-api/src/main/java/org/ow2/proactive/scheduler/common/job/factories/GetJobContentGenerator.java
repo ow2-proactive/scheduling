@@ -57,12 +57,12 @@ public class GetJobContentGenerator {
      */
     public String replaceVarsAndGenericInfo(String jobContent, Map<String, JobVariable> variables,
             Map<String, String> genericInformation) {
-        final int end = jobContent.indexOf(XMLTags.TASK_FLOW.getXMLName());
-
-        String replacedJobContent = replaceVarsContent(jobContent, newVariablesContent(variables), end);
+        int sizeOfFirstPart = jobContent.indexOf(XMLTags.TASK_FLOW.getXMLName());
+        String replacedJobContent = replaceVarsContent(jobContent, newVariablesContent(variables), sizeOfFirstPart);
+        sizeOfFirstPart = replacedJobContent.indexOf(XMLTags.TASK_FLOW.getXMLName());
         replacedJobContent = replaceGenericInfoContent(replacedJobContent,
                                                        newGenericInfoContent(genericInformation),
-                                                       end);
+                                                       sizeOfFirstPart);
 
         return replacedJobContent;
     }
