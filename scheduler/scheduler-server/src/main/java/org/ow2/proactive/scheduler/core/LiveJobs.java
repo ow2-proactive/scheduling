@@ -893,7 +893,7 @@ class LiveJobs {
                                                                            TerminationData.TerminationStatus.ABORTED);
 
             long waitTime = restartDelay * 1000L;
-            restartTaskOnError(jobData, task, TaskStatus.PENDING, taskResult, waitTime, terminationData);
+            restartTaskOnError(jobData, task, TaskStatus.SUBMITTED, taskResult, waitTime, terminationData);
 
             return terminationData;
         } finally {

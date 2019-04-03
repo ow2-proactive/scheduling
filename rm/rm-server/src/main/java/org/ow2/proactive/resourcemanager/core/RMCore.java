@@ -2985,8 +2985,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     }
 
     @Override
-    public void setPendingTasksCount(int pendingTasksCount) {
-        this.monitoring.setPendingTasksCount(pendingTasksCount);
+    public void setNeededNodes(int neededNodes) {
+        this.monitoring.setNeededNodes(neededNodes);
     }
 
     /**

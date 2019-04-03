@@ -606,6 +606,19 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException;
 
     /**
+     *
+     * @param currentJobId id of the already submitted job
+     * @param jobVariables new job variables which is merged to existing job variables of the submitted job
+     * @param jobGenericInfos new generic information which is merged to existing generic info of the submitted job
+     * @return job id of the newly submitted job
+     * @throws UnknownJobException if <code>currentJobId</code> does not correspond to any submitted job
+     * @throws PermissionException if user cannot access job with <code>currentJobId</code>
+     */
+    JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException;
+
+    /**
      * Get the result for the given jobId.<br>
      * The jobId is given as a string. It's in fact the string returned by the
      * {@link JobId#value()} method.<br>

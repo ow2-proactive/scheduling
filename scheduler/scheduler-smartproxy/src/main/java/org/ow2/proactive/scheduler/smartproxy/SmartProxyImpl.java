@@ -534,6 +534,16 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        if (schedulerProxy == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return schedulerProxy.reSubmit(currentJobId, jobVariables, jobGenericInfos);
+    }
+
+    @Override
     public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.getJobState(jobId);
     }

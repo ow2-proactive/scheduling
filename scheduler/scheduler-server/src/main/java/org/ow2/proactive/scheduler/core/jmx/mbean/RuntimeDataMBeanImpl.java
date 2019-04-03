@@ -55,6 +55,8 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     /** Current Scheduler status typed as scheduler event */
     private volatile SchedulerEvent schedulerStatus;
 
+    private int neededNodes;
+
     public RuntimeDataMBeanImpl(SchedulerDBManager dbManager) throws NotCompliantMBeanException {
         super(RuntimeDataMBean.class);
         this.schedulerClients = new SchedulerUsers();
@@ -98,6 +100,36 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     @Chronological
     public int getFinishedJobsCount() {
         return (int) dbManager.getFinishedJobsCount();
+    }
+
+    @Override
+    public int getStalledJobsCount() {
+        return (int) dbManager.getStalledJobsCount();
+    }
+
+    @Override
+    public int getPausedJobsCount() {
+        return (int) dbManager.getPausedJobsCount();
+    }
+
+    @Override
+    public int getInErrorJobsCount() {
+        return (int) dbManager.getInErrorJobsCount();
+    }
+
+    @Override
+    public int getKilledJobsCount() {
+        return (int) dbManager.getKilledJobCount();
+    }
+
+    @Override
+    public int getCancelledJobsCount() {
+        return (int) dbManager.getCancelledJobsCount();
+    }
+
+    @Override
+    public int getFailedJobsCount() {
+        return (int) dbManager.getFailedJobsCount();
     }
 
     /**
@@ -312,4 +344,14 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     public byte[] getStatisticHistory() throws IOException {
         return SchedulerJMXHelper.getInstance().getDataStore().getBytes();
     }
+
+    @Override
+    public int getNeededNodes() {
+        return neededNodes;
+    }
+
+    public void setNeededNodes(int neededNodes) {
+        this.neededNodes = neededNodes;
+    }
+
 }

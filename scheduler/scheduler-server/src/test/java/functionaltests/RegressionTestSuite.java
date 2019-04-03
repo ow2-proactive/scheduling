@@ -44,6 +44,7 @@ import functionaltests.recover.RunningTaskRecoveryWithForkedTaskExecutorTest;
 import functionaltests.recover.RunningTaskRecoveryWithInProcessTaskExecutorTest;
 import functionaltests.rm.TestOperationsWhenUnlinked;
 import functionaltests.workflow.TestJobLegacySchemas;
+import functionaltests.workflow.TestWorkflowReSubmission;
 import functionaltests.workflow.TestWorkflowSubmission;
 import functionaltests.workflow.complex.TestWorkflowComplexJobs;
 import functionaltests.workflow.complex.TestWorkflowComplexJobs2;
@@ -78,7 +79,7 @@ import functionaltests.workflow.complex.TestWorkflowReplicateJobs3;
                       TestWorkflowComplexJobs3.class, TestWorkflowComplexJobs4.class, TestWorkflowComplexJobs5.class,
                       TestWorkflowIfJobs.class, TestWorkflowLoopJobs.class, TestWorkflowLoopJobs2.class,
                       TestWorkflowReplicateJobs.class, TestWorkflowReplicateJobs2.class,
-                      TestWorkflowReplicateJobs3.class,
+                      TestWorkflowReplicateJobs3.class, TestWorkflowReSubmission.class,
 
                       // Tests with different configurations (and restart)
                       TestJobKilled.class,

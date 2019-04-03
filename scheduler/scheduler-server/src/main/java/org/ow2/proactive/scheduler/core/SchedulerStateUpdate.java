@@ -87,4 +87,6 @@ public interface SchedulerStateUpdate {
      */
     void usersUpdated(NotificationData<UserIdentification> notification);
 
+    void updateNeededNodes(int needed);
+
 }

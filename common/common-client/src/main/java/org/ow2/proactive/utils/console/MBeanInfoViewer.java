@@ -198,7 +198,7 @@ public final class MBeanInfoViewer {
      * @param mbeanNameAsString the object name of the MBean
      * @return the informations about the MBean as a formatted string
      */
-    public Map<String, String> getMappedInfo(final String mbeanNameAsString) {
+    public synchronized Map<String, String> getMappedInfo(final String mbeanNameAsString) {
         HashMap<String, String> result = new HashMap<>();
         // Lazy initial connection
         this.lazyConnect();
