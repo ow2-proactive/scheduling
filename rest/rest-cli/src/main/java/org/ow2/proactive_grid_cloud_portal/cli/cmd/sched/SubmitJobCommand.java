@@ -160,7 +160,7 @@ public class SubmitJobCommand extends AbstractCommand implements Command {
         return false;
     }
 
-    public static boolean isFilePathValid(String path) {
+    private static boolean isFilePathValid(String path) {
 
         try {
 

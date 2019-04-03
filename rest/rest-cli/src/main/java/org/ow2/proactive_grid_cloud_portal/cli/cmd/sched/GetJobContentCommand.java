@@ -25,40 +25,34 @@
  */
 package org.ow2.proactive_grid_cloud_portal.cli.cmd.sched;
 
-import static org.ow2.proactive_grid_cloud_portal.cli.CLIException.REASON_INVALID_ARGUMENTS;
-
-import java.util.Map;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.apache.log4j.Logger;
+import org.ow2.proactive_grid_cloud_portal.cli.ApplicationContext;
 import org.ow2.proactive_grid_cloud_portal.cli.CLIException;
+import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
+import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 
-import com.google.common.collect.Maps;
 
+public class GetJobContentCommand extends AbstractJobTagCommand implements Command {
 
-public class JobKeyValueTransformer {
-    private final static String USAGE = " The correct format is [ '{\"key1\":\"value1\",...}' ]";
+    private static final Logger LOGGER = Logger.getLogger(GetJobContentCommand.class);
 
-    public static Map<String, String> transformJsonStringToMap(String jsonString) {
-        Map<String, String> jsonMap = Maps.newHashMap();
-        if (jsonString != null && !jsonString.equals("undefined")) {
-            try {
-                jsonMap = (JSONObject) new JSONParser().parse(jsonString);
-                validateJsonMap(jsonMap);
-            } catch (ParseException | IllegalArgumentException e) {
-
-                throw new CLIException(REASON_INVALID_ARGUMENTS, e.getMessage() + USAGE);
-            }
-        }
-        return jsonMap;
+    public GetJobContentCommand(String jobId) {
+        super(jobId);
     }
 
-    private static void validateJsonMap(Map<String, String> jsonMap) {
-        for (String key : jsonMap.keySet()) {
-            if (key.length() == 0) {
-                throw new IllegalArgumentException("empty key ");
+    @Override
+    public void execute(ApplicationContext currentContext) throws CLIException {
+        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+        try {
+            String output = scheduler.getJobContent(currentContext.getSessionId(), jobId);
+            LOGGER.info("output: " + output);
+            resultStack(currentContext).push(output);
+            if (!currentContext.isSilent()) {
+                writeLine(currentContext, "%s", output);
             }
+        } catch (Exception e) {
+            handleError(String.format("An error occurred while retrieving %s content:", job()), e, currentContext);
         }
     }
+
 }

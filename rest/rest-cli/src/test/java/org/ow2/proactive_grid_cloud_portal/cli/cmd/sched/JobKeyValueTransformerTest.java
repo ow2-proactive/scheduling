@@ -67,11 +67,6 @@ public class JobKeyValueTransformerTest {
     }
 
     @Test(expected = CLIException.class)
-    public void emptyJsonVariablesToMapTest() {
-        transformJsonStringToMap("{}");
-    }
-
-    @Test(expected = CLIException.class)
     public void emptyVariablesToMapTest() {
         transformJsonStringToMap(" ");
     }
