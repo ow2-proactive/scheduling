@@ -404,15 +404,15 @@ public class SchedulerDBManager {
     }
 
     public long getFinishedJobsCount() {
-        return getJobsNumberWithStatus(FINISHED_JOB_STATUSES);
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.FINISHED));
     }
 
     public long getPendingJobsCount() {
-        return getJobsNumberWithStatus(Arrays.asList(JobStatus.PAUSED, JobStatus.PENDING));
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.PENDING));
     }
 
     public long getRunningJobsCount() {
-        return getJobsNumberWithStatus(Arrays.asList(JobStatus.RUNNING, JobStatus.STALLED));
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.RUNNING));
     }
 
     public long getTotalJobsCount() {
