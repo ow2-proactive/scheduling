@@ -1301,4 +1301,22 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             }
         }
     }
+
+    public TaskStatesPage getTaskPaginated(JobId jobId, String statusFilter, int offset, int limit)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        checkPermissions("getJobState",
+                         getIdentifiedJob(jobId),
+                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
+        ClientJobState jobState = getClientJobState(jobId);
+        synchronized (jobState) {
+            try {
+                final TaskStatesPage tasksPaginated = jobState.getTasksPaginated(statusFilter, offset, limit);
+                final List<TaskState> taskStatesCopy = (List<TaskState>) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(new ArrayList<>(tasksPaginated.getTaskStates()));
+                return new TaskStatesPage(taskStatesCopy, tasksPaginated.getSize());
+            } catch (Exception e) {
+                logger.error("Error when copying tasks page", e);
+                throw new IllegalStateException(e);
+            }
+        }
+    }
 }

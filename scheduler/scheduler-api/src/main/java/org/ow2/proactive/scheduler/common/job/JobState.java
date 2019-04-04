@@ -263,10 +263,9 @@ public abstract class JobState extends Job implements Comparable<JobState> {
             }
         }).collect(Collectors.toSet());
 
-        final List<TaskState> filteredTasks = tasks.stream()
-                                                   .filter(task -> goodTaskStatuses.contains(task.getTaskInfo()
-                                                                                                 .getStatus()))
-                                                   .collect(Collectors.toList());
+        List<TaskState> filteredTasks = tasks.stream()
+                                             .filter(task -> goodTaskStatuses.contains(task.getTaskInfo().getStatus()))
+                                             .collect(Collectors.toList());
         return getTaskStatesPage(offset, limit, filteredTasks);
     }
 

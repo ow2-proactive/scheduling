@@ -861,6 +861,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        renewSession();
+        return client.getTaskPaginated(jobId, statusFilter, offset, limit);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         renewSession();

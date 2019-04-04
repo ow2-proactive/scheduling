@@ -904,30 +904,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @Override
-    public RestPage<String> getTasksNamesPaginated(String sessionId, String jobId, int offset, int limit,
-            String statusFilter) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
-        if (limit == -1)
-            limit = TASKS_PAGE_SIZE;
-        try {
-            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks");
-
-            JobState jobState = s.getJobState(jobId);
-            TaskStatesPage page = jobState.getTasksPaginated(statusFilter, offset, limit);
-            List<String> tasksNames = new ArrayList<>(page.getTaskStates().size());
-            for (TaskState ts : page.getTaskStates()) {
-                tasksNames.add(ts.getId().getReadableName());
-            }
-            return new RestPage<>(tasksNames, page.getSize());
-        } catch (PermissionException e) {
-            throw new PermissionRestException(e);
-        } catch (UnknownJobException e) {
-            throw new UnknownJobRestException(e);
-        } catch (NotConnectedException e) {
-            throw new NotConnectedRestException(e);
-        }
-    }
-
     /**
      * Returns a list of the name of the tasks belonging to job and filtered by
      * a given tag. <code>jobId</code>
@@ -1151,6 +1127,26 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/paginated");
             TaskStatesPage page = scheduler.getTaskPaginated(jobId, offset, limit);
+            List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
+            return new RestPage<>(tasks, page.getSize());
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    @Override
+    public RestPage<TaskStateData> getJobTaskStatesFilteredPaginated(String sessionId, String jobId, int offset,
+            int limit, String statusFilter)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        if (limit == -1)
+            limit = TASKS_PAGE_SIZE;
+        try {
+            Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/paginated");
+            TaskStatesPage page = scheduler.getTaskPaginated(jobId, statusFilter, offset, limit);
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (PermissionException e) {

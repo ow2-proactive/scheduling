@@ -1120,6 +1120,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), offset, limit);
     }
 
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), statusFilter, offset, limit);
+    }
+
     /**
      * {@inheritDoc}
      */

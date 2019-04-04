@@ -358,15 +358,6 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("-1") int limit)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
-    @GET
-    @Path("jobs/{jobid}/tasks/filtered/paginated")
-    @Produces("application/json")
-    RestPage<String> getTasksNamesPaginated(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("-1") int limit,
-            @QueryParam("statusFilter") @DefaultValue("") String statusFilter)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
-
     /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code>
@@ -615,6 +606,16 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
             @QueryParam("limit") @DefaultValue("50") int limit)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/filtered/paginated")
+    @Produces("application/json")
+    RestPage<TaskStateData> getJobTaskStatesFilteredPaginated(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit,
+            @QueryParam("statusFilter") @DefaultValue("") String statusFilter)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
