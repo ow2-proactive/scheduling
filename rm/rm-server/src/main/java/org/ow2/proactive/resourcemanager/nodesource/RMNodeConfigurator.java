@@ -82,7 +82,8 @@ public class RMNodeConfigurator implements RunActive {
                 }
             } else if (!dataSpaceStatus.equals(Boolean.TRUE.toString())) {
                 // there was a problem of data space configuring
-                logger.error("Cannot configure data spaces : " + dataSpaceStatus);
+                nodeToAdd.getProActiveRuntime().killRT(true);
+                throw new NotConfiguredException("Cannot configure data spaces : " + dataSpaceStatus);
             } else {
                 // data space is configured
                 logger.debug("Data spaces is already configured for node " + nodeToAdd.getNodeInformation().getURL());
@@ -100,8 +101,8 @@ public class RMNodeConfigurator implements RunActive {
             }
             rmcore.internalAddNodeToCore(rmnodeToAdd);
         } catch (Exception e) {
-            logger.warn("Cannot properly configure the node " + nodeURL +
-                        " because of an error during configuration phase", e);
+            logger.error("Cannot properly configure the node " + nodeURL +
+                         " because of an error during configuration phase", e);
             //if a problem occurs during the configuration step,
             //the node is set to down
             rmcore.setDownNode(nodeURL);
