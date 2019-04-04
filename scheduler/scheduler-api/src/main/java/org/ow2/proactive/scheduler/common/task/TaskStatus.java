@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -109,11 +110,11 @@ public enum TaskStatus implements java.io.Serializable {
      */
     IN_ERROR("In-Error", true);
 
-    public static final Set<TaskStatus> FAILED_TASKS = ImmutableSet.of(IN_ERROR,
-                                                                       WAITING_ON_ERROR,
-                                                                       WAITING_ON_FAILURE,
-                                                                       FAILED,
-                                                                       FAULTY);
+    public static final Set<TaskStatus> ERROR_TASKS = ImmutableSet.of(IN_ERROR,
+                                                                      WAITING_ON_ERROR,
+                                                                      WAITING_ON_FAILURE,
+                                                                      FAILED,
+                                                                      FAULTY);
 
     public static final Set<TaskStatus> FINISHED_TASKS = ImmutableSet.of(FAILED,
                                                                          NOT_RESTARTED,
@@ -168,15 +169,18 @@ public enum TaskStatus implements java.io.Serializable {
     public static Set<TaskStatus> expandAggregatedStatusesToRealStatuses(List<String> aggregatedStatuses) {
         return aggregatedStatuses.stream().flatMap(aggregatedStatus -> {
             switch (aggregatedStatus) {
+                case "Submitted":
+                    return Stream.of(TaskStatus.SUBMITTED);
                 case "Pending":
-                    return TaskStatus.PENDING_TASKS.stream();
+                    return Stream.of(TaskStatus.PENDING);
                 case "Running":
                     return TaskStatus.RUNNING_TASKS.stream();
                 case "Finished":
                     return TaskStatus.FINISHED_TASKS.stream();
-                case "Failed":
+                case "Error":
+                    return TaskStatus.ERROR_TASKS.stream();
                 default:
-                    return TaskStatus.FAILED_TASKS.stream();
+                    return Stream.empty();
             }
         }).collect(Collectors.toSet());
     }
