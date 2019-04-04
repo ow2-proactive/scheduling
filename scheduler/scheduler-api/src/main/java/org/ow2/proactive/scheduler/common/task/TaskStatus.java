@@ -75,8 +75,8 @@ public enum TaskStatus implements java.io.Serializable {
     FAILED("Resource down", false),
     /**
      * The task could not be started.<br>
-     * It means that the task could not be started due to
-     * dependences failure.
+     * It means that the task will not be started due to
+     * dependence's failure.
      */
     NOT_STARTED("Could not start", false),
     /**

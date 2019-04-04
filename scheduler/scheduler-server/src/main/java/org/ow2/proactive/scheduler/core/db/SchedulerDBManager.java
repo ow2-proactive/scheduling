@@ -127,9 +127,7 @@ public class SchedulerDBManager {
     public static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES = ImmutableSet.copyOf(Iterables.concat(RUNNING_JOB_STATUSES,
                                                                                                         PENDING_JOB_STATUSES));
 
-    public static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(TaskStatus.SUBMITTED,
-                                                                        TaskStatus.PENDING,
-                                                                        TaskStatus.NOT_STARTED);
+    public static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(TaskStatus.SUBMITTED, TaskStatus.PENDING);
 
     public static final Set<TaskStatus> RUNNING_TASKS = ImmutableSet.of(TaskStatus.PAUSED,
                                                                         TaskStatus.IN_ERROR,
@@ -142,7 +140,14 @@ public class SchedulerDBManager {
                                                                          TaskStatus.ABORTED,
                                                                          TaskStatus.FAULTY,
                                                                          TaskStatus.FINISHED,
-                                                                         TaskStatus.SKIPPED);
+                                                                         TaskStatus.SKIPPED,
+                                                                         TaskStatus.NOT_STARTED);
+
+    public static final Set<TaskStatus> ERROR_TASKS = ImmutableSet.of(TaskStatus.IN_ERROR,
+                                                                      TaskStatus.WAITING_ON_ERROR,
+                                                                      TaskStatus.WAITING_ON_FAILURE,
+                                                                      TaskStatus.FAILED,
+                                                                      TaskStatus.FAULTY);
 
     public static final String ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED = "All required Jobs have been fetched"; // important for JobRecoveryTest
 
