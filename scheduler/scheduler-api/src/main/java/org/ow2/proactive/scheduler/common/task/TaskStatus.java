@@ -109,11 +109,11 @@ public enum TaskStatus implements java.io.Serializable {
      */
     IN_ERROR("In-Error", true);
 
-    public static final Set<TaskStatus> ERROR_TASKS = ImmutableSet.of(IN_ERROR,
-                                                                      WAITING_ON_ERROR,
-                                                                      WAITING_ON_FAILURE,
-                                                                      FAILED,
-                                                                      FAULTY);
+    public static final Set<TaskStatus> FAILED_TASKS = ImmutableSet.of(IN_ERROR,
+                                                                       WAITING_ON_ERROR,
+                                                                       WAITING_ON_FAILURE,
+                                                                       FAILED,
+                                                                       FAULTY);
 
     public static final Set<TaskStatus> FINISHED_TASKS = ImmutableSet.of(FAILED,
                                                                          NOT_RESTARTED,

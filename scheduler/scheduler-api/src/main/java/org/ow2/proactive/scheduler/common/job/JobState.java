@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -36,6 +38,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -228,6 +231,10 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return getTaskStatesPage(offset, limit, getTasks());
     }
 
+    public TaskStatesPage getTasksPaginated(final String statusFilter, final int offset, final int limit) {
+        return getTaskStatesPage(statusFilter, offset, limit, getTasks());
+    }
+
     /**
      * To get the paginated filtered tasks by a given tag.
      * The filtered tasks are paginated with the following rule: [offset,limit[
@@ -238,6 +245,29 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      */
     public TaskStatesPage getTaskByTagPaginated(final String tag, final int offset, final int limit) {
         return getTaskStatesPage(offset, limit, getTasksByTag(tag));
+    }
+
+    private TaskStatesPage getTaskStatesPage(String statusFilter, int offset, int limit, List<TaskState> tasks) {
+        List<String> aggregatedStatuses = Arrays.asList(statusFilter.split(";"));
+        Set<TaskStatus> goodTaskStatuses = aggregatedStatuses.stream().flatMap(aggregatedStatus -> {
+            switch (aggregatedStatus) {
+                case "Pending":
+                    return TaskStatus.PENDING_TASKS.stream();
+                case "Running":
+                    return TaskStatus.RUNNING_TASKS.stream();
+                case "Finished":
+                    return TaskStatus.FINISHED_TASKS.stream();
+                case "Failed":
+                default:
+                    return TaskStatus.FAILED_TASKS.stream();
+            }
+        }).collect(Collectors.toSet());
+
+        final List<TaskState> filteredTasks = tasks.stream()
+                                                   .filter(task -> goodTaskStatuses.contains(task.getTaskInfo()
+                                                                                                 .getStatus()))
+                                                   .collect(Collectors.toList());
+        return getTaskStatesPage(offset, limit, filteredTasks);
     }
 
     private TaskStatesPage getTaskStatesPage(int offset, int limit, List<TaskState> tasks) {
