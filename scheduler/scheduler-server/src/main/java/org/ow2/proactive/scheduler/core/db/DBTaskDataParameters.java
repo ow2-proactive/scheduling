@@ -80,15 +80,15 @@ public class DBTaskDataParameters {
         Set<TaskStatus> newStatus = new HashSet<>();
 
         if (pending) {
-            newStatus.addAll(SchedulerDBManager.PENDING_TASKS);
+            newStatus.addAll(TaskStatus.PENDING_TASKS);
         }
 
         if (running) {
-            newStatus.addAll(SchedulerDBManager.RUNNING_TASKS);
+            newStatus.addAll(TaskStatus.RUNNING_TASKS);
         }
 
         if (finished) {
-            newStatus.addAll(SchedulerDBManager.FINISHED_TASKS);
+            newStatus.addAll(TaskStatus.FINISHED_TASKS);
         }
 
         this.status = Collections.unmodifiableSet(newStatus);

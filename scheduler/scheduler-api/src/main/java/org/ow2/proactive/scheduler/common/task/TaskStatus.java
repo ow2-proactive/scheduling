@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+import com.google.common.collect.ImmutableSet;
+
 
 /**
  * This class represents every status that a task is able to be in.<br>
@@ -106,6 +108,28 @@ public enum TaskStatus implements java.io.Serializable {
      * The task is suspended after first error and is waiting for a manual restart action.
      */
     IN_ERROR("In-Error", true);
+
+    public static final Set<TaskStatus> ERROR_TASKS = ImmutableSet.of(IN_ERROR,
+                                                                      WAITING_ON_ERROR,
+                                                                      WAITING_ON_FAILURE,
+                                                                      FAILED,
+                                                                      FAULTY);
+
+    public static final Set<TaskStatus> FINISHED_TASKS = ImmutableSet.of(FAILED,
+                                                                         NOT_RESTARTED,
+                                                                         ABORTED,
+                                                                         FAULTY,
+                                                                         FINISHED,
+                                                                         SKIPPED,
+                                                                         NOT_STARTED);
+
+    public static final Set<TaskStatus> RUNNING_TASKS = ImmutableSet.of(PAUSED,
+                                                                        IN_ERROR,
+                                                                        RUNNING,
+                                                                        WAITING_ON_ERROR,
+                                                                        WAITING_ON_FAILURE);
+
+    public static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(SUBMITTED, PENDING);
 
     /** The name of the current status. */
     private String name;
