@@ -164,4 +164,20 @@ public enum TaskStatus implements java.io.Serializable {
                      .filter(taskStatus -> !statusesToAvoid.contains(taskStatus))
                      .collect(Collectors.toList());
     }
+
+    public static Set<TaskStatus> expandAggregatedStatusesToRealStatuses(List<String> aggregatedStatuses) {
+        return aggregatedStatuses.stream().flatMap(aggregatedStatus -> {
+            switch (aggregatedStatus) {
+                case "Pending":
+                    return TaskStatus.PENDING_TASKS.stream();
+                case "Running":
+                    return TaskStatus.RUNNING_TASKS.stream();
+                case "Finished":
+                    return TaskStatus.FINISHED_TASKS.stream();
+                case "Failed":
+                default:
+                    return TaskStatus.FAILED_TASKS.stream();
+            }
+        }).collect(Collectors.toSet());
+    }
 }

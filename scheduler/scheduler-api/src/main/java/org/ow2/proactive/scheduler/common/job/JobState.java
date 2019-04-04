@@ -249,19 +249,8 @@ public abstract class JobState extends Job implements Comparable<JobState> {
 
     private TaskStatesPage getTaskStatesPage(String statusFilter, int offset, int limit, List<TaskState> tasks) {
         List<String> aggregatedStatuses = Arrays.asList(statusFilter.split(";"));
-        Set<TaskStatus> goodTaskStatuses = aggregatedStatuses.stream().flatMap(aggregatedStatus -> {
-            switch (aggregatedStatus) {
-                case "Pending":
-                    return TaskStatus.PENDING_TASKS.stream();
-                case "Running":
-                    return TaskStatus.RUNNING_TASKS.stream();
-                case "Finished":
-                    return TaskStatus.FINISHED_TASKS.stream();
-                case "Failed":
-                default:
-                    return TaskStatus.FAILED_TASKS.stream();
-            }
-        }).collect(Collectors.toSet());
+
+        Set<TaskStatus> goodTaskStatuses = TaskStatus.expandAggregatedStatusesToRealStatuses(aggregatedStatuses);
 
         List<TaskState> filteredTasks = tasks.stream()
                                              .filter(task -> goodTaskStatuses.contains(task.getTaskInfo().getStatus()))
