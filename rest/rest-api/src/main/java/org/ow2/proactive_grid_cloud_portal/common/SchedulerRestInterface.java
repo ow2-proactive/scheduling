@@ -608,6 +608,16 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("50") int limit)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/filtered/paginated")
+    @Produces("application/json")
+    RestPage<TaskStateData> getJobTaskStatesFilteredPaginated(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit,
+            @QueryParam("statusFilter") @DefaultValue("") String statusFilter)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
     /**
      * Returns a list of taskState of the tasks filtered by a given tag.
      * 
@@ -652,6 +662,16 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("50") int limit)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/{tasktag}/{statusFilter}/paginated")
+    @Produces("application/json")
+    RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit, @PathParam("tasktag") String taskTag,
+            @PathParam("statusFilter") String statusFilter)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**

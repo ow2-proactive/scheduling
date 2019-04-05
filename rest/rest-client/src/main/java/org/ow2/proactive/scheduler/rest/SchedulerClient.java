@@ -1347,6 +1347,30 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        TaskStatesPage taskStatesPage = null;
+        try {
+            final int size = restApi().getJobTaskStates(sid, jobId).getList().size();
+            List<TaskState> taskStates = restApi().getJobTaskStatesFilteredPaginated(sid,
+                                                                                     jobId,
+                                                                                     offset,
+                                                                                     limit,
+                                                                                     statusFilter)
+                                                  .getList()
+                                                  .stream()
+                                                  .map(DataUtility::taskState)
+                                                  .collect(Collectors.toList());
+            taskStatesPage = new TaskStatesPage();
+            taskStatesPage.setSize(size);
+            taskStatesPage.setTaskStates(taskStates);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return taskStatesPage;
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         try {

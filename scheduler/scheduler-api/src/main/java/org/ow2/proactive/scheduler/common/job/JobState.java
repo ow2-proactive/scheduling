@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.common.job;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -36,6 +38,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskState;
 import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.common.util.PageBoundaries;
 import org.ow2.proactive.scheduler.common.util.Pagination;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -208,12 +211,9 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      */
     public List<TaskState> getTasksByTag(final String tag) {
         List<TaskState> tasks = this.getTasks();
-        return (List<TaskState>) CollectionUtils.select(tasks, new Predicate() {
-            @Override
-            public boolean evaluate(Object object) {
-                String taskTag = ((TaskState) object).getTag();
-                return (taskTag != null) && (taskTag.equals(tag));
-            }
+        return (List<TaskState>) CollectionUtils.select(tasks, (Predicate) object -> {
+            String taskTag = ((TaskState) object).getTag();
+            return (taskTag != null) && (taskTag.equals(tag));
         });
     }
 
@@ -228,6 +228,10 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return getTaskStatesPage(offset, limit, getTasks());
     }
 
+    public TaskStatesPage getTasksPaginated(String statusFilter, int offset, int limit) {
+        return getTaskStatesPage(offset, limit, filterByStatus(getTasks(), statusFilter));
+    }
+
     /**
      * To get the paginated filtered tasks by a given tag.
      * The filtered tasks are paginated with the following rule: [offset,limit[
@@ -236,8 +240,22 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @param limit the last index (non inclusive) of the sublist of tasks to get
      * @return a TaskStatePage which includes subset of filtered tasks and the total number of all filtered tasks
      */
-    public TaskStatesPage getTaskByTagPaginated(final String tag, final int offset, final int limit) {
+    public TaskStatesPage getTaskByTagPaginated(String tag, int offset, int limit) {
         return getTaskStatesPage(offset, limit, getTasksByTag(tag));
+    }
+
+    public TaskStatesPage getTaskByTagByStatusPaginated(int offset, int limit, String tag, String statusFilter) {
+        return getTaskStatesPage(offset, limit, filterByStatus(getTasksByTag(tag), statusFilter));
+    }
+
+    private List<TaskState> filterByStatus(List<TaskState> tasks, String statusFilter) {
+        List<String> aggregatedStatuses = Arrays.asList(statusFilter.split(";"));
+
+        Set<TaskStatus> goodTaskStatuses = TaskStatus.expandAggregatedStatusesToRealStatuses(aggregatedStatuses);
+
+        return tasks.stream()
+                    .filter(task -> goodTaskStatuses.contains(task.getTaskInfo().getStatus()))
+                    .collect(Collectors.toList());
     }
 
     private TaskStatesPage getTaskStatesPage(int offset, int limit, List<TaskState> tasks) {
