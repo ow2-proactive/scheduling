@@ -1220,6 +1220,29 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit, @PathParam("tasktag") String taskTag,
+            @PathParam("statusFilter") String statusFilter)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        if (limit == -1)
+            limit = TASKS_PAGE_SIZE;
+        try {
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/" + taskTag + "/paginated");
+            JobState jobState = s.getJobState(jobId);
+            TaskStatesPage page = jobState.getTaskByTagByStatusPaginated(offset, limit, taskTag, statusFilter);
+            List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
+            return new RestPage<>(tasks, page.getSize());
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+    }
+
+    @Override
     @GET
     @GZIP
     @Path("jobs/{jobid}/log/full")

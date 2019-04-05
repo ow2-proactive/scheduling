@@ -664,6 +664,16 @@ public interface SchedulerRestInterface {
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("50") int limit)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/{tasktag}/{statusFilter}/paginated")
+    @Produces("application/json")
+    RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit, @PathParam("tasktag") String taskTag,
+            @PathParam("statusFilter") String statusFilter)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
     /**
      * Returns a paginated list of <code>TaskStateData</code> regarding the
      * given parameters (decoupled from the associated jobs). The result is

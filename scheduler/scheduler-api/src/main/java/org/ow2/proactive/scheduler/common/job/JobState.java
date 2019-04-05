@@ -211,12 +211,9 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      */
     public List<TaskState> getTasksByTag(final String tag) {
         List<TaskState> tasks = this.getTasks();
-        return (List<TaskState>) CollectionUtils.select(tasks, new Predicate() {
-            @Override
-            public boolean evaluate(Object object) {
-                String taskTag = ((TaskState) object).getTag();
-                return (taskTag != null) && (taskTag.equals(tag));
-            }
+        return (List<TaskState>) CollectionUtils.select(tasks, (Predicate) object -> {
+            String taskTag = ((TaskState) object).getTag();
+            return (taskTag != null) && (taskTag.equals(tag));
         });
     }
 
@@ -231,8 +228,8 @@ public abstract class JobState extends Job implements Comparable<JobState> {
         return getTaskStatesPage(offset, limit, getTasks());
     }
 
-    public TaskStatesPage getTasksPaginated(final String statusFilter, final int offset, final int limit) {
-        return getTaskStatesPage(statusFilter, offset, limit, getTasks());
+    public TaskStatesPage getTasksPaginated(String statusFilter, int offset, int limit) {
+        return getTaskStatesPage(offset, limit, filterByStatus(getTasks(), statusFilter));
     }
 
     /**
@@ -243,19 +240,22 @@ public abstract class JobState extends Job implements Comparable<JobState> {
      * @param limit the last index (non inclusive) of the sublist of tasks to get
      * @return a TaskStatePage which includes subset of filtered tasks and the total number of all filtered tasks
      */
-    public TaskStatesPage getTaskByTagPaginated(final String tag, final int offset, final int limit) {
+    public TaskStatesPage getTaskByTagPaginated(String tag, int offset, int limit) {
         return getTaskStatesPage(offset, limit, getTasksByTag(tag));
     }
 
-    private TaskStatesPage getTaskStatesPage(String statusFilter, int offset, int limit, List<TaskState> tasks) {
+    public TaskStatesPage getTaskByTagByStatusPaginated(int offset, int limit, String tag, String statusFilter) {
+        return getTaskStatesPage(offset, limit, filterByStatus(getTasksByTag(tag), statusFilter));
+    }
+
+    private List<TaskState> filterByStatus(List<TaskState> tasks, String statusFilter) {
         List<String> aggregatedStatuses = Arrays.asList(statusFilter.split(";"));
 
         Set<TaskStatus> goodTaskStatuses = TaskStatus.expandAggregatedStatusesToRealStatuses(aggregatedStatuses);
 
-        List<TaskState> filteredTasks = tasks.stream()
-                                             .filter(task -> goodTaskStatuses.contains(task.getTaskInfo().getStatus()))
-                                             .collect(Collectors.toList());
-        return getTaskStatesPage(offset, limit, filteredTasks);
+        return tasks.stream()
+                    .filter(task -> goodTaskStatuses.contains(task.getTaskInfo().getStatus()))
+                    .collect(Collectors.toList());
     }
 
     private TaskStatesPage getTaskStatesPage(int offset, int limit, List<TaskState> tasks) {
