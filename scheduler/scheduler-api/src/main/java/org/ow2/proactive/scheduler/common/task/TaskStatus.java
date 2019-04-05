@@ -168,16 +168,16 @@ public enum TaskStatus implements java.io.Serializable {
 
     public static Set<TaskStatus> expandAggregatedStatusesToRealStatuses(List<String> aggregatedStatuses) {
         return aggregatedStatuses.stream().flatMap(aggregatedStatus -> {
-            switch (aggregatedStatus) {
-                case "Submitted":
+            switch (aggregatedStatus.toLowerCase()) {
+                case "submitted":
                     return Stream.of(TaskStatus.SUBMITTED);
-                case "Pending":
+                case "pending":
                     return Stream.of(TaskStatus.PENDING);
-                case "Running":
+                case "running":
                     return TaskStatus.RUNNING_TASKS.stream();
-                case "Finished":
+                case "finished":
                     return TaskStatus.FINISHED_TASKS.stream();
-                case "Error":
+                case "error":
                     return TaskStatus.ERROR_TASKS.stream();
                 default:
                     return Stream.empty();
