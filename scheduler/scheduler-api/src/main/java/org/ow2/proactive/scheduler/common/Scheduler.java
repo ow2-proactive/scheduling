@@ -1539,4 +1539,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException;;
 
+    TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException;
+
 }

@@ -740,6 +740,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
         return _getScheduler().getTaskPaginated(jobId, offset, limit);
     }
 
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return _getScheduler().getTaskPaginated(jobId, statusFilter, offset, limit);
+    }
+
     /**
      * notify the socket disconnection
      */

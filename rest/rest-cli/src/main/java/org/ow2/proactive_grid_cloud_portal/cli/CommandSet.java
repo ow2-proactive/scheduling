@@ -257,7 +257,7 @@ public class CommandSet {
                                                                            .hasArgs(true)
                                                                            .numOfArgs(1)
                                                                            .hasOptionalArg(true)
-                                                                           .argNames("jobId [ '{\"var1\":\"value1\",...}' ['{\"genericInfo1\":\"value1\",...}'] ]")
+                                                                           .argNames("jobId [, '{\"var1\":\"value1\",...}' [, '{\"genericInfo1\":\"value1\",...}'] ]")
                                                                            .jsCommand("resubmit(job-id [ '{\"var1\":\"value1\",...}' ['{\"genericInfo1\":\"value1\",...}'] ])")
                                                                            .commandClass(ReSubmitJobCommand.class)
                                                                            .entry();

@@ -877,6 +877,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return schedulerProxy.getTaskPaginated(jobId, statusFilter, offset, limit);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         return schedulerProxy.checkJobPermissionMethod(sessionId, jobId, method);
