@@ -437,6 +437,14 @@ public class SchedulerDBManager {
         });
     }
 
+    public long getTaskCount(TaskStatus filter) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTasksCount").setParameter("taskStatus", filter);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
     public long getRunningTasksCount() {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getRunningTasksCount")

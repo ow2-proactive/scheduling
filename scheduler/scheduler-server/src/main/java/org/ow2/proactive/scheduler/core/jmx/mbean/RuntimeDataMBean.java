@@ -99,6 +99,28 @@ public interface RuntimeDataMBean {
      */
     int getFinishedTasksCount();
 
+    int getSubmittedTasksCount();
+
+    int getPausedTasksCount();
+
+    int getWaitingOnErrorTasksCount();
+
+    int getWaitingOnFailureTasksCount();
+
+    int getFailedTasksCount();
+
+    int getNotStartedTasksCount();
+
+    int getNotRestartedTasksCount();
+
+    int getAbortedTasksCount();
+
+    int getFaultyTasksCount();
+
+    int getSkippedTasksCount();
+
+    int getInErrorTasksCount();
+
     /**
      * @return current mean job pending time as integer
      */

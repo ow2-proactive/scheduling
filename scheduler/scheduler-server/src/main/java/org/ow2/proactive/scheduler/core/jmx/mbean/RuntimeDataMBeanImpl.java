@@ -35,6 +35,7 @@ import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.utils.Tools;
@@ -157,21 +158,76 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * @return current number of pending tasks
      */
     public int getPendingTasksCount() {
-        return (int) dbManager.getPendingTasksCount();
+        return (int) dbManager.getTaskCount(TaskStatus.PENDING);
     }
 
     /**
      * @return current number of finished tasks
      */
     public int getFinishedTasksCount() {
-        return (int) dbManager.getFinishedTasksCount();
+        return (int) dbManager.getTaskCount(TaskStatus.FINISHED);
+    }
+
+    @Override
+    public int getSubmittedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.SUBMITTED);
+    }
+
+    @Override
+    public int getPausedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.PAUSED);
+    }
+
+    @Override
+    public int getWaitingOnErrorTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.WAITING_ON_ERROR);
+    }
+
+    @Override
+    public int getWaitingOnFailureTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.WAITING_ON_FAILURE);
+    }
+
+    @Override
+    public int getFailedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.FAILED);
+    }
+
+    @Override
+    public int getNotStartedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.NOT_STARTED);
+    }
+
+    @Override
+    public int getNotRestartedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.NOT_RESTARTED);
+    }
+
+    @Override
+    public int getAbortedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.ABORTED);
+    }
+
+    @Override
+    public int getFaultyTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.FAULTY);
+    }
+
+    @Override
+    public int getSkippedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.SKIPPED);
+    }
+
+    @Override
+    public int getInErrorTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.IN_ERROR);
     }
 
     /**
      * @return current number of running tasks
      */
     public int getRunningTasksCount() {
-        return (int) dbManager.getRunningTasksCount();
+        return (int) dbManager.getTaskCount(TaskStatus.RUNNING);
     }
 
     /**
