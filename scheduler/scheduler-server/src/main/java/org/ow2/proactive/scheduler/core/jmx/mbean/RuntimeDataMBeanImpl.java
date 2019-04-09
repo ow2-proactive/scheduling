@@ -34,6 +34,7 @@ import org.ow2.proactive.jmx.Chronological;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
@@ -105,32 +106,32 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
 
     @Override
     public int getStalledJobsCount() {
-        return (int) dbManager.getStalledJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.STALLED);
     }
 
     @Override
     public int getPausedJobsCount() {
-        return (int) dbManager.getPausedJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.PAUSED);
     }
 
     @Override
     public int getInErrorJobsCount() {
-        return (int) dbManager.getInErrorJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.IN_ERROR);
     }
 
     @Override
     public int getKilledJobsCount() {
-        return (int) dbManager.getKilledJobCount();
+        return (int) dbManager.getJobsCount(JobStatus.KILLED);
     }
 
     @Override
     public int getCancelledJobsCount() {
-        return (int) dbManager.getCancelledJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.CANCELED);
     }
 
     @Override
     public int getFailedJobsCount() {
-        return (int) dbManager.getFailedJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.FAILED);
     }
 
     /**
