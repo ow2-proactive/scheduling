@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.core.RMCore;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -74,10 +75,15 @@ public class RMNodeConfigurator implements RunActive {
             if (dataSpaceStatus == null) {
                 // no data space configured on the node
                 logger.debug("Configuring data spaces for node " + nodeToAdd.getNodeInformation().getURL());
-                configureForDataSpace(nodeToAdd);
+                if (!configureForDataSpace(nodeToAdd)) {
+                    // the dataspaces could not be configured, the node should be killed.
+                    nodeToAdd.getProActiveRuntime().killRT(true);
+                    throw new NotConfiguredException("Failed to configure dataspaces, check the node logs for more details");
+                }
             } else if (!dataSpaceStatus.equals(Boolean.TRUE.toString())) {
                 // there was a problem of data space configuring
-                logger.error("Cannot configure data spaces : " + dataSpaceStatus);
+                nodeToAdd.getProActiveRuntime().killRT(true);
+                throw new NotConfiguredException("Cannot configure data spaces : " + dataSpaceStatus);
             } else {
                 // data space is configured
                 logger.debug("Data spaces is already configured for node " + nodeToAdd.getNodeInformation().getURL());
@@ -95,8 +101,8 @@ public class RMNodeConfigurator implements RunActive {
             }
             rmcore.internalAddNodeToCore(rmnodeToAdd);
         } catch (Exception e) {
-            logger.warn("Cannot properly configure the node " + nodeURL +
-                        " because of an error during configuration phase", e);
+            logger.error("Cannot properly configure the node " + nodeURL +
+                         " because of an error during configuration phase", e);
             //if a problem occurs during the configuration step,
             //the node is set to down
             rmcore.setDownNode(nodeURL);
@@ -110,8 +116,8 @@ public class RMNodeConfigurator implements RunActive {
      * @throws NodeException
      * @throws ActiveObjectCreationException
      */
-    protected void configureForDataSpace(Node node) throws ActiveObjectCreationException, NodeException {
-        RMNodeStarter.configureNodeForDataSpace(node);
+    protected boolean configureForDataSpace(Node node) throws ActiveObjectCreationException, NodeException {
+        return RMNodeStarter.configureNodeForDataSpace(node);
     }
 
     /**

@@ -258,6 +258,14 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        checkSchedulerConnection();
+        return uischeduler.reSubmit(currentJobId, jobVariables, jobGenericInfos);
+    }
+
+    @Override
     public void changeJobPriority(JobId jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         checkSchedulerConnection();
@@ -700,6 +708,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.getTaskPaginated(jobId, offset, limit);
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return uischeduler.getTaskPaginated(jobId, statusFilter, offset, limit);
     }
 
     @Override

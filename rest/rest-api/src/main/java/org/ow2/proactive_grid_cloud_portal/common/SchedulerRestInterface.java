@@ -42,6 +42,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -607,6 +608,16 @@ public interface SchedulerRestInterface {
             @QueryParam("limit") @DefaultValue("50") int limit)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/filtered/paginated")
+    @Produces("application/json")
+    RestPage<TaskStateData> getJobTaskStatesFilteredPaginated(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit,
+            @QueryParam("statusFilter") @DefaultValue("") String statusFilter)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
     /**
      * Returns a list of taskState of the tasks filtered by a given tag.
      * 
@@ -651,6 +662,16 @@ public interface SchedulerRestInterface {
     RestPage<TaskStateData> getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
             @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("50") int limit)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/taskstates/{tasktag}/{statusFilter}/paginated")
+    @Produces("application/json")
+    RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
+            @QueryParam("limit") @DefaultValue("50") int limit, @PathParam("tasktag") String taskTag,
+            @PathParam("statusFilter") String statusFilter)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
@@ -1273,6 +1294,26 @@ public interface SchedulerRestInterface {
     JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
             MultipartFormDataInput multipart, @Context UriInfo contextInfos) throws JobCreationRestException,
             NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException;
+
+    /**
+     * Submits a job to the scheduler
+     *
+     * @param sessionId
+     *            a valid session id
+     * @param jobId
+     *            job id of the already submitted job
+     * @param pathSegment
+     *            variables of the workflow
+     * @return the <code>jobid</code> of the newly created job
+     * @throws PermissionRestException if user does not have rights to access job with <code>jobId</code>
+     */
+    @GET
+    @Path("jobs/{jobid}/{path:resubmit}")
+    @Produces("application/json")
+    JobIdData reSubmit(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
+            @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException, UnknownJobRestException;
 
     /**
      * submit a planned workflow

@@ -85,7 +85,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         expectedJob = job(job.getId(), JobStatus.STALLED)
                                                          .withFinished(task("task1", TaskStatus.FINISHED)
                                                                                                          .checkFinished())
-                                                         .withPending(task("task2", TaskStatus.PENDING), true)
+                                                         .withPending(task("task2", TaskStatus.SUBMITTED), true)
                                                          .withEligible("task2");
 
         checkRecoveredState(recovered, state().withRunning(expectedJob));
@@ -99,7 +99,7 @@ public class TestLoadSchedulerClientState extends BaseSchedulerDBTest {
         expectedJob = job(job.getId(), JobStatus.STALLED)
                                                          .withFinished(task("task1", TaskStatus.FINISHED)
                                                                                                          .checkFinished())
-                                                         .withPending(task("task2", TaskStatus.PENDING), true)
+                                                         .withPending(task("task2", TaskStatus.SUBMITTED), true)
                                                          .withEligible("task2");
         recovered = stateRecoverHelper.recover(-1);
         checkRecoveredState(recovered, state().withRunning(expectedJob));

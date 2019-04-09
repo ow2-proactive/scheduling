@@ -1066,6 +1066,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     @Override
+    public void updateNeededNodes(int needed) {
+        this.jmxHelper.getSchedulerRuntimeMBean().setNeededNodes(needed);
+    }
+
+    @Override
     public synchronized void schedulerStateUpdated(SchedulerEvent eventType) {
         switch (eventType) {
             case STARTED:
@@ -1288,6 +1293,24 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         synchronized (jobState) {
             try {
                 final TaskStatesPage tasksPaginated = jobState.getTasksPaginated(offset, limit);
+                final List<TaskState> taskStatesCopy = (List<TaskState>) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(new ArrayList<>(tasksPaginated.getTaskStates()));
+                return new TaskStatesPage(taskStatesCopy, tasksPaginated.getSize());
+            } catch (Exception e) {
+                logger.error("Error when copying tasks page", e);
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    public TaskStatesPage getTaskPaginated(JobId jobId, String statusFilter, int offset, int limit)
+            throws UnknownJobException, NotConnectedException, PermissionException {
+        checkPermissions("getJobState",
+                         getIdentifiedJob(jobId),
+                         YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
+        ClientJobState jobState = getClientJobState(jobId);
+        synchronized (jobState) {
+            try {
+                final TaskStatesPage tasksPaginated = jobState.getTasksPaginated(statusFilter, offset, limit);
                 final List<TaskState> taskStatesCopy = (List<TaskState>) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(new ArrayList<>(tasksPaginated.getTaskStates()));
                 return new TaskStatesPage(taskStatesCopy, tasksPaginated.getSize());
             } catch (Exception e) {

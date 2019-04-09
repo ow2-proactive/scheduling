@@ -278,8 +278,8 @@ public class SchedulerStateRecoverHelper {
     }
 
     private void setTaskStatusAndIncrementPendingCounter(TaskStatusCounter counter, InternalTask task) {
-        logger.info("Changing task status to " + TaskStatus.PENDING);
-        task.setStatus(TaskStatus.PENDING);
+        logger.info("Changing task status to " + TaskStatus.SUBMITTED);
+        task.setStatus(TaskStatus.SUBMITTED);
         counter.incrementPendingTasks();
     }
 

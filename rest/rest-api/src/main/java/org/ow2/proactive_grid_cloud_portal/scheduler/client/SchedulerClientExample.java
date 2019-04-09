@@ -28,7 +28,9 @@ package org.ow2.proactive_grid_cloud_portal.scheduler.client;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,12 +51,12 @@ public class SchedulerClientExample {
     public static void main(String[] args) throws Exception {
 
         // LOGIN IN
-        SchedulerRestClient client = new SchedulerRestClient("http://localhost:9191/rest/rest/");
+        SchedulerRestClient client = new SchedulerRestClient("http://localhost:8080/rest/");
         SchedulerRestInterface scheduler = client.getScheduler();
         String sessionId = scheduler.login("admin", "admin");
 
         // JOB SUBMISSION
-        File xmlJobFile = new File("/home/ybonnaffe/src/cloud_service_provider_conectors/cloudstack/vminfo_job.xml");
+        File xmlJobFile = new File("/path/to/some/existing/job/job_1.xml");
         JobIdData xmlJob;
         try (FileInputStream inputStream = new FileInputStream(xmlJobFile)) {
             xmlJob = client.submitXml(sessionId, inputStream);

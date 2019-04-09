@@ -30,8 +30,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+
+import com.google.common.collect.ImmutableSet;
 
 
 /**
@@ -75,8 +78,8 @@ public enum TaskStatus implements java.io.Serializable {
     FAILED("Resource down", false),
     /**
      * The task could not be started.<br>
-     * It means that the task could not be started due to
-     * dependences failure.
+     * It means that the task will not be started due to
+     * dependence's failure.
      */
     NOT_STARTED("Could not start", false),
     /**
@@ -106,6 +109,28 @@ public enum TaskStatus implements java.io.Serializable {
      * The task is suspended after first error and is waiting for a manual restart action.
      */
     IN_ERROR("In-Error", true);
+
+    public static final Set<TaskStatus> ERROR_TASKS = ImmutableSet.of(IN_ERROR,
+                                                                      WAITING_ON_ERROR,
+                                                                      WAITING_ON_FAILURE,
+                                                                      FAILED,
+                                                                      FAULTY);
+
+    public static final Set<TaskStatus> FINISHED_TASKS = ImmutableSet.of(FAILED,
+                                                                         NOT_RESTARTED,
+                                                                         ABORTED,
+                                                                         FAULTY,
+                                                                         FINISHED,
+                                                                         SKIPPED,
+                                                                         NOT_STARTED);
+
+    public static final Set<TaskStatus> RUNNING_TASKS = ImmutableSet.of(PAUSED,
+                                                                        IN_ERROR,
+                                                                        RUNNING,
+                                                                        WAITING_ON_ERROR,
+                                                                        WAITING_ON_FAILURE);
+
+    public static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(SUBMITTED, PENDING);
 
     /** The name of the current status. */
     private String name;
@@ -139,5 +164,24 @@ public enum TaskStatus implements java.io.Serializable {
         return Arrays.stream(TaskStatus.values())
                      .filter(taskStatus -> !statusesToAvoid.contains(taskStatus))
                      .collect(Collectors.toList());
+    }
+
+    public static Set<TaskStatus> expandAggregatedStatusesToRealStatuses(List<String> aggregatedStatuses) {
+        return aggregatedStatuses.stream().flatMap(aggregatedStatus -> {
+            switch (aggregatedStatus.toLowerCase()) {
+                case "submitted":
+                    return Stream.of(TaskStatus.SUBMITTED);
+                case "pending":
+                    return Stream.of(TaskStatus.PENDING);
+                case "running":
+                    return TaskStatus.RUNNING_TASKS.stream();
+                case "finished":
+                    return TaskStatus.FINISHED_TASKS.stream();
+                case "error":
+                    return TaskStatus.ERROR_TASKS.stream();
+                default:
+                    return Stream.empty();
+            }
+        }).collect(Collectors.toSet());
     }
 }

@@ -727,6 +727,18 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException {
+        final JobIdData jobIdData;
+        try {
+            jobIdData = restApiClient().reSubmit(sid, currentJobId.value(), jobVariables, jobGenericInfos);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        }
+        return jobId(jobIdData);
+    }
+
+    @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return submit(job, variables, null);
@@ -1321,6 +1333,30 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         try {
             final int size = restApi().getJobTaskStates(sid, jobId).getList().size();
             List<TaskState> taskStates = restApi().getJobTaskStatesPaginated(sid, jobId, offset, limit)
+                                                  .getList()
+                                                  .stream()
+                                                  .map(DataUtility::taskState)
+                                                  .collect(Collectors.toList());
+            taskStatesPage = new TaskStatesPage();
+            taskStatesPage.setSize(size);
+            taskStatesPage.setTaskStates(taskStates);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return taskStatesPage;
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        TaskStatesPage taskStatesPage = null;
+        try {
+            final int size = restApi().getJobTaskStates(sid, jobId).getList().size();
+            List<TaskState> taskStates = restApi().getJobTaskStatesFilteredPaginated(sid,
+                                                                                     jobId,
+                                                                                     offset,
+                                                                                     limit,
+                                                                                     statusFilter)
                                                   .getList()
                                                   .stream()
                                                   .map(DataUtility::taskState)
