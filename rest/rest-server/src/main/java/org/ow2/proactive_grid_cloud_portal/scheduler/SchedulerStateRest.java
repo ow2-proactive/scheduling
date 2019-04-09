@@ -1482,6 +1482,28 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return result;
     }
 
+    @Override
+    public Map<String, Map<String, String>> metadataOfPreciousResults(String sessionId, String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        Scheduler s = checkAccess(sessionId, "");
+        List<TaskResult> trs = null;
+        try {
+            trs = s.getPreciousTaskResults(jobId);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
+        Map<String, Map<String, String>> result = new HashMap<>(trs.size());
+        for (TaskResult currentResult : trs) {
+            TaskResult r = PAFuture.getFutureValue(currentResult);
+            result.put(r.getTaskId().getReadableName(), r.getMetadata());
+        }
+        return result;
+    }
+
     /**
      * Returns the value of the task result of the task <code>taskName</code> of
      * the job <code>jobId</code> This method returns the result as a byte array

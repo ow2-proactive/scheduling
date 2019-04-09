@@ -69,6 +69,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -123,6 +124,7 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -1124,6 +1126,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), statusFilter, offset, limit);
+    }
+
+    @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        frontendState.checkPermission("getTaskResultByTag",
+                                      YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        List<TaskState> taskStates = getJobState(jobId).getTasks()
+                                                       .stream()
+                                                       .filter(Task::isPreciousResult)
+                                                       .collect(Collectors.toList());
+
+        List<TaskResult> results = new ArrayList<>();
+        for (TaskState currentState : taskStates) {
+            String taskName = currentState.getTaskInfo().getName();
+            try {
+                TaskResult currentResult = getTaskResult(jobId, taskName);
+                results.add(currentResult);
+            } catch (UnknownTaskException ex) {
+                // never occurs because tasks are filtered by tag so they cannot
+                // be unknown.
+                logger.warn("Unknown task.", ex);
+            }
+        }
+        return results;
     }
 
     /**

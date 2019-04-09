@@ -59,6 +59,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -919,6 +920,23 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable;
+
+    /**
+     * Returns the metadata of the all precious task results of the job <code>jobId</code>.
+     * Metadata is a map containing additional information associated with a result.
+     * For example a file name if the result represents a file.
+     *
+     * @param sessionId a valid session id
+     * @param jobId     the id of the job
+     * @return a map containing for each task entry, the metadata of the task result
+     */
+    @GET
+    @GZIP
+    @Path("jobs/{jobid}/tasks/results/precious/metadata")
+    @Produces("application/json")
+    Map<String, Map<String, String>> metadataOfPreciousResults(@HeaderParam("sessionid") String sessionId,
+            @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
      * Returns the value of the task result of the task <code>taskName</code> of

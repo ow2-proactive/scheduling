@@ -868,6 +868,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        renewSession();
+        return client.getPreciousTaskResults(jobId);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         renewSession();

@@ -746,6 +746,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
         return _getScheduler().getTaskPaginated(jobId, statusFilter, offset, limit);
     }
 
+    @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        return _getScheduler().getPreciousTaskResults(jobId);
+    }
+
     /**
      * notify the socket disconnection
      */

@@ -1371,6 +1371,21 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        try {
+            final Map<String, Map<String, String>> stringMapMap = restApi().metadataOfPreciousResults(sid, jobId);
+            return null;
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        } catch (UnknownJobRestException e) {
+            throw new UnknownJobException(e);
+        }
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         try {
