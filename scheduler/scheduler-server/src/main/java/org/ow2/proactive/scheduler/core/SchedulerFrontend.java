@@ -177,8 +177,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     private static final Logger logger = Logger.getLogger(SchedulerFrontend.class);
 
-    private static final JobLogger jlogger = JobLogger.getInstance();
-
     /**
      * Temporary rmURL at starting process
      */
@@ -509,12 +507,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         frontendState.checkPermissions("getJobResult", ij, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB);
 
         if (!ij.isFinished()) {
-            jlogger.info(jobId, "is not finished");
-            jlogger.info(jobId, "Job state: " + frontendState.getJobState(jobId).getStatus());
+            logger.info("Job " + jobId + " is not finished");
+            logger.info("Job " + jobId + " state: " + frontendState.getJobState(jobId).getStatus());
             return null;
         }
 
-        jlogger.info(jobId, "trying to get the job result");
+        logger.info("Trying to get result of job " + jobId);
 
         JobResult result = dbManager.loadJobResult(jobId);
         if (result == null) {
@@ -525,7 +523,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             // remember that this job is to be removed
             dbManager.jobSetToBeRemoved(jobId);
             schedulingService.scheduleJobRemove(jobId, System.currentTimeMillis() + SCHEDULER_REMOVED_JOB_DELAY);
-            jlogger.info(jobId, "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+            logger.info("Job " + jobId + " will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
         }
 
         return result;
@@ -616,7 +614,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
         }
 
-        jlogger.debug(jobId, "trying to get the task result, incarnation " + inc);
+        logger.debug("Job " + jobId + ", trying to get the task result, incarnation " + inc);
 
         try {
             TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
@@ -658,7 +656,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 default:
                     if (result == null) {
                         // otherwise the task is not finished
-                        jlogger.info(jobId, taskName + " is not finished");
+                        logger.info("Task " + taskName + " of job " + jobId + " is not finished");
                     }
                     break;
             }
@@ -691,7 +689,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
 
-        jlogger.debug(jobId, "trying to get all task results associated with task " + taskName + " from job " + jobId);
+        logger.debug("Job " + jobId + ", trying to get all task results associated with task " + taskName +
+                     " from job " + jobId);
 
         try {
             return dbManager.loadTaskResultAllAttempts(jobId, taskName);

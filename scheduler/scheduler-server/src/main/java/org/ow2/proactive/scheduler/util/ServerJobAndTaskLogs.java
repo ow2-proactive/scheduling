@@ -39,6 +39,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.utils.FileUtils;
 import org.ow2.proactive.utils.appenders.FileAppender;
 
@@ -46,6 +47,10 @@ import org.ow2.proactive.utils.appenders.FileAppender;
 public class ServerJobAndTaskLogs {
 
     private static final Logger logger = Logger.getLogger(ServerJobAndTaskLogs.class);
+
+    private static final TaskLogger tlogger = TaskLogger.getInstance();
+
+    private static final int MAX_REMOVAL_ATTEMPTS = 10;
 
     private SchedulerSpacesSupport spacesSupport = null;
 
@@ -114,7 +119,7 @@ public class ServerJobAndTaskLogs {
             deleteLogsFolderIfEmpty(jobId, userspace);
 
         } catch (Exception e) {
-            logger.warn("Exception occurred when trying to remove precious logs for job " + jobId);
+            logger.warn("Error occurred when trying to remove precious logs for job " + jobId, e);
         }
     }
 
@@ -132,7 +137,7 @@ public class ServerJobAndTaskLogs {
         DataSpacesFileObject logsFolder = userspace.resolveFile(TaskLoggerRelativePathGenerator.getContainingFolderForLogFiles(jobId));
         if (logsFolder != null) {
             logsFolder.refresh();
-            if (logsFolder.getChildren().isEmpty()) {
+            if (logsFolder.exists() && logsFolder.getChildren().isEmpty()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Deleting empty folder : " + logsFolder.getRealURI());
                 }
@@ -147,21 +152,36 @@ public class ServerJobAndTaskLogs {
             File logFolder = new File(logsLocation, path);
             org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
 
-            while (logFolder.exists()) {
-                logger.warn("Could not remove logs folder " + logFolder + " , retrying...");
-                displayFolderContents(logFolder);
-                org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+            int nbAttempts = 1;
+            try {
+                while (logFolder.exists() && nbAttempts <= MAX_REMOVAL_ATTEMPTS) {
+                    nbAttempts++;
+                    logger.warn("Could not remove logs folder " + logFolder + " , retrying " + nbAttempts + "/" +
+                                MAX_REMOVAL_ATTEMPTS);
+                    displayFolderContentsAndCleanLoggers(logFolder);
+                    boolean success = org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
+                    if (!success) {
+                        Thread.sleep(1000);
+                    }
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }
 
-    private void displayFolderContents(File logFolder) {
+    private void displayFolderContentsAndCleanLoggers(File logFolder) {
         for (File file : org.apache.commons.io.FileUtils.listFiles(logFolder, null, true)) {
+            // close eventually task logger
+            if (file.getName().contains("t")) {
+                try {
+                    TaskId taskid = TaskIdImpl.makeTaskId(file.getName());
+                    tlogger.close(taskid);
+                } catch (Exception e) {
+                    //ignored
+                }
+
+            }
             logger.warn("Remaining file or folder : " + file);
         }
     }

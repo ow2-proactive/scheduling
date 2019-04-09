@@ -326,9 +326,19 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     RM_REST_MONITORING_MAXIMUM_CHUNK_SIZE("pa.rm.rest.monitoring.maximum.chunk.size", PropertyType.INTEGER, "100"),
 
     /**
+     * Enables or disables asynchronous logging for server
+     */
+    LOG4J_ASYNC_APPENDER_ENABLED("pa.log4j.async.appender.enabled", PropertyType.BOOLEAN, "true"),
+
+    /**
+     * When asynchronous logging is enabled, also cache file appenders inside a cache structure (leaves file descriptors open while a job or task is running)
+     */
+    LOG4J_ASYNC_APPENDER_CACHE_ENABLED("pa.log4j.async.appender.cache.enabled", PropertyType.BOOLEAN, "false"),
+
+    /**
      * Defines the buffer size used in asynchronous appenders
      */
-    RM_LOG4J_ASYNC_APPENDER_BUFFER_SIZE("pa.rm.log4j.async.appender.buffer.size", PropertyType.INTEGER, "1024");
+    LOG4J_ASYNC_APPENDER_BUFFER_SIZE("pa.log4j.async.appender.buffer.size", PropertyType.INTEGER, "10000");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
