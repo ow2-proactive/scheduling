@@ -169,7 +169,7 @@ public class RMProxyActiveObject {
         if (nodes != null && nodes.size() > 0) {
             if (cleaningScript == null) {
                 releaseNodes(nodes).booleanValue();
-                TaskLogger.getInstance().close(taskId);
+                closeTaskLogger(taskId);
             } else if (InternalTask.isScriptAuthorized(taskId, cleaningScript)) {
                 handleCleaningScript(nodes, cleaningScript, variables, genericInformation, taskId, creds, store);
             } else {
@@ -177,8 +177,16 @@ public class RMProxyActiveObject {
                                                "Unauthorized clean script: " + System.getProperty("line.separator") +
                                                        cleaningScript.fetchScript());
                 releaseNodes(nodes).booleanValue();
-                TaskLogger.getInstance().close(taskId);
+                closeTaskLogger(taskId);
             }
+        } else {
+            closeTaskLogger(taskId);
+        }
+    }
+
+    private void closeTaskLogger(TaskId taskId) {
+        if (taskId != null) {
+            TaskLogger.getInstance().close(taskId);
         }
     }
 
@@ -266,6 +274,7 @@ public class RMProxyActiveObject {
                 instance.error(taskId,
                                "ERROR : Callback method won't be executed, node won't be released. This is a critical state, check the callback method name",
                                e);
+                instance.close(taskId);
             }
             instance.info(taskId, "Cleaning Script started on node " + nodes.get(0).getNodeInformation().getURL());
 
@@ -274,6 +283,7 @@ public class RMProxyActiveObject {
             instance.error(taskId,
                            "Error while starting cleaning script for task " + taskId + " on " + nodes.get(0),
                            e);
+            instance.close(taskId);
             releaseNodes(nodes).booleanValue();
         }
     }
@@ -297,8 +307,8 @@ public class RMProxyActiveObject {
             logger.error("Exception occurred while executing cleaning script on node " + nodeUrl + ":", e);
         }
         printCleaningScriptInformations(nodes, sResult, taskId);
+        closeTaskLogger(taskId);
         releaseNodes(nodes);
-        TaskLogger.getInstance().close(taskId);
     }
 
     private void printCleaningScriptInformations(NodeSet nodes, ScriptResult<?> sResult, TaskId taskId) {

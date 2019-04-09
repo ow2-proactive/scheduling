@@ -30,7 +30,7 @@ log4j.appender.FILE.MaxFileSize=100MB
 log4j.appender.FILE.Append=true
 log4j.appender.FILE.MaxBackupIndex=10
 log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
-log4j.appender.FILE.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n
+log4j.appender.FILE.layout.ConversionPattern=[%d{ISO8601} %10.10t %-5p %30.30c{1.}] %m%n
 
 log4j.appender.FILE_LAST=org.apache.log4j.RollingFileAppender
 log4j.appender.FILE_LAST.File=${pa.rm.home}/logs/Scheduler-tests-last.log
@@ -38,4 +38,4 @@ log4j.appender.FILE_LAST.MaxFileSize=100MB
 log4j.appender.FILE_LAST.Append=false
 log4j.appender.FILE_LAST.MaxBackupIndex=10
 log4j.appender.FILE_LAST.layout=org.apache.log4j.PatternLayout
-log4j.appender.FILE_LAST.layout.ConversionPattern=[%d{ISO8601} %-5p] %m%n
+log4j.appender.FILE_LAST.layout.ConversionPattern=[%d{ISO8601} %10.10t %-5p %30.30c{1.}] %m%n

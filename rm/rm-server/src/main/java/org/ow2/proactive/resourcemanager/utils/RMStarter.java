@@ -214,29 +214,31 @@ public class RMStarter {
      * Wrap existing appenders configured for the root logger in AsyncAppenders
      */
     public static void overrideAppenders() {
-        Logger rootLogger = Logger.getRootLogger();
-        Enumeration<?> en = rootLogger.getAllAppenders();
-        if (en != null) {
-            List<AsyncAppender> newAppenders = new ArrayList();
-            List<String> appendersToRemove = new ArrayList<>();
-            int index = 0;
-            while (en.hasMoreElements()) {
-                Appender app = (Appender) en.nextElement();
-                if (app != null && !(app instanceof AsyncAppender)) {
-                    AsyncAppender asyncAppender = new AsyncAppender();
-                    asyncAppender.setName("MainAsyncAppender_" + index);
-                    asyncAppender.setBufferSize(PAResourceManagerProperties.RM_LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
-                    asyncAppender.addAppender(app);
-                    newAppenders.add(asyncAppender);
-                    appendersToRemove.add(app.getName());
-                    index++;
+        if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_ENABLED.getValueAsBoolean()) {
+            Logger rootLogger = Logger.getRootLogger();
+            Enumeration<?> en = rootLogger.getAllAppenders();
+            if (en != null) {
+                List<AsyncAppender> newAppenders = new ArrayList();
+                List<String> appendersToRemove = new ArrayList<>();
+                int index = 0;
+                while (en.hasMoreElements()) {
+                    Appender app = (Appender) en.nextElement();
+                    if (app != null && !(app instanceof AsyncAppender)) {
+                        AsyncAppender asyncAppender = new AsyncAppender();
+                        asyncAppender.setName("MainAsyncAppender_" + index);
+                        asyncAppender.setBufferSize(PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
+                        asyncAppender.addAppender(app);
+                        newAppenders.add(asyncAppender);
+                        appendersToRemove.add(app.getName());
+                        index++;
+                    }
                 }
-            }
-            for (String appenderName : appendersToRemove) {
-                rootLogger.removeAppender(appenderName);
-            }
-            for (Appender newAppender : newAppenders) {
-                rootLogger.addAppender(newAppender);
+                for (String appenderName : appendersToRemove) {
+                    rootLogger.removeAppender(appenderName);
+                }
+                for (Appender newAppender : newAppenders) {
+                    rootLogger.addAppender(newAppender);
+                }
             }
         }
     }

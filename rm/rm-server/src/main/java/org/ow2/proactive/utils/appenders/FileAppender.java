@@ -28,6 +28,7 @@ package org.ow2.proactive.utils.appenders;
 import java.io.File;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
@@ -56,12 +57,22 @@ public class FileAppender extends WriterAppender {
 
     private String maxFileSize;
 
-    private static ConcurrentHashMap<String, AsyncAppender> appenderCache = new ConcurrentHashMap<>();
+    protected static ConcurrentHashMap<String, RollingFileAppender> appenderCache = new ConcurrentHashMap<>();
+
+    protected static LinkedBlockingQueue<QueuedLoggingEvent> loggingQueue = new LinkedBlockingQueue<>(PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
+
+    private static Thread logEventsProcessor;
+
+    static {
+        logEventsProcessor = new Thread(new LogEventsProcessor(), "FileAppenderThread");
+        logEventsProcessor.setDaemon(true);
+    }
 
     protected String filesLocation;
 
     public FileAppender() {
-
+        setLayout(new PatternLayout("[%d{ISO8601} %-5p] %m%n"));
+        fetchLayoutFromRootLogger();
     }
 
     @Override
@@ -73,19 +84,24 @@ public class FileAppender extends WriterAppender {
     }
 
     public void append(String cacheKey, LoggingEvent event) {
-        AsyncAppender asyncAppender;
-
-        if (appenderCache.containsKey(cacheKey)) {
-            asyncAppender = appenderCache.get(cacheKey);
+        if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_ENABLED.getValueAsBoolean()) {
+            if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
+                appenderCache.computeIfAbsent(cacheKey, k -> createAppender(k));
+            }
+            try {
+                loggingQueue.put(new QueuedLoggingEvent(cacheKey, event));
+            } catch (InterruptedException e) {
+                Logger.getRootLogger().warn("Interrupted while logging on " + cacheKey);
+            }
         } else {
-            asyncAppender = createAppender(cacheKey);
+            RollingFileAppender appender = createAppender(cacheKey);
+            appender.append(event);
+            appender.close();
         }
-        asyncAppender.append(event);
-
     }
 
-    private AsyncAppender createAppender(String cacheKey) {
-        AsyncAppender asyncAppender = new AsyncAppender();
+    private RollingFileAppender createAppender(String cacheKey) {
+        RollingFileAppender appender;
         String fileName = cacheKey;
         if (filesLocation != null) {
             fileName = filesLocation + File.separator + fileName;
@@ -96,28 +112,22 @@ public class FileAppender extends WriterAppender {
                 FileUtils.forceMkdirParent(file);
                 FileUtils.touch(file);
             }
-            setLayout(new PatternLayout("[%d{ISO8601} %-5p] %m%n"));
-            fetchLayoutFromRootLogger();
 
-            RollingFileAppender appender = new RollingFileAppender(getLayout(), fileName, true);
+            appender = new RollingFileAppender(getLayout(), fileName, true);
             appender.setMaxBackupIndex(1);
             if (maxFileSize != null) {
                 appender.setMaxFileSize(maxFileSize);
             }
-            asyncAppender.setName(cacheKey);
-            asyncAppender.setBufferSize(PAResourceManagerProperties.RM_LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
-            asyncAppender.addAppender(appender);
-            AsyncAppender previousValue = appenderCache.putIfAbsent(cacheKey, asyncAppender);
-            if (previousValue != null) {
-                asyncAppender = previousValue;
-            }
         } catch (Exception e) {
-            Logger.getRootLogger().error(e.getMessage(), e);
+            Logger.getRootLogger()
+                  .error("Error when creating logger : " + cacheKey + " logging will be disabled for this context", e);
+            appender = new RollingFileAppender();
+
         }
-        return asyncAppender;
+        return appender;
     }
 
-    private void fetchLayoutFromRootLogger() {
+    private boolean fetchLayoutFromRootLogger() {
         // trying to get a layout from log4j configuration
         Enumeration<?> en = Logger.getRootLogger().getAllAppenders();
         if (en != null && en.hasMoreElements()) {
@@ -127,29 +137,39 @@ public class FileAppender extends WriterAppender {
                     Enumeration<?> attachedAppenders = ((AsyncAppender) app).getAllAppenders();
                     if (attachedAppenders != null && attachedAppenders.hasMoreElements()) {
                         Appender attachedApp = (Appender) attachedAppenders.nextElement();
-                        setLayoutUsingAppender(attachedApp);
+                        return setLayoutUsingAppender(attachedApp);
                     }
                 } else {
-                    setLayoutUsingAppender(app);
+                    return setLayoutUsingAppender(app);
                 }
             }
         }
+        return false;
     }
 
-    private void setLayoutUsingAppender(Appender attachedApp) {
+    private boolean setLayoutUsingAppender(Appender attachedApp) {
         if (attachedApp.getLayout() != null) {
-            Logger.getRootLogger().debug("Retrieved layout from log4j configuration");
+            Logger.getRootLogger().trace("Retrieved layout from log4j configuration");
             setLayout(attachedApp.getLayout());
+            return true;
         }
+        return false;
     }
 
     @Override
     public void close() {
         Object fileName = MDC.get(FILE_NAME);
         if (fileName != null) {
-            AsyncAppender cachedAppender = appenderCache.remove(fileName);
-            if (cachedAppender != null) {
-                cachedAppender.close();
+            loggingQueue.stream()
+                        .filter(event -> event.getKey().equals(fileName))
+                        .forEach(cachedEvent -> cachedEvent.apply());
+            loggingQueue.removeIf(event -> event.getKey().equals(fileName));
+
+            if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
+                RollingFileAppender cachedAppender = appenderCache.remove(fileName);
+                if (cachedAppender != null) {
+                    cachedAppender.close();
+                }
             }
         }
     }
@@ -173,5 +193,74 @@ public class FileAppender extends WriterAppender {
 
     public void setMaxFileSize(String maxFileSize) {
         this.maxFileSize = maxFileSize;
+    }
+
+    public static boolean doesCacheContain(String key) {
+        return appenderCache.containsKey(key);
+    }
+
+    private RollingFileAppender getAppender(String key) {
+        RollingFileAppender appender;
+
+        if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
+            appender = appenderCache.get(key);
+        } else {
+            appender = createAppender(key);
+        }
+        return appender;
+    }
+
+    /**
+     * An event waiting to be processed
+     */
+    private class QueuedLoggingEvent {
+
+        private String cacheKey;
+
+        private LoggingEvent event;
+
+        public QueuedLoggingEvent(String cacheKey, LoggingEvent event) {
+            this.cacheKey = cacheKey;
+            this.event = event;
+        }
+
+        public String getKey() {
+            return cacheKey;
+        }
+
+        public LoggingEvent getEvent() {
+            return event;
+        }
+
+        public synchronized void apply() {
+            RollingFileAppender appender = getAppender(cacheKey);
+
+            if (appender != null && event != null) {
+                appender.append(event);
+            }
+            event = null;
+
+            if (!PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
+                appender.close();
+            }
+        }
+    }
+
+    /**
+     * Singleton thread processing all logging events
+     */
+    private static class LogEventsProcessor implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                while (Thread.currentThread().isAlive()) {
+                    QueuedLoggingEvent queuedEvent = loggingQueue.take();
+                    queuedEvent.apply();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }
