@@ -413,6 +413,10 @@ public class SchedulerDBManager {
         });
     }
 
+    public long getJobsCount(JobStatus status) {
+        return getJobsNumberWithStatus(Collections.singletonList(status));
+    }
+
     public long getFinishedTasksCount() {
         return executeReadOnlyTransaction(session -> {
             Query query = session.getNamedQuery("getFinishedTasksCount")
@@ -432,6 +436,14 @@ public class SchedulerDBManager {
             Query query = session.getNamedQuery("getPendingTasksCount")
                                  .setParameterList("jobStatus", NOT_FINISHED_JOB_STATUSES)
                                  .setParameterList("taskStatus", taskStatus);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    public long getTaskCount(TaskStatus filter) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTasksCount").setParameter("taskStatus", filter);
 
             return (Long) query.uniqueResult();
         });
@@ -1853,27 +1865,4 @@ public class SchedulerDBManager {
         return transactionHelper;
     }
 
-    public long getStalledJobsCount() {
-        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.STALLED));
-    }
-
-    public long getPausedJobsCount() {
-        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.PAUSED));
-    }
-
-    public long getInErrorJobsCount() {
-        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.IN_ERROR));
-    }
-
-    public long getKilledJobCount() {
-        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.KILLED));
-    }
-
-    public long getCancelledJobsCount() {
-        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.CANCELED));
-    }
-
-    public long getFailedJobsCount() {
-        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.FAILED));
-    }
 }

@@ -34,7 +34,9 @@ import org.ow2.proactive.jmx.Chronological;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
+import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
+import org.ow2.proactive.scheduler.common.task.TaskStatus;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.utils.Tools;
@@ -104,32 +106,32 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
 
     @Override
     public int getStalledJobsCount() {
-        return (int) dbManager.getStalledJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.STALLED);
     }
 
     @Override
     public int getPausedJobsCount() {
-        return (int) dbManager.getPausedJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.PAUSED);
     }
 
     @Override
     public int getInErrorJobsCount() {
-        return (int) dbManager.getInErrorJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.IN_ERROR);
     }
 
     @Override
     public int getKilledJobsCount() {
-        return (int) dbManager.getKilledJobCount();
+        return (int) dbManager.getJobsCount(JobStatus.KILLED);
     }
 
     @Override
     public int getCancelledJobsCount() {
-        return (int) dbManager.getCancelledJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.CANCELED);
     }
 
     @Override
     public int getFailedJobsCount() {
-        return (int) dbManager.getFailedJobsCount();
+        return (int) dbManager.getJobsCount(JobStatus.FAILED);
     }
 
     /**
@@ -157,21 +159,76 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
      * @return current number of pending tasks
      */
     public int getPendingTasksCount() {
-        return (int) dbManager.getPendingTasksCount();
+        return (int) dbManager.getTaskCount(TaskStatus.PENDING);
     }
 
     /**
      * @return current number of finished tasks
      */
     public int getFinishedTasksCount() {
-        return (int) dbManager.getFinishedTasksCount();
+        return (int) dbManager.getTaskCount(TaskStatus.FINISHED);
+    }
+
+    @Override
+    public int getSubmittedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.SUBMITTED);
+    }
+
+    @Override
+    public int getPausedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.PAUSED);
+    }
+
+    @Override
+    public int getWaitingOnErrorTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.WAITING_ON_ERROR);
+    }
+
+    @Override
+    public int getWaitingOnFailureTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.WAITING_ON_FAILURE);
+    }
+
+    @Override
+    public int getFailedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.FAILED);
+    }
+
+    @Override
+    public int getNotStartedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.NOT_STARTED);
+    }
+
+    @Override
+    public int getNotRestartedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.NOT_RESTARTED);
+    }
+
+    @Override
+    public int getAbortedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.ABORTED);
+    }
+
+    @Override
+    public int getFaultyTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.FAULTY);
+    }
+
+    @Override
+    public int getSkippedTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.SKIPPED);
+    }
+
+    @Override
+    public int getInErrorTasksCount() {
+        return (int) dbManager.getTaskCount(TaskStatus.IN_ERROR);
     }
 
     /**
      * @return current number of running tasks
      */
     public int getRunningTasksCount() {
-        return (int) dbManager.getRunningTasksCount();
+        return (int) dbManager.getTaskCount(TaskStatus.RUNNING);
     }
 
     /**
