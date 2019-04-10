@@ -75,7 +75,7 @@ public class TaskLoggerTest extends ProActiveTestClean {
         } catch (Exception e) {
             Assert.fail(e);
         }
-        Thread.sleep(100);
+        Thread.sleep(1000);
         assertTrue(FileUtils.readFileToString(logFile, Charset.defaultCharset()).contains("HelloWorld"));
 
     }

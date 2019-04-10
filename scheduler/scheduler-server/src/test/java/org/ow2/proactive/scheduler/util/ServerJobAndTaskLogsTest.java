@@ -111,7 +111,7 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        Thread.sleep(100);
+        Thread.sleep(1000);
 
         assertTrue(new File(ServerJobAndTaskLogs.getInstance().getLogsLocation(),
                             JobLogger.getJobLogRelativePath(jobId)).exists());
@@ -146,7 +146,7 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
     }
 
     private void checkContains(JobId jobId, TaskId taskId, String word) throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(1000);
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    containsString(word + " job log"));
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
@@ -155,7 +155,7 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
     }
 
     private void checkDoesNotContain(JobId jobId, TaskId taskId, String word) throws InterruptedException {
-        Thread.sleep(100);
+        Thread.sleep(1000);
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    not(containsString(word + " job log")));
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
