@@ -100,6 +100,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -1373,16 +1374,23 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     @Override
     public List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        try {
-            final Map<String, Map<String, String>> stringMapMap = restApi().metadataOfPreciousResults(sid, jobId);
-            return null;
-        } catch (NotConnectedRestException e) {
-            throw new NotConnectedException(e);
-        } catch (PermissionRestException e) {
-            throw new PermissionException(e);
-        } catch (UnknownJobRestException e) {
-            throw new UnknownJobException(e);
+        List<TaskState> taskStates = getJobState(jobId).getTasks()
+                                                       .stream()
+                                                       .filter(Task::isPreciousResult)
+                                                       .collect(Collectors.toList());
+        ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
+        for (TaskState currentState : taskStates) {
+            String taskName = currentState.getTaskInfo().getName();
+            try {
+                TaskResult currentResult = getTaskResult(jobId, taskName);
+                results.add(currentResult);
+            } catch (UnknownTaskException ex) {
+                // never occurs because tasks are filtered by tag so they cannot
+                // be unknown.
+                logger.warn("Unknown task.", ex);
+            }
         }
+        return results;
     }
 
     @Override

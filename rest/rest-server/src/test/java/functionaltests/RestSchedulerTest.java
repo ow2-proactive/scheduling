@@ -32,14 +32,11 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.rest.ISchedulerClient;
-
-import functionaltests.jobs.JobResultTask;
 
 
 public class RestSchedulerTest extends AbstractRestFuncTestCase {
@@ -81,6 +78,7 @@ public class RestSchedulerTest extends AbstractRestFuncTestCase {
         assertEquals("Started", jsonObject.get("Status").toString());
     }
 
+    @Ignore
     @Test
     public void testPreciousMetadat() throws Exception {
         final JobId jobId1 = submitJobWithResults();
