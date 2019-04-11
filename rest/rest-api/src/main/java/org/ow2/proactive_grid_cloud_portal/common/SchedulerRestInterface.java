@@ -921,20 +921,18 @@ public interface SchedulerRestInterface {
             @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable;
 
     /**
-     * Returns the metadata of the all precious task results of the job <code>jobId</code>.
-     * Metadata is a map containing additional information associated with a result.
-     * For example a file name if the result represents a file.
+     * Returns the name of the tasks, which has precious result property set on,
+     * and they all releated to the job with <code>jobId</code>.
      *
      * @param sessionId a valid session id
      * @param jobId     the id of the job
-     * @return a map containing for each task entry, the metadata of the task result
+     * @return a list of task names
      */
     @GET
     @GZIP
     @Path("jobs/{jobid}/tasks/results/precious/metadata")
     @Produces("application/json")
-    List<TaskResultData> metadataOfPreciousResults(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId)
+    List<String> getPreciousTaskName(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**

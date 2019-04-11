@@ -1483,16 +1483,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public List<TaskResultData> metadataOfPreciousResults(String sessionId, String jobId)
+    public List<String> getPreciousTaskName(String sessionId, String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
         try {
             return scheduler.getPreciousTaskResults(jobId)
                             .stream()
-                            .map(taskResult -> buildTaskResultData(PAFuture.getFutureValue(taskResult)))
-                            .peek(taskResultData -> taskResultData.setSerializedValue(""))
-                            .peek(taskResultData -> taskResultData.setSerializedPropagatedVariables(Collections.emptyMap()))
-                            .peek(taskResultData -> taskResultData.setPropagatedVariables(Collections.emptyMap()))
+                            .map(TaskResult::getTaskId)
+                            .map(TaskId::getReadableName)
                             .collect(Collectors.toList());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
