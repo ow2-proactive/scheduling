@@ -1131,8 +1131,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
-        frontendState.checkPermission("getTaskResultByTag",
-                                      YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        frontendState.checkPermission("getJobResult", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
         List<TaskState> taskStates = getJobState(jobId).getTasks()
                                                        .stream()
                                                        .filter(Task::isPreciousResult)

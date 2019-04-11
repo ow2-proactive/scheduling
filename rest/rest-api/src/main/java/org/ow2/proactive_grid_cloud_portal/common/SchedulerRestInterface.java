@@ -59,7 +59,6 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.common.SortSpecifierContainer;
-import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobIdData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobInfoData;
@@ -934,7 +933,7 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/{jobid}/tasks/results/precious/metadata")
     @Produces("application/json")
-    Map<String, Map<String, String>> metadataOfPreciousResults(@HeaderParam("sessionid") String sessionId,
+    List<TaskResultData> metadataOfPreciousResults(@HeaderParam("sessionid") String sessionId,
             @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
@@ -942,7 +941,7 @@ public interface SchedulerRestInterface {
      * Returns the value of the task result of the task <code>taskName</code> of
      * the job <code>jobId</code> This method returns the result as a byte array
      * whatever the result is.
-     * 
+     *
      * @param sessionId
      *            a valid session id
      * @param jobId

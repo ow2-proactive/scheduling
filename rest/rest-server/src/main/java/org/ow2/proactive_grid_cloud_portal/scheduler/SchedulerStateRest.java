@@ -1483,12 +1483,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public Map<String, Map<String, String>> metadataOfPreciousResults(String sessionId, String jobId)
+    public List<TaskResultData> metadataOfPreciousResults(String sessionId, String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
-        Scheduler s = checkAccess(sessionId, "");
-        List<TaskResult> trs = null;
+        Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
         try {
-            trs = s.getPreciousTaskResults(jobId);
+            return scheduler.getPreciousTaskResults(jobId)
+                            .stream()
+                            .map(taskResult -> buildTaskResultData(PAFuture.getFutureValue(taskResult)))
+                            .peek(taskResultData -> taskResultData.setSerializedValue(""))
+                            .peek(taskResultData -> taskResultData.setSerializedPropagatedVariables(Collections.emptyMap()))
+                            .peek(taskResultData -> taskResultData.setPropagatedVariables(Collections.emptyMap()))
+                            .collect(Collectors.toList());
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (UnknownJobException e) {
@@ -1496,12 +1501,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         }
-        Map<String, Map<String, String>> result = new HashMap<>(trs.size());
-        for (TaskResult currentResult : trs) {
-            TaskResult r = PAFuture.getFutureValue(currentResult);
-            result.put(r.getTaskId().getReadableName(), r.getMetadata());
-        }
-        return result;
     }
 
     /**

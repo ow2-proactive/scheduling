@@ -1378,7 +1378,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
                                                        .stream()
                                                        .filter(Task::isPreciousResult)
                                                        .collect(Collectors.toList());
-        ArrayList<TaskResult> results = new ArrayList<TaskResult>(taskStates.size());
+        ArrayList<TaskResult> results = new ArrayList<>(taskStates.size());
         for (TaskState currentState : taskStates) {
             String taskName = currentState.getTaskInfo().getName();
             try {
