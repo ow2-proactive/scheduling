@@ -54,6 +54,7 @@ import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.OnTaskError;
 
+import functionaltests.jobs.JobResultTask;
 import functionaltests.jobs.NonTerminatingJob;
 import functionaltests.jobs.SimpleJob;
 import functionaltests.utils.RestFuncTUtils;
@@ -192,6 +193,11 @@ public abstract class AbstractRestFuncTestCase {
         return getScheduler().submit(job);
     }
 
+    protected JobId submitJobWithResults() throws Exception {
+        Job job = createJob(JobResultTask.class);
+        return getScheduler().submit(job);
+    }
+
     protected String submitFinishedJob(Class<?> clazz, int executionAttempts) throws Exception {
         Scheduler scheduler = getScheduler();
         Job job = createJob(clazz, executionAttempts);
@@ -267,6 +273,7 @@ public abstract class AbstractRestFuncTestCase {
         task.setExecutableClassName(clazz.getName());
         task.setMaxNumberOfExecution(executionAttempts);
         task.setOnTaskError(errorPolicy);
+        task.setPreciousResult(true);
 
         String classpath = RestFuncTUtils.getClassPath(clazz);
         ForkEnvironment forkEnvironment = new ForkEnvironment();

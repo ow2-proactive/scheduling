@@ -28,12 +28,15 @@ package functionaltests;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
+import org.ow2.proactive.scheduler.common.job.JobId;
 
 
 public class RestSchedulerTest extends AbstractRestFuncTestCase {
@@ -74,4 +77,5 @@ public class RestSchedulerTest extends AbstractRestFuncTestCase {
         JSONObject jsonObject = toJsonObject(response);
         assertEquals("Started", jsonObject.get("Status").toString());
     }
+
 }
