@@ -25,9 +25,8 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import org.apache.log4j.Logger;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
+import static com.google.common.io.Files.*;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,8 +40,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.google.common.io.Files.*;
-import static org.apache.commons.io.FileUtils.deleteQuietly;
+import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
 
 /**
@@ -178,7 +178,7 @@ public class ProgressFileReaderPoller {
 
                 }
             } catch (InterruptedException e) {
-                logger.debug("ProgressFileReaderThread was interrupted." , e);
+                logger.debug("ProgressFileReaderThread was interrupted.", e);
             } catch (IOException e) {
                 logger.error("Could not get lastModifiedTime: " + e.getMessage(), e);
             }

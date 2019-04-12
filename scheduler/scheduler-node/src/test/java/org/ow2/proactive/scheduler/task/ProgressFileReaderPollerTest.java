@@ -25,13 +25,9 @@
  */
 package org.ow2.proactive.scheduler.task;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.ow2.proactive.scripting.helper.progress.ProgressFile;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,9 +35,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.ow2.proactive.scripting.helper.progress.ProgressFile;
 
 
 /**
@@ -64,7 +64,7 @@ public class ProgressFileReaderPollerTest {
     private ProgressFileReaderHistory listener = new ProgressFileReaderHistory();
 
     @Before
-    public void setup()  {
+    public void setup() {
         String progressFileName = "test";
         progressFileReader.register(listener);
         progressFileReader.start(folder.getRoot(), progressFileName);
