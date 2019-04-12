@@ -34,15 +34,15 @@ import java.nio.charset.Charset;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
 
@@ -59,6 +59,8 @@ import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
  */
 public class ProgressFileReaderPoller {
 
+    private static final Long DEFAULT_POLLER_PERIOD = 1000L;
+
     private static final Logger logger = Logger.getLogger(ProgressFileReaderPoller.class);
 
     private static final String PROGRESS_FILE_DIR = ".tasks-progress";
@@ -69,9 +71,9 @@ public class ProgressFileReaderPoller {
 
     private volatile int progress;
 
-    private Thread watchDogThread;
-
     private Set<Listener> observers;
+
+    private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     public ProgressFileReaderPoller() {
         // mainly for test purposes
@@ -89,9 +91,20 @@ public class ProgressFileReaderPoller {
         try {
             createProgressFile(workingDir, filename);
 
-            watchDogThread = new Thread(new ProgressFileReaderThread(Duration.ofMillis(PASchedulerProperties.SCHEDULER_PROGRESS_FILE_READER_POLL_TIMEOUT.getValueAsInt())));
-            watchDogThread.setName(ProgressFileReaderThread.class.getName());
-            watchDogThread.start();
+            String propertyValue = System.getProperty(TaskLauncher.PROGRESS_FILE_READER_PERIOD,
+                                                      DEFAULT_POLLER_PERIOD.toString());
+            Long periodInMs;
+            try {
+                periodInMs = Long.parseLong(propertyValue);
+            } catch (NumberFormatException e) {
+                logger.warn(String.format("Incorect property %s value: %s, using default value: %s.",
+                                          TaskLauncher.PROGRESS_FILE_READER_PERIOD,
+                                          propertyValue,
+                                          DEFAULT_POLLER_PERIOD.toString()));
+                periodInMs = DEFAULT_POLLER_PERIOD;
+            }
+
+            scheduledExecutorService.scheduleAtFixedRate(this::readValue, 0, periodInMs, TimeUnit.MILLISECONDS);
 
             progress = 0;
 
@@ -135,8 +148,9 @@ public class ProgressFileReaderPoller {
     }
 
     public void stop() {
-        if (watchDogThread != null) {
-            watchDogThread.interrupt();
+        logger.trace(String.format("Stopping %s...", ProgressFileReaderPoller.class.getSimpleName()));
+        if (scheduledExecutorService != null) {
+            scheduledExecutorService.shutdownNow();
         }
         removeProgressFileDir();
     }
@@ -153,70 +167,35 @@ public class ProgressFileReaderPoller {
 
     }
 
-    public final class ProgressFileReaderThread implements Runnable {
+    public void readValue() {
+        try {
+            String line = readFirstLine(progressFile.toFile(), Charset.defaultCharset());
 
-        private final Duration duration;
+            if (line != null) {
+                try {
+                    // try to parse double to allow int + double
+                    int value = (int) Double.parseDouble(line);
 
-        ProgressFileReaderThread(Duration duration) {
-            this.duration = duration;
-        }
+                    if (value >= 0 && value <= 100) {
+                        progress = value;
 
-        @Override
-        public void run() {
-
-            FileTime lastModificationTime = FileTime.fromMillis(0);
-
-            try {
-                while (true) {
-                    Thread.sleep(duration.toMillis());
-
-                    FileTime newLastModificationTime = Files.getLastModifiedTime(progressFile);
-
-                    if (newLastModificationTime.compareTo(lastModificationTime) > 0) {
-                        readNewValue();
-                        lastModificationTime = newLastModificationTime;
-                    }
-
-                }
-            } catch (InterruptedException e) {
-                logger.debug("ProgressFileReaderThread was interrupted.", e);
-            } catch (IOException e) {
-                logger.error("Could not get lastModifiedTime: " + e.getMessage(), e);
-            }
-
-        }
-
-        private void readNewValue() {
-            try {
-                String line = readFirstLine(progressFile.toFile(), Charset.defaultCharset());
-
-                if (line != null) {
-                    try {
-                        // try to parse double to allow int + double
-                        int value = (int) Double.parseDouble(line);
-
-                        if (value >= 0 && value <= 100) {
-                            progress = value;
-
-                            for (Listener observer : observers) {
-                                observer.onProgressUpdate(progress);
-                            }
-
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("New progress value read: " + value);
-                            }
-                        } else {
-                            logger.warn("Invalid progress value: " + value);
+                        for (Listener observer : observers) {
+                            observer.onProgressUpdate(progress);
                         }
-                    } catch (NumberFormatException e) {
-                        logger.warn("Progress value is a not a numeric value: " + line);
-                    }
-                }
-            } catch (IOException e) {
-                logger.warn("Error while reading the first line of " + progressFile);
-            }
-        }
 
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("New progress value read: " + value);
+                        }
+                    } else {
+                        logger.warn("Invalid progress value: " + value);
+                    }
+                } catch (NumberFormatException e) {
+                    logger.warn("Progress value is a not a numeric value: " + line);
+                }
+            }
+        } catch (IOException e) {
+            logger.warn("Error while reading the first line of " + progressFile);
+        }
     }
 
 }

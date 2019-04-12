@@ -84,6 +84,8 @@ import com.google.common.base.Stopwatch;
 @ActiveObject
 public class TaskLauncher implements InitActive {
 
+    public static final String PROGRESS_FILE_READER_PERIOD = "progress.file.reader.period";
+
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
     final private TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
