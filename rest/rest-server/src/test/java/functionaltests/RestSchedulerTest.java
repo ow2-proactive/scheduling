@@ -78,18 +78,4 @@ public class RestSchedulerTest extends AbstractRestFuncTestCase {
         assertEquals("Started", jsonObject.get("Status").toString());
     }
 
-    @Ignore
-    @Test
-    public void testPreciousMetadat() throws Exception {
-        final JobId jobId1 = submitJobWithResults();
-
-        String resourceUrl = getResourceUrl("jobs/" + jobId1.value() + "/tasks/results/precious/metadata");
-        HttpGet httpGet = new HttpGet(resourceUrl);
-        setSessionHeader(httpGet);
-        HttpResponse response = executeUriRequest(httpGet);
-        String s = EntityUtils.toString(response.getEntity());
-        System.out.println(s);
-        assertEquals("", s);
-    }
-
 }
