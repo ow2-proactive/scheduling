@@ -117,11 +117,11 @@ public class ProgressFileReaderPollerTest {
             values.add(newValue);
         }
 
-        public Set<Integer> getValues() {
+        Set<Integer> getValues() {
             return values;
         }
 
-        public void clear() {
+        void clear() {
             values.clear();
         }
 

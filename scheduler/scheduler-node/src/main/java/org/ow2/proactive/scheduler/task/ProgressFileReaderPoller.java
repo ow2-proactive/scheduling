@@ -89,7 +89,7 @@ public class ProgressFileReaderPoller {
         try {
             createProgressFile(workingDir, filename);
 
-            watchDogThread = new Thread(new ProgressFileReaderThread(Duration.ofMillis(PASchedulerProperties.NODE_PROGRESS_FILE_READER_POLL_TIMEOUT.getValueAsInt())));
+            watchDogThread = new Thread(new ProgressFileReaderThread(Duration.ofMillis(PASchedulerProperties.SCHEDULER_PROGRESS_FILE_READER_POLL_TIMEOUT.getValueAsInt())));
             watchDogThread.setName(ProgressFileReaderThread.class.getName());
             watchDogThread.start();
 

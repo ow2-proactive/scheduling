@@ -420,7 +420,10 @@ public enum PASchedulerProperties implements PACommonProperties {
     /* ***************************************************************************** */
     /* ***************************************************************************** */
 
-    NODE_PROGRESS_FILE_READER_POLL_TIMEOUT("node.progress.file.reader.poll.timeout", PropertyType.INTEGER, "1");
+    SCHEDULER_PROGRESS_FILE_READER_POLL_TIMEOUT(
+            "pa.scheduler.progress.file.reader.poll.timeout",
+            PropertyType.INTEGER,
+            "1000");
 
     public static final String PA_SCHEDULER_PROPERTIES_FILEPATH = "pa.scheduler.properties.filepath";
 
