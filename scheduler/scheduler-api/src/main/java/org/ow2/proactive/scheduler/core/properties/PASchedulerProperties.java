@@ -415,10 +415,12 @@ public enum PASchedulerProperties implements PACommonProperties {
     SCHEDULER_PORTAL_CONFIGURATION(
             "pa.scheduler.portal.configuration",
             PropertyType.STRING,
-            "config/portal/scheduler-portal-display.conf");
+            "config/portal/scheduler-portal-display.conf"),
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
+
+    NODE_PROGRESS_FILE_READER_POLL_TIMEOUT("node.progress.file.reader.poll.timeout", PropertyType.INTEGER, "1");
 
     public static final String PA_SCHEDULER_PROPERTIES_FILEPATH = "pa.scheduler.properties.filepath";
 

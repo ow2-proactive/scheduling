@@ -42,6 +42,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.task.TaskId;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
 
 
@@ -88,7 +89,7 @@ public class ProgressFileReaderPoller {
         try {
             createProgressFile(workingDir, filename);
 
-            watchDogThread = new Thread(new ProgressFileReaderThread(Duration.ofMillis(1)));
+            watchDogThread = new Thread(new ProgressFileReaderThread(Duration.ofMillis(PASchedulerProperties.NODE_PROGRESS_FILE_READER_POLL_TIMEOUT.getValueAsInt())));
             watchDogThread.setName(ProgressFileReaderThread.class.getName());
             watchDogThread.start();
 
