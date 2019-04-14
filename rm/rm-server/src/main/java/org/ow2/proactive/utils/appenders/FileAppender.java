@@ -63,16 +63,22 @@ public class FileAppender extends WriterAppender {
 
     private static Thread logEventsProcessor;
 
-    static {
-        logEventsProcessor = new Thread(new LogEventsProcessor(), "FileAppenderThread");
-        logEventsProcessor.setDaemon(true);
-    }
+    private static Boolean threadStarted = false;
 
     protected String filesLocation;
 
     public FileAppender() {
         setLayout(new PatternLayout("[%d{ISO8601} %-5p] %m%n"));
         fetchLayoutFromRootLogger();
+
+        synchronized (threadStarted) {
+            if (!threadStarted) {
+                logEventsProcessor = new Thread(new LogEventsProcessor(), "FileAppenderThread");
+                logEventsProcessor.setDaemon(true);
+                logEventsProcessor.start();
+                threadStarted = true;
+            }
+        }
     }
 
     @Override
@@ -89,7 +95,7 @@ public class FileAppender extends WriterAppender {
                 appenderCache.computeIfAbsent(cacheKey, k -> createAppender(k));
             }
             try {
-                loggingQueue.put(new QueuedLoggingEvent(cacheKey, event));
+                loggingQueue.put(new QueuedLoggingEvent(cacheKey, event, false));
             } catch (InterruptedException e) {
                 Logger.getRootLogger().warn("Interrupted while logging on " + cacheKey);
             }
@@ -160,16 +166,21 @@ public class FileAppender extends WriterAppender {
     public void close() {
         Object fileName = MDC.get(FILE_NAME);
         if (fileName != null) {
-            loggingQueue.stream()
-                        .filter(event -> event.getKey().equals(fileName))
-                        .forEach(cachedEvent -> cachedEvent.apply());
-            loggingQueue.removeIf(event -> event.getKey().equals(fileName));
-
-            if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
-                RollingFileAppender cachedAppender = appenderCache.remove(fileName);
-                if (cachedAppender != null) {
-                    cachedAppender.close();
-                }
+            //            loggingQueue.stream()
+            //                    .filter(event -> event.getKey().equals(fileName))
+            //                    .forEach(cachedEvent -> cachedEvent.apply());
+            //            loggingQueue.removeIf(event -> event.getKey().equals(fileName));
+            //
+            //            if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
+            //                RollingFileAppender cachedAppender = appenderCache.remove(fileName);
+            //                if (cachedAppender != null) {
+            //                    cachedAppender.close();
+            //                }
+            //            }
+            try {
+                loggingQueue.put(new QueuedLoggingEvent((String) fileName, null, true));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -210,6 +221,15 @@ public class FileAppender extends WriterAppender {
         return appender;
     }
 
+    private void closeAppender(String key) {
+        if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
+            RollingFileAppender cachedAppender = appenderCache.remove(key);
+            if (cachedAppender != null) {
+                cachedAppender.close();
+            }
+        }
+    }
+
     /**
      * An event waiting to be processed
      */
@@ -219,9 +239,12 @@ public class FileAppender extends WriterAppender {
 
         private LoggingEvent event;
 
-        public QueuedLoggingEvent(String cacheKey, LoggingEvent event) {
+        private boolean isClosing;
+
+        public QueuedLoggingEvent(String cacheKey, LoggingEvent event, boolean isClosing) {
             this.cacheKey = cacheKey;
             this.event = event;
+            this.isClosing = isClosing;
         }
 
         public String getKey() {
@@ -235,13 +258,17 @@ public class FileAppender extends WriterAppender {
         public synchronized void apply() {
             RollingFileAppender appender = getAppender(cacheKey);
 
-            if (appender != null && event != null) {
-                appender.append(event);
-            }
-            event = null;
+            if (isClosing) {
+                closeAppender(cacheKey);
+            } else {
 
-            if (!PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
-                appender.close();
+                if (appender != null && event != null) {
+                    appender.append(event);
+                }
+
+                if (!PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
+                    appender.close();
+                }
             }
         }
     }
@@ -253,14 +280,18 @@ public class FileAppender extends WriterAppender {
 
         @Override
         public void run() {
-            try {
-                while (Thread.currentThread().isAlive()) {
+
+            while (Thread.currentThread().isAlive()) {
+                try {
                     QueuedLoggingEvent queuedEvent = loggingQueue.take();
                     queuedEvent.apply();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (Exception e) {
+                    Logger.getRootLogger().warn("Error while logging", e);
                 }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
+
         }
     }
 }

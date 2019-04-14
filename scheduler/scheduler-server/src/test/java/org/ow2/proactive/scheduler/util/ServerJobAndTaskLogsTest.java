@@ -38,10 +38,7 @@ import java.util.Collections;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -71,6 +68,12 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.updateProperty("10");
 
         ServerJobAndTaskLogs.getInstance().configure();
+    }
+
+    @AfterClass
+    public static void wrapup() throws IOException {
+        PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.updateProperty("logs/jobs/");
+        PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.updateProperty("10000");
     }
 
     @Before
@@ -111,7 +114,7 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        Thread.sleep(1000);
+        Thread.sleep(200);
 
         assertTrue(new File(ServerJobAndTaskLogs.getInstance().getLogsLocation(),
                             JobLogger.getJobLogRelativePath(jobId)).exists());
@@ -146,7 +149,7 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
     }
 
     private void checkContains(JobId jobId, TaskId taskId, String word) throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(200);
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    containsString(word + " job log"));
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
@@ -155,7 +158,7 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
     }
 
     private void checkDoesNotContain(JobId jobId, TaskId taskId, String word) throws InterruptedException {
-        Thread.sleep(1000);
+        Thread.sleep(200);
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
                    not(containsString(word + " job log")));
         assertThat(ServerJobAndTaskLogs.getInstance().getJobLog(jobId, Collections.singleton(taskId)),
