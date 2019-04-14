@@ -51,6 +51,20 @@ public class JobLoggerTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
+    File logFolder;
+
+    @BeforeClass
+    public static void init() {
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.DEBUG);
+    }
+
+    @AfterClass
+    public static void wrapup() {
+        PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_ENABLED.updateProperty("true");
+        PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.updateProperty("false");
+    }
+
     @After
     public void clean() {
         Logger.getLogger(JobLogger.class).removeAllAppenders();
@@ -64,21 +78,17 @@ public class JobLoggerTest {
 
     @Test
     public void testLoggerAsync() throws IOException {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.DEBUG);
 
         PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_ENABLED.updateProperty("true");
         PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.updateProperty("false");
 
-        File logFolder = initLoggers();
+        logFolder = initLoggers();
 
         doLogTest(logFolder, false);
     }
 
     @Test
     public void testLoggerAsyncWithCache() throws IOException {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.DEBUG);
 
         PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_ENABLED.updateProperty("true");
         PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.updateProperty("true");
@@ -99,8 +109,6 @@ public class JobLoggerTest {
 
     @Test
     public void testLoggerSync() throws IOException {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.DEBUG);
 
         PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_ENABLED.updateProperty("false");
         PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.updateProperty("false");
@@ -133,6 +141,12 @@ public class JobLoggerTest {
                                               Charset.defaultCharset());
         String log3Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id3)).toURI(),
                                               Charset.defaultCharset());
+        System.out.println("------------------- log1 contents -----------------------");
+        System.out.println(log1Content);
+        System.out.println("------------------- log2 contents -----------------------");
+        System.out.println(log2Content);
+        System.out.println("------------------- log3 contents -----------------------");
+        System.out.println(log3Content);
         Assert.assertThat(StringUtils.countMatches(log1Content, "info message"), is(1));
         Assert.assertThat(StringUtils.countMatches(log2Content, "warn message"), is(1));
         Assert.assertThat(StringUtils.countMatches(log3Content, "debug message"), is(1));

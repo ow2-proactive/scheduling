@@ -27,9 +27,13 @@ package org.ow2.proactive.scheduler.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
@@ -40,8 +44,9 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
-import org.ow2.proactive.utils.FileUtils;
 import org.ow2.proactive.utils.appenders.FileAppender;
+
+import com.google.common.collect.Lists;
 
 
 public class ServerJobAndTaskLogs {
@@ -66,6 +71,8 @@ public class ServerJobAndTaskLogs {
                 removeLogsDirectory();
 
             }
+            removeAllFileAppendersToLogger(JobLogger.class);
+            removeAllFileAppendersToLogger(TaskLogger.class);
             addNewFileAppenderToLoggerFor(JobLogger.class);
             addNewFileAppenderToLoggerFor(TaskLogger.class);
         }
@@ -238,13 +245,36 @@ public class ServerJobAndTaskLogs {
     void removeLogsDirectory() {
         String logsLocation = getLogsLocation();
         logger.info("Removing logs " + logsLocation);
-        FileUtils.removeDir(new File(logsLocation));
+        while (!org.apache.commons.io.FileUtils.deleteQuietly(new File(logsLocation))) {
+            logger.warn("Could not delete folder " + logsLocation + " retrying");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
     }
 
     private void addNewFileAppenderToLoggerFor(Class<?> cls) {
         Logger jobLogger = Logger.getLogger(cls);
         FileAppender appender = createFileAppender();
         jobLogger.addAppender(appender);
+    }
+
+    private void removeAllFileAppendersToLogger(Class<?> cls) {
+        Logger classLogger = Logger.getLogger(cls);
+        List<Appender> appendersToRemove = new ArrayList<>();
+        for (Appender appender : (List<Appender>) Collections.list(classLogger.getAllAppenders())) {
+            if (appender instanceof FileAppender) {
+                appendersToRemove.add(appender);
+            }
+        }
+        for (Appender appender : appendersToRemove) {
+            classLogger.removeAppender(appender);
+        }
+        FileAppender appender = createFileAppender();
+        classLogger.addAppender(appender);
     }
 
     private FileAppender createFileAppender() {
