@@ -26,12 +26,16 @@
 package org.ow2.proactive.scheduler.util;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,9 +45,14 @@ import org.apache.log4j.Logger;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.utils.appenders.AsynchChachedFileAppender;
 import org.ow2.proactive.utils.appenders.FileAppender;
+import org.ow2.proactive.utils.appenders.SynchFileAppender;
+
+import sun.rmi.runtime.Log;
 
 
 public class JobLoggerTest {
@@ -95,12 +104,12 @@ public class JobLoggerTest {
 
         File logFolder = initLoggers();
 
-        doLogTest(logFolder, true);
+        doLogTestCached(logFolder, true);
     }
 
     private File initLoggers() throws IOException {
         Logger jobLogger = Logger.getLogger(JobLogger.class);
-        FileAppender appender = new FileAppender();
+        FileAppender appender = ServerJobAndTaskLogs.createFileAppender();
         File logFolder = folder.newFolder("logs");
         appender.setFilesLocation(logFolder.getAbsolutePath());
         jobLogger.addAppender(appender);
@@ -125,15 +134,9 @@ public class JobLoggerTest {
         JobLogger.getInstance().info(id1, "info message");
         JobLogger.getInstance().warn(id2, "warn message");
         JobLogger.getInstance().debug(id3, "debug message");
-        Assert.assertEquals(cacheEnabled, FileAppender.doesCacheContain(JobLogger.getJobLogRelativePath(id1)));
-        Assert.assertEquals(cacheEnabled, FileAppender.doesCacheContain(JobLogger.getJobLogRelativePath(id2)));
-        Assert.assertEquals(cacheEnabled, FileAppender.doesCacheContain(JobLogger.getJobLogRelativePath(id3)));
         JobLogger.getInstance().close(id1);
         JobLogger.getInstance().close(id2);
         JobLogger.getInstance().close(id3);
-        Assert.assertFalse(FileAppender.doesCacheContain(JobLogger.getJobLogRelativePath(id1)));
-        Assert.assertFalse(FileAppender.doesCacheContain(JobLogger.getJobLogRelativePath(id2)));
-        Assert.assertFalse(FileAppender.doesCacheContain(JobLogger.getJobLogRelativePath(id3)));
         Assert.assertEquals(1, Collections.list(Logger.getLogger(JobLogger.class).getAllAppenders()).size());
         String log1Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id1)).toURI(),
                                               Charset.defaultCharset());
@@ -151,4 +154,44 @@ public class JobLoggerTest {
         Assert.assertThat(StringUtils.countMatches(log2Content, "warn message"), is(1));
         Assert.assertThat(StringUtils.countMatches(log3Content, "debug message"), is(1));
     }
+
+    private void doLogTestCached(File logFolder, boolean cacheEnabled) throws IOException {
+        JobId id1 = new JobIdImpl(112, "readableName");
+        JobId id2 = new JobIdImpl(113, "readableName");
+        JobId id3 = new JobIdImpl(114, "readableName");
+        JobLogger.getInstance().info(id1, "info message");
+        JobLogger.getInstance().warn(id2, "warn message");
+        JobLogger.getInstance().debug(id3, "debug message");
+
+        final Enumeration allAppenders = Logger.getLogger(JobLogger.class).getAllAppenders();
+        final ArrayList list = Collections.list(allAppenders);
+        assertEquals(1, list.size());
+        AsynchChachedFileAppender appender = (AsynchChachedFileAppender) list.get(0);
+        Assert.assertEquals(cacheEnabled, appender.doesCacheContain(JobLogger.getJobLogRelativePath(id1)));
+        Assert.assertEquals(cacheEnabled, appender.doesCacheContain(JobLogger.getJobLogRelativePath(id2)));
+        Assert.assertEquals(cacheEnabled, appender.doesCacheContain(JobLogger.getJobLogRelativePath(id3)));
+        JobLogger.getInstance().close(id1);
+        JobLogger.getInstance().close(id2);
+        JobLogger.getInstance().close(id3);
+        Assert.assertFalse(appender.doesCacheContain(JobLogger.getJobLogRelativePath(id1)));
+        Assert.assertFalse(appender.doesCacheContain(JobLogger.getJobLogRelativePath(id2)));
+        Assert.assertFalse(appender.doesCacheContain(JobLogger.getJobLogRelativePath(id3)));
+        Assert.assertEquals(1, Collections.list(Logger.getLogger(JobLogger.class).getAllAppenders()).size());
+        String log1Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id1)).toURI(),
+                                              Charset.defaultCharset());
+        String log2Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id2)).toURI(),
+                                              Charset.defaultCharset());
+        String log3Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id3)).toURI(),
+                                              Charset.defaultCharset());
+        System.out.println("------------------- log1 contents -----------------------");
+        System.out.println(log1Content);
+        System.out.println("------------------- log2 contents -----------------------");
+        System.out.println(log2Content);
+        System.out.println("------------------- log3 contents -----------------------");
+        System.out.println(log3Content);
+        Assert.assertThat(StringUtils.countMatches(log1Content, "info message"), is(1));
+        Assert.assertThat(StringUtils.countMatches(log2Content, "warn message"), is(1));
+        Assert.assertThat(StringUtils.countMatches(log3Content, "debug message"), is(1));
+    }
+
 }

@@ -27,6 +27,8 @@ package org.ow2.proactive.scheduler.util;
 
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED;
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_ENABLED;
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION;
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.getAbsolutePath;
 
 import java.io.File;
 import java.io.IOException;
@@ -208,12 +210,12 @@ public class ServerJobAndTaskLogs {
     }
 
     private boolean logsLocationIsSet() {
-        return PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.isSet();
+        return SCHEDULER_JOB_LOGS_LOCATION.isSet();
     }
 
     // public for testing
     public String getLogsLocation() {
-        return PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
+        return getAbsolutePath(SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
     }
 
     private boolean isCleanStart() {
@@ -281,7 +283,7 @@ public class ServerJobAndTaskLogs {
         classLogger.addAppender(appender);
     }
 
-    private FileAppender createFileAppender() {
+    public static FileAppender createFileAppender() {
         FileAppender appender;
 
         if (LOG4J_ASYNC_APPENDER_ENABLED.getValueAsBoolean()) {
@@ -294,7 +296,7 @@ public class ServerJobAndTaskLogs {
             appender = new SynchFileAppender();
         }
         appender.setMaxFileSize(PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.getValueAsString());
-        appender.setFilesLocation(getLogsLocation());
+        appender.setFilesLocation(getAbsolutePath(SCHEDULER_JOB_LOGS_LOCATION.getValueAsString()));
 
         return appender;
     }

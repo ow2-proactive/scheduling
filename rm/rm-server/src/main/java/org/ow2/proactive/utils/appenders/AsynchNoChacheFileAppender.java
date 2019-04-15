@@ -41,21 +41,30 @@ public class AsynchNoChacheFileAppender extends AsynchFileAppender {
 
     protected class QueuedLoggingEvent implements ApplicableEvent {
 
-        private String cacheKey;
+        private String key;
 
         private LoggingEvent event;
 
         QueuedLoggingEvent(String cacheKey, LoggingEvent event) {
-            this.cacheKey = cacheKey;
+            this.key = cacheKey;
             this.event = event;
         }
 
         public synchronized void apply() {
-            RollingFileAppender appender = createAppender(cacheKey);
+            RollingFileAppender appender = createAppender(key);
             if (appender != null && event != null) {
                 appender.append(event);
                 appender.close();
             }
+        }
+
+        @Override
+        public String getKey() {
+            return key;
+        }
+
+        public LoggingEvent getEvent() {
+            return event;
         }
     }
 }

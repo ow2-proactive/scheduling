@@ -44,26 +44,20 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
         }
     }
 
+    public boolean doesCacheContain(String fileName) {
+        return appenderCache.containsKey(fileName);
+    }
+
     @Override
     public void close() {
         Object fileName = MDC.get(FILE_NAME);
         if (fileName != null) {
-            //            loggingQueue.stream()
-            //                    .filter(event -> event.getKey().equals(fileName))
-            //                    .forEach(cachedEvent -> cachedEvent.apply());
-            //            loggingQueue.removeIf(event -> event.getKey().equals(fileName));
-            //
-            //            if (PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
-            //                RollingFileAppender cachedAppender = appenderCache.remove(fileName);
-            //                if (cachedAppender != null) {
-            //                    cachedAppender.close();
-            //                }
-            //            }
             try {
                 loggingQueue.put(new QueuedLoggingEvent((String) fileName, null, true));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            super.close();
         }
     }
 
@@ -76,23 +70,28 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
 
     protected class QueuedLoggingEvent implements ApplicableEvent {
 
-        private String cacheKey;
+        private String key;
 
         private LoggingEvent event;
 
         private boolean isClosing;
 
         QueuedLoggingEvent(String cacheKey, LoggingEvent event, boolean isClosing) {
-            this.cacheKey = cacheKey;
+            this.key = cacheKey;
             this.event = event;
             this.isClosing = isClosing;
         }
 
+        @Override
+        public String getKey() {
+            return key;
+        }
+
         public synchronized void apply() {
-            RollingFileAppender appender = appenderCache.get(cacheKey);
+            RollingFileAppender appender = appenderCache.get(key);
 
             if (isClosing) {
-                closeAppender(cacheKey);
+                closeAppender(key);
             } else {
 
                 if (appender != null && event != null) {

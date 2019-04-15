@@ -54,10 +54,26 @@ public abstract class AsynchFileAppender extends FileAppender {
         }
     }
 
+    @Override
+    public void close() {
+        Object fileName = MDC.get(FILE_NAME);
+        if (fileName != null) {
+            while (loggingQueue.stream().anyMatch(event -> event.getKey().equals(fileName))) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+            }
+        }
+        super.close();
+    }
+
     /**
      * An event waiting to be processed
      */
     public interface ApplicableEvent {
+
+        String getKey();
 
         void apply();
     }

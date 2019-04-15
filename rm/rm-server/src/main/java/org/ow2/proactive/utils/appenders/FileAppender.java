@@ -120,6 +120,7 @@ public abstract class FileAppender extends WriterAppender {
 
     @Override
     public void close() {
+        super.close();
     }
 
     @Override
