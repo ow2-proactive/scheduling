@@ -367,9 +367,9 @@ class CustomCreateStartScripts extends CreateStartScripts {
         generator.mainClassName = getMainClassName()
 
         if (getApplicationName().equals("proactive-server")) {
-            generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8", "-Xms4g"]
+            generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8", "-Xms4g", "-Djava.awt.headless=false"]
         } else {
-            generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8"]
+            generator.defaultJvmOpts = ["-server", "-Dfile.encoding=UTF-8", "-Djava.awt.headless=false"]
         }
 
         generator.optsEnvironmentVar = getOptsEnvironmentVar()
