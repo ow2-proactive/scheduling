@@ -26,32 +26,27 @@
 package org.ow2.proactive.utils.appenders;
 
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_BUFFER_SIZE;
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_POOL_SIZE;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.*;
+import org.ow2.proactive.utils.ThreadPoolRouter;
 
 
 public abstract class AsynchFileAppender extends FileAppender {
 
-    protected static BlockingQueue<ApplicableEvent> loggingQueue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
+    private static final Logger LOGGER = Logger.getLogger(AsynchFileAppender.class);
 
-    private static Thread logEventsProcessor;
+    static BlockingQueue<ApplicableEvent> loggingQueue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
 
-    private static Boolean threadStarted = false;
+    private static ThreadPoolRouter pool = new ThreadPoolRouter(LOG4J_ASYNC_APPENDER_POOL_SIZE.getValueAsInt());
 
-    public AsynchFileAppender() {
-        super();
-
-        synchronized (threadStarted) {
-            if (!threadStarted) {
-                logEventsProcessor = new Thread(this::logEventsProcessor, "FileAppenderThread");
-                logEventsProcessor.setDaemon(true);
-                logEventsProcessor.start();
-                threadStarted = true;
-            }
-        }
+    static {
+        Thread logEventsProcessor = new Thread(AsynchFileAppender::logEventsProcessor, "FileAppenderThread");
+        logEventsProcessor.setDaemon(true);
+        logEventsProcessor.start();
     }
 
     @Override
@@ -62,6 +57,7 @@ public abstract class AsynchFileAppender extends FileAppender {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
+                    LOGGER.warn("Close method was interrupted.", e);
                 }
             }
         }
@@ -78,12 +74,12 @@ public abstract class AsynchFileAppender extends FileAppender {
         void apply();
     }
 
-    public void logEventsProcessor() {
+    private static void logEventsProcessor() {
 
         while (Thread.currentThread().isAlive()) {
             try {
                 ApplicableEvent queuedEvent = loggingQueue.take();
-                queuedEvent.apply();
+                pool.route(queuedEvent.getKey(), queuedEvent::apply);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             } catch (Exception e) {
@@ -92,4 +88,5 @@ public abstract class AsynchFileAppender extends FileAppender {
         }
 
     }
+
 }

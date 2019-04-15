@@ -338,7 +338,12 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /**
      * Defines the buffer size used in asynchronous appenders
      */
-    LOG4J_ASYNC_APPENDER_BUFFER_SIZE("pa.log4j.async.appender.buffer.size", PropertyType.INTEGER, "10000");
+    LOG4J_ASYNC_APPENDER_BUFFER_SIZE("pa.log4j.async.appender.buffer.size", PropertyType.INTEGER, "10000"),
+
+    /**
+     * Defins the size of the thread pool of the AsynchFileAppender
+     */
+    LOG4J_ASYNC_APPENDER_POOL_SIZE("pa.log4j.async.appender.pool.size", PropertyType.INTEGER, "1");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
