@@ -32,8 +32,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggingEvent;
 
-import sun.rmi.runtime.Log;
-
 
 public class AsynchChachedFileAppender extends AsynchFileAppender {
 
@@ -43,12 +41,10 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
 
     @Override
     public void append(String cacheKey, LoggingEvent event) {
-        System.out.println("append called");
-        int indexOfQueue = getIndexOfQueue(cacheKey);
         try {
-            synchronized (queues) {
+            synchronized (queue) {
                 appenderCache.computeIfAbsent(cacheKey, this::createAppender);
-                queues.get(indexOfQueue).put(new ApplicableEvent(cacheKey, event));
+                queue.put(new ApplicableEvent(cacheKey, event));
             }
         } catch (InterruptedException e) {
             LOGGER.warn("Queue put is interrupted.");
@@ -56,10 +52,8 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
     }
 
     public void close() {
-        System.out.println("close called");
-
         super.flush();
-        synchronized (queues) {
+        synchronized (queue) {
             Optional<String> opKey = extractKey();
             if (opKey.isPresent()) {
                 RollingFileAppender appender = appenderCache.remove(opKey.get());
@@ -84,12 +78,6 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
         protected void apply() {
             RollingFileAppender appender = appenderCache.get(key);
             if (appender != null) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                appender.append(event);
                 appender.append(event);
             }
         }
