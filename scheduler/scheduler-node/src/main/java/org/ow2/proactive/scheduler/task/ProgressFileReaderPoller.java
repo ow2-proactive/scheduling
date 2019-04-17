@@ -89,7 +89,7 @@ public class ProgressFileReaderPoller {
 
     boolean start(File workingDir, String filename) {
         try {
-            createProgressFile(workingDir, filename);
+            createProgressFileIfNeeded(workingDir, filename);
 
             String propertyValue = System.getProperty(TaskLauncher.PROGRESS_FILE_READER_PERIOD,
                                                       DEFAULT_POLLER_PERIOD.toString());
@@ -115,18 +115,16 @@ public class ProgressFileReaderPoller {
         }
     }
 
-    private void createProgressFile(File workingDir, String progressFileName) throws IOException {
+    private void createProgressFileIfNeeded(File workingDir, String progressFileName) throws IOException {
         progressFileDir = workingDir.toPath().resolve(PROGRESS_FILE_DIR);
 
-        try {
-            Files.createDirectories(progressFileDir);
-            ForkerUtils.setSharedExecutablePermissions(progressFileDir.toFile());
-            progressFile = progressFileDir.resolve(progressFileName);
+        Files.createDirectories(progressFileDir);
+        ForkerUtils.setSharedExecutablePermissions(progressFileDir.toFile());
+        progressFile = progressFileDir.resolve(progressFileName);
+        if (!Files.exists(progressFile)) {
             Files.createFile(progressFile);
-            ForkerUtils.setSharedPermissions(progressFile.toFile());
-        } catch (FileAlreadyExistsException e) {
-            // ignore file already exists exception
         }
+        ForkerUtils.setSharedPermissions(progressFile.toFile());
 
         logger.debug("Progress file '" + progressFile + "' created");
     }
