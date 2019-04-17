@@ -62,7 +62,7 @@ public abstract class FileAppender extends WriterAppender {
 
     abstract public void append(String cacheKey, LoggingEvent event);
 
-    RollingFileAppender createAppender(String cacheKey) {
+    public RollingFileAppender createAppender(String cacheKey) {
         RollingFileAppender appender;
         String fileName = cacheKey;
         if (filesLocation != null) {
@@ -77,13 +77,17 @@ public abstract class FileAppender extends WriterAppender {
 
             appender = new RollingFileAppender(getLayout(), fileName, true);
             appender.setMaxBackupIndex(1);
+            appender.setImmediateFlush(true);
+            appender.setBufferSize(0);
+            appender.setBufferedIO(false);
             if (maxFileSize != null) {
                 appender.setMaxFileSize(maxFileSize);
             }
         } catch (Exception e) {
             Logger.getRootLogger()
                   .error("Error when creating logger : " + cacheKey + " logging will be disabled for this context", e);
-            appender = new RollingFileAppender();
+            //            appender = new RollingFileAppender();
+            return null;
 
         }
         return appender;

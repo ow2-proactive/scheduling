@@ -25,22 +25,48 @@
  */
 package org.ow2.proactive.utils.appenders;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggingEvent;
+
+import sun.rmi.runtime.Log;
 
 
 public class AsynchChachedFileAppender extends AsynchFileAppender {
 
+    private static final Logger LOGGER = Logger.getLogger(AsynchChachedFileAppender.class);
+
     private static ConcurrentHashMap<String, RollingFileAppender> appenderCache = new ConcurrentHashMap<>();
 
+    @Override
     public void append(String cacheKey, LoggingEvent event) {
-        appenderCache.computeIfAbsent(cacheKey, this::createAppender);
+        System.out.println("append called");
+        int indexOfQueue = getIndexOfQueue(cacheKey);
         try {
-            loggingQueue.put(new QueuedLoggingEvent(cacheKey, event, false));
+            synchronized (queues) {
+                appenderCache.computeIfAbsent(cacheKey, this::createAppender);
+                queues.get(indexOfQueue).put(new ApplicableEvent(cacheKey, event));
+            }
         } catch (InterruptedException e) {
-            Logger.getRootLogger().warn("Interrupted while logging on " + cacheKey);
+            LOGGER.warn("Queue put is interrupted.");
+        }
+    }
+
+    public void close() {
+        System.out.println("close called");
+
+        super.flush();
+        synchronized (queues) {
+            Optional<String> opKey = extractKey();
+            if (opKey.isPresent()) {
+                RollingFileAppender appender = appenderCache.remove(opKey.get());
+                if (appender != null) {
+                    appender.close();
+                }
+            }
         }
     }
 
@@ -48,57 +74,26 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
         return appenderCache.containsKey(fileName);
     }
 
-    @Override
-    public void close() {
-        Object fileName = MDC.get(FILE_NAME);
-        if (fileName != null) {
-            try {
-                loggingQueue.put(new QueuedLoggingEvent((String) fileName, null, true));
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            super.close();
-        }
-    }
+    class ApplicableEvent extends AsynchFileAppender.ApplicableEvent {
 
-    private void closeAppender(String key) {
-        RollingFileAppender cachedAppender = appenderCache.remove(key);
-        if (cachedAppender != null) {
-            cachedAppender.close();
-        }
-    }
-
-    protected class QueuedLoggingEvent implements ApplicableEvent {
-
-        private String key;
-
-        private LoggingEvent event;
-
-        private boolean isClosing;
-
-        QueuedLoggingEvent(String cacheKey, LoggingEvent event, boolean isClosing) {
-            this.key = cacheKey;
-            this.event = event;
-            this.isClosing = isClosing;
+        ApplicableEvent(String key, LoggingEvent event) {
+            super(key, event);
         }
 
         @Override
-        public String getKey() {
-            return key;
-        }
-
-        public synchronized void apply() {
+        protected void apply() {
             RollingFileAppender appender = appenderCache.get(key);
-
-            if (isClosing) {
-                closeAppender(key);
-            } else {
-
-                if (appender != null && event != null) {
-                    appender.append(event);
+            if (appender != null) {
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-
+                appender.append(event);
+                appender.append(event);
             }
         }
+
     }
+
 }

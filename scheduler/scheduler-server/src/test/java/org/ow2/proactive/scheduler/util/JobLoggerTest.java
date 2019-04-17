@@ -42,17 +42,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.spi.LoggingEvent;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.utils.appenders.AsynchChachedFileAppender;
+import org.ow2.proactive.utils.appenders.AsynchFileAppender;
 import org.ow2.proactive.utils.appenders.FileAppender;
-import org.ow2.proactive.utils.appenders.SynchFileAppender;
-
-import sun.rmi.runtime.Log;
 
 
 public class JobLoggerTest {

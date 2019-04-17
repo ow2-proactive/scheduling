@@ -28,65 +28,164 @@ package org.ow2.proactive.utils.appenders;
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_BUFFER_SIZE;
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_POOL_SIZE;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.*;
-import org.ow2.proactive.utils.ThreadPoolRouter;
+import org.apache.log4j.spi.LoggingEvent;
+import org.eclipse.jetty.util.ConcurrentHashSet;
 
 
-public abstract class AsynchFileAppender extends FileAppender {
+public class AsynchFileAppender extends FileAppender {
 
     private static final Logger LOGGER = Logger.getLogger(AsynchFileAppender.class);
 
-    static BlockingQueue<ApplicableEvent> loggingQueue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
+    protected static final ArrayList<BlockingQueue<ApplicableEvent>> queues;
 
-    private static ThreadPoolRouter pool = new ThreadPoolRouter(LOG4J_ASYNC_APPENDER_POOL_SIZE.getValueAsInt());
+    private static final ArrayList<Thread> pool;
+
+    private static final Set<ApplicableEvent> keys = new ConcurrentHashSet<>();
 
     static {
-        Thread logEventsProcessor = new Thread(AsynchFileAppender::logEventsProcessor, "FileAppenderThread");
-        logEventsProcessor.setDaemon(true);
-        logEventsProcessor.start();
+        queues = new ArrayList<>();
+        for (int i = 0; i < LOG4J_ASYNC_APPENDER_POOL_SIZE.getValueAsInt(); ++i) {
+            queues.add(new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt()));
+        }
+
+        pool = new ArrayList<>();
+        for (int i = 0; i < LOG4J_ASYNC_APPENDER_POOL_SIZE.getValueAsInt(); ++i) {
+            Thread logEventsProcessor = new Thread(new EventProcessor(queues.get(i)), "FileAppenderThread-" + i);
+            logEventsProcessor.setDaemon(true);
+            logEventsProcessor.start();
+            pool.add(logEventsProcessor);
+        }
+
     }
 
-    @Override
-    public void close() {
-        Object fileName = MDC.get(FILE_NAME);
-        if (fileName != null) {
-            while (loggingQueue.stream().anyMatch(event -> event.getKey().equals(fileName))) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    LOGGER.warn("Close method was interrupted.", e);
+    // non blocking
+    public void append(String cacheKey, LoggingEvent event) {
+        int indexOfQueue = getIndexOfQueue(cacheKey);
+        try {
+            synchronized (queues) {
+                queues.get(indexOfQueue).put(new ApplicableEvent(cacheKey, event));
+            }
+        } catch (InterruptedException e) {
+            LOGGER.warn("Queue put is interrupted.");
+        }
+    }
+
+    protected int getIndexOfQueue(String cacheKey) {
+        return cacheKey.hashCode() % queues.size();
+    }
+
+    protected Optional<String> extractKey() {
+        return Optional.ofNullable((String) MDC.get(FILE_NAME));
+    }
+
+    // blocking
+    final public void flush() {
+        Optional<String> opKey = extractKey();
+        if (opKey.isPresent()) {
+            synchronized (queues) {
+                Optional<ApplicableEvent> opApplicableEvent = lastEventByKey(opKey.get());
+                if (opApplicableEvent.isPresent()) {
+                    ApplicableEvent lastEvent = opApplicableEvent.get();
+                    keys.add(lastEvent);
+                    synchronized (lastEvent) {
+                        while (keys.contains(lastEvent)) {
+                            try {
+                                lastEvent.wait();
+                            } catch (InterruptedException e) {
+                                LOGGER.warn("Wait method was interrupted.", e);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    private Optional<ApplicableEvent> lastEventByKey(String key) {
+        List<ApplicableEvent> collect = queues.get(getIndexOfQueue(key))
+                                              .stream()
+                                              .filter(event -> event.getKey().equals(key))
+                                              .collect(Collectors.toList());
+        if (!collect.isEmpty()) {
+            return Optional.of(collect.get(collect.size() - 1));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    class ApplicableEvent {
+
+        protected String key;
+
+        protected LoggingEvent event;
+
+        ApplicableEvent(String key, LoggingEvent event) {
+            this.key = key;
+            this.event = event;
+        }
+
+        protected void apply() {
+            RollingFileAppender appender = createAppender(key);
+            if (appender != null && event != null) {
+                appender.append(event);
+                appender.close();
+            }
+        }
+
+        final void applyAndPossiblyClose() throws InterruptedException {
+            apply();
+            synchronized (queues) {
+                queues.get(getIndexOfQueue(getKey())).take();
+                if (keys.contains(this)) {
+                    synchronized (this) {
+                        keys.remove(this);
+                        this.notifyAll();
+                    }
                 }
             }
         }
-        super.close();
-    }
 
-    /**
-     * An event waiting to be processed
-     */
-    public interface ApplicableEvent {
-
-        String getKey();
-
-        void apply();
-    }
-
-    private static void logEventsProcessor() {
-
-        while (Thread.currentThread().isAlive()) {
-            try {
-                ApplicableEvent queuedEvent = loggingQueue.take();
-                pool.route(queuedEvent.getKey(), queuedEvent::apply);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            } catch (Exception e) {
-                Logger.getRootLogger().warn("Error while logging", e);
-            }
+        public String getKey() {
+            return key;
         }
 
+        public LoggingEvent getEvent() {
+            return event;
+        }
     }
 
+    private static class EventProcessor implements Runnable {
+
+        private BlockingQueue<ApplicableEvent> queue;
+
+        EventProcessor(BlockingQueue<ApplicableEvent> queue) {
+            this.queue = queue;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                synchronized (queues) {
+                    try {
+                        ApplicableEvent queuedEvent = queue.peek();
+                        if (queuedEvent != null) {
+                            queuedEvent.applyAndPossiblyClose();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
 }

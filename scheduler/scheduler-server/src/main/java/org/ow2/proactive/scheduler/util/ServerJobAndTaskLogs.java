@@ -50,7 +50,7 @@ import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.utils.appenders.AsynchChachedFileAppender;
-import org.ow2.proactive.utils.appenders.AsynchNoChacheFileAppender;
+import org.ow2.proactive.utils.appenders.AsynchFileAppender;
 import org.ow2.proactive.utils.appenders.FileAppender;
 import org.ow2.proactive.utils.appenders.SynchFileAppender;
 
@@ -290,7 +290,7 @@ public class ServerJobAndTaskLogs {
             if (LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
                 appender = new AsynchChachedFileAppender();
             } else {
-                appender = new AsynchNoChacheFileAppender();
+                appender = new AsynchFileAppender();
             }
         } else {
             appender = new SynchFileAppender();
