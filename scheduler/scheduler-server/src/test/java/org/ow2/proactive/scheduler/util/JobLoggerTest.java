@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import static java.nio.charset.Charset.defaultCharset;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -42,6 +43,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.Priority;
 import org.apache.log4j.RollingFileAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.*;
@@ -138,11 +141,11 @@ public class JobLoggerTest {
         JobLogger.getInstance().close(id3);
         Assert.assertEquals(1, Collections.list(Logger.getLogger(JobLogger.class).getAllAppenders()).size());
         String log1Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id1)).toURI(),
-                                              Charset.defaultCharset());
+                                              defaultCharset());
         String log2Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id2)).toURI(),
-                                              Charset.defaultCharset());
+                                              defaultCharset());
         String log3Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id3)).toURI(),
-                                              Charset.defaultCharset());
+                                              defaultCharset());
         System.out.println("------------------- log1 contents -----------------------");
         System.out.println(log1Content);
         System.out.println("------------------- log2 contents -----------------------");
@@ -152,6 +155,29 @@ public class JobLoggerTest {
         Assert.assertThat(StringUtils.countMatches(log1Content, "info message"), is(1));
         Assert.assertThat(StringUtils.countMatches(log2Content, "warn message"), is(1));
         Assert.assertThat(StringUtils.countMatches(log3Content, "debug message"), is(1));
+    }
+
+    @Test
+    public void testRFA() throws IOException {
+        PatternLayout patternLayout = new PatternLayout("[%d{ISO8601} %-5p] %m%n");
+
+        final String path = "/home/Gleb/rfa";
+
+        RollingFileAppender appender = new RollingFileAppender(patternLayout, path, true);
+        appender.setMaxBackupIndex(1);
+        appender.setMaxFileSize("10000");
+
+        Logger logger = Logger.getLogger(JobLoggerTest.class);
+        appender.append(new LoggingEvent("fqcn", logger, Priority.INFO, "first", null));
+        appender.append(new LoggingEvent("fqcn", logger, Priority.INFO, "first", null));
+        appender.append(new LoggingEvent("fqcn", logger, Priority.INFO, "first", null));
+        appender.append(new LoggingEvent("fqcn", logger, Priority.INFO, "first", null));
+        appender.close();
+
+        final File file = new File(path);
+        final String s = IOUtils.toString(file.toURI(), Charset.defaultCharset());
+        System.out.println(s);
+        file.delete();
     }
 
     private void doLogTestCached(File logFolder, boolean cacheEnabled) throws IOException {
@@ -177,11 +203,11 @@ public class JobLoggerTest {
         Assert.assertFalse(appender.doesCacheContain(JobLogger.getJobLogRelativePath(id3)));
         Assert.assertEquals(1, Collections.list(Logger.getLogger(JobLogger.class).getAllAppenders()).size());
         String log1Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id1)).toURI(),
-                                              Charset.defaultCharset());
+                                              defaultCharset());
         String log2Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id2)).toURI(),
-                                              Charset.defaultCharset());
+                                              defaultCharset());
         String log3Content = IOUtils.toString(new File(logFolder, JobLogger.getJobLogRelativePath(id3)).toURI(),
-                                              Charset.defaultCharset());
+                                              defaultCharset());
         System.out.println("------------------- log1 contents -----------------------");
         System.out.println(log1Content);
         System.out.println("------------------- log2 contents -----------------------");

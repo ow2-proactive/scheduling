@@ -96,8 +96,7 @@ public class JobLogger {
 
     public void close(JobId id) {
         updateMdcWithTaskLogFilename(id);
-        final String s = PREFIX + id + " closing logger";
-        logger.debug(s);
+        logger.debug(PREFIX + id + " closing logger");
         for (Appender appender : (List<Appender>) Collections.list(logger.getAllAppenders())) {
             if (appender != null && appender instanceof FileAppender) {
                 appender.close();
