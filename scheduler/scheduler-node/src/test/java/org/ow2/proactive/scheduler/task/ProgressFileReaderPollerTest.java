@@ -27,8 +27,7 @@ package org.ow2.proactive.scheduler.task;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -36,10 +35,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.scripting.helper.progress.ProgressFile;
-import org.ow2.tests.ProActiveTestClean;
 
 
 /**
@@ -48,7 +50,7 @@ import org.ow2.tests.ProActiveTestClean;
  * @author The ProActive Team
  */
 @Ignore
-public class ProgressFileReaderTest {
+public class ProgressFileReaderPollerTest {
 
     private static final int NB_UPDATES = 3;
 
@@ -57,12 +59,12 @@ public class ProgressFileReaderTest {
     @Rule
     public TemporaryFolder folder = new TemporaryFolder();
 
-    private ProgressFileReader progressFileReader = new ProgressFileReader();
+    private ProgressFileReaderPoller progressFileReader = new ProgressFileReaderPoller();
 
     private ProgressFileReaderHistory listener = new ProgressFileReaderHistory();
 
     @Before
-    public void setup() throws IOException {
+    public void setup() {
         String progressFileName = "test";
         progressFileReader.register(listener);
         progressFileReader.start(folder.getRoot(), progressFileName);
@@ -106,7 +108,7 @@ public class ProgressFileReaderTest {
         assertThat(ProgressFile.getProgress(progressFile), is(lastProgressValue));
     }
 
-    private static class ProgressFileReaderHistory implements ProgressFileReader.Listener {
+    private static class ProgressFileReaderHistory implements ProgressFileReaderPoller.Listener {
 
         private final Set<Integer> values = new HashSet<>(NB_UPDATES);
 
@@ -115,11 +117,11 @@ public class ProgressFileReaderTest {
             values.add(newValue);
         }
 
-        public Set<Integer> getValues() {
+        Set<Integer> getValues() {
             return values;
         }
 
-        public void clear() {
+        void clear() {
             values.clear();
         }
 
