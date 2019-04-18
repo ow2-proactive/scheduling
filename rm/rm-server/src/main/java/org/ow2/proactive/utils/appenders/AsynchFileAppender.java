@@ -26,6 +26,7 @@
 package org.ow2.proactive.utils.appenders;
 
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_BUFFER_SIZE;
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_FLUSH_TIMOUT;
 
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -38,8 +39,6 @@ import org.apache.log4j.spi.LoggingEvent;
 public class AsynchFileAppender extends FileAppender {
 
     private static final Logger LOGGER = Logger.getLogger(AsynchFileAppender.class);
-
-    private static final int FLUSH_TIMEOUT = 300;
 
     final BlockingQueue<ApplicableEvent> queue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
 
@@ -68,11 +67,11 @@ public class AsynchFileAppender extends FileAppender {
     }
 
     // blocking
-    public final void flush() {
+    final void flush() {
         extractKey().ifPresent(key -> {
             while (queueHasEventByKey(key) && !Thread.currentThread().isInterrupted()) {
                 try {
-                    Thread.sleep(FLUSH_TIMEOUT);
+                    Thread.sleep(LOG4J_ASYNC_APPENDER_FLUSH_TIMOUT.getValueAsInt());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }

@@ -46,7 +46,7 @@ public abstract class FileAppender extends WriterAppender {
 
     private String maxFileSize;
 
-    protected String filesLocation;
+    private String filesLocation;
 
     public FileAppender() {
         setLayout(new PatternLayout("[%d{ISO8601} %-5p] %m%n"));
@@ -63,7 +63,7 @@ public abstract class FileAppender extends WriterAppender {
 
     abstract public void append(String cacheKey, LoggingEvent event);
 
-    public RollingFileAppender createAppender(String cacheKey) {
+    RollingFileAppender createAppender(String cacheKey) {
         RollingFileAppender appender;
         String fileName = cacheKey;
         if (filesLocation != null) {
