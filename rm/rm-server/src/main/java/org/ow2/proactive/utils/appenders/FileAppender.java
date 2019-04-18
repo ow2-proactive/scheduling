@@ -31,6 +31,7 @@ import java.util.Enumeration;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.AsyncAppender;
+import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.PatternLayout;
@@ -49,7 +50,7 @@ public abstract class FileAppender extends WriterAppender {
 
     public FileAppender() {
         setLayout(new PatternLayout("[%d{ISO8601} %-5p] %m%n"));
-        //        fetchLayoutFromRootLogger();
+        fetchLayoutFromRootLogger();
     }
 
     @Override
@@ -91,7 +92,7 @@ public abstract class FileAppender extends WriterAppender {
         return appender;
     }
 
-    private boolean fetchLayoutFromRootLogger() {
+    private void fetchLayoutFromRootLogger() {
         // trying to get a layout from log4j configuration
         Enumeration<?> en = Logger.getRootLogger().getAllAppenders();
         if (en != null && en.hasMoreElements()) {
@@ -101,23 +102,22 @@ public abstract class FileAppender extends WriterAppender {
                     Enumeration<?> attachedAppenders = ((AsyncAppender) app).getAllAppenders();
                     if (attachedAppenders != null && attachedAppenders.hasMoreElements()) {
                         Appender attachedApp = (Appender) attachedAppenders.nextElement();
-                        return setLayoutUsingAppender(attachedApp);
+                        setLayoutUsingAppender(attachedApp);
                     }
                 } else {
-                    return setLayoutUsingAppender(app);
+                    setLayoutUsingAppender(app);
                 }
             }
         }
-        return false;
     }
 
-    private boolean setLayoutUsingAppender(Appender attachedApp) {
-        if (attachedApp.getLayout() != null) {
+    private void setLayoutUsingAppender(Appender attachedApp) {
+        final Layout layout = attachedApp.getLayout();
+        if (layout instanceof PatternLayout) {
             Logger.getRootLogger().trace("Retrieved layout from log4j configuration");
-            setLayout(attachedApp.getLayout());
-            return true;
+            PatternLayout paternLayout = (PatternLayout) layout;
+            setLayout(new PatternLayout(paternLayout.getConversionPattern()));
         }
-        return false;
     }
 
     @Override

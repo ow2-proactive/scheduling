@@ -46,7 +46,7 @@ public class AsynchFileAppender extends FileAppender {
     public AsynchFileAppender() {
         super();
 
-        Thread logEventsProcessor = new Thread(this::logEventProcessor, "azaza");
+        Thread logEventsProcessor = new Thread(this::logEventProcessor, "logEventsProcessor");
         logEventsProcessor.setDaemon(true);
         logEventsProcessor.start();
     }
