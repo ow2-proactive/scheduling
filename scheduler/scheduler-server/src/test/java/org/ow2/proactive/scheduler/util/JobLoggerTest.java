@@ -157,29 +157,6 @@ public class JobLoggerTest {
         Assert.assertThat(StringUtils.countMatches(log3Content, "debug message"), is(1));
     }
 
-    @Test
-    public void testRFA() throws IOException {
-        PatternLayout patternLayout = new PatternLayout("[%d{ISO8601} %-5p] %m%n");
-
-        final String path = "/home/Gleb/rfa";
-
-        RollingFileAppender appender = new RollingFileAppender(patternLayout, path, true);
-        appender.setMaxBackupIndex(1);
-        appender.setMaxFileSize("10000");
-
-        Logger logger = Logger.getLogger(JobLoggerTest.class);
-        appender.append(new LoggingEvent("fqcn", logger, Priority.INFO, "first", null));
-        appender.append(new LoggingEvent("fqcn", logger, Priority.INFO, "first", null));
-        appender.append(new LoggingEvent("fqcn", logger, Priority.INFO, "first", null));
-        appender.append(new LoggingEvent("fqcn", logger, Priority.INFO, "first", null));
-        appender.close();
-
-        final File file = new File(path);
-        final String s = IOUtils.toString(file.toURI(), Charset.defaultCharset());
-        System.out.println(s);
-        file.delete();
-    }
-
     private void doLogTestCached(File logFolder, boolean cacheEnabled) throws IOException {
         JobId id1 = new JobIdImpl(112, "readableName");
         JobId id2 = new JobIdImpl(113, "readableName");

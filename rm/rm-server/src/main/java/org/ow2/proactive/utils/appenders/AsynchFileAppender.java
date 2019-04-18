@@ -44,9 +44,9 @@ public class AsynchFileAppender extends FileAppender {
 
     private static final Logger LOGGER = Logger.getLogger(AsynchFileAppender.class);
 
-    static final BlockingQueue<ApplicableEvent> queue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
+    final BlockingQueue<ApplicableEvent> queue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
 
-    private static final Set<ApplicableEvent> keys = new ConcurrentHashSet<>();
+    private final Set<ApplicableEvent> keys = new ConcurrentHashSet<>();
 
     public AsynchFileAppender() {
         super();
@@ -65,6 +65,11 @@ public class AsynchFileAppender extends FileAppender {
                 LOGGER.debug("Append interrupted: " + e);
             }
         }
+    }
+
+    @Override
+    public void close() {
+        flush();
     }
 
     // blocking
@@ -106,15 +111,13 @@ public class AsynchFileAppender extends FileAppender {
 
     public void logEventProcessor() {
         while (true) {
-            synchronized (queue) {
-                try {
-                    ApplicableEvent queuedEvent = queue.peek();
-                    if (queuedEvent != null) {
-                        queuedEvent.applyAndPossiblyClose();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            try {
+                ApplicableEvent queuedEvent = queue.peek();
+                if (queuedEvent != null) {
+                    queuedEvent.applyAndPossiblyClose();
                 }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
