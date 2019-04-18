@@ -251,15 +251,14 @@ public class ServerJobAndTaskLogs {
     void removeLogsDirectory() {
         String logsLocation = getLogsLocation();
         logger.info("Removing logs " + logsLocation);
-        while (!org.apache.commons.io.FileUtils.deleteQuietly(new File(logsLocation))) {
-            logger.warn("Could not delete folder " + logsLocation + " retrying");
-            try {
+        try {
+            while (!org.apache.commons.io.FileUtils.deleteQuietly(new File(logsLocation))) {
+                logger.warn("Could not delete folder " + logsLocation + " retrying");
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
-
     }
 
     private void addNewFileAppenderToLoggerFor(Class<?> cls) {

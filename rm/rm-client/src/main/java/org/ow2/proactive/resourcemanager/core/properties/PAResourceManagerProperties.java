@@ -348,7 +348,7 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     /**
      * Defines the AsynchFileAppender flush timeout
      */
-    LOG4J_ASYNC_APPENDER_FLUSH_TIMOUT("pa.log4j.async.appender.flush.timeout", PropertyType.INTEGER, "300");
+    LOG4J_ASYNC_APPENDER_FLUSH_TIMOUT("pa.log4j.async.appender.flush.timeout", PropertyType.INTEGER, "50");
 
     /* ***************************************************************************** */
     /* ***************************************************************************** */
