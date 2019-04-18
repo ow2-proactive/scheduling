@@ -57,7 +57,7 @@ import org.ow2.proactive.scheduler.task.utils.ForkerUtils;
  *
  * @author The ProActive Team
  */
-public class ProgressFileReaderPoller {
+public class ProgressFileReaderPoller implements ProgressFileReaderInterface {
 
     private static final Long DEFAULT_POLLER_PERIOD = 1000L;
 
@@ -80,6 +80,7 @@ public class ProgressFileReaderPoller {
         observers = new HashSet<>(0);
     }
 
+    @Override
     public boolean start(File workingDir, TaskId taskId) {
         String progressFileName = "job-" + taskId.getJobId().value() + "-task-" + taskId.value() + "-" +
                                   UUID.randomUUID() + ".progress";
@@ -129,11 +130,13 @@ public class ProgressFileReaderPoller {
         logger.debug("Progress file '" + progressFile + "' created");
     }
 
+    @Override
     public int getProgress() {
         return progress;
     }
 
-    Path getProgressFile() {
+    @Override
+    public Path getProgressFile() {
         return progressFile;
     }
 
@@ -145,6 +148,7 @@ public class ProgressFileReaderPoller {
         this.observers.remove(listener);
     }
 
+    @Override
     public void stop() {
         logger.trace(String.format("Stopping %s...", ProgressFileReaderPoller.class.getSimpleName()));
         if (scheduledExecutorService != null) {

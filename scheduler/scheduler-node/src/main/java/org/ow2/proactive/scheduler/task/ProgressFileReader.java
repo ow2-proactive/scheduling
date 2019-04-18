@@ -55,7 +55,7 @@ import com.google.common.util.concurrent.TimeLimiter;
  *
  * @author The ProActive Team
  */
-public class ProgressFileReader {
+public class ProgressFileReader implements ProgressFileReaderInterface {
 
     private static final Logger logger = Logger.getLogger(ProgressFileReader.class);
 
@@ -78,6 +78,7 @@ public class ProgressFileReader {
         observers = new HashSet<>(0);
     }
 
+    @Override
     public boolean start(File workingDir, TaskId taskId) {
         String progressFileName = "job-" + taskId.getJobId().value() + "-task-" + taskId.value() + "-" +
                                   UUID.randomUUID() + ".progress";
@@ -122,10 +123,12 @@ public class ProgressFileReader {
         logger.debug("Progress file '" + progressFile + "' created");
     }
 
+    @Override
     public int getProgress() {
         return progress;
     }
 
+    @Override
     public Path getProgressFile() {
         return progressFile;
     }
@@ -138,6 +141,7 @@ public class ProgressFileReader {
         this.observers.remove(listener);
     }
 
+    @Override
     public void stop() {
         if (watchService != null) {
             try {
