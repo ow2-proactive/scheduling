@@ -37,7 +37,7 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
 
     private static final Logger LOGGER = Logger.getLogger(AsynchChachedFileAppender.class);
 
-    private static ConcurrentHashMap<String, RollingFileAppender> appenderCache = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, RollingFileAppender> appenderCache = new ConcurrentHashMap<>();
 
     @Override
     public void append(String cacheKey, LoggingEvent event) {
@@ -51,6 +51,7 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
         }
     }
 
+    @Override
     public void close() {
         super.flush();
         synchronized (queue) {
@@ -62,10 +63,6 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
                 }
             }
         }
-    }
-
-    public boolean doesCacheContain(String fileName) {
-        return appenderCache.containsKey(fileName);
     }
 
     class ApplicableEvent extends AsynchFileAppender.ApplicableEvent {
@@ -82,6 +79,10 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
             }
         }
 
+    }
+
+    public boolean doesCacheContain(String fileName) {
+        return appenderCache.containsKey(fileName);
     }
 
 }

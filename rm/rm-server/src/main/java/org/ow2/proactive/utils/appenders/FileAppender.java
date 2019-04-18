@@ -49,7 +49,7 @@ public abstract class FileAppender extends WriterAppender {
 
     public FileAppender() {
         setLayout(new PatternLayout("[%d{ISO8601} %-5p] %m%n"));
-        fetchLayoutFromRootLogger();
+        //        fetchLayoutFromRootLogger();
     }
 
     @Override
@@ -78,8 +78,6 @@ public abstract class FileAppender extends WriterAppender {
             appender = new RollingFileAppender(getLayout(), fileName, true);
             appender.setMaxBackupIndex(1);
             appender.setImmediateFlush(true);
-            appender.setBufferSize(0);
-            appender.setBufferedIO(false);
             if (maxFileSize != null) {
                 appender.setMaxFileSize(maxFileSize);
             }

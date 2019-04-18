@@ -28,12 +28,10 @@ package org.ow2.proactive.scheduler.util;
 import static java.nio.charset.Charset.defaultCharset;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -43,17 +41,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.Priority;
-import org.apache.log4j.RollingFileAppender;
-import org.apache.log4j.spi.LoggingEvent;
 import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.utils.appenders.AsynchChachedFileAppender;
-import org.ow2.proactive.utils.appenders.AsynchFileAppender;
 import org.ow2.proactive.utils.appenders.FileAppender;
 
 

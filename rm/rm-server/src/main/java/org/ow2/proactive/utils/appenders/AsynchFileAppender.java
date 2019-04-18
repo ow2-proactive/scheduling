@@ -27,31 +27,26 @@ package org.ow2.proactive.utils.appenders;
 
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_BUFFER_SIZE;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
-import org.eclipse.jetty.util.ConcurrentHashSet;
 
 
 public class AsynchFileAppender extends FileAppender {
 
     private static final Logger LOGGER = Logger.getLogger(AsynchFileAppender.class);
 
-    final BlockingQueue<ApplicableEvent> queue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
+    private static final int FLUSH_TIMEOUT = 300;
 
-    private final Set<ApplicableEvent> keys = new ConcurrentHashSet<>();
+    final BlockingQueue<ApplicableEvent> queue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
 
     public AsynchFileAppender() {
         super();
 
-        Thread logEventsProcessor = new Thread(this::logEventProcessor, "FileAppenderThread");
+        Thread logEventsProcessor = new Thread(this::logEventProcessor, "azaza");
         logEventsProcessor.setDaemon(true);
         logEventsProcessor.start();
     }
@@ -74,50 +69,35 @@ public class AsynchFileAppender extends FileAppender {
 
     // blocking
     public final void flush() {
-        Optional<String> opKey = extractKey();
-        if (opKey.isPresent()) {
-            synchronized (queue) {
-                Optional<ApplicableEvent> opApplicableEvent = lastEventByKey(opKey.get());
-                if (opApplicableEvent.isPresent()) {
-                    ApplicableEvent lastEvent = opApplicableEvent.get();
-                    keys.add(lastEvent);
-                    while (keys.contains(lastEvent)) {
-                        try {
-                            queue.wait(1000);
-                        } catch (InterruptedException e) {
-                            LOGGER.warn("Wait method was interrupted.", e);
-                        }
-                    }
+        extractKey().ifPresent(key -> {
+            while (queueHasEventByKey(key) && !Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(FLUSH_TIMEOUT);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
-
             }
-        }
+        });
     }
 
-    protected Optional<String> extractKey() {
+    Optional<String> extractKey() {
         return Optional.ofNullable((String) MDC.get(FILE_NAME));
     }
 
-    private Optional<ApplicableEvent> lastEventByKey(String key) {
-        List<ApplicableEvent> collect = queue.stream()
-                                             .filter(event -> event.getKey().equals(key))
-                                             .collect(Collectors.toList());
-        if (!collect.isEmpty()) {
-            return Optional.of(collect.get(collect.size() - 1));
-        } else {
-            return Optional.empty();
-        }
+    private boolean queueHasEventByKey(String key) {
+        return queue.stream().anyMatch(event -> event.getKey().equals(key));
     }
 
-    public void logEventProcessor() {
-        while (true) {
+    private void logEventProcessor() {
+        while (Thread.currentThread().isAlive()) {
             try {
                 ApplicableEvent queuedEvent = queue.peek();
                 if (queuedEvent != null) {
-                    queuedEvent.applyAndPossiblyClose();
+                    queuedEvent.apply();
+                    queue.take();
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -139,32 +119,6 @@ public class AsynchFileAppender extends FileAppender {
                 appender.append(event);
                 appender.close();
             }
-        }
-
-        final void applyAndPossiblyClose() throws InterruptedException {
-            apply();
-            synchronized (queue) {
-                queue.take();
-                if (keys.contains(this)) {
-                    keys.remove(this);
-                    queue.notifyAll();
-                }
-            }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            ApplicableEvent that = (ApplicableEvent) o;
-            return Objects.equals(key, that.key) && Objects.equals(event, that.event);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(key, event);
         }
 
         public String getKey() {
