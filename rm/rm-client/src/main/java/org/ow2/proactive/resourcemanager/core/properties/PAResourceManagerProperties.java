@@ -341,11 +341,6 @@ public enum PAResourceManagerProperties implements PACommonProperties {
     LOG4J_ASYNC_APPENDER_BUFFER_SIZE("pa.log4j.async.appender.buffer.size", PropertyType.INTEGER, "10000"),
 
     /**
-     * Defines the size of the thread pool of the AsynchFileAppender
-     */
-    LOG4J_ASYNC_APPENDER_POOL_SIZE("pa.log4j.async.appender.pool.size", PropertyType.INTEGER, "1"),
-
-    /**
      * Defines the AsynchFileAppender flush timeout
      */
     LOG4J_ASYNC_APPENDER_FLUSH_TIMOUT("pa.log4j.async.appender.flush.timeout", PropertyType.INTEGER, "50");
