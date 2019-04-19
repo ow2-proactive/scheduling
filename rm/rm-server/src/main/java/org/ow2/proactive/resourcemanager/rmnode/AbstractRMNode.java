@@ -56,7 +56,7 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
      * When a Node is locked, it is no longer eligible for Tasks execution.
      * A ProActive node can be locked whatever its state is.
      */
-    protected boolean isLocked;
+    protected volatile boolean isLocked;
 
     /** The last event */
     protected RMNodeEvent lastEvent;
@@ -65,13 +65,13 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
      * Defines who has locked the node.
      * This field has a meaning when {@code isLocked} is {@code true} only.
      */
-    protected Client lockedBy;
+    protected volatile Client lockedBy;
 
     /**
      * Defines the time at which the node has been locked.
      * This field has a meaning when {@code isLocked} is {@code true} only.
      */
-    protected long lockTime = -1;
+    protected volatile long lockTime = -1;
 
     /** Name of the node */
     protected final String nodeName;
