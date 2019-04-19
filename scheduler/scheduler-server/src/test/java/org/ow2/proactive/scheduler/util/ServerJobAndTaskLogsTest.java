@@ -92,10 +92,16 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         jobLogger.info(jobId, "first job log");
         taskLogger.info(taskId, "first task log");
 
+        jobLogger.close(jobId);
+        taskLogger.close(taskId);
+
         checkContains(jobId, taskId, "first");
 
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
+
+        jobLogger.close(jobId);
+        taskLogger.close(taskId);
 
         checkContains(jobId, taskId, "second");
         checkDoesNotContain(jobId, taskId, "first");
@@ -114,7 +120,8 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         jobLogger.info(jobId, "second job log");
         taskLogger.info(taskId, "second task log");
 
-        Thread.sleep(200);
+        jobLogger.close(jobId);
+        taskLogger.close(taskId);
 
         assertTrue(new File(ServerJobAndTaskLogs.getInstance().getLogsLocation(),
                             JobLogger.getJobLogRelativePath(jobId)).exists());
