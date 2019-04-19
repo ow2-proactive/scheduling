@@ -86,12 +86,12 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
             try {
                 userAccessType = AccessType.valueOf(policyParameters[0].toString());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[0]);
+                throw e;
             }
             try {
                 providerAccessType = AccessType.valueOf(policyParameters[1].toString());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Incorrect parameter value " + policyParameters[1]);
+                throw e;
             }
         }
 

@@ -28,22 +28,8 @@ package org.ow2.proactive.resourcemanager.selection;
 import java.io.File;
 import java.io.Serializable;
 import java.security.Permission;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.concurrent.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -498,13 +484,15 @@ public abstract class SelectionManager {
      */
     private List<RMNode> filterOut(List<RMNode> freeNodes, Criteria criteria, Client client) {
 
+        // Get inclusion/exclusion list for the final check
+        Set<String> inclusion = criteria.getAcceptableNodesUrls();
         NodeSet exclusion = criteria.getBlackList();
 
-        Set<String> inclusion = criteria.getAcceptableNodesUrls();
-
+        // Is a token specified at the task level ?
         boolean nodeWithTokenRequested = criteria.getNodeAccessToken() != null &&
-                                         criteria.getNodeAccessToken().length() > 0;
+                                         !criteria.getNodeAccessToken().isEmpty();
 
+        // If yes, add it to the client Principals list as TokenPrincipal object
         TokenPrincipal tokenPrincipal = null;
         if (nodeWithTokenRequested) {
             logger.debug("Node access token specified " + criteria.getNodeAccessToken());
@@ -513,25 +501,27 @@ public abstract class SelectionManager {
             client.getSubject().getPrincipals().add(tokenPrincipal);
         }
 
+        // Can client has access to the node ?
         List<RMNode> filteredList = new ArrayList<>();
         HashSet<Permission> clientPermissions = new HashSet<>();
         for (RMNode node : freeNodes) {
-            // checking the permission
             try {
                 if (!clientPermissions.contains(node.getUserPermission())) {
                     client.checkPermission(node.getUserPermission(),
                                            client + " is not authorized to get the node " + node.getNodeURL() +
                                                                      " from " + node.getNodeSource().getName());
+                    // YES
                     clientPermissions.add(node.getUserPermission());
                 }
             } catch (SecurityException e) {
-                // client does not have an access to this node
+                // NO
                 logger.debug(e.getMessage());
                 continue;
             }
 
-            // if the node access token is specified we filtered out all nodes
-            // with other tokens but must also filter out nodes without tokens
+            // If a token is specified at the client level (ie token in a task GI), and if the current node
+            // is not protected by any token (ie no token specified in the NodeSourcePolicy),
+            // we do not consider this node. We only consider nodes protected by the token required by the client.
             if (nodeWithTokenRequested && !node.isProtectedByToken()) {
                 continue;
             }

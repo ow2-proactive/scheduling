@@ -28,13 +28,9 @@ package org.ow2.proactive.permissions;
 import java.io.Serializable;
 import java.security.Permission;
 import java.security.PermissionCollection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import org.ow2.proactive.authentication.principals.IdentityPrincipal;
+import org.ow2.proactive.authentication.principals.*;
 
 
 /**
@@ -53,7 +49,7 @@ import org.ow2.proactive.authentication.principals.IdentityPrincipal;
  * PrincipalPermission(GroupPrincipal("users")).
  * <p>
  * Then in the code if an action is limited to PrincipalPermission(UserPrincipal("Jon"))
- * Bob cannot access it. If it's limited to PrincipalPermission(GroupPrincipal("Bob")) or
+ * Bob cannot access it. If it's limited to PrincipalPermission(UserPrincipal("Bob")) or
  * PrincipalPermission(GroupPrincipal("users")) or
  * PrincipalPermission(none) it is authorized to execute it.
  *
@@ -64,7 +60,7 @@ public class PrincipalPermission extends ClientPermission {
     // any addition to this class (new method, field, etc) should imply to change this uid.
     private static final long serialVersionUID = 1L;
 
-    private List<IdentityPrincipal> principals = new LinkedList<>();
+    protected List<IdentityPrincipal> principals = new LinkedList<>();
 
     public PrincipalPermission(IdentityPrincipal principal) {
         super(principal.getName());
@@ -77,17 +73,81 @@ public class PrincipalPermission extends ClientPermission {
     }
 
     @Override
-    public boolean implies(Permission p) {
-        if (!(p instanceof PrincipalPermission)) {
+    public boolean implies(Permission permission) {
+
+        if (!(permission instanceof PrincipalPermission)) {
             return false;
         }
-        PrincipalPermission pp = (PrincipalPermission) p;
-        // checking that all this.principals are presented in
-        // p.principals or pp.principals is empty
-        if (pp.principals.size() == 0 || pp.principals.containsAll(principals)) {
+
+        PrincipalPermission permissionToRespect = (PrincipalPermission) permission;
+        if (permissionToRespect.principals.isEmpty())
             return true;
+
+        int nbPrincipals = permissionToRespect.principals.size();
+        long nbExcludedPrincipals = permissionToRespect.principals.stream()
+                                                                  .filter(c -> c instanceof NotIdentityPrincipal)
+                                                                  .count();
+
+        if (nbExcludedPrincipals > 0 && nbExcludedPrincipals < nbPrincipals) {
+            throw new IllegalArgumentException("Not supposed to find mixed included/excluded principals in permission");
         }
-        return false;
+
+        // Separate included/excluded principals in this
+        Set<IdentityPrincipal> includedThisUserNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> includedThisGroupNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> thisTokenPrincipals = new HashSet<>();
+        for (IdentityPrincipal instance : this.principals) {
+            if (instance instanceof NotIdentityPrincipal) {
+                throw new IllegalArgumentException("Not supposed to find excluded principals in this");
+            } else if (instance instanceof UserNamePrincipal) {
+                includedThisUserNamePrincipals.add(instance);
+            } else if (instance instanceof GroupNamePrincipal) {
+                includedThisGroupNamePrincipals.add(instance);
+            } else if (instance instanceof TokenPrincipal) {
+                thisTokenPrincipals.add(instance);
+            }
+        }
+
+        // Separate included/excluded principals in permissionToRespect
+        Set<IdentityPrincipal> includedUserNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> includedGroupNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> excludedUserNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> excludedGroupNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> tokenPrincipals = new HashSet<>();
+        for (IdentityPrincipal instance : permissionToRespect.principals) {
+            if (instance instanceof NotIdentityPrincipal && instance instanceof UserNamePrincipal) {
+                excludedUserNamePrincipals.add(new UserNamePrincipal(instance.getName()));
+            } else if (instance instanceof NotIdentityPrincipal && instance instanceof GroupNamePrincipal) {
+                excludedGroupNamePrincipals.add(new GroupNamePrincipal(instance.getName()));
+            } else if (instance instanceof UserNamePrincipal) {
+                includedUserNamePrincipals.add(instance);
+            } else if (instance instanceof GroupNamePrincipal) {
+                includedGroupNamePrincipals.add(instance);
+            } else if (instance instanceof TokenPrincipal) {
+                tokenPrincipals.add(instance);
+            }
+        }
+
+        boolean userAuthorized, groupAuthorized, tokenAuthorized;
+
+        if (nbExcludedPrincipals == 0) {
+            // To access to a resource , a principal (this) must be present
+            // in the included principal list of the resource permission
+            userAuthorized = includedUserNamePrincipals.containsAll(includedThisUserNamePrincipals);
+            groupAuthorized = includedGroupNamePrincipals.containsAll(includedThisGroupNamePrincipals);
+            tokenAuthorized = tokenPrincipals.containsAll(thisTokenPrincipals);
+
+        } else {
+
+            // To access to a resource , a principal (this) must not be present
+            // in the excluded principal list of the resource permission
+            userAuthorized = !excludedUserNamePrincipals.stream().anyMatch(includedThisUserNamePrincipals::contains);
+            groupAuthorized = !excludedGroupNamePrincipals.stream().anyMatch(includedThisGroupNamePrincipals::contains);
+            tokenAuthorized = true;
+        }
+
+        // Authorization must be given at user, group and token level
+        return userAuthorized && groupAuthorized && tokenAuthorized;
     }
 
     @Override
@@ -151,11 +211,41 @@ final class PrincipalPermissionCollection extends PermissionCollection implement
 
     @Override
     public boolean implies(Permission permission) {
-        for (Permission p : permissions) {
-            if (p.implies(permission)) {
-                return true;
-            }
+
+        if (!(permission instanceof PrincipalPermission)) {
+            return false;
         }
-        return false;
+
+        PrincipalPermission permissionToRespect = (PrincipalPermission) permission;
+        if (permissionToRespect.principals.isEmpty())
+            return true;
+
+        int nbPrincipals = permissionToRespect.principals.size();
+        long nbExcludedPrincipals = permissionToRespect.principals.stream()
+                                                                  .filter(c -> c instanceof NotIdentityPrincipal)
+                                                                  .count();
+
+        if (nbExcludedPrincipals == 0) {
+            // Give access if INCLUSION permissions to respect include/implie one of the permission requiring access
+            // ex: "Bob" or "GroupBob" get access if "Bob" or "GroupBob" is part of permissions to respect
+            for (Permission p : permissions) {
+                if (p.implies(permission)) {
+                    return true;
+                }
+            }
+            return false;
+
+        } else if (nbExcludedPrincipals == nbPrincipals) {
+            // Do not give access if EXCLUSION rules include/implie one of the permission requiring access
+            // ex: "Bob" or "GroupBob" do not get access if "Bob" or "GroupBob" is part of permissions to respect
+            for (Permission p : permissions) {
+                if (!p.implies(permission)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            throw new IllegalArgumentException("Not supposed to find mixed included/excluded principals in permission");
+        }
     }
 }

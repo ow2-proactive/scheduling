@@ -26,14 +26,11 @@
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
-import org.ow2.proactive.authentication.principals.IdentityPrincipal;
-import org.ow2.proactive.authentication.principals.TokenPrincipal;
-import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.authentication.principals.*;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 
 
@@ -58,6 +55,12 @@ public class AccessType implements Serializable {
 
     private static Set<String> types = new HashSet<>();
 
+    public static final String USER_ACCESS_TYPE = "users";
+
+    public static final String GROUP_ACCESS_TYPE = "groups";
+
+    public static final String TOKEN_ACCESS_TYPE = "tokens";
+
     public static final AccessType ME = new AccessType("ME");
 
     @Deprecated
@@ -73,9 +76,13 @@ public class AccessType implements Serializable {
 
     private String type;
 
-    private String[] users;
+    private String[] includedUsers = null;
 
-    private String[] groups;
+    private String[] excludedUsers = null;
+
+    private String[] includedGroups = null;
+
+    private String[] excludedGroups = null;
 
     private String[] tokens;
 
@@ -105,26 +112,67 @@ public class AccessType implements Serializable {
 
             // parsing the string in the following format
             // users=name1,name2;groups=group1,group2
-            HashMap<String, String[]> values = new HashMap<>();
+            // or
+            // users=!name1,!name2;groups=!group1,!group2
             String[] semicolon = type.split(";");
             if (semicolon.length == 0) {
-                throw new IllegalArgumentException("Incorrect parameter value " + type);
+                throw new IllegalArgumentException("Cannot split " + type + " ';'");
             }
+
+            ArrayList<String> includedUsers = new ArrayList<>();
+            ArrayList<String> excludedUsers = new ArrayList<>();
+            ArrayList<String> includedGroups = new ArrayList<>();
+            ArrayList<String> excludedGroups = new ArrayList<>();
+            ArrayList<String> tokens = new ArrayList<>();
 
             for (String s : semicolon) {
                 String[] eq = s.split("=");
                 if (eq.length == 0) {
-                    throw new IllegalArgumentException("Incorrect parameter value " + type);
+                    throw new IllegalArgumentException("Cannot split " + type + " '='");
                 }
-                values.put(eq[0], eq[1].split(","));
+
+                // Separate included and excluded users, groups
+                String key = eq[0];
+                String[] values = eq[1].split(",");
+
+                for (String value : values) {
+
+                    switch (key) {
+                        case USER_ACCESS_TYPE:
+                            if (!value.startsWith("!")) {
+                                includedUsers.add(value);
+                            } else {
+                                excludedUsers.add(value.replaceFirst("!", ""));
+                            }
+                            break;
+                        case GROUP_ACCESS_TYPE:
+                            if (!value.startsWith("!")) {
+                                includedGroups.add(value);
+                            } else {
+                                excludedGroups.add(value.replaceFirst("!", ""));
+                            }
+                            break;
+                        case TOKEN_ACCESS_TYPE:
+                            tokens.add(value);
+                            break;
+                    }
+                }
             }
 
-            accessType.users = values.get("users");
-            accessType.groups = values.get("groups");
-            accessType.tokens = values.get("tokens");
+            if (!includedUsers.isEmpty())
+                accessType.includedUsers = includedUsers.toArray(new String[0]);
+            if (!excludedUsers.isEmpty())
+                accessType.excludedUsers = excludedUsers.toArray(new String[0]);
+            if (!includedGroups.isEmpty())
+                accessType.includedGroups = includedGroups.toArray(new String[0]);
+            if (!excludedGroups.isEmpty())
+                accessType.excludedGroups = excludedGroups.toArray(new String[0]);
+            if (!tokens.isEmpty())
+                accessType.tokens = tokens.toArray(new String[0]);
 
-            if (accessType.users == null && accessType.groups == null && accessType.tokens == null) {
-                throw new IllegalArgumentException("Incorrect parameter value " + type);
+            if (accessType.includedUsers == null && accessType.excludedUsers == null &&
+                accessType.includedGroups == null && accessType.excludedGroups == null && accessType.tokens == null) {
+                throw new IllegalArgumentException("Not able to retrieve any users/groups/tokens " + type);
             }
         }
 
@@ -133,20 +181,6 @@ public class AccessType implements Serializable {
 
     public String toString() {
         return type;
-    }
-
-    /**
-     * Gets the list of users if the following syntax was used users=user1,user2.
-     */
-    public String[] getUsers() {
-        return users;
-    }
-
-    /**
-     * Gets the list of groups if the following syntax was used groups=group1,group2.
-     */
-    public String[] getGroups() {
-        return groups;
     }
 
     /**
@@ -171,14 +205,24 @@ public class AccessType implements Serializable {
         }
 
         Set<IdentityPrincipal> identities = new HashSet<>();
-        if (users != null) {
-            for (String user : users) {
+        if (includedUsers != null) {
+            for (String user : includedUsers) {
                 identities.add(new UserNamePrincipal(user));
             }
         }
-        if (groups != null) {
-            for (String group : groups) {
+        if (excludedUsers != null) {
+            for (String user : excludedUsers) {
+                identities.add(new NotUserNamePrincipal(user));
+            }
+        }
+        if (includedGroups != null) {
+            for (String group : includedGroups) {
                 identities.add(new GroupNamePrincipal(group));
+            }
+        }
+        if (excludedGroups != null) {
+            for (String group : excludedGroups) {
+                identities.add(new NotGroupNamePrincipal(group));
             }
         }
         if (tokens != null) {

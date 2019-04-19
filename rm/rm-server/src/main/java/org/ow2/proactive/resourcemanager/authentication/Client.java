@@ -250,14 +250,12 @@ public class Client implements Serializable {
      */
     public boolean checkPermission(final Permission permission, String errorMessage) {
         try {
-            Subject.doAsPrivileged(subject, new PrivilegedAction<Object>() {
-                public Object run() {
-                    SecurityManager sm = System.getSecurityManager();
-                    if (sm != null) {
-                        sm.checkPermission(permission);
-                    }
-                    return null;
+            Subject.doAsPrivileged(subject, (PrivilegedAction<Object>) () -> {
+                SecurityManager sm = System.getSecurityManager();
+                if (sm != null) {
+                    sm.checkPermission(permission);
                 }
+                return null;
             }, null);
         } catch (SecurityException ex) {
             throw new SecurityException(errorMessage, ex);
