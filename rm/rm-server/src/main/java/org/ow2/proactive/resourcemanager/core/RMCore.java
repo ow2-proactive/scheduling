@@ -2822,8 +2822,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      */
     @ImmediateService
     public <T> List<ScriptResult<T>> executeScript(Script<T> script, String targetType, Set<String> targets) {
+        Client client;
         try {
-            checkPermissionAndGetClientIsSuccessful();
+            client = checkPermissionAndGetClientIsSuccessful();
         } catch (Exception e) {
             logger.error("Error while checking permission to execute node script", e);
             return Collections.singletonList(new ScriptResult<>(new ScriptException(e)));
@@ -2843,7 +2844,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                             if (candidateNode.getNodeSource().equals(nodeSource) &&
                                 !scriptExecutionHostNames.contains(candidateNodeHostName)) {
                                 scriptExecutionHostNames.add(candidateNodeHostName);
-                                this.selectCandidateNode(selectedRMNodes, candidateNode);
+                                this.selectCandidateNode(selectedRMNodes, candidateNode, client);
                             }
                         }
                     }
@@ -2854,7 +2855,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 for (String target : targets) {
                     RMNode candidateNode = this.allNodes.get(target);
                     if (candidateNode != null) {
-                        this.selectCandidateNode(selectedRMNodes, candidateNode);
+                        this.selectCandidateNode(selectedRMNodes, candidateNode, client);
                     }
                 }
                 break;
@@ -2863,7 +2864,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 for (String target : targets) {
                     for (RMNode node : this.allNodes.values()) {
                         if (node.getHostName().equals(target)) {
-                            this.selectCandidateNode(selectedRMNodes, node);
+                            this.selectCandidateNode(selectedRMNodes, node, client);
                             break;
                         }
                     }
@@ -2881,8 +2882,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // finished it's execution.
     }
 
-    private void selectCandidateNode(HashSet<RMNode> selectedRMNodes, RMNode candidateNode) {
-        if (this.internalLockNode(candidateNode, caller)) {
+    private void selectCandidateNode(HashSet<RMNode> selectedRMNodes, RMNode candidateNode, Client clientCaller) {
+        if (this.internalLockNode(candidateNode, clientCaller)) {
             selectedRMNodes.add(candidateNode);
         } else {
             // Unlock all previously locked nodes
