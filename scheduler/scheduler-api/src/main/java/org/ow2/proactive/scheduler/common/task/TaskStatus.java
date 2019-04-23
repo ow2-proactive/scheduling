@@ -173,9 +173,9 @@ public enum TaskStatus implements java.io.Serializable {
                     return Stream.of(TaskStatus.SUBMITTED);
                 case "pending":
                     return Stream.of(TaskStatus.PENDING);
-                case "running":
+                case "active":
                     return TaskStatus.RUNNING_TASKS.stream();
-                case "finished":
+                case "terminated":
                     return TaskStatus.FINISHED_TASKS.stream();
                 case "error":
                     return TaskStatus.ERROR_TASKS.stream();
