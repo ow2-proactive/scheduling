@@ -42,7 +42,6 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -1810,14 +1809,24 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            the session id associated to this new connection
      * @return a string containing the statistics
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @GET
     @Path("stats")
     @Produces("application/json")
     Map<String, String> getStatistics(@HeaderParam("sessionid")
     final String sessionId) throws NotConnectedRestException, PermissionRestException;
+
+    /**
+     *
+     * @param sessionId
+     *              the session id associated to this new connection
+     * @return a string containing the history of the statistics for 1 day
+     */
+    @GET
+    @Path("stathistory")
+    @Produces("application/json")
+    public String getStatHistory(@HeaderParam("sessionid")
+    final String sessionId) throws NotConnectedRestException;
 
     /**
      * returns a string containing some data regarding the user's account

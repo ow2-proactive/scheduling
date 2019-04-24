@@ -728,4 +728,8 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
         return uischeduler.checkJobPermissionMethod(sessionId, jobId, method);
     }
 
+    public String getStatHistory(String mbeanName, String range, String[] dataSources) {
+        return mbeaninfoviewer.retrieveStats(mbeanName, range, dataSources);
+    }
+
 }
