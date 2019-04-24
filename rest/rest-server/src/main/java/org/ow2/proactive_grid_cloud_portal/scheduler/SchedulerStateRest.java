@@ -3048,6 +3048,18 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return s.getMappedInfo("ProActiveScheduler:name=RuntimeData");
     }
 
+    @Override
+    @GET
+    @Path("stathistory")
+    @Produces("application/json")
+    public String getStatHistory(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException {
+        SchedulerProxyUserInterface s = checkAccess(sessionId, "stats");
+        return s.getStatHistory("ProActiveScheduler:name=RuntimeData",
+                                "dddd", // all for ranges for the days
+                                new String[] { "PendingJobsCount", "PausedJobsCount", "RunningJobsCount",
+                                               "StalledJobsCount" });
+    }
+
     /**
      * returns a string containing some data regarding the user's account
      *

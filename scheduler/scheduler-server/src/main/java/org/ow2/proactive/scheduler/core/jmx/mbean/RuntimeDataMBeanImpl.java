@@ -104,11 +104,13 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
         return (int) dbManager.getFinishedJobsCount();
     }
 
+    @Chronological
     @Override
     public int getStalledJobsCount() {
         return (int) dbManager.getJobsCount(JobStatus.STALLED);
     }
 
+    @Chronological
     @Override
     public int getPausedJobsCount() {
         return (int) dbManager.getJobsCount(JobStatus.PAUSED);
@@ -137,6 +139,8 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     /**
      * @return current number of pending jobs
      */
+    @Chronological
+    @Override
     public int getPendingJobsCount() {
         return (int) dbManager.getPendingJobsCount();
     }
@@ -144,6 +148,8 @@ public final class RuntimeDataMBeanImpl extends StandardMBean implements Runtime
     /**
      * @return current number of running jobs
      */
+    @Chronological
+    @Override
     public int getRunningJobsCount() {
         return (int) dbManager.getRunningJobsCount();
     }
