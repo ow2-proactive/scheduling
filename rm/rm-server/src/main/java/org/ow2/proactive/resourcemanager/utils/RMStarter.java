@@ -218,7 +218,7 @@ public class RMStarter {
             Logger rootLogger = Logger.getRootLogger();
             Enumeration<?> en = rootLogger.getAllAppenders();
             if (en != null) {
-                List<AsyncAppender> newAppenders = new ArrayList();
+                List<AsyncAppender> newAppenders = new ArrayList<>();
                 List<String> appendersToRemove = new ArrayList<>();
                 int index = 0;
                 while (en.hasMoreElements()) {
