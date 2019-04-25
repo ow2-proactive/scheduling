@@ -278,8 +278,6 @@ public class ServerJobAndTaskLogs {
         for (Appender appender : appendersToRemove) {
             classLogger.removeAppender(appender);
         }
-        FileAppender appender = createFileAppender();
-        classLogger.addAppender(appender);
     }
 
     public static FileAppender createFileAppender() {
