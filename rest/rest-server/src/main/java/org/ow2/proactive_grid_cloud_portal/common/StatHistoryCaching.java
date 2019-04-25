@@ -26,6 +26,9 @@
 package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.util.HashMap;
+import java.util.concurrent.Callable;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -41,6 +44,8 @@ import java.util.HashMap;
  *
  */
 public class StatHistoryCaching {
+
+    private static final Logger LOGGER = Logger.getLogger(StatHistoryCaching.class);
 
     // invalidate entry after MAX_DURATION millis
     private static final long MAX_DURATION = 5000;
@@ -98,6 +103,26 @@ public class StatHistoryCaching {
         if (System.currentTimeMillis() - entry.timeStamp > MAX_DURATION) {
             this.statHistoryCache.remove(key);
             return null;
+        }
+
+        return entry;
+    }
+
+    public synchronized StatHistoryCacheEntry getEntryOrCompute(String key, Callable<String> valueCreator) {
+        StatHistoryCacheEntry entry = statHistoryCache.get(key);
+
+        if (entry == null || (System.currentTimeMillis() - entry.timeStamp) > MAX_DURATION) {
+            statHistoryCache.remove(key);
+            long timeStamp = System.currentTimeMillis();
+            String value = null;
+            try {
+                value = valueCreator.call();
+            } catch (Exception e) {
+                LOGGER.error("Could not calculate statistics history for key: " + key, e);
+            }
+
+            entry = new StatHistoryCacheEntry(value, timeStamp);
+            statHistoryCache.put(key, entry);
         }
 
         return entry;
