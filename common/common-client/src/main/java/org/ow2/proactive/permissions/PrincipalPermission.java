@@ -80,8 +80,9 @@ public class PrincipalPermission extends ClientPermission {
         }
 
         PrincipalPermission permissionToRespect = (PrincipalPermission) permission;
-        if (permissionToRespect.principals.isEmpty())
+        if (permissionToRespect.principals.isEmpty()) {
             return true;
+        }
 
         int nbPrincipals = permissionToRespect.principals.size();
         long nbExcludedPrincipals = permissionToRespect.principals.stream()
@@ -217,8 +218,9 @@ final class PrincipalPermissionCollection extends PermissionCollection implement
         }
 
         PrincipalPermission permissionToRespect = (PrincipalPermission) permission;
-        if (permissionToRespect.principals.isEmpty())
+        if (permissionToRespect.principals.isEmpty()) {
             return true;
+        }
 
         int nbPrincipals = permissionToRespect.principals.size();
         long nbExcludedPrincipals = permissionToRespect.principals.stream()
@@ -228,12 +230,12 @@ final class PrincipalPermissionCollection extends PermissionCollection implement
         if (nbExcludedPrincipals == 0) {
             // Give access if INCLUSION permissions to respect include/implie one of the permission requiring access
             // ex: "Bob" or "GroupBob" get access if "Bob" or "GroupBob" is part of permissions to respect
-            for (Permission p : permissions) {
-                if (p.implies(permission)) {
-                    return true;
-                }
+
+            if (permissions.stream().anyMatch(p -> p.implies(permission))) {
+                return true;
+            } else {
+                return false;
             }
-            return false;
 
         } else if (nbExcludedPrincipals == nbPrincipals) {
             // Do not give access if EXCLUSION rules include/implie one of the permission requiring access
