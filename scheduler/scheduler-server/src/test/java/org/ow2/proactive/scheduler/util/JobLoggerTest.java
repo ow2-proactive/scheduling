@@ -163,6 +163,9 @@ public class JobLoggerTest {
         final ArrayList list = Collections.list(allAppenders);
         assertEquals(1, list.size());
         AsynchChachedFileAppender appender = (AsynchChachedFileAppender) list.get(0);
+        JobLogger.getInstance().flush(id1);
+        JobLogger.getInstance().flush(id2);
+        JobLogger.getInstance().flush(id3);
         Assert.assertEquals(cacheEnabled, appender.doesCacheContain(JobLogger.getJobLogRelativePath(id1)));
         Assert.assertEquals(cacheEnabled, appender.doesCacheContain(JobLogger.getJobLogRelativePath(id2)));
         Assert.assertEquals(cacheEnabled, appender.doesCacheContain(JobLogger.getJobLogRelativePath(id3)));

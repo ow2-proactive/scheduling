@@ -67,7 +67,7 @@ public class AsynchFileAppender extends FileAppender {
     }
 
     // blocking
-    final void flush() {
+    public final void flush() {
         extractKey().ifPresent(key -> {
             while (queueHasEventByKey(key) && !Thread.currentThread().isInterrupted()) {
                 try {
