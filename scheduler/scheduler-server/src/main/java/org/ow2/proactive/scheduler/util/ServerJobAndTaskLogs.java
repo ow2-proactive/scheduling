@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
+import org.ow2.proactive.utils.FileUtils;
 import org.ow2.proactive.utils.appenders.AsynchChachedFileAppender;
 import org.ow2.proactive.utils.appenders.AsynchFileAppender;
 import org.ow2.proactive.utils.appenders.FileAppender;
@@ -251,14 +252,16 @@ public class ServerJobAndTaskLogs {
     void removeLogsDirectory() {
         String logsLocation = getLogsLocation();
         logger.info("Removing logs " + logsLocation);
-        try {
-            while (!org.apache.commons.io.FileUtils.deleteQuietly(new File(logsLocation))) {
-                logger.warn("Could not delete folder " + logsLocation + " retrying");
-                Thread.sleep(1000);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        FileUtils.removeDir(new File(logsLocation));
+        // this code breaks the tests
+        //        try {
+        //            while (!org.apache.commons.io.FileUtils.deleteQuietly(new File(logsLocation))) {
+        //                logger.warn("Could not delete folder " + logsLocation + " retrying");
+        //                Thread.sleep(1000);
+        //            }
+        //        } catch (InterruptedException e) {
+        //            Thread.currentThread().interrupt();
+        //        }
     }
 
     private void addNewFileAppenderToLoggerFor(Class<?> cls) {
