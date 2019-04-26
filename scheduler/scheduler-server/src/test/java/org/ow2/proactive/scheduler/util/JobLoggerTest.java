@@ -107,6 +107,7 @@ public class JobLoggerTest {
         FileAppender appender = ServerJobAndTaskLogs.createFileAppender();
         File logFolder = folder.newFolder("logs");
         appender.setFilesLocation(logFolder.getAbsolutePath());
+        jobLogger.removeAllAppenders();
         jobLogger.addAppender(appender);
         return logFolder;
     }
