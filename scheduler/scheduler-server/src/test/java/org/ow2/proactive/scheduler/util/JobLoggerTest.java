@@ -63,7 +63,7 @@ public class JobLoggerTest {
         // this line is commented, because otherwise
         // JobLoggerTest.{testLoggerAsync, testLoggerSync, testLoggerAsyncWithCache}
         // fails in some mysterious way only for Linux machine
-        // Logger.getRootLogger().setLevel(Level.DEBUG);
+        Logger.getRootLogger().setLevel(Level.DEBUG);
     }
 
     @AfterClass
@@ -132,7 +132,7 @@ public class JobLoggerTest {
         JobId id3 = new JobIdImpl(114, "readableName");
         JobLogger.getInstance().info(id1, "info message");
         JobLogger.getInstance().warn(id2, "warn message");
-        JobLogger.getInstance().debug(id3, "debug message");
+        JobLogger.getInstance().error(id3, "error message");
         JobLogger.getInstance().close(id1);
         JobLogger.getInstance().close(id2);
         JobLogger.getInstance().close(id3);
@@ -167,7 +167,7 @@ public class JobLoggerTest {
         assertEquals(1, appender.numberOfAppenders());
         JobLogger.getInstance().warn(id2, "warn message");
         assertEquals(2, appender.numberOfAppenders());
-        JobLogger.getInstance().debug(id3, "debug message");
+        JobLogger.getInstance().error(id3, "error message");
         assertEquals(3, appender.numberOfAppenders());
 
         JobLogger.getInstance().flush(id1);
