@@ -30,7 +30,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.FileUtils;
@@ -45,6 +44,7 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
 import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.utils.appenders.FileAppender;
+import org.ow2.proactive.utils.appenders.SynchFileAppender;
 import org.ow2.tests.ProActiveTestClean;
 import org.python.icu.impl.Assert;
 
@@ -62,11 +62,11 @@ public class TaskLoggerTest extends ProActiveTestClean {
     }
 
     @Test
-    public void testFileAppender() throws IOException {
+    public void testFileAppender() throws Exception {
         JobId jobId = new JobIdImpl(1123, "readableName");
         TaskId taskId = TaskIdImpl.createTaskId(jobId, "taskreadableName", 123123);
 
-        FileAppender appender = new FileAppender();
+        FileAppender appender = new SynchFileAppender();
         File logFolder = folder.newFolder("logs");
         File logFile = new File(logFolder, TaskLogger.getTaskLogRelativePath(taskId));
         appender.setFilesLocation(logFolder.getAbsolutePath());
@@ -76,6 +76,7 @@ public class TaskLoggerTest extends ProActiveTestClean {
         } catch (Exception e) {
             Assert.fail(e);
         }
+        Thread.sleep(1000);
         assertTrue(FileUtils.readFileToString(logFile, Charset.defaultCharset()).contains("HelloWorld"));
 
     }

@@ -25,34 +25,17 @@
  */
 package org.ow2.proactive.utils.appenders;
 
-import java.util.Collection;
-
-import org.apache.log4j.MDC;
+import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
 
 
-/**
- * 
- * An appender that redirects logging events to all files
- * specified in "filenames" property in log4j context.
- *
- * It is used in the RM to during the selection script execution.
- * If the selection is performed for several tasks it writes logs
- * to all the tasks files.
- *
- */
-public class MultipleFileAppender extends SynchFileAppender {
-
-    public static final String FILE_NAMES = "filenames";
+public class SynchFileAppender extends FileAppender {
 
     @Override
-    public void append(LoggingEvent event) {
-        Object value = MDC.get(FILE_NAMES);
-        if (value != null) {
-            Collection<String> names = (Collection<String>) value;
-            for (String fileName : names) {
-                append(fileName, event);
-            }
-        }
+    public void append(String cacheKey, LoggingEvent event) {
+        RollingFileAppender appender = createAppender(cacheKey);
+        appender.append(event);
+        appender.close();
     }
+
 }
