@@ -85,9 +85,7 @@ public abstract class FileAppender extends WriterAppender {
         } catch (Exception e) {
             Logger.getRootLogger()
                   .error("Error when creating logger : " + cacheKey + " logging will be disabled for this context", e);
-            //            appender = new RollingFileAppender();
-            throw new RuntimeException(e);
-
+            return null;
         }
         return appender;
     }

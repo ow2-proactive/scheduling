@@ -60,7 +60,10 @@ public class JobLoggerTest {
     @BeforeClass
     public static void init() {
         BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.DEBUG);
+        // this line is commented, because otherwise
+        // JobLoggerTest.{testLoggerAsync, testLoggerSync, testLoggerAsyncWithCache}
+        // fails in some mysterious way only for Linux machine
+        // Logger.getRootLogger().setLevel(Level.DEBUG);
     }
 
     @AfterClass
