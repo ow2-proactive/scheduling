@@ -85,4 +85,8 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
         return appenderCache.containsKey(fileName);
     }
 
+    public int numberOfAppenders() {
+        return appenderCache.size();
+    }
+
 }

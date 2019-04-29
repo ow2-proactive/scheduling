@@ -155,14 +155,18 @@ public class JobLoggerTest {
         JobId id1 = new JobIdImpl(112, "readableName");
         JobId id2 = new JobIdImpl(113, "readableName");
         JobId id3 = new JobIdImpl(114, "readableName");
-        JobLogger.getInstance().info(id1, "info message");
-        JobLogger.getInstance().warn(id2, "warn message");
-        JobLogger.getInstance().debug(id3, "debug message");
-
         final Enumeration allAppenders = Logger.getLogger(JobLogger.class).getAllAppenders();
         final ArrayList list = Collections.list(allAppenders);
         assertEquals(1, list.size());
         AsynchChachedFileAppender appender = (AsynchChachedFileAppender) list.get(0);
+        assertEquals(0, appender.numberOfAppenders());
+        JobLogger.getInstance().info(id1, "info message");
+        assertEquals(1, appender.numberOfAppenders());
+        JobLogger.getInstance().warn(id2, "warn message");
+        assertEquals(2, appender.numberOfAppenders());
+        JobLogger.getInstance().debug(id3, "debug message");
+        assertEquals(3, appender.numberOfAppenders());
+
         JobLogger.getInstance().flush(id1);
         JobLogger.getInstance().flush(id2);
         JobLogger.getInstance().flush(id3);
