@@ -151,7 +151,7 @@ public class JobLoggerTest {
         System.out.println(log3Content);
         Assert.assertThat(StringUtils.countMatches(log1Content, "info message"), is(1));
         Assert.assertThat(StringUtils.countMatches(log2Content, "warn message"), is(1));
-        Assert.assertThat(StringUtils.countMatches(log3Content, "debug message"), is(1));
+        Assert.assertThat(StringUtils.countMatches(log3Content, "error message"), is(1));
     }
 
     private void doLogTestCached(File logFolder, boolean cacheEnabled) throws IOException {
@@ -197,7 +197,7 @@ public class JobLoggerTest {
         System.out.println(log3Content);
         Assert.assertThat(StringUtils.countMatches(log1Content, "info message"), is(1));
         Assert.assertThat(StringUtils.countMatches(log2Content, "warn message"), is(1));
-        Assert.assertThat(StringUtils.countMatches(log3Content, "debug message"), is(1));
+        Assert.assertThat(StringUtils.countMatches(log3Content, "error message"), is(1));
     }
 
 }
