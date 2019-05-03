@@ -658,7 +658,9 @@ public interface RMRestInterface {
     @GZIP
     @Path("stathistory")
     @Produces("application/json")
-    String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range);
+    String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range)
+            throws ReflectionException, InterruptedException, IntrospectionException, NotConnectedException,
+            InstanceNotFoundException, MalformedObjectNameException, IOException;
 
     /**
      * Returns the version of the rest api
