@@ -25,23 +25,30 @@
  */
 package org.ow2.proactive.scheduler.core;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerState;
 import org.ow2.proactive.scheduler.common.SchedulerStatus;
 import org.ow2.proactive.scheduler.common.SchedulerUsers;
+import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
@@ -61,13 +68,13 @@ import org.ow2.proactive.scheduler.job.ClientJobState;
 public final class SchedulerStateImpl<T extends JobState> implements SchedulerState<T> {
 
     /** Pending jobs */
-    private Set<T> pendingJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
+    private Set<T> pendingJobs = new ConcurrentHashSet<>();
 
     /** Running jobs */
-    private Set<T> runningJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
+    private Set<T> runningJobs = new ConcurrentHashSet<>();
 
     /** Finished jobs */
-    private Set<T> finishedJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
+    private Map<JobId, T> finishedJobs = new ConcurrentHashMap<JobId, T>();
 
     /** Scheduler status */
     private SchedulerStatus status = SchedulerStatus.STARTED;
@@ -102,7 +109,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      * @return the finishedJobs
      */
     public Vector<T> getFinishedJobs() {
-        return new Vector(finishedJobs);
+        return new Vector(finishedJobs.values());
     }
 
     /**
@@ -111,7 +118,9 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      * @param finishedJobs the finishedJobs to set
      */
     public void setFinishedJobs(Vector<T> finishedJobs) {
-        this.finishedJobs = Collections.synchronizedSet(new LinkedHashSet<>(finishedJobs));
+        this.finishedJobs = new ConcurrentHashMap<>(new ArrayList<>(finishedJobs).stream()
+                                                                                 .collect(Collectors.toMap(JobState::getId,
+                                                                                                           Function.identity())));
     }
 
     /**
@@ -318,7 +327,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
             for (T j : runningJobs) {
                 jobs.put(j.getId(), j);
             }
-            for (T j : finishedJobs) {
+            for (T j : finishedJobs.values()) {
                 jobs.put(j.getId(), j);
             }
             initialized = true;
@@ -365,12 +374,12 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
 
     public synchronized void pendingToFinished(T js) {
         pendingJobs.remove(js);
-        finishedJobs.add(js);
+        finishedJobs.put(js.getId(), js);
     }
 
     public synchronized void runningToFinished(T js) {
         runningJobs.remove(js);
-        finishedJobs.add(js);
+        finishedJobs.put(js.getId(), js);
     }
 
     public synchronized void removeFinished(T js) {
@@ -379,19 +388,8 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     }
 
     public synchronized void removeFinished(JobId jobId) {
-        removeJobyId(finishedJobs, jobId);
+        finishedJobs.remove(jobId);
         jobs.remove(jobId);
-    }
-
-    public synchronized void removeJobyId(Set<T> jobs, JobId jobId) {
-        final Iterator<T> iterator = jobs.iterator();
-        while (iterator.hasNext()) {
-            final T next = iterator.next();
-            if (next.getJobInfo().getJobId().equals(jobId)) {
-                iterator.remove();
-                return;
-            }
-        }
     }
 
 }
