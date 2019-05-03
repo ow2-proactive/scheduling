@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.core;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -373,8 +374,20 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     }
 
     public synchronized void removeFinished(T js) {
-        finishedJobs.remove(js);
+        final JobId jobId = js.getJobInfo().getJobId();
+        removeJobyId(finishedJobs, jobId);
         jobs.remove(js.getId());
+    }
+
+    public synchronized void removeJobyId(Set<T> jobs, JobId jobId) {
+        final Iterator<T> iterator = jobs.iterator();
+        while (iterator.hasNext()) {
+            final T next = iterator.next();
+            if (next.getJobInfo().getJobId().equals(jobId)) {
+                iterator.remove();
+                return;
+            }
+        }
     }
 
 }

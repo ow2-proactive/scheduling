@@ -1124,6 +1124,16 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     @Override
     public synchronized void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
         ClientJobState js = getClientJobState(notification.getData().getJobId());
+        if (notification.getEventType().equals(SchedulerEvent.JOB_REMOVE_FINISHED)) {
+            // removing jobs from the global list : this job is no more managed
+            sState.removeFinished(js);
+            jobsMap.remove(js.getId());
+            finishedJobsLRUCache.remove(js.getId());
+            jobs.remove(notification.getData().getJobId());
+            logger.debug("HOUSEKEEPING removed the finished job " + js.getId() + " from the SchedulerFrontEndState");
+            return;
+        }
+
         boolean withAttachment = false;
         if (js != null) {
             synchronized (js) {
@@ -1153,14 +1163,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                         withAttachment = true;
                         break;
                     case JOB_REMOVE_FINISHED:
-                        // removing jobs from the global list : this job is no more managed
-                        sState.removeFinished(js);
-                        jobsMap.remove(js.getId());
-                        finishedJobsLRUCache.remove(js.getId());
-                        jobs.remove(notification.getData().getJobId());
-                        logger.debug("HOUSEKEEPING removed the finished job " + js.getId() +
-                                     " from the SchedulerFrontEndState");
-                        break;
+
                     default:
                         logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
                                     notification.getEventType());
