@@ -14,6 +14,7 @@
 //
 // Members of "guest" group can get/free nodes and monitor the state submit jobs
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "guests" {
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setPendingTasksCount";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.freeNode";
@@ -88,6 +89,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Members of "user" group can get/free nodes and monitor the state, submit jobs and see jobs of other people
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "user" {
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setPendingTasksCount";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.freeNode";
@@ -162,6 +164,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Resource providers have the same permissions as users + an ability to add remove node
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "providers" {
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setPendingTasksCount";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExactlyNodes";
@@ -209,6 +212,7 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Members of "nsadmins" can create/remove node sources (according to their policies)
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "nsadmins" {
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setPendingTasksCount";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getExactlyNodes";

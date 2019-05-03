@@ -25,11 +25,20 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_CACHE_ENABLED;
+import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_ENABLED;
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION;
+import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.getAbsolutePath;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
@@ -39,13 +48,21 @@ import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.core.SchedulerSpacesSupport;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.task.TaskIdImpl;
 import org.ow2.proactive.utils.FileUtils;
+import org.ow2.proactive.utils.appenders.AsynchChachedFileAppender;
+import org.ow2.proactive.utils.appenders.AsynchFileAppender;
 import org.ow2.proactive.utils.appenders.FileAppender;
+import org.ow2.proactive.utils.appenders.SynchFileAppender;
 
 
 public class ServerJobAndTaskLogs {
 
     private static final Logger logger = Logger.getLogger(ServerJobAndTaskLogs.class);
+
+    private static final TaskLogger tlogger = TaskLogger.getInstance();
+
+    private static final int MAX_REMOVAL_ATTEMPTS = 10;
 
     private SchedulerSpacesSupport spacesSupport = null;
 
@@ -53,12 +70,16 @@ public class ServerJobAndTaskLogs {
         return LazyHolder.INSTANCE;
     }
 
+    static final JobLogger jlogger = JobLogger.getInstance();
+
     public void configure() {
         if (logsLocationIsSet()) {
             if (isCleanStart()) {
                 removeLogsDirectory();
 
             }
+            removeAllFileAppendersToLogger(JobLogger.class);
+            removeAllFileAppendersToLogger(TaskLogger.class);
             addNewFileAppenderToLoggerFor(JobLogger.class);
             addNewFileAppenderToLoggerFor(TaskLogger.class);
         }
@@ -91,6 +112,7 @@ public class ServerJobAndTaskLogs {
     }
 
     public void remove(JobId jobId, String jobOwner) {
+        jlogger.close(jobId);
         removeFolderLog(jobId.value());
         removeVisualizationFile(jobId.value());
         removePreciousLogs(jobId, jobOwner);
@@ -111,7 +133,7 @@ public class ServerJobAndTaskLogs {
             deleteLogsFolderIfEmpty(jobId, userspace);
 
         } catch (Exception e) {
-            logger.warn("Exception occurred when trying to remove precious logs for job " + jobId);
+            logger.warn("Error occurred when trying to remove precious logs for job " + jobId, e);
         }
     }
 
@@ -129,7 +151,7 @@ public class ServerJobAndTaskLogs {
         DataSpacesFileObject logsFolder = userspace.resolveFile(TaskLoggerRelativePathGenerator.getContainingFolderForLogFiles(jobId));
         if (logsFolder != null) {
             logsFolder.refresh();
-            if (logsFolder.getChildren().isEmpty()) {
+            if (logsFolder.exists() && logsFolder.getChildren().isEmpty()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Deleting empty folder : " + logsFolder.getRealURI());
                 }
@@ -144,17 +166,38 @@ public class ServerJobAndTaskLogs {
             File logFolder = new File(logsLocation, path);
             org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
 
-            while (logFolder.exists()) {
-                logger.warn("Could not remove logs folder " + logFolder + " , retrying...");
-                org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+            int nbAttempts = 1;
+            try {
+                while (logFolder.exists() && nbAttempts <= MAX_REMOVAL_ATTEMPTS) {
+                    nbAttempts++;
+                    logger.warn("Could not remove logs folder " + logFolder + " , retrying " + nbAttempts + "/" +
+                                MAX_REMOVAL_ATTEMPTS);
+                    displayFolderContentsAndCleanLoggers(logFolder);
+                    boolean success = org.apache.commons.io.FileUtils.deleteQuietly(logFolder);
+                    if (!success) {
+                        Thread.sleep(1000);
+                    }
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
+    }
 
+    private void displayFolderContentsAndCleanLoggers(File logFolder) {
+        for (File file : org.apache.commons.io.FileUtils.listFiles(logFolder, null, true)) {
+            // close eventually task logger
+            if (file.getName().contains("t")) {
+                try {
+                    TaskId taskid = TaskIdImpl.makeTaskId(file.getName());
+                    tlogger.close(taskid);
+                } catch (Exception e) {
+                    //ignored
+                }
+
+            }
+            logger.warn("Remaining file or folder : " + file);
+        }
     }
 
     /**
@@ -168,12 +211,12 @@ public class ServerJobAndTaskLogs {
     }
 
     private boolean logsLocationIsSet() {
-        return PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.isSet();
+        return SCHEDULER_JOB_LOGS_LOCATION.isSet();
     }
 
     // public for testing
     public String getLogsLocation() {
-        return PASchedulerProperties.getAbsolutePath(PASchedulerProperties.SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
+        return getAbsolutePath(SCHEDULER_JOB_LOGS_LOCATION.getValueAsString());
     }
 
     private boolean isCleanStart() {
@@ -210,6 +253,15 @@ public class ServerJobAndTaskLogs {
         String logsLocation = getLogsLocation();
         logger.info("Removing logs " + logsLocation);
         FileUtils.removeDir(new File(logsLocation));
+        // this code breaks the tests
+        //        try {
+        //            while (!org.apache.commons.io.FileUtils.deleteQuietly(new File(logsLocation))) {
+        //                logger.warn("Could not delete folder " + logsLocation + " retrying");
+        //                Thread.sleep(1000);
+        //            }
+        //        } catch (InterruptedException e) {
+        //            Thread.currentThread().interrupt();
+        //        }
     }
 
     private void addNewFileAppenderToLoggerFor(Class<?> cls) {
@@ -218,12 +270,34 @@ public class ServerJobAndTaskLogs {
         jobLogger.addAppender(appender);
     }
 
-    private FileAppender createFileAppender() {
-        FileAppender appender = new FileAppender();
-        if (PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.isSet()) {
-            appender.setMaxFileSize(PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.getValueAsString());
+    private void removeAllFileAppendersToLogger(Class<?> cls) {
+        Logger classLogger = Logger.getLogger(cls);
+        List<Appender> appendersToRemove = new ArrayList<>();
+        for (Appender appender : (List<Appender>) Collections.list(classLogger.getAllAppenders())) {
+            if (appender instanceof FileAppender) {
+                appendersToRemove.add(appender);
+            }
         }
-        appender.setFilesLocation(getLogsLocation());
+        for (Appender appender : appendersToRemove) {
+            classLogger.removeAppender(appender);
+        }
+    }
+
+    public static FileAppender createFileAppender() {
+        FileAppender appender;
+
+        if (LOG4J_ASYNC_APPENDER_ENABLED.getValueAsBoolean()) {
+            if (LOG4J_ASYNC_APPENDER_CACHE_ENABLED.getValueAsBoolean()) {
+                appender = new AsynchChachedFileAppender();
+            } else {
+                appender = new AsynchFileAppender();
+            }
+        } else {
+            appender = new SynchFileAppender();
+        }
+        appender.setMaxFileSize(PASchedulerProperties.SCHEDULER_JOB_LOGS_MAX_SIZE.getValueAsString());
+        appender.setFilesLocation(getAbsolutePath(SCHEDULER_JOB_LOGS_LOCATION.getValueAsString()));
+
         return appender;
     }
 

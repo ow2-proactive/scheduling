@@ -58,6 +58,8 @@ import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTaskParentFinder;
 import org.ow2.proactive.scheduler.task.utils.VariablesMap;
+import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.utils.TaskIdWrapper;
 
 
@@ -207,6 +209,8 @@ final class TerminationData {
                         RunningTaskData taskData = taskToTerminate.taskData;
                         if (taskToTerminate.terminatedWhileRunning()) {
                             terminateRunningTask(service, taskToTerminate, taskData);
+                        } else {
+                            TaskLogger.getInstance().close(taskToTerminate.taskData.getTask().getId());
                         }
                     } catch (Throwable e) {
                         logger.error("Failed to terminate task " + taskToTerminate.taskData.getTask().getName(), e);
@@ -254,9 +258,7 @@ final class TerminationData {
             RMProxiesManager proxiesManager = service.getInfrastructure().getRMProxiesManager();
             proxiesManager.getUserRMProxy(taskData.getUser(), taskData.getCredentials())
                           .releaseNodes(taskData.getNodes(),
-                                        taskToTerminate.terminationStatus != NODEFAILED ? taskData.getTask()
-                                                                                                  .getCleaningScript()
-                                                                                        : null,
+                                        getCleaningScript(taskToTerminate, taskData),
                                         variables,
                                         genericInformation,
                                         taskToTerminate.taskData.getTask().getId(),
@@ -268,6 +270,10 @@ final class TerminationData {
         } catch (Throwable t) {
             logger.info("Failed to release nodes for task '" + taskData.getTask().getId() + "'", t);
         }
+    }
+
+    private Script<?> getCleaningScript(TaskTerminationData taskToTerminate, RunningTaskData taskData) {
+        return taskToTerminate.terminationStatus != NODEFAILED ? taskData.getTask().getCleaningScript() : null;
     }
 
     public VariablesMap getStringSerializableMap(SchedulingService service, TaskTerminationData taskToTerminate)

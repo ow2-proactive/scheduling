@@ -1086,6 +1086,7 @@ class LiveJobs {
         updateJobInSchedulerState(job, event);
 
         jlogger.info(job.getId(), "finished (" + jobStatus + ")");
+        jlogger.close(job.getId());
     }
 
     private void updateTasksInSchedulerState(InternalJob job, Set<TaskId> tasksToUpdate) {
@@ -1104,7 +1105,7 @@ class LiveJobs {
     public JobData lockJob(JobId jobId) {
         JobData jobData = jobs.get(jobId);
         if (jobData == null) {
-            jlogger.info(jobId, "is terminated");
+            logger.info("Job " + jobId + " is terminated");
             return null;
         }
         jobData.jobLock.lock();

@@ -743,16 +743,20 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         TaskLauncher launcher = null;
         LiveJobs.JobData jobData = null;
         try {
+            schedulingMainLoopTimingLogger.start("jobLockAcquisition");
             jobData = schedulingService.lockJob(job.getId());
+            schedulingMainLoopTimingLogger.end("jobLockAcquisition");
             //enough nodes to be launched at same time for a communicating task
             // task is not paused
             if (nodeSet.size() >= task.getNumberOfNodesNeeded() && (task.getStatus() != TaskStatus.PAUSED) &&
                 (jobData != null)) {
+
+                schedulingMainLoopTimingLogger.start("startDataspaceApp");
                 //start dataspace app for this job
                 DataSpaceServiceStarter dsStarter = schedulingService.getInfrastructure().getDataSpaceServiceStarter();
                 job.startDataSpaceApplication(dsStarter.getNamingService(), ImmutableList.of(task));
                 job.setSynchronizationAPI(schedulingService.getSynchronizationAPI());
-
+                schedulingMainLoopTimingLogger.end("startDataspaceApp");
                 NodeSet nodes = new NodeSet();
                 try {
 
@@ -800,7 +804,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                                                                         .getURL();
                     TaskRecoveryData taskRecoveryData = new TaskRecoveryData(terminateNotificationNodeURL,
                                                                              taskRecoverable);
-                    schedulingMainLoopTimingLogger.start("terminateNotificationNodeURL");
+                    schedulingMainLoopTimingLogger.end("terminateNotificationNodeURL");
 
                     schedulingMainLoopTimingLogger.start("submitWithTimeout");
 
