@@ -666,7 +666,7 @@ public class SchedulerDBManager {
                                  .setParameter("timeLimit", time);
 
             return ((List<Object[]>) query.list()).stream()
-                                                  .collect(Collectors.toMap(pair -> JobIdImpl.makeJobId(((Long)pair[0]).toString()),
+                                                  .collect(Collectors.toMap(pair -> JobIdImpl.makeJobId(((Long) pair[0]).toString()),
                                                                             pair -> (String) pair[1]));
         });
     }

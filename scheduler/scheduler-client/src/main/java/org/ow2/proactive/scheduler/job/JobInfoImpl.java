@@ -132,8 +132,9 @@ public class JobInfoImpl implements JobInfo {
     public JobInfoImpl() {
     }
 
-    public JobInfoImpl(JobId jobId) {
+    public JobInfoImpl(JobId jobId, String owner) {
         this.jobId = jobId;
+        this.owner = owner;
     }
 
     /*

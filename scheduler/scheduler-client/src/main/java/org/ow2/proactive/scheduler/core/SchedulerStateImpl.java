@@ -374,9 +374,13 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     }
 
     public synchronized void removeFinished(T js) {
-        final JobId jobId = js.getJobInfo().getJobId();
-        removeJobyId(finishedJobs, jobId);
+        finishedJobs.remove(js);
         jobs.remove(js.getId());
+    }
+
+    public synchronized void removeFinished(JobId jobId) {
+        removeJobyId(finishedJobs, jobId);
+        jobs.remove(jobId);
     }
 
     public synchronized void removeJobyId(Set<T> jobs, JobId jobId) {

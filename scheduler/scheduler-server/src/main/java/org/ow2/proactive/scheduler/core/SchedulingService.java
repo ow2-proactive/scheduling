@@ -1092,7 +1092,7 @@ public class SchedulingService {
 
                 getListener().jobStateUpdated(owner,
                                               new NotificationData<>(SchedulerEvent.JOB_REMOVE_FINISHED,
-                                                                     new JobInfoImpl(jobId)));
+                                                                     new JobInfoImpl(jobId, owner)));
                 ServerJobAndTaskLogs.getInstance().remove(jobId, owner);
                 logger.info("HOUSEKEEPING sent JOB_REMOVE_FINISHED notification for job " + jobId);
 
