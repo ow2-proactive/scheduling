@@ -25,9 +25,6 @@
  */
 package org.ow2.proactive.authentication.principals;
 
-public class NotGroupNamePrincipal extends GroupNamePrincipal implements NotIdentityPrincipal {
+public interface ExcludedIdentityPrincipal {
 
-    public NotGroupNamePrincipal(String name) {
-        super(name);
-    }
 }

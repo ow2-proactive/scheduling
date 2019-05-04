@@ -212,7 +212,7 @@ public class AccessType implements Serializable {
         }
         if (excludedUsers != null) {
             for (String user : excludedUsers) {
-                identities.add(new NotUserNamePrincipal(user));
+                identities.add(new ExcludedUserNamePrincipal(user));
             }
         }
         if (includedGroups != null) {
@@ -222,7 +222,7 @@ public class AccessType implements Serializable {
         }
         if (excludedGroups != null) {
             for (String group : excludedGroups) {
-                identities.add(new NotGroupNamePrincipal(group));
+                identities.add(new ExcludedGroupNamePrincipal(group));
             }
         }
         if (tokens != null) {

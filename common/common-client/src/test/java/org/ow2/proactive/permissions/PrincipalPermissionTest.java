@@ -27,6 +27,7 @@ package org.ow2.proactive.permissions;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -39,7 +40,7 @@ import org.ow2.proactive.authentication.principals.*;
 public class PrincipalPermissionTest {
 
     @Test
-    public void userInGroupImpliesEmptyUserTest() throws Exception {
+    public void userInGroupImpliesEmptyPermissionTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
@@ -51,7 +52,7 @@ public class PrincipalPermissionTest {
     }
 
     @Test
-    public void userImpliesSameUserTest() throws Exception {
+    public void userImpliesHimselfTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         PrincipalPermission perm = new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0")));
@@ -61,7 +62,7 @@ public class PrincipalPermissionTest {
     }
 
     @Test
-    public void userInGroupsImpliesUsersGroupsWithHimTest() throws Exception {
+    public void userInGroupImpliesHimWithOtherUserAndGroupsTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
@@ -76,7 +77,7 @@ public class PrincipalPermissionTest {
     }
 
     @Test
-    public void userInGroupsImpliesUsersGroupsWithHisGroupTest() throws Exception {
+    public void userInGroupImpliesHimAndHisGroupWithOtherUserAndGroupTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
@@ -86,37 +87,38 @@ public class PrincipalPermissionTest {
                                                            new HashSet<>(Arrays.asList(new UserNamePrincipal("user0"),
                                                                                        new UserNamePrincipal("user1"),
                                                                                        new GroupNamePrincipal("group0"),
-                                                                                       new GroupNamePrincipal("group2"))));
+                                                                                       new GroupNamePrincipal("group1"))));
         assertTrue(perms.implies(perm));
     }
 
     @Test
-    public void userImpliesDifferentUserTest() throws Exception {
+    public void userNotImpliesOtherUserTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
 
         PrincipalPermission perm = new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user1")));
 
-        assertTrue(!perms.implies(perm));
+        assertFalse(perms.implies(perm));
     }
 
     @Test
-    public void userInGroupImpliesDifferentGroupTest() throws Exception {
+    public void userInGroupsNotImpliesOtherGroupsTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
         perms.add(new PrincipalPermission("permissions", singleton(new GroupNamePrincipal("group0"))));
+        perms.add(new PrincipalPermission("permissions", singleton(new GroupNamePrincipal("group1"))));
 
         PrincipalPermission perm = new PrincipalPermission("permissions",
-                                                           new HashSet<>(Arrays.asList(new GroupNamePrincipal("group1"),
-                                                                                       new GroupNamePrincipal("group2"))));
+                                                           new HashSet<>(Arrays.asList(new GroupNamePrincipal("group2"),
+                                                                                       new GroupNamePrincipal("group3"))));
 
-        assertTrue(!perms.implies(perm));
+        assertFalse(perms.implies(perm));
     }
 
     @Test
-    public void userImpliesUsersWithoutHimTest() throws Exception {
+    public void userNotImpliesOtherUsersTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
@@ -124,56 +126,58 @@ public class PrincipalPermissionTest {
         PrincipalPermission perm = new PrincipalPermission("permissions",
                                                            new HashSet<>(Arrays.asList(new UserNamePrincipal("user1"),
                                                                                        new UserNamePrincipal("user2"))));
-        assertTrue(!perms.implies(perm));
+        assertFalse(perms.implies(perm));
     }
 
     @Test
-    public void userImpliesNotSameUserTest() throws Exception {
+    public void userNotImpliesExcludedHimTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
 
-        PrincipalPermission perm = new PrincipalPermission("permissions", singleton(new NotUserNamePrincipal("user0")));
+        PrincipalPermission perm = new PrincipalPermission("permissions",
+                                                           singleton(new ExcludedUserNamePrincipal("user0")));
 
-        assertTrue(!perms.implies(perm));
+        assertFalse(perms.implies(perm));
     }
 
     @Test
-    public void userImpliesNotDifferentUserTest() throws Exception {
+    public void userImpliesExcludedOtherUserTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
 
-        PrincipalPermission perm = new PrincipalPermission("permissions", singleton(new NotUserNamePrincipal("user1")));
+        PrincipalPermission perm = new PrincipalPermission("permissions",
+                                                           singleton(new ExcludedUserNamePrincipal("user1")));
 
         assertTrue(perms.implies(perm));
     }
 
     @Test
-    public void usersInGroupImpliesNotSameGroupTest() throws Exception {
+    public void userInGroupNotImpliesExcludedHisGroupTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
         perms.add(new PrincipalPermission("permissions", singleton(new GroupNamePrincipal("group0"))));
 
         PrincipalPermission perm = new PrincipalPermission("permissions",
-                                                           singleton(new NotGroupNamePrincipal("group0")));
+                                                           singleton(new ExcludedGroupNamePrincipal("group0")));
 
-        assertTrue(!perms.implies(perm));
+        assertFalse(perms.implies(perm));
     }
 
     @Test
-    public void userInGroupImpliesNotDifferentUsersGroupsTest() throws Exception {
+    public void userInGroupImpliesExcludedOtherUsersAndGroupsTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new UserNamePrincipal("user0"))));
         perms.add(new PrincipalPermission("permissions", singleton(new GroupNamePrincipal("group0"))));
 
         PrincipalPermission perm = new PrincipalPermission("permissions",
-                                                           new HashSet<>(Arrays.asList(new NotUserNamePrincipal("user1"),
-                                                                                       new NotUserNamePrincipal("user2"),
-                                                                                       new NotGroupNamePrincipal("group1"),
-                                                                                       new NotGroupNamePrincipal("group2"))));
+                                                           new HashSet<>(Arrays.asList(new ExcludedUserNamePrincipal("user1"),
+                                                                                       new ExcludedUserNamePrincipal("user2"),
+                                                                                       new ExcludedGroupNamePrincipal("group1"),
+                                                                                       new ExcludedGroupNamePrincipal("group2"))));
 
         assertTrue(perms.implies(perm));
     }
@@ -190,7 +194,7 @@ public class PrincipalPermissionTest {
     }
 
     @Test
-    public void tokenImpliesSameTokenTest() throws Exception {
+    public void tokenImpliesItselfTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         PrincipalPermission perm = new PrincipalPermission("permissions", singleton(new TokenPrincipal("token0")));
@@ -200,7 +204,7 @@ public class PrincipalPermissionTest {
     }
 
     @Test
-    public void tokenImpliesDifferentTokensTest() throws Exception {
+    public void tokenNotImpliesOtherTokensTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new TokenPrincipal("token0"))));
@@ -209,11 +213,11 @@ public class PrincipalPermissionTest {
                                                            new HashSet<>(Arrays.asList(new TokenPrincipal("token1"),
                                                                                        new TokenPrincipal("token2"))));
 
-        assertTrue(!perms.implies(perm));
+        assertFalse(perms.implies(perm));
     }
 
     @Test
-    public void tokenImpliesDifferentTokensWithItTest() throws Exception {
+    public void tokenImpliesItselfWithOtherTokenTest() throws Exception {
 
         PrincipalPermissionCollection perms = new PrincipalPermissionCollection();
         perms.add(new PrincipalPermission("permissions", singleton(new TokenPrincipal("token0"))));

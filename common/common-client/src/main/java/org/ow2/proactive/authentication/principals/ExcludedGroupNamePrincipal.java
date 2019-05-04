@@ -25,9 +25,11 @@
  */
 package org.ow2.proactive.authentication.principals;
 
-public class NotUserNamePrincipal extends UserNamePrincipal implements NotIdentityPrincipal {
+public class ExcludedGroupNamePrincipal extends GroupNamePrincipal implements ExcludedIdentityPrincipal {
 
-    public NotUserNamePrincipal(String name) {
+    private static final long serialVersionUID = 1L;
+
+    public ExcludedGroupNamePrincipal(String name) {
         super(name);
     }
 }
