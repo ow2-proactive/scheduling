@@ -25,29 +25,11 @@
  */
 package org.ow2.proactive.authentication.principals;
 
-public class UserNamePrincipal extends IdentityPrincipal {
+public class ExcludedUserNamePrincipal extends UserNamePrincipal implements ExcludedIdentityPrincipal {
 
     private static final long serialVersionUID = 1L;
 
-    public UserNamePrincipal(String name) {
+    public ExcludedUserNamePrincipal(String name) {
         super(name);
-    }
-
-    public boolean equals(Object o) {
-        if (o == null)
-            return false;
-
-        if (this == o)
-            return true;
-
-        if (!(o instanceof UserNamePrincipal))
-            return false;
-
-        UserNamePrincipal that = (UserNamePrincipal) o;
-
-        if (this.getName().equals(that.getName()))
-            return true;
-
-        return false;
     }
 }
