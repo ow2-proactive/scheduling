@@ -293,6 +293,14 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        renewSession();
+        return client.reSubmit(currentJobId, jobVariables, jobGenericInfos);
+    }
+
+    @Override
     public JobId submit(File job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         renewSession();
@@ -850,6 +858,20 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
             throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.getTaskPaginated(jobId, offset, limit);
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        renewSession();
+        return client.getTaskPaginated(jobId, statusFilter, offset, limit);
+    }
+
+    @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        renewSession();
+        return client.getPreciousTaskResults(jobId);
     }
 
     @Override

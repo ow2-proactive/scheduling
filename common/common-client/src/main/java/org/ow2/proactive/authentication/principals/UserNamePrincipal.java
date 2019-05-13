@@ -32,4 +32,22 @@ public class UserNamePrincipal extends IdentityPrincipal {
     public UserNamePrincipal(String name) {
         super(name);
     }
+
+    public boolean equals(Object o) {
+        if (o == null)
+            return false;
+
+        if (this == o)
+            return true;
+
+        if (!(o instanceof UserNamePrincipal))
+            return false;
+
+        UserNamePrincipal that = (UserNamePrincipal) o;
+
+        if (this.getName().equals(that.getName()))
+            return true;
+
+        return false;
+    }
 }

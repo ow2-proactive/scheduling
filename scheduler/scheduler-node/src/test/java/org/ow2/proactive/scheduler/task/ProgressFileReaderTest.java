@@ -69,7 +69,7 @@ public class ProgressFileReaderTest {
     }
 
     @Test
-    public void testProgressMultipleUpdates() throws IOException, InterruptedException {
+    public void testProgressMultipleUpdates() throws InterruptedException {
         Path progressFile = progressFileReader.getProgressFile();
 
         int lastProgressValue = -1;
@@ -85,7 +85,7 @@ public class ProgressFileReaderTest {
     }
 
     @Test
-    public void testProgressMultipleInvalidUpdates() throws IOException, InterruptedException {
+    public void testProgressMultipleInvalidUpdates() throws InterruptedException {
         Path progressFile = progressFileReader.getProgressFile();
 
         int lastProgressValue = -1;

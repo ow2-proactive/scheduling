@@ -55,6 +55,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
 
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -68,7 +69,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -119,7 +122,9 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.job.JobState;
+import org.ow2.proactive.scheduler.common.job.factories.JobFactory;
 import org.ow2.proactive.scheduler.common.task.SimpleTaskLogs;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -176,8 +181,6 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                                             1000;
 
     private static final Logger logger = Logger.getLogger(SchedulerFrontend.class);
-
-    private static final JobLogger jlogger = JobLogger.getInstance();
 
     /**
      * Temporary rmURL at starting process
@@ -446,6 +449,20 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        final String jobContent = getJobContent(currentJobId);
+        final Job job = JobFactory.getFactory().createJob(IOUtils.toInputStream(jobContent, Charset.forName("UTF-8")),
+                                                          jobVariables,
+                                                          jobGenericInfos);
+        return submit(job);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     @ImmediateService
     public JobId submit(Job userJob)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
@@ -509,12 +526,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         frontendState.checkPermissions("getJobResult", ij, YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_RESULT_OF_THIS_JOB);
 
         if (!ij.isFinished()) {
-            jlogger.info(jobId, "is not finished");
-            jlogger.info(jobId, "Job state: " + frontendState.getJobState(jobId).getStatus());
+            logger.info("Job " + jobId + " is not finished");
+            logger.info("Job " + jobId + " state: " + frontendState.getJobState(jobId).getStatus());
             return null;
         }
 
-        jlogger.info(jobId, "trying to get the job result");
+        logger.info("Trying to get result of job " + jobId);
 
         JobResult result = dbManager.loadJobResult(jobId);
         if (result == null) {
@@ -525,7 +542,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             // remember that this job is to be removed
             dbManager.jobSetToBeRemoved(jobId);
             schedulingService.scheduleJobRemove(jobId, System.currentTimeMillis() + SCHEDULER_REMOVED_JOB_DELAY);
-            jlogger.info(jobId, "will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
+            logger.info("Job " + jobId + " will be removed in " + (SCHEDULER_REMOVED_JOB_DELAY / 1000) + "sec");
         }
 
         return result;
@@ -616,7 +633,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             throw new IllegalArgumentException("Incarnation must be 0 or greater.");
         }
 
-        jlogger.debug(jobId, "trying to get the task result, incarnation " + inc);
+        logger.debug("Job " + jobId + ", trying to get the task result, incarnation " + inc);
 
         try {
             TaskResult result = dbManager.loadTaskResult(jobId, taskName, inc);
@@ -658,7 +675,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 default:
                     if (result == null) {
                         // otherwise the task is not finished
-                        jlogger.info(jobId, taskName + " is not finished");
+                        logger.info("Task " + taskName + " of job " + jobId + " is not finished");
                     }
                     break;
             }
@@ -691,7 +708,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                                        frontendState.getIdentifiedJob(jobId),
                                        YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
 
-        jlogger.debug(jobId, "trying to get all task results associated with task " + taskName + " from job " + jobId);
+        logger.debug("Job " + jobId + ", trying to get all task results associated with task " + taskName +
+                     " from job " + jobId);
 
         try {
             return dbManager.loadTaskResultAllAttempts(jobId, taskName);
@@ -1101,6 +1119,36 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), offset, limit);
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), statusFilter, offset, limit);
+    }
+
+    @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        frontendState.checkPermission("getJobResult", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
+        List<TaskState> taskStates = getJobState(jobId).getTasks()
+                                                       .stream()
+                                                       .filter(Task::isPreciousResult)
+                                                       .collect(Collectors.toList());
+
+        List<TaskResult> results = new ArrayList<>();
+        for (TaskState currentState : taskStates) {
+            String taskName = currentState.getTaskInfo().getName();
+            try {
+                TaskResult currentResult = getTaskResult(jobId, taskName);
+                results.add(currentResult);
+            } catch (UnknownTaskException ex) {
+                // never occurs because tasks are filtered by tag so they cannot
+                // be unknown.
+                logger.warn("Unknown task.", ex);
+            }
+        }
+        return results;
     }
 
     /**

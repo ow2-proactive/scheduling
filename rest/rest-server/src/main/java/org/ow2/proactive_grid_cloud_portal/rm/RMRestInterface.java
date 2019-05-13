@@ -78,11 +78,6 @@ public interface RMRestInterface {
     /**
      * Log into the resource manager using an form containing 2 fields
      * @return the sessionid of the user if succeed
-     * @throws RMException
-     * @throws LoginException
-     * @throws KeyException
-     * @throws NodeException
-     * @throws ActiveObjectCreationException
      */
     @POST
     @Path("login")
@@ -96,7 +91,6 @@ public interface RMRestInterface {
      *
      * @param sessionId
      *            a valid session id
-     * @throws NotConnectedException
      */
     @POST
     @Path("disconnect")
@@ -142,7 +136,6 @@ public interface RMRestInterface {
      * Returns the state of the Resource Manager
      * @param sessionId a valid session id
      * @return Returns the state of the scheduler
-     * @throws NotConnectedException
      */
     @GET
     @Path("state")
@@ -158,7 +151,6 @@ public interface RMRestInterface {
      * @param clientCounter (optional) is the latest counter client has, if parameter is not provided then
      *                                 method returns all events
      * @return the difference between current state and state that client knows
-     * @throws NotConnectedException
      */
     @GET
     @GZIP
@@ -171,7 +163,6 @@ public interface RMRestInterface {
      * Returns the full state of the RM, which does not include REMOVED node/nodesources
      * @param sessionId a valid session id
      * @return the state of the RM, which does not include REMOVED node/nodesources
-     * @throws NotConnectedException
      */
     @GET
     @GZIP
@@ -185,7 +176,6 @@ public interface RMRestInterface {
      * @param sessionId
      *            a valid session id
      * @return true if the resource manager is operational.
-     * @throws NotConnectedException
      */
     @GET
     @Path("isactive")
@@ -203,7 +193,6 @@ public interface RMRestInterface {
      *            the node source, can be null
      * @return true if new node is added successfully, runtime exception
      *         otherwise
-     * @throws NotConnectedException
      */
     @POST
     @Path("node")
@@ -220,7 +209,6 @@ public interface RMRestInterface {
      * @param url
      *            the url of the node
      * @return true if the node nodeUrl is registered and not down
-     * @throws NotConnectedException
      */
     @GET
     @Path("node/isavailable")
@@ -318,7 +306,6 @@ public interface RMRestInterface {
      * @param nodesRecoverable
      *            Whether the nodes can be recovered after a crash of the RM
      * @return true if a node source has been created
-     * @throws NotConnectedException
      */
     @Deprecated
     @POST
@@ -339,7 +326,6 @@ public interface RMRestInterface {
      * @param sessionId a valid session id
      * @param nodeSourceName the name of the node source to start
      * @return the result of the action, possibly containing the error message
-     * @throws NotConnectedException
      */
     @PUT
     @Path("nodesource/deploy")
@@ -353,7 +339,6 @@ public interface RMRestInterface {
      * @param sessionId a valid session id
      * @param nodeSourceName the name of the node source to undeploy
      * @return the result of the action, possibly containing the error message
-     * @throws NotConnectedException
      */
     @PUT
     @Path("nodesource/undeploy")
@@ -368,7 +353,6 @@ public interface RMRestInterface {
      * @param sessionId a valid session id
      * @param sourceName a node source
      * @return the ping frequency
-     * @throws NotConnectedException
      */
     @POST
     @Path("nodesource/pingfrequency")
@@ -382,8 +366,6 @@ public interface RMRestInterface {
      * @param sessionId a valid session id
      * @param url node's URL
      * @return true of the node has been released
-     * @throws NodeException
-     * @throws NotConnectedException
      */
     @POST
     @Path("node/release")
@@ -398,7 +380,6 @@ public interface RMRestInterface {
      * @param nodeUrl node's URL
      * @param preempt if true remove node source immediatly whithout waiting for nodes to be freed
      * @return true if the node is removed successfully, false or exception otherwise
-     * @throws NotConnectedException
      */
     @POST
     @Path("node/remove")
@@ -677,9 +658,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("stathistory")
     @Produces("application/json")
-    String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range)
-            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            MalformedObjectNameException, NullPointerException, InterruptedException, NotConnectedException;
+    String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range);
 
     /**
      * Returns the version of the rest api

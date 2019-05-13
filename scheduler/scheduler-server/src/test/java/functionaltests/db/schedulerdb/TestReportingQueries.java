@@ -102,7 +102,7 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
         // job1: task1 finished
         finishTask(job1, "task1");
 
-        checkJobAndTasksNumbers(1, 1, 0, 2, 5, 0, 1, 6);
+        checkJobAndTasksNumbers(1, 0, 0, 2, 5, 0, 1, 6);
         checkMeanTaskRunningTime(job1);
         checkNumberOfHosts(job1, 1);
 
@@ -113,7 +113,7 @@ public class TestReportingQueries extends BaseSchedulerDBTest {
 
         checkMeanPendingTime(job1, job2);
         checkMeanTaskRunningTime(job2);
-        checkJobAndTasksNumbers(0, 2, 0, 2, 4, 1, 1, 6);
+        checkJobAndTasksNumbers(0, 1, 0, 2, 4, 1, 1, 6);
 
         // job1: task2 and task3 started
         startTask(job1, job1.getTask("task2"));

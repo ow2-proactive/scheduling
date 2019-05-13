@@ -782,11 +782,8 @@ public class RMNodeStarter {
             node.setProperty(DATASPACES_STATUS_PROP_NAME, Boolean.TRUE.toString());
         } catch (Throwable t) {
             logger.error("Cannot configure dataSpace", t);
-            try {
-                node.setProperty(DATASPACES_STATUS_PROP_NAME, getStackTraceAsString(t));
-            } catch (ProActiveException e) {
-                logger.error("Cannot contact the node", e);
-            }
+            logger.error(ExitStatus.DATASPACES_NOT_CONFIGURED.description);
+            System.exit(ExitStatus.DATASPACES_NOT_CONFIGURED.exitCode);
         }
     }
 
@@ -1459,8 +1456,10 @@ public class RMNodeStarter {
                 305,
                 "Was not able to add RMNode to the Resource Manager. Force system to exit to bypass daemon threads."),
         ALL_NODES_REMOVED(306, "All nodes have been removed from the Resource Manager."),
+        DATASPACES_NOT_CONFIGURED(307, "Dataspaces could not be configured"),
         FAILED_TO_LAUNCH(-1, RMNodeStarter.class.getSimpleName() + " process hasn't been started at all."),
         UNKNOWN(-2, "Cannot determine exit status.");
+        ;
         public final int exitCode;
 
         public final String description;

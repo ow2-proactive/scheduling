@@ -127,23 +127,6 @@ public class SchedulerDBManager {
     public static final Set<JobStatus> NOT_FINISHED_JOB_STATUSES = ImmutableSet.copyOf(Iterables.concat(RUNNING_JOB_STATUSES,
                                                                                                         PENDING_JOB_STATUSES));
 
-    public static final Set<TaskStatus> PENDING_TASKS = ImmutableSet.of(TaskStatus.SUBMITTED,
-                                                                        TaskStatus.PENDING,
-                                                                        TaskStatus.NOT_STARTED);
-
-    public static final Set<TaskStatus> RUNNING_TASKS = ImmutableSet.of(TaskStatus.PAUSED,
-                                                                        TaskStatus.IN_ERROR,
-                                                                        TaskStatus.RUNNING,
-                                                                        TaskStatus.WAITING_ON_ERROR,
-                                                                        TaskStatus.WAITING_ON_FAILURE);
-
-    public static final Set<TaskStatus> FINISHED_TASKS = ImmutableSet.of(TaskStatus.FAILED,
-                                                                         TaskStatus.NOT_RESTARTED,
-                                                                         TaskStatus.ABORTED,
-                                                                         TaskStatus.FAULTY,
-                                                                         TaskStatus.FINISHED,
-                                                                         TaskStatus.SKIPPED);
-
     public static final String ALL_REQUIRED_JOBS_HAVE_BEEN_FETCHED = "All required Jobs have been fetched"; // important for JobRecoveryTest
 
     private final SessionFactory sessionFactory;
@@ -404,15 +387,15 @@ public class SchedulerDBManager {
     }
 
     public long getFinishedJobsCount() {
-        return getJobsNumberWithStatus(FINISHED_JOB_STATUSES);
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.FINISHED));
     }
 
     public long getPendingJobsCount() {
-        return getJobsNumberWithStatus(Arrays.asList(JobStatus.PAUSED, JobStatus.PENDING));
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.PENDING));
     }
 
     public long getRunningJobsCount() {
-        return getJobsNumberWithStatus(Arrays.asList(JobStatus.RUNNING, JobStatus.STALLED));
+        return getJobsNumberWithStatus(Collections.singletonList(JobStatus.RUNNING));
     }
 
     public long getTotalJobsCount() {
@@ -428,6 +411,10 @@ public class SchedulerDBManager {
 
             return (Long) query.uniqueResult();
         });
+    }
+
+    public long getJobsCount(JobStatus status) {
+        return getJobsNumberWithStatus(Collections.singletonList(status));
     }
 
     public long getFinishedTasksCount() {
@@ -449,6 +436,14 @@ public class SchedulerDBManager {
             Query query = session.getNamedQuery("getPendingTasksCount")
                                  .setParameterList("jobStatus", NOT_FINISHED_JOB_STATUSES)
                                  .setParameterList("taskStatus", taskStatus);
+
+            return (Long) query.uniqueResult();
+        });
+    }
+
+    public long getTaskCount(TaskStatus filter) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.getNamedQuery("getTasksCount").setParameter("taskStatus", filter);
 
             return (Long) query.uniqueResult();
         });

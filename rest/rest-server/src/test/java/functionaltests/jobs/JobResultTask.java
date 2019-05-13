@@ -43,4 +43,5 @@ public class JobResultTask extends JavaExecutable {
         getResultMap().put(MYVAR, MYVALUE);
         return true;
     }
+
 }

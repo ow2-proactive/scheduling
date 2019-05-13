@@ -258,6 +258,14 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        checkSchedulerConnection();
+        return uischeduler.reSubmit(currentJobId, jobVariables, jobGenericInfos);
+    }
+
+    @Override
     public void changeJobPriority(JobId jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         checkSchedulerConnection();
@@ -703,9 +711,25 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return uischeduler.getTaskPaginated(jobId, statusFilter, offset, limit);
+    }
+
+    @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        return uischeduler.getPreciousTaskResults(jobId);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         return uischeduler.checkJobPermissionMethod(sessionId, jobId, method);
+    }
+
+    public String getStatHistory(String mbeanName, String range, String[] dataSources) {
+        return mbeaninfoviewer.retrieveStats(mbeanName, range, dataSources);
     }
 
 }

@@ -155,7 +155,7 @@ public class RestFuncTHelper {
         restServerUrl = "https://localhost:8443/rest/";
         restfulSchedulerUrl = restServerUrl + "scheduler";
 
-        await().atMost(Duration.TEN_MINUTES).until(restIsStarted());
+        await().atMost(new Duration(900, TimeUnit.SECONDS)).until(restIsStarted());
     }
 
     public static void stopRestfulSchedulerWebapp() {

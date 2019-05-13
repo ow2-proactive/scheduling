@@ -534,6 +534,16 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        if (schedulerProxy == null) {
+            throw new NotConnectedException("Not connected to the scheduler.");
+        }
+        return schedulerProxy.reSubmit(currentJobId, jobVariables, jobGenericInfos);
+    }
+
+    @Override
     public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.getJobState(jobId);
     }
@@ -864,6 +874,18 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return schedulerProxy.getTaskPaginated(jobId, offset, limit);
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return schedulerProxy.getTaskPaginated(jobId, statusFilter, offset, limit);
+    }
+
+    @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        return schedulerProxy.getPreciousTaskResults(jobId);
     }
 
     @Override

@@ -606,6 +606,7 @@ public class SchedulerStarter {
             PropertyConfigurator.configure(defaultLog4jConfig);
         setPropIfNotAlreadySet("java.util.logging.config.file", defaultLog4jConfig);
         setPropIfNotAlreadySet("derby.stream.error.file", schedHome + "/logs/Database.log");
+        RMStarter.overrideAppenders();
     }
 
     protected static void configureDerby() {

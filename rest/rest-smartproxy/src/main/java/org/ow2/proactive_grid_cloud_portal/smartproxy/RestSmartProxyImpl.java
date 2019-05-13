@@ -203,6 +203,13 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
+            SubmissionClosedException {
+        return _getScheduler().reSubmit(currentJobId, jobVariables, jobGenericInfos);
+    }
+
+    @Override
     public JobId submit(Job job)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return _getScheduler().submit(job);
@@ -731,6 +738,18 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return _getScheduler().getTaskPaginated(jobId, offset, limit);
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        return _getScheduler().getTaskPaginated(jobId, statusFilter, offset, limit);
+    }
+
+    @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        return _getScheduler().getPreciousTaskResults(jobId);
     }
 
     /**

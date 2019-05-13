@@ -125,7 +125,7 @@ public enum XMLTags {
      * e.g.: <code>String.format(OPEN_TAG_PATTERN, XMLTags.VARIABLES</code> seeks
      * for the string like this: &lt;variables&gt;, &lt;   variables&gt;, &lt;variables   &gt;, etc.
      */
-    public static final String OPEN_TAG_PATTERN = "<[ ]*%s[ ]*>";
+    public static final String OPEN_TAG_PATTERN = "<[ ]*%s[^>]*>";
 
     /**
      * pattern that matches for open tag for provided tag name.
@@ -200,6 +200,10 @@ public enum XMLTags {
      */
     public boolean matches(String xmlName) {
         return xmlName.equalsIgnoreCase(this.xmlName);
+    }
+
+    public String withContent(String content) {
+        return "  <" + this.xmlName + ">\n" + content + "  </" + this.xmlName + ">";
     }
 
     /**

@@ -84,6 +84,10 @@ import com.google.common.base.Stopwatch;
 @ActiveObject
 public class TaskLauncher implements InitActive {
 
+    static final String PROGRESS_FILE_READER_PERIOD = "progress.file.reader.period";
+
+    static final String PROGRESS_FILE_READER_OLD = "progress.file.reader.old";
+
     private static final Logger logger = Logger.getLogger(TaskLauncher.class);
 
     final private TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
@@ -100,7 +104,7 @@ public class TaskLauncher implements InitActive {
 
     private Decrypter decrypter;
 
-    private ProgressFileReader progressFileReader;
+    private ProgressFileReaderInterface progressFileReader;
 
     private Thread nodeShutdownHook;
 
@@ -128,7 +132,11 @@ public class TaskLauncher implements InitActive {
     public void initActivity(Body body) {
         this.taskId = initializer.getTaskId();
         this.taskLogger = new TaskLogger(taskId, getHostname());
-        this.progressFileReader = new ProgressFileReader();
+        if (Boolean.valueOf(System.getProperty(PROGRESS_FILE_READER_OLD))) {
+            this.progressFileReader = new ProgressFileReader();
+        } else {
+            this.progressFileReader = new ProgressFileReaderPoller();
+        }
         this.taskKiller = new TaskKiller(Thread.currentThread(), new CleanupTimeoutGetterDoubleValue());
         nodeShutdownHook = new Thread(this::kill);
     }

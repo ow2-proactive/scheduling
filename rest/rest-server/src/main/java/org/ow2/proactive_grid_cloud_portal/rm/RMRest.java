@@ -27,19 +27,13 @@ package org.ow2.proactive_grid_cloud_portal.rm;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,7 +81,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
-import org.ow2.proactive.resourcemanager.common.util.RRDDbUtil;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -99,16 +92,13 @@ import org.ow2.proactive.resourcemanager.utils.TargetType;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
 import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
-import org.rrd4j.ConsolFun;
-import org.rrd4j.core.FetchData;
-import org.rrd4j.core.FetchRequest;
-import org.rrd4j.core.RrdDb;
 
 
 @Path("/rm")
@@ -740,94 +730,25 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("stathistory")
     @Produces("application/json")
-    public String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range)
-            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            MalformedObjectNameException, NullPointerException, InterruptedException, NotConnectedException {
+    public String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range1) {
 
-        RMProxyUserInterface rm = checkAccess(sessionId);
+        String newRange = MBeanInfoViewer.possibleModifyRange(range1, dataSources, 'a');
 
-        // if range String is too large, shorten it
-        // to make it recognizable by StatHistoryCaching
-        if (range.length() > dataSources.length) {
-            range = range.substring(0, dataSources.length);
-        }
-        // complete range if too short
-        StringBuilder rangeBuilder = new StringBuilder(range);
-        while (rangeBuilder.length() < dataSources.length) {
-            rangeBuilder.append('a');
-        }
-        range = rangeBuilder.toString();
+        StatHistoryCacheEntry entry = StatHistoryCaching.getInstance().getEntryOrCompute(newRange, () -> {
+            RMProxyUserInterface rm = checkAccess(sessionId);
 
-        StatHistoryCacheEntry cache = StatHistoryCaching.getInstance().getEntry(range);
-        // found unexpired cache entry matching the parameters: return it immediately
-        if (cache != null) {
-            return cache.getValue();
-        }
+            AttributeList attrs = rm.getMBeanAttributes(new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME),
+                                                        new String[] { "StatisticHistory" });
 
-        long currentTimeMillis = System.currentTimeMillis();
+            Attribute attr = (Attribute) attrs.get(0);
 
-        ObjectName on = new ObjectName(RMJMXBeans.RUNTIMEDATA_MBEAN_NAME);
-        AttributeList attrs = rm.getMBeanAttributes(on, new String[] { "StatisticHistory" });
-        Attribute attr = (Attribute) attrs.get(0);
-        // content of the RRD4J database backing file
-        byte[] rrd4j = (byte[]) attr.getValue();
+            // content of the RRD4J database backing file
+            byte[] rrd4j = (byte[]) attr.getValue();
 
-        File rrd4jDb = File.createTempFile("database", "rr4dj");
-        rrd4jDb.deleteOnExit();
+            return MBeanInfoViewer.rrdContent(rrd4j, newRange, dataSources);
+        });
 
-        try (OutputStream out = new FileOutputStream(rrd4jDb)) {
-            out.write(rrd4j);
-        }
-
-        // create RRD4J DB, should be identical to the one held by the RM
-        RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);
-
-        long timeEnd = db.getLastUpdateTime();
-        // force float separator for JSON parsing
-        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
-        otherSymbols.setDecimalSeparator('.');
-        // formatting will greatly reduce response size
-        DecimalFormat formatter = new DecimalFormat("###.###", otherSymbols);
-
-        // construct the JSON response directly in a String
-        StringBuilder result = new StringBuilder();
-        result.append("{");
-
-        for (int i = 0; i < dataSources.length; i++) {
-            String dataSource = dataSources[i];
-            char zone = range.charAt(i);
-            long timeStart = timeEnd - RRDDbUtil.secondsInZone(zone);
-
-            FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
-            req.setFilter(dataSource);
-            FetchData fetchData = req.fetchData();
-            result.append("\"").append(dataSource).append("\":[");
-
-            double[] values = fetchData.getValues(dataSource);
-            for (int j = 0; j < values.length; j++) {
-                if (Double.compare(Double.NaN, values[j]) == 0) {
-                    result.append("null");
-                } else {
-                    result.append(formatter.format(values[j]));
-                }
-                if (j < values.length - 1) {
-                    result.append(',');
-                }
-            }
-            result.append(']');
-            if (i < dataSources.length - 1)
-                result.append(',');
-        }
-        result.append("}");
-
-        db.close();
-        rrd4jDb.delete();
-
-        String ret = result.toString();
-
-        StatHistoryCaching.getInstance().addEntry(range, currentTimeMillis, ret);
-
-        return ret;
+        return entry.getValue();
     }
 
     @Override

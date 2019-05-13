@@ -100,6 +100,7 @@ import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Job2XMLTransformer;
+import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.TaskState;
@@ -727,6 +728,18 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
+            throws NotConnectedException {
+        final JobIdData jobIdData;
+        try {
+            jobIdData = restApiClient().reSubmit(sid, currentJobId.value(), jobVariables, jobGenericInfos);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        }
+        return jobId(jobIdData);
+    }
+
+    @Override
     public JobId submit(File job, Map<String, String> variables)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         return submit(job, variables, null);
@@ -1332,6 +1345,52 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throwUJEOrNCEOrPE(e);
         }
         return taskStatesPage;
+    }
+
+    @Override
+    public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
+            throws NotConnectedException, UnknownJobException, PermissionException {
+        TaskStatesPage taskStatesPage = null;
+        try {
+            final int size = restApi().getJobTaskStates(sid, jobId).getList().size();
+            List<TaskState> taskStates = restApi().getJobTaskStatesFilteredPaginated(sid,
+                                                                                     jobId,
+                                                                                     offset,
+                                                                                     limit,
+                                                                                     statusFilter)
+                                                  .getList()
+                                                  .stream()
+                                                  .map(DataUtility::taskState)
+                                                  .collect(Collectors.toList());
+            taskStatesPage = new TaskStatesPage();
+            taskStatesPage.setSize(size);
+            taskStatesPage.setTaskStates(taskStates);
+        } catch (Exception e) {
+            throwUJEOrNCEOrPE(e);
+        }
+        return taskStatesPage;
+    }
+
+    @Override
+    public List<TaskResult> getPreciousTaskResults(String jobId)
+            throws NotConnectedException, PermissionException, UnknownJobException {
+        List<TaskState> taskStates = getJobState(jobId).getTasks()
+                                                       .stream()
+                                                       .filter(Task::isPreciousResult)
+                                                       .collect(Collectors.toList());
+        ArrayList<TaskResult> results = new ArrayList<>(taskStates.size());
+        for (TaskState currentState : taskStates) {
+            String taskName = currentState.getTaskInfo().getName();
+            try {
+                TaskResult currentResult = getTaskResult(jobId, taskName);
+                results.add(currentResult);
+            } catch (UnknownTaskException ex) {
+                // never occurs because tasks are filtered by tag so they cannot
+                // be unknown.
+                logger.warn("Unknown task.", ex);
+            }
+        }
+        return results;
     }
 
     @Override

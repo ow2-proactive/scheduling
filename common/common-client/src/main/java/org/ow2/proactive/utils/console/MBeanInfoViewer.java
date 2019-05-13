@@ -25,9 +25,16 @@
  */
 package org.ow2.proactive.utils.console;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.management.Attribute;
@@ -37,9 +44,14 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 
+import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.JMXClientHelper;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.FetchData;
+import org.rrd4j.core.FetchRequest;
+import org.rrd4j.core.RrdDb;
 
 
 /**
@@ -49,6 +61,9 @@ import org.ow2.proactive.jmx.JMXClientHelper;
  * @since ProActive Scheduling 1.0
  */
 public final class MBeanInfoViewer {
+
+    private static final Logger LOGGER = Logger.getLogger(MBeanInfoViewer.class);
+
     /** The authentication interface */
     private final Authentication auth;
 
@@ -66,9 +81,9 @@ public final class MBeanInfoViewer {
 
     /**
      * Creates a new instance of MBeanInfoViewer.
-     * 
+     *
      * @param auth the authentication interface
-     * @param user the user that wants to connect to the JMX infrastructure 
+     * @param user the user that wants to connect to the JMX infrastructure
      * @param creds the credentials of the user
      */
     public MBeanInfoViewer(final Authentication auth, final String user, final Credentials creds) {
@@ -76,6 +91,77 @@ public final class MBeanInfoViewer {
         this.env = new HashMap<>(2);
         // Fill the env with credentials 
         this.env.put(JMXConnector.CREDENTIALS, new Object[] { (user == null ? "" : user), creds });
+    }
+
+    public static String possibleModifyRange(String range, String[] dataSources, Character defaultRange) {
+        String newRange = range;
+        // if range String is too large, shorten it
+        // to make it recognizable by StatHistoryCaching
+        if (range.length() > dataSources.length) {
+            newRange = range.substring(0, dataSources.length);
+        }
+        // complete range if too short
+        StringBuilder rangeBuilder = new StringBuilder(newRange);
+        while (rangeBuilder.length() < dataSources.length) {
+            rangeBuilder.append(defaultRange);
+        }
+        return rangeBuilder.toString();
+    }
+
+    public static String rrdContent(byte[] rrd4j, String newRange, String[] dataSources) throws IOException {
+
+        File rrd4jDb = File.createTempFile("database", "rr4dj");
+        rrd4jDb.deleteOnExit();
+
+        try (OutputStream out = new FileOutputStream(rrd4jDb)) {
+            out.write(rrd4j);
+        }
+
+        // create RRD4J DB, should be identical to the one held by the RM
+        RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);
+
+        long timeEnd = db.getLastUpdateTime();
+        // force float separator for JSON parsing
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+        otherSymbols.setDecimalSeparator('.');
+        // formatting will greatly reduce response size
+        DecimalFormat formatter = new DecimalFormat("###.###", otherSymbols);
+
+        // construct the JSON response directly in a String
+        StringBuilder result = new StringBuilder();
+        result.append("{");
+
+        for (int i = 0; i < dataSources.length; i++) {
+            String dataSource = dataSources[i];
+            char zone = newRange.charAt(i);
+            long timeStart = timeEnd - secondsInZone(zone);
+
+            FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
+            req.setFilter(dataSource);
+            FetchData fetchData = req.fetchData();
+            result.append("\"").append(dataSource).append("\":[");
+
+            double[] values = fetchData.getValues(dataSource);
+            for (int j = 0; j < values.length; j++) {
+                if (Double.compare(Double.NaN, values[j]) == 0) {
+                    result.append("null");
+                } else {
+                    result.append(formatter.format(values[j]));
+                }
+                if (j < values.length - 1) {
+                    result.append(',');
+                }
+            }
+            result.append(']');
+            if (i < dataSources.length - 1)
+                result.append(',');
+        }
+        result.append("}");
+
+        db.close();
+        rrd4jDb.delete();
+
+        return result.toString();
     }
 
     private synchronized void lazyConnect() {
@@ -94,7 +180,7 @@ public final class MBeanInfoViewer {
      * Sets the value of a specific attribute of a named MBean. The MBean
      * is identified by its object name as a String.
      * The first time this method is called it connects to the JMX connector server.
-     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * The default behavior will try to establish a connection using RMI protocol, if it fails
      * the RO (Remote Object) protocol is used.
      *
      * @param mbeanNameAsString the object name of the MBean
@@ -118,7 +204,7 @@ public final class MBeanInfoViewer {
     /**
      * Invokes an operation on an MBean.
      * The first time this method is called it connects to the JMX connector server.
-     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * The default behavior will try to establish a connection using RMI protocol, if it fails
      * the RO (Remote Object) protocol is used.
      *
      * @param mbeanNameAsString the object name of the MBean
@@ -138,10 +224,59 @@ public final class MBeanInfoViewer {
         }
     }
 
+    public String retrieveStats(String mbeanName, String range, String[] dataSources) {
+        lazyConnect();
+
+        try {
+            AttributeList attrs = connection.getAttributes(new ObjectName(mbeanName),
+                                                           new String[] { "StatisticHistory" });
+            Attribute attr = (Attribute) attrs.get(0);
+            // content of the RRD4J database backing file
+            byte[] rrd4j = (byte[]) attr.getValue();
+
+            return MBeanInfoViewer.rrdContent(rrd4j,
+                                              MBeanInfoViewer.possibleModifyRange(range, dataSources, 'd'),
+                                              dataSources);
+        } catch (Exception e) {
+            LOGGER.error("Could not retrieve statistics history, " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static long secondsInZone(char zone) {
+        switch (zone) {
+            default:
+            case 'a': // 1 minute
+                return 60;
+            case 'n': // 5 minutes
+                return 60 * 5;
+            case 'm': // 10 minutes
+                return 60 * 10;
+            case 't': // 30 minutes
+                return 60 * 30;
+            case 'h': // 1 hour
+                return 60 * 60;
+            case 'j': // 2 hours
+                return 60 * 60 * 2;
+            case 'k': // 4 hours
+                return 60 * 60 * 4;
+            case 'H': // 8 hours
+                return 60 * 60 * 8;
+            case 'd': // 1 day
+                return 60 * 60 * 24;
+            case 'w': // 1 week
+                return 60 * 60 * 24 * 7;
+            case 'M': // 1 month
+                return 60 * 60 * 24 * 28;
+            case 'y': // 1 year
+                return 60 * 60 * 24 * 365;
+        }
+    }
+
     /**
      * Return the informations about the Scheduler MBean as a formatted string.
      * The first time this method is called it connects to the JMX connector server.
-     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * The default behavior will try to establish a connection using RMI protocol, if it fails
      * the RO (Remote Object) protocol is used.
      *
      * @param mbeanNameAsString the object name of the MBean
@@ -192,7 +327,7 @@ public final class MBeanInfoViewer {
     /**
      * Return the informations about the Scheduler MBean as a Map.
      * The first time this method is called it connects to the JMX connector server.
-     * The default behavior will try to establish a connection using RMI protocol, if it fails 
+     * The default behavior will try to establish a connection using RMI protocol, if it fails
      * the RO (Remote Object) protocol is used.
      *
      * @param mbeanNameAsString the object name of the MBean

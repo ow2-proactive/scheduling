@@ -26,11 +26,12 @@
 package org.ow2.proactive.utils.appenders;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Enumeration;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
+import org.apache.log4j.AsyncAppender;
+import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.PatternLayout;
@@ -39,36 +40,17 @@ import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
 
 
-/**
- * 
- * An appender that redirects logging events to different files
- * depending on "filename" property in log4j context.
- * 
- * Is used to put server logs for tasks and jobs into files with 
- * different names.
- *
- */
-public class FileAppender extends WriterAppender {
+public abstract class FileAppender extends WriterAppender {
 
     public static final String FILE_NAME = "filename";
 
     private String maxFileSize;
 
-    protected String filesLocation;
+    private String filesLocation;
 
     public FileAppender() {
-
         setLayout(new PatternLayout("[%d{ISO8601} %-5p] %m%n"));
-
-        // trying to get a layout from log4j configuration
-        Enumeration<?> en = Logger.getRootLogger().getAllAppenders();
-        if (en != null && en.hasMoreElements()) {
-            Appender app = (Appender) en.nextElement();
-            if (app != null && app.getLayout() != null) {
-                Logger.getRootLogger().debug("Retrieved layout from log4j configuration");
-                setLayout(app.getLayout());
-            }
-        }
+        fetchLayoutFromRootLogger();
     }
 
     @Override
@@ -79,35 +61,66 @@ public class FileAppender extends WriterAppender {
         }
     }
 
-    public void append(String fileName, LoggingEvent event) {
+    abstract public void append(String cacheKey, LoggingEvent event);
+
+    RollingFileAppender createAppender(String cacheKey) {
+        RollingFileAppender appender;
+        String fileName = cacheKey;
         if (filesLocation != null) {
             fileName = filesLocation + File.separator + fileName;
         }
-        File file = new File(fileName);
-        if (!file.exists()) {
-            try {
+        try {
+            File file = new File(fileName);
+            if (!file.exists()) {
                 FileUtils.forceMkdirParent(file);
                 FileUtils.touch(file);
-            } catch (IOException e) {
-                Logger.getRootLogger().error(e.getMessage(), e);
             }
-        }
 
-        try {
-            RollingFileAppender appender = new RollingFileAppender(getLayout(), fileName, true);
+            appender = new RollingFileAppender(getLayout(), fileName, true);
             appender.setMaxBackupIndex(1);
+            appender.setImmediateFlush(true);
             if (maxFileSize != null) {
                 appender.setMaxFileSize(maxFileSize);
             }
-            appender.append(event);
-            appender.close();
-        } catch (IOException e) {
-            Logger.getRootLogger().error(e.getMessage(), e);
+        } catch (Exception e) {
+            Logger.getRootLogger()
+                  .error("Error when creating logger : " + cacheKey + " logging will be disabled for this context", e);
+            return null;
+        }
+        return appender;
+    }
+
+    private void fetchLayoutFromRootLogger() {
+        // trying to get a layout from log4j configuration
+        Enumeration<?> en = Logger.getRootLogger().getAllAppenders();
+        if (en != null && en.hasMoreElements()) {
+            Appender app = (Appender) en.nextElement();
+            if (app != null && app.getLayout() != null) {
+                if (app instanceof AsyncAppender) {
+                    Enumeration<?> attachedAppenders = ((AsyncAppender) app).getAllAppenders();
+                    if (attachedAppenders != null && attachedAppenders.hasMoreElements()) {
+                        Appender attachedApp = (Appender) attachedAppenders.nextElement();
+                        setLayoutUsingAppender(attachedApp);
+                    }
+                } else {
+                    setLayoutUsingAppender(app);
+                }
+            }
+        }
+    }
+
+    private void setLayoutUsingAppender(Appender attachedApp) {
+        final Layout layout = attachedApp.getLayout();
+        if (layout instanceof PatternLayout) {
+            Logger.getRootLogger().trace("Retrieved layout from log4j configuration");
+            PatternLayout paternLayout = (PatternLayout) layout;
+            setLayout(new PatternLayout(paternLayout.getConversionPattern()));
         }
     }
 
     @Override
     public void close() {
+        super.close();
     }
 
     @Override
@@ -115,19 +128,11 @@ public class FileAppender extends WriterAppender {
         return true;
     }
 
-    public String getFilesLocation() {
-        return filesLocation;
+    public void setMaxFileSize(String valueAsString) {
+        this.maxFileSize = valueAsString;
     }
 
-    public void setFilesLocation(String filesLocation) {
-        this.filesLocation = filesLocation;
-    }
-
-    public String getMaxFileSize() {
-        return maxFileSize;
-    }
-
-    public void setMaxFileSize(String maxFileSize) {
-        this.maxFileSize = maxFileSize;
+    public void setFilesLocation(String logsLocation) {
+        this.filesLocation = logsLocation;
     }
 }

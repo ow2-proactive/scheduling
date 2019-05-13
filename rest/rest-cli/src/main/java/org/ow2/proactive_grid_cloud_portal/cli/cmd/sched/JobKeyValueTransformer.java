@@ -42,7 +42,7 @@ public class JobKeyValueTransformer {
 
     public static Map<String, String> transformJsonStringToMap(String jsonString) {
         Map<String, String> jsonMap = Maps.newHashMap();
-        if (jsonString != null) {
+        if (jsonString != null && !jsonString.equals("undefined")) {
             try {
                 jsonMap = (JSONObject) new JSONParser().parse(jsonString);
                 validateJsonMap(jsonMap);
@@ -55,14 +55,9 @@ public class JobKeyValueTransformer {
     }
 
     private static void validateJsonMap(Map<String, String> jsonMap) {
-        if (jsonMap.size() == 0) {
-            throw new IllegalArgumentException("empty json ");
-        } else {
-            for (String key : jsonMap.keySet()) {
-                if (key.length() == 0) {
-                    throw new IllegalArgumentException("empty key ");
-                }
-
+        for (String key : jsonMap.keySet()) {
+            if (key.length() == 0) {
+                throw new IllegalArgumentException("empty key ");
             }
         }
     }

@@ -25,9 +25,14 @@
  */
 package org.ow2.proactive.scheduler.util;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.ow2.proactive.scheduler.common.job.JobId;
+import org.ow2.proactive.utils.appenders.AsynchFileAppender;
 import org.ow2.proactive.utils.appenders.FileAppender;
 
 
@@ -87,6 +92,28 @@ public class JobLogger {
     public void error(JobId id, String message, Throwable th) {
         updateMdcWithTaskLogFilename(id);
         logger.error(PREFIX + id + " " + message, th);
+        MDC.remove(FileAppender.FILE_NAME);
+    }
+
+    public void close(JobId id) {
+        updateMdcWithTaskLogFilename(id);
+        logger.debug(PREFIX + id + " closing logger");
+        for (Appender appender : (List<Appender>) Collections.list(logger.getAllAppenders())) {
+            if (appender != null && appender instanceof FileAppender) {
+                appender.close();
+            }
+        }
+        MDC.remove(FileAppender.FILE_NAME);
+    }
+
+    public void flush(JobId id) {
+        updateMdcWithTaskLogFilename(id);
+        logger.debug(PREFIX + id + " closing logger");
+        for (Appender appender : (List<Appender>) Collections.list(logger.getAllAppenders())) {
+            if (appender instanceof AsynchFileAppender) {
+                ((AsynchFileAppender) appender).flush();
+            }
+        }
         MDC.remove(FileAppender.FILE_NAME);
     }
 
