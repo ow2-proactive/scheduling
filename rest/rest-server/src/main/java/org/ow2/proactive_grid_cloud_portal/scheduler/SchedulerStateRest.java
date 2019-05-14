@@ -2338,6 +2338,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                     // clean the temporary file
                     FileUtils.deleteQuietly(tmpJobFile);
                 }
+                if (multipart != null) {
+                    multipart.close();
+                }
             }
         } catch (IOException e) {
             throw new IOException("I/O Error: " + e.getMessage(), e);
@@ -2426,50 +2429,57 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public boolean pushFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,
             @PathParam("filePath") String filePath, MultipartFormDataInput multipart)
             throws IOException, NotConnectedRestException, PermissionRestException {
-        checkAccess(sessionId, "pushFile");
+        try {
+            checkAccess(sessionId, "pushFile");
 
-        Session session = dataspaceRestApi.checkSessionValidity(sessionId);
+            Session session = dataspaceRestApi.checkSessionValidity(sessionId);
 
-        Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
+            Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
 
-        List<InputPart> fNL = formDataMap.get("fileName");
-        if ((fNL == null) || (fNL.isEmpty())) {
-            throw new IllegalArgumentException("Illegal multipart argument definition (fileName), received " + fNL);
+            List<InputPart> fNL = formDataMap.get("fileName");
+            if ((fNL == null) || (fNL.isEmpty())) {
+                throw new IllegalArgumentException("Illegal multipart argument definition (fileName), received " + fNL);
+            }
+            String fileName = fNL.get(0).getBody(String.class, null);
+
+            List<InputPart> fCL = formDataMap.get("fileContent");
+            if ((fCL == null) || (fCL.isEmpty())) {
+                throw new IllegalArgumentException("Illegal multipart argument definition (fileContent), received " +
+                                                   fCL);
+            }
+            InputStream fileContent = fCL.get(0).getBody(InputStream.class, null);
+
+            if (fileName == null) {
+                throw new IllegalArgumentException("Wrong file name : " + fileName);
+            }
+
+            filePath = normalizeFilePath(filePath, fileName);
+
+            FileObject destfo = dataspaceRestApi.resolveFile(session, spaceName, filePath);
+
+            URL targetUrl = destfo.getURL();
+            logger.info("[pushFile] pushing file to " + targetUrl);
+
+            if (!destfo.isWriteable()) {
+                RuntimeException ex = new IllegalArgumentException("File " + filePath + " is not writable in space " +
+                                                                   spaceName);
+                logger.error(ex);
+                throw ex;
+            }
+            if (destfo.exists()) {
+                destfo.delete();
+            }
+            // used to create the necessary directories if needed
+            destfo.createFile();
+
+            dataspaceRestApi.writeFile(fileContent, destfo, null);
+
+            return true;
+        } finally {
+            if (multipart != null) {
+                multipart.close();
+            }
         }
-        String fileName = fNL.get(0).getBody(String.class, null);
-
-        List<InputPart> fCL = formDataMap.get("fileContent");
-        if ((fCL == null) || (fCL.isEmpty())) {
-            throw new IllegalArgumentException("Illegal multipart argument definition (fileContent), received " + fCL);
-        }
-        InputStream fileContent = fCL.get(0).getBody(InputStream.class, null);
-
-        if (fileName == null) {
-            throw new IllegalArgumentException("Wrong file name : " + fileName);
-        }
-
-        filePath = normalizeFilePath(filePath, fileName);
-
-        FileObject destfo = dataspaceRestApi.resolveFile(session, spaceName, filePath);
-
-        URL targetUrl = destfo.getURL();
-        logger.info("[pushFile] pushing file to " + targetUrl);
-
-        if (!destfo.isWriteable()) {
-            RuntimeException ex = new IllegalArgumentException("File " + filePath + " is not writable in space " +
-                                                               spaceName);
-            logger.error(ex);
-            throw ex;
-        }
-        if (destfo.exists()) {
-            destfo.delete();
-        }
-        // used to create the necessary directories if needed
-        destfo.createFile();
-
-        dataspaceRestApi.writeFile(fileContent, destfo, null);
-
-        return true;
     }
 
     /**
@@ -3321,6 +3331,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } finally {
             if (tmpFile != null) {
                 FileUtils.deleteQuietly(tmpFile);
+            }
+            if (multipart != null) {
+                multipart.close();
             }
         }
     }
