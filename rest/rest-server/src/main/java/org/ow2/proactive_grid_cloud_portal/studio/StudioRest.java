@@ -281,40 +281,43 @@ public class StudioRest implements StudioInterface {
     @Override
     public String createClass(@HeaderParam("sessionid") String sessionId, MultipartFormDataInput input)
             throws NotConnectedRestException, IOException {
+        try {
+            String userName = getUserName(sessionId);
+            File classesDir = new File(getFileStorageSupport().getWorkflowsDir(userName), "classes");
 
-        String userName = getUserName(sessionId);
-        File classesDir = new File(getFileStorageSupport().getWorkflowsDir(userName), "classes");
-
-        if (!classesDir.exists()) {
-            logger.info("Creating dir " + classesDir.getAbsolutePath());
-            classesDir.mkdirs();
-        }
-
-        String fileName = "";
-
-        Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
-        String name = uploadForm.keySet().iterator().next();
-        List<InputPart> inputParts = uploadForm.get(name);
-
-        for (InputPart inputPart : inputParts) {
-
-            try {
-                //convert the uploaded file to inputstream
-                InputStream inputStream = inputPart.getBody(InputStream.class, null);
-                byte[] bytes = IOUtils.toByteArray(inputStream);
-
-                //constructs upload file path
-                fileName = classesDir.getAbsolutePath() + File.separator + name;
-
-                FileUtils.writeByteArrayToFile(new File(fileName), bytes);
-            } catch (IOException e) {
-                logger.warn("Could not read input part", e);
-                throw e;
+            if (!classesDir.exists()) {
+                logger.info("Creating dir " + classesDir.getAbsolutePath());
+                classesDir.mkdirs();
             }
 
-        }
+            String fileName = "";
 
-        return fileName;
+            Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
+            String name = uploadForm.keySet().iterator().next();
+            List<InputPart> inputParts = uploadForm.get(name);
+
+            for (InputPart inputPart : inputParts) {
+
+                try {
+                    //convert the uploaded file to inputstream
+                    InputStream inputStream = inputPart.getBody(InputStream.class, null);
+                    byte[] bytes = IOUtils.toByteArray(inputStream);
+
+                    //constructs upload file path
+                    fileName = classesDir.getAbsolutePath() + File.separator + name;
+
+                    FileUtils.writeByteArrayToFile(new File(fileName), bytes);
+                } catch (IOException e) {
+                    logger.warn("Could not read input part", e);
+                    throw e;
+                }
+
+            }
+
+            return fileName;
+        } finally {
+            input.close();
+        }
     }
 
     @Override
