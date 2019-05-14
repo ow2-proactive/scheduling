@@ -130,7 +130,7 @@ public class JettyStarter {
                     requestLog.setExtended(false);
                     requestLog.setLogTimeZone("GMT");
                     requestLog.setLogLatency(true);
-                    requestLog.setRetainDays(90);
+                    requestLog.setRetainDays(WebProperties.JETTY_LOG_RETAIN_DAYS.getValueAsInt());
 
                     RequestLogHandler requestLogHandler = new RequestLogHandler();
                     requestLogHandler.setRequestLog(requestLog);
