@@ -313,6 +313,9 @@ public enum PASchedulerProperties implements PACommonProperties {
     /** Scheduler home directory */
     SCHEDULER_HOME("pa.scheduler.home", PropertyType.STRING),
 
+    /** Hsqldb catalog location, use this property to store the hsqldb database in a different folder than scheduler_home/data/db */
+    HSQLDB_LOCATION("pa.hsqldb.location", PropertyType.STRING),
+
     /**
      * Scheduler rest url
      */
