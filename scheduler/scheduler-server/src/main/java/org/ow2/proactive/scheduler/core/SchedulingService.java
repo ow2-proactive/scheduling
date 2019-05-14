@@ -29,13 +29,12 @@ import java.net.URI;
 import java.security.KeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
@@ -51,7 +50,6 @@ import org.ow2.proactive.scheduler.common.exception.InternalException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
 import org.ow2.proactive.scheduler.common.job.JobId;
-import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
@@ -1079,37 +1077,26 @@ public class SchedulingService {
      */
     public class HousekeepingRunner implements Runnable {
 
-        private List<Long> removeFromContext(List<JobId> jobIdList) {
-            List<Long> longList = new ArrayList<>(jobIdList.size());
-            for (JobId jobId : jobIdList) {
+        private List<Long> removeFromContext(Map<JobId, String> jobIdList) {
+            for (Map.Entry<JobId, String> jobIdStringEntry : jobIdList.entrySet()) {
+                JobId jobId = jobIdStringEntry.getKey();
+                String owner = jobIdStringEntry.getValue();
+
                 if (jobs.isJobAlive(jobId)) {
                     TerminationData terminationData = jobs.removeJob(jobId);
                     submitTerminationDataHandler(terminationData);
                 }
-            }
-            List<InternalJob> jobsFromDB;
-            if (!jobIdList.isEmpty()) {
-                jobsFromDB = getInfrastructure().getDBManager()
-                                                .loadJobWithTasksIfNotRemoved(jobIdList.toArray(new JobId[0]));
-            } else {
-                jobsFromDB = Collections.emptyList();
-            }
 
-            for (InternalJob job : jobsFromDB) {
-                if (job != null) {
-                    job.setRemovedTime(System.currentTimeMillis());
-                    getListener().jobStateUpdated(job.getOwner(),
-                                                  new NotificationData<JobInfo>(SchedulerEvent.JOB_REMOVE_FINISHED,
-                                                                                new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
-                    getListener().jobUpdatedFullData(job);
-                    longList.add(job.getId().longValue());
-                    ServerJobAndTaskLogs.getInstance().remove(job.getId(), job.getOwner());
-                    logger.info("HOUSEKEEPING sent JOB_REMOVE_FINISHED notification for job " + job.getId());
-                }
+                getListener().jobStateUpdated(owner,
+                                              new NotificationData<>(SchedulerEvent.JOB_REMOVE_FINISHED,
+                                                                     new JobInfoImpl(jobId, owner)));
+                ServerJobAndTaskLogs.getInstance().remove(jobId, owner);
+                logger.debug("HOUSEKEEPING sent JOB_REMOVE_FINISHED notification for job " + jobId);
+
             }
 
             wakeUpSchedulingThread();
-            return longList;
+            return jobIdList.keySet().stream().map(JobId::longValue).collect(Collectors.toList());
         }
 
         private void removeFromDB(List<Long> longJobIdList) {
@@ -1124,7 +1111,7 @@ public class SchedulingService {
         public void run() {
             long timeNow = System.currentTimeMillis();
             try {
-                List<JobId> jobIdList = getInfrastructure().getDBManager().getJobsToRemove(timeNow);
+                Map<JobId, String> jobIdList = getInfrastructure().getDBManager().getJobsToRemove(timeNow);
 
                 // remove from the memory context
                 long inMemoryTimeStart = System.currentTimeMillis();
