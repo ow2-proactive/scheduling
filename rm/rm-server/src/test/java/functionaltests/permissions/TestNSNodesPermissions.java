@@ -26,6 +26,7 @@
 package functionaltests.permissions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,9 +81,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                .getBooleanValue();
 
         List<Node> nodePool = createNodes("node", 2);
-
         Node node = nodePool.remove(0);
         Node node2 = nodePool.remove(0);
+
         nsadmin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -132,9 +133,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
              .getBooleanValue();
 
         nodePool = createNodes("node", 2);
-
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
+
         System.out.println(System.currentTimeMillis());
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
@@ -297,8 +298,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                               NODES_NOT_RECOVERABLE)
             .getBooleanValue();
 
-        nodePool = createNodes("node", 2);
+        nodePool = createNodes("node", 1);
         node = nodePool.remove(0);
+
         user.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -337,6 +339,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodePool = createNodes("node", 2);
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
+
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -384,6 +387,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodePool = createNodes("node", 2);
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
+
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -438,8 +442,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                NODES_NOT_RECOVERABLE)
              .getBooleanValue();
 
-        nodePool = createNodes("node", 2);
+        nodePool = createNodes("node", 1);
         node = nodePool.remove(0);
+
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -495,6 +500,7 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nodePool = createNodes("node", 2);
         node = nodePool.remove(0);
         node2 = nodePool.remove(0);
+
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -547,8 +553,9 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
                                NODES_NOT_RECOVERABLE)
              .getBooleanValue();
 
-        nodePool = createNodes("node", 2);
+        nodePool = createNodes("node", 1);
         node = nodePool.remove(0);
+
         admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
         //we eat the configuring to free nodeevent
@@ -574,6 +581,62 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         nsadmin.releaseNodes(nodes);
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        // removing the node source
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+
+        RMTHelper.log("Test7.1 - excluding specific user");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "users=!radmin", "ALL" },
+                               NODES_NOT_RECOVERABLE)
+             .getBooleanValue();
+
+        nodePool = createNodes("node", 1);
+        node = nodePool.remove(0);
+
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
+        boolean canComputeOnIt = user.isNodeUser(node.getNodeInformation().getURL()).getBooleanValue();
+        assertFalse("User is not supposed to get this compute node", canComputeOnIt);
+
+        // removing the node source
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.removeNodeSource(nsName, true).getBooleanValue();
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
+
+        RMTHelper.log("Test7.2 - excluding specific group");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "groups=!nsadmins", "ALL" },
+                               NODES_NOT_RECOVERABLE)
+             .getBooleanValue();
+
+        nodePool = createNodes("node", 1);
+        node = nodePool.remove(0);
+
+        admin.addNode(node.getNodeInformation().getURL(), nsName).getBooleanValue();
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_ADDED);
+        //we eat the configuring to free nodeevent
+        rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
+
+        user = rmHelper.getResourceManager(TestUsers.NSADMIN);
+        canComputeOnIt = user.isNodeUser(node.getNodeInformation().getURL()).getBooleanValue();
+        assertFalse("User is not supposed to get this compute node", canComputeOnIt);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
