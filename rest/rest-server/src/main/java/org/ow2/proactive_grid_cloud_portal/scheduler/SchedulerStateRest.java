@@ -2447,7 +2447,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return true;
         } finally {
-            multipart.close();
+            if (multipart != null) {
+                multipart.close();
+            }
         }
     }
 
@@ -3282,7 +3284,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             if (tmpFile != null) {
                 FileUtils.deleteQuietly(tmpFile);
             }
-            multipart.close();
+            if (multipart !== null) {
+                multipart.close();
+            }
         }
     }
 
