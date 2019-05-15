@@ -656,17 +656,18 @@ public class SchedulerDBManager {
         });
     }
 
-    public List<JobId> getJobsToRemove(final long time) {
+    public Map<JobId, String> getJobsToRemove(final long time) {
         return executeReadOnlyTransaction(session -> {
-            Query query = session.createSQLQuery("select ID from JOB_DATA where " +
+            Query query = session.createSQLQuery("select ID, OWNER from JOB_DATA where " +
                                                  "SCHEDULED_TIME_FOR_REMOVAL <> 0 and " +
                                                  "SCHEDULED_TIME_FOR_REMOVAL < :timeLimit")
                                  .addScalar("ID", StandardBasicTypes.LONG)
+                                 .addScalar("OWNER", StandardBasicTypes.STRING)
                                  .setParameter("timeLimit", time);
-            return ((List<Long>) query.list()).stream()
-                                              .map(Object::toString)
-                                              .map(JobIdImpl::makeJobId)
-                                              .collect(Collectors.toList());
+
+            return ((List<Object[]>) query.list()).stream()
+                                                  .collect(Collectors.toMap(pair -> JobIdImpl.makeJobId(((Long) pair[0]).toString()),
+                                                                            pair -> (String) pair[1]));
         });
     }
 

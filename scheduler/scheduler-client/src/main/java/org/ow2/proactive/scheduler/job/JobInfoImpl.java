@@ -132,6 +132,11 @@ public class JobInfoImpl implements JobInfo {
     public JobInfoImpl() {
     }
 
+    public JobInfoImpl(JobId jobId, String owner) {
+        this.jobId = jobId;
+        this.owner = owner;
+    }
+
     /*
      * Copy constructor is used to pass job information to the event listener
      * (SchedulerStateUpdate)
