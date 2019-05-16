@@ -71,6 +71,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -777,83 +778,86 @@ public class RMRest implements RMRestInterface {
         // content of the RRD4J database backing file
         byte[] rrd4j = (byte[]) attr.getValue();
 
-        File rrd4jDb = File.createTempFile("database", "rr4dj");
-        rrd4jDb.deleteOnExit();
-
-        try (OutputStream out = new FileOutputStream(rrd4jDb)) {
-            out.write(rrd4j);
-        }
-
-        // create RRD4J DB, should be identical to the one held by the RM
-        RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);
-
-        long timeEnd = db.getLastUpdateTime();
-        // force float separator for JSON parsing
-        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
-        otherSymbols.setDecimalSeparator('.');
-        // formatting will greatly reduce response size
-        DecimalFormat formatter = new DecimalFormat("###.###", otherSymbols);
-
         // construct the JSON response directly in a String
         StringBuilder result = new StringBuilder();
-        result.append("{");
 
-        for (int i = 0; i < dataSources.length; i++) {
-            String dataSource = dataSources[i];
-            char zone = range.charAt(i);
-            long timeStart;
+        File rrd4jDb = File.createTempFile("database", "rr4dj");
+        try {
 
-            switch (zone) {
-                default:
-                case 'a': // 1 minute
-                    timeStart = timeEnd - 60;
-                    break;
-                case 'm': // 10 minute
-                    timeStart = timeEnd - 60 * 10;
-                    break;
-                case 'h': // 1 hours
-                    timeStart = timeEnd - 60 * 60;
-                    break;
-                case 'H': // 8 hours
-                    timeStart = timeEnd - 60 * 60 * 8;
-                    break;
-                case 'd': // 1 day
-                    timeStart = timeEnd - 60 * 60 * 24;
-                    break;
-                case 'w': // 1 week
-                    timeStart = timeEnd - 60 * 60 * 24 * 7;
-                    break;
-                case 'M': // 1 month
-                    timeStart = timeEnd - 60 * 60 * 24 * 28;
-                    break;
-                case 'y': // 1 year
-                    timeStart = timeEnd - 60 * 60 * 24 * 365;
-                    break;
+            try (OutputStream out = new FileOutputStream(rrd4jDb)) {
+                out.write(rrd4j);
             }
 
-            FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
-            req.setFilter(dataSource);
-            FetchData fetchData = req.fetchData();
-            result.append("\"").append(dataSource).append("\":[");
+            // create RRD4J DB, should be identical to the one held by the RM
+            RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);
 
-            double[] values = fetchData.getValues(dataSource);
-            for (int j = 0; j < values.length; j++) {
-                if (Double.compare(Double.NaN, values[j]) == 0) {
-                    result.append("null");
-                } else {
-                    result.append(formatter.format(values[j]));
+            long timeEnd = db.getLastUpdateTime();
+            // force float separator for JSON parsing
+            DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+            otherSymbols.setDecimalSeparator('.');
+            // formatting will greatly reduce response size
+            DecimalFormat formatter = new DecimalFormat("###.###", otherSymbols);
+
+            result.append("{");
+
+            for (int i = 0; i < dataSources.length; i++) {
+                String dataSource = dataSources[i];
+                char zone = range.charAt(i);
+                long timeStart;
+
+                switch (zone) {
+                    default:
+                    case 'a': // 1 minute
+                        timeStart = timeEnd - 60;
+                        break;
+                    case 'm': // 10 minute
+                        timeStart = timeEnd - 60 * 10;
+                        break;
+                    case 'h': // 1 hours
+                        timeStart = timeEnd - 60 * 60;
+                        break;
+                    case 'H': // 8 hours
+                        timeStart = timeEnd - 60 * 60 * 8;
+                        break;
+                    case 'd': // 1 day
+                        timeStart = timeEnd - 60 * 60 * 24;
+                        break;
+                    case 'w': // 1 week
+                        timeStart = timeEnd - 60 * 60 * 24 * 7;
+                        break;
+                    case 'M': // 1 month
+                        timeStart = timeEnd - 60 * 60 * 24 * 28;
+                        break;
+                    case 'y': // 1 year
+                        timeStart = timeEnd - 60 * 60 * 24 * 365;
+                        break;
                 }
-                if (j < values.length - 1)
+
+                FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
+                req.setFilter(dataSource);
+                FetchData fetchData = req.fetchData();
+                result.append("\"").append(dataSource).append("\":[");
+
+                double[] values = fetchData.getValues(dataSource);
+                for (int j = 0; j < values.length; j++) {
+                    if (Double.compare(Double.NaN, values[j]) == 0) {
+                        result.append("null");
+                    } else {
+                        result.append(formatter.format(values[j]));
+                    }
+                    if (j < values.length - 1)
+                        result.append(',');
+                }
+                result.append(']');
+                if (i < dataSources.length - 1)
                     result.append(',');
             }
-            result.append(']');
-            if (i < dataSources.length - 1)
-                result.append(',');
-        }
-        result.append("}");
+            result.append("}");
 
-        db.close();
-        rrd4jDb.delete();
+            db.close();
+        } finally {
+            FileUtils.deleteQuietly(rrd4jDb);
+        }
 
         String ret = result.toString();
 
