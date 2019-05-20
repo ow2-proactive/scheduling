@@ -89,11 +89,15 @@ public class AsynchFileAppender extends FileAppender {
 
     private void logEventProcessor() {
         while (Thread.currentThread().isAlive()) {
+            ApplicableEvent queuedEvent;
             try {
-                ApplicableEvent queuedEvent = queue.peek();
+                queuedEvent = queue.peek();
                 if (queuedEvent != null) {
                     queuedEvent.apply();
                     queue.take();
+                } else {
+                    // Workaround to avoid CPU overhead
+                    Thread.sleep(10);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
