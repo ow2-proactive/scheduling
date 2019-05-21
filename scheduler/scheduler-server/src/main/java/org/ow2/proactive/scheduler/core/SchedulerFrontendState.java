@@ -1131,6 +1131,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             jobs.remove(notification.getData().getJobId());
             logger.debug("HOUSEKEEPING removed the finished job " + notification.getData().getJobId() +
                          " from the SchedulerFrontEndState");
+            dispatchJobStateUpdated(owner, notification);
             return;
         }
         ClientJobState js = getClientJobState(notification.getData().getJobId());

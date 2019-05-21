@@ -25,10 +25,17 @@
  */
 package org.ow2.proactive_grid_cloud_portal.common;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ReflectionException;
+
 import org.apache.log4j.Logger;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 
 
 /**
@@ -108,24 +115,26 @@ public class StatHistoryCaching {
         return entry;
     }
 
-    public synchronized StatHistoryCacheEntry getEntryOrCompute(String key, Callable<String> valueCreator) {
+    public synchronized StatHistoryCacheEntry getEntryOrCompute(String key, RestCallable<String> valueCreator)
+            throws ReflectionException, InterruptedException, NotConnectedException, IntrospectionException,
+            IOException, InstanceNotFoundException, MalformedObjectNameException {
         StatHistoryCacheEntry entry = statHistoryCache.get(key);
 
         if (entry == null || (System.currentTimeMillis() - entry.timeStamp) > MAX_DURATION) {
             statHistoryCache.remove(key);
             long timeStamp = System.currentTimeMillis();
-            String value = null;
-            try {
-                value = valueCreator.call();
-            } catch (Exception e) {
-                LOGGER.error("Could not calculate statistics history for key: " + key, e);
-            }
-
+            String value = valueCreator.call();
             entry = new StatHistoryCacheEntry(value, timeStamp);
             statHistoryCache.put(key, entry);
         }
 
         return entry;
+    }
+
+    @FunctionalInterface
+    public interface RestCallable<V> {
+        V call() throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+                MalformedObjectNameException, NullPointerException, InterruptedException, NotConnectedException;
     }
 
     public synchronized void addEntry(String key, long timeStamp, String value) {
