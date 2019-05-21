@@ -36,6 +36,7 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.exceptions.NotBoundException;
@@ -170,8 +171,9 @@ public abstract class Connection<T extends Authentication> implements Loggable, 
                 try {
                     PAFuture.waitFor(future, leftTime);
                 } catch (ProActiveTimeoutException e) {
-                    logger.error(e);
-                    throw e;
+                    String errorMessage = "The ProActive server can not send a reply to the Node (usually due to a firewall). Please check the server logs for more information.";
+                    logger.error(errorMessage, e);
+                    throw new ProActiveRuntimeException(errorMessage, e);
                 }
 
                 if (authentication.isActivated().getBooleanValue()) {
