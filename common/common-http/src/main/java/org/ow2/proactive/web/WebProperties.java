@@ -94,6 +94,8 @@ public enum WebProperties implements PACommonProperties {
 
     JETTY_LOG_FILE("jetty.log.file", PropertyType.STRING),
 
+    JETTY_LOG_RETAIN_DAYS("jetty.log.retain.days", PropertyType.INTEGER, "5"),
+
     /** session cleaning period in seconds **/
     SESSION_CLEANING_PERIOD("session.cleaning.period", PropertyType.INTEGER, "300"),
 

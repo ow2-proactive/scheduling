@@ -70,7 +70,17 @@ public class SchedulerHsqldbStarter {
         String databaseFileName = "database.properties";
         String schedulerConfigurationFolderName = "config";
 
-        Path schedulerDbPath = Paths.get(schedulerHome, "data", "db");
+        Path schedulerDbPath;
+
+        if (PASchedulerProperties.HSQLDB_LOCATION.isSet()) {
+            if (Paths.get(PASchedulerProperties.HSQLDB_LOCATION.getValueAsString()).isAbsolute()) {
+                schedulerDbPath = Paths.get(PASchedulerProperties.HSQLDB_LOCATION.getValueAsString());
+            } else {
+                schedulerDbPath = Paths.get(schedulerHome, PASchedulerProperties.HSQLDB_LOCATION.getValueAsString());
+            }
+        } else {
+            schedulerDbPath = Paths.get(schedulerHome, "data", "db");
+        }
 
         hibernateRmConfiguration = Paths.get(schedulerHome, schedulerConfigurationFolderName, "rm", databaseFileName);
         hibernateSchedulerConfiguration = Paths.get(schedulerHome,

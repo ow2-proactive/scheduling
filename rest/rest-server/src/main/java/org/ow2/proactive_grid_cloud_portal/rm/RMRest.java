@@ -730,7 +730,9 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("stathistory")
     @Produces("application/json")
-    public String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range1) {
+    public String getStatHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("range") String range1)
+            throws ReflectionException, InterruptedException, IntrospectionException, NotConnectedException,
+            InstanceNotFoundException, MalformedObjectNameException, IOException {
 
         String newRange = MBeanInfoViewer.possibleModifyRange(range1, dataSources, 'a');
 

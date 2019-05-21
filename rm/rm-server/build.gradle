@@ -26,7 +26,7 @@ dependencies {
 
     testCompile 'org.apache.sshd:sshd-core:1.7.0'
 
-    runtime 'org.hsqldb:hsqldb:2.4.0'
+    runtime 'org.hsqldb:hsqldb:2.4.1'
 
     runtime "org.objectweb.proactive:programming-extension-pnp:${programmingVersion}"
     runtime "org.objectweb.proactive:programming-extension-pnpssl:${programmingVersion}"

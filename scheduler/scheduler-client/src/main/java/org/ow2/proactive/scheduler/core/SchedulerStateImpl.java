@@ -25,12 +25,9 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -46,7 +43,6 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
 import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.job.ClientJobState;
 
 
 /**
@@ -66,7 +62,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
     private Set<T> runningJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
 
     /** Finished jobs */
-    private Set<T> finishedJobs = Collections.synchronizedSet(new LinkedHashSet<T>());
+    private Map<JobId, T> finishedJobs = Collections.synchronizedMap(new LinkedHashMap<JobId, T>());
 
     /** Scheduler status */
     private SchedulerStatus status = SchedulerStatus.STARTED;
@@ -101,7 +97,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      * @return the finishedJobs
      */
     public Vector<T> getFinishedJobs() {
-        return new Vector(finishedJobs);
+        return new Vector(finishedJobs.values());
     }
 
     /**
@@ -110,7 +106,11 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
      * @param finishedJobs the finishedJobs to set
      */
     public void setFinishedJobs(Vector<T> finishedJobs) {
-        this.finishedJobs = Collections.synchronizedSet(new LinkedHashSet<>(finishedJobs));
+        this.finishedJobs = Collections.synchronizedMap(finishedJobs.stream()
+                                                                    .collect(Collectors.toMap(JobState::getId,
+                                                                                              Function.identity(),
+                                                                                              (x1, x2) -> x2,
+                                                                                              LinkedHashMap::new)));
     }
 
     /**
@@ -317,7 +317,7 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
             for (T j : runningJobs) {
                 jobs.put(j.getId(), j);
             }
-            for (T j : finishedJobs) {
+            for (T j : finishedJobs.values()) {
                 jobs.put(j.getId(), j);
             }
             initialized = true;
@@ -364,17 +364,22 @@ public final class SchedulerStateImpl<T extends JobState> implements SchedulerSt
 
     public synchronized void pendingToFinished(T js) {
         pendingJobs.remove(js);
-        finishedJobs.add(js);
+        finishedJobs.put(js.getId(), js);
     }
 
     public synchronized void runningToFinished(T js) {
         runningJobs.remove(js);
-        finishedJobs.add(js);
+        finishedJobs.put(js.getId(), js);
     }
 
     public synchronized void removeFinished(T js) {
-        finishedJobs.remove(js);
+        finishedJobs.remove(js.getId());
         jobs.remove(js.getId());
+    }
+
+    public synchronized void removeFinished(JobId jobId) {
+        finishedJobs.remove(jobId);
+        jobs.remove(jobId);
     }
 
 }

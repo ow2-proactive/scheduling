@@ -44,6 +44,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.Credentials;
@@ -111,55 +112,56 @@ public final class MBeanInfoViewer {
     public static String rrdContent(byte[] rrd4j, String newRange, String[] dataSources) throws IOException {
 
         File rrd4jDb = File.createTempFile("database", "rr4dj");
-        rrd4jDb.deleteOnExit();
-
-        try (OutputStream out = new FileOutputStream(rrd4jDb)) {
-            out.write(rrd4j);
-        }
-
-        // create RRD4J DB, should be identical to the one held by the RM
-        RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);
-
-        long timeEnd = db.getLastUpdateTime();
-        // force float separator for JSON parsing
-        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
-        otherSymbols.setDecimalSeparator('.');
-        // formatting will greatly reduce response size
-        DecimalFormat formatter = new DecimalFormat("###.###", otherSymbols);
-
         // construct the JSON response directly in a String
         StringBuilder result = new StringBuilder();
-        result.append("{");
-
-        for (int i = 0; i < dataSources.length; i++) {
-            String dataSource = dataSources[i];
-            char zone = newRange.charAt(i);
-            long timeStart = timeEnd - secondsInZone(zone);
-
-            FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
-            req.setFilter(dataSource);
-            FetchData fetchData = req.fetchData();
-            result.append("\"").append(dataSource).append("\":[");
-
-            double[] values = fetchData.getValues(dataSource);
-            for (int j = 0; j < values.length; j++) {
-                if (Double.compare(Double.NaN, values[j]) == 0) {
-                    result.append("null");
-                } else {
-                    result.append(formatter.format(values[j]));
-                }
-                if (j < values.length - 1) {
-                    result.append(',');
-                }
+        try {
+            try (OutputStream out = new FileOutputStream(rrd4jDb)) {
+                out.write(rrd4j);
             }
-            result.append(']');
-            if (i < dataSources.length - 1)
-                result.append(',');
-        }
-        result.append("}");
 
-        db.close();
-        rrd4jDb.delete();
+            // create RRD4J DB, should be identical to the one held by the RM
+            RrdDb db = new RrdDb(rrd4jDb.getAbsolutePath(), true);
+
+            long timeEnd = db.getLastUpdateTime();
+            // force float separator for JSON parsing
+            DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.US);
+            otherSymbols.setDecimalSeparator('.');
+            // formatting will greatly reduce response size
+            DecimalFormat formatter = new DecimalFormat("###.###", otherSymbols);
+
+            result.append("{");
+
+            for (int i = 0; i < dataSources.length; i++) {
+                String dataSource = dataSources[i];
+                char zone = newRange.charAt(i);
+                long timeStart = timeEnd - secondsInZone(zone);
+
+                FetchRequest req = db.createFetchRequest(ConsolFun.AVERAGE, timeStart, timeEnd);
+                req.setFilter(dataSource);
+                FetchData fetchData = req.fetchData();
+                result.append("\"").append(dataSource).append("\":[");
+
+                double[] values = fetchData.getValues(dataSource);
+                for (int j = 0; j < values.length; j++) {
+                    if (Double.compare(Double.NaN, values[j]) == 0) {
+                        result.append("null");
+                    } else {
+                        result.append(formatter.format(values[j]));
+                    }
+                    if (j < values.length - 1) {
+                        result.append(',');
+                    }
+                }
+                result.append(']');
+                if (i < dataSources.length - 1)
+                    result.append(',');
+            }
+            result.append("}");
+
+            db.close();
+        } finally {
+            FileUtils.deleteQuietly(rrd4jDb);
+        }
 
         return result.toString();
     }
