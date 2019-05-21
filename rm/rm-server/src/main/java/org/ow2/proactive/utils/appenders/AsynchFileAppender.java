@@ -64,7 +64,8 @@ public class AsynchFileAppender extends FileAppender {
             isAppending.lock();
             queue.put(new ApplicableEvent(cacheKey, event));
         } catch (InterruptedException e) {
-            LOGGER.debug("Append interrupted: " + e);
+            LOGGER.warn("Interrupted append on " + cacheKey);
+            Thread.currentThread().interrupt();
         } finally {
             isAppending.unlock();
         }

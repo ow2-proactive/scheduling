@@ -46,7 +46,8 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
             appenderCache.computeIfAbsent(cacheKey, this::createAppender);
             queue.put(new ApplicableEvent(cacheKey, event));
         } catch (InterruptedException e) {
-            LOGGER.warn("Queue put is interrupted.");
+            LOGGER.warn("Interrupted append on " + cacheKey);
+            Thread.currentThread().interrupt();
         } finally {
             isAppending.unlock();
         }
