@@ -1177,8 +1177,7 @@ public class RMNodeStarter {
             logger.info("Resource Manager joined.");
             return auth;
         } catch (Throwable t) {
-            logger.error("Unable to join the Resource Manager at " + rmURL
-            + "\n ProActive server can not send reply to Node (usually due to firewall). Please check server log for more information", t);
+            logger.error("Unable to join the Resource Manager at " + rmURL, t);
             System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
         return null;
