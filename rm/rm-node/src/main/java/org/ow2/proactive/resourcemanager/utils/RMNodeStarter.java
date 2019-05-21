@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import static com.google.common.base.Throwables.getStackTraceAsString;
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 import java.io.BufferedReader;
@@ -1178,7 +1177,8 @@ public class RMNodeStarter {
             logger.info("Resource Manager joined.");
             return auth;
         } catch (Throwable t) {
-            logger.error("Unable to join the Resource Manager at " + rmURL, t);
+            logger.error("Unable to join the Resource Manager at " + rmURL
+            + "\n ProActive server can not send reply to Node (usually due to firewall). Please check server log for more information", t);
             System.exit(ExitStatus.RMNODE_ADD_ERROR.exitCode);
         }
         return null;
