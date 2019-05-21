@@ -42,19 +42,21 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
     @Override
     public void append(String cacheKey, LoggingEvent event) {
         try {
-            synchronized (queue) {
-                appenderCache.computeIfAbsent(cacheKey, this::createAppender);
-                queue.put(new ApplicableEvent(cacheKey, event));
-            }
+            isAppending.lock();
+            appenderCache.computeIfAbsent(cacheKey, this::createAppender);
+            queue.put(new ApplicableEvent(cacheKey, event));
         } catch (InterruptedException e) {
             LOGGER.warn("Queue put is interrupted.");
+        } finally {
+            isAppending.unlock();
         }
     }
 
     @Override
     public void close() {
-        super.flush();
-        synchronized (queue) {
+        try {
+            isClosing.lock();
+            super.flush();
             Optional<String> opKey = extractKey();
             if (opKey.isPresent()) {
                 RollingFileAppender appender = appenderCache.remove(opKey.get());
@@ -62,6 +64,8 @@ public class AsynchChachedFileAppender extends AsynchFileAppender {
                     appender.close();
                 }
             }
+        } finally {
+            isClosing.unlock();
         }
     }
 
