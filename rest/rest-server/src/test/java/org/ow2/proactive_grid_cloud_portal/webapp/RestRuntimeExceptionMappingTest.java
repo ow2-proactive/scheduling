@@ -42,12 +42,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive_grid_cloud_portal.RestTestServer;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
 
 public class RestRuntimeExceptionMappingTest extends RestTestServer {
 
     @BeforeClass
     public static void setUpRest() throws Exception {
+        SchedulerRestClient.registerGzipEncoding(ResteasyProviderFactory.getInstance());
         new RestRuntime().addExceptionMappers(ResteasyProviderFactory.getInstance());
     }
 

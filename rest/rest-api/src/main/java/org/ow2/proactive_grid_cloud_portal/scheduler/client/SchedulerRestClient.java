@@ -51,9 +51,11 @@ import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.jboss.resteasy.plugins.interceptors.encoding.AcceptEncodingGZIPFilter;
+import org.jboss.resteasy.plugins.interceptors.encoding.GZIPDecodingInterceptor;
+import org.jboss.resteasy.plugins.interceptors.encoding.GZIPEncodingInterceptor;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
@@ -88,8 +90,21 @@ public class SchedulerRestClient {
         if (!providerFactory.isRegistered(JacksonContextResolver.class)) {
             providerFactory.registerProvider(JacksonContextResolver.class);
         }
+        registerGzipEncoding(providerFactory);
 
         scheduler = createRestProxy(providerFactory, restEndpointURL, httpEngine);
+    }
+
+    public static void registerGzipEncoding(ResteasyProviderFactory providerFactory) {
+        if (!providerFactory.isRegistered(AcceptEncodingGZIPFilter.class)) {
+            providerFactory.registerProvider(AcceptEncodingGZIPFilter.class);
+        }
+        if (!providerFactory.isRegistered(GZIPDecodingInterceptor.class)) {
+            providerFactory.registerProvider(GZIPDecodingInterceptor.class);
+        }
+        if (!providerFactory.isRegistered(GZIPEncodingInterceptor.class)) {
+            providerFactory.registerProvider(GZIPEncodingInterceptor.class);
+        }
     }
 
     public JobIdData submitXmlAs(String sessionId, InputStream jobXml, String user) throws Exception {

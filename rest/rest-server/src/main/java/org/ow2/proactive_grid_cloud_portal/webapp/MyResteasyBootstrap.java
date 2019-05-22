@@ -35,6 +35,7 @@ import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
 
 public class MyResteasyBootstrap extends ResteasyBootstrap {
@@ -50,6 +51,7 @@ public class MyResteasyBootstrap extends ResteasyBootstrap {
 
         dispatcher.registerProvider(OctetStreamWriter.class, false);
         dispatcher.registerProvider(PlainTextReader.class, false);
+        SchedulerRestClient.registerGzipEncoding(dispatcher);
 
         restRuntime = new RestRuntime();
 
