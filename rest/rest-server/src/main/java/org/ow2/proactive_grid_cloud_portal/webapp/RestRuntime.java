@@ -46,7 +46,6 @@ import org.ow2.proactive_grid_cloud_portal.rm.RMStateCaching;
 import org.ow2.proactive_grid_cloud_portal.scheduler.IntWrapperConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.RestartModeConverter;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateListener;
-import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
 
 public class RestRuntime {
@@ -66,7 +65,6 @@ public class RestRuntime {
         dispatcher.registerProvider(RestartModeConverter.class);
         dispatcher.registerProvider(IntWrapperConverter.class);
         dispatcher.registerProvider(JacksonProvider.class);
-        SchedulerRestClient.registerGzipEncoding(dispatcher);
 
         configureLogger(log4jConfig);
 
