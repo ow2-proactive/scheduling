@@ -26,8 +26,8 @@ miredot {
 }
 
 dependencies {
-    compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.19.Final'
-    compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.19.Final'
+    compile 'org.jboss.resteasy:resteasy-jackson-provider:3.0.21.Final'
+    compile 'org.jboss.resteasy:resteasy-multipart-provider:3.0.21.Final'
 
     compile 'org.rrd4j:rrd4j:2.2.1'
     compile 'net.sf.dozer:dozer:5.5.1'
@@ -51,7 +51,7 @@ dependencies {
     testCompile functionalTestDependencies
 
     testCompile 'org.apache.httpcomponents:httpmime:4.5.2'
-    testCompile 'org.jboss.resteasy:tjws:3.0.19.Final'
+    testCompile 'org.jboss.resteasy:tjws:3.0.21.Final'
 
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'org.eclipse.jetty:jetty-client:9.2.24.v20180105'
