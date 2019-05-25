@@ -32,22 +32,4 @@ public class GroupNamePrincipal extends IdentityPrincipal {
     public GroupNamePrincipal(String name) {
         super(name);
     }
-
-    public boolean equals(Object o) {
-        if (o == null)
-            return false;
-
-        if (this == o)
-            return true;
-
-        if (!(o instanceof GroupNamePrincipal))
-            return false;
-
-        GroupNamePrincipal that = (GroupNamePrincipal) o;
-
-        if (this.getName().equals(that.getName()))
-            return true;
-
-        return false;
-    }
 }

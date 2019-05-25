@@ -30,8 +30,7 @@ import java.security.Permission;
 import java.security.PermissionCollection;
 import java.util.*;
 
-import org.ow2.proactive.authentication.principals.ExcludedIdentityPrincipal;
-import org.ow2.proactive.authentication.principals.IdentityPrincipal;
+import org.ow2.proactive.authentication.principals.*;
 
 
 /**
@@ -85,33 +84,65 @@ public class PrincipalPermission extends ClientPermission {
             return true;
         }
 
+        int nbPrincipals = permissionToRespect.principals.size();
+        long nbExcludedPrincipals = permissionToRespect.principals.stream()
+                                                                  .filter(c -> c instanceof ExcludedIdentityPrincipal)
+                                                                  .count();
+
         // Separate included/excluded principals in permissionToRespect
-        Set<IdentityPrincipal> includedPrincipals = new HashSet<>();
-        Set<IdentityPrincipal> excludedPrincipals = new HashSet<>();
+        Set<IdentityPrincipal> includedUserNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> includedGroupNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> excludedUserNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> excludedGroupNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> tokenPrincipals = new HashSet<>();
         for (IdentityPrincipal instance : permissionToRespect.principals) {
-            if (instance instanceof ExcludedIdentityPrincipal) {
-                excludedPrincipals.add(instance);
-            } else {
-                includedPrincipals.add(instance);
+            if (instance instanceof ExcludedIdentityPrincipal && instance instanceof UserNamePrincipal) {
+                excludedUserNamePrincipals.add(new UserNamePrincipal(instance.getName()));
+            } else if (instance instanceof ExcludedIdentityPrincipal && instance instanceof GroupNamePrincipal) {
+                excludedGroupNamePrincipals.add(new GroupNamePrincipal(instance.getName()));
+            } else if (instance instanceof UserNamePrincipal) {
+                includedUserNamePrincipals.add(instance);
+            } else if (instance instanceof GroupNamePrincipal) {
+                includedGroupNamePrincipals.add(instance);
+            } else if (instance instanceof TokenPrincipal) {
+                tokenPrincipals.add(instance);
             }
         }
 
-        if (!includedPrincipals.isEmpty() && !excludedPrincipals.isEmpty()) {
+        // Separate included/excluded principals in this
+        Set<IdentityPrincipal> includedThisUserNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> includedThisGroupNamePrincipals = new HashSet<>();
+        Set<IdentityPrincipal> thisTokenPrincipals = new HashSet<>();
+        for (IdentityPrincipal instance : this.principals) {
+            if (instance instanceof UserNamePrincipal) {
+                includedThisUserNamePrincipals.add(instance);
+            } else if (instance instanceof GroupNamePrincipal) {
+                includedThisGroupNamePrincipals.add(instance);
+            } else if (instance instanceof TokenPrincipal) {
+                thisTokenPrincipals.add(instance);
+            }
+        }
+
+        boolean userAuthorized, groupAuthorized, tokenAuthorized;
+        if (nbExcludedPrincipals == 0) {
+            // To access to a resource , a principal (this) must be present
+            // in the included principal list of the resource permission
+            userAuthorized = includedUserNamePrincipals.containsAll(includedThisUserNamePrincipals);
+            groupAuthorized = includedGroupNamePrincipals.containsAll(includedThisGroupNamePrincipals);
+            tokenAuthorized = tokenPrincipals.containsAll(thisTokenPrincipals);
+
+        } else if (nbExcludedPrincipals == nbPrincipals) {
+            // To access to a resource , a principal (this) must not be present
+            // in the excluded principal list of the resource permission
+            userAuthorized = !excludedUserNamePrincipals.stream().anyMatch(includedThisUserNamePrincipals::contains);
+            groupAuthorized = !excludedGroupNamePrincipals.stream().anyMatch(includedThisGroupNamePrincipals::contains);
+            tokenAuthorized = true;
+        } else {
             // Not supposed to find mixed included/excluded principals in permission
             return false;
         }
-
-        if (!includedPrincipals.isEmpty()) {
-            // To access to a resource , a principal (this) must be present
-            // in the included principal list of the resource permission
-            return includedPrincipals.containsAll(this.principals);
-
-        } else {
-
-            // To access to a resource , a principal (this) must not be present
-            // in the excluded principal list of the resource permission
-            return !excludedPrincipals.stream().anyMatch(this.principals::contains);
-        }
+        // Authorization must be given at user, group and token level
+        return userAuthorized && groupAuthorized && tokenAuthorized;
     }
 
     @Override
