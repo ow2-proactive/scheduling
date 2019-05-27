@@ -104,6 +104,7 @@ public class RestFuncTHelper {
         String javaPath = RestFuncTUtils.getJavaPathFromSystemProperties();
         cmd.add(javaPath);
         cmd.add("-Djava.security.manager");
+        cmd.add("-Dresteasy.allowGzip=true");
         cmd.add(CentralPAPropertyRepository.JAVA_SECURITY_POLICY.getCmdLine() + toPath(serverJavaPolicy));
 
         cmd.add(CentralPAPropertyRepository.PA_HOME.getCmdLine() + getSchedHome());
