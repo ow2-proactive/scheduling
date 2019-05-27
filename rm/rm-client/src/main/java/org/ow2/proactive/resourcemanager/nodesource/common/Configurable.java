@@ -65,6 +65,11 @@ public @interface Configurable {
     boolean fileBrowser() default false;
 
     /**
+     * Field is a multiline text area.
+     */
+    boolean textArea() default false;
+
+    /**
      * Dynamic fields can be edited while the node source is deployed.
      */
     boolean dynamic() default false;
