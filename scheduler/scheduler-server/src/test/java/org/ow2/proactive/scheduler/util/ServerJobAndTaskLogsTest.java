@@ -150,6 +150,10 @@ public class ServerJobAndTaskLogsTest extends ProActiveTestClean {
         System.out.println(fakeSchedulerHome);
         assertEquals(1, fakeSchedulerHome.list().length);
 
+        // avoid keeping a handle on the files
+        jobLogger.close(jobId);
+        taskLogger.close(taskId);
+
         ServerJobAndTaskLogs.getInstance().removeLogsDirectory();
 
         assertEquals(0, fakeSchedulerHome.list().length);

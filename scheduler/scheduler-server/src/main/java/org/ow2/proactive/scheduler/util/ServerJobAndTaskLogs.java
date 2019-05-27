@@ -252,8 +252,13 @@ public class ServerJobAndTaskLogs {
     void removeLogsDirectory() {
         String logsLocation = getLogsLocation();
         logger.info("Removing logs " + logsLocation);
-        FileUtils.removeDir(new File(logsLocation));
-        // this code breaks the tests
+
+        boolean folderRemoved = org.apache.commons.io.FileUtils.deleteQuietly(new File(logsLocation));
+        if (!folderRemoved) {
+            logger.error("Could not remove logs folder");
+        }
+
+        // infinite remove retries breaks the tests
         //        try {
         //            while (!org.apache.commons.io.FileUtils.deleteQuietly(new File(logsLocation))) {
         //                logger.warn("Could not delete folder " + logsLocation + " retrying");

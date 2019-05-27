@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.resourcemanager.utils;
 
-import static com.google.common.base.Throwables.getStackTraceAsString;
 import static org.ow2.proactive.utils.ClasspathUtils.findSchedulerHome;
 
 import java.io.BufferedReader;

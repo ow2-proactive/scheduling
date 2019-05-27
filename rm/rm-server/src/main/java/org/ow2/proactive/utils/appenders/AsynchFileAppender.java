@@ -29,8 +29,9 @@ import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManage
 import static org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties.LOG4J_ASYNC_APPENDER_FLUSH_TIMOUT;
 
 import java.util.Optional;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
@@ -40,7 +41,14 @@ public class AsynchFileAppender extends FileAppender {
 
     private static final Logger LOGGER = Logger.getLogger(AsynchFileAppender.class);
 
-    final BlockingQueue<ApplicableEvent> queue = new LinkedBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt());
+    final BlockingQueue<ApplicableEvent> queue = new ArrayBlockingQueue<>(LOG4J_ASYNC_APPENDER_BUFFER_SIZE.getValueAsInt(),
+                                                                          true);
+
+    protected ReentrantReadWriteLock preventConcurrentAppendClose = new ReentrantReadWriteLock();
+
+    protected ReentrantReadWriteLock.ReadLock isAppending = preventConcurrentAppendClose.readLock();
+
+    protected ReentrantReadWriteLock.WriteLock isClosing = preventConcurrentAppendClose.writeLock();
 
     public AsynchFileAppender() {
         super();
@@ -52,18 +60,25 @@ public class AsynchFileAppender extends FileAppender {
 
     // non blocking
     public void append(String cacheKey, LoggingEvent event) {
-        synchronized (queue) {
-            try {
-                queue.put(new ApplicableEvent(cacheKey, event));
-            } catch (InterruptedException e) {
-                LOGGER.debug("Append interrupted: " + e);
-            }
+        try {
+            isAppending.lock();
+            queue.put(new ApplicableEvent(cacheKey, event));
+        } catch (InterruptedException e) {
+            LOGGER.warn("Interrupted append on " + cacheKey);
+            Thread.currentThread().interrupt();
+        } finally {
+            isAppending.unlock();
         }
     }
 
     @Override
     public void close() {
-        flush();
+        try {
+            isClosing.lock();
+            flush();
+        } finally {
+            isClosing.unlock();
+        }
     }
 
     // blocking

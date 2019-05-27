@@ -178,6 +178,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         factory.register(new WildCardTypeReader());
         factory.register(new OctetStreamReader());
         factory.register(new TaskResultReader());
+        SchedulerRestClient.registerGzipEncoding(factory);
 
         setApiClient(restApiClient);
 

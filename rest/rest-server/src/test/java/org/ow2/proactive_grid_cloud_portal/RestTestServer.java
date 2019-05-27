@@ -29,6 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
@@ -48,7 +50,8 @@ public class RestTestServer {
     protected static ByteArrayOutputStream serverLogs = new ByteArrayOutputStream();
 
     @BeforeClass
-    public static void startServer() throws IOException, NoSuchFieldException, IllegalAccessException {
+    public static void startServer() throws IOException, NoSuchFieldException, IllegalAccessException,
+            NoSuchMethodException, InvocationTargetException {
         bypassProActiveLogger();
         preventProActiveToChangeSecurityManager();
         server = new TJWSEmbeddedJaxrsServer();
@@ -71,15 +74,20 @@ public class RestTestServer {
     /**
      * Use reflection to access private fields of the underlying server.
      */
-    private static void silentServerError() throws NoSuchFieldException, IllegalAccessException {
+    private static void silentServerError()
+            throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         Field f = TJWSServletServer.class.getDeclaredField("server");
         f.setAccessible(true);
         TJWSServletServer.FileMappingServe serve = (TJWSServletServer.FileMappingServe) f.get(server);
 
-        Field streamField = Serve.class.getDeclaredField("logStream");
-        streamField.setAccessible(true);
+        Field logField = Serve.class.getDeclaredField("log");
+        logField.setAccessible(true);
 
-        streamField.set(serve, new PrintStream(serverLogs));
+        Method newLoggerForPrintStreamMethod = Serve.class.getDeclaredMethod("newLoggerForPrintStream",
+                                                                             PrintStream.class);
+        newLoggerForPrintStreamMethod.setAccessible(true);
+
+        logField.set(serve, newLoggerForPrintStreamMethod.invoke(null, new PrintStream(serverLogs)));
     }
 
     protected static void addResource(Object restResource) {
