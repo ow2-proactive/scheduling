@@ -52,6 +52,7 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
         CREDENTIAL("credential"),
         PASSWORD("password"),
         FILEBROWSER("fileBrowser"),
+        TEXTAREA("textArea"),
         NONE("none");
 
         private String name;
@@ -97,6 +98,8 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
             type = ConfigurableValues.PASSWORD;
         } else if (arg0.fileBrowser()) {
             type = ConfigurableValues.FILEBROWSER;
+        } else if (arg0.textArea()) {
+            type = ConfigurableValues.TEXTAREA;
         } else {
             type = ConfigurableValues.NONE;
         }
@@ -105,7 +108,7 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
     }
 
     @Override
-    public Configurable unmarshal(ConfigurableWrapper arg0) throws Exception {
+    public Configurable unmarshal(final ConfigurableWrapper arg0) throws Exception {
 
         if (arg0 == null || arg0.type == null)
             return null;
@@ -135,6 +138,11 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
             @Override
             public boolean fileBrowser() {
                 return arg0.type == ConfigurableValues.FILEBROWSER;
+            }
+
+            @Override
+            public boolean textArea() {
+                return arg0.type == ConfigurableValues.TEXTAREA;
             }
 
             @Override
