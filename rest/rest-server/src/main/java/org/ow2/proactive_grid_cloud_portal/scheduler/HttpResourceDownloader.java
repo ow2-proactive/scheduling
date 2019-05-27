@@ -38,9 +38,11 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.web.WebProperties;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
 
 public class HttpResourceDownloader {
@@ -65,7 +67,11 @@ public class HttpResourceDownloader {
                                                                                             .useSystemProperties()
                                                                                             .build());
 
-        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().httpEngine(engine);
+        ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
+        SchedulerRestClient.registerGzipEncoding(providerFactory);
+
+        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().providerFactory(providerFactory)
+                                                                         .httpEngine(engine);
 
         if (WebProperties.WEB_HTTPS_TRUSTSTORE.isSet() && WebProperties.WEB_HTTPS_TRUSTSTORE_PASSWORD.isSet()) {
             String trustStorePath = null;

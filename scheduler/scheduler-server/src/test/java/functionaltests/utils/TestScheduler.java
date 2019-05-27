@@ -83,6 +83,7 @@ public class TestScheduler {
         List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
+        commandLine.add("-Dresteasy.allowGzip=true");
         commandLine.add("-Dfile.encoding=" + System.getProperty("file.encoding"));
         // commandLine.add("-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005");
 

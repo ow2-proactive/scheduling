@@ -50,6 +50,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -59,6 +60,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.rest.ISchedulerClient;
 import org.ow2.proactive.scheduler.rest.SchedulerClient;
 import org.ow2.proactive_grid_cloud_portal.dataspace.dto.ListFile;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
@@ -73,6 +75,8 @@ public class DataSpaceClient implements IDataSpaceClient {
     private String sessionId;
 
     private ClientHttpEngine httpEngine;
+
+    private ResteasyProviderFactory providerFactory;
 
     private ISchedulerClient schedulerClient;
 
@@ -90,6 +94,8 @@ public class DataSpaceClient implements IDataSpaceClient {
                                                                                              .isInsecure())
                                                                              .useSystemProperties()
                                                                              .build());
+        this.providerFactory = ResteasyProviderFactory.getInstance();
+        SchedulerRestClient.registerGzipEncoding(providerFactory);
         this.restDataspaceUrl = restDataspaceUrl(restServerUrl);
         this.sessionId = client.getSession();
         if (log.isDebugEnabled()) {
@@ -113,7 +119,9 @@ public class DataSpaceClient implements IDataSpaceClient {
         }
 
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(destination.getDataspace().value());
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory)
+                                                           .httpEngine(httpEngine)
+                                                           .build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(destination.getPath());
         Response response = null;
         try {
@@ -153,7 +161,9 @@ public class DataSpaceClient implements IDataSpaceClient {
         }
 
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory)
+                                                           .httpEngine(httpEngine)
+                                                           .build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
 
         Response response = null;
@@ -194,7 +204,9 @@ public class DataSpaceClient implements IDataSpaceClient {
         }
 
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory)
+                                                           .httpEngine(httpEngine)
+                                                           .build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
 
         List<String> includes = source.getIncludes();
@@ -254,7 +266,9 @@ public class DataSpaceClient implements IDataSpaceClient {
     @Override
     public ListFile list(IRemoteSource source) throws NotConnectedException, PermissionException {
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory)
+                                                           .httpEngine(httpEngine)
+                                                           .build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath()).queryParam("comp", "list");
 
         List<String> includes = source.getIncludes();
@@ -291,7 +305,9 @@ public class DataSpaceClient implements IDataSpaceClient {
         }
 
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory)
+                                                           .httpEngine(httpEngine)
+                                                           .build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
 
         List<String> includes = source.getIncludes();
@@ -336,7 +352,9 @@ public class DataSpaceClient implements IDataSpaceClient {
     @Override
     public Map<String, String> metadata(IRemoteSource source) throws NotConnectedException, PermissionException {
         StringBuffer uriTmpl = (new StringBuffer()).append(restDataspaceUrl).append(source.getDataspace().value());
-        ResteasyClient client = new ResteasyClientBuilder().httpEngine(httpEngine).build();
+        ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory)
+                                                           .httpEngine(httpEngine)
+                                                           .build();
         ResteasyWebTarget target = client.target(uriTmpl.toString()).path(source.getPath());
         Response response = null;
         try {
