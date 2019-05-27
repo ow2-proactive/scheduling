@@ -88,6 +88,7 @@ public class TestRM {
         List<String> commandLine = new ArrayList<>();
         commandLine.add(System.getProperty("java.home") + File.separator + "bin" + File.separator + "java");
         commandLine.add("-Djava.security.manager");
+        commandLine.add("-Dresteasy.allowGzip=true");
 
         String proactiveHome = CentralPAPropertyRepository.PA_HOME.getValue();
         if (!CentralPAPropertyRepository.PA_HOME.isSet()) {
