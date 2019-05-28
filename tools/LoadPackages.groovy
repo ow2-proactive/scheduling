@@ -1,10 +1,27 @@
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.zip.ZipFile
+import org.apache.commons.configuration2.Configuration
+import org.apache.commons.configuration2.PropertiesConfiguration
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder
+import org.apache.commons.configuration2.builder.fluent.Parameters
+import org.apache.commons.configuration2.builder.fluent.PropertiesBuilderParameters
+import org.apache.commons.configuration2.ex.ConfigurationException
 import org.apache.log4j.Logger
 import org.codehaus.groovy.runtime.StackTraceUtils
 
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.zip.ZipFile
+import java.util.Arrays
+import org.apache.commons.lang3.ArrayUtils
+
+
+
 class LoadPackages {
+
+    private static final String PROACTIVE_EXAMPLES_LOADED = "proactive.examples.loaded"
+    private static final String PROACTIVE_EXAMPLES_LAST_LOADED_PACKAGE = "proactive.examples.last.loaded.package"
+    private static final FileBasedConfigurationBuilder<PropertiesConfiguration> BUILDER = new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
+    private static Configuration configuration
+    private static String lastLoadedPackage
 
     private final String SCRIPT_NAME = "LoadPackages.groovy"
 
@@ -14,10 +31,21 @@ class LoadPackages {
     private final String SCHEDULER_HOME
     private final String EXAMPLES_ZIP_PATH
     private final String EXAMPLES_DIR_PATH
+    private final File SAMPLES_PROPERTIES_FILE
     private final String TOOLS_DIR
     private final GroovyObject package_loader
 
     private logger = Logger.getLogger("org.ow2.proactive.scheduler")
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                configuration.setProperty(PROACTIVE_EXAMPLES_LAST_LOADED_PACKAGE, lastLoadedPackage)
+                BUILDER.save()
+
+            }
+        })
+    }
 
 
     LoadPackages(binding) {
@@ -28,6 +56,10 @@ class LoadPackages {
         // User variables
         this.EXAMPLES_ZIP_PATH = new File(this.SCHEDULER_HOME, "samples/proactive-examples.zip").absolutePath
         this.TOOLS_DIR = new File(this.SCHEDULER_HOME, "tools")
+        this.SAMPLES_PROPERTIES_FILE = new File(this.SCHEDULER_HOME, "samples/samples.properties")
+
+        // Load configuration
+        this.configuration = loadConfig()
 
         // Deduced variables
         this.EXAMPLES_DIR_PATH = this.SCHEDULER_HOME + "/samples/workflows/proactive-examples"
@@ -68,56 +100,105 @@ class LoadPackages {
         logger.error("[" + this.SCRIPT_NAME + "] " + output, exception)
     }
 
+    /**
+     * loads Proactive examples configuration.
+     *
+     * @return Proactive example configuration
+     * @throws ConfigurationException If a problem occurs when loading proactive examples configuration
+     * @since version 8.4.0
+     */
+    public Configuration loadConfig() throws ConfigurationException {
+
+        Configuration config
+
+        PropertiesBuilderParameters propertyParameters = new Parameters().properties()
+        propertyParameters.setFile(SAMPLES_PROPERTIES_FILE)
+        propertyParameters.setThrowExceptionOnMissing(true)
+
+        BUILDER.configure(propertyParameters)
+
+        config = BUILDER.getConfiguration()
+
+        writeToOutput("Proactive examples configuration loaded")
+
+        return config
+    }
+
+    public void updateConfig(){
+        configuration.setProperty(PROACTIVE_EXAMPLES_LOADED, Boolean.TRUE.toString())
+        configuration.setProperty(PROACTIVE_EXAMPLES_LAST_LOADED_PACKAGE, "")
+        BUILDER.save()
+    }
 
     def run() {
-        writeToOutput(" Automatic deployment of proactive packages ...")
 
-        writeToOutput(" Variables : ")
-        writeToOutput(" EXAMPLES_ZIP_PATH " + this.EXAMPLES_ZIP_PATH)
-        writeToOutput(" EXAMPLES_DIR_PATH " + this.EXAMPLES_DIR_PATH)
+        if (!configuration.getBoolean(PROACTIVE_EXAMPLES_LOADED)) {
+            writeToOutput(" Automatic deployment of proactive packages ...")
+            writeToOutput(" Variables : ")
+            writeToOutput(" EXAMPLES_ZIP_PATH " + this.EXAMPLES_ZIP_PATH)
+            writeToOutput(" EXAMPLES_DIR_PATH " + this.EXAMPLES_DIR_PATH)
 
-        writeToOutput(" Actions : ")
+            writeToOutput(" Actions : ")
 
-        // If the unzipped dir already exists, stop the script execution
-        def examples_dir = new File(this.EXAMPLES_DIR_PATH)
-        if (examples_dir.exists()) {
+            def examples_dir = new File(this.EXAMPLES_DIR_PATH)
+            // If the unzipped dir already exists, do nothing
+            if (examples_dir.exists()) {
+                writeToOutput(this.EXAMPLES_DIR_PATH + " already exists, delete it to redeploy packages.")
+                writeToOutput("Terminated.")
+            } else {
+                // Unzip the examples
+                def examples_zip = new File(this.EXAMPLES_ZIP_PATH)
+                if (!examples_zip.exists()) {
+                    writeToOutput(this.EXAMPLES_ZIP_PATH + " not found!")
+                    return
+                }
+                unzipFile(examples_zip, this.EXAMPLES_DIR_PATH)
+                writeToOutput(this.EXAMPLES_ZIP_PATH + " extracted!")
+            }
+
+            println "Loading workflow and utility packages..."
+
+            // Connect to the scheduler
+            package_loader.loginAdminUserCredToSchedulerAndGetSessionId()
+
+            // Create buckets following the ordered bucket list
+            new File(examples_dir, "ordered_bucket_list").text.split(",").each { bucket ->
+                package_loader.createBucketIfNotExist(bucket)
+            }
+
+            //sort packages to simplify the recovery loading behavior
+            def directoryFilter = new FileFilter() {
+                boolean accept(File file) {
+                    return file.isDirectory()
+                }}
+            File[] packages = examples_dir.listFiles(directoryFilter)
+            Arrays.sort(packages)
+
+            //load only remaining packages in case proactive.examples.last.loaded.package property is not empty
+            lastLoadedPackage = configuration.getString(PROACTIVE_EXAMPLES_LAST_LOADED_PACKAGE)
+            if(!lastLoadedPackage.equals("")){
+                packages = Arrays.copyOfRange(packages, ArrayUtils.indexOf(packages, new File(lastLoadedPackage)), packages.length-1)
+            }
+
+
+            // Load all packages
+            for(File package_dir : packages) {
+                package_loader.run(package_dir, false)
+                lastLoadedPackage = package_dir.getPath()
+            }
+            //update sample.properties
+            updateConfig()
+
+            writeToOutput(" ... proactive packages deployed!")
+            println "Packages successfully loaded"
+        } else {
             writeToOutput(this.EXAMPLES_DIR_PATH + " already exists, delete it to redeploy packages.")
-            writeToOutput("Terminated.")
             println "Workflow and utility packages already loaded"
-            return
         }
-
-        // Unzip the examples
-        def examples_zip = new File(this.EXAMPLES_ZIP_PATH)
-        if (!examples_zip.exists()) {
-            writeToOutput(this.EXAMPLES_ZIP_PATH + " not found!")
-            return
-        }
-
-        println "Loading workflow and utility packages..."
-
-        unzipFile(examples_zip, this.EXAMPLES_DIR_PATH)
-        writeToOutput(this.EXAMPLES_ZIP_PATH + " extracted!")
-
-        // Connect to the scheduler
-        package_loader.loginAdminUserCredToSchedulerAndGetSessionId()
-
-        // Create buckets following the ordered bucket list
-        new File(examples_dir, "ordered_bucket_list").text.split(",").each { bucket ->
-            package_loader.createBucketIfNotExist(bucket)
-        }
-
-        // Load all packages without loading each package dependencies
-        examples_dir.eachDir { package_dir ->
-            package_loader.run(package_dir, false)
-        }
-
-        writeToOutput(" ... proactive packages deployed!")
-        writeToOutput(" Terminated.")
-        println "Packages successfully loaded"
     }
 }
-instance = null;
+
+instance = null
 try {
     instance = new LoadPackages(this.binding)
     instance.run()
