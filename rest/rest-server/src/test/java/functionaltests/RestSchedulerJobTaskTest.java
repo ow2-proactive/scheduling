@@ -151,6 +151,19 @@ public class RestSchedulerJobTaskTest extends AbstractRestFuncTestCase {
     }
 
     @Test
+    public void testSubmitFromUrl() throws Exception {
+        String schedulerUrl = getResourceUrl("jobs");
+        HttpPost httpPost = new HttpPost(schedulerUrl);
+        setSessionHeader(httpPost);
+        File jobFile = RestFuncTHelper.getDefaultJobXmlfile();
+        httpPost.setHeader("link", jobFile.toURI().toURL().toExternalForm());
+        HttpResponse response = executeUriRequest(httpPost);
+        assertHttpStatusOK(response);
+        JSONObject jsonObj = toJsonObject(response);
+        assertNotNull(jsonObj.get("id").toString());
+    }
+
+    @Test
     public void testUrlMatrixParamsShouldReplaceJobVariables() throws Exception {
         File jobFile = new File(RestSchedulerJobTaskTest.class.getResource("config/job_matrix_params.xml").toURI());
 

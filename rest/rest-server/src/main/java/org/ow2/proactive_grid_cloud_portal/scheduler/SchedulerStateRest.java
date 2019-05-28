@@ -67,6 +67,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -96,6 +97,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.dataspace.RestDataspaceImpl;
+import org.ow2.proactive_grid_cloud_portal.scheduler.client.SchedulerRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.*;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventNotification;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.eventing.EventSubscription;
@@ -2325,7 +2327,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         Response response = null;
         try {
-            ResteasyClient client = new ResteasyClientBuilder().build();
+            ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
+            SchedulerRestClient.registerGzipEncoding(providerFactory);
+            ResteasyClient client = new ResteasyClientBuilder().providerFactory(providerFactory).build();
             ResteasyWebTarget target = client.target(PortalConfiguration.JOBPLANNER_URL.getValueAsString());
             response = target.request()
                              .header("sessionid", sessionId)
