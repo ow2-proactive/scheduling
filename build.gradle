@@ -326,7 +326,6 @@ dependencies {
 
     compile 'org.codehaus.groovy:groovy-all:2.4.12'
     compile 'commons-io:commons-io:2.5'
-    compile 'org.apache.commons:commons-configuration2:2.2'
 }
 
 task dist(type: Sync) {
