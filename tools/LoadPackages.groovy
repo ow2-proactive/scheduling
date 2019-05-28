@@ -4,6 +4,8 @@ import org.codehaus.groovy.runtime.StackTraceUtils
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipFile
+import org.apache.commons.io.FileUtils;
+
 
 class LoadPackages {
 
@@ -88,6 +90,7 @@ class LoadPackages {
             println "Workflow and utility packages already loaded"
             return
         } else {
+            FileUtils.deleteQuietly(examples_dir)
             // Unzip the examples
             def examples_zip = new File(this.EXAMPLES_ZIP_PATH)
             if (!examples_zip.exists()) {
