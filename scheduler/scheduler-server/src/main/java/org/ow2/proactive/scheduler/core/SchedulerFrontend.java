@@ -493,7 +493,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             long d3 = t3 - t2;
             long d4 = t4 - t3;
             long d5 = t5 - t4;
-            logger.debug(String.format("%d;%d;%d;%d;%d;%d", job.getId().longValue(), d1, d2, d3, d4, d5));
+            logger.debug(String.format("timer;%d;%d;%d;%d;%d;%d", job.getId().longValue(), d1, d2, d3, d4, d5));
             return job.getId();
         } catch (Exception e) {
             logger.warn("Error when submitting job.", e);

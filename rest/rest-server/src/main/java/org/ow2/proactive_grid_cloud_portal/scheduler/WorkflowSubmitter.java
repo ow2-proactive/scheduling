@@ -96,7 +96,7 @@ public class WorkflowSubmitter {
             long d1 = t1 - t0;
             long d2 = t2 - t1;
             long d3 = t3 - t2;
-            logger.debug(String.format("%d;%d;%d;%d", jobId.longValue(), d1, d2, d3));
+            logger.debug(String.format("timer;%d;%d;%d;%d", jobId.longValue(), d1, d2, d3));
             return jobId;
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
