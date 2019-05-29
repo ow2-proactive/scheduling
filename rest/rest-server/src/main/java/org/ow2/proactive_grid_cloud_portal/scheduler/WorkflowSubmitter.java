@@ -78,17 +78,25 @@ public class WorkflowSubmitter {
             throws NotConnectedRestException, PermissionRestException, SubmissionClosedRestException,
             JobCreationRestException {
         try {
+            long t0 = System.currentTimeMillis();
             Job job = createJobObject(workflowFile, variables, genericInfos);
+            long t1 = System.currentTimeMillis();
             JobId jobId = scheduler.submit(job);
+            long t2 = System.currentTimeMillis();
             // Create Job's SVG visualization file
             String visualization = job.getVisualization();
             File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId.value()) + ".html");
+            long t3 = System.currentTimeMillis();
             Files.deleteIfExists(visualizationFile.toPath());
             if (visualization != null && !visualization.isEmpty()) {
                 FileUtils.write(new File(visualizationFile.getAbsolutePath()),
                                 job.getVisualization(),
                                 Charset.forName(FILE_ENCODING));
             }
+            long d1 = t1 - t0;
+            long d2 = t2 - t1;
+            long d3 = t3 - t2;
+            logger.debug(String.format("%d;%d;%d;%d", jobId.longValue(), d1, d2, d3));
             return jobId;
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
