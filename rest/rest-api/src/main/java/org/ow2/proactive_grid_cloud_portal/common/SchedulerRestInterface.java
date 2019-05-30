@@ -39,6 +39,7 @@ import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -2011,7 +2012,7 @@ public interface SchedulerRestInterface {
 
     @POST
     @Path("/credentials/{key}")
-    void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") String key,
+    void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") @Encoded String key,
             @FormParam("value") String value)
             throws NotConnectedRestException, PermissionRestException, SchedulerRestException;
 
