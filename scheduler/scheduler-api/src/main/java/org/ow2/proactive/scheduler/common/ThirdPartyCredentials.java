@@ -63,5 +63,5 @@ public interface ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
-    void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException;
+    void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException, KeyException;
 }

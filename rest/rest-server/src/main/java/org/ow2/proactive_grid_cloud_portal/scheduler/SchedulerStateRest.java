@@ -3338,14 +3338,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         } catch (KeyException e) {
             throw new SchedulerRestException(e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             throw new SchedulerRestException(e);
         }
     }
 
     @Override
     public void removeThirdPartyCredential(String sessionId, String key)
-            throws NotConnectedRestException, PermissionRestException {
+            throws NotConnectedRestException, PermissionRestException, SchedulerRestException {
         try {
             key = java.net.URLDecoder.decode(key, Charsets.UTF_8.displayName());
             Scheduler s = checkAccess(sessionId);
@@ -3354,8 +3354,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
-        } catch (UnsupportedEncodingException e) {
-            throw new NotConnectedRestException(e);
+        } catch (Exception e) {
+            throw new SchedulerRestException(e);
         }
     }
 

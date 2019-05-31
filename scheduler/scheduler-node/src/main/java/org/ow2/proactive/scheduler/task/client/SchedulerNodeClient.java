@@ -824,7 +824,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException, KeyException {
         renewSession();
         client.removeThirdPartyCredential(key);
     }

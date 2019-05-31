@@ -2019,7 +2019,7 @@ public interface SchedulerRestInterface {
     @DELETE
     @Path("/credentials/{key}")
     void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") @Encoded String key)
-            throws NotConnectedRestException, PermissionRestException;
+            throws NotConnectedRestException, PermissionRestException, SchedulerRestException;
 
     @GET
     @Path("/credentials/")

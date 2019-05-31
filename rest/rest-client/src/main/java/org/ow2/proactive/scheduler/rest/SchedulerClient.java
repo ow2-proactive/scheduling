@@ -1157,13 +1157,15 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException, KeyException {
         try {
             restApi().removeThirdPartyCredential(sid, key);
         } catch (NotConnectedRestException e) {
             throw new NotConnectedException(e);
         } catch (PermissionRestException e) {
             throw new PermissionException(e);
+        } catch (SchedulerRestException e) {
+            throw new KeyException(e);
         }
     }
 
