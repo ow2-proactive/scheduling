@@ -38,6 +38,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -317,6 +318,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         Assert.assertThat(jobLog, CoreMatchers.containsString("GLOBALSPACE_FILE_LIST_NOT_NULL=true"));
         //assert globalspaceapi.connect() worked
         Assert.assertThat(jobLog, CoreMatchers.containsString("TEST_CREDS=mypassword_" + jobId.toString()));
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void createThirdPartyCredentials() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        client.putThirdPartyCredential("key/slash", "value/slash");
+        Set<String> keySet = client.thirdPartyCredentialsKeySet();
+        System.out.println("Server Third-Party Credentials : " + keySet);
+        Job job = createJob(JobResultTask.class);
+        Assert.assertTrue("credentials should contain the key", keySet.contains("key/slash"));
     }
 
     @Test(timeout = MAX_WAIT_TIME)
