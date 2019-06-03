@@ -78,7 +78,7 @@ public class HybridEncryptionUtil {
         return decryptedData;
     }
 
-    public static HybridEncryptedData encrypt(PublicKey publicKey, String cipher, byte[] message) {
+    public static HybridEncryptedData encrypt(PublicKey publicKey, String cipher, byte[] message) throws KeyException {
         // generate symmetric key
         SecretKey aesKey = KeyUtil.generateKey(AES_ALGO, AES_KEYSIZE);
 
@@ -89,14 +89,14 @@ public class HybridEncryptionUtil {
         try {
             encAes = KeyPairUtil.encrypt(publicKey, cipher, aesKey.getEncoded());
         } catch (KeyException e) {
-            throw new RuntimeException("Symmetric key encryption failed", e);
+            throw new KeyException("Symmetric key encryption failed", e);
         }
 
         // encrypt clear credentials with AES key
         try {
             encData = KeyUtil.encrypt(aesKey, AES_CIPHER, message);
         } catch (KeyException e) {
-            throw new RuntimeException("Message encryption failed", e);
+            throw new KeyException("Message encryption failed", e);
         }
         return new HybridEncryptedData(encAes, encData);
     }
@@ -109,7 +109,7 @@ public class HybridEncryptionUtil {
         }
     }
 
-    public static HybridEncryptedData encryptString(String value, PublicKey publicKey) {
+    public static HybridEncryptedData encryptString(String value, PublicKey publicKey) throws KeyException {
         try {
             byte[] valueAsBytes = value.getBytes(ENCRYPTED_STRING_CHARSET);
             return encrypt(publicKey, STRING_ENCRYPTION_CIPHER, valueAsBytes);
@@ -126,7 +126,8 @@ public class HybridEncryptionUtil {
         return decryptString(encryptedData, privateKey);
     }
 
-    public static String encryptStringToBase64(String value, PublicKey publicKey, String separator) {
+    public static String encryptStringToBase64(String value, PublicKey publicKey, String separator)
+            throws KeyException {
         HybridEncryptedData data = encryptString(value, publicKey);
         return Base64.encodeBase64String(data.getEncryptedData()) + separator +
                Base64.encodeBase64String(data.getEncryptedSymmetricKey());

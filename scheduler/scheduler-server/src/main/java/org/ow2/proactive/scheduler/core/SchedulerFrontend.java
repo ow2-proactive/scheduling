@@ -56,6 +56,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1444,8 +1445,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
 
-        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encryptString(value,
-                                                                                                    corePublicKey);
+        HybridEncryptionUtil.HybridEncryptedData encryptedData = null;
+        try {
+            encryptedData = HybridEncryptionUtil.encryptString(value, corePublicKey);
+        } catch (KeyException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         dbManager.putThirdPartyCredential(ident.getUsername(), key, encryptedData);
     }
 
