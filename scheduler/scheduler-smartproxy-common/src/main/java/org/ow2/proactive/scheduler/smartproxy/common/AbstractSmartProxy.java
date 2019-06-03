@@ -30,7 +30,6 @@ import static com.google.common.base.Throwables.propagate;
 import static com.google.common.base.Throwables.propagateIfInstanceOf;
 
 import java.io.File;
-import java.security.KeyException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -1239,7 +1238,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
 
     @Override
     public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException {
+            throws NotConnectedException, PermissionException {
         getScheduler().putThirdPartyCredential(key, value);
     }
 
@@ -1249,7 +1248,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException, KeyException {
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
         getScheduler().removeThirdPartyCredential(key);
     }
 

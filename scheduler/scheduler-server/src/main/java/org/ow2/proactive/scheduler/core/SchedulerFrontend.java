@@ -56,7 +56,6 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.security.KeyException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Date;
@@ -154,7 +153,6 @@ import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.NodeSet;
@@ -1443,7 +1441,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
 
     @Override
     public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException {
+            throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
 

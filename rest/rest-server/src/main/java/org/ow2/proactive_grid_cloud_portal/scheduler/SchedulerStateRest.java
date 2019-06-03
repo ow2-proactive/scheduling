@@ -109,7 +109,6 @@ import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 import com.google.common.base.Charsets;
-import com.google.common.net.UrlEscapers;
 
 
 /**
@@ -3336,8 +3335,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
-        } catch (KeyException e) {
-            throw new SchedulerRestException(e);
         } catch (Exception e) {
             throw new SchedulerRestException(e);
         }

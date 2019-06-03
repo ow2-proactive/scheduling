@@ -25,7 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common;
 
-import java.security.KeyException;
 import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -45,10 +44,9 @@ public interface ThirdPartyCredentials {
      * @param value the third-party credential value to store, it will be encrypted
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
-     * @throws KeyException if encryption of value fails
      */
     void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException;
+            throws NotConnectedException, PermissionException;
 
     /**
      * @return all third-party credential keys stored for the current user
@@ -63,5 +61,5 @@ public interface ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
-    void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException, KeyException;
+    void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException;
 }

@@ -50,7 +50,6 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1133,7 +1132,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
 
     @Override
     public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException {
+            throws NotConnectedException, PermissionException{
         try {
             restApi().putThirdPartyCredential(sid, key, value);
         } catch (NotConnectedRestException e) {
@@ -1141,7 +1140,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         } catch (PermissionRestException e) {
             throw new PermissionException(e);
         } catch (SchedulerRestException e) {
-            throw new KeyException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -1157,7 +1156,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException, KeyException {
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
         try {
             restApi().removeThirdPartyCredential(sid, key);
         } catch (NotConnectedRestException e) {
@@ -1165,7 +1164,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         } catch (PermissionRestException e) {
             throw new PermissionException(e);
         } catch (SchedulerRestException e) {
-            throw new KeyException(e);
+            throw new RuntimeException(e);
         }
     }
 
