@@ -1131,8 +1131,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException{
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         try {
             restApi().putThirdPartyCredential(sid, key, value);
         } catch (NotConnectedRestException e) {

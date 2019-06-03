@@ -810,8 +810,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException{
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         renewSession();
         client.putThirdPartyCredential(key, value);
     }
@@ -823,7 +822,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException{
+    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
         renewSession();
         client.removeThirdPartyCredential(key);
     }

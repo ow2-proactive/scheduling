@@ -1440,8 +1440,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException {
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
 

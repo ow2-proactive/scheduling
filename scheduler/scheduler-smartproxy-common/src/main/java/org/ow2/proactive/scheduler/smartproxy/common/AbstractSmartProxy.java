@@ -1237,8 +1237,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException {
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         getScheduler().putThirdPartyCredential(key, value);
     }
 

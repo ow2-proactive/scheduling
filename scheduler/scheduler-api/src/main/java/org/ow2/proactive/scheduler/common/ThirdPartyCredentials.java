@@ -45,8 +45,7 @@ public interface ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
-    void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException;
+    void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException;
 
     /**
      * @return all third-party credential keys stored for the current user
