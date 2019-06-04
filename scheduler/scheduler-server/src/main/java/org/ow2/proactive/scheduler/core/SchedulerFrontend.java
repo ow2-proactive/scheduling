@@ -154,7 +154,6 @@ import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.NodeSet;
@@ -1442,13 +1441,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException {
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
 
-        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encryptString(value,
-                                                                                                    corePublicKey);
+        HybridEncryptionUtil.HybridEncryptedData encryptedData = null;
+        try {
+            encryptedData = HybridEncryptionUtil.encryptString(value, corePublicKey);
+        } catch (KeyException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         dbManager.putThirdPartyCredential(ident.getUsername(), key, encryptedData);
     }
 

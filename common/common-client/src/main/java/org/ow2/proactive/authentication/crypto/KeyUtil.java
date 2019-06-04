@@ -67,14 +67,13 @@ public class KeyUtil {
      * @param size size of the generated key, must be one of 128, 192, 256. Use 128 when unsure,
      *             default configurations and providers should refuse to use longer keys.
      * @return the generated key
-     * @throws KeyException key generation or saving failed
      */
-    public static synchronized SecretKey generateKey(String algorithm, int size) throws KeyException {
+    public static synchronized SecretKey generateKey(String algorithm, int size) {
         KeyGenerator keyGen = null;
         try {
             keyGen = KeyGenerator.getInstance(algorithm);
         } catch (NoSuchAlgorithmException e) {
-            throw new KeyException("Cannot initialize key generator", e);
+            throw new RuntimeException("Cannot initialize key generator", e);
         }
 
         keyGen.init(size, getSecureRandom());

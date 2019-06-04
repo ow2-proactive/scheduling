@@ -324,10 +324,16 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     public void createThirdPartyCredentials() throws Throwable {
         ISchedulerClient client = clientInstance();
         client.putThirdPartyCredential("key/slash", "value/slash");
-        Set<String> keySet = client.thirdPartyCredentialsKeySet();
-        System.out.println("Server Third-Party Credentials : " + keySet);
-        Job job = createJob(JobResultTask.class);
-        Assert.assertTrue("credentials should contain the key", keySet.contains("key/slash"));
+        Set<String> keySet1 = client.thirdPartyCredentialsKeySet();
+        System.out.println("Server Third-Party Credentials : " + keySet1);
+        Job job1 = createJob(JobResultTask.class);
+        Assert.assertTrue("credentials should contain the key", keySet1.contains("key/slash"));
+        client.removeThirdPartyCredential("key/slash");
+        Set<String> keySet2 = client.thirdPartyCredentialsKeySet();
+        System.out.println("Server Third-Party Credentials : " + keySet2);
+        Job job2 = createJob(JobResultTask.class);
+        Assert.assertFalse("credentials should not contain the key", keySet2.contains("key/slash"));
+
     }
 
     @Test(timeout = MAX_WAIT_TIME)
