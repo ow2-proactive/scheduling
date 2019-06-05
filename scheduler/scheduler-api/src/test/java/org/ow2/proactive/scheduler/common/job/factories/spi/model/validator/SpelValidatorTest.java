@@ -69,7 +69,7 @@ public class SpelValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType() throws ValidationException {
-        SpelValidator validator = new SpelValidator("T(java.lang.Runtime).exec('hostname').waitFor() instanceof T(Integer)");
+        SpelValidator validator = new SpelValidator("T(java.lang.Runtime).getRuntime().exec('hostname').waitFor() instanceof T(Integer)");
         String value = "MyString123";
         validator.validate(value, new ModelValidatorContext(context));
     }
