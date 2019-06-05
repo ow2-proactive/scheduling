@@ -28,6 +28,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 import java.util.regex.PatternSyntaxException;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.exception.UserException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
@@ -44,19 +45,40 @@ import com.google.common.collect.ImmutableMap;
 
 public class SpelValidatorTest {
 
+    private StandardEvaluationContext context;
+
+    @Before
+    public void before() {
+        context = new StandardEvaluationContext();
+        context.setTypeLocator(new ModelValidatorContext.RestrictedTypeLocator());
+    }
+
     @Test
     public void testSpelOK() throws ValidationException {
         SpelValidator validator = new SpelValidator("#value == 'MyString'");
         String value = "MyString";
-        Assert.assertEquals(value,
-                            validator.validate(value, new ModelValidatorContext(new StandardEvaluationContext())));
+        Assert.assertEquals(value, validator.validate(value, new ModelValidatorContext(context)));
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelKO() throws ValidationException {
         SpelValidator validator = new SpelValidator("#value == 'MyString'");
         String value = "MyString123";
-        validator.validate(value, new ModelValidatorContext(new StandardEvaluationContext()));
+        validator.validate(value, new ModelValidatorContext(context));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testSpelUnauthorizedType() throws ValidationException {
+        SpelValidator validator = new SpelValidator("T(Runtime).exec('hostname').waitFor() instanceof T(Integer)");
+        String value = "MyString123";
+        validator.validate(value, new ModelValidatorContext(context));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testSpelUnauthorizedType2() throws ValidationException {
+        SpelValidator validator = new SpelValidator("T(java.lang.Runtime).getRuntime().exec('sleep 100') instanceof T(Integer)");
+        String value = "MyString123";
+        validator.validate(value, new ModelValidatorContext(context));
     }
 
     @Test
