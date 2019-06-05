@@ -629,8 +629,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, KeyException, PermissionException {
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         uischeduler.putThirdPartyCredential(key, value);
     }
 
