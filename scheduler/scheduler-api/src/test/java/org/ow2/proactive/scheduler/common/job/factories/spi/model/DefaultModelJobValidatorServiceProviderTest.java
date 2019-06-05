@@ -166,7 +166,7 @@ public class DefaultModelJobValidatorServiceProviderTest {
                                          new JobVariable("var1",
                                                          "value1",
                                                          SPEL_LEFT +
-                                                                   "T(Runtime).exec('hostname').waitFor() instanceof T(Integer)" +
+                                                                   "T(java.lang.Runtime).exec('hostname').waitFor() instanceof T(Integer)" +
                                                                    SPEL_RIGHT)));
         return job;
     }

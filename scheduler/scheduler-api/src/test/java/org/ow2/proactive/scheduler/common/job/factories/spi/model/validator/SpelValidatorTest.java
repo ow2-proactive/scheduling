@@ -69,14 +69,14 @@ public class SpelValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType() throws ValidationException {
-        SpelValidator validator = new SpelValidator("T(Runtime).exec('hostname').waitFor() instanceof T(Integer)");
+        SpelValidator validator = new SpelValidator("T(java.lang.Runtime).exec('hostname').waitFor() instanceof T(Integer)");
         String value = "MyString123";
         validator.validate(value, new ModelValidatorContext(context));
     }
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType2() throws ValidationException {
-        SpelValidator validator = new SpelValidator("T(java.lang.Runtime).getRuntime().exec('sleep 100') instanceof T(Integer)");
+        SpelValidator validator = new SpelValidator("T(java.lang.Runtime).getRuntime().exec('sleep 100').waitFor() instanceof T(Integer)");
         String value = "MyString123";
         validator.validate(value, new ModelValidatorContext(context));
     }
