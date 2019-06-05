@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.task.client;
 import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
-import java.security.KeyException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -811,8 +810,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException {
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         renewSession();
         client.putThirdPartyCredential(key, value);
     }

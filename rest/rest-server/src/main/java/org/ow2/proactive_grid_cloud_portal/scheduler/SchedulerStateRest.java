@@ -109,7 +109,6 @@ import org.ow2.proactive_grid_cloud_portal.webapp.DateFormatter;
 import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 import com.google.common.base.Charsets;
-import com.google.common.net.UrlEscapers;
 
 
 /**
@@ -3336,23 +3335,24 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
-        } catch (KeyException e) {
-            throw new SchedulerRestException(e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             throw new SchedulerRestException(e);
         }
     }
 
     @Override
     public void removeThirdPartyCredential(String sessionId, String key)
-            throws NotConnectedRestException, PermissionRestException {
+            throws NotConnectedRestException, PermissionRestException, SchedulerRestException {
         try {
+            key = java.net.URLDecoder.decode(key, Charsets.UTF_8.displayName());
             Scheduler s = checkAccess(sessionId);
             s.removeThirdPartyCredential(key);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
+        } catch (Exception e) {
+            throw new SchedulerRestException(e);
         }
     }
 
