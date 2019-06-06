@@ -71,7 +71,7 @@ public class SpelValidatorTest {
     public void testSpelMathOK() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(java.lang.Math).random() instanceof T(Double)");
         String value = "true";
-        validator.validate(value, new ModelValidatorContext(context));
+        Assert.assertEquals(value, validator.validate(value, new ModelValidatorContext(context)));
     }
 
     @Test
@@ -101,7 +101,6 @@ public class SpelValidatorTest {
         String value = "value";
         validator.validate(value, new ModelValidatorContext(context));
     }
-
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType2() throws ValidationException {
