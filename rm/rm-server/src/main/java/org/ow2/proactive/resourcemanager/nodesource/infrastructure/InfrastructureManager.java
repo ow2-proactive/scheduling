@@ -1087,7 +1087,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
             try {
                 Class.forName(RMDeployingNode.class.getName(), true, RMDeployingNode.class.getClassLoader());
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                logger.error("Error when loading RMDeployingNode class", e);
             }
             return RMDeployingNodeAccessor.DEFAULT;
         }

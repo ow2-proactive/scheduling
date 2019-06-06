@@ -40,7 +40,9 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.utils.FileToBytesConverter;
@@ -57,6 +59,9 @@ import org.ow2.proactive.utils.FileToBytesConverter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "pluginDescriptor")
 public class PluginDescriptor implements Serializable {
+
+    @XmlTransient
+    private final static Logger logger = Logger.getLogger(PluginDescriptor.class);
 
     private String pluginName;
 
@@ -83,7 +88,7 @@ public class PluginDescriptor implements Serializable {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error when reading configurable fields", e);
         }
     }
 

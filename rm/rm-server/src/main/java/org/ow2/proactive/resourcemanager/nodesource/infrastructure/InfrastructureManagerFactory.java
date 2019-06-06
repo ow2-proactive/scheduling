@@ -49,6 +49,8 @@ public class InfrastructureManagerFactory {
     /** list of supported infrastructures */
     private static Collection<Class<?>> supportedInfrastructures;
 
+    private static final Logger logger = Logger.getLogger(InfrastructureManagerFactory.class);
+
     /**
      * Creates new infrastructure manager using reflection mechanism.
      *
@@ -101,8 +103,9 @@ public class InfrastructureManagerFactory {
     public static Collection<Class<?>> getSupportedInfrastructures() {
         // reload file each time as it can be updated while the rm is running
         Properties properties = new Properties();
+        String propFileName = null;
         try {
-            String propFileName = PAResourceManagerProperties.RM_NODESOURCE_INFRASTRUCTURE_FILE.getValueAsString();
+            propFileName = PAResourceManagerProperties.RM_NODESOURCE_INFRASTRUCTURE_FILE.getValueAsString();
             if (!(new File(propFileName).isAbsolute())) {
                 // file path is relative, so we complete the path with the prefix RM_Home constant
                 propFileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + propFileName;
@@ -112,7 +115,7 @@ public class InfrastructureManagerFactory {
                 properties.load(stream);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error when loading infrastructure definition file : " + propFileName, e);
         }
 
         supportedInfrastructures = new ArrayList<>(properties.size());
@@ -122,7 +125,7 @@ public class InfrastructureManagerFactory {
                 Class<?> cls = Class.forName(className.toString());
                 supportedInfrastructures.add(cls);
             } catch (ClassNotFoundException e) {
-                Logger.getLogger(InfrastructureManagerFactory.class).warn("Cannot find class " + className.toString());
+                logger.error("Cannot find infrastructure class " + className.toString());
             }
         }
 
