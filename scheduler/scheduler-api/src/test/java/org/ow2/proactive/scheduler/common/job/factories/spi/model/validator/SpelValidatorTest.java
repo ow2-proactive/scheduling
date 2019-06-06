@@ -76,23 +76,23 @@ public class SpelValidatorTest {
 
     @Test
     public void testSpelXmlOK() throws ValidationException {
-        SpelValidator validator = new SpelValidator("T(javax.xml.parsers.DocumentBuilderFactory).newInstance().newDocumentBuilder().parse(new org.xml.sax.InputSource(new java.io.StringReader('<employee id=\"101\"><name>toto</name><title>Author</title></employee>'))).getElementsByTagName('name').item(0).getTextContent() instanceof T(String)");
+        SpelValidator validator = new SpelValidator("T(javax.xml.parsers.DocumentBuilderFactory).newInstance().newDocumentBuilder().parse(new org.xml.sax.InputSource(new java.io.StringReader('<employee id=\"101\"><name>toto</name><title>tata</title></employee>'))).getElementsByTagName('name').item(0).getTextContent() instanceof T(String)");
         String value = "toto";
-        validator.validate(value, new ModelValidatorContext(context));
+        Assert.assertEquals(value, validator.validate(value, new ModelValidatorContext(context)));
     }
 
     @Test
     public void testSpelJSONOK() throws ValidationException {
         SpelValidator validator = new SpelValidator("new org.codehaus.jackson.map.ObjectMapper().readTree('{\"var\": \"value\"}').get('var').getTextValue() instanceof T(String)");
         String value = "value";
-        validator.validate(value, new ModelValidatorContext(context));
+        Assert.assertEquals(value, validator.validate(value, new ModelValidatorContext(context)));
     }
 
     @Test
     public void testSpelJSONOK2() throws ValidationException {
         SpelValidator validator = new SpelValidator("new org.json.simple.parser.JSONParser().parse('{\"var\": \"value\"}').get('var').toString() instanceof T(String)");
         String value = "value";
-        validator.validate(value, new ModelValidatorContext(context));
+        Assert.assertEquals(value, validator.validate(value, new ModelValidatorContext(context)));
     }
 
     @Test(expected = ValidationException.class)
