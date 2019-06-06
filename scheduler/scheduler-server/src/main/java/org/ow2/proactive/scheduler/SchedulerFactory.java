@@ -234,7 +234,7 @@ public class SchedulerFactory {
             logger.debug("Scheduler is now ready to be started!");
             ServerJobAndTaskLogs.getInstance().configure();
         } catch (Exception e) {
-            logger.error(e);
+            logger.fatal(e);
             e.printStackTrace();
             throw new AdminSchedulerException(e.getMessage());
         }

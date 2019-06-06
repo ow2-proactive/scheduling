@@ -464,7 +464,7 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
                                                                          ts.getTaskInfo()));
                         }
                     } catch (NotConnectedException e) {
-                        e.printStackTrace();
+                        log.error("Scheduler connection error", e);
                     } catch (UnknownJobException e) {
                         log.error("Could not retrieve output data for job " + id +
                                   " because this job is not known by the Scheduler. \n ", e);

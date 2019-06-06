@@ -367,7 +367,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 metricsMonitorScheduler.start();
             }
         } catch (Exception e) {
-            logger.error("Failed to start Scheduler", e);
+            logger.fatal("Failed to start Scheduler", e);
             e.printStackTrace();
             System.exit(1);
         }
