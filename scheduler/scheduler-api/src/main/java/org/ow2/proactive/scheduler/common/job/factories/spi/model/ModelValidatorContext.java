@@ -133,6 +133,8 @@ public class ModelValidatorContext {
                                                                     "StringReader",
                                                                     "org.xml.sax.InputSource",
                                                                     "InputSource",
+                                                                    "org.json.simple.parser.JSONParser",
+                                                                    "JSONParser",
                                                                     "Date",
                                                                     "java.util.Date",
                                                                     "ImmutableSet",
@@ -158,7 +160,7 @@ public class ModelValidatorContext {
             registerImport("javax.xml.parsers");
             registerImport("org.xml.sax.map");
             registerImport("java.io");
-
+            registerImport("org.json.simple.parser");
         }
 
         /**

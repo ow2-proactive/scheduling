@@ -88,8 +88,8 @@ public class SpelValidatorTest {
         validator.validate(value, new ModelValidatorContext(context));
     }
 
-    @Test(expected = ValidationException.class)
-    public void testSpelUnauthorizedJSON() throws ValidationException {
+    @Test
+    public void testSpelJSONOK2() throws ValidationException {
         SpelValidator validator = new SpelValidator("new org.json.simple.parser.JSONParser().parse('{\"var\": \"value\"}').get('var').toString() instanceof T(String)");
         String value = "value";
         validator.validate(value, new ModelValidatorContext(context));
@@ -97,20 +97,28 @@ public class SpelValidatorTest {
 
     @Test(expected = ValidationException.class)
     public void testSpelUnauthorizedType() throws ValidationException {
+        SpelValidator validator = new SpelValidator("new x.y.z.Object().toString() instanceof T(String)");
+        String value = "value";
+        validator.validate(value, new ModelValidatorContext(context));
+    }
+
+
+    @Test(expected = ValidationException.class)
+    public void testSpelUnauthorizedType2() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(java.lang.Runtime).getRuntime().exec('hostname').waitFor() instanceof T(Integer)");
         String value = "MyString123";
         validator.validate(value, new ModelValidatorContext(context));
     }
 
     @Test(expected = ValidationException.class)
-    public void testSpelUnauthorizedType2() throws ValidationException {
+    public void testSpelUnauthorizedType3() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(java.lang.System).getenv('HOME').waitFor() instanceof T(Integer)");
         String value = "MyString123";
         validator.validate(value, new ModelValidatorContext(context));
     }
 
     @Test(expected = ValidationException.class)
-    public void testSpelUnauthorizedType3() throws ValidationException {
+    public void testSpelUnauthorizedType4() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(org.apache.commons.lang3.time.DateUtils).toCalendar('01/01/2000') instanceof T(Date)");
         String value = "true";
         validator.validate(value, new ModelValidatorContext(context));
