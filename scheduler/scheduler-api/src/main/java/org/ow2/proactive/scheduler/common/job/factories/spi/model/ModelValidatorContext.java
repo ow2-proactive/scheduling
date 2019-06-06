@@ -32,7 +32,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -121,12 +120,19 @@ public class ModelValidatorContext {
                                                                     "Double",
                                                                     "java.lang.Double",
                                                                     "Long",
-                                                                    "java.lang.Longit g",
+                                                                    "java.lang.Long",
                                                                     "Float",
                                                                     "java.lang.Float",
                                                                     "Math",
                                                                     "java.lang.Math",
-                                                                    "org.codehaus.jackson.JsonNode",
+                                                                    "org.codehaus.jackson.map.ObjectMapper",
+                                                                    "ObjectMapper",
+                                                                    "javax.xml.parsers.DocumentBuilderFactory",
+                                                                    "DocumentBuilderFactory",
+                                                                    "java.io.StringReader",
+                                                                    "StringReader",
+                                                                    "org.xml.sax.InputSource",
+                                                                    "InputSource",
                                                                     "Date",
                                                                     "java.util.Date",
                                                                     "ImmutableSet",
@@ -148,6 +154,11 @@ public class ModelValidatorContext {
             this.classLoader = classLoader;
             registerImport("java.lang");
             registerImport("com.google.common.collect");
+            registerImport("org.codehaus.jackson.map");
+            registerImport("javax.xml.parsers");
+            registerImport("org.xml.sax.map");
+            registerImport("java.io");
+
         }
 
         /**
