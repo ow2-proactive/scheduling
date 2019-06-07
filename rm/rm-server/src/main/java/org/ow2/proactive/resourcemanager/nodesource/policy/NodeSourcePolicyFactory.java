@@ -47,6 +47,8 @@ import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProper
  */
 public class NodeSourcePolicyFactory {
 
+    private static Logger logger = Logger.getLogger(NodeSourcePolicyFactory.class);
+
     /** list of supported policies */
     private static Collection<Class<?>> supportedPolicies;
 
@@ -125,8 +127,9 @@ public class NodeSourcePolicyFactory {
         // reload file each time as it can be updated while the rm is running
         supportedPolicies = new ArrayList<>();
         Properties properties = new Properties();
+        String propFileName = null;
         try {
-            String propFileName = PAResourceManagerProperties.RM_NODESOURCE_POLICY_FILE.getValueAsString();
+            propFileName = PAResourceManagerProperties.RM_NODESOURCE_POLICY_FILE.getValueAsString();
             if (!(new File(propFileName).isAbsolute())) {
                 //file path is relative, so we complete the path with the prefix RM_Home constant
                 propFileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + propFileName;
@@ -136,7 +139,7 @@ public class NodeSourcePolicyFactory {
                 properties.load(stream);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error when reading node source policies in file : " + propFileName, e);
         }
 
         for (Object className : properties.keySet()) {

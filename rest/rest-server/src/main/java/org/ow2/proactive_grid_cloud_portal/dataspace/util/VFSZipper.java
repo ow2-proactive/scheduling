@@ -123,7 +123,7 @@ public class VFSZipper {
                     zipEntry = zis.getNextEntry();
                 }
             } catch (IOException ioe) {
-                ioe.printStackTrace();
+                logger.error("Error when unzipping", ioe);
                 throw closer.rethrow(ioe);
             } finally {
                 closer.close();

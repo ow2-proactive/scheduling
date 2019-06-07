@@ -295,6 +295,7 @@ public class SchedulerStarter {
             startDiscovery(commandLine, rmUrl);
             LOGGER.info("The scheduler created on " + sai.getHostURL());
         } catch (Exception e) {
+            LOGGER.fatal("Error when starting scheduler", e);
             e.printStackTrace();
         }
 
