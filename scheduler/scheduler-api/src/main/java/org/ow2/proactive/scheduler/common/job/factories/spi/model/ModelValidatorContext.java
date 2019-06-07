@@ -26,11 +26,15 @@
 package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedMethodResolver;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedPropertyAccessor;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedTypeLocator;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -51,27 +55,26 @@ public class ModelValidatorContext {
 
     }
 
-    public ModelValidatorContext(Task task) {
-        Map<String, Serializable> taskVariablesValues = new LinkedHashMap<>();
-
-        for (TaskVariable taskVariable : task.getVariables().values()) {
-            taskVariablesValues.put(taskVariable.getName(), taskVariable.getValue());
-        }
-
-        spELVariables = new SpELVariables(taskVariablesValues);
+    private ModelValidatorContext(Map<String, Serializable> variablesValues) {
+        spELVariables = new SpELVariables(variablesValues);
         spelContext = new StandardEvaluationContext(spELVariables);
+        spelContext.setTypeLocator(new RestrictedTypeLocator());
+        spelContext.setMethodResolvers(Collections.singletonList(new RestrictedMethodResolver()));
+        spelContext.addPropertyAccessor(new RestrictedPropertyAccessor());
+    }
+
+    public ModelValidatorContext(Task task) {
+        this(task.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
+                                                           (m, v) -> m.put(v.getName(), v.getValue()),
+                                                           HashMap<String, Serializable>::putAll));
+
     }
 
     public ModelValidatorContext(TaskFlowJob job) {
+        this(job.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
+                                                          (m, v) -> m.put(v.getName(), v.getValue()),
+                                                          HashMap<String, Serializable>::putAll));
 
-        Map<String, Serializable> jobVariablesValues = new LinkedHashMap<>();
-
-        for (JobVariable jobVariable : job.getVariables().values()) {
-            jobVariablesValues.put(jobVariable.getName(), jobVariable.getValue());
-        }
-
-        spELVariables = new SpELVariables(jobVariablesValues);
-        spelContext = new StandardEvaluationContext(spELVariables);
     }
 
     public StandardEvaluationContext getSpELContext() {
