@@ -25,8 +25,6 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.utils;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.expression.EvaluationException;
@@ -78,16 +76,12 @@ public class RestrictedTypeLocator extends StandardTypeLocator {
                                                                 "ImmutableList",
                                                                 "com.google.common.collect.ImmutableList");
 
-    private final ClassLoader classLoader;
-
-    private final List<String> knownPackagePrefixes = new LinkedList<String>();
-
     public RestrictedTypeLocator() {
         this(ClassUtils.getDefaultClassLoader());
     }
 
     public RestrictedTypeLocator(ClassLoader classLoader) {
-        this.classLoader = classLoader;
+        super(classLoader);
         registerImport("java.lang");
         registerImport("com.google.common.collect");
         registerImport("org.codehaus.jackson.map");
