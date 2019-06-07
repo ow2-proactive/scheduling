@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import java.util.Collections;
 import java.util.regex.PatternSyntaxException;
 
 import org.junit.Assert;
@@ -35,6 +36,9 @@ import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedMethodResolver;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedPropertyAccessor;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedTypeLocator;
 import org.ow2.proactive.scheduler.common.task.JavaTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.TaskVariable;
@@ -50,7 +54,9 @@ public class SpelValidatorTest {
     @Before
     public void before() {
         context = new StandardEvaluationContext();
-        context.setTypeLocator(new ModelValidatorContext.RestrictedTypeLocator());
+        context.setTypeLocator(new RestrictedTypeLocator());
+        context.setMethodResolvers(Collections.singletonList(new RestrictedMethodResolver()));
+        context.addPropertyAccessor(new RestrictedPropertyAccessor());
     }
 
     @Test
@@ -120,6 +126,20 @@ public class SpelValidatorTest {
     public void testSpelUnauthorizedType4() throws ValidationException {
         SpelValidator validator = new SpelValidator("T(org.apache.commons.lang3.time.DateUtils).toCalendar('01/01/2000') instanceof T(Date)");
         String value = "true";
+        validator.validate(value, new ModelValidatorContext(context));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testSpelUnauthorizedMethod() throws ValidationException {
+        SpelValidator validator = new SpelValidator("(new java.lang.String()).getClass().forName('java.lang.Runtime').getDeclaredMethod('getRuntime').invoke(null).exec('hostname').waitFor() instanceof T(Integer)");
+        String value = "MyString123";
+        validator.validate(value, new ModelValidatorContext(context));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testSpelUnauthorizedAttribute() throws ValidationException {
+        SpelValidator validator = new SpelValidator("T(java.lang.String).class.forName('java.lang.Runtime').getDeclaredMethod('getRuntime').invoke(null).exec('hostname').waitFor() instanceof T(Integer)");
+        String value = "MyString123";
         validator.validate(value, new ModelValidatorContext(context));
     }
 
