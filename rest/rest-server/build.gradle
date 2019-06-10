@@ -101,7 +101,7 @@ task miredotDocZip(type: Zip) {
 
 task copyMiredotDoc(type: Copy, dependsOn: miredotDocZip) {
     from "${buildDir}/miredot"
-    into "$rootDir/dist/war/rest/doc"
+    into "$rootDir/dist/war/getstarted/doc/rest"
 }
 
 
