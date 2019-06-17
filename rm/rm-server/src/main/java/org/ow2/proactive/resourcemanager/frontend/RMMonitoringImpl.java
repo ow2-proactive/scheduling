@@ -81,6 +81,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
     /** Resource Manager's statistics */
     public static final RMStatistics rmStatistics = new RMStatistics();
 
+    private Set<String> aliveNodeSources = new HashSet<>();
+
     // ----------------------------------------------------------------------//
     // CONSTRUTORS
 
@@ -417,6 +419,11 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      * @see org.ow2.proactive.resourcemanager.frontend.RMEventListener#nodeEvent(org.ow2.proactive.resourcemanager.common.event.RMNodeEvent)
      */
     public void nodeEvent(RMNodeEvent event) {
+        if (event.getEventType() == RMEventType.NODE_ADDED || event.getEventType() == RMEventType.NODE_STATE_CHANGED) {
+            if (!aliveNodeSources.contains(event.getNodeSource())) {
+                return;
+            }
+        }
         RMMonitoringImpl.rmStatistics.nodeEvent(event);
         RMDBManager.getInstance().saveNodeHistory(new NodeHistory(event));
         queueEvent(event);
@@ -431,6 +438,12 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActi
      */
     public void nodeSourceEvent(RMNodeSourceEvent event) {
         queueEvent(event);
+        if (event.getEventType() == RMEventType.NODESOURCE_REMOVED ||
+            event.getEventType() == RMEventType.NODESOURCE_SHUTDOWN) {
+            aliveNodeSources.remove(event.getSourceName());
+        } else {
+            aliveNodeSources.add(event.getSourceName());
+        }
     }
 
     /**
