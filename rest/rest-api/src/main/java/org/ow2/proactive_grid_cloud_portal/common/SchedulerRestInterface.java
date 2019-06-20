@@ -936,6 +936,19 @@ public interface SchedulerRestInterface {
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
+     * e.g.
+     * request:  http://localhost:8080/rest/scheduler/jobs/tasks/results/precious/metadata?jobsid=102&jobsid=152
+     * response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
+     */
+    @GET
+    @GZIP
+    @Path("jobs/tasks/results/precious/metadata")
+    @Produces("application/json")
+    Map<Long, List<String>> getPreciousTaskNamess(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    /**
      * Returns the value of the task result of the task <code>taskName</code> of
      * the job <code>jobId</code> This method returns the result as a byte array
      * whatever the result is.
