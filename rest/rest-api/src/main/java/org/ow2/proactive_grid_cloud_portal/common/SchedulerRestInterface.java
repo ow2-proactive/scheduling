@@ -942,9 +942,9 @@ public interface SchedulerRestInterface {
      */
     @GET
     @GZIP
-    @Path("jobs/tasks/results/precious/metadata")
+    @Path("jobs/result/precious/metadata")
     @Produces("application/json")
-    Map<Long, List<String>> getPreciousTaskNamess(@HeaderParam("sessionid") String sessionId,
+    Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
             @QueryParam("jobsid") List<String> jobsId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 

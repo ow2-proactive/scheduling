@@ -1505,9 +1505,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     @GET
     @GZIP
-    @Path("jobs/tasks/results/precious/metadata")
+    @Path("jobs/result/precious/metadata")
     @Produces("application/json")
-    public Map<Long, List<String>> getPreciousTaskNamess(@HeaderParam("sessionid") String sessionId,
+    public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
             @QueryParam("jobsid") List<String> jobsId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
