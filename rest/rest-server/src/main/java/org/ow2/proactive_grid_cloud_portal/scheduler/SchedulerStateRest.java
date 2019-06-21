@@ -539,6 +539,32 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    // request:  http://localhost:8080/rest/scheduler/jobs/resultmap?jobsid=102&jobsid=152
+    // response: {"102": {"var1" : "val1", "var2" : "val2"},"152": {}}
+    @Override
+    public Map<Long, Map<String, String>> jobResultMaps(String sessionId, List<String> jobsId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        Map<Long, Map<String, String>> result = new HashMap<>();
+        try {
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + "/resultmap");
+            for (String jobId : jobsId) {
+
+                JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
+                if (jobResult != null) {
+                    Map<String, String> jobResultMapAsString = getJobResultMapAsString(jobResult.getResultMap());
+                    result.put(Long.parseLong(jobId), jobResultMapAsString);
+                }
+            }
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+        return result;
+    }
+
     public Map getJobResultMapAsString(Map<String, Serializable> source) {
         if (source == null) {
             return null;
@@ -546,7 +572,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return source.entrySet()
                      .stream()
                      .filter(entry -> entry.getValue() != null)
-                     .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue().toString()));
+                     .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().toString()));
 
     }
 
@@ -1501,6 +1527,34 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         }
+    }
+
+    // request:  http://localhost:8080/rest/scheduler/jobs/result/precious/metadata?jobsid=102&jobsid=152
+    // response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        Map<Long, List<String>> result = new HashMap<>();
+        try {
+            Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
+            for (String jobId : jobsId) {
+                result.put(Long.parseLong(jobId),
+                           scheduler.getPreciousTaskResults(jobId)
+                                    .stream()
+                                    .map(TaskResult::getTaskId)
+                                    .map(TaskId::getReadableName)
+                                    .collect(Collectors.toList()));
+            }
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
+
+        return result;
     }
 
     /**

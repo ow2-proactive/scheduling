@@ -238,6 +238,19 @@ public interface SchedulerRestInterface {
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
 
     /**
+     * @param sessionId a valid session id
+     * @param jobsId the list of job ids
+     * @return a map which contains job id as key and resultMap of this job as value
+     */
+    @GET
+    @GZIP
+    @Path("jobs/resultmap")
+    @Produces("application/json")
+    Map<Long, Map<String, String>> jobResultMaps(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId)
+            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+
+    /**
      * Returns the job info associated to the job referenced by the id
      * <code>jobid</code>
      * 
@@ -933,6 +946,19 @@ public interface SchedulerRestInterface {
     @Path("jobs/{jobid}/tasks/results/precious/metadata")
     @Produces("application/json")
     List<String> getPreciousTaskName(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    /**
+     * @param sessionId a valid session id
+     * @param jobsId the list of job ids
+     * @return a map where key is a job id, and value is list of precious tasks names of this job
+     **/
+    @GET
+    @GZIP
+    @Path("jobs/result/precious/metadata")
+    @Produces("application/json")
+    Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
