@@ -544,22 +544,23 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @Override
     public Map<Long, Map<String, String>> jobResultMaps(String sessionId, List<String> jobsId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
-        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobsId.get(0) + "/resultmap");
         Map<Long, Map<String, String>> result = new HashMap<>();
-        for (String jobId : jobsId) {
-            try {
+        try {
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobsId.get(0) + "/resultmap");
+            for (String jobId : jobsId) {
+
                 JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
                 if (jobResult != null) {
                     Map<String, String> jobResultMapAsString = getJobResultMapAsString(jobResult.getResultMap());
                     result.put(Long.parseLong(jobId), jobResultMapAsString);
                 }
-            } catch (PermissionException e) {
-                throw new PermissionRestException(e);
-            } catch (UnknownJobException e) {
-                throw new UnknownJobRestException(e);
-            } catch (NotConnectedException e) {
-                throw new NotConnectedRestException(e);
             }
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
         }
         return result;
     }
@@ -1534,25 +1535,25 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
             @QueryParam("jobsid") List<String> jobsId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
-        Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
-
         Map<Long, List<String>> result = new HashMap<>();
-        for (String jobId : jobsId) {
-            try {
+        try {
+            Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
+            for (String jobId : jobsId) {
                 result.put(Long.parseLong(jobId),
                            scheduler.getPreciousTaskResults(jobId)
                                     .stream()
                                     .map(TaskResult::getTaskId)
                                     .map(TaskId::getReadableName)
                                     .collect(Collectors.toList()));
-            } catch (NotConnectedException e) {
-                throw new NotConnectedRestException(e);
-            } catch (UnknownJobException e) {
-                throw new UnknownJobRestException(e);
-            } catch (PermissionException e) {
-                throw new PermissionRestException(e);
             }
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        } catch (UnknownJobException e) {
+            throw new UnknownJobRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
         }
+
         return result;
     }
 
