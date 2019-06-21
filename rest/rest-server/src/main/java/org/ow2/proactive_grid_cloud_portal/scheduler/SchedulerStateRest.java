@@ -539,6 +539,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    // request:  http://localhost:8080/rest/scheduler/jobs/resultmap?jobsid=102&jobsid=152
+    // response: {"102": {"var1" : "val1", "var2" : "val2"},"152": {}}
     @Override
     public Map<Long, Map<String, String>> jobResultMaps(String sessionId, List<String> jobsId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
@@ -1526,7 +1528,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    // request:  http://localhost:8080/rest/scheduler/jobs/tasks/results/precious/metadata?jobsid=102&jobsid=152
+    // request:  http://localhost:8080/rest/scheduler/jobs/result/precious/metadata?jobsid=102&jobsid=152
     // response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
     @Override
     public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
