@@ -39,6 +39,7 @@ import java.security.PublicKey;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
@@ -539,6 +540,29 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    @Override
+    public Map<Long, Map<String, String>> jobResultMaps(String sessionId, List<String> jobsId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+        Scheduler s = checkAccess(sessionId, PATH_JOBS + jobsId.get(0) + "/resultmap");
+        Map<Long, Map<String, String>> result = new HashMap<>();
+        for (String jobId : jobsId) {
+            try {
+                JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
+                if (jobResult != null) {
+                    Map<String, String> jobResultMapAsString = getJobResultMapAsString(jobResult.getResultMap());
+                    result.put(Long.parseLong(jobId), jobResultMapAsString);
+                }
+            } catch (PermissionException e) {
+                throw new PermissionRestException(e);
+            } catch (UnknownJobException e) {
+                throw new UnknownJobRestException(e);
+            } catch (NotConnectedException e) {
+                throw new NotConnectedRestException(e);
+            }
+        }
+        return result;
+    }
+
     public Map getJobResultMapAsString(Map<String, Serializable> source) {
         if (source == null) {
             return null;
@@ -546,7 +570,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return source.entrySet()
                      .stream()
                      .filter(entry -> entry.getValue() != null)
-                     .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue().toString()));
+                     .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().toString()));
 
     }
 
