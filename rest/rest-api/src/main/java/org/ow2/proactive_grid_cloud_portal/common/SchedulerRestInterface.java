@@ -936,10 +936,10 @@ public interface SchedulerRestInterface {
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
 
     /**
-     * e.g.
-     * request:  http://localhost:8080/rest/scheduler/jobs/tasks/results/precious/metadata?jobsid=102&jobsid=152
-     * response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
-     */
+     * @param sessionId a valid session id
+     * @param jobsId the list of job ids
+     * @return a map where key is a job id, and value is list of precious tasks names of this job
+     **/
     @GET
     @GZIP
     @Path("jobs/result/precious/metadata")

@@ -1503,10 +1503,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @GET
-    @GZIP
-    @Path("jobs/result/precious/metadata")
-    @Produces("application/json")
+    // request:  http://localhost:8080/rest/scheduler/jobs/tasks/results/precious/metadata?jobsid=102&jobsid=152
+    // response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
+    @Override
     public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
             @QueryParam("jobsid") List<String> jobsId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
