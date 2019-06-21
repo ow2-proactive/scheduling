@@ -546,7 +546,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         Map<Long, Map<String, String>> result = new HashMap<>();
         try {
-            Scheduler s = checkAccess(sessionId, PATH_JOBS + jobsId.get(0) + "/resultmap");
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + "/resultmap");
             for (String jobId : jobsId) {
 
                 JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
