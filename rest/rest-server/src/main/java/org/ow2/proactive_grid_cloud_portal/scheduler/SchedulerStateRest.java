@@ -540,7 +540,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     // request:  http://localhost:8080/rest/scheduler/jobs/resultmap?jobsid=102&jobsid=152
-    // response: {"102": {"var1" : "val1", "var2" : "val2"},"152": {}}
+    // response: {"102": {"var1" : "val1", "var2" : "val2"}}
     @Override
     public Map<Long, Map<String, String>> jobResultMaps(String sessionId, List<String> jobsId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
@@ -549,16 +549,19 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + "/resultmap");
             for (String jobId : jobsId) {
 
-                JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
-                if (jobResult != null) {
-                    Map<String, String> jobResultMapAsString = getJobResultMapAsString(jobResult.getResultMap());
-                    result.put(Long.parseLong(jobId), jobResultMapAsString);
+                try {
+                    JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
+                    if (jobResult != null && !jobResult.getResultMap().isEmpty()) {
+                        Map<String, String> jobResultMapAsString = getJobResultMapAsString(jobResult.getResultMap());
+                        result.put(Long.parseLong(jobId), jobResultMapAsString);
+                    }
+                } catch (UnknownJobException e) {
+                    // we dont put anything in result
+                    // because job with given id does not exist
                 }
             }
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
-        } catch (UnknownJobException e) {
-            throw new UnknownJobRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
@@ -1529,7 +1532,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    // request:  http://localhost:8080/rest/scheduler/jobs/result/precious/metadata?jobsid=102&jobsid=152
+    // request:  http://localhost:8080/rest/scheduler/jobs/result/precious/metadata?jobsid=102&jobsid=152&jobsid=162
     // response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
     @Override
     public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
@@ -1539,17 +1542,21 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
             for (String jobId : jobsId) {
-                result.put(Long.parseLong(jobId),
-                           scheduler.getPreciousTaskResults(jobId)
-                                    .stream()
-                                    .map(TaskResult::getTaskId)
-                                    .map(TaskId::getReadableName)
-                                    .collect(Collectors.toList()));
+                try {
+                    List<TaskResult> preciousTaskResults = scheduler.getPreciousTaskResults(jobId);
+                    if (!preciousTaskResults.isEmpty()) {
+                        List<String> preciousTaskNames = preciousTaskResults.stream()
+                                                                            .map(TaskResult::getTaskId)
+                                                                            .map(TaskId::getReadableName)
+                                                                            .collect(Collectors.toList());
+                        result.put(Long.parseLong(jobId), preciousTaskNames);
+                    }
+                } catch (UnknownJobException e) {
+                    // job with given id does not exist so we dont put in result
+                }
             }
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
-        } catch (UnknownJobException e) {
-            throw new UnknownJobRestException(e);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         }

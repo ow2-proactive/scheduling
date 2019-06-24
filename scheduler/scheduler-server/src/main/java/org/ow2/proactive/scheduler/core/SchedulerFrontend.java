@@ -596,7 +596,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             String taskName = currentState.getTaskInfo().getName();
             try {
                 TaskResult currentResult = getTaskResult(jobId, taskName);
-                results.add(currentResult);
+                if (currentResult != null) {
+                    results.add(currentResult);
+                }
             } catch (UnknownTaskException ex) {
                 // never occurs because tasks are filtered by tag so they cannot
                 // be unknown.
