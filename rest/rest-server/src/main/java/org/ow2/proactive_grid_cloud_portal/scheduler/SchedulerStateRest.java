@@ -1536,8 +1536,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     // response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
     @Override
     public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("jobsid") List<String> jobsId)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+            @QueryParam("jobsid") List<String> jobsId) throws NotConnectedRestException, PermissionRestException {
         Map<Long, List<String>> result = new HashMap<>();
         try {
             Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
