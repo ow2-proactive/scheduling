@@ -40,8 +40,8 @@ public class ResumeCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             boolean success = scheduler.resumeScheduler(currentContext.getSessionId());
             resultStack(currentContext).push(success);
             if (success) {

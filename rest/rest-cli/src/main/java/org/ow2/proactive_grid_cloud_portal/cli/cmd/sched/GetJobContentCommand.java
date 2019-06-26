@@ -42,8 +42,9 @@ public class GetJobContentCommand extends AbstractJobTagCommand implements Comma
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             String output = scheduler.getJobContent(currentContext.getSessionId(), jobId);
             LOGGER.info("output: " + output);
             resultStack(currentContext).push(output);

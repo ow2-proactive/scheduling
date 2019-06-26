@@ -42,8 +42,9 @@ public class RemoveThirdPartyCredentialCommand extends AbstractCommand implement
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             scheduler.removeThirdPartyCredential(currentContext.getSessionId(), key);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "Credential \"%s\" successfully removed.", key);
