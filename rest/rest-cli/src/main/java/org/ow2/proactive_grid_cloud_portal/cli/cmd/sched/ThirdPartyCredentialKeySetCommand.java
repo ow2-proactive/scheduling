@@ -39,8 +39,9 @@ public class ThirdPartyCredentialKeySetCommand extends AbstractCommand implement
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             Set<String> credentialsKeySet = scheduler.thirdPartyCredentialsKeySet(currentContext.getSessionId());
             resultStack(currentContext).push(credentialsKeySet);
             if (!currentContext.isSilent()) {

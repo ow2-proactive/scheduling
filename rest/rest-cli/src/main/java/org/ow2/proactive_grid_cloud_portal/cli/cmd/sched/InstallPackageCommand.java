@@ -74,18 +74,12 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
-        ScriptResult scriptResult;
-        Map<String, Object> schedulerProperties;
-        String packageDirPath;
         try {
-            packageDirPath = retrievePackagePath();
-
-            schedulerProperties = retrieveSchedulerProperties(currentContext, scheduler);
-
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+            String packageDirPath = retrievePackagePath();
+            Map<String, Object> schedulerProperties = retrieveSchedulerProperties(currentContext, scheduler);
             addSessionIdToSchedulerProperties(currentContext, schedulerProperties);
-
-            scriptResult = executeScript(schedulerProperties, packageDirPath);
+            ScriptResult scriptResult = executeScript(schedulerProperties, packageDirPath);
 
             if (scriptResult.errorOccured()) {
                 logger.error("Failed to execute script: " + SCRIPT_PATH);

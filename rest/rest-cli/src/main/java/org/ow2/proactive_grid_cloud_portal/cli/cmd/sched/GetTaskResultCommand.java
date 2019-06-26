@@ -43,8 +43,8 @@ public class GetTaskResultCommand extends AbstractTaskCommand implements Command
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             TaskResultData taskResult = scheduler.taskResult(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(taskResult);
             if (!currentContext.isSilent()) {

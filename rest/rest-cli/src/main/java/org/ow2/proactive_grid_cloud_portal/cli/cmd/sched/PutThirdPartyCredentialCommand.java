@@ -45,8 +45,9 @@ public class PutThirdPartyCredentialCommand extends AbstractCommand implements C
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             scheduler.putThirdPartyCredential(currentContext.getSessionId(), key, value);
             if (!currentContext.isSilent()) {
                 writeLine(currentContext, "Credential \"%s\" successfully stored.", key);

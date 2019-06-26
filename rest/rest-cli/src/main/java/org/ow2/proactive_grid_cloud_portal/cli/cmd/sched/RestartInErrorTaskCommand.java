@@ -41,9 +41,8 @@ public class RestartInErrorTaskCommand extends AbstractTaskCommand implements Co
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
-
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             boolean result = scheduler.restartInErrorTask(currentContext.getSessionId(), jobId, taskId);
 
             handleResult(currentContext, result);

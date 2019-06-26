@@ -41,9 +41,8 @@ public class ResumeAllPausedTasksCommand extends AbstractJobCommand implements C
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
-
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             boolean result = scheduler.resumeJob(currentContext.getSessionId(), jobId);
 
             handleResult(currentContext, result);

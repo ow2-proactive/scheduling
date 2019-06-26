@@ -44,8 +44,8 @@ public class ResumeJobCommand extends AbstractJobCommand implements Command {
 
         writeDeprecation(currentContext, CommandSet.JOB_RESUME_ALL_PAUSED_TASKS);
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             boolean success = scheduler.resumeJob(currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(success);
             if (success) {

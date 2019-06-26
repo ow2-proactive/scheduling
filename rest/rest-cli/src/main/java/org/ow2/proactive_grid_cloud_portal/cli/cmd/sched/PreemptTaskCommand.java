@@ -44,8 +44,9 @@ public class PreemptTaskCommand extends AbstractTaskCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             boolean success = scheduler.preemptTask(currentContext.getSessionId(), jobId, taskId);
             resultStack(currentContext).push(success);
             if (success) {
