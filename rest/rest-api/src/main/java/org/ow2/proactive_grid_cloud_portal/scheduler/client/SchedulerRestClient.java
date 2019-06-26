@@ -122,7 +122,7 @@ public class SchedulerRestClient {
             sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
 
         } catch (KeyStoreException | KeyManagementException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
     }
 
