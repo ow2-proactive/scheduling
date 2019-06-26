@@ -41,8 +41,8 @@ public class RemoveJobCommand extends AbstractJobCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             boolean success = scheduler.removeJob(currentContext.getSessionId(), jobId);
             resultStack(currentContext).push(success);
             if (success) {

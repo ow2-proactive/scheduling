@@ -42,8 +42,9 @@ public class ChangeJobPriorityCommand extends AbstractJobCommand implements Comm
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             scheduler.schedulerChangeJobPriorityByValue(currentContext.getSessionId(), jobId, priorityValue);
             resultStack(currentContext).push(Boolean.TRUE);
             writeLine(currentContext, "%s priority changed successfully.", job());
