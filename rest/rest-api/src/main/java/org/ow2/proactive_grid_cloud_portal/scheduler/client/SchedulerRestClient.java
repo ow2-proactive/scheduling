@@ -96,11 +96,8 @@ public class SchedulerRestClient {
 
     public SchedulerRestClient(String restEndpointURL, ClientHttpEngine httpEngine) {
 
-        if (sslContext == null) {
-            setBlindTrustSSLContext();
-        }
-
         if (httpEngine == null) {
+            setBlindTrustSSLContext();
             SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
                                                                                                    NoopHostnameVerifier.INSTANCE);
             HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sslConnectionSocketFactory).build();
