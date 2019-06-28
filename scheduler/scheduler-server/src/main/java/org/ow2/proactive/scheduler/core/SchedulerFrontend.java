@@ -54,6 +54,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyException;
@@ -1158,6 +1159,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             }
         }
         return results;
+    }
+
+    @Override
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) {
+        return dbManager.getJobResultMaps(jobsId);
+    }
+
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return dbManager.getPreciousTaskNames(jobsId);
     }
 
     /**

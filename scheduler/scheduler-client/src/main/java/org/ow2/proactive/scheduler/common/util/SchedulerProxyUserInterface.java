@@ -722,6 +722,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return uischeduler.getJobResultMaps(jobsId);
+    }
+
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return uischeduler.getPreciousTaskNames(jobsId);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         return uischeduler.checkJobPermissionMethod(sessionId, jobId, method);

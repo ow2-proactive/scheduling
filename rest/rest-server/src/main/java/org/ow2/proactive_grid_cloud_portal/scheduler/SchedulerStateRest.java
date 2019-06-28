@@ -543,29 +543,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     // response: {"102": {"var1" : "val1", "var2" : "val2"}}
     @Override
     public Map<Long, Map<String, String>> jobResultMaps(String sessionId, List<String> jobsId)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
-        Map<Long, Map<String, String>> result = new HashMap<>();
+            throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + "/resultmap");
-            for (String jobId : jobsId) {
-
-                try {
-                    JobResult jobResult = PAFuture.getFutureValue(s.getJobResult(jobId));
-                    if (jobResult != null && !jobResult.getResultMap().isEmpty()) {
-                        Map<String, String> jobResultMapAsString = getJobResultMapAsString(jobResult.getResultMap());
-                        result.put(Long.parseLong(jobId), jobResultMapAsString);
-                    }
-                } catch (UnknownJobException e) {
-                    // we dont put anything in result
-                    // because job with given id does not exist
-                }
+            Map<Long, Map<String, Serializable>> maps = PAFuture.getFutureValue(s.getJobResultMaps(jobsId));
+            if (maps != null) {
+                return maps.entrySet()
+                           .stream()
+                           .collect(Collectors.toMap(Entry::getKey,
+                                                     entry -> getJobResultMapAsString(entry.getValue())));
             }
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         }
-        return result;
+        return new HashMap<>();
     }
 
     public Map getJobResultMapAsString(Map<String, Serializable> source) {
@@ -1540,27 +1533,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Map<Long, List<String>> result = new HashMap<>();
         try {
             Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
-            for (String jobId : jobsId) {
-                try {
-                    List<TaskResult> preciousTaskResults = scheduler.getPreciousTaskResults(jobId);
-                    if (!preciousTaskResults.isEmpty()) {
-                        List<String> preciousTaskNames = preciousTaskResults.stream()
-                                                                            .map(TaskResult::getTaskId)
-                                                                            .map(TaskId::getReadableName)
-                                                                            .collect(Collectors.toList());
-                        result.put(Long.parseLong(jobId), preciousTaskNames);
-                    }
-                } catch (UnknownJobException e) {
-                    // job with given id does not exist so we dont put in result
-                }
-            }
+            return scheduler.getPreciousTaskNames(jobsId);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         }
-
-        return result;
     }
 
     /**

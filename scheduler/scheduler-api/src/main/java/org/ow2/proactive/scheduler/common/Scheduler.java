@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.common;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -1545,4 +1546,8 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
+    Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, PermissionException;
+
+    Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws NotConnectedException, PermissionException;
 }
