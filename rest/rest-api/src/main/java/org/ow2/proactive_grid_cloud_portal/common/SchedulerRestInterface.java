@@ -247,8 +247,7 @@ public interface SchedulerRestInterface {
     @Path("jobs/resultmap")
     @Produces("application/json")
     Map<Long, Map<String, String>> jobResultMaps(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("jobsid") List<String> jobsId)
-            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+            @QueryParam("jobsid") List<String> jobsId) throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Returns the job info associated to the job referenced by the id
@@ -958,8 +957,7 @@ public interface SchedulerRestInterface {
     @Path("jobs/result/precious/metadata")
     @Produces("application/json")
     Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("jobsid") List<String> jobsId)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+            @QueryParam("jobsid") List<String> jobsId) throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Returns the value of the task result of the task <code>taskName</code> of

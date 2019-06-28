@@ -1395,6 +1395,41 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        try {
+            Map<Long, Map<String, Serializable>> result = new HashMap<>();
+            Map<Long, Map<String, String>> map = restApi().jobResultMaps(sid, jobsId);
+            for (Entry<Long, Map<String, String>> entry : map.entrySet()) {
+                Map<String, Serializable> resultMap = new HashMap<>();
+                for (Entry<String, String> entryInEntry : entry.getValue().entrySet()) {
+                    resultMap.put(entryInEntry.getKey(), entryInEntry.getValue());
+                }
+
+                result.put(entry.getKey(), resultMap);
+            }
+
+            return result;
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
+    }
+
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        try {
+            return restApi().getPreciousTaskNames(sid, jobsId);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         try {
