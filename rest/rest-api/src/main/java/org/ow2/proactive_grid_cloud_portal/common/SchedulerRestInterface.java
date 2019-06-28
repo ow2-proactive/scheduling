@@ -246,9 +246,8 @@ public interface SchedulerRestInterface {
     @GZIP
     @Path("jobs/resultmap")
     @Produces("application/json")
-    Map<Long, Map<String, String>> jobResultMaps(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("jobsid") List<String> jobsId)
-            throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+    Map jobResultMaps(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
+            throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Returns the job info associated to the job referenced by the id

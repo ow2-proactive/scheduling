@@ -889,6 +889,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return schedulerProxy.getJobResultMaps(jobsId);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         return schedulerProxy.checkJobPermissionMethod(sessionId, jobId, method);

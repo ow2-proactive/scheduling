@@ -28,6 +28,7 @@ package org.ow2.proactive_grid_cloud_portal.smartproxy;
 import static org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient.Dataspace.USER;
 
 import java.io.File;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -750,6 +751,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     public List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
         return _getScheduler().getPreciousTaskResults(jobId);
+    }
+
+    @Override
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return _getScheduler().getJobResultMaps(jobsId);
     }
 
     /**
