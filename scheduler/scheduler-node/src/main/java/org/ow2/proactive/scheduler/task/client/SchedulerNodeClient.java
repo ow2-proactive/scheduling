@@ -880,6 +880,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return client.getPreciousTaskNames(jobsId);
+    }
+
+    @Override
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         renewSession();

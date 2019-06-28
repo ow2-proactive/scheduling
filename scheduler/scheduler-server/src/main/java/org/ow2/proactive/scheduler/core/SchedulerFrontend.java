@@ -1166,6 +1166,12 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         return dbManager.getJobResultMaps(jobsId);
     }
 
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return dbManager.getPreciousTaskNames(jobsId);
+    }
+
     /**
      * {@inheritDoc}
      */

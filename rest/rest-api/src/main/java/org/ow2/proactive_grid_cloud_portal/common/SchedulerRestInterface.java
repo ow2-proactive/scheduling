@@ -957,8 +957,7 @@ public interface SchedulerRestInterface {
     @Path("jobs/result/precious/metadata")
     @Produces("application/json")
     Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("jobsid") List<String> jobsId)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+            @QueryParam("jobsid") List<String> jobsId) throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Returns the value of the task result of the task <code>taskName</code> of

@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1884,6 +1885,25 @@ public class SchedulerDBManager {
             }
 
             return result;
+        });
+    }
+
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) {
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.createQuery("SELECT task.id.jobId, task.id.taskId, task.taskName " +
+                                              "FROM TaskData as task " + "WHERE task.id.jobId in :jobIdList " +
+                                              "and task.preciousResult = true");
+            query.setParameterList("jobIdList", jobsId.stream().map(Long::parseLong).collect(Collectors.toList()));
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .collect(Collectors.groupingBy(row -> (Long) row[0]))
+                       .entrySet()
+                       .stream()
+                       .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue()
+                                                                                .stream()
+                                                                                .sorted(Comparator.comparing(row -> (long) row[1]))
+                                                                                .map(row -> (String) row[2])
+                                                                                .collect(Collectors.toList())));
         });
     }
 }

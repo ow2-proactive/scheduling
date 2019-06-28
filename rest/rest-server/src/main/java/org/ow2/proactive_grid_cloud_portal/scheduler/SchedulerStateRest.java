@@ -1533,27 +1533,12 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         Map<Long, List<String>> result = new HashMap<>();
         try {
             Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
-            for (String jobId : jobsId) {
-                try {
-                    List<TaskResult> preciousTaskResults = scheduler.getPreciousTaskResults(jobId);
-                    if (!preciousTaskResults.isEmpty()) {
-                        List<String> preciousTaskNames = preciousTaskResults.stream()
-                                                                            .map(TaskResult::getTaskId)
-                                                                            .map(TaskId::getReadableName)
-                                                                            .collect(Collectors.toList());
-                        result.put(Long.parseLong(jobId), preciousTaskNames);
-                    }
-                } catch (UnknownJobException e) {
-                    // job with given id does not exist so we dont put in result
-                }
-            }
+            return scheduler.getPreciousTaskNames(jobsId);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         }
-
-        return result;
     }
 
     /**

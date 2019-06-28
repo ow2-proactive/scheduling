@@ -759,6 +759,12 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
         return _getScheduler().getJobResultMaps(jobsId);
     }
 
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return _getScheduler().getPreciousTaskNames(jobsId);
+    }
+
     /**
      * notify the socket disconnection
      */

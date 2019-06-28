@@ -1548,4 +1548,6 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
 
     Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
             throws NotConnectedException, PermissionException;
+
+    Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws NotConnectedException, PermissionException;
 }
