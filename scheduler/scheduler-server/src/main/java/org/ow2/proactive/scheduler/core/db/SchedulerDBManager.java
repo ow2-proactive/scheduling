@@ -1869,6 +1869,9 @@ public class SchedulerDBManager {
     }
 
     public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) {
+        if (jobsId.isEmpty()) {
+            return Collections.EMPTY_MAP;
+        }
         return executeReadOnlyTransaction(session -> {
 
             Query query = session.createQuery("SELECT id, resultMap FROM JobData WHERE id in (:jobIdList)");
@@ -1889,6 +1892,9 @@ public class SchedulerDBManager {
     }
 
     public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) {
+        if (jobsId.isEmpty()) {
+            return Collections.EMPTY_MAP;
+        }
         return executeReadOnlyTransaction(session -> {
             Query query = session.createQuery("SELECT task.id.jobId, task.id.taskId, task.taskName " +
                                               "FROM TaskData as task " + "WHERE task.id.jobId in :jobIdList " +
@@ -1896,12 +1902,12 @@ public class SchedulerDBManager {
             query.setParameterList("jobIdList", jobsId.stream().map(Long::parseLong).collect(Collectors.toList()));
             List<Object[]> list = query.list();
             return list.stream()
-                       .collect(Collectors.groupingBy(row -> (Long) row[0]))
+                       .collect(Collectors.groupingBy(row -> (Long) row[0])) // group by job id
                        .entrySet()
                        .stream()
                        .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue()
                                                                                 .stream()
-                                                                                .sorted(Comparator.comparing(row -> (long) row[1]))
+                                                                                .sorted(Comparator.comparing(row -> (long) row[1])) // sort by task id
                                                                                 .map(row -> (String) row[2])
                                                                                 .collect(Collectors.toList())));
         });
