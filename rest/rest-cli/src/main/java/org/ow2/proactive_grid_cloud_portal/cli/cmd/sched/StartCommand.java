@@ -39,8 +39,9 @@ public class StartCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             boolean success = scheduler.startScheduler(currentContext.getSessionId());
             resultStack(currentContext).push(success);
             if (success) {

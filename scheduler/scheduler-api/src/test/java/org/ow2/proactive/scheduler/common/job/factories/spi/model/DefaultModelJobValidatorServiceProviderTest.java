@@ -95,6 +95,11 @@ public class DefaultModelJobValidatorServiceProviderTest {
         factory.validateJob(createJobWithSpelJobModelVariablesKO());
     }
 
+    @Test(expected = JobValidationException.class)
+    public void testValidateJobWithSpelModelVariablesUnauthorizedType() throws UserException, JobValidationException {
+        factory.validateJob(createJobWithSpelJobModelVariablesUnauthorizedType());
+    }
+
     @Test
     public void testValidateJobWithTaskModelVariableOK() throws UserException, JobValidationException {
         factory.validateJob(createJobWithTaskModelVariable("true",
@@ -152,6 +157,17 @@ public class DefaultModelJobValidatorServiceProviderTest {
                                                                    SPEL_RIGHT),
                                          "var2",
                                          new JobVariable("var2", "", SPEL_LEFT + "#value == 'toto1'" + SPEL_RIGHT)));
+        return job;
+    }
+
+    private TaskFlowJob createJobWithSpelJobModelVariablesUnauthorizedType() throws UserException {
+        TaskFlowJob job = new TaskFlowJob();
+        job.setVariables(ImmutableMap.of("var1",
+                                         new JobVariable("var1",
+                                                         "value1",
+                                                         SPEL_LEFT +
+                                                                   "T(java.lang.Runtime).getRuntime().exec('hostname').waitFor() instanceof T(Integer)" +
+                                                                   SPEL_RIGHT)));
         return job;
     }
 

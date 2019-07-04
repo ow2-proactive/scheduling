@@ -39,6 +39,7 @@ import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -235,6 +236,18 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     Map<String, String> jobResultMap(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, PermissionRestException, UnknownJobRestException;
+
+    /**
+     * @param sessionId a valid session id
+     * @param jobsId the list of job ids
+     * @return a map which contains job id as key and resultMap of this job as value
+     */
+    @GET
+    @GZIP
+    @Path("jobs/resultmap")
+    @Produces("application/json")
+    Map<Long, Map<String, String>> jobResultMaps(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId) throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Returns the job info associated to the job referenced by the id
@@ -933,6 +946,18 @@ public interface SchedulerRestInterface {
     @Produces("application/json")
     List<String> getPreciousTaskName(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException;
+
+    /**
+     * @param sessionId a valid session id
+     * @param jobsId the list of job ids
+     * @return a map where key is a job id, and value is list of precious tasks names of this job
+     **/
+    @GET
+    @GZIP
+    @Path("jobs/result/precious/metadata")
+    @Produces("application/json")
+    Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId) throws NotConnectedRestException, PermissionRestException;
 
     /**
      * Returns the value of the task result of the task <code>taskName</code> of
@@ -2011,14 +2036,14 @@ public interface SchedulerRestInterface {
 
     @POST
     @Path("/credentials/{key}")
-    void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") String key,
+    void putThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") @Encoded String key,
             @FormParam("value") String value)
             throws NotConnectedRestException, PermissionRestException, SchedulerRestException;
 
     @DELETE
     @Path("/credentials/{key}")
-    void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") String key)
-            throws NotConnectedRestException, PermissionRestException;
+    void removeThirdPartyCredential(@HeaderParam("sessionid") String sessionId, @PathParam("key") @Encoded String key)
+            throws NotConnectedRestException, PermissionRestException, SchedulerRestException;
 
     @GET
     @Path("/credentials/")

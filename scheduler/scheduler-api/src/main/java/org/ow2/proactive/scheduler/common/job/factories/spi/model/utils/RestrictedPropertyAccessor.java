@@ -23,13 +23,32 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.authentication.principals;
+package org.ow2.proactive.scheduler.common.job.factories.spi.model.utils;
 
-public class GroupNamePrincipal extends IdentityPrincipal {
+import java.util.Set;
 
-    private static final long serialVersionUID = 1L;
+import org.springframework.expression.AccessException;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.spel.support.ReflectivePropertyAccessor;
 
-    public GroupNamePrincipal(String name) {
-        super(name);
+import com.google.common.collect.ImmutableSet;
+
+
+/**
+ * @author ActiveEon Team
+ * @since 2019-06-07
+ */
+public class RestrictedPropertyAccessor extends ReflectivePropertyAccessor {
+
+    private final Set<String> unAuthorizedAttributes = ImmutableSet.of("class");
+
+    @Override
+    public boolean canRead(EvaluationContext context, Object target, String name) throws AccessException {
+        if (unAuthorizedAttributes.contains(name)) {
+            throw new AccessException("Unauthorized attribute: " + name);
+        }
+        return super.canRead(context, target, name);
+
     }
+
 }

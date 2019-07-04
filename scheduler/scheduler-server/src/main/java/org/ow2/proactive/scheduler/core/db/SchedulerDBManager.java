@@ -27,12 +27,14 @@ package org.ow2.proactive.scheduler.core.db;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1866,4 +1868,48 @@ public class SchedulerDBManager {
         return transactionHelper;
     }
 
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) {
+        if (jobsId.isEmpty()) {
+            return Collections.EMPTY_MAP;
+        }
+        return executeReadOnlyTransaction(session -> {
+
+            Query query = session.createQuery("SELECT id, resultMap FROM JobData WHERE id in (:jobIdList)");
+            query.setParameterList("jobIdList", jobsId.stream().map(Long::parseLong).collect(Collectors.toList()));
+
+            Map<Long, Map<String, Serializable>> result = new HashMap<>();
+            List<Object[]> list = query.list();
+            for (Object[] row : list) {
+                long id = (long) row[0];
+                Map<String, byte[]> resultMapAsBytes = (Map<String, byte[]>) row[1];
+
+                Map<String, Serializable> stringSerializableMap = ObjectByteConverter.mapOfByteArrayToSerializable(resultMapAsBytes);
+                result.put(id, stringSerializableMap);
+            }
+
+            return result;
+        });
+    }
+
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) {
+        if (jobsId.isEmpty()) {
+            return Collections.EMPTY_MAP;
+        }
+        return executeReadOnlyTransaction(session -> {
+            Query query = session.createQuery("SELECT task.id.jobId, task.id.taskId, task.taskName " +
+                                              "FROM TaskData as task " + "WHERE task.id.jobId in :jobIdList " +
+                                              "and task.preciousResult = true");
+            query.setParameterList("jobIdList", jobsId.stream().map(Long::parseLong).collect(Collectors.toList()));
+            List<Object[]> list = query.list();
+            return list.stream()
+                       .collect(Collectors.groupingBy(row -> (Long) row[0])) // group by job id
+                       .entrySet()
+                       .stream()
+                       .collect(Collectors.toMap(Map.Entry::getKey, pair -> pair.getValue()
+                                                                                .stream()
+                                                                                .sorted(Comparator.comparing(row -> (long) row[1])) // sort by task id
+                                                                                .map(row -> (String) row[2])
+                                                                                .collect(Collectors.toList())));
+        });
+    }
 }

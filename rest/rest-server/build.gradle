@@ -93,10 +93,17 @@ task proActiveWar(type: Sync, dependsOn: [classes, stub, tasks.miredot]) {
     }
 }
 
-task copyMiredotDoc(type: Copy) {
+task miredotDocZip(type: Zip) {
     from "${buildDir}/miredot"
-    into "$rootDir/dist/war/rest/doc"
+    archiveName 'restdoc-' + project.version + '.zip'
+    destinationDir file("${buildDir}/distributions")
 }
+
+task copyMiredotDoc(type: Copy, dependsOn: miredotDocZip) {
+    from "${buildDir}/miredot"
+    into "$rootDir/dist/war/getstarted/doc/rest"
+}
+
 
 proActiveWar.finalizedBy(copyMiredotDoc)
 

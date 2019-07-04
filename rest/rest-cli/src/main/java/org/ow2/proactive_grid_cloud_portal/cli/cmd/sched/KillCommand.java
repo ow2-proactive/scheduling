@@ -39,8 +39,9 @@ public class KillCommand extends AbstractCommand implements Command {
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             boolean success = scheduler.killScheduler(currentContext.getSessionId());
             resultStack(currentContext).push(success);
             if (success) {

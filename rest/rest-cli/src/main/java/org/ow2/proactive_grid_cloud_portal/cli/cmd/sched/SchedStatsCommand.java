@@ -43,8 +43,8 @@ public class SchedStatsCommand extends AbstractCommand implements Command {
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             Map<String, String> stats = scheduler.getStatistics(currentContext.getSessionId());
             resultStack(currentContext).push(stats);
             if (!currentContext.isSilent()) {

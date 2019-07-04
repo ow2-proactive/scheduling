@@ -44,8 +44,9 @@ public class GetJobOutputCommand extends AbstractJobTagCommand implements Comman
 
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
+
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             String output = null;
             if (this.tag == null) {
                 output = scheduler.jobLogs(currentContext.getSessionId(), jobId);

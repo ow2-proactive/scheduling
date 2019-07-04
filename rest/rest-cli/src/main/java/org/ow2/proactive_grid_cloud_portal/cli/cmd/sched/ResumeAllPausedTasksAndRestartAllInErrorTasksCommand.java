@@ -41,9 +41,8 @@ public class ResumeAllPausedTasksAndRestartAllInErrorTasksCommand extends Abstra
     @Override
     public void execute(ApplicationContext currentContext) throws CLIException {
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
-
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             String sessionId = currentContext.getSessionId();
             boolean result = scheduler.resumeJob(sessionId, jobId);
             result &= scheduler.restartAllInErrorTasks(sessionId, jobId);

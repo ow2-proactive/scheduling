@@ -54,6 +54,7 @@ import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_STOP_THE_SCHEDULER;
 import static org.ow2.proactive.scheduler.core.SchedulerFrontendState.YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.KeyException;
@@ -154,7 +155,6 @@ import org.ow2.proactive.scheduler.synchronization.AOSynchronization;
 import org.ow2.proactive.scheduler.synchronization.SynchronizationInternal;
 import org.ow2.proactive.scheduler.task.TaskResultImpl;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
-import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.NodeSet;
@@ -470,7 +470,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             if (logger.isDebugEnabled()) {
                 logger.debug("New job submission requested : " + userJob.getName());
             }
-
+            long t0 = System.currentTimeMillis();
             // check if the scheduler is stopped
             if (!schedulingService.isSubmitPossible()) {
                 String msg = "Scheduler is stopped, cannot submit job";
@@ -478,14 +478,22 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
                 throw new SubmissionClosedException(msg);
             }
 
+            long t1 = System.currentTimeMillis();
             UserIdentificationImpl ident = frontendState.checkPermission("submit",
                                                                          YOU_DO_NOT_HAVE_PERMISSION_TO_SUBMIT_A_JOB);
-
+            long t2 = System.currentTimeMillis();
             InternalJob job = frontendState.createJob(userJob, ident);
-
+            long t3 = System.currentTimeMillis();
             schedulingService.submitJob(job);
-
+            long t4 = System.currentTimeMillis();
             frontendState.jobSubmitted(job, ident);
+            long t5 = System.currentTimeMillis();
+            long d1 = t1 - t0;
+            long d2 = t2 - t1;
+            long d3 = t3 - t2;
+            long d4 = t4 - t3;
+            long d5 = t5 - t4;
+            logger.debug(String.format("timer;%d;%d;%d;%d;%d;%d", job.getId().longValue(), d1, d2, d3, d4, d5));
             return job.getId();
         } catch (Exception e) {
             logger.warn("Error when submitting job.", e);
@@ -1141,7 +1149,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             String taskName = currentState.getTaskInfo().getName();
             try {
                 TaskResult currentResult = getTaskResult(jobId, taskName);
-                results.add(currentResult);
+                if (currentResult != null) {
+                    results.add(currentResult);
+                }
             } catch (UnknownTaskException ex) {
                 // never occurs because tasks are filtered by tag so they cannot
                 // be unknown.
@@ -1149,6 +1159,17 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             }
         }
         return results;
+    }
+
+    @Override
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) {
+        return dbManager.getJobResultMaps(jobsId);
+    }
+
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return dbManager.getPreciousTaskNames(jobsId);
     }
 
     /**
@@ -1434,13 +1455,16 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException {
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
 
-        HybridEncryptionUtil.HybridEncryptedData encryptedData = HybridEncryptionUtil.encryptString(value,
-                                                                                                    corePublicKey);
+        HybridEncryptionUtil.HybridEncryptedData encryptedData = null;
+        try {
+            encryptedData = HybridEncryptionUtil.encryptString(value, corePublicKey);
+        } catch (KeyException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         dbManager.putThirdPartyCredential(ident.getUsername(), key, encryptedData);
     }
 

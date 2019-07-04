@@ -50,7 +50,6 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.KeyException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1132,8 +1131,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, PermissionException, KeyException {
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         try {
             restApi().putThirdPartyCredential(sid, key, value);
         } catch (NotConnectedRestException e) {
@@ -1141,7 +1139,7 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
         } catch (PermissionRestException e) {
             throw new PermissionException(e);
         } catch (SchedulerRestException e) {
-            throw new KeyException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -1164,6 +1162,8 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throw new NotConnectedException(e);
         } catch (PermissionRestException e) {
             throw new PermissionException(e);
+        } catch (SchedulerRestException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -1392,6 +1392,41 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             }
         }
         return results;
+    }
+
+    @Override
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        try {
+            Map<Long, Map<String, Serializable>> result = new HashMap<>();
+            Map<Long, Map<String, String>> map = restApi().jobResultMaps(sid, jobsId);
+            for (Entry<Long, Map<String, String>> entry : map.entrySet()) {
+                Map<String, Serializable> resultMap = new HashMap<>();
+                for (Entry<String, String> entryInEntry : entry.getValue().entrySet()) {
+                    resultMap.put(entryInEntry.getKey(), entryInEntry.getValue());
+                }
+
+                result.put(entry.getKey(), resultMap);
+            }
+
+            return result;
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
+    }
+
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        try {
+            return restApi().getPreciousTaskNames(sid, jobsId);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(e);
+        } catch (PermissionRestException e) {
+            throw new PermissionException(e);
+        }
     }
 
     @Override

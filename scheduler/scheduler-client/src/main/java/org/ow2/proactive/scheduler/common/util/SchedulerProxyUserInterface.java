@@ -629,8 +629,7 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value)
-            throws NotConnectedException, KeyException, PermissionException {
+    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         uischeduler.putThirdPartyCredential(key, value);
     }
 
@@ -720,6 +719,18 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
         return uischeduler.getPreciousTaskResults(jobId);
+    }
+
+    @Override
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return uischeduler.getJobResultMaps(jobsId);
+    }
+
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
+            throws NotConnectedException, PermissionException {
+        return uischeduler.getPreciousTaskNames(jobsId);
     }
 
     @Override

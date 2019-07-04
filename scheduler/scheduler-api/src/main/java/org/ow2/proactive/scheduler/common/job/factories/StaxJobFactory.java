@@ -209,11 +209,13 @@ public class StaxJobFactory extends JobFactory {
     private Job createJobFromInputStream(InputStream jobInputStream, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos)
             throws JobCreationException, VerifierConfigurationException, IOException, XMLStreamException {
+        long t0 = System.currentTimeMillis();
         byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
+        long t1 = System.currentTimeMillis();
         try (ByteArrayInputStream jobInputStreamForValidation = new ByteArrayInputStream(bytes)) {
             validate(jobInputStreamForValidation);
         }
-
+        long t2 = System.currentTimeMillis();
         Map<String, ArrayList<String>> dependencies = new HashMap<>();
         Job job;
         try (ByteArrayInputStream jobInpoutStreamForParsing = new ByteArrayInputStream(bytes)) {
@@ -221,11 +223,20 @@ public class StaxJobFactory extends JobFactory {
             job = createJob(xmlsr, replacementVariables, replacementGenericInfos, dependencies, new String(bytes));
             xmlsr.close();
         }
+        long t3 = System.currentTimeMillis();
 
         makeDependences(job, dependencies);
+        long t4 = System.currentTimeMillis();
         validate((TaskFlowJob) job);
+        long t5 = System.currentTimeMillis();
+        long d1 = t1 - t0;
+        long d2 = t2 - t1;
+        long d3 = t3 - t2;
+        long d4 = t4 - t3;
+        long d5 = t5 - t4;
 
         logger.debug("Job successfully created!");
+        logger.debug(String.format("timer;%d;%d;%d;%d;%d", d1, d2, d3, d4, d5));
         //debug mode only
         displayJobInfo(job);
         return job;

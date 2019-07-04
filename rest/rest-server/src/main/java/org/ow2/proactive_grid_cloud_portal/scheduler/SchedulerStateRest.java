@@ -539,6 +539,28 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    // request:  http://localhost:8080/rest/scheduler/jobs/resultmap?jobsid=102&jobsid=152
+    // response: {"102": {"var1" : "val1", "var2" : "val2"}}
+    @Override
+    public Map<Long, Map<String, String>> jobResultMaps(String sessionId, List<String> jobsId)
+            throws NotConnectedRestException, PermissionRestException {
+        try {
+            Scheduler s = checkAccess(sessionId, PATH_JOBS + "/resultmap");
+            Map<Long, Map<String, Serializable>> maps = PAFuture.getFutureValue(s.getJobResultMaps(jobsId));
+            if (maps != null) {
+                return maps.entrySet()
+                           .stream()
+                           .collect(Collectors.toMap(Entry::getKey,
+                                                     entry -> getJobResultMapAsString(entry.getValue())));
+            }
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
+        }
+        return new HashMap<>();
+    }
+
     public Map getJobResultMapAsString(Map<String, Serializable> source) {
         if (source == null) {
             return null;
@@ -546,7 +568,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return source.entrySet()
                      .stream()
                      .filter(entry -> entry.getValue() != null)
-                     .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue().toString()));
+                     .collect(Collectors.toMap(Entry::getKey, entry -> entry.getValue().toString()));
 
     }
 
@@ -1498,6 +1520,22 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throw new NotConnectedRestException(e);
         } catch (UnknownJobException e) {
             throw new UnknownJobRestException(e);
+        } catch (PermissionException e) {
+            throw new PermissionRestException(e);
+        }
+    }
+
+    // request:  http://localhost:8080/rest/scheduler/jobs/result/precious/metadata?jobsid=102&jobsid=152&jobsid=162
+    // response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
+    @Override
+    public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("jobsid") List<String> jobsId) throws NotConnectedRestException, PermissionRestException {
+        Map<Long, List<String>> result = new HashMap<>();
+        try {
+            Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
+            return scheduler.getPreciousTaskNames(jobsId);
+        } catch (NotConnectedException e) {
+            throw new NotConnectedRestException(e);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         }
@@ -3328,27 +3366,31 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public void putThirdPartyCredential(String sessionId, String key, String value)
             throws NotConnectedRestException, PermissionRestException, SchedulerRestException {
         try {
+            key = java.net.URLDecoder.decode(key, Charsets.UTF_8.displayName());
             Scheduler s = checkAccess(sessionId);
             s.putThirdPartyCredential(key, value);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
-        } catch (KeyException e) {
+        } catch (Exception e) {
             throw new SchedulerRestException(e);
         }
     }
 
     @Override
     public void removeThirdPartyCredential(String sessionId, String key)
-            throws NotConnectedRestException, PermissionRestException {
+            throws NotConnectedRestException, PermissionRestException, SchedulerRestException {
         try {
+            key = java.net.URLDecoder.decode(key, Charsets.UTF_8.displayName());
             Scheduler s = checkAccess(sessionId);
             s.removeThirdPartyCredential(key);
         } catch (PermissionException e) {
             throw new PermissionRestException(e);
         } catch (NotConnectedException e) {
             throw new NotConnectedRestException(e);
+        } catch (Exception e) {
+            throw new SchedulerRestException(e);
         }
     }
 

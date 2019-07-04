@@ -53,8 +53,8 @@ public class LoginSchedCommand extends AbstractLoginCommand implements Command {
             password = new String(readPassword(currentContext, "password:"));
         }
 
-        SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
         try {
+            SchedulerRestInterface scheduler = currentContext.getRestClient().getScheduler();
             return scheduler.login(username, password);
         } catch (Exception e) {
             throw new CLIException(REASON_OTHER, "An error occurred while logging.", e);

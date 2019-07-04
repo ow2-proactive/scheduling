@@ -1,8 +1,11 @@
+import org.apache.log4j.Logger
+import org.codehaus.groovy.runtime.StackTraceUtils
+
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.zip.ZipFile
-import org.apache.log4j.Logger
-import org.codehaus.groovy.runtime.StackTraceUtils
+import org.apache.commons.io.FileUtils;
+
 
 class LoadPackages {
 
@@ -68,36 +71,37 @@ class LoadPackages {
         logger.error("[" + this.SCRIPT_NAME + "] " + output, exception)
     }
 
-
     def run() {
-        writeToOutput(" Automatic deployment of proactive packages ...")
 
+        writeToOutput(" Automatic deployment of proactive packages ...")
         writeToOutput(" Variables : ")
         writeToOutput(" EXAMPLES_ZIP_PATH " + this.EXAMPLES_ZIP_PATH)
         writeToOutput(" EXAMPLES_DIR_PATH " + this.EXAMPLES_DIR_PATH)
 
         writeToOutput(" Actions : ")
 
-        // If the unzipped dir already exists, stop the script execution
         def examples_dir = new File(this.EXAMPLES_DIR_PATH)
-        if (examples_dir.exists()) {
+        def packages_loaded_file = new File(this.SCHEDULER_HOME, "samples/packages.loaded")
+
+        // If packages.loaded file already exists, do nothing
+        if (packages_loaded_file.exists() && !packages_loaded_file.isDirectory()) {
             writeToOutput(this.EXAMPLES_DIR_PATH + " already exists, delete it to redeploy packages.")
             writeToOutput("Terminated.")
             println "Workflow and utility packages already loaded"
             return
-        }
-
-        // Unzip the examples
-        def examples_zip = new File(this.EXAMPLES_ZIP_PATH)
-        if (!examples_zip.exists()) {
-            writeToOutput(this.EXAMPLES_ZIP_PATH + " not found!")
-            return
+        } else {
+            FileUtils.deleteQuietly(examples_dir)
+            // Unzip the examples
+            def examples_zip = new File(this.EXAMPLES_ZIP_PATH)
+            if (!examples_zip.exists()) {
+                writeToOutput(this.EXAMPLES_ZIP_PATH + " not found!")
+                return
+            }
+            unzipFile(examples_zip, this.EXAMPLES_DIR_PATH)
+            writeToOutput(this.EXAMPLES_ZIP_PATH + " extracted!")
         }
 
         println "Loading workflow and utility packages..."
-
-        unzipFile(examples_zip, this.EXAMPLES_DIR_PATH)
-        writeToOutput(this.EXAMPLES_ZIP_PATH + " extracted!")
 
         // Connect to the scheduler
         package_loader.loginAdminUserCredToSchedulerAndGetSessionId()
@@ -107,17 +111,20 @@ class LoadPackages {
             package_loader.createBucketIfNotExist(bucket)
         }
 
-        // Load all packages without loading each package dependencies
+        // Load all packages
         examples_dir.eachDir { package_dir ->
             package_loader.run(package_dir, false)
         }
 
+        packages_loaded_file.createNewFile()
+
         writeToOutput(" ... proactive packages deployed!")
-        writeToOutput(" Terminated.")
         println "Packages successfully loaded"
     }
+
 }
-instance = null;
+
+instance = null
 try {
     instance = new LoadPackages(this.binding)
     instance.run()

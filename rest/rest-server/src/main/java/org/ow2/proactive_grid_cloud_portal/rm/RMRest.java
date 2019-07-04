@@ -113,6 +113,9 @@ public class RMRest implements RMRestInterface {
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
+        if (sessionId == null) {
+            throw new NotConnectedException("you did not provide 'sessionid' in the header");
+        }
         Session session = sessionStore.get(sessionId);
         if (session == null) {
             throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
