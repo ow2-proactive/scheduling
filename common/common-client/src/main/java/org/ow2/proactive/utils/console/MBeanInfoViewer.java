@@ -32,10 +32,12 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -142,16 +144,29 @@ public final class MBeanInfoViewer {
                 result.append("\"").append(dataSource).append("\":[");
 
                 double[] values = fetchData.getValues(dataSource);
-                for (int j = 0; j < values.length - 2; j++) {
-                    if (Double.compare(Double.NaN, values[j]) == 0) {
-                        result.append("null");
-                    } else {
-                        result.append(formatter.format(values[j]));
-                    }
-                    if (j < values.length - 2) {
-                        result.append(',');
-                    }
+
+                int nValuesToTake = values.length;
+                // if the last value is NaN then we decide to not send it to the client
+                // why? Because when we retrieve from RDD file, somehow the latest is
+                // always NaN, which is not what we want.
+                if (Double.compare(values[values.length - 1], Double.NaN) == 0) {
+                    --nValuesToTake;
                 }
+
+                String collect = Arrays.stream(values)
+                                       .boxed()
+                                       .collect(Collectors.toList())
+                                       .subList(0, nValuesToTake)
+                                       .stream()
+                                       .map(value -> {
+                                           if (Double.compare(Double.NaN, value) == 0) {
+                                               return "null";
+                                           } else {
+                                               return formatter.format(value);
+                                           }
+                                       })
+                                       .collect(Collectors.joining(","));
+                result.append(collect);
                 result.append(']');
                 if (i < dataSources.length - 1) {
                     result.append(',');
