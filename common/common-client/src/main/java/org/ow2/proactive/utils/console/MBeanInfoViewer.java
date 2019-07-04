@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -142,19 +143,20 @@ public final class MBeanInfoViewer {
                 result.append("\"").append(dataSource).append("\":[");
 
                 double[] values = fetchData.getValues(dataSource);
-                for (int j = 0; j < values.length; j++) {
+                for (int j = 0; j < values.length - 2; j++) {
                     if (Double.compare(Double.NaN, values[j]) == 0) {
                         result.append("null");
                     } else {
                         result.append(formatter.format(values[j]));
                     }
-                    if (j < values.length - 1) {
+                    if (j < values.length - 2) {
                         result.append(',');
                     }
                 }
                 result.append(']');
-                if (i < dataSources.length - 1)
+                if (i < dataSources.length - 1) {
                     result.append(',');
+                }
             }
             result.append("}");
 
