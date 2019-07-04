@@ -1183,7 +1183,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.info("Restoring DOWN node to FREE: " + nodeUrl);
             internalSetFree(node);
         }
-
+        RMCore.topologyManager.addNode(node.getNode());
         node.getNodeSource().setNodeAvailable(node);
     }
 
