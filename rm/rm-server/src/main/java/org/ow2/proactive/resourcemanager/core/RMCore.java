@@ -1184,6 +1184,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             internalSetFree(node);
         }
 
+        if (RMCore.topologyManager != null) {
+            RMCore.topologyManager.addNode(node.getNode());
+        }
         node.getNodeSource().setNodeAvailable(node);
     }
 
