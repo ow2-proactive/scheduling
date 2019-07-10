@@ -1,5 +1,5 @@
-default namespace = "urn:proactive:jobdescriptor:dev"
-namespace jd = "urn:proactive:jobdescriptor:dev"
+default namespace = "urn:proactive:jobdescriptor:3.12"
+namespace jd = "urn:proactive:jobdescriptor:3.12"
 namespace xsi = "http://www.w3.org/2001/XMLSchema-instance"
 namespace doc = "http://relaxng.org/ns/compatibility/annotations/1.0"
 start = job
@@ -21,7 +21,7 @@ job = ## Definition of a job for the scheduler
         userSpace?, 
         projectName?,
         attribute xsi:schemaLocation {xsd:anyURI}?,( taskFlow ),
-		metadata?
+        metadata?
     }
 
 jobName = ## Identification of this job
@@ -145,7 +145,7 @@ post = ## A script launched after the task execution in the task node
     element post { simpleScript }
 cleaning = ## A script launched by the Resource Manager after the task or post script
     element cleaning { simpleScript }
-forkedMode = ## Do we run this task in a forked JVM
+forkedMode = ## Do we run this task in a forked VM
     attribute forkedMode { xsd:boolean | variableRefType }
 runAsMe = ## Do we run this task under the job owner user identity
     attribute runAsMe { xsd:boolean | variableRefType }

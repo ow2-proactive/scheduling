@@ -457,6 +457,10 @@ public class Job2XMLTransformer {
             setAttribute(taskE, XMLAttributes.TASK_RUN_AS_ME, "true");
         }
 
+        if (task.isForkedMode() != null && task.isForkedMode()) {
+            setAttribute(taskE, XMLAttributes.TASK_FORKED_MODE, "true");
+        }
+
         if (task.isPreciousResult()) {
             setAttribute(taskE, XMLAttributes.TASK_PRECIOUS_RESULT, "true");
         }

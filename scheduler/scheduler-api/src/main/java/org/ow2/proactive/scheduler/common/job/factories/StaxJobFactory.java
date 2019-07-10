@@ -954,6 +954,9 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attributeName)) {
                     tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue,
                                                                     tmpTask.getVariablesOverriden(job))));
+                } else if (XMLAttributes.TASK_FORKED_MODE.matches(attributeName)) {
+                    tmpTask.setForkedMode(Boolean.parseBoolean(replace(attributeValue,
+                                                                       tmpTask.getVariablesOverriden(job))));
                 }
             }
 

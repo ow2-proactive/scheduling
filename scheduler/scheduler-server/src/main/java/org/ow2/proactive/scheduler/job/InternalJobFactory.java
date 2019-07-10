@@ -271,7 +271,7 @@ public class InternalJobFactory {
             HashMap<String, byte[]> args = task.getSerializedArguments();
 
             try {
-                if (isForkingTask()) {
+                if (isForkingTask(task)) {
                     javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
                                                                                                                           JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
                                                                                                                           new Serializable[] { args }))),
@@ -326,7 +326,7 @@ public class InternalJobFactory {
         try {
             String commandAndArguments = "\"" + Joiner.on("\" \"").join(task.getCommandLine()) + "\"";
             InternalTask scriptTask;
-            if (isForkingTask()) {
+            if (isForkingTask(task)) {
                 scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(commandAndArguments,
                                                                                                                         "native"))),
                                                           internalJob);
@@ -350,7 +350,7 @@ public class InternalJobFactory {
     private static InternalTask createTask(Job userJob, InternalJob internalJob, ScriptTask task)
             throws JobCreationException {
         InternalTask scriptTask;
-        if (isForkingTask()) {
+        if (isForkingTask(task)) {
             scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()), internalJob);
             configureRunAsMe(task);
         } else {
@@ -365,8 +365,12 @@ public class InternalJobFactory {
         return scriptTask;
     }
 
-    private static boolean isForkingTask() {
-        return PASchedulerProperties.TASK_FORK.getValueAsBoolean() || isRunAsMeTask();
+    private static boolean isForkingTask(Task task) {
+        if (task.isForkedMode() != null) {
+            return task.isForkedMode();
+        } else {
+            return PASchedulerProperties.TASK_FORK.getValueAsBoolean() || isRunAsMeTask();
+        }
     }
 
     private static boolean isRunAsMeTask() {
