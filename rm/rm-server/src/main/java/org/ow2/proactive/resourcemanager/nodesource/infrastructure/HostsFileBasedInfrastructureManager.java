@@ -53,16 +53,16 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     protected static final long DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES = 5000;
 
-    @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts")
+    @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts", sectionSelector = 1)
     protected File hostsList;
 
-    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
+    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost", sectionSelector = 3)
     protected int nodeTimeOut = HostsFileBasedInfrastructureManager.DEFAULT_NODE_TIMEOUT;
 
-    @Configurable(description = "Maximum number of failed attempt to deploy on \na host before discarding it")
+    @Configurable(description = "Maximum number of failed attempt to deploy on \na host before discarding it", sectionSelector = 3)
     protected int maxDeploymentFailure = HostsFileBasedInfrastructureManager.DEFAULT_NODE_DEPLOYMENT_FAILURE_THRESHOLD;
 
-    @Configurable(description = "Milliseconds to wait after each failed attempt to deploy on \na host")
+    @Configurable(description = "Milliseconds to wait after each failed attempt to deploy on \na host", sectionSelector = 3)
     protected long waitBetweenDeploymentFailures = HostsFileBasedInfrastructureManager.DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES;
 
     /**

@@ -144,6 +144,14 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      */
     private NodeSourceData nodeSourceData;
 
+    private Map<Integer, String> sectionDescriptions = new HashMap<>();
+
+    {
+        sectionDescriptions.put(1, "User parameters");
+        sectionDescriptions.put(2, "Functional parameters");
+        sectionDescriptions.put(3, "Advanced parameters");
+    }
+
     public InfrastructureManager() {
     }
 
@@ -1254,4 +1262,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         return getPersistedInfraVariable(() -> (String) this.persistedInfraVariables.get(RM_URL_KEY));
     }
 
+    public Map<Integer, String> getSectionDescriptions() {
+        return sectionDescriptions;
+    }
 }

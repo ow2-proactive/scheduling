@@ -83,32 +83,32 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
 
     public static final int DEFAULT_SSH_PORT = 22;
 
-    @Configurable(description = "The port of the ssh server " + DEFAULT_SSH_PORT + " by default")
+    @Configurable(description = "The port of the ssh server " + DEFAULT_SSH_PORT + " by default", sectionSelector = 3)
     protected int sshPort = DEFAULT_SSH_PORT;
 
-    @Configurable(description = "Specifies the user to log in as on the remote machine")
+    @Configurable(description = "Specifies the user to log in as on the remote machine", sectionSelector = 1)
     protected String sshUsername;
 
-    @Configurable(description = "The password to use for authentification (less secure than private key)")
+    @Configurable(description = "The password to use for authentification (less secure than private key)", sectionSelector = 1)
     protected String sshPassword;
 
-    @Configurable(fileBrowser = true, description = "If no password specify the private key file")
+    @Configurable(fileBrowser = true, description = "If no password specify the private key file", sectionSelector = 1)
     protected byte[] sshPrivateKey;
 
-    @Configurable(fileBrowser = true, description = "Options file for the ssh to log in the remote hosts, use key=value format, if empty StrictHostKeyChecking is disabled")
+    @Configurable(fileBrowser = true, description = "Options file for the ssh to log in the remote hosts, use key=value format, if empty StrictHostKeyChecking is disabled", sectionSelector = 1)
     protected Properties sshOptions;
 
-    @Configurable(description = "Absolute path of the java executable on the remote hosts")
+    @Configurable(description = "Absolute path of the java executable on the remote hosts", sectionSelector = 3)
     protected String javaPath = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + "jre" +
                                 File.separator + "bin" + File.separator + "java";
 
-    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)root directory on the remote hosts")
+    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)root directory on the remote hosts", sectionSelector = 3)
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
 
-    @Configurable(description = "Linux, Cygwin or Windows depending on the operating system of the remote hosts")
+    @Configurable(description = "Linux, Cygwin or Windows depending on the operating system of the remote hosts", sectionSelector = 3)
     protected String targetOs = "Linux";
 
-    @Configurable(description = "Options for the java command launching the node on the remote hosts")
+    @Configurable(description = "Options for the java command launching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
     private static final String TARGET_OS_OBJ_KEY = "targetOSObj";
