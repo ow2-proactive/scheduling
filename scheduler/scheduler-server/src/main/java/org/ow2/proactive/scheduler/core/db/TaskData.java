@@ -534,7 +534,9 @@ public class TaskData {
         taskData.setPreciousLogs(task.isPreciousLogs());
         taskData.setPreciousResult(task.isPreciousResult());
         taskData.setRunAsMe(task.isRunAsMe());
-        taskData.setForkedMode(task.isForkedMode());
+        if (task.isForkedMode() != null) {
+            taskData.setForkedMode(task.isForkedMode());
+        }
         taskData.setWallTime(task.getWallTime());
         taskData.setOnTaskErrorString(task.getOnTaskErrorProperty().getValue());
         taskData.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
