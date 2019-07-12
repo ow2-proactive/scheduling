@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -69,12 +70,20 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
     protected NodeSource nodeSource;
 
     // Users who can get nodes for computations from this node source
-    @Configurable(description = "ME|users=name1,name2;groups=group1,group2;tokens=t1,t2|ALL")
+    @Configurable(description = "ME|users=name1,name2;groups=group1,group2;tokens=t1,t2|ALL", sectionSelector = 3)
     private AccessType userAccessType = AccessType.ALL;
 
     // Users who can add/remove nodes to/from this node source
-    @Configurable(description = "ME|users=name1,name2;groups=group1,group2|ALL")
+    @Configurable(description = "ME|users=name1,name2;groups=group1,group2|ALL", sectionSelector = 3)
     private AccessType providerAccessType = AccessType.ME;
+
+    private Map<Integer, String> sectionDescriptions = new HashMap<>();
+
+    {
+        sectionDescriptions.put(1, "User parameters");
+        sectionDescriptions.put(2, "Functional parameters");
+        sectionDescriptions.put(3, "Advanced parameters");
+    }
 
     /**
      * Configure a policy with given parameters.
@@ -255,5 +264,9 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
     public String toString() {
         return NamesConvertor.beautifyName(this.getClass().getSimpleName()) + " user access type [" + userAccessType +
                "]" + ", provider access type [" + providerAccessType + "]";
+    }
+
+    public Map<Integer, String> getSectionDescriptions() {
+        return sectionDescriptions;
     }
 }
