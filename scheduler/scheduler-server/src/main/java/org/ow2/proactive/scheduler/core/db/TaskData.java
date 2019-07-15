@@ -255,7 +255,7 @@ public class TaskData {
 
     private boolean runAsMe;
 
-    private boolean fork;
+    private Boolean fork;
 
     private long wallTime;
 
@@ -697,7 +697,7 @@ public class TaskData {
         internalTask.setPreciousLogs(isPreciousLogs());
         internalTask.setPreciousResult(isPreciousResult());
         internalTask.setRunAsMe(isRunAsMe());
-        internalTask.setFork(isFork());
+        internalTask.setFork(getFork());
         internalTask.setWallTime(getWallTime());
         internalTask.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalTask.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
@@ -995,11 +995,11 @@ public class TaskData {
     }
 
     @Column(name = "FORK", updatable = false)
-    public boolean isFork() {
+    public Boolean getFork() {
         return fork;
     }
 
-    public void setFork(boolean fork) {
+    public void setFork(Boolean fork) {
         this.fork = fork;
     }
 
