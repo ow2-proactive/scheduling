@@ -255,7 +255,7 @@ public class TaskData {
 
     private boolean runAsMe;
 
-    private boolean forkedMode;
+    private boolean fork;
 
     private long wallTime;
 
@@ -534,8 +534,8 @@ public class TaskData {
         taskData.setPreciousLogs(task.isPreciousLogs());
         taskData.setPreciousResult(task.isPreciousResult());
         taskData.setRunAsMe(task.isRunAsMe());
-        if (task.isForkedMode() != null) {
-            taskData.setForkedMode(task.isForkedMode());
+        if (task.isFork() != null) {
+            taskData.setFork(task.isFork());
         }
         taskData.setWallTime(task.getWallTime());
         taskData.setOnTaskErrorString(task.getOnTaskErrorProperty().getValue());
@@ -697,7 +697,7 @@ public class TaskData {
         internalTask.setPreciousLogs(isPreciousLogs());
         internalTask.setPreciousResult(isPreciousResult());
         internalTask.setRunAsMe(isRunAsMe());
-        internalTask.setForkedMode(isForkedMode());
+        internalTask.setFork(isFork());
         internalTask.setWallTime(getWallTime());
         internalTask.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalTask.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
@@ -994,13 +994,13 @@ public class TaskData {
         this.runAsMe = runAsMe;
     }
 
-    @Column(name = "FORKED_MODE", updatable = false)
-    public boolean isForkedMode() {
-        return forkedMode;
+    @Column(name = "FORK", updatable = false)
+    public boolean isFork() {
+        return fork;
     }
 
-    public void setForkedMode(boolean forkedMode) {
-        this.forkedMode = forkedMode;
+    public void setFork(boolean fork) {
+        this.fork = fork;
     }
 
     @Column(name = "WALLTIME", updatable = false)

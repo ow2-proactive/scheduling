@@ -207,7 +207,7 @@
         <ref name="numberOfExecution_t"/>
       </optional>
       <optional>
-        <ref name="forkedMode"/>
+        <ref name="fork"/>
       </optional>
       <optional>
         <ref name="runAsMe"/>
@@ -481,8 +481,8 @@
       <ref name="simpleScript"/>
     </element>
   </define>
-  <define name="forkedMode">
-    <attribute name="forkedMode">
+  <define name="fork">
+    <attribute name="fork">
       <doc:documentation>Do we run this task in a forked JVM</doc:documentation>
       <choice>
         <data type="boolean"/>

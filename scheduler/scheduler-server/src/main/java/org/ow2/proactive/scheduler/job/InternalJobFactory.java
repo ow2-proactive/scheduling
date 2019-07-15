@@ -366,8 +366,8 @@ public class InternalJobFactory {
     }
 
     private static boolean isForkingTask(Task task) {
-        if (task.isForkedMode() != null) {
-            return task.isForkedMode();
+        if (task.isFork() != null) {
+            return task.isFork();
         } else {
             return PASchedulerProperties.TASK_FORK.getValueAsBoolean() || isRunAsMeTask();
         }

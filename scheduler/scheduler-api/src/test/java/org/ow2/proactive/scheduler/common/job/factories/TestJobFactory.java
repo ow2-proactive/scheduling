@@ -127,7 +127,7 @@ public class TestJobFactory {
         assertEquals("1", ((JavaTask) task1).getArgument("sleepTime"));
         assertEquals("1", ((JavaTask) task1).getArgument("number"));
         assertEquals("org.ow2.proactive.scheduler.examples.WaitAndPrint", ((JavaTask) task1).getExecutableClassName());
-        assertEquals(true, ((JavaTask) task1).isFork());
+        assertEquals(true, ((JavaTask) task1).isRunningInForkedJvm());
         assertEquals(null, task1.getForkEnvironment());
 
         //Check task 2 properties
@@ -167,7 +167,7 @@ public class TestJobFactory {
         assertEquals("21", ((JavaTask) task2).getArgument("number"));
         assertEquals("/bin/java/jdk1.5", ((JavaTask) task2).getArgument("test"));
         assertEquals("org.ow2.proactive.scheduler.examples.WaitAndPrint", ((JavaTask) task2).getExecutableClassName());
-        assertEquals(true, ((JavaTask) task2).isFork());
+        assertEquals(true, ((JavaTask) task2).isRunningInForkedJvm());
         assertEquals(false, task2.isWallTimeSet());
         assertEquals("/bin/java/jdk1.5", task2.getForkEnvironment().getJavaHome());
         assertEquals("/bin/java/jdk1.5/toto", task2.getForkEnvironment().getWorkingDir());

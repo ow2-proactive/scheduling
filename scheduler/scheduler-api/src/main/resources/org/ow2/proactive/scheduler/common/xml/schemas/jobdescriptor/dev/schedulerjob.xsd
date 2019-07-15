@@ -281,7 +281,7 @@
               <xs:union memberTypes="xs:nonNegativeInteger jd:variableRefType"/>
             </xs:simpleType>
           </xs:attribute>
-          <xs:attribute name="forkedMode">
+          <xs:attribute name="fork">
             <xs:annotation>
               <xs:documentation>Do we run this task in a forked JVM</xs:documentation>
             </xs:annotation>
@@ -583,8 +583,8 @@
       <xs:documentation>A script launched by the Resource Manager after the task or post script</xs:documentation>
     </xs:annotation>
   </xs:element>
-  <xs:attributeGroup name="forkedMode">
-    <xs:attribute name="forkedMode" use="required">
+  <xs:attributeGroup name="fork">
+    <xs:attribute name="fork" use="required">
       <xs:annotation>
         <xs:documentation>Do we run this task in a forked JVM</xs:documentation>
       </xs:annotation>

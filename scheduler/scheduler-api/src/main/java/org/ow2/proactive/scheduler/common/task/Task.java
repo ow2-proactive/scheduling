@@ -142,7 +142,7 @@ public abstract class Task extends CommonAttribute {
     protected boolean runAsMe;
 
     /** If true, task is ran in a forked JVM, this parameter is optional (nullable) .*/
-    protected Boolean forkedMode;
+    protected Boolean fork;
 
     /** List of dependences if necessary. */
     @XmlTransient
@@ -264,12 +264,21 @@ public abstract class Task extends CommonAttribute {
         this.runAsMe = runAsMe;
     }
 
-    public Boolean isForkedMode() {
-        return forkedMode;
+    /**
+     * To know if the task will be run in a forked JVM
+     * @return fork true if the task will be run in a forked JVM; false if the task will be ran in the node's JVM.
+     */
+    public Boolean isFork() {
+        return fork;
     }
 
-    public void setForkedMode(Boolean forkedMode) {
-        this.forkedMode = forkedMode;
+    /**
+     * Set if the task will be run in a forked JVM
+     * 
+     * @param fork if true, this task will be run in a forked JVM; if false, it will be ran in the node's JVM.
+     */
+    public void setFork(Boolean fork) {
+        this.fork = fork;
     }
 
     /**
@@ -763,6 +772,7 @@ public abstract class Task extends CommonAttribute {
                                    line("PreciousResult", preciousResult),
                                    line("PreciousLogs", preciousLogs),
                                    line("RunAsMe", runAsMe),
+                                   line("fork", fork),
                                    line("WallTime", wallTime),
                                    line("Dependences", dependences))
                                .filter(s -> !s.isEmpty())

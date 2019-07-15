@@ -1,28 +1,54 @@
-package functionaltests.forkedmode;
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
+package functionaltests.fork;
 
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.Map;
+import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
 
 
-public class TestForkedModeTask extends SchedulerFunctionalTestWithCustomConfigAndRestart {
-    public static final String TASK_NAME = "Check_Forked_Mode_Task";
+public class TestForkTask extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+    public static final String TASK_NAME = "Check_Fork_Task";
 
-    public void testTaskIsRunningInForkedMode(String jobResource) throws Exception {
+    public void testTaskIsRunningInForkedJvm(String jobResource) throws Exception {
         testTaskGetExpectedOutput(jobResource,
                                   TASK_NAME,
                                   System.getProperty("java.io.tmpdir") + File.separator,
                                   "Task output should display a path under the system tmp directory, as the task is supposed to run in a forked JVM.");
     }
 
-    public void testTaskIsRunningInNonForkedMode(String jobResource) throws Exception {
+    public void testTaskIsRunningInNonForkedJvm(String jobResource) throws Exception {
         testTaskGetExpectedOutput(jobResource,
                                   TASK_NAME,
                                   PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
@@ -49,6 +75,6 @@ public class TestForkedModeTask extends SchedulerFunctionalTestWithCustomConfigA
     }
 
     protected static String getResourceAbsolutePath(String resourceName) throws URISyntaxException {
-        return new File(TestTaskForkedModeParameter.class.getResource(resourceName).toURI()).getAbsolutePath();
+        return new File(TestTaskWithForkParameter.class.getResource(resourceName).toURI()).getAbsolutePath();
     }
 }

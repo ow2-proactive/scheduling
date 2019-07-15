@@ -954,9 +954,8 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attributeName)) {
                     tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue,
                                                                     tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.TASK_FORKED_MODE.matches(attributeName)) {
-                    tmpTask.setForkedMode(Boolean.parseBoolean(replace(attributeValue,
-                                                                       tmpTask.getVariablesOverriden(job))));
+                } else if (XMLAttributes.TASK_FORK.matches(attributeName)) {
+                    tmpTask.setFork(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 }
             }
 
@@ -1944,7 +1943,7 @@ public class StaxJobFactory extends JobFactory {
                     } catch (Exception e) {
                         logger.debug("Cannot get args: " + e.getMessage(), e);
                     }
-                    logger.debug("fork: " + ((JavaTask) t).isFork());
+                    logger.debug("fork: " + ((JavaTask) t).isRunningInForkedJvm());
                 } else if (t instanceof NativeTask) {
                     logger.debug("commandLine: " + Arrays.toString(((NativeTask) t).getCommandLine()));
                 } else if (t instanceof ScriptTask) {

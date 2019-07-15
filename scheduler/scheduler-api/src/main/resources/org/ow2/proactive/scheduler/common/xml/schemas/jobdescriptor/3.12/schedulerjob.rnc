@@ -21,7 +21,7 @@ job = ## Definition of a job for the scheduler
         userSpace?, 
         projectName?,
         attribute xsi:schemaLocation {xsd:anyURI}?,( taskFlow ),
-        metadata?
+		metadata?
     }
 
 jobName = ## Identification of this job
@@ -70,7 +70,7 @@ task = ## A task is the smallest computation unit for the scheduler
         onTaskError_t?,
         restartTaskOnError_t?,
         numberOfExecution_t?,
-        forkedMode?,
+        fork?,
         runAsMe?,
         walltime?,
         preciousResult?,
@@ -145,8 +145,8 @@ post = ## A script launched after the task execution in the task node
     element post { simpleScript }
 cleaning = ## A script launched by the Resource Manager after the task or post script
     element cleaning { simpleScript }
-forkedMode = ## Do we run this task in a forked VM
-    attribute forkedMode { xsd:boolean | variableRefType }
+fork = ## Do we run this task in a forked JVM
+    attribute fork { xsd:boolean | variableRefType }
 runAsMe = ## Do we run this task under the job owner user identity
     attribute runAsMe { xsd:boolean | variableRefType }
 
