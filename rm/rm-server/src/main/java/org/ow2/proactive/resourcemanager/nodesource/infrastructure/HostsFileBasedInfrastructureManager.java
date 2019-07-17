@@ -77,6 +77,15 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
      */
     private static final String PN_TIMEOUT_KEY = "pnTimeout";
 
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = new HashMap<>();
+        sectionDescriptions.put(1, "Deployment Parameters");
+        sectionDescriptions.put(2, "SSH Parameters");
+        sectionDescriptions.put(3, "Node Parameters");
+        return sectionDescriptions;
+    }
+
     protected NodeNameBuilder nodeNameBuilder = new NodeNameBuilder();
 
     @Override

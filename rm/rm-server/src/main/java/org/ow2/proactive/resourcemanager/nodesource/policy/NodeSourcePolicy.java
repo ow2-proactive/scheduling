@@ -79,12 +79,6 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
 
     private Map<Integer, String> sectionDescriptions = new HashMap<>();
 
-    {
-        sectionDescriptions.put(1, "User parameters");
-        sectionDescriptions.put(2, "Functional parameters");
-        sectionDescriptions.put(3, "Advanced parameters");
-    }
-
     /**
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user

@@ -146,12 +146,6 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
 
     private Map<Integer, String> sectionDescriptions = new HashMap<>();
 
-    {
-        sectionDescriptions.put(1, "User parameters");
-        sectionDescriptions.put(2, "Functional parameters");
-        sectionDescriptions.put(3, "Advanced parameters");
-    }
-
     public InfrastructureManager() {
     }
 
