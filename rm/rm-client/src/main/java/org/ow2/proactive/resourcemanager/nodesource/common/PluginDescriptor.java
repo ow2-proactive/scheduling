@@ -130,10 +130,6 @@ public class PluginDescriptor implements Serializable {
     }
 
     private void findSectionDescriptions(Class<?> cls, Object instance) {
-        if (cls.getSuperclass() != null && cls.getSuperclass() != Object.class) {
-            findSectionDescriptions(cls.getSuperclass(), instance);
-        }
-
         try {
             Method getSectionDescriptions = cls.getMethod("getSectionDescriptions");
             Map<Integer, String> sectionDescriptions = (Map<Integer, String>) getSectionDescriptions.invoke(instance);
