@@ -26,8 +26,12 @@
 package org.ow2.proactive.resourcemanager.nodesource;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
+
+import com.trilead.ssh2.crypto.digest.HMAC;
 
 
 /**
@@ -37,5 +41,5 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  * a policy.
  */
 public interface NodeSourcePlugin extends Serializable {
-
+    Map<Integer, String> getSectionDescriptions();
 }

@@ -79,9 +79,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     @Override
     public Map<Integer, String> getSectionDescriptions() {
-        Map<Integer, String> sectionDescriptions = new HashMap<>();
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
         sectionDescriptions.put(1, "Deployment Parameters");
-        sectionDescriptions.put(2, "SSH Parameters");
         sectionDescriptions.put(3, "Node Parameters");
         return sectionDescriptions;
     }
