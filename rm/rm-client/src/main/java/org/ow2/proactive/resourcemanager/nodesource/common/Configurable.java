@@ -74,4 +74,9 @@ public @interface Configurable {
      */
     boolean dynamic() default false;
 
+    /**
+     * Section selector which is used to group parameters
+     * and show description on top of the group
+     */
+    int sectionSelector() default 0;
 }
