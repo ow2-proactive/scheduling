@@ -444,4 +444,10 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
         });
     }
 
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(2, "SSH Parameters");
+        return sectionDescriptions;
+    }
 }
