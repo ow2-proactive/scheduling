@@ -27,26 +27,41 @@ package functionaltests.fork;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.task.Task;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
+import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerTHelper;
 
 
-public class TestTaskWithForkParameter extends TestForkTask {
+/**
+ * Test the task fork parameter while the global task fork mode is not set (null).
+ */
+public class TestTaskForkParameter extends SchedulerFunctionalTestNoRestart {
+    private static ForkTaskTestHelper forkTaskTestHelper;
 
     @BeforeClass
-    public static void startScheduler() throws Exception {
-        schedulerHelper = new SchedulerTHelper(true);
+    public static void initialize() {
+        // initialize forkTaskTestHelper after the parent class start scheduler and initialize schedulerHelper
+        forkTaskTestHelper = new ForkTaskTestHelper(schedulerHelper);
     }
 
     @Test
-    public void testForkedTask() throws Exception {
+    public void testForkTask() throws Exception {
         // test the job task which specified the parameter fork as true
-        testTaskIsRunningInForkedJvm("/functionaltests/descriptors/Job_Fork.xml");
+        forkTaskTestHelper.testTaskIsRunningInExpectedForkedMode("/functionaltests/descriptors/Job_Fork.xml", true);
     }
 
     @Test
-    public void testNonForkedTask() throws Exception {
+    public void testNonForkTask() throws Exception {
         // test the job task which specified the parameter fork as false
-        testTaskIsRunningInNonForkedJvm("/functionaltests/descriptors/Job_NonFork.xml");
+        forkTaskTestHelper.testTaskIsRunningInExpectedForkedMode("/functionaltests/descriptors/Job_NonFork.xml", false);
+    }
+
+    @Test
+    public void testMissingForkTask() throws Exception {
+        // test the job task which not specified the parameter fork 
+        forkTaskTestHelper.testTaskIsRunningInExpectedForkedMode("/functionaltests/descriptors/Job_MissingFork.xml",
+                                                                 Task.DEFAULT_TASK_FORK);
     }
 }

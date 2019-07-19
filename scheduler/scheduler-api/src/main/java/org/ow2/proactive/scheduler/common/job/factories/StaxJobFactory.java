@@ -1038,6 +1038,12 @@ public class StaxJobFactory extends JobFactory {
                         // do nothing just cope with sonarqube rule switch must have default
                 }
             }
+            // check whether task properties has conflicts between "runAsMe" and "fork"
+            if (tmpTask.isRunAsMe() && Boolean.FALSE.equals(tmpTask.isFork())) {
+                throw new JobCreationException(String.format("The task contains conflicting properties between 'runAsMe=%s' and 'fork=%s', because 'runAsMe=true' implies 'fork=true'.",
+                                                             tmpTask.isRunAsMe(),
+                                                             tmpTask.isFork()));
+            }
             //fill the real task with common attribute if it is a new one
             autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
             autoCopyfields(Task.class, tmpTask, toReturn);
@@ -1943,7 +1949,7 @@ public class StaxJobFactory extends JobFactory {
                     } catch (Exception e) {
                         logger.debug("Cannot get args: " + e.getMessage(), e);
                     }
-                    logger.debug("fork: " + ((JavaTask) t).isRunningInForkedJvm());
+                    logger.debug("fork: " + t.isForkingTask());
                 } else if (t instanceof NativeTask) {
                     logger.debug("commandLine: " + Arrays.toString(((NativeTask) t).getCommandLine()));
                 } else if (t instanceof ScriptTask) {

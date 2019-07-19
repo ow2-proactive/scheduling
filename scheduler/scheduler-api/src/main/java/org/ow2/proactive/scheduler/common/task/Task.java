@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -78,6 +79,8 @@ import org.ow2.proactive.scripting.SelectionScript;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "task")
 public abstract class Task extends CommonAttribute {
+    // When the fork mode is neither specified in global config, nor in task property, it is set to true.
+    public static final boolean DEFAULT_TASK_FORK = true;
 
     /** Name of the task. */
     protected String name = SchedulerConstants.TASK_DEFAULT_NAME;
@@ -797,6 +800,47 @@ public abstract class Task extends CommonAttribute {
 
     public void setForkEnvironment(ForkEnvironment forkEnvironment) {
         this.forkEnvironment = forkEnvironment;
+    }
+
+    /**
+     * Returns whether the task should be run in a forked JVM, depending on the global configuration and task property.
+     * The global configuration has a higher priority than the task property; And runasme true implies fork true.
+     *
+     * @return whether the task should be run in a forked JVM.
+     */
+    public boolean isForkingTask() {
+        if (PASchedulerProperties.TASK_RUNASME.getValueAsBoolean()) {
+            return true;
+        } else if (getGlobalConfigureFork() != null) {
+            return getGlobalConfigureFork();
+        } else if (this.runAsMe) {
+            return true;
+        } else if (this.fork != null) {
+            return this.fork;
+        } else {
+            return DEFAULT_TASK_FORK;
+        }
+    }
+
+    /**
+     * Returns whether the task should be run under the job owner user identity
+     *
+     * @return whether the task should be run under the job owner user identity
+     */
+    public boolean isRunAsMeTask() {
+        if (Boolean.FALSE.equals(getGlobalConfigureFork())) {
+            return false;
+        } else {
+            return PASchedulerProperties.TASK_RUNASME.getValueAsBoolean() || runAsMe;
+        }
+    }
+
+    public static Boolean getGlobalConfigureFork() {
+        if (PASchedulerProperties.TASK_FORK.getValueAsStringOrNull() == null) {
+            return null;
+        } else {
+            return PASchedulerProperties.TASK_FORK.getValueAsBoolean();
+        }
     }
 
 }

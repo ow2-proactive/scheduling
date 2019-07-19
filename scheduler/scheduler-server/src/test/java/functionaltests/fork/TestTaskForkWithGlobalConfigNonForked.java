@@ -27,22 +27,34 @@ package functionaltests.fork;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
+import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
 import functionaltests.utils.SchedulerTHelper;
 
 
-public class TestTaskMissingForkParameterWithGlobalConfigForked extends TestForkTask {
+/**
+ * Test the task fork parameter while the global task fork mode is set to false.
+ */
+public class TestTaskForkWithGlobalConfigNonForked extends SchedulerFunctionalTestNonForkedModeNoRestart {
+    private static ForkTaskTestHelper forkTaskTestHelper;
 
     @BeforeClass
-    public static void startSchedulerConfiguredForked() throws Exception {
-        // start an empty scheduler which configured global task fork mode as true
-        schedulerHelper = new SchedulerTHelper(true,
-                                               getResourceAbsolutePath("/functionaltests/config/scheduler-forkedscripttasks.ini"));
+    public static void initialize() {
+        // initialize forkTaskTestHelper after the parent class start scheduler and initialize schedulerHelper
+        forkTaskTestHelper = new ForkTaskTestHelper(schedulerHelper);
     }
 
     @Test
-    public void testMissingForkParameterWithGlobalConfigForked() throws Exception {
+    public void testMissingForkParameterWithGlobalConfigNonForked() throws Exception {
         // test the job task which doesn't have the parameter fork
-        testTaskIsRunningInForkedJvm("/functionaltests/descriptors/Job_MissingFork.xml");
+        forkTaskTestHelper.testTaskIsRunningInExpectedForkedMode("/functionaltests/descriptors/Job_MissingFork.xml",
+                                                                 false);
+    }
+
+    @Test
+    public void testTaskForkParameterShouldBeOverridedGlobalConfigNonForked() throws Exception {
+        // test the job task which set the parameter fork, but it should be overrided by the global config
+        forkTaskTestHelper.testTaskIsRunningInExpectedForkedMode("/functionaltests/descriptors/Job_Fork.xml", false);
     }
 }

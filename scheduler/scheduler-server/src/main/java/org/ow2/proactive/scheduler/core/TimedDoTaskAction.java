@@ -152,7 +152,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
     }
 
     protected void fillContainer() throws KeyException, NoSuchAlgorithmException {
-        boolean isRunAsMeEnabled = task.isRunAsMe();
+        boolean isRunAsMeEnabled = task.isRunAsMeTask();
 
         task.getExecutableContainer().setRunAsUser(isRunAsMeEnabled);
 

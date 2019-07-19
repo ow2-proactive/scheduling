@@ -212,7 +212,7 @@ public enum PASchedulerProperties implements PACommonProperties {
     NUMBER_OF_EXECUTION_ON_FAILURE("pa.scheduler.task.numberofexecutiononfailure", PropertyType.INTEGER, "2"),
 
     /** If true script tasks are ran in a forked JVM, if false they are ran in the node's JVM */
-    TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN, "true"),
+    TASK_FORK("pa.scheduler.task.fork", PropertyType.BOOLEAN),
 
     /**
      * If true tasks are always ran in RunAsMe mode (implies automatically fork), if false, the user can choose whether to run the task in runasme mode or not

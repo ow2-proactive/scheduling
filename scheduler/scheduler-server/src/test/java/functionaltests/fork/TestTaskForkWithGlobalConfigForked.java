@@ -28,21 +28,32 @@ package functionaltests.fork;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import functionaltests.utils.SchedulerFunctionalTestForkedModeNoRestart;
 import functionaltests.utils.SchedulerTHelper;
 
 
-public class TestTaskMissingForkParameterWithGlobalConfigNonForked extends TestForkTask {
+/**
+ * Test the task fork parameter while the global task fork mode is set to true.
+ */
+public class TestTaskForkWithGlobalConfigForked extends SchedulerFunctionalTestForkedModeNoRestart {
+    private static ForkTaskTestHelper forkTaskTestHelper;
 
     @BeforeClass
-    public static void startSchedulerConfiguredNonForked() throws Exception {
-        // start an empty scheduler which configured global task fork mode as false
-        schedulerHelper = new SchedulerTHelper(true,
-                                               getResourceAbsolutePath("/functionaltests/config/scheduler-nonforkedscripttasks.ini"));
+    public static void initialize() {
+        // initialize forkTaskTestHelper after the parent class start scheduler and initialize schedulerHelper
+        forkTaskTestHelper = new ForkTaskTestHelper(schedulerHelper);
     }
 
     @Test
-    public void testMissingForkParameterWithGlobalConfigNonForked() throws Exception {
+    public void testMissingForkParameterWithGlobalConfigForked() throws Exception {
         // test the job task which doesn't have the parameter fork
-        testTaskIsRunningInNonForkedJvm("/functionaltests/descriptors/Job_MissingFork.xml");
+        forkTaskTestHelper.testTaskIsRunningInExpectedForkedMode("/functionaltests/descriptors/Job_MissingFork.xml",
+                                                                 true);
+    }
+
+    @Test
+    public void testTaskNonForkParameterShouldBeOverridedGlobalConfigForked() throws Exception {
+        // test the job task which set the parameter fork, but it should be overrided by the global config
+        forkTaskTestHelper.testTaskIsRunningInExpectedForkedMode("/functionaltests/descriptors/Job_NonFork.xml", true);
     }
 }

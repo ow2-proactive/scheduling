@@ -166,14 +166,6 @@ public class JavaTask extends Task {
         }
     }
 
-    /**
-     * @return true if the task will be executed in a separate JVM
-     */
-    public boolean isRunningInForkedJvm() {
-        return this.forkEnvironment != null || super.isWallTimeSet() || super.isRunAsMe() ||
-               (super.isFork() != null && super.isFork());
-    }
-
     @Override
     public String display() {
         String nl = System.lineSeparator();

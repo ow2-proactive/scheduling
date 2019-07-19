@@ -35,24 +35,38 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
-import functionaltests.utils.SchedulerFunctionalTestWithCustomConfigAndRestart;
+import functionaltests.utils.SchedulerTHelper;
 
 
-public class TestForkTask extends SchedulerFunctionalTestWithCustomConfigAndRestart {
+public class ForkTaskTestHelper {
     public static final String TASK_NAME = "Check_Fork_Task";
 
-    public void testTaskIsRunningInForkedJvm(String jobResource) throws Exception {
-        testTaskGetExpectedOutput(jobResource,
-                                  TASK_NAME,
-                                  System.getProperty("java.io.tmpdir") + File.separator,
-                                  "Task output should display a path under the system tmp directory, as the task is supposed to run in a forked JVM.");
+    private SchedulerTHelper schedulerHelper;
+
+    public ForkTaskTestHelper(SchedulerTHelper schedulerHelper) {
+        this.schedulerHelper = schedulerHelper;
     }
 
-    public void testTaskIsRunningInNonForkedJvm(String jobResource) throws Exception {
-        testTaskGetExpectedOutput(jobResource,
-                                  TASK_NAME,
-                                  PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
-                                  "Task output should display the proactive home path, as the task is supposed to run in the node JVM.");
+    /**
+     * Test whether the job is executed in the expected forked mode
+     *
+     * @param jobResource the path of the job to check whether it's executed in forked mode.
+     *                    The job is expected to contain a task named ForkTaskTestHelper.TASK_NAME which prints the working directory
+     * @param expectForked true if expect the job to run in a forked JVM; false if expect the job to run in the node JVM.
+     * @throws Exception
+     */
+    public void testTaskIsRunningInExpectedForkedMode(String jobResource, boolean expectForked) throws Exception {
+        if (expectForked) {
+            testTaskGetExpectedOutput(jobResource,
+                                      TASK_NAME,
+                                      System.getProperty("java.io.tmpdir") + File.separator,
+                                      "Task output should display a path under the system tmp directory, as the task is supposed to run in a forked JVM.");
+        } else {
+            testTaskGetExpectedOutput(jobResource,
+                                      TASK_NAME,
+                                      PASchedulerProperties.SCHEDULER_HOME.getValueAsString(),
+                                      "Task output should display the proactive home path, as the task is supposed to run in the node JVM.");
+        }
     }
 
     /**
@@ -63,7 +77,7 @@ public class TestForkTask extends SchedulerFunctionalTestWithCustomConfigAndRest
      * @param errorMessage the error message when the task output doesn't contain the expected substring
      * @throws Exception
      */
-    protected void testTaskGetExpectedOutput(String jobResource, String expectedTaskName, String expectedTaskOutput,
+    public void testTaskGetExpectedOutput(String jobResource, String expectedTaskName, String expectedTaskOutput,
             String errorMessage) throws Exception {
         Scheduler scheduler = schedulerHelper.getSchedulerInterface();
         JobId jobid = schedulerHelper.testJobSubmission(getResourceAbsolutePath(jobResource));
@@ -74,7 +88,7 @@ public class TestForkTask extends SchedulerFunctionalTestWithCustomConfigAndRest
         Assert.assertTrue(errorMessage, taskOutput.contains(expectedTaskOutput));
     }
 
-    protected static String getResourceAbsolutePath(String resourceName) throws URISyntaxException {
-        return new File(TestTaskWithForkParameter.class.getResource(resourceName).toURI()).getAbsolutePath();
+    public static String getResourceAbsolutePath(String resourceName) throws URISyntaxException {
+        return new File(TestTaskForkParameter.class.getResource(resourceName).toURI()).getAbsolutePath();
     }
 }
