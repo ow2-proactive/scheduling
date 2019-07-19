@@ -29,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
+import org.ow2.proactive.scheduler.util.TaskConfiguration;
 
 import functionaltests.utils.SchedulerFunctionalTestNoRestart;
 import functionaltests.utils.SchedulerTHelper;
@@ -62,6 +63,6 @@ public class TestTaskForkParameter extends SchedulerFunctionalTestNoRestart {
     public void testMissingForkTask() throws Exception {
         // test the job task which not specified the parameter fork 
         forkTaskTestHelper.testTaskIsRunningInExpectedForkedMode("/functionaltests/descriptors/Job_MissingFork.xml",
-                                                                 Task.DEFAULT_TASK_FORK);
+                                                                 TaskConfiguration.DEFAULT_TASK_FORK);
     }
 }

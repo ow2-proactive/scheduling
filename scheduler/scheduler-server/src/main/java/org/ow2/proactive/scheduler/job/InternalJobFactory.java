@@ -57,6 +57,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.java.JavaClassScriptEngineFactory;
+import org.ow2.proactive.scheduler.util.TaskConfiguration;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -271,7 +272,7 @@ public class InternalJobFactory {
             HashMap<String, byte[]> args = task.getSerializedArguments();
 
             try {
-                if (task.isForkingTask()) {
+                if (TaskConfiguration.isForkingTask(task)) {
                     javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
                                                                                                                           JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
                                                                                                                           new Serializable[] { args }))),
@@ -319,7 +320,7 @@ public class InternalJobFactory {
         try {
             String commandAndArguments = "\"" + Joiner.on("\" \"").join(task.getCommandLine()) + "\"";
             InternalTask scriptTask;
-            if (task.isForkingTask()) {
+            if (TaskConfiguration.isForkingTask(task)) {
                 scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(commandAndArguments,
                                                                                                                         "native"))),
                                                           internalJob);
@@ -342,7 +343,7 @@ public class InternalJobFactory {
     private static InternalTask createTask(Job userJob, InternalJob internalJob, ScriptTask task)
             throws JobCreationException {
         InternalTask scriptTask;
-        if (task.isForkingTask()) {
+        if (TaskConfiguration.isForkingTask(task)) {
             scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()), internalJob);
         } else {
             scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()), internalJob);

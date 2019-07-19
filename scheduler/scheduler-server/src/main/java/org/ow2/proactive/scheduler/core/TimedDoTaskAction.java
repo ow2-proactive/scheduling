@@ -49,6 +49,7 @@ import org.ow2.proactive.scheduler.task.TaskLauncher;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTaskParentFinder;
 import org.ow2.proactive.scheduler.task.internal.TaskRecoveryData;
+import org.ow2.proactive.scheduler.util.TaskConfiguration;
 import org.ow2.proactive.threading.CallableWithTimeoutAction;
 
 
@@ -152,7 +153,7 @@ public class TimedDoTaskAction implements CallableWithTimeoutAction<Void> {
     }
 
     protected void fillContainer() throws KeyException, NoSuchAlgorithmException {
-        boolean isRunAsMeEnabled = task.isRunAsMeTask();
+        boolean isRunAsMeEnabled = TaskConfiguration.isRunAsMeTask(task);
 
         task.getExecutableContainer().setRunAsUser(isRunAsMeEnabled);
 

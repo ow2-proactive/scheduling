@@ -1949,7 +1949,8 @@ public class StaxJobFactory extends JobFactory {
                     } catch (Exception e) {
                         logger.debug("Cannot get args: " + e.getMessage(), e);
                     }
-                    logger.debug("fork: " + t.isForkingTask());
+                    logger.debug("fork: " + t.isFork());
+                    logger.debug("runAsMe: " + t.isRunAsMe());
                 } else if (t instanceof NativeTask) {
                     logger.debug("commandLine: " + Arrays.toString(((NativeTask) t).getCommandLine()));
                 } else if (t instanceof ScriptTask) {
