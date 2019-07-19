@@ -77,13 +77,16 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
 
         public boolean dynamic;
 
+        public int sectionSelector;
+
         ConfigurableWrapper() {
         }
 
-        public ConfigurableWrapper(ConfigurableValues type, String desc, boolean dynamic) {
+        public ConfigurableWrapper(ConfigurableValues type, String desc, boolean dynamic, int sectionSelector) {
             this.description = desc;
             this.type = type;
             this.dynamic = dynamic;
+            this.sectionSelector = sectionSelector;
         }
     }
 
@@ -104,7 +107,7 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
             type = ConfigurableValues.NONE;
         }
 
-        return new ConfigurableWrapper(type, arg0.description(), arg0.dynamic());
+        return new ConfigurableWrapper(type, arg0.description(), arg0.dynamic(), arg0.sectionSelector());
     }
 
     @Override
@@ -150,6 +153,10 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
                 return arg0.dynamic;
             }
 
+            @Override
+            public int sectionSelector() {
+                return arg0.sectionSelector;
+            }
         };
     }
 

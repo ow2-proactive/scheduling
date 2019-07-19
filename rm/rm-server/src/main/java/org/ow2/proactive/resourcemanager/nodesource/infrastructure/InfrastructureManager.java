@@ -1254,4 +1254,8 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
         return getPersistedInfraVariable(() -> (String) this.persistedInfraVariables.get(RM_URL_KEY));
     }
 
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        return new HashMap<>();
+    }
 }
