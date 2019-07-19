@@ -56,16 +56,16 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     public static final long DEFAULT_TIMEOUT = 30000;
 
-    @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true)
+    @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true, sectionSelector = 1)
     private Credentials credentials;
 
-    @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine")
+    @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine", sectionSelector = 2)
     private int maxNodes = DEFAULT_NODE_NUMBER;
 
-    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost")
+    @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost", sectionSelector = 3)
     private long nodeTimeout = DEFAULT_TIMEOUT;
 
-    @Configurable(description = "Additional ProActive properties")
+    @Configurable(description = "Additional ProActive properties", sectionSelector = 3)
     private String paProperties = "";
 
     /**

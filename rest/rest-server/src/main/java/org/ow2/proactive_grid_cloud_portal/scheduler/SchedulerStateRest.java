@@ -3109,7 +3109,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return s.getStatHistory("ProActiveScheduler:name=RuntimeData",
                                 "dddd", // all for ranges for the days
                                 new String[] { "PendingJobsCount", "PausedJobsCount", "RunningJobsCount",
-                                               "StalledJobsCount" });
+                                               "StalledJobsCount", "InErrorJobsCount" });
     }
 
     /**
