@@ -543,12 +543,12 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             }
             if (PASchedulerProperties.TASK_FORK.getValueAsStringOrNull() != null) {
                 if (task.isFork() != null && PASchedulerProperties.TASK_FORK.getValueAsBoolean() != task.isFork()) {
-                    jlogger.warn(job.getId(),
-                                 String.format("The task [%s] configuration 'fork=%s' is ignored, as it conflicts with the global configuration [%s=%s].",
-                                               task.getName(),
-                                               task.isFork(),
-                                               PASchedulerProperties.TASK_FORK.getKey(),
-                                               PASchedulerProperties.TASK_FORK.getValueAsStringOrNull()));
+                    jlogger.debug(job.getId(),
+                                  String.format("The task [%s] configuration 'fork=%s' is ignored, as it conflicts with the global configuration [%s=%s].",
+                                                task.getName(),
+                                                task.isFork(),
+                                                PASchedulerProperties.TASK_FORK.getKey(),
+                                                PASchedulerProperties.TASK_FORK.getValueAsStringOrNull()));
                 }
                 if (!PASchedulerProperties.TASK_FORK.getValueAsBoolean() && task.isRunAsMe()) {
                     jlogger.warn(job.getId(),
