@@ -57,6 +57,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.task.java.JavaClassScriptEngineFactory;
+import org.ow2.proactive.scheduler.util.TaskConfiguration;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SimpleScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -271,13 +272,12 @@ public class InternalJobFactory {
             HashMap<String, byte[]> args = task.getSerializedArguments();
 
             try {
-                if (isForkingTask()) {
+                if (TaskConfiguration.isForkingTask(task)) {
                     javaTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
                                                                                                                           JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
                                                                                                                           new Serializable[] { args }))),
                                                             internalJob);
                     javaTask.setForkEnvironment(task.getForkEnvironment());
-                    configureRunAsMe(task);
                 } else {
                     javaTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(task.getExecutableClassName(),
                                                                                                                     JavaClassScriptEngineFactory.JAVA_CLASS_SCRIPT_ENGINE_NAME,
@@ -302,12 +302,6 @@ public class InternalJobFactory {
         return javaTask;
     }
 
-    private static void configureRunAsMe(Task task) {
-        if (isRunAsMeTask()) {
-            task.setRunAsMe(true);
-        }
-    }
-
     /**
      * Create an internal native Task with the given native task (user)
      *
@@ -326,11 +320,10 @@ public class InternalJobFactory {
         try {
             String commandAndArguments = "\"" + Joiner.on("\" \"").join(task.getCommandLine()) + "\"";
             InternalTask scriptTask;
-            if (isForkingTask()) {
+            if (TaskConfiguration.isForkingTask(task)) {
                 scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(commandAndArguments,
                                                                                                                         "native"))),
                                                           internalJob);
-                configureRunAsMe(task);
             } else {
                 scriptTask = new InternalScriptTask(new ScriptExecutableContainer(new TaskScript(new SimpleScript(commandAndArguments,
                                                                                                                   "native"))),
@@ -350,9 +343,8 @@ public class InternalJobFactory {
     private static InternalTask createTask(Job userJob, InternalJob internalJob, ScriptTask task)
             throws JobCreationException {
         InternalTask scriptTask;
-        if (isForkingTask()) {
+        if (TaskConfiguration.isForkingTask(task)) {
             scriptTask = new InternalForkedScriptTask(new ScriptExecutableContainer(task.getScript()), internalJob);
-            configureRunAsMe(task);
         } else {
             scriptTask = new InternalScriptTask(new ScriptExecutableContainer(task.getScript()), internalJob);
         }
@@ -363,14 +355,6 @@ public class InternalJobFactory {
             throw new JobCreationException(e);
         }
         return scriptTask;
-    }
-
-    private static boolean isForkingTask() {
-        return PASchedulerProperties.TASK_FORK.getValueAsBoolean() || isRunAsMeTask();
-    }
-
-    private static boolean isRunAsMeTask() {
-        return PASchedulerProperties.TASK_RUNASME.getValueAsBoolean();
     }
 
     /**

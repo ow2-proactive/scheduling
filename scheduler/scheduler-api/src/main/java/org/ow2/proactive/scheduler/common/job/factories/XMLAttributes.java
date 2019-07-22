@@ -61,6 +61,7 @@ public enum XMLAttributes {
     TASK_PRECIOUS_LOGS("preciousLogs"),
     TASK_PRECIOUS_RESULT("preciousResult"),
     TASK_RUN_AS_ME("runAsMe"),
+    TASK_FORK("fork"),
     TASK_WALLTIME("walltime"),
 
     // NATIVE TASK ATTRIBUTES

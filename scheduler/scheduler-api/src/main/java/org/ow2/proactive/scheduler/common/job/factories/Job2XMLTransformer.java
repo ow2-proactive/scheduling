@@ -50,7 +50,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -455,6 +454,10 @@ public class Job2XMLTransformer {
 
         if (task.isRunAsMe()) {
             setAttribute(taskE, XMLAttributes.TASK_RUN_AS_ME, "true");
+        }
+
+        if (task.isFork() != null && task.isFork()) {
+            setAttribute(taskE, XMLAttributes.TASK_FORK, "true");
         }
 
         if (task.isPreciousResult()) {

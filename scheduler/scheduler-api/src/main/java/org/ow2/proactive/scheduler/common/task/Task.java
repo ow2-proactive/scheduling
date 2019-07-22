@@ -53,6 +53,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.OutputSelector;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowBlock;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
+import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.SelectionScript;
 
@@ -140,6 +141,9 @@ public abstract class Task extends CommonAttribute {
     protected boolean preciousLogs;
 
     protected boolean runAsMe;
+
+    /** If true, task is ran in a forked JVM, this parameter is optional (nullable) .*/
+    protected Boolean fork;
 
     /** List of dependences if necessary. */
     @XmlTransient
@@ -259,6 +263,23 @@ public abstract class Task extends CommonAttribute {
      */
     public void setRunAsMe(boolean runAsMe) {
         this.runAsMe = runAsMe;
+    }
+
+    /**
+     * To know if the task will be run in a forked JVM
+     * @return fork true if the task will be run in a forked JVM; false if the task will be ran in the node's JVM.
+     */
+    public Boolean isFork() {
+        return fork;
+    }
+
+    /**
+     * Set if the task will be run in a forked JVM
+     * 
+     * @param fork if true, this task will be run in a forked JVM; if false, it will be ran in the node's JVM.
+     */
+    public void setFork(Boolean fork) {
+        this.fork = fork;
     }
 
     /**
@@ -752,6 +773,7 @@ public abstract class Task extends CommonAttribute {
                                    line("PreciousResult", preciousResult),
                                    line("PreciousLogs", preciousLogs),
                                    line("RunAsMe", runAsMe),
+                                   line("fork", fork),
                                    line("WallTime", wallTime),
                                    line("Dependences", dependences))
                                .filter(s -> !s.isEmpty())

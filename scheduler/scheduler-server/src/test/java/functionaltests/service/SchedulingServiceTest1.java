@@ -101,6 +101,7 @@ public class SchedulingServiceTest1 extends BaseServiceTest {
 
         assertEquals(1, jobsMap.size());
         jobDesc = jobsMap.values().iterator().next();
+        JobId jobId = jobDesc.getJobId();
         Assert.assertEquals(1, jobDesc.getEligibleTasks().size());
 
         taskStarted(jobDesc, (EligibleTaskDescriptor) jobDesc.getEligibleTasks().iterator().next());
@@ -116,11 +117,10 @@ public class SchedulingServiceTest1 extends BaseServiceTest {
         TaskId taskId = ((JobDescriptorImpl) jobDesc).getInternal().getTask("task1").getId();
         service.taskTerminatedWithResult(taskId, new TaskResultImpl(taskId, "Result", null, 0));
 
-        jobsMap = service.lockJobsToSchedule();
-
-        // when a job finishes, it isn't removed from the hibernate context unless
-        // the housekeeping mechanism is enabled
-        assertEquals(1, jobsMap.size());
+        // wait for the job to finish
+        while (service.isJobAlive(jobId)) {
+            Thread.sleep(100);
+        }
 
         listener.assertEvents(SchedulerEvent.JOB_PENDING_TO_RUNNING,
                               SchedulerEvent.JOB_UPDATED,

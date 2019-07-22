@@ -954,6 +954,8 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attributeName)) {
                     tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue,
                                                                     tmpTask.getVariablesOverriden(job))));
+                } else if (XMLAttributes.TASK_FORK.matches(attributeName)) {
+                    tmpTask.setFork(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 }
             }
 
@@ -1035,6 +1037,12 @@ public class StaxJobFactory extends JobFactory {
                     default:
                         // do nothing just cope with sonarqube rule switch must have default
                 }
+            }
+            // check whether task properties has conflicts between "runAsMe" and "fork"
+            if (tmpTask.isRunAsMe() && Boolean.FALSE.equals(tmpTask.isFork())) {
+                throw new JobCreationException(String.format("The task contains conflicting properties between 'runAsMe=%s' and 'fork=%s', because 'runAsMe=true' implies 'fork=true'.",
+                                                             tmpTask.isRunAsMe(),
+                                                             tmpTask.isFork()));
             }
             //fill the real task with common attribute if it is a new one
             autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
@@ -1941,7 +1949,8 @@ public class StaxJobFactory extends JobFactory {
                     } catch (Exception e) {
                         logger.debug("Cannot get args: " + e.getMessage(), e);
                     }
-                    logger.debug("fork: " + ((JavaTask) t).isFork());
+                    logger.debug("fork: " + t.isFork());
+                    logger.debug("runAsMe: " + t.isRunAsMe());
                 } else if (t instanceof NativeTask) {
                     logger.debug("commandLine: " + Arrays.toString(((NativeTask) t).getCommandLine()));
                 } else if (t instanceof ScriptTask) {
