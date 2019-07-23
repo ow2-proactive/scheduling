@@ -84,7 +84,7 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
         ConfigurableWrapper() {
         }
 
-        public ConfigurableWrapper(ConfigurableValues type, String desc, boolean dynamic, int sectionSelectorm,
+        public ConfigurableWrapper(ConfigurableValues type, String desc, boolean dynamic, int sectionSelector,
                 boolean important) {
             this.description = desc;
             this.type = type;
