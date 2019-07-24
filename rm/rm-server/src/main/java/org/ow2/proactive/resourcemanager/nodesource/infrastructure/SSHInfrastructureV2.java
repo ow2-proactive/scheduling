@@ -84,10 +84,10 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
     @Configurable(description = "The port of the ssh server " + DEFAULT_SSH_PORT + " by default", sectionSelector = 2)
     protected int sshPort = DEFAULT_SSH_PORT;
 
-    @Configurable(description = "Specifies the user to log in as on the remote machine", sectionSelector = 2)
+    @Configurable(description = "Specifies the user to log in as on the remote machine", sectionSelector = 2, important = true)
     protected String sshUsername;
 
-    @Configurable(description = "The password to use for authentification (less secure than private key)", sectionSelector = 2)
+    @Configurable(description = "The password to use for authentification (less secure than private key)", sectionSelector = 2, important = true)
     protected String sshPassword;
 
     @Configurable(fileBrowser = true, description = "If no password specify the private key file", sectionSelector = 2)
