@@ -75,30 +75,21 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
 
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        // user does not have an access to change the node source
-        ResourceManager userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
-        try {
-            userRMAccess.removeNodeSource(nsName, true).getBooleanValue();
-            fail();
-        } catch (Exception e) {
-        }
-
-        // admin and provider are in "nsadmins" group
         ResourceManager providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
         try {
             providerRMAccess.removeNodeSource(nsName, true).getBooleanValue();
-            fail();
+            fail("nsadmin is not the node source owner");
         } catch (Exception e) {
         }
 
-        adminRMAccess = rmHelper.getResourceManager(TestUsers.ADMIN);
+        adminRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
 
         adminRMAccess.removeNodeSource(nsName, true).getBooleanValue();
 
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_REMOVED, nsName);
 
         RMTHelper.log("Test2 - ns admin can remove foreign nodes");
-        userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
+        ResourceManager userRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
         userRMAccess.createNodeSource(nsName,
                                       DefaultInfrastructureManager.class.getName(),
                                       null,
@@ -107,7 +98,7 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
                                       NODES_NOT_RECOVERABLE);
         rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, nsName);
 
-        providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
+        providerRMAccess = rmHelper.getResourceManager(TestUsers.PROVIDER);
         TestNode testNode1 = rmHelper.createNode("node1");
         testNodes.add(testNode1);
         Node node = testNode1.getNode();
@@ -118,13 +109,13 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
         // node becomes free
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
+        userRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
         // this is an administrator of the node source, so it can remove the foreign node
         userRMAccess.removeNode(node.getNodeInformation().getURL(), true).getBooleanValue();
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_REMOVED);
 
         RMTHelper.log("Test3 - ns admin cannot get the foreign node");
-        providerRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
+        providerRMAccess = rmHelper.getResourceManager(TestUsers.PROVIDER);
         TestNode testNode2 = rmHelper.createNode("node2");
         testNodes.add(testNode2);
         Node node2 = testNode2.getNode();
@@ -134,8 +125,8 @@ public class TestNSAdminPermissions extends RMFunctionalTest {
         // node becomes free
         rmHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
 
-        userRMAccess = rmHelper.getResourceManager(TestUsers.RADMIN);
-        // this is an administrator of the node source, so it can remove the foreign node
+        userRMAccess = rmHelper.getResourceManager(TestUsers.NSADMIN);
+        // this is an administrator of the node source, but it cannot use the node
         NodeSet nodes = userRMAccess.getAtMostNodes(1, null);
         Assert.assertEquals("NS admin cannot get nodes as the get level is set to PROVIDER", 0, nodes.size());
 

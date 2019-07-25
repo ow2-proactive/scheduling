@@ -53,6 +53,7 @@ import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.PrincipalPermission;
+import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -362,7 +363,8 @@ public class NodeSource implements InitActive, RunActive {
         // checking that client has a right to change this node source
         // if the provider is the administrator of the node source it always has this permission
         provider.checkPermission(providerPermission,
-                                 provider + " is not authorized to add node " + nodeUrl + " to " + name);
+                                 provider + " is not authorized to add node " + nodeUrl + " to " + name,
+                                 new RMCoreAllPermission());
 
         // lookup for a new Node
         int lookUpTimeout = PAResourceManagerProperties.RM_NODELOOKUP_TIMEOUT.getValueAsInt();

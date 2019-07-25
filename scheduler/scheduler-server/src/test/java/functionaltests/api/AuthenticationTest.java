@@ -92,7 +92,7 @@ public class AuthenticationTest extends SchedulerFunctionalTestNoRestart {
         Assert.assertNotNull(userData);
         Assert.assertNotNull(userData.getUserName());
         Assert.assertNotNull(userData.getGroups());
-        Assert.assertTrue(userData.getGroups().contains("admin"));
+        Assert.assertTrue(userData.getGroups().contains("scheduleradmins"));
         admin.disconnect();
         log("Passed: successful authentication");
     }

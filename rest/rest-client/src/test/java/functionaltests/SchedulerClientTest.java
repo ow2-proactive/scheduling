@@ -690,7 +690,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         UserData userData = client.getCurrentUserData();
         Assert.assertNotNull(userData);
         Assert.assertNotNull(userData.getGroups());
-        Assert.assertTrue(userData.getGroups().contains("admin"));
+        Assert.assertTrue(userData.getGroups().contains("scheduleradmins"));
         client.disconnect();
 
         client.init(new ConnectionInfo(getRestServerUrl(), getNonAdminLogin(), getNonAdminLoginPassword(), null, true));
