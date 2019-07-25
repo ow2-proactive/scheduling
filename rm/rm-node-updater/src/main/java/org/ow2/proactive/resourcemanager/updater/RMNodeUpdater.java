@@ -200,13 +200,11 @@ public class RMNodeUpdater extends RMNodeStarter {
             case OUT_DATED:
                 logger.info("Downloading node.jar from " + nodeJarUrl + " to " + nodeJarSaveAs);
                 File destination = new File(nodeJarSaveAs);
-                destination.mkdirs();
                 File lockFile = null;
                 FileLock lock = null;
                 FileChannel channel = null;
                 try {
                     if (destination.exists()) {
-
                         lockFile = new File(StandardSystemProperty.JAVA_IO_TMPDIR.value(), "lock");
                         if (!lockFile.exists()) {
                             lockFile.createNewFile();
@@ -220,6 +218,8 @@ public class RMNodeUpdater extends RMNodeStarter {
                             logger.warn("Another process downloaded node.jar");
                             return false;
                         }
+                    } else {
+                        FileUtils.forceMkdirParent(destination);
                     }
                     fetchUrl(nodeJarUrl, destination);
                     // Align the local file modification time with the remote url.
