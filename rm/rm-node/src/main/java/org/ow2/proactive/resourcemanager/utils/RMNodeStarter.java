@@ -461,7 +461,11 @@ public class RMNodeStarter {
         configureSecurityManager();
         configureRMAndProActiveHomes();
         configureProActiveDefaultConfigurationFile();
-        loadSigarIfRunningWithOneJar();
+        try {
+            loadSigarIfRunningWithOneJar();
+        } catch (Exception e) {
+            logger.warn("Sigar will not be loaded, as it is not supported by the underlying OS.");
+        }
 
         String nodeName = parseCommandLine(args);
 
