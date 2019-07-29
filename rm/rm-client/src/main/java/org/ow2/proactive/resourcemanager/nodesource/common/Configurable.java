@@ -70,6 +70,11 @@ public @interface Configurable {
     boolean textArea() default false;
 
     /**
+     * Field is a checkbox
+     */
+    boolean checkbox() default false;
+
+    /**
      * Dynamic fields can be edited while the node source is deployed.
      */
     boolean dynamic() default false;
