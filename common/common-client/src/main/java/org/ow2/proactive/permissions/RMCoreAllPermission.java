@@ -23,25 +23,22 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package functionaltests.utils;
+package org.ow2.proactive.permissions;
 
-public enum TestUsers {
+import org.ow2.proactive.policy.ClientsPolicy;
 
-    DEMO("demo", "demo"),
-    USER("user", "pwd"),
-    TEST("test_executor", "pwd"),
-    RADMIN("radmin", "pwd"),
-    NSADMIN("nsadmin", "pwd"),
-    NSADMIN2("nsadmin2", "pwd"),
-    ADMIN("admin", "admin"),
-    PROVIDER("provider", "pwd");
 
-    public final String username;
+/**
+ * The AllPermission is a permission that implies all other permissions.
+ * It is an equivalent of java.security.AllPermission and could be granted
+ * to the resource manager of scheduler clients. java.security.AllPermission
+ * cannot be granted to them.
+ * @see ClientsPolicy
+ */
+public class RMCoreAllPermission extends ClientPermission {
 
-    public final String password;
+    // This serial version uid is meant to prevent issues when restoring Resource Manager database from a previous version.
+    // any addition to this class (new method, field, etc) should imply to change this uid.
+    private static final long serialVersionUID = 1L;
 
-    TestUsers(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
 }

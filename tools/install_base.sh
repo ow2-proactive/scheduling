@@ -155,6 +155,7 @@ generate_new_accounts()
     $PA_ROOT/default/tools/proactive-users -D -l test
     $PA_ROOT/default/tools/proactive-users -D -l radmin
     $PA_ROOT/default/tools/proactive-users -D -l nsadmin
+    $PA_ROOT/default/tools/proactive-users -D -l nsadmin2
     $PA_ROOT/default/tools/proactive-users -D -l provider
     $PA_ROOT/default/tools/proactive-users -D -l test_executor
 

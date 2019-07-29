@@ -329,9 +329,9 @@ public class ProbabilisticSelectionManagerTest {
 
             freeNodes = new ArrayList<>(nbNodes);
             for (int i = 0; i < nbNodes; i++) {
-                freeNodes.add(SelectionManagerTest.createMockeNode("user",
-                                                                   "mocked-node-" + (i + 1),
-                                                                   "mocked-node-" + (i + 1)));
+                freeNodes.add(SelectionManagerTest.createMockedNode("user",
+                                                                    "mocked-node-" + (i + 1),
+                                                                    "mocked-node-" + (i + 1)));
             }
             when(rmCore.getFreeNodes()).thenReturn(freeNodes);
 

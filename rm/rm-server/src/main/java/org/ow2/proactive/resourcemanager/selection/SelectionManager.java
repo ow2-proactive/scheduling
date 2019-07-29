@@ -39,6 +39,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.utils.NamedThreadFactory;
 import org.ow2.proactive.authentication.principals.TokenPrincipal;
+import org.ow2.proactive.permissions.NodeUserAllPermission;
 import org.ow2.proactive.permissions.PrincipalPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -509,7 +510,8 @@ public abstract class SelectionManager {
                 if (!clientPermissions.contains(node.getUserPermission())) {
                     client.checkPermission(node.getUserPermission(),
                                            client + " is not authorized to get the node " + node.getNodeURL() +
-                                                                     " from " + node.getNodeSource().getName());
+                                                                     " from " + node.getNodeSource().getName(),
+                                           new NodeUserAllPermission());
                     // YES
                     clientPermissions.add(node.getUserPermission());
                 }
