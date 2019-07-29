@@ -537,6 +537,22 @@ if [[ "$OLD_PADIR" == "" ]]; then
         sed -e "s/^SINGLE_JVM=.*/SINGLE_JVM=true/g" -i "$PA_ROOT/default/tools/proactive-scheduler"
     fi
 
+    if [[ "$OS" == "Debian" ]]; then
+        tail -n +5 "$PA_ROOT/default/tools/proactive-scheduler" > "$PA_ROOT/default/tools/proactive-scheduler.tmp"
+        echo '
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          proactive-scheduler
+# Required-Start:    $all
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+### END INIT INFO
+ ' > "$PA_ROOT/default/tools/proactive-scheduler"
+        cat "$PA_ROOT/default/tools/proactive-scheduler.tmp" >> "$PA_ROOT/default/tools/proactive-scheduler"
+        rm "$PA_ROOT/default/tools/proactive-scheduler.tmp"
+    fi
+
     echo "Here are the network interfaces available on your machine and the interface which will be automatically selected by ProActive: "
 
 
