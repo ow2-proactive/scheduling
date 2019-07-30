@@ -63,10 +63,10 @@ public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
     @Configurable(description = "An interpreter that executes the script")
     protected String interpreter = "bash";
 
-    @Configurable(fileBrowser = true, description = "A script that deploys a node on host (parameters: host, node, ns names and rm url).")
+    @Configurable(fileBrowser = true, description = "A script that deploys a node on host (parameters: host, node, ns names and rm url).", important = true)
     protected File deploymentScript;
 
-    @Configurable(fileBrowser = true, description = "A script that removes a node (parameters: host name and node url")
+    @Configurable(fileBrowser = true, description = "A script that removes a node (parameters: host name and node url", important = true)
     protected File removalScript;
 
     private static final String NB_REMOVAL_THREAD_KEY = "numberOfRemovalThread";
