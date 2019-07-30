@@ -1,3 +1,7 @@
+//Import required to format the license report plugin
+import com.github.jk1.license.render.*
+import com.github.jk1.license.filter.*
+
 buildscript {
     repositories {
         if (project.hasProperty('local')) mavenLocal()
@@ -31,8 +35,7 @@ buildscript {
         classpath "com.diffplug.gradle.spotless:spotless:2.4.0"
         classpath "org.ow2.proactive:coding-rules:1.0.0"
 
-	classpath 'com.github.jk1:gradle-license-report:1.7'
-
+        classpath 'com.github.jk1:gradle-license-report:1.9'
 
         delete "gradle/ext"
         ant.unjar src: configurations.classpath.find { it.name.startsWith("coding-rules") }, dest: 'gradle/ext'
@@ -120,6 +123,9 @@ allprojects {
 
     licenseReport {
         configurations = ['runtime']
+	excludeGroups = ['org.objectweb.proactive','jsr223']
+    	filters = [new LicenseBundleNormalizer(bundlePath: "$rootDir/config/report/license-normalizer-bundle.json")]
+        renderers = [new InventoryHtmlReportRenderer()]
     }
 }
 
