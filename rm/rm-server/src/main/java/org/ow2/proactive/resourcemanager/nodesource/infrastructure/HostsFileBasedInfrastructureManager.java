@@ -53,7 +53,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     protected static final long DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES = 5000;
 
-    @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts", sectionSelector = 1)
+    @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts", sectionSelector = 1, important = true)
     protected File hostsList;
 
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost", sectionSelector = 3)
