@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -113,7 +114,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the credential file")
+    @Configurable(credential = true, description = "Absolute path of the credential file", important = true)
     protected File rmCredentialsPath;
 
     private static final String CREDENTIALS_KEY = "credentials";
