@@ -56,10 +56,10 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     public static final long DEFAULT_TIMEOUT = 30000;
 
-    @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true, sectionSelector = 1)
+    @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true, sectionSelector = 3, important = true)
     private Credentials credentials;
 
-    @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine", sectionSelector = 2)
+    @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine", sectionSelector = 1, important = true)
     private int maxNodes = DEFAULT_NODE_NUMBER;
 
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost", sectionSelector = 3)
@@ -476,5 +476,13 @@ public class LocalInfrastructure extends InfrastructureManager {
     private int getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock() {
         return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) -
                                                (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY));
+    }
+
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(1, "Deployment Configuration");
+        sectionDescriptions.put(3, "Node Configuration");
+        return sectionDescriptions;
     }
 }

@@ -30,7 +30,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -69,25 +71,25 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
     /**
      * Initial time for nodes acquisition
      */
-    @Configurable(description = "Time of nodes acquisition", dynamic = true)
+    @Configurable(description = "Time of nodes acquisition", dynamic = true, sectionSelector = 2)
     private String acquireTime = DATE_FORMAT.format(getDate(System.currentTimeMillis()));
 
     /**
      * Initial time for nodes releasing
      */
-    @Configurable(description = "Time of nodes removal", dynamic = true)
+    @Configurable(description = "Time of nodes removal", dynamic = true, sectionSelector = 2)
     private String releaseTime = DATE_FORMAT.format(getDate(System.currentTimeMillis() + 60 * 60 * 1000)); // 1 hour
 
     /**
      * Period in milliseconds between nodes acquisition/releasing iterations
      */
-    @Configurable(description = "ms (1 day by default)", dynamic = true)
+    @Configurable(description = "ms (1 day by default)", dynamic = true, sectionSelector = 2)
     private Long period = 24 * 60 * 60 * 1000L;
 
     /**
      * The way of nodes removing
      */
-    @Configurable(description = "How nodes are removed", dynamic = true)
+    @Configurable(description = "How nodes are removed", dynamic = true, checkbox = true, sectionSelector = 2)
     private boolean preemptive = true;
 
     /**
@@ -260,4 +262,10 @@ public class TimeSlotPolicy extends NodeSourcePolicy implements InitActive {
         }
     }
 
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(2, "Time Slot Configuration");
+        return sectionDescriptions;
+    }
 }
