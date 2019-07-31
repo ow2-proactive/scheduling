@@ -668,12 +668,10 @@ public class TaskData {
 
         InternalTask internalTask;
 
-        if (taskType.equals(SCRIPT_TASK)) {
-            internalTask = new InternalScriptTask(internalJob);
-        } else if (taskType.equals(FORKED_SCRIPT_TASK)) {
+        if (isForkTask()) {
             internalTask = new InternalForkedScriptTask(internalJob);
         } else {
-            throw new IllegalStateException("Unexpected stored task type: " + taskType);
+            internalTask = new InternalScriptTask(internalJob);
         }
 
         internalTask.setId(taskId);
@@ -1227,4 +1225,14 @@ public class TaskData {
         return taskState;
     }
 
+    @Transient
+    public boolean isForkTask() {
+        if (SCRIPT_TASK.equals(taskType)) {
+            return false;
+        } else if (FORKED_SCRIPT_TASK.equals(taskType)) {
+            return true;
+        } else {
+            throw new IllegalStateException("Unexpected stored task type: " + taskType);
+        }
+    }
 }
