@@ -337,15 +337,15 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             this.javaOptions = parameters[index++].toString();
 
             // credentials
-            if (parameters[index] == null) {
-                throw new IllegalArgumentException("Credentials must be specified");
-            }
-            try {
-                persistedInfraVariables.put(CREDENTIALS_KEY,
-                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
-            } catch (KeyException e) {
-                throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
-            }
+//            if (parameters[index] == null) {
+//                throw new IllegalArgumentException("Credentials must be specified");
+//            }
+//            try {
+//                persistedInfraVariables.put(CREDENTIALS_KEY,
+//                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+//            } catch (KeyException e) {
+//                throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
+//            }
         } else {
             throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
         }
@@ -397,10 +397,12 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     // Below are wrapper methods around the runtime variables map
 
     private Credentials getCredentials() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Credentials>() {
-            @Override
-            public Credentials handle() {
-                return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
+        return getPersistedInfraVariable(() -> {
+            final Credentials credentials = (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
+            if (credentials != null) {
+                return credentials;
+            } else {
+                return super.nodeSource.getAdministrator().getCredentials();
             }
         });
     }
