@@ -70,13 +70,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * SshClient options (@see {@link SSHClient})
      */
-    @Configurable(description = "Options for the ssh command\nto log in the remote hosts")
+    @Configurable(description = "Options for the ssh command\nto log in the remote hosts", sectionSelector = 2)
     protected String sshOptions;
 
     /**
      * Path to the Java executable on the remote hosts
      */
-    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts")
+    @Configurable(description = "Absolute path of the java\nexecutable on the remote hosts", sectionSelector = 1)
     protected String javaPath = System.getProperty("java.home") + "/bin/java";
 
     /**
@@ -95,26 +95,26 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * Path to the Scheduling installation on the remote hosts
      */
-    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts")
+    @Configurable(description = "Absolute path of the Resource Manager (or Scheduler)\nroot directory on the remote hosts", sectionSelector = 1)
     protected String schedulingPath = PAResourceManagerProperties.RM_HOME.getValueAsString();
 
     /**
      * The type of the OS on the remote machine, 'Linux', 'Windows' or 'Cygwin'
      */
-    @Configurable(description = "Linux, Cygwin or Windows depending on\nthe operating system of the remote hosts")
+    @Configurable(description = "Linux, Cygwin or Windows depending on\nthe operating system of the remote hosts", sectionSelector = 1)
     protected String targetOs = "Linux";
 
     /**
      * Additional java options to append to the command executed on the remote
      * host
      */
-    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts")
+    @Configurable(description = "Options for the java command\nlaunching the node on the remote hosts", sectionSelector = 3)
     protected String javaOptions;
 
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the credential file", important = true)
+    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 1, important = true)
     protected File rmCredentialsPath;
 
     private static final String CREDENTIALS_KEY = "credentials";
@@ -422,6 +422,13 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                 return null;
             }
         });
+    }
+
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(2, "SSH Configuration");
+        return sectionDescriptions;
     }
 
 }

@@ -60,13 +60,13 @@ import org.ow2.proactive.utils.FileToBytesConverter;
  */
 public class CLIInfrastructure extends HostsFileBasedInfrastructureManager {
 
-    @Configurable(description = "An interpreter that executes the script")
+    @Configurable(description = "An interpreter that executes the script", sectionSelector = 1)
     protected String interpreter = "bash";
 
-    @Configurable(fileBrowser = true, description = "A script that deploys a node on host (parameters: host, node, ns names and rm url).", important = true)
+    @Configurable(fileBrowser = true, description = "A script that deploys a node on host (parameters: host, node, ns names and rm url).", sectionSelector = 1, important = true)
     protected File deploymentScript;
 
-    @Configurable(fileBrowser = true, description = "A script that removes a node (parameters: host name and node url", important = true)
+    @Configurable(fileBrowser = true, description = "A script that removes a node (parameters: host name and node url", sectionSelector = 1, important = true)
     protected File removalScript;
 
     private static final String NB_REMOVAL_THREAD_KEY = "numberOfRemovalThread";

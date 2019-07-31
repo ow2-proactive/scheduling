@@ -80,8 +80,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Override
     public Map<Integer, String> getSectionDescriptions() {
         Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
-        sectionDescriptions.put(1, "Deployment Parameters");
-        sectionDescriptions.put(3, "Node Parameters");
+        sectionDescriptions.put(1, "Deployment Configuration");
+        sectionDescriptions.put(3, "Node Configuration");
         return sectionDescriptions;
     }
 

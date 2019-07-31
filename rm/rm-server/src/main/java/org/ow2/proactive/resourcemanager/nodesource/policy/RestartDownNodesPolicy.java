@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.nodesource.policy;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,7 +50,7 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
 
     private static final String TIMER_NAME = "RestartDownNodesPolicy node status check";
 
-    @Configurable(description = "ms (30 mins by default)", dynamic = true)
+    @Configurable(description = "ms (30 mins by default)", dynamic = true, sectionSelector = 2)
     private int checkNodeStateEach = 30 * 60 * 1000; // 30 mins by default;
 
     private transient Timer timer;
@@ -152,6 +154,13 @@ public class RestartDownNodesPolicy extends NodeSourcePolicy {
     @Override
     public String getDescription() {
         return "Static nodes acquisition. If node becomes down policy tries to restart it.";
+    }
+
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(2, "Restart Nodes Configuration");
+        return sectionDescriptions;
     }
 
 }
