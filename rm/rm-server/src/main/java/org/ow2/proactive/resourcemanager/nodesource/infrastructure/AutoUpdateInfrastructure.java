@@ -61,7 +61,7 @@ public class AutoUpdateInfrastructure extends HostsFileBasedInfrastructureManage
 
     public static final String NB_NODES = "nb.nodes";
 
-    @Configurable(description = "Command that will be launched for every host")
+    @Configurable(description = "Command that will be launched for every host", sectionSelector = 1)
     protected String command = "scp -o StrictHostKeyChecking=no ${pa.rm.home}/dist/war/rest/node.jar ${host.name}:/tmp/${node.name}.jar && " +
                                "ssh -o StrictHostKeyChecking=no ${host.name} " +
                                "\"${java.home}/bin/java -jar /tmp/${node.name}.jar -w ${nb.nodes} -v ${nodesource.credentials} -n ${node.name} -s ${nodesource.name} -p 30000 -r ${rm.url} " +

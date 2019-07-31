@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -49,7 +50,7 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy
 
     private int activeJobs = 0;
 
-    @Configurable(description = "ms")
+    @Configurable(description = "ms", sectionSelector = 5, important = true)
     private long idleTime = 60 * 1000; // 1 min by default
 
     private boolean resourcesReleased = true;
@@ -147,5 +148,12 @@ public class ReleaseResourcesWhenSchedulerIdle extends SchedulerAwarePolicy
                 }
                 break;
         }
+    }
+
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(5, "Idle Configuration");
+        return sectionDescriptions;
     }
 }

@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
 import java.io.File;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -54,16 +55,16 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
 
     protected static Logger logger = Logger.getLogger(SchedulerAwarePolicy.class);
 
-    @Configurable(description = "url used to contact the scheduler, e.g. pnp://, pamr://")
+    @Configurable(description = "url used to contact the scheduler, e.g. pnp://, pamr://", sectionSelector = 3, important = true)
     protected String schedulerUrl = "";
 
-    @Configurable(credential = true, description = "credentials used when contacting the scheduler")
+    @Configurable(credential = true, description = "credentials used when contacting the scheduler", sectionSelector = 3, important = true)
     protected File schedulerCredentialsPath;
 
-    @Configurable(description = "Delay in ms for the resource manger to recover broken node source in scheduler aware policy")
+    @Configurable(description = "Delay in ms for the resource manger to recover broken node source in scheduler aware policy", sectionSelector = 4)
     protected long schedulerAwarePolicyNodeSourceRecoveryDelay = 10000;
 
-    @Configurable(description = "number of trials for the resource manager to recover a broken node source in scheduler aware policy")
+    @Configurable(description = "number of trials for the resource manager to recover a broken node source in scheduler aware policy", sectionSelector = 4)
     protected int schedulerAwarePolicyNodeSourceRecoveryTrialsNumber = 10;
 
     protected SchedulerState<JobState> state;
@@ -184,4 +185,12 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     protected abstract SchedulerEvent[] getEventsList();
 
     protected abstract SchedulerEventListener getSchedulerListener();
+
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(3, "Scheduler Configuration");
+        sectionDescriptions.put(4, "Scheduler Policy Configuration");
+        return sectionDescriptions;
+    }
 }
