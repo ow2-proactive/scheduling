@@ -1225,6 +1225,7 @@ public class TaskData {
         return taskState;
     }
 
+    @Transient
     public boolean isForkTask() {
         if (taskType.equals(SCRIPT_TASK)) {
             return false;
