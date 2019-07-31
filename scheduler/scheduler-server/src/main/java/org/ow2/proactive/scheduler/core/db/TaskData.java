@@ -1227,9 +1227,9 @@ public class TaskData {
 
     @Transient
     public boolean isForkTask() {
-        if (taskType.equals(SCRIPT_TASK)) {
+        if (SCRIPT_TASK.equals(taskType)) {
             return false;
-        } else if (taskType.equals(FORKED_SCRIPT_TASK)) {
+        } else if (FORKED_SCRIPT_TASK.equals(taskType)) {
             return true;
         } else {
             throw new IllegalStateException("Unexpected stored task type: " + taskType);
