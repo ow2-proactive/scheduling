@@ -114,7 +114,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 1, important = true)
+    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 1)
     protected File rmCredentialsPath;
 
     private static final String CREDENTIALS_KEY = "credentials";
@@ -342,6 +342,8 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                                             Credentials.getCredentialsBase64((byte[]) parameters[index++]));
             } catch (KeyException e) {
                 logger.debug("Provided credentials are not compatible with Base64 format.");
+                logger.debug("We will use administrator credentials.");
+                persistedInfraVariables.put(CREDENTIALS_KEY, nodeSource.getAdministrator().getCredentials());
             }
         } else {
             throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
@@ -394,14 +396,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     // Below are wrapper methods around the runtime variables map
 
     private Credentials getCredentials() {
-        return getPersistedInfraVariable(() -> {
-            final Credentials credentials = (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
-            if (credentials != null) {
-                return credentials;
-            } else {
-                return super.nodeSource.getAdministrator().getCredentials();
-            }
-        });
+        return getPersistedInfraVariable(() -> (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY));
     }
 
     private OperatingSystem getTargetOSObj() {

@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
 import java.io.File;
+import java.security.KeyException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -88,7 +89,11 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         schedulerUrl = policyParameters[2].toString();
 
         if (policyParameters[3] == null) {
-            throw new IllegalArgumentException("Credentials must be specified");
+            try {
+                policyParameters[3] = nodeSource.getAdministrator().getCredentials().getBase64();
+            } catch (KeyException e) {
+                logger.info("Cannot use default admin credentials.", e);
+            }
         }
 
         credentials = (byte[]) policyParameters[3];
