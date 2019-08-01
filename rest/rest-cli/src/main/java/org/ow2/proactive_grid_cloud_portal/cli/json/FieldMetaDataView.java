@@ -34,7 +34,7 @@ public class FieldMetaDataView {
 
         NONE("none"),
 
-        PASSWORD_TEXT("password");
+        PASSWORD("password");
 
         private String name;
 
