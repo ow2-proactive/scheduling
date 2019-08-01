@@ -498,8 +498,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             } catch (KeyException e) {
                 logger.debug("Could not retrieve base64 credentials", e);
                 logger.debug("We will use administrator credentials.");
-                persistedInfraVariables.put(CREDENTIALS_KEY,
-                        nodeSource.getAdministrator().getCredentials());
+                persistedInfraVariables.put(CREDENTIALS_KEY, nodeSource.getAdministrator().getCredentials());
             }
             if (parameters[index] != null) {
                 this.submitJobOpt = parameters[index++].toString().replaceAll("\"", "\\\"");
