@@ -337,15 +337,12 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             this.javaOptions = parameters[index++].toString();
 
             // credentials
-//            if (parameters[index] == null) {
-//                throw new IllegalArgumentException("Credentials must be specified");
-//            }
-//            try {
-//                persistedInfraVariables.put(CREDENTIALS_KEY,
-//                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
-//            } catch (KeyException e) {
-//                throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
-//            }
+            try {
+                persistedInfraVariables.put(CREDENTIALS_KEY,
+                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+            } catch (KeyException e) {
+                logger.debug("Provided credentials are not compatible with Base64 format.");
+            }
         } else {
             throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
         }
