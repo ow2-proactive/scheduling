@@ -56,7 +56,7 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     public static final long DEFAULT_TIMEOUT = 30000;
 
-    @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true, sectionSelector = 3, important = true)
+    @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true, sectionSelector = 3)
     private Credentials credentials;
 
     @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine", sectionSelector = 1, important = true)
@@ -279,7 +279,9 @@ public class LocalInfrastructure extends InfrastructureManager {
         try {
             this.credentials = Credentials.getCredentialsBase64((byte[]) args[index++]);
         } catch (KeyException e1) {
-            throw new IllegalArgumentException("Cannot decrypt credentials", e1);
+            logger.debug("Cannot decrypt credentials", e1);
+            logger.debug("We will use administrator credentials.");
+            this.credentials = nodeSource.getAdministrator().getCredentials();
         }
 
         try {

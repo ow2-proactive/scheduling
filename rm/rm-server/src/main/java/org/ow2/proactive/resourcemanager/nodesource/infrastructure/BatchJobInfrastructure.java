@@ -140,7 +140,7 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 3, important = true)
+    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 3)
     protected File rmCredentialsPath;
 
     /**
@@ -496,7 +496,10 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
                 persistedInfraVariables.put(CREDENTIALS_KEY,
                                             Credentials.getCredentialsBase64((byte[]) parameters[index++]));
             } catch (KeyException e) {
-                throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
+                logger.debug("Could not retrieve base64 credentials", e);
+                logger.debug("We will use administrator credentials.");
+                persistedInfraVariables.put(CREDENTIALS_KEY,
+                        nodeSource.getAdministrator().getCredentials());
             }
             if (parameters[index] != null) {
                 this.submitJobOpt = parameters[index++].toString().replaceAll("\"", "\\\"");
