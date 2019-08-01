@@ -76,17 +76,21 @@ public class TaskLoggerTest extends ProActiveTestClean {
     @Test
     public void printAndGetLogs() throws Exception {
 
-        taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L), "myhost");
+        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L),
+                                               "myhost");
 
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
         taskLogger.getOutputSink().println("hello");
-        assertEquals(String.format("hello%n"), taskLogger.getLogs().getAllLogs(false));
-        assertEquals(String.format("hello%n"), taskLogger.getLogs().getStdoutLogs(false));
+
+        System.out.println(taskLogger.getLogs().getAllLogs(false));
+
+        assertEquals(String.format("hello%n%n"), taskLogger.getLogs().getAllLogs(false));
+        assertEquals(String.format("hello%n%n"), taskLogger.getLogs().getStdoutLogs(false));
 
         taskLogger.getErrorSink().println("error");
-        assertEquals(String.format("hello%nerror%n"), taskLogger.getLogs().getAllLogs(false));
-        assertEquals(String.format("error%n"), taskLogger.getLogs().getStderrLogs(false));
+        assertEquals(String.format("hello%n%nerror%n%n"), taskLogger.getLogs().getAllLogs(false));
+        assertEquals(String.format("error%n%n"), taskLogger.getLogs().getStderrLogs(false));
     }
 
     @Test
@@ -134,7 +138,7 @@ public class TaskLoggerTest extends ProActiveTestClean {
         taskLogger.getOutputSink().println("hello");
 
         taskLogger.getStoredLogs(stringAppenderProvider);
-        assertEquals(String.format("hello%n"), stringAppender.toString());
+        assertEquals(String.format("hello%n%n"), stringAppender.toString());
     }
 
     @Test
@@ -147,17 +151,16 @@ public class TaskLoggerTest extends ProActiveTestClean {
         taskLogger.getOutputSink().println("hello");
 
         String quotedStringTaskId = Pattern.quote(taskId.toString());
-
         assertTrue(taskLogger.getLogs()
-                             .getAllLogs(true)
+                .getAllLogs(true)
                              .matches("\\[" + quotedStringTaskId +
-                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello \r?\n"));
+                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello\n? *\n+"));
 
         taskLogger.getErrorSink().println("error");
         assertTrue(taskLogger.getLogs()
                              .getStderrLogs(true)
                              .matches("\\[" + quotedStringTaskId +
-                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error \r?\n"));
+                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error\n? *\n+"));
 
     }
 
