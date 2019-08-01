@@ -34,7 +34,11 @@ public class FieldMetaDataView {
 
         NONE("none"),
 
-        PASSWORD("password");
+        PASSWORD("password"),
+
+        TEXTAREA("textArea"),
+
+        CHECKBOX("checkbox");
 
         private String name;
 
