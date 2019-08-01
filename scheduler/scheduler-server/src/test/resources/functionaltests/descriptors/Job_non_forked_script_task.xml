@@ -7,8 +7,8 @@
 		<task name="notforked">
 			<scriptExecutable>
 				<script>
-					<code language="groovy">
-						java.lang.System.exit(42);
+					<code language="scalaw">
+						println("hello world")
 					</code>
 				</script>
 			</scriptExecutable>

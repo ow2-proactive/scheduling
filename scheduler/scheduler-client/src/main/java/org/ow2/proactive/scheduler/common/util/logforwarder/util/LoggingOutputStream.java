@@ -122,8 +122,8 @@ public class LoggingOutputStream extends OutputStream {
      */
     @Override
     public void close() {
-        flush();
-        hasBeenClosed = true;
+        this.flush(false);
+        this.hasBeenClosed = true;
     }
 
     /**
@@ -160,6 +160,40 @@ public class LoggingOutputStream extends OutputStream {
         count++;
     }
 
+    private void flush(boolean waitForNewLine) {
+        if (this.count != 0) {
+            if (this.count == lineSepBytes.length) {
+                boolean isLineSep = true;
+
+                for (int c = 0; c < lineSepBytes.length; ++c) {
+                    if (this.buf[c] != lineSepBytes[c]) {
+                        isLineSep = false;
+                        break;
+                    }
+                }
+
+                if (isLineSep) {
+                    this.reset();
+                    return;
+                }
+            }
+
+            byte[] theBytes = new byte[this.count];
+            System.arraycopy(this.buf, 0, theBytes, 0, this.count);
+            if (waitForNewLine) {
+                for (int c = 0; c < lineSepBytes.length; ++c) {
+                    if (this.count < lineSepBytes.length ||
+                        theBytes[theBytes.length - lineSepBytes.length + c] != lineSepBytes[c]) {
+                        return;
+                    }
+                }
+            }
+
+            this.logger.log(this.level, new String(theBytes));
+            this.reset();
+        }
+    }
+
     /**
      * Flushes this output stream and forces any buffered output bytes
      * to be written out. The general contract of <code>flush</code> is
@@ -170,33 +204,7 @@ public class LoggingOutputStream extends OutputStream {
      */
     @Override
     public void flush() {
-        if (count == 0) {
-            return;
-        }
-
-        // don't print out blank lines; flushing from PrintStream puts out these
-        if (count == lineSepBytes.length) {
-            boolean isLineSep = true;
-            for (int c = 0; c < lineSepBytes.length; c++) {
-                if (buf[c] != lineSepBytes[c]) {
-                    isLineSep = false;
-                    break;
-                }
-            }
-            if (isLineSep) {
-                reset();
-                return;
-            }
-        }
-
-        final byte[] theBytes = new byte[count];
-
-        System.arraycopy(buf, 0, theBytes, 0, count);
-
-        //logger.log(level, (new String(theBytes)).trim());
-        logger.log(level, new String(theBytes));
-
-        reset();
+        flush(true);
     }
 
     private void reset() {

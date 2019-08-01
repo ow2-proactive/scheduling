@@ -25,7 +25,10 @@
  */
 package functionaltests.scripts.nonforked;
 
+import static functionaltests.utils.SchedulerTHelper.log;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.net.URL;
@@ -35,13 +38,13 @@ import org.junit.Test;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.StaxJobFactory;
 
 import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
 
 
-@Ignore
 public class TestNonForkedScriptTask extends SchedulerFunctionalTestNonForkedModeNoRestart {
 
     private static URL nonForked_jobDescriptor = TestNonForkedScriptTask.class.getResource("/functionaltests/descriptors/Job_non_forked_script_task.xml");
@@ -62,4 +65,23 @@ public class TestNonForkedScriptTask extends SchedulerFunctionalTestNonForkedMod
         RMNodeEvent nodeKilledEvent = schedulerHelper.waitForAnyNodeEvent(RMEventType.NODE_STATE_CHANGED);
         assertEquals(NodeState.DOWN, nodeKilledEvent.getNodeState());
     }
+
+    @Test
+    public void testScalaOutputFromScript() throws Exception {
+
+        String jobDescriptorPath = new File(nonForked_jobDescriptor.toURI()).getAbsolutePath();
+
+        log("Test 1 : Job submission...");
+
+        //job submission
+        JobId id = schedulerHelper.testJobSubmission(jobDescriptorPath);
+
+        //check events reception
+        log("Job terminated, id " + id.toString());
+
+        assertThat(schedulerHelper.getJobResult(id).getResult("notforked").getOutput().getAllLogs(),
+                   containsString("hello world"));
+
+    }
+
 }
