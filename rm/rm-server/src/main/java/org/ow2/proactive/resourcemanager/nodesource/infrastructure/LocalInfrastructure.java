@@ -190,7 +190,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         clb.setNodeName(baseNodeName);
         clb.setNumberOfNodes(numberOfNodes);
         try {
-            clb.setCredentialsValueAndNullOthers(new String(this.credentials.getBase64()));
+            clb.setCredentialsValueAndNullOthers(getCredentials());
         } catch (KeyException e) {
             createLostNodes(baseNodeName, numberOfNodes, "Cannot decrypt credentials value", e);
             return;
@@ -251,6 +251,14 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
     }
 
+    private String getCredentials() throws KeyException {
+        if (this.credentials == null) {
+            this.credentials = super.nodeSource.getAdministrator().getCredentials();
+        }
+
+        return new String(this.credentials.getBase64());
+    }
+
     /**
      * Creates a lost node to indicate that the deployment has failed while
      * building the command line.
@@ -280,8 +288,6 @@ public class LocalInfrastructure extends InfrastructureManager {
             this.credentials = Credentials.getCredentialsBase64((byte[]) args[index++]);
         } catch (KeyException e1) {
             logger.debug("Cannot decrypt credentials", e1);
-            logger.debug("We will use administrator credentials.");
-            this.credentials = nodeSource.getAdministrator().getCredentials();
         }
 
         try {

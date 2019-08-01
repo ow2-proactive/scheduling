@@ -33,6 +33,7 @@ import java.net.InetAddress;
 import java.security.KeyException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -342,8 +343,6 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
                                             Credentials.getCredentialsBase64((byte[]) parameters[index++]));
             } catch (KeyException e) {
                 logger.debug("Provided credentials are not compatible with Base64 format.");
-                logger.debug("We will use administrator credentials.");
-                persistedInfraVariables.put(CREDENTIALS_KEY, nodeSource.getAdministrator().getCredentials());
             }
         } else {
             throw new IllegalArgumentException("Invalid parameters for infrastructure creation");
@@ -396,7 +395,10 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     // Below are wrapper methods around the runtime variables map
 
     private Credentials getCredentials() {
-        return getPersistedInfraVariable(() -> (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY));
+        return getPersistedInfraVariable(() -> {
+            Credentials credentials = (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
+            return Optional.ofNullable(credentials).orElse(nodeSource.getAdministrator().getCredentials());
+        });
     }
 
     private OperatingSystem getTargetOSObj() {
