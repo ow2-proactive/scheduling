@@ -37,6 +37,7 @@ import java.net.UnknownHostException;
 import java.security.KeyException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
@@ -497,8 +498,6 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
                                             Credentials.getCredentialsBase64((byte[]) parameters[index++]));
             } catch (KeyException e) {
                 logger.debug("Could not retrieve base64 credentials", e);
-                logger.debug("We will use administrator credentials.");
-                persistedInfraVariables.put(CREDENTIALS_KEY, nodeSource.getAdministrator().getCredentials());
             }
             if (parameters[index] != null) {
                 this.submitJobOpt = parameters[index++].toString().replaceAll("\"", "\\\"");
@@ -818,11 +817,9 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
     }
 
     private Credentials getCredentials() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Credentials>() {
-            @Override
-            public Credentials handle() {
-                return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
-            }
+        return getPersistedInfraVariable(() -> {
+            Credentials credentials = (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
+            return Optional.ofNullable(credentials).orElse(nodeSource.getAdministrator().getCredentials());
         });
     }
 
