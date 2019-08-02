@@ -491,9 +491,10 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             }
             this.serverName = parameters[index++].toString();
             try {
-                if (parameters[index] != null) {
+                Object possibleCredentials = parameters[index++];
+                if (possibleCredentials != null) {
                     persistedInfraVariables.put(CREDENTIALS_KEY,
-                                                Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                                                Credentials.getCredentialsBase64((byte[]) possibleCredentials));
                 }
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
