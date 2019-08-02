@@ -163,14 +163,7 @@ public class LoggingOutputStream extends OutputStream {
     private void flush(boolean waitForNewLine) {
         if (this.count != 0) {
             if (this.count == lineSepBytes.length) {
-                boolean isLineSep = true;
-
-                for (int c = 0; c < lineSepBytes.length; ++c) {
-                    if (this.buf[c] != lineSepBytes[c]) {
-                        isLineSep = false;
-                        break;
-                    }
-                }
+                boolean isLineSep = checkBufferIsLineSeparator();
 
                 if (isLineSep) {
                     this.reset();
@@ -192,6 +185,15 @@ public class LoggingOutputStream extends OutputStream {
             this.logger.log(this.level, new String(theBytes));
             this.reset();
         }
+    }
+
+    private boolean checkBufferIsLineSeparator() {
+        for (int c = 0; c < lineSepBytes.length; ++c) {
+            if (this.buf[c] != lineSepBytes[c]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
