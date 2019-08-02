@@ -914,7 +914,7 @@ public class RMRest implements RMRestInterface {
         int concatenatedParametersIndex = 0;
 
         for (ConfigurableField field : fields) {
-            if (field.getMeta().credential() || field.getMeta().password() || field.getMeta().fileBrowser()) {
+            if (field.getMeta().credential() || field.getMeta().fileBrowser()) {
                 concatenatedParameters[concatenatedParametersIndex] = fileParameters[fileParametersIndex].getBytes();
                 fileParametersIndex++;
             } else {
