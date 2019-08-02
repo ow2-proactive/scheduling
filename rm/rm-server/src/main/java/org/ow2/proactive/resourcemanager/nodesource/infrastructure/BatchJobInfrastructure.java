@@ -490,14 +490,13 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
                 this.nodeTimeOut = 1000 * 60 * 5;
             }
             this.serverName = parameters[index++].toString();
-            if (parameters[index] == null) {
-                throw new IllegalArgumentException("Credentials must be specified");
-            }
             try {
-                persistedInfraVariables.put(CREDENTIALS_KEY,
-                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                if (parameters[index] != null) {
+                    persistedInfraVariables.put(CREDENTIALS_KEY,
+                                                Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                }
             } catch (KeyException e) {
-                logger.debug("Could not retrieve base64 credentials", e);
+                throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
             if (parameters[index] != null) {
                 this.submitJobOpt = parameters[index++].toString().replaceAll("\"", "\\\"");
