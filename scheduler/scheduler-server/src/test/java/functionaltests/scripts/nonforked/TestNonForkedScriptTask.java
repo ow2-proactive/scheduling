@@ -47,7 +47,7 @@ import functionaltests.utils.SchedulerFunctionalTestNonForkedModeNoRestart;
 
 public class TestNonForkedScriptTask extends SchedulerFunctionalTestNonForkedModeNoRestart {
 
-    private static URL nonForked_jobDescriptor = TestNonForkedScriptTask.class.getResource("/functionaltests/descriptors/Job_non_forked_script_task.xml");
+    private static URL nonForked_jobDescriptor = TestNonForkedScriptTask.class.getResource("/functionaltests/descriptors/Job_non_forked_scala_script_task.xml");
 
     @Ignore
     @Test
@@ -81,6 +81,8 @@ public class TestNonForkedScriptTask extends SchedulerFunctionalTestNonForkedMod
 
         assertThat(schedulerHelper.getJobResult(id).getResult("notforked").getOutput().getAllLogs(),
                    containsString("hello world"));
+        assertThat(schedulerHelper.getJobResult(id).getResult("notforked").getOutput().getAllLogs(),
+                   containsString("how are you"));
 
     }
 
