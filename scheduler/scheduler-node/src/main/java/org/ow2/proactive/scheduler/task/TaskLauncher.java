@@ -253,7 +253,6 @@ public class TaskLauncher implements InitActive {
             wallTimer.stop();
 
             copyTaskLogsToUserSpace(taskLogFile, dataspaces);
-            taskResult.setLogs(taskLogger.getLogs());
 
             sendResultToScheduler(rebindedTerminateNotification, taskResult);
         } catch (Throwable taskFailure) {
@@ -404,6 +403,8 @@ public class TaskLauncher implements InitActive {
         }
         int pingAttempts = initializer.getPingAttempts();
         int pingPeriodMs = initializer.getPingPeriod() * 1000;
+        taskLogger.close();
+        taskResult.setLogs(taskLogger.getLogs());
 
         // We are going to contact the recipient of the task result. This
         // recipient is the TaskTerminateNotification, an active object on the

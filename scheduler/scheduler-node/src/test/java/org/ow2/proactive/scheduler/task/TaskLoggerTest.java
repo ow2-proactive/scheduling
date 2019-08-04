@@ -32,16 +32,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
+import org.apache.log4j.*;
+import org.hamcrest.Matchers;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -52,6 +52,9 @@ import org.ow2.proactive.scheduler.common.util.TaskLoggerRelativePathGenerator;
 import org.ow2.proactive.scheduler.common.util.logforwarder.AppenderProvider;
 import org.ow2.proactive.scheduler.common.util.logforwarder.LogForwardingException;
 import org.ow2.proactive.scheduler.job.JobIdImpl;
+import org.ow2.proactive.scripting.ScriptResult;
+import org.ow2.proactive.scripting.SimpleScript;
+import org.ow2.proactive.scripting.TaskScript;
 import org.ow2.tests.ProActiveTestClean;
 
 
@@ -73,17 +76,21 @@ public class TaskLoggerTest extends ProActiveTestClean {
     @Test
     public void printAndGetLogs() throws Exception {
 
-        taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L), "myhost");
+        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1000, "job"), "task", 42L),
+                                               "myhost");
 
         assertEquals("", taskLogger.getLogs().getAllLogs(false));
 
         taskLogger.getOutputSink().println("hello");
-        assertEquals(String.format("hello%n"), taskLogger.getLogs().getAllLogs(false));
-        assertEquals(String.format("hello%n"), taskLogger.getLogs().getStdoutLogs(false));
+
+        System.out.println(taskLogger.getLogs().getAllLogs(false));
+
+        assertEquals(String.format("hello%n%n"), taskLogger.getLogs().getAllLogs(false));
+        assertEquals(String.format("hello%n%n"), taskLogger.getLogs().getStdoutLogs(false));
 
         taskLogger.getErrorSink().println("error");
-        assertEquals(String.format("hello%nerror%n"), taskLogger.getLogs().getAllLogs(false));
-        assertEquals(String.format("error%n"), taskLogger.getLogs().getStderrLogs(false));
+        assertEquals(String.format("hello%n%nerror%n%n"), taskLogger.getLogs().getAllLogs(false));
+        assertEquals(String.format("error%n%n"), taskLogger.getLogs().getStderrLogs(false));
     }
 
     @Test
@@ -131,7 +138,7 @@ public class TaskLoggerTest extends ProActiveTestClean {
         taskLogger.getOutputSink().println("hello");
 
         taskLogger.getStoredLogs(stringAppenderProvider);
-        assertEquals(String.format("hello%n"), stringAppender.toString());
+        assertEquals(String.format("hello%n%n"), stringAppender.toString());
     }
 
     @Test
@@ -144,17 +151,16 @@ public class TaskLoggerTest extends ProActiveTestClean {
         taskLogger.getOutputSink().println("hello");
 
         String quotedStringTaskId = Pattern.quote(taskId.toString());
-
         assertTrue(taskLogger.getLogs()
                              .getAllLogs(true)
                              .matches("\\[" + quotedStringTaskId +
-                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello \r?\n"));
+                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello\r?\n? *\r?\n+"));
 
         taskLogger.getErrorSink().println("error");
         assertTrue(taskLogger.getLogs()
                              .getStderrLogs(true)
                              .matches("\\[" + quotedStringTaskId +
-                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error \r?\n"));
+                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error\r?\n? *\r?\n+"));
 
     }
 
@@ -188,5 +194,26 @@ public class TaskLoggerTest extends ProActiveTestClean {
             assertNull(LogManager.exists(loggers.get(i).getName()));
         }
         assertNull(LogManager.exists(Log4JTaskLogs.getLoggerName("" + 1000)));
+    }
+
+    @Test
+    public void testScalaOutputFromScript() throws Exception {
+        BasicConfigurator.resetConfiguration();
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.INFO);
+        String scalaScript = "println(\"Hello World\")" + System.getProperty("line.separator");
+        scalaScript += "print(\"How are you\")";
+        TaskLogger taskLogger = new TaskLogger(TaskIdImpl.createTaskId(new JobIdImpl(1, "job1"), "task1", 1), "myhost");
+        SimpleScript ss = new SimpleScript(scalaScript, "scalaw");
+        TaskScript taskScript = new TaskScript(ss);
+        ScriptResult<Serializable> res = taskScript.execute(null,
+                                                            taskLogger.getOutputSink(),
+                                                            taskLogger.getErrorSink());
+        taskLogger.close();
+        Assert.assertThat(res.getOutput(), Matchers.containsString("Hello World"));
+        Assert.assertThat(taskLogger.getLogs().getAllLogs(), Matchers.containsString("Hello World"));
+        Assert.assertThat(res.getOutput(), Matchers.containsString("How are you"));
+        Assert.assertThat(taskLogger.getLogs().getAllLogs(), Matchers.containsString("How are you"));
+
     }
 }
