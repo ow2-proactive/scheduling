@@ -74,6 +74,8 @@ public class PluginDescriptor implements Serializable {
 
     private Map<Integer, String> sectionDescriptions = new HashMap<>();
 
+    private Map<String, String> meta = new HashMap<>();
+
     public PluginDescriptor() {
     }
 
@@ -85,6 +87,7 @@ public class PluginDescriptor implements Serializable {
 
             findSectionDescriptions(cls, instance);
             findConfigurableFileds(cls, instance);
+            findMeta(cls, instance);
 
             Method getDescription = cls.getMethod("getDescription");
             if (getDescription != null) {
@@ -134,6 +137,15 @@ public class PluginDescriptor implements Serializable {
             Method getSectionDescriptions = cls.getMethod("getSectionDescriptions");
             Map<Integer, String> sectionDescriptions = (Map<Integer, String>) getSectionDescriptions.invoke(instance);
             this.sectionDescriptions.putAll(sectionDescriptions);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        }
+    }
+
+    private void findMeta(Class<?> cls, Object instance) {
+        try {
+            Method getMetaMethod = cls.getMethod("getMeta");
+            Map<String, String> metaInfo = (Map<String, String>) getMetaMethod.invoke(instance);
+            this.meta.putAll(metaInfo);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
         }
     }

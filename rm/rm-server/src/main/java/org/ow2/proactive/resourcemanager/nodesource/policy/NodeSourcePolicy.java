@@ -264,4 +264,9 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
         sectionDescriptions.put(1, "Authorizations");
         return sectionDescriptions;
     }
+
+    @Override
+    public Map<String, String> getMeta() {
+        return new HashMap<>();
+    }
 }

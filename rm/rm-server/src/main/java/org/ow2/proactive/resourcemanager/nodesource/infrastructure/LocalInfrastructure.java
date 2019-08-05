@@ -485,4 +485,11 @@ public class LocalInfrastructure extends InfrastructureManager {
         sectionDescriptions.put(3, "Node Configuration");
         return sectionDescriptions;
     }
+
+    @Override
+    public Map<String, String> getMeta() {
+        Map<String, String> meta = super.getMeta();
+        meta.put(InfrastructureManager.ELASTIC, "true");
+        return meta;
+    }
 }
