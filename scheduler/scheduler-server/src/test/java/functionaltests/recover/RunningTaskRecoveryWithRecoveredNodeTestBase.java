@@ -146,7 +146,7 @@ public abstract class RunningTaskRecoveryWithRecoveredNodeTestBase
         taskState = jobState.getTasks().get(0);
         Assert.assertEquals(firstExecutionHostInfo, taskState.getTaskInfo().getExecutionHostName());
 
-        appender.waitForLoggingEvent(LOG_EVENT_TIMEOUT, TASK_LOG_OUTPUT_STARTING_STRING + MAXIMUM_STEP_IN_TASK_LOOP);
+        appender.waitForLoggingEvent(LOG_EVENT_TIMEOUT, String.format("%s%n", TASK_LOG_OUTPUT_STARTING_STRING + MAXIMUM_STEP_IN_TASK_LOOP));
         schedulerHelper.waitForEventJobFinished(jobid);
 
         TaskResult taskResult = scheduler.getJobResult(jobid).getResult(TASK_NAME);

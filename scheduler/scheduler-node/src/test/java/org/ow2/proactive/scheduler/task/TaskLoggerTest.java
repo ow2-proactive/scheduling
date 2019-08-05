@@ -154,13 +154,13 @@ public class TaskLoggerTest extends ProActiveTestClean {
         assertTrue(taskLogger.getLogs()
                              .getAllLogs(true)
                              .matches("\\[" + quotedStringTaskId +
-                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello\r?\n? *\r?\n+"));
+                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] hello\r?\n *\r?\n"));
 
         taskLogger.getErrorSink().println("error");
         assertTrue(taskLogger.getLogs()
                              .getStderrLogs(true)
                              .matches("\\[" + quotedStringTaskId +
-                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error\r?\n? *\r?\n+"));
+                                      "@myhost;[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\\] error\r?\n \r?\n"));
 
     }
 
