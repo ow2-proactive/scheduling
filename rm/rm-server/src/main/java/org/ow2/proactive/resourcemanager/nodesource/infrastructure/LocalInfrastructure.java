@@ -293,9 +293,9 @@ public class LocalInfrastructure extends InfrastructureManager {
     protected void configure(Object... args) {
         int index = 0;
         try {
-            Object possibleCredentials = args[index++];
-            if (possibleCredentials != null) {
-                this.credentials = Credentials.getCredentialsBase64((byte[]) possibleCredentials);
+            byte[] possibleCredentials = (byte[]) args[index++];
+            if (possibleCredentials != null && possibleCredentials.length > 0) {
+                this.credentials = Credentials.getCredentialsBase64(possibleCredentials);
             }
         } catch (KeyException e1) {
             throw new IllegalArgumentException("Cannot decrypt credentials", e1);

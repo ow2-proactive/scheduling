@@ -339,10 +339,9 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
 
             // credentials
             try {
-                Object possibleCredentials = parameters[index++];
-                if (possibleCredentials != null) {
-                    persistedInfraVariables.put(CREDENTIALS_KEY,
-                                                Credentials.getCredentialsBase64((byte[]) possibleCredentials));
+                byte[] possibleCredentials = (byte[]) parameters[index++];
+                if (possibleCredentials != null && possibleCredentials.length > 0) {
+                    persistedInfraVariables.put(CREDENTIALS_KEY, Credentials.getCredentialsBase64(possibleCredentials));
                 }
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);

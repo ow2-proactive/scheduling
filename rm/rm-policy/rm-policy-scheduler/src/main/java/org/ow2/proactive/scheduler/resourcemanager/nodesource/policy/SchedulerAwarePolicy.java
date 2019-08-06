@@ -128,10 +128,10 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
                 authentication = SchedulerConnection.join(schedulerUrl);
 
                 Credentials creds;
-                if (credentials == null) {
-                    creds = nodeSource.getAdministrator().getCredentials();
-                } else {
+                if (credentials != null && credentials.length > 0) {
                     creds = Credentials.getCredentialsBase64(credentials);
+                } else {
+                    creds = nodeSource.getAdministrator().getCredentials();
                 }
                 scheduler = authentication.login(creds);
                 Thread.sleep(schedulerAwarePolicyNodeSourceRecoveryDelay);
