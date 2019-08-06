@@ -31,9 +31,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -668,6 +671,46 @@ public class RMRest implements RMRestInterface {
             @HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getSupportedNodeSourceInfrastructures();
+    }
+
+    @Override
+    @GET
+    @GZIP
+    @Path("infrastructuresmapping")
+    @Produces("application/json")
+    public Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        Map<String, List<String>> result = rm.getInfrasToPoliciesMapping();
+        Collection<PluginDescriptor> supportedInfrastructures = rm.getSupportedNodeSourceInfrastructures();
+        Collection<PluginDescriptor> supportedPolicies = rm.getSupportedNodeSourcePolicies();
+        Iterator<Map.Entry<String, List<String>>> iterator = result.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, List<String>> entry = iterator.next();
+            boolean found = false;
+            for (PluginDescriptor supportedInfrastructure : supportedInfrastructures) {
+                if (supportedInfrastructure.getPluginName().equals(entry.getKey())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                iterator.remove();
+            }
+        }
+        return result.entrySet().stream().map(entry -> {
+            List<String> policies = entry.getValue().stream().filter(policy -> {
+                for (PluginDescriptor supportedPolicy : supportedPolicies) {
+                    if (supportedPolicy.getPluginName().equals(policy)) {
+                        return true;
+                    }
+                }
+                return false;
+            }).collect(Collectors.toList());
+            ;
+            return new AbstractMap.SimpleEntry<>(entry.getKey(), policies);
+
+        }).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
     @Override

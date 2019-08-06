@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.common.util;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.Attribute;
@@ -451,6 +452,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     }
 
     @Override
+    public Map<String, List<String>> getInfrasToPoliciesMapping() {
+        return this.target.getInfrasToPoliciesMapping();
+    }
+
+    @Override
     public StringWrapper getRMThreadDump() {
         return target.getRMThreadDump();
     }
@@ -459,5 +465,4 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public StringWrapper getNodeThreadDump(String nodeUrl) {
         return target.getNodeThreadDump(nodeUrl);
     }
-
 }
