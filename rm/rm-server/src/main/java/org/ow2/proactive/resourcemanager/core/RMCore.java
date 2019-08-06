@@ -25,13 +25,12 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Permission;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -3018,23 +3017,20 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 fileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + fileName;
             }
 
-            try (FileReader fr = new FileReader(fileName); BufferedReader br = new BufferedReader(fr)) {
-                String line = br.readLine();
-                while (line != null) {
-                    final String[] split = line.split(",");
-                    if (split.length > 1) {
-                        List<String> strings = Arrays.asList(split);
-                        String infra = strings.get(0).trim();
-                        List<String> policies = strings.subList(1, strings.size())
-                                                       .stream()
-                                                       .map(String::trim)
-                                                       .collect(Collectors.toList());
-                        mapping.put(infra, policies);
-                    }
-
-                    line = br.readLine();
+            List<String> lines = Files.readAllLines(Paths.get(fileName));
+            for (String line : lines) {
+                final String[] split = line.split(",");
+                if (split.length > 1) {
+                    List<String> strings = Arrays.asList(split);
+                    String infra = strings.get(0).trim();
+                    List<String> policies = strings.subList(1, strings.size())
+                                                   .stream()
+                                                   .map(String::trim)
+                                                   .collect(Collectors.toList());
+                    mapping.put(infra, policies);
                 }
             }
+
         } catch (Exception e) {
             logger.error("Error when loading infrastructure definition file : " + fileName, e);
         }

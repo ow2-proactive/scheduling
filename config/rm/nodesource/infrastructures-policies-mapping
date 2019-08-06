@@ -18,16 +18,3 @@ org.ow2.proactive.resourcemanager.nodesource.infrastructure.LSFInfrastructure,or
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager,org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy,org.ow2.proactive.resourcemanager.nodesource.policy.TimeSlotPolicy,org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.ReleaseResourcesWhenSchedulerIdle,org.ow2.proactive.resourcemanager.nodesource.policy.CronPolicy,org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.CronSlotLoadBasedPolicy
 
 org.ow2.proactive.resourcemanager.nodesource.infrastructure.NativeSchedulerInfrastructure,org.ow2.proactive.scheduler.resourcemanager.nodesource.policy.NativeSchedulerPolicy
-
-
-
-
-
-
-
-
-
-
-
-
-
