@@ -77,6 +77,8 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
     @Configurable(description = "ME|users=name1,name2;groups=group1,group2|ALL", sectionSelector = 1)
     private AccessType providerAccessType = AccessType.ME;
 
+    private Map<String, String> meta = new HashMap<>();
+
     /**
      * Configure a policy with given parameters.
      * @param policyParameters parameters defined by user
@@ -263,5 +265,10 @@ public abstract class NodeSourcePolicy implements NodeSourcePlugin {
         Map<Integer, String> sectionDescriptions = new HashMap<>();
         sectionDescriptions.put(1, "Authorizations");
         return sectionDescriptions;
+    }
+
+    @Override
+    public Map<String, String> getMeta() {
+        return meta;
     }
 }

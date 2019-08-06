@@ -39,4 +39,6 @@ import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
  */
 public interface NodeSourcePlugin extends Serializable {
     Map<Integer, String> getSectionDescriptions();
+
+    Map<String, String> getMeta();
 }
