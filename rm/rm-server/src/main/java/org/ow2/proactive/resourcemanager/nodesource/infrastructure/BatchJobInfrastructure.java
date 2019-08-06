@@ -491,8 +491,8 @@ public abstract class BatchJobInfrastructure extends InfrastructureManager {
             }
             this.serverName = parameters[index++].toString();
             try {
-                Object possibleCredentials = parameters[index++];
-                if (possibleCredentials != null) {
+                byte[] possibleCredentials = (byte[]) parameters[index++];
+                if (possibleCredentials != null && possibleCredentials.length > 0) {
                     persistedInfraVariables.put(CREDENTIALS_KEY,
                                                 Credentials.getCredentialsBase64((byte[]) possibleCredentials));
                 }
