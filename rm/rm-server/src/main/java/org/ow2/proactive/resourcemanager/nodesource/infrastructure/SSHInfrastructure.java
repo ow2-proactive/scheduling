@@ -33,6 +33,7 @@ import java.net.InetAddress;
 import java.security.KeyException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
@@ -114,7 +115,7 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     /**
      * Path to the credentials file user for RM authentication
      */
-    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 1, important = true)
+    @Configurable(credential = true, description = "Absolute path of the credential file", sectionSelector = 1)
     protected File rmCredentialsPath;
 
     private static final String CREDENTIALS_KEY = "credentials";
@@ -337,12 +338,12 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
             this.javaOptions = parameters[index++].toString();
 
             // credentials
-            if (parameters[index] == null) {
-                throw new IllegalArgumentException("Credentials must be specified");
-            }
             try {
-                persistedInfraVariables.put(CREDENTIALS_KEY,
-                                            Credentials.getCredentialsBase64((byte[]) parameters[index++]));
+                Object possibleCredentials = parameters[index++];
+                if (possibleCredentials != null) {
+                    persistedInfraVariables.put(CREDENTIALS_KEY,
+                                                Credentials.getCredentialsBase64((byte[]) possibleCredentials));
+                }
             } catch (KeyException e) {
                 throw new IllegalArgumentException("Could not retrieve base64 credentials", e);
             }
@@ -397,11 +398,9 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
     // Below are wrapper methods around the runtime variables map
 
     private Credentials getCredentials() {
-        return getPersistedInfraVariable(new PersistedInfraVariablesHandler<Credentials>() {
-            @Override
-            public Credentials handle() {
-                return (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
-            }
+        return getPersistedInfraVariable(() -> {
+            Credentials credentials = (Credentials) persistedInfraVariables.get(CREDENTIALS_KEY);
+            return Optional.ofNullable(credentials).orElse(nodeSource.getAdministrator().getCredentials());
         });
     }
 

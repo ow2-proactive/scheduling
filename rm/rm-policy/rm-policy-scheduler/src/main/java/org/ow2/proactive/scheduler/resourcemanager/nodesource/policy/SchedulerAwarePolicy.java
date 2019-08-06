@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.resourcemanager.nodesource.policy;
 
 import java.io.File;
+import java.security.KeyException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -58,7 +59,7 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
     @Configurable(description = "url used to contact the scheduler, e.g. pnp://, pamr://", sectionSelector = 3, important = true)
     protected String schedulerUrl = "";
 
-    @Configurable(credential = true, description = "credentials used when contacting the scheduler", sectionSelector = 3, important = true)
+    @Configurable(credential = true, description = "credentials used when contacting the scheduler", sectionSelector = 3)
     protected File schedulerCredentialsPath;
 
     @Configurable(description = "Delay in ms for the resource manger to recover broken node source in scheduler aware policy", sectionSelector = 4)
@@ -86,10 +87,6 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
         }
 
         schedulerUrl = policyParameters[2].toString();
-
-        if (policyParameters[3] == null) {
-            throw new IllegalArgumentException("Credentials must be specified");
-        }
 
         credentials = (byte[]) policyParameters[3];
 
@@ -129,7 +126,13 @@ public abstract class SchedulerAwarePolicy extends NodeSourcePolicy implements S
             trialsNumber++;
             try {
                 authentication = SchedulerConnection.join(schedulerUrl);
-                Credentials creds = Credentials.getCredentialsBase64(credentials);
+
+                Credentials creds;
+                if (credentials == null) {
+                    creds = nodeSource.getAdministrator().getCredentials();
+                } else {
+                    creds = Credentials.getCredentialsBase64(credentials);
+                }
                 scheduler = authentication.login(creds);
                 Thread.sleep(schedulerAwarePolicyNodeSourceRecoveryDelay);
 
