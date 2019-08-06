@@ -138,6 +138,7 @@ public class PluginDescriptor implements Serializable {
             Map<Integer, String> sectionDescriptions = (Map<Integer, String>) getSectionDescriptions.invoke(instance);
             this.sectionDescriptions.putAll(sectionDescriptions);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            logger.debug("Could not load `getSectionDescriptions`.", e);
         }
     }
 
@@ -147,6 +148,7 @@ public class PluginDescriptor implements Serializable {
             Map<String, String> metaInfo = (Map<String, String>) getMetaMethod.invoke(instance);
             this.meta.putAll(metaInfo);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            logger.debug("Could not load `getMeta`.", e);
         }
     }
 

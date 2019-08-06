@@ -149,10 +149,14 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     public InfrastructureManager() {
     }
 
+    private Map<String, String> meta = new HashMap<>();
+
+    {
+        meta.put(InfrastructureManager.ELASTIC, "false");
+    }
+
     @Override
     public Map<String, String> getMeta() {
-        Map<String, String> meta = new HashMap<>();
-        meta.put(InfrastructureManager.ELASTIC, "false");
         return meta;
     }
 

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,13 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Configurable(description = "Additional ProActive properties", sectionSelector = 3)
     private String paProperties = "";
+
+    private Map<String, String> meta = new HashMap<>();
+
+    {
+        meta.putAll(super.getMeta());
+        meta.put(InfrastructureManager.ELASTIC, "true");
+    }
 
     /**
      * key to retrieve the number of nodes which are acquired in the persisted
@@ -488,8 +496,6 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Override
     public Map<String, String> getMeta() {
-        Map<String, String> meta = super.getMeta();
-        meta.put(InfrastructureManager.ELASTIC, "true");
         return meta;
     }
 }
