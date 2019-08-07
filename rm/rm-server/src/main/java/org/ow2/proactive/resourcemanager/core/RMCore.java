@@ -25,9 +25,12 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Permission;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -3001,6 +3004,32 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public void setNeededNodes(int neededNodes) {
         this.monitoring.setNeededNodes(neededNodes);
+    }
+
+    @Override
+    public Map<String, List<String>> getInfrasToPoliciesMapping() {
+        Map<String, List<String>> mapping = new HashMap<>();
+        String fileName = null;
+        try {
+            fileName = PAResourceManagerProperties.RM_NODESOURCE_INFRA_POLICY_MAPPING.getValueAsString();
+            if (!(new File(fileName).isAbsolute())) {
+                // file path is relative, so we complete the path with the prefix RM_Home constant
+                fileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + fileName;
+            }
+
+            mapping = Files.readAllLines(Paths.get(fileName))
+                           .stream()
+                           .map(line -> line.split(","))
+                           .filter(array -> array.length > 1)
+                           .map(Arrays::asList)
+                           .collect(Collectors.toMap(list -> list.get(0).trim(), list -> list.subList(1, list.size())
+                                                                                             .stream()
+                                                                                             .map(String::trim)
+                                                                                             .collect(Collectors.toList())));
+        } catch (Exception e) {
+            logger.error("Error when loading infrastructure definition file : " + fileName, e);
+        }
+        return mapping;
     }
 
     /**

@@ -31,9 +31,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -668,6 +671,43 @@ public class RMRest implements RMRestInterface {
             @HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getSupportedNodeSourceInfrastructures();
+    }
+
+    @Override
+    public Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+
+        Collection<PluginDescriptor> supportedInfrastructures = rm.getSupportedNodeSourceInfrastructures();
+
+        Collection<PluginDescriptor> supportedPolicies = rm.getSupportedNodeSourcePolicies();
+
+        Map<String, List<String>> result = rm.getInfrasToPoliciesMapping().entrySet().stream().filter(entry -> {
+            for (PluginDescriptor supportedInfrastructure : supportedInfrastructures) {
+                if (supportedInfrastructure.getPluginName().equals(entry.getKey())) {
+                    return true;
+                }
+            }
+            return false;
+        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return result.entrySet().stream().map(entry -> {
+            List<String> policies = entry.getValue()
+                                         .stream()
+                                         .filter(policy -> containsPlugin(policy, supportedPolicies))
+                                         .collect(Collectors.toList());
+            return new AbstractMap.SimpleEntry<>(entry.getKey(), policies);
+
+        }).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+    }
+
+    private boolean containsPlugin(String pluginName, Collection<PluginDescriptor> plugins) {
+        for (PluginDescriptor supportedPolicy : plugins) {
+            if (supportedPolicy.getPluginName().equals(pluginName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

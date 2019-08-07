@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.frontend;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -558,4 +559,6 @@ public interface ResourceManager {
     boolean areNodesRecoverable(NodeSet nodes);
 
     void setNeededNodes(int neededNodes);
+
+    Map<String, List<String>> getInfrasToPoliciesMapping();
 }

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.AttributeNotFoundException;
@@ -549,6 +550,18 @@ public interface RMRestInterface {
     @Path("infrastructures")
     @Produces("application/json")
     Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException;
+
+    /**
+     * @param sessionId a valid session
+     * @return a mapping which for each infrastructure provides list of policies
+     * that can work together with given infrastructure
+     */
+    @GET
+    @GZIP
+    @Path("infrastructures/mapping")
+    @Produces("application/json")
+    Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException;
 
     /**
