@@ -3017,20 +3017,15 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                 fileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + fileName;
             }
 
-            List<String> lines = Files.readAllLines(Paths.get(fileName));
-            for (String line : lines) {
-                final String[] split = line.split(",");
-                if (split.length > 1) {
-                    List<String> strings = Arrays.asList(split);
-                    String infra = strings.get(0).trim();
-                    List<String> policies = strings.subList(1, strings.size())
-                                                   .stream()
-                                                   .map(String::trim)
-                                                   .collect(Collectors.toList());
-                    mapping.put(infra, policies);
-                }
-            }
-
+            mapping = Files.readAllLines(Paths.get(fileName))
+                           .stream()
+                           .map(line -> line.split(","))
+                           .filter(array -> array.length > 1)
+                           .map(Arrays::asList)
+                           .collect(Collectors.toMap(list -> list.get(0).trim(), list -> list.subList(1, list.size())
+                                                                                             .stream()
+                                                                                             .map(String::trim)
+                                                                                             .collect(Collectors.toList())));
         } catch (Exception e) {
             logger.error("Error when loading infrastructure definition file : " + fileName, e);
         }

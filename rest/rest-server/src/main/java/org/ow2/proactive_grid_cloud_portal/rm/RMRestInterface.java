@@ -559,7 +559,7 @@ public interface RMRestInterface {
      */
     @GET
     @GZIP
-    @Path("infrastructuresmapping")
+    @Path("infrastructures/mapping")
     @Produces("application/json")
     Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException;

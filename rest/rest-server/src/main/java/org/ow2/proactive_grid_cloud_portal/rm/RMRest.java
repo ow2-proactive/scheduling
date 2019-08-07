@@ -674,10 +674,6 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("infrastructuresmapping")
-    @Produces("application/json")
     public Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
