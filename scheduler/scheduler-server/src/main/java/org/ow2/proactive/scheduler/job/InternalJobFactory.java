@@ -51,7 +51,6 @@ import org.ow2.proactive.scheduler.common.task.ScriptTask;
 import org.ow2.proactive.scheduler.common.task.Task;
 import org.ow2.proactive.scheduler.common.task.flow.FlowActionType;
 import org.ow2.proactive.scheduler.core.OnErrorPolicyInterpreter;
-import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
@@ -399,6 +398,13 @@ public class InternalJobFactory {
         } else {
             taskToSet.setRestartTaskOnError(userJob.getRestartTaskOnError());
         }
+
+        if (task.getTaskRetryDelayProperty().isSet()) {
+            taskToSet.setTaskRetryDelay(task.getTaskRetryDelay());
+        } else {
+            taskToSet.setTaskRetryDelay(userJob.getTaskRetryDelay());
+        }
+
         if (task.getMaxNumberOfExecutionProperty().isSet()) {
             taskToSet.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         } else {
