@@ -64,7 +64,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.json.simple.JSONObject;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -619,13 +618,10 @@ public class RMRest implements RMRestInterface {
 
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
-        JSONObject json = new JSONObject();
         Map nodesMBeanHistoryMap = new HashMap<String, String>();
         for (String nodeJmxUrl : nodesJmxUrl) {
             nodesMBeanHistoryMap.put(nodeJmxUrl, rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range));
         }
-
-        json.putAll(nodesMBeanHistoryMap);
         return nodesMBeanHistoryMap.toString();
     }
 
