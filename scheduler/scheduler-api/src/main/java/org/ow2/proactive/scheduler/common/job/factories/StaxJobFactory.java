@@ -469,7 +469,9 @@ public class StaxJobFactory extends JobFactory {
                 job.setProjectName(commonPropertiesHolder.getProjectName());
                 job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
                 job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
-                job.setTaskRetryDelay(commonPropertiesHolder.getTaskRetryDelay());
+                if (commonPropertiesHolder.getTaskRetryDelayProperty().isSet()) {
+                    job.setTaskRetryDelay(commonPropertiesHolder.getTaskRetryDelay());
+                }
                 job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
                 job.setGenericInformation(commonPropertiesHolder.getGenericInformation());
                 job.setUnresolvedGenericInformation(commonPropertiesHolder.getUnresolvedGenericInformation());

@@ -401,7 +401,7 @@ public class InternalJobFactory {
 
         if (task.getTaskRetryDelayProperty().isSet()) {
             taskToSet.setTaskRetryDelay(task.getTaskRetryDelay());
-        } else {
+        } else if (userJob.getTaskRetryDelayProperty().isSet()) {
             taskToSet.setTaskRetryDelay(userJob.getTaskRetryDelay());
         }
 
