@@ -54,6 +54,9 @@ public abstract class CommonAttribute implements Serializable {
     /** The key for specifying start at time as generic information */
     public static final String GENERIC_INFO_START_AT_KEY = "START_AT";
 
+    /** The default value of defining how long to wait before restart task in error (zero or negative value means restart immediately) */
+    public static final Long DEFAULT_TASK_RETRY_DELAY = -1l;
+
     /**
      * Define where will a task be restarted if an error occurred (default is ANYWHERE).
      * <p>
@@ -64,7 +67,7 @@ public abstract class CommonAttribute implements Serializable {
     protected UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(RestartMode.ANYWHERE);
 
     /** Specify how long to wait before restart the task if an error occurred. */
-    protected UpdatableProperties<LongWrapper> taskRetryDelay = new UpdatableProperties<LongWrapper>(new LongWrapper(-1l));
+    protected UpdatableProperties<LongWrapper> taskRetryDelay = new UpdatableProperties<LongWrapper>(new LongWrapper(DEFAULT_TASK_RETRY_DELAY));
 
     /**
      * The maximum number of execution for a task (default 1).

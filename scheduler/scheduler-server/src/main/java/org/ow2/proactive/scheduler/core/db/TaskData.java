@@ -695,7 +695,9 @@ public class TaskData {
         internalTask.setRunAsMe(isRunAsMe());
         internalTask.setFork(isForkTask());
         internalTask.setWallTime(getWallTime());
-        internalTask.setTaskRetryDelay(getRetryDelay());
+        if (getRetryDelay() != null) {
+            internalTask.setTaskRetryDelay(getRetryDelay());
+        }
         internalTask.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalTask.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
         internalTask.setNumberOfExecutionOnFailureLeft(getNumberOfExecutionOnFailureLeft());
@@ -1234,7 +1236,9 @@ public class TaskData {
         taskState.setIterationIndex(getIteration());
         taskState.setReplicationIndex(getReplication());
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
-        taskState.setTaskRetryDelay(getRetryDelay());
+        if (getRetryDelay() != null) {
+            taskState.setTaskRetryDelay(getRetryDelay());
+        }
         taskState.setParallelEnvironment(getParallelEnvironment());
         taskState.setGenericInformation(getGenericInformation());
         taskState.setVariables(variablesToTaskVariables());
