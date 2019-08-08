@@ -31,13 +31,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
-import java.util.AbstractMap;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -70,6 +64,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.json.simple.JSONObject;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -609,6 +604,29 @@ public class RMRest implements RMRestInterface {
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
         return rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range);
+    }
+
+    @Override
+    @GET
+    @GZIP
+    @Produces("application/json")
+    @Path("nodes/mbean/history")
+    public String getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodejmxurl") Set<String> nodesJmxUrl, @QueryParam("objectname") String objectName,
+            @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
+
+        // checking that still connected to the RM
+        RMProxyUserInterface rmProxy = checkAccess(sessionId);
+        JSONObject json = new JSONObject();
+        Map nodesMBeanHistoryMap = new HashMap<String, String>();
+        for (String nodeJmxUrl : nodesJmxUrl) {
+            nodesMBeanHistoryMap.put(nodeJmxUrl, rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range));
+        }
+
+        json.putAll(nodesMBeanHistoryMap);
+        return nodesMBeanHistoryMap.toString();
     }
 
     @Override
