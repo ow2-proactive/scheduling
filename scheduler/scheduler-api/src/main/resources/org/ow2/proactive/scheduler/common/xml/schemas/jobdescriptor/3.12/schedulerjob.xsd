@@ -44,7 +44,7 @@
       </xs:attribute>
       <xs:attribute name="taskRetryDelay">
         <xs:annotation>
-          <xs:documentation>For each task, specifies how long to wait before restart the task if an error occurred.</xs:documentation>
+          <xs:documentation>For each task, it specifies how long to wait before restarting the task if an error occurred.</xs:documentation>
         </xs:annotation>
         <xs:simpleType>
           <xs:union memberTypes="jd:durationPattern jd:variableRefType"/>
@@ -162,7 +162,7 @@
   <xs:attributeGroup name="taskRetryDelay_j">
     <xs:attribute name="taskRetryDelay" use="required">
       <xs:annotation>
-        <xs:documentation>For each task, specifies how long to wait before restart the task if an error occurred.</xs:documentation>
+        <xs:documentation>For each task, it specifies how long to wait before restarting the task if an error occurred.</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="jd:durationPattern jd:variableRefType"/>
@@ -293,7 +293,7 @@
           </xs:attribute>
           <xs:attribute name="taskRetryDelay">
             <xs:annotation>
-              <xs:documentation>Specifies how long to wait before restart the task if an error occurred.</xs:documentation>
+              <xs:documentation>This parameter specifies how long to wait before restarting the task if an error occurred.</xs:documentation>
             </xs:annotation>
             <xs:simpleType>
               <xs:union memberTypes="jd:durationPattern jd:variableRefType"/>
@@ -478,7 +478,7 @@
   <xs:attributeGroup name="taskRetryDelay_t">
     <xs:attribute name="taskRetryDelay" use="required">
       <xs:annotation>
-        <xs:documentation>Specifies how long to wait before restart the task if an error occurred.</xs:documentation>
+        <xs:documentation>This parameter specifies how long to wait before restarting the task if an error occurred.</xs:documentation>
       </xs:annotation>
       <xs:simpleType>
         <xs:union memberTypes="jd:durationPattern jd:variableRefType"/>

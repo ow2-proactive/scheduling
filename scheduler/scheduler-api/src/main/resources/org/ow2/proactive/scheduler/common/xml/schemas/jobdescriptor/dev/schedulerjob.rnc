@@ -43,7 +43,7 @@ onTaskError_j = ## Defines the base task error behavior. Cancel job, suspend tas
     attribute onTaskError {onErrorTaskType | variableRefType}
 restartTaskOnError_j = ## For each task, where does the task restart if an error occurred ? (default=anywhere)
     attribute restartTaskOnError {restartTaskType | variableRefType}
-taskRetryDelay_j = ## For each task, specifies how long to wait before restart the task if an error occurred.
+taskRetryDelay_j = ## For each task, it specifies how long to wait before restarting the task if an error occurred.
     attribute taskRetryDelay {durationPattern | variableRefType}
 numberOfExecution_j = ## Maximum number of execution for each task (default=1)
     attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}
@@ -121,7 +121,7 @@ onTaskError_t = ## Defines the base task error behavior. Cancel job, suspend tas
    attribute onTaskError {onErrorTaskType | variableRefType}
 restartTaskOnError_t = ## Where does the task restart if an error occurred ?
     attribute restartTaskOnError {restartTaskType}
-taskRetryDelay_t = ## Specifies how long to wait before restart the task if an error occurred.
+taskRetryDelay_t = ## This parameter specifies how long to wait before restarting the task if an error occurred.
     attribute taskRetryDelay {durationPattern | variableRefType}
 numberOfExecution_t = ## Maximum number of execution for this task
     attribute maxNumberOfExecution {xsd:nonNegativeInteger | variableRefType}

@@ -130,7 +130,7 @@
   </define>
   <define name="taskRetryDelay_j">
     <attribute name="taskRetryDelay">
-      <doc:documentation>For each task, specifies how long to wait before restart the task if an error occurred.</doc:documentation>
+      <doc:documentation>For each task, it specifies how long to wait before restarting the task if an error occurred.</doc:documentation>
       <choice>
         <ref name="durationPattern"/>
         <ref name="variableRefType"/>
@@ -376,7 +376,7 @@
   </define>
   <define name="taskRetryDelay_t">
     <attribute name="taskRetryDelay">
-      <doc:documentation>Specifies how long to wait before restart the task if an error occurred.</doc:documentation>
+      <doc:documentation>This parameter specifies how long to wait before restarting the task if an error occurred.</doc:documentation>
       <choice>
         <ref name="durationPattern"/>
         <ref name="variableRefType"/>
