@@ -361,6 +361,7 @@ public abstract class Job extends CommonAttribute {
                                    lineWithQuotes("ProjectName", projectName),
                                    line("onTaskError", onTaskError),
                                    line("restartTaskOnError", restartTaskOnError),
+                                   line("taskRetryDelay", taskRetryDelay),
                                    line("maxNumberOfExecution",
                                         maxNumberOfExecution,
                                         () -> maxNumberOfExecution.getValue().getIntegerValue()),

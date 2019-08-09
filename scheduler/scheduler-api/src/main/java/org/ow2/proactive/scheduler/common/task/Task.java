@@ -751,6 +751,7 @@ public abstract class Task extends CommonAttribute {
         return "Task '" + name + "' : " + System.lineSeparator() +
                addIndent(Stream.of(lineWithQuotes("Description", description),
                                    line("restartTaskOnError", restartTaskOnError),
+                                   line("taskRetryDelay", taskRetryDelay),
                                    line("onTaskError", onTaskError),
                                    line("maxNumberOfExecution",
                                         maxNumberOfExecution,
