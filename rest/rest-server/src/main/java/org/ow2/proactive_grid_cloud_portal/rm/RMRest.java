@@ -610,19 +610,18 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Produces("application/json")
     @Path("nodes/mbean/history")
-    public String getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
+    public Object getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
             @QueryParam("nodejmxurl") Set<String> nodesJmxUrl, @QueryParam("objectname") String objectName,
             @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
 
-        // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
         Map nodesMBeanHistoryMap = new HashMap<String, String>();
         for (String nodeJmxUrl : nodesJmxUrl) {
             nodesMBeanHistoryMap.put(nodeJmxUrl, rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range));
         }
-        return nodesMBeanHistoryMap.toString();
+        return nodesMBeanHistoryMap;
     }
 
     @Override
