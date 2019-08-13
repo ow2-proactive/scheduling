@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,8 +63,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -96,6 +101,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
 
 
 @Path("/rm")
@@ -108,6 +114,8 @@ public class RMRest implements RMRestInterface {
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
+
+    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         if (sessionId == null) {
@@ -594,7 +602,7 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Produces("application/json")
     @Path("node/mbean/history")
-    public String getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId,
+    public Object getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId,
             @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectName,
             @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
@@ -606,20 +614,22 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Produces("application/json")
-    @Path("nodes/mbean/history")
     public Object getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
             @QueryParam("nodejmxurl") Set<String> nodesJmxUrl, @QueryParam("objectname") String objectName,
             @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
 
+        // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
-        Map nodesMBeanHistoryMap = new HashMap<String, String>();
+        Map<String, Object> nodesMBeanHistoryMap = new HashMap();
         for (String nodeJmxUrl : nodesJmxUrl) {
-            nodesMBeanHistoryMap.put(nodeJmxUrl, rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range));
+            nodesMBeanHistoryMap.put(nodeJmxUrl,
+                                     processHistoryResult(rmProxy.getNodeMBeanHistory(nodeJmxUrl,
+                                                                                      objectName,
+                                                                                      attrs,
+                                                                                      range),
+                                                          range));
         }
         return nodesMBeanHistoryMap;
     }
@@ -987,5 +997,73 @@ public class RMRest implements RMRestInterface {
             return 0;
         }
     }
+
+    private Map<String, Object> processHistoryResult(String result, String range) throws IOException {
+        result = removingInternalEscaping(result);
+        Map<String, Object> jsonMap = parseJSON(result);
+        Map<String, Object> processedJsonMap = new HashMap<>();
+        if (jsonMap == null) {
+            return null;
+        }
+        long now = new Date().getTime() / 1000;
+        long dur = StatHistory.Range.valueOf(range).getDuration();
+        int size = getJsonInternalSize(jsonMap);
+        long step = dur / size;
+
+        List<String> labels = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            //The time instant where the metric is taken
+            long t = now - dur + step * i;
+            Date date = new Date(t * 1000);
+
+            labels.add(formatter.format(date));
+        }
+        JSONObject measureInfo;
+        JSONArray measureInfoList;
+        for (String key : jsonMap.keySet()) {
+            ArrayList values = (ArrayList) jsonMap.get(key);
+            measureInfoList = new JSONArray();
+            for (int i = 0; i < size - 1; i++) {
+                measureInfo = new JSONObject();
+                measureInfo.put("value", values.get(i));
+                measureInfo.put("from", labels.get(i));
+                measureInfo.put("to", labels.get(i + 1));
+                measureInfoList.add(measureInfo);
+            }
+            processedJsonMap.put(key, measureInfoList);
+        }
+        return processedJsonMap;
+    }
+
+    private String removingInternalEscaping(String result) {
+        result = result.replace("\\\"", "\"");
+        result = result.replace("\"{", "{");
+        result = result.replace("}\"", "}");
+        return result;
+    }
+
+    private Map<String, Object> parseJSON(final String jsonString) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            final JsonParser parser = mapper.getJsonFactory().createJsonParser(jsonString);
+            while (parser.nextToken() != null) {
+            }
+        } catch (Exception jpe) {
+            throw new RuntimeException("Invalid JSON: " + jpe.getMessage(), jpe);
+        }
+        return mapper.readValue(jsonString, Map.class);
+    }
+
+    private int getJsonInternalSize(Map<String, Object> jsonMap) {
+        for (String key : jsonMap.keySet()) {
+            ArrayList values = (ArrayList) jsonMap.get(key);
+            if (values != null) {
+                return values.size();
+            }
+        }
+
+        return 0;
+    }
+
 
 }

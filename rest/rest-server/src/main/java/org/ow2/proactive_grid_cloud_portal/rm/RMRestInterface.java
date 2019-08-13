@@ -465,8 +465,8 @@ public interface RMRestInterface {
      * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
      *      for each source. Each char can be:<ul>
      *            <li>'a' 1 minute
-     *            <li>'m' 10 minutes
      *            <li>'n' 5 minutes
+     *            <li>'m' 10 minutes
      *            <li>'t' 30 minutes
      *            <li>'h' 1 hour
      *            <li>'j' 2 hours
@@ -477,12 +477,6 @@ public interface RMRestInterface {
      *            <li>'M' 1 month
      *            <li>'y' 1 year</ul>
      * @return a JSON object containing a key for each source
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws MalformedObjectNameException
-     * @throws NullPointerException
      * @throws NotConnectedException
      */
     @GET
@@ -500,14 +494,14 @@ public interface RMRestInterface {
      * without redundancy, in a friendly JSON format.
      *
      * @param sessionId a valid session
-     * @param nodesJmxUrl a list of mbean server urls
+     * @param nodesJmxUrl a set of mbean server urls
      * @param objectName name of mbean
      * @param attrs set of mbean attributes
      * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
      *      for each source. Each char can be:<ul>
      *            <li>'a' 1 minute
-     *            <li>'m' 10 minutes
      *            <li>'n' 5 minutes
+     *            <li>'m' 10 minutes
      *            <li>'t' 30 minutes
      *            <li>'h' 1 hour
      *            <li>'j' 2 hours
@@ -518,12 +512,6 @@ public interface RMRestInterface {
      *            <li>'M' 1 month
      *            <li>'y' 1 year</ul>
      * @return a JSON object containing a key for each source
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws MalformedObjectNameException
-     * @throws NullPointerException
      * @throws NotConnectedException
      */
     @GET
