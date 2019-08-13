@@ -1053,16 +1053,4 @@ public class RMRest implements RMRestInterface {
         }
         return mapper.readValue(jsonString, Map.class);
     }
-
-    private int getJsonInternalSize(Map<String, Object> jsonMap) {
-        for (String key : jsonMap.keySet()) {
-            ArrayList values = (ArrayList) jsonMap.get(key);
-            if (values != null) {
-                return values.size();
-            }
-        }
-
-        return 0;
-    }
-
 }
