@@ -115,7 +115,7 @@ public class RMRest implements RMRestInterface {
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
-    private static final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         if (sessionId == null) {
@@ -998,34 +998,34 @@ public class RMRest implements RMRestInterface {
         }
     }
 
-    private Map<String, Object> processHistoryResult(String result, String range) throws IOException {
-        result = removingInternalEscaping(result);
-        Map<String, Object> jsonMap = parseJSON(result);
+    private Map<String, Object> processHistoryResult(String mbeanHistory, String range) throws IOException {
+        mbeanHistory = removingInternalEscaping(mbeanHistory);
+        Map<String, Object> jsonMap = parseJSON(mbeanHistory);
         Map<String, Object> processedJsonMap = new HashMap<>();
         if (jsonMap == null) {
             return null;
         }
-        long now = new Date().getTime() / 1000;
-        long dur = StatHistory.Range.valueOf(range).getDuration();
-        int size = getJsonInternalSize(jsonMap);
-        long step = dur / size;
+        long currentTime = new Date().getTime() / 1000;
+        long duration = StatHistory.Range.valueOf(range).getDuration();
+        int size = Optional.ofNullable(((ArrayList) jsonMap.entrySet().iterator().next().getValue()).size()).orElse(0);
+        long step = duration / size;
 
         List<String> labels = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i <= size; i++) {
             //The time instant where the metric is taken
-            long t = now - dur + step * i;
+            long t = currentTime - duration + step * i;
             Date date = new Date(t * 1000);
 
-            labels.add(formatter.format(date));
+            labels.add(DATE_FORMAT.format(date));
         }
         JSONObject measureInfo;
         JSONArray measureInfoList;
         for (String key : jsonMap.keySet()) {
             ArrayList values = (ArrayList) jsonMap.get(key);
             measureInfoList = new JSONArray();
-            for (int i = 0; i < size - 1; i++) {
+            for (int i = 0; i < size; i++) {
                 measureInfo = new JSONObject();
-                measureInfo.put("value", values.get(i));
+                measureInfo.put("value", Optional.ofNullable(values.get(i)).orElse(0));
                 measureInfo.put("from", labels.get(i));
                 measureInfo.put("to", labels.get(i + 1));
                 measureInfoList.add(measureInfo);
@@ -1064,6 +1064,5 @@ public class RMRest implements RMRestInterface {
 
         return 0;
     }
-
 
 }
