@@ -483,7 +483,7 @@ public interface RMRestInterface {
     @GZIP
     @Produces("application/json")
     @Path("node/mbean/history")
-    Object getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
+    String getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectName, @QueryParam("attrs") List<String> attrs,
             @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
@@ -511,14 +511,15 @@ public interface RMRestInterface {
      *            <li>'w' 1 week
      *            <li>'M' 1 month
      *            <li>'y' 1 year</ul>
-     * @return a JSON object containing a key for each source
+     * @return a Map where each entry containse mbean server url as key and a map of statistic values as value. Each entry has an mbean attribute as key and
+     * list of its mbean values as value.
      * @throws NotConnectedException
      */
     @GET
     @GZIP
     @Produces("application/json")
     @Path("nodes/mbean/history")
-    Object getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
+    Map<String, Map<String, Object>> getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
             @QueryParam("nodejmxurl") Set<String> nodesJmxUrl, @QueryParam("objectname") String objectName,
             @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,

@@ -33,7 +33,6 @@ import java.net.URISyntaxException;
 import java.security.KeyException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -603,7 +602,7 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Produces("application/json")
     @Path("node/mbean/history")
-    public Object getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId,
+    public String getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId,
             @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectName,
             @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
@@ -615,7 +614,7 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public Object getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
+    public Map<String, Map<String, Object>> getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
             @QueryParam("nodejmxurl") Set<String> nodesJmxUrl, @QueryParam("objectname") String objectName,
             @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
@@ -999,16 +998,16 @@ public class RMRest implements RMRestInterface {
     private Map<String, Object> processHistoryResult(String mbeanHistory, String range) throws IOException {
         mbeanHistory = removingInternalEscaping(mbeanHistory);
         Map<String, Object> jsonMap = parseJSON(mbeanHistory);
-        Map<String, Object> processedJsonMap = new HashMap<>();
         if (jsonMap == null) {
             return null;
         }
+        Map<String, Object> processedJsonMap = new HashMap<>();
         long currentTime = new Date().getTime() / 1000;
         long duration = StatHistory.Range.valueOf(range).getDuration();
         int size = Optional.ofNullable(((ArrayList) jsonMap.entrySet().iterator().next().getValue()).size()).orElse(0);
         long step = duration / size;
 
-        List<String> labels = new ArrayList<>();
+        List<String> labels = new ArrayList<>(size + 1);
         for (int i = 0; i <= size; i++) {
             //The time instant where the metric is taken
             long t = currentTime - duration + step * i;
