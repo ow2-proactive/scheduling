@@ -257,6 +257,8 @@ public class TaskData {
 
     private long wallTime;
 
+    private Long retryDelay;
+
     private int iteration;
 
     private int replication;
@@ -534,6 +536,7 @@ public class TaskData {
         taskData.setRunAsMe(task.isRunAsMe());
         taskData.setWallTime(task.getWallTime());
         taskData.setOnTaskErrorString(task.getOnTaskErrorProperty().getValue());
+        taskData.setRetryDelay(task.getTaskRetryDelay());
         taskData.setMaxNumberOfExecution(task.getMaxNumberOfExecution());
         taskData.setJobData(jobRuntimeData);
         taskData.setNumberOfExecutionOnFailureLeft(PASchedulerProperties.NUMBER_OF_EXECUTION_ON_FAILURE.getValueAsInt());
@@ -690,11 +693,16 @@ public class TaskData {
         internalTask.setPreciousLogs(isPreciousLogs());
         internalTask.setPreciousResult(isPreciousResult());
         internalTask.setRunAsMe(isRunAsMe());
+        internalTask.setFork(isForkTask());
         internalTask.setWallTime(getWallTime());
+        if (getRetryDelay() != null) {
+            internalTask.setTaskRetryDelay(getRetryDelay());
+        }
         internalTask.setMaxNumberOfExecution(getMaxNumberOfExecution());
         internalTask.setNumberOfExecutionLeft(getNumberOfExecutionLeft());
         internalTask.setNumberOfExecutionOnFailureLeft(getNumberOfExecutionOnFailureLeft());
         internalTask.setRestartTaskOnError(getRestartMode());
+
         internalTask.setFlowBlock(getFlowBlock());
         internalTask.setIterationIndex(getIteration());
         internalTask.setReplicationIndex(getReplication());
@@ -1004,6 +1012,15 @@ public class TaskData {
         this.startTime = startTime;
     }
 
+    @Column(name = "RETRY_DELAY")
+    public Long getRetryDelay() {
+        return retryDelay;
+    }
+
+    public void setRetryDelay(Long retryDelay) {
+        this.retryDelay = retryDelay;
+    }
+
     @Column(name = "FINISH_TIME")
     public long getFinishedTime() {
         return finishedTime;
@@ -1219,6 +1236,9 @@ public class TaskData {
         taskState.setIterationIndex(getIteration());
         taskState.setReplicationIndex(getReplication());
         taskState.setMaxNumberOfExecution(getMaxNumberOfExecution());
+        if (getRetryDelay() != null) {
+            taskState.setTaskRetryDelay(getRetryDelay());
+        }
         taskState.setParallelEnvironment(getParallelEnvironment());
         taskState.setGenericInformation(getGenericInformation());
         taskState.setVariables(variablesToTaskVariables());

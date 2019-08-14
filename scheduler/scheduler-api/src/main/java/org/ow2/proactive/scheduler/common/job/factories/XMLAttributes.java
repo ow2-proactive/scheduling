@@ -47,6 +47,7 @@ public enum XMLAttributes {
     COMMON_MAX_NUMBER_OF_EXECUTION("maxNumberOfExecution"),
     COMMON_NAME("name"),
     COMMON_RESTART_TASK_ON_ERROR("restartTaskOnError"),
+    COMMON_TASK_RETRY_DELAY("taskRetryDelay"),
     COMMON_VALUE("value"),
 
     // VARIABLE
