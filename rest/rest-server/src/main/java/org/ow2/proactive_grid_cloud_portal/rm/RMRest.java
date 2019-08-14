@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import java.security.KeyException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -622,16 +623,13 @@ public class RMRest implements RMRestInterface {
 
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
-        Map<String, Object> nodesMBeanHistoryMap = new HashMap();
-        for (String nodeJmxUrl : nodesJmxUrl) {
-            nodesMBeanHistoryMap.put(nodeJmxUrl,
-                                     processHistoryResult(rmProxy.getNodeMBeanHistory(nodeJmxUrl,
-                                                                                      objectName,
-                                                                                      attrs,
-                                                                                      range),
-                                                          range));
-        }
-        return nodesMBeanHistoryMap;
+        return nodesJmxUrl.stream().collect(Collectors.toMap(nodeJmxUrl -> nodeJmxUrl, nodeJmxUrl -> {
+            try {
+                return processHistoryResult(rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range), range);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }));
     }
 
     @Override
@@ -1025,7 +1023,7 @@ public class RMRest implements RMRestInterface {
             measureInfoList = new JSONArray();
             for (int i = 0; i < size; i++) {
                 measureInfo = new JSONObject();
-                measureInfo.put("value", Optional.ofNullable(values.get(i)).orElse(0));
+                measureInfo.put("value", values.get(i));
                 measureInfo.put("from", labels.get(i));
                 measureInfo.put("to", labels.get(i + 1));
                 measureInfoList.add(measureInfo);
