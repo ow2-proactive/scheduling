@@ -145,6 +145,11 @@ public class JobComparator {
             return false;
         }
 
+        if (attrib1.getTaskRetryDelay() != attrib2.getTaskRetryDelay()) {
+            stack.push(" taskRetryDelay ");
+            return false;
+        }
+
         stack.push(" genericInformation ");
         if (!isEqualMap(attrib1.getGenericInformation(), attrib2.getGenericInformation())) {
 

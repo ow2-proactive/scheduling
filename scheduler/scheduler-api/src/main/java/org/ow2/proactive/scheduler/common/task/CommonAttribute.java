@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.scheduler.common.task.util.IntegerWrapper;
+import org.ow2.proactive.scheduler.common.task.util.LongWrapper;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 
 
@@ -53,6 +54,9 @@ public abstract class CommonAttribute implements Serializable {
     /** The key for specifying start at time as generic information */
     public static final String GENERIC_INFO_START_AT_KEY = "START_AT";
 
+    /** The default value of defining how long to wait before restart task in error (zero or negative value means restart immediately) */
+    public static final Long DEFAULT_TASK_RETRY_DELAY = -1l;
+
     /**
      * Define where will a task be restarted if an error occurred (default is ANYWHERE).
      * <p>
@@ -61,6 +65,9 @@ public abstract class CommonAttribute implements Serializable {
      * You can override this property inside each task.
      */
     protected UpdatableProperties<RestartMode> restartTaskOnError = new UpdatableProperties<RestartMode>(RestartMode.ANYWHERE);
+
+    /** Specify how long to wait before restart the task if an error occurred. */
+    protected UpdatableProperties<LongWrapper> taskRetryDelay = new UpdatableProperties<LongWrapper>(new LongWrapper(DEFAULT_TASK_RETRY_DELAY));
 
     /**
      * The maximum number of execution for a task (default 1).
@@ -97,6 +104,32 @@ public abstract class CommonAttribute implements Serializable {
      */
     public UpdatableProperties<OnTaskError> getOnTaskErrorProperty() {
         return this.onTaskError;
+    }
+
+    /**
+     * Get how long to wait before restart the task if an error occurred.
+     *
+     * @return delay to restart a task in error
+     */
+    public Long getTaskRetryDelay() {
+        return taskRetryDelay.getValue().getLongValue();
+    }
+
+    /**
+     * Get taskRetryDelay UpdatableProperties
+     * @return taskRetryDelay UpdatableProperties
+     */
+    public UpdatableProperties<LongWrapper> getTaskRetryDelayProperty() {
+        return this.taskRetryDelay;
+    }
+
+    /**
+     * Set how long to wait before restart the task if an error occurred.
+     *
+     * @param taskRetryDelay delay to restart a task in error
+     */
+    public void setTaskRetryDelay(long taskRetryDelay) {
+        this.taskRetryDelay.setValue(new LongWrapper(taskRetryDelay));
     }
 
     /**

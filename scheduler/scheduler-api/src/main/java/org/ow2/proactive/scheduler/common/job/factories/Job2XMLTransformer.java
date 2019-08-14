@@ -198,6 +198,9 @@ public class Job2XMLTransformer {
         if (job.getRestartTaskOnErrorProperty().isSet()) {
             setAttribute(rootJob, XMLAttributes.COMMON_RESTART_TASK_ON_ERROR, job.getRestartTaskOnError().toString());
         }
+        if (job.getTaskRetryDelayProperty().isSet()) {
+            setAttribute(rootJob, XMLAttributes.COMMON_TASK_RETRY_DELAY, formatDate(job.getTaskRetryDelay()));
+        }
 
         // *** elements ***
 
@@ -445,6 +448,9 @@ public class Job2XMLTransformer {
         setAttribute(taskE, XMLAttributes.COMMON_NAME, task.getName(), true);
         if (task.getRestartTaskOnErrorProperty().isSet()) {
             setAttribute(taskE, XMLAttributes.COMMON_RESTART_TASK_ON_ERROR, task.getRestartTaskOnError().toString());
+        }
+        if (task.getTaskRetryDelayProperty().isSet()) {
+            setAttribute(taskE, XMLAttributes.COMMON_TASK_RETRY_DELAY, formatDate(task.getTaskRetryDelay()));
         }
 
         // *** task attributes ***

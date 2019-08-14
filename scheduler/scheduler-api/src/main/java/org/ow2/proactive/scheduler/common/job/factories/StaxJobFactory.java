@@ -469,6 +469,9 @@ public class StaxJobFactory extends JobFactory {
                 job.setProjectName(commonPropertiesHolder.getProjectName());
                 job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
                 job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
+                if (commonPropertiesHolder.getTaskRetryDelayProperty().isSet()) {
+                    job.setTaskRetryDelay(commonPropertiesHolder.getTaskRetryDelay());
+                }
                 job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
                 job.setGenericInformation(commonPropertiesHolder.getGenericInformation());
                 job.setUnresolvedGenericInformation(commonPropertiesHolder.getUnresolvedGenericInformation());
@@ -519,6 +522,9 @@ public class StaxJobFactory extends JobFactory {
             } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
                 commonPropertiesHolder.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue,
                                                                                          commonPropertiesHolder.getVariablesAsReplacementMap())));
+            } else if (XMLAttributes.COMMON_TASK_RETRY_DELAY.matches(attributeName)) {
+                commonPropertiesHolder.setTaskRetryDelay(Tools.formatDate(replace(attributeValue,
+                                                                                  commonPropertiesHolder.getVariablesAsReplacementMap())));
             } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
                 commonPropertiesHolder.setOnTaskError(OnTaskError.getInstance(replace(attributeValue,
                                                                                       commonPropertiesHolder.getVariablesAsReplacementMap())));
@@ -940,6 +946,9 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
                     tmpTask.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue,
                                                                               tmpTask.getVariablesOverriden(job))));
+                } else if (XMLAttributes.COMMON_TASK_RETRY_DELAY.matches(attributeName)) {
+                    tmpTask.setTaskRetryDelay(Tools.formatDate(replace(attributeValue,
+                                                                       tmpTask.getVariablesOverriden(job))));
                 } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
                     tmpTask.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue,
                                                                              tmpTask.getVariablesOverriden(job))));
@@ -1897,6 +1906,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("priority: " + job.getPriority());
             logger.debug("onTaskError: " + job.getOnTaskErrorProperty().getValue().toString());
             logger.debug("restartTaskOnError: " + job.getRestartTaskOnError());
+            logger.debug("TaskRetryDelay: " + job.getTaskRetryDelay());
             logger.debug("maxNumberOfExecution: " + job.getMaxNumberOfExecution());
             logger.debug("inputSpace: " + job.getInputSpace());
             logger.debug("outputSpace: " + job.getOutputSpace());
@@ -1917,6 +1927,7 @@ public class StaxJobFactory extends JobFactory {
                 logger.debug("preciousResult: " + t.isPreciousResult());
                 logger.debug("preciousLogs: " + t.isPreciousLogs());
                 logger.debug("restartTaskOnError: " + t.getRestartTaskOnError());
+                logger.debug("taskRetryDelay: " + t.getTaskRetryDelay());
                 logger.debug("maxNumberOfExecution: " + t.getMaxNumberOfExecution());
                 logger.debug("walltime: " + t.getWallTime());
                 logger.debug("selectionScripts: " + t.getSelectionScripts());
