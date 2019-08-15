@@ -31,13 +31,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
-import java.util.AbstractMap;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -68,8 +63,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
@@ -102,6 +101,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
 
 
 @Path("/rm")
@@ -114,6 +114,8 @@ public class RMRest implements RMRestInterface {
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         if (sessionId == null) {
@@ -612,6 +614,24 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
+    public Map<String, Map<String, Object>> getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodejmxurl") Set<String> nodesJmxUrl, @QueryParam("objectname") String objectName,
+            @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
+
+        // checking that still connected to the RM
+        RMProxyUserInterface rmProxy = checkAccess(sessionId);
+        return nodesJmxUrl.stream().collect(Collectors.toMap(nodeJmxUrl -> nodeJmxUrl, nodeJmxUrl -> {
+            try {
+                return processHistoryResult(rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range), range);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }));
+    }
+
+    @Override
     @GET
     @GZIP
     @Produces("application/json")
@@ -975,4 +995,59 @@ public class RMRest implements RMRestInterface {
         }
     }
 
+    private Map<String, Object> processHistoryResult(String mbeanHistory, String range) throws IOException {
+        mbeanHistory = removingInternalEscaping(mbeanHistory);
+        Map<String, Object> jsonMap = parseJSON(mbeanHistory);
+        if (jsonMap == null) {
+            return null;
+        }
+        Map<String, Object> processedJsonMap = new HashMap<>();
+        long currentTime = new Date().getTime() / 1000;
+        long duration = StatHistory.Range.valueOf(range).getDuration();
+        int size = Optional.ofNullable(((ArrayList) jsonMap.entrySet().iterator().next().getValue()).size()).orElse(0);
+        long step = duration / size;
+
+        List<String> labels = new ArrayList<>(size + 1);
+        for (int i = 0; i <= size; i++) {
+            //The time instant where the metric is taken
+            long t = currentTime - duration + step * i;
+            Date date = new Date(t * 1000);
+
+            labels.add(DATE_FORMAT.format(date));
+        }
+        JSONObject measureInfo;
+        JSONArray measureInfoList;
+        for (String key : jsonMap.keySet()) {
+            ArrayList values = (ArrayList) jsonMap.get(key);
+            measureInfoList = new JSONArray();
+            for (int i = 0; i < size; i++) {
+                measureInfo = new JSONObject();
+                measureInfo.put("value", values.get(i));
+                measureInfo.put("from", labels.get(i));
+                measureInfo.put("to", labels.get(i + 1));
+                measureInfoList.add(measureInfo);
+            }
+            processedJsonMap.put(key, measureInfoList);
+        }
+        return processedJsonMap;
+    }
+
+    private String removingInternalEscaping(String result) {
+        result = result.replace("\\\"", "\"");
+        result = result.replace("\"{", "{");
+        result = result.replace("}\"", "}");
+        return result;
+    }
+
+    private Map<String, Object> parseJSON(final String jsonString) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            final JsonParser parser = mapper.getJsonFactory().createJsonParser(jsonString);
+            while (parser.nextToken() != null) {
+            }
+        } catch (Exception jpe) {
+            throw new RuntimeException("Invalid JSON: " + jpe.getMessage(), jpe);
+        }
+        return mapper.readValue(jsonString, Map.class);
+    }
 }
