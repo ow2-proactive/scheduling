@@ -43,6 +43,13 @@ public class NotEmptyValidatorTest {
         Assert.assertEquals(value, validator.validate(value, null));
     }
 
+    @Test
+    public void testNotEmptyStringWithSpacesOK() throws ValidationException {
+        NotEmptyValidator validator = new NotEmptyValidator();
+        String value = " abc ";
+        Assert.assertEquals(value, validator.validate(value, null));
+    }
+
     @Test(expected = ValidationException.class)
     public void testEmptyStringDisallowed() throws ValidationException {
         NotEmptyValidator validator = new NotEmptyValidator();
@@ -61,6 +68,13 @@ public class NotEmptyValidatorTest {
     public void testBlankStringDisallowed() throws ValidationException {
         NotEmptyValidator validator = new NotEmptyValidator();
         String value = "      ";
+        validator.validate(value, null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testTabStringDisallowed() throws ValidationException {
+        NotEmptyValidator validator = new NotEmptyValidator();
+        String value = "\t";
         validator.validate(value, null);
     }
 }
