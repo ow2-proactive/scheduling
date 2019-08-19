@@ -28,7 +28,6 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.IdentityConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.AcceptAllValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.NotEmptyValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
@@ -45,6 +44,10 @@ public class NotEmptyParserValidator extends BaseParserValidator<String> {
 
     public NotEmptyParserValidator(String model) throws ModelSyntaxException {
         super(model);
+        String regexp = "^" + NOT_EMPTY_TYPE_REGEXP + "$";
+        if (!model.matches(regexp)) {
+            throw new ModelSyntaxException(model + " expression in model does not match " + regexp);
+        }
     }
 
     @Override
