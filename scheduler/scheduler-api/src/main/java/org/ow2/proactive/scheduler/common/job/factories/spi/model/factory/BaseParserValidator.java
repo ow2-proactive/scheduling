@@ -63,7 +63,7 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
      */
     protected BaseParserValidator(String model, ModelType type) throws ModelSyntaxException {
         // By default, the model expression should match the parser type while ignoring case.
-        this(model, type, ignoreCaseRegexp(type.name()));
+        this(model, type, "^" + ignoreCaseRegexp(type.name()) + "$");
     }
 
     /**

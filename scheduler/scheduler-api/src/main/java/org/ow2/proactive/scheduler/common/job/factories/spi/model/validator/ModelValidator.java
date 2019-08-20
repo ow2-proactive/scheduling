@@ -101,8 +101,15 @@ public class ModelValidator implements Validator<String> {
                                                  .newInstance(removePrefix(model));
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                         | NoSuchMethodException e) {
+                    if (e instanceof InvocationTargetException) {
+                        // unwrap InvocationTargetException to get more specific error message
+                        Throwable exceptionCause = e.getCause();
+                        if (exceptionCause instanceof ModelSyntaxException) {
+                            throw (ModelSyntaxException) exceptionCause;
+                        }
+                    }
                     throw new ModelSyntaxException(String.format("Error during create the parser [%s] for the model [%s].",
-                                                                 type.getTypeParserValidator(),
+                                                                 type.getTypeParserValidator().getSimpleName(),
                                                                  model),
                                                    e);
                 }
