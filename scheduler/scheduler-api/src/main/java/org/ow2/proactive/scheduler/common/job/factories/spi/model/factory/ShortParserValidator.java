@@ -32,27 +32,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 
 public class ShortParserValidator extends RangeParserValidator<Short> {
 
-    public static final String SHORT_TYPE = "SHORT";
-
-    protected static final String SHORT_TYPE_REGEXP = "[Ss][Hh][Oo][Rr][Tt]";
-
     public ShortParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return SHORT_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return SHORT_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return Short.class;
+        super(model, ModelType.SHORT);
     }
 
     @Override

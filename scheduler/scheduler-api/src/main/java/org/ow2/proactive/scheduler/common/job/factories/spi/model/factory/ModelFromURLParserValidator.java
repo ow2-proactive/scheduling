@@ -43,20 +43,15 @@ import com.google.common.base.Strings;
 
 public class ModelFromURLParserValidator extends BaseParserValidator<String> {
 
-    public static final String MODEL_FROM_URL_TYPE = "MODEL_FROM_URL";
-
     public static final String LEFT_DELIMITER = "(";
 
     public static final String RIGHT_DELIMITER = ")";
 
-    protected static final String MODEL_FROM_URL_TYPE_REGEXP = "[Mm][Oo][Dd][Ee][Ll]_[Ff][Rr][Oo][Mm]_[Uu][Rr][Ll]";
-
-    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
-
-    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
+    protected static final String MODEL_FROM_URL_REGEXP = "^" + ignoreCaseRegexp(ModelType.MODEL_FROM_URL.name()) +
+                                                          "\\" + LEFT_DELIMITER + "(.+)" + "\\" + RIGHT_DELIMITER + "$";
 
     public ModelFromURLParserValidator(String model) throws ModelSyntaxException {
-        super(model);
+        super(model, ModelType.MODEL_FROM_URL, MODEL_FROM_URL_REGEXP);
     }
 
     private String findFirstNonEmptyLineTrimmed(List<String> lines) {
@@ -71,31 +66,13 @@ public class ModelFromURLParserValidator extends BaseParserValidator<String> {
     }
 
     @Override
-    public String getType() {
-        return MODEL_FROM_URL_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return MODEL_FROM_URL_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return String.class;
-    }
-
-    @Override
     protected Converter<String> createConverter(String model) throws ModelSyntaxException {
         return new IdentityConverter();
     }
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
-        String modelFromUrlRegexp = "^" + MODEL_FROM_URL_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "(.+)" +
-                                    RIGHT_DELIMITER_REGEXP + "$";
-
-        String urlString = parseAndGetOneGroup(model, modelFromUrlRegexp);
+        String urlString = parseAndGetOneGroup(model, MODEL_FROM_URL_REGEXP);
 
         URL url = null;
         try {
@@ -106,20 +83,20 @@ public class ModelFromURLParserValidator extends BaseParserValidator<String> {
             modelReceivedFromURL = findFirstNonEmptyLineTrimmed(lines);
 
             if (Strings.isNullOrEmpty(modelReceivedFromURL)) {
-                throw new ModelSyntaxException("In " + getType() + " expression, model received from defined url '" +
+                throw new ModelSyntaxException("In " + type + " expression, model received from defined url '" +
                                                urlString + "' is empty.");
             }
-            if (modelReceivedFromURL.startsWith(MODEL_FROM_URL_TYPE)) {
-                throw new ModelSyntaxException("In " + getType() + " expression, model received from defined url '" +
+            if (modelReceivedFromURL.startsWith(type.name())) {
+                throw new ModelSyntaxException("In " + type + " expression, model received from defined url '" +
                                                urlString + "' is recursive.");
             }
             return new ModelValidator(modelReceivedFromURL);
 
         } catch (MalformedURLException e) {
-            throw new ModelSyntaxException("In " + getType() + " expression, defined url '" + urlString +
-                                           "' is invalid: " + e.getMessage(), e);
+            throw new ModelSyntaxException("In " + type + " expression, defined url '" + urlString + "' is invalid: " +
+                                           e.getMessage(), e);
         } catch (IOException e) {
-            throw new ModelSyntaxException("In " + getType() + " expression, defined url '" + urlString +
+            throw new ModelSyntaxException("In " + type + " expression, defined url '" + urlString +
                                            "' could not be reached: " + e.getMessage(), e);
         }
     }

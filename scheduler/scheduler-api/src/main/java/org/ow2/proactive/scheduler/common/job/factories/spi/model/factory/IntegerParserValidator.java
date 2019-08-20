@@ -32,27 +32,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 
 public class IntegerParserValidator extends RangeParserValidator<Integer> {
 
-    public static final String INTEGER_TYPE = "INTEGER";
-
-    protected static final String INTEGER_TYPE_REGEXP = "[Ii][Nn][Tt][Ee][Gg][Ee][Rr]";
-
     public IntegerParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return INTEGER_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return INTEGER_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return Integer.class;
+        super(model, ModelType.INTEGER);
     }
 
     @Override

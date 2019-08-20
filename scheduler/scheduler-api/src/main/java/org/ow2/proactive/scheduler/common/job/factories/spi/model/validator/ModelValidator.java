@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
@@ -39,6 +41,7 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.JSONPa
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ListParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.LongParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelFromURLParserValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ModelType;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.NotEmptyParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.ParserValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.factory.RegexpParserValidator;
@@ -86,48 +89,26 @@ public class ModelValidator implements Validator<String> {
      */
     protected ParserValidator createParserValidator() throws ModelSyntaxException {
         String uppercaseModel = model.toUpperCase();
-        if (uppercaseModel.startsWith(PREFIX)) {
-            uppercaseModel = removePrefix(uppercaseModel);
-            if (uppercaseModel.startsWith(IntegerParserValidator.INTEGER_TYPE)) {
-                return new IntegerParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(LongParserValidator.LONG_TYPE)) {
-                return new LongParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(DoubleParserValidator.DOUBLE_TYPE)) {
-                return new DoubleParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(FloatParserValidator.FLOAT_TYPE)) {
-                return new FloatParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(ShortParserValidator.SHORT_TYPE)) {
-                return new ShortParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(BooleanParserValidator.BOOLEAN_TYPE)) {
-                return new BooleanParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(URLParserValidator.URL_TYPE)) {
-                return new URLParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(URIParserValidator.URI_TYPE)) {
-                return new URIParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(DateTimeParserValidator.DATETIME_TYPE)) {
-                return new DateTimeParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(ListParserValidator.LIST_TYPE)) {
-                return new ListParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(RegexpParserValidator.REGEXP_TYPE)) {
-                return new RegexpParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(ModelFromURLParserValidator.MODEL_FROM_URL_TYPE)) {
-                return new ModelFromURLParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(CRONParserValidator.CRON_TYPE)) {
-                return new CRONParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(SPELParserValidator.SPEL_TYPE)) {
-                return new SPELParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(CatalogObjectParserValidator.CATALOG_OBJECT_TYPE)) {
-                return new CatalogObjectParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(JSONParserValidator.JSON_TYPE)) {
-                return new JSONParserValidator(removePrefix(model));
-            } else if (uppercaseModel.startsWith(NotEmptyParserValidator.NOT_EMPTY_TYPE)) {
-                return new NotEmptyParserValidator(removePrefix(model));
-            } else {
-                throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
-            }
-        } else {
+        if (!uppercaseModel.startsWith(PREFIX)) {
             return null;
         }
+        uppercaseModel = removePrefix(uppercaseModel);
+        for (ModelType type : ModelType.values()) {
+            if (uppercaseModel.startsWith(type.name())) {
+                try {
+                    return (ParserValidator) type.getTypeParserValidator()
+                                                 .getDeclaredConstructor(String.class)
+                                                 .newInstance(removePrefix(model));
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                        | NoSuchMethodException e) {
+                    throw new ModelSyntaxException(String.format("Error during create the parser [%s] for the model [%s].",
+                                                                 type.getTypeParserValidator(),
+                                                                 model),
+                                                   e);
+                }
+            }
+        }
+        throw new ModelSyntaxException("Unrecognized type in model '" + model + "'");
     }
 
     private String removePrefix(String model) {

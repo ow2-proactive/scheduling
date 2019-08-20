@@ -38,31 +38,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Vali
  */
 public class NotEmptyParserValidator extends BaseParserValidator<String> {
 
-    public static final String NOT_EMPTY_TYPE = "NOT_EMPTY";
-
-    protected static final String NOT_EMPTY_TYPE_REGEXP = "[Nn][Oo][Tt]_[Ee][Mm][Pp][Tt][Yy]";
-
     public NotEmptyParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-        String regexp = "^" + NOT_EMPTY_TYPE_REGEXP + "$";
-        if (!model.matches(regexp)) {
-            throw new ModelSyntaxException(model + " expression in model does not match " + regexp);
-        }
-    }
-
-    @Override
-    protected String getType() {
-        return NOT_EMPTY_TYPE;
-    }
-
-    @Override
-    protected String getTypeRegexp() {
-        return NOT_EMPTY_TYPE_REGEXP;
-    }
-
-    @Override
-    protected Class getClassType() {
-        return String.class;
+        super(model, ModelType.NOT_EMPTY);
     }
 
     @Override

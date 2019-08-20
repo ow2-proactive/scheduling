@@ -34,31 +34,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Vali
 
 public class CRONParserValidator extends BaseParserValidator<String> {
 
-    public static final String CRON_TYPE = "CRON";
-
-    protected static final String CRON_TYPE_REGEXP = "[Cc][Rr][Oo][Nn]";
-
     public CRONParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-        String regexep = "^" + CRON_TYPE_REGEXP + "$";
-        if (!model.matches(regexep)) {
-            throw new ModelSyntaxException(CRON_TYPE + " expression in model does not match " + regexep);
-        }
-    }
-
-    @Override
-    public String getType() {
-        return CRON_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return CRON_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return String.class;
+        super(model, ModelType.CRON);
     }
 
     @Override

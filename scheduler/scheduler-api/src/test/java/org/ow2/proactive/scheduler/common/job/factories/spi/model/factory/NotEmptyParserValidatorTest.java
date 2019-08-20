@@ -41,22 +41,21 @@ public class NotEmptyParserValidatorTest {
     @Test
     public void testNotEmptyParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "my string foo";
-        Assert.assertEquals(value,
-                            new NotEmptyParserValidator(NotEmptyParserValidator.NOT_EMPTY_TYPE).parseAndValidate(value));
+        Assert.assertEquals(value, new NotEmptyParserValidator(ModelType.NOT_EMPTY.name()).parseAndValidate(value));
     }
 
     @Test(expected = ValidationException.class)
     public void testNotEmptyParserValidatorDisallowEmptyString()
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "";
-        new NotEmptyParserValidator(NotEmptyParserValidator.NOT_EMPTY_TYPE).parseAndValidate(value);
+        new NotEmptyParserValidator(ModelType.NOT_EMPTY.name()).parseAndValidate(value);
     }
 
     @Test(expected = ValidationException.class)
     public void testNotEmptyParserValidatorDisallowBlankString()
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = " ";
-        new NotEmptyParserValidator(NotEmptyParserValidator.NOT_EMPTY_TYPE).parseAndValidate(value);
+        new NotEmptyParserValidator(ModelType.NOT_EMPTY.name()).parseAndValidate(value);
     }
 
     @Test

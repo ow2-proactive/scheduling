@@ -29,12 +29,17 @@ import java.net.MalformedURLException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
 
 public class BaseParserValidatorTest {
+    @Mock
+    private ModelType fakeType;
+
+    private static final String ACCEPT_ALL_REGEXP = ".*";
 
     @Test(expected = ModelSyntaxException.class)
     @SuppressWarnings("squid:S1848")
@@ -56,22 +61,7 @@ public class BaseParserValidatorTest {
     }
 
     private BaseParserValidator<String> getValidator(String model) throws ModelSyntaxException {
-        return new BaseParserValidator<String>(model) {
-            @Override
-            protected String getType() {
-                return null;
-            }
-
-            @Override
-            protected String getTypeRegexp() {
-                return null;
-            }
-
-            @Override
-            protected Class getClassType() {
-                return null;
-            }
-
+        return new BaseParserValidator<String>(model, fakeType, ACCEPT_ALL_REGEXP) {
             @Override
             protected Converter<String> createConverter(String model) throws ModelSyntaxException {
                 return null;
