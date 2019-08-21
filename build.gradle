@@ -123,8 +123,8 @@ allprojects {
 
     licenseReport {
         configurations = ['runtime']
-	excludeGroups = ['org.objectweb.proactive','jsr223']
-    	filters = [new LicenseBundleNormalizer(bundlePath: "$rootDir/config/report/license-normalizer-bundle.json")]
+    excludeGroups = ['org.objectweb.proactive','jsr223']
+        filters = [new LicenseBundleNormalizer(bundlePath: "$rootDir/config/report/license-normalizer-bundle.json")]
         renderers = [new InventoryHtmlReportRenderer()]
     }
 }
