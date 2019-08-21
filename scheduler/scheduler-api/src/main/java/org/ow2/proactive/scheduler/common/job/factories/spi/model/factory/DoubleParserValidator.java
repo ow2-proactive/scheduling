@@ -32,27 +32,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 
 public class DoubleParserValidator extends RangeParserValidator<Double> {
 
-    public static final String DOUBLE_TYPE = "DOUBLE";
-
-    protected static final String DOUBLE_TYPE_REGEXP = "[Dd][Oo][Uu][Bb][Ll][Ee]";
-
     public DoubleParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return DOUBLE_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return DOUBLE_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return Double.class;
+        super(model, ModelType.DOUBLE);
     }
 
     @Override

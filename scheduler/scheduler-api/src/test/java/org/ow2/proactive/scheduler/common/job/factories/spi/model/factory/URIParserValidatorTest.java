@@ -41,13 +41,12 @@ public class URIParserValidatorTest {
     public void testURIParserValidatorOK()
             throws ModelSyntaxException, ValidationException, ConversionException, URISyntaxException {
         String value = "/my/file";
-        Assert.assertEquals(new URI(value),
-                            new URIParserValidator(URIParserValidator.URI_TYPE).parseAndValidate(value));
+        Assert.assertEquals(new URI(value), new URIParserValidator(ModelType.URI.name()).parseAndValidate(value));
     }
 
     @Test(expected = ConversionException.class)
     public void testURIParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new URIParserValidator(URIParserValidator.URI_TYPE).parseAndValidate("\\&¨^¨$ù%");
+        new URIParserValidator(ModelType.URI.name()).parseAndValidate("\\&¨^¨$ù%");
     }
 
     @Test(expected = ModelSyntaxException.class)

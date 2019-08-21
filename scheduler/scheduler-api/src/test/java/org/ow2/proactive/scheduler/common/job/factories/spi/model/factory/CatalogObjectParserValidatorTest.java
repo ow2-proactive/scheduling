@@ -43,14 +43,14 @@ public class CatalogObjectParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "bucket_1/object10/1539310165443";
         Assert.assertEquals(value,
-                            new CatalogObjectParserValidator(CatalogObjectParserValidator.CATALOG_OBJECT_TYPE).parseAndValidate(value));
+                            new CatalogObjectParserValidator(ModelType.CATALOG_OBJECT.name()).parseAndValidate(value));
     }
 
     @Test(expected = ValidationException.class)
     public void testCatalogObjectParserValidatorKO()
             throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "bucket_1/object10/";
-        new CatalogObjectParserValidator(CatalogObjectParserValidator.CATALOG_OBJECT_TYPE).parseAndValidate(value);
+        new CatalogObjectParserValidator(ModelType.CATALOG_OBJECT.name()).parseAndValidate(value);
     }
 
     @Test(expected = ModelSyntaxException.class)

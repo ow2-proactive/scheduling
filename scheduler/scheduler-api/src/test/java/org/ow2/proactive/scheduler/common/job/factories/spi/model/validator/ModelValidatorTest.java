@@ -56,87 +56,92 @@ public class ModelValidatorTest {
 
     @Test
     public void testModelValidatorInteger() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + IntegerParserValidator.INTEGER_TYPE,
-                                IntegerParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.INTEGER, IntegerParserValidator.class);
     }
 
     @Test
     public void testModelValidatorLong() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + LongParserValidator.LONG_TYPE, LongParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.LONG, LongParserValidator.class);
     }
 
     @Test
     public void testModelValidatorShort() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + ShortParserValidator.SHORT_TYPE, ShortParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.SHORT, ShortParserValidator.class);
     }
 
     @Test
     public void testModelValidatorFloat() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + FloatParserValidator.FLOAT_TYPE, FloatParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.FLOAT, FloatParserValidator.class);
     }
 
     @Test
     public void testModelValidatorDouble() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + DoubleParserValidator.DOUBLE_TYPE, DoubleParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.DOUBLE, DoubleParserValidator.class);
     }
 
     @Test
     public void testModelValidatorBoolean() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + BooleanParserValidator.BOOLEAN_TYPE,
-                                BooleanParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.BOOLEAN, BooleanParserValidator.class);
     }
 
     @Test
     public void testModelValidatorURI() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + URIParserValidator.URI_TYPE, URIParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.URI, URIParserValidator.class);
     }
 
     @Test
     public void testModelValidatorURL() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + URLParserValidator.URL_TYPE, URLParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.URL, URLParserValidator.class);
     }
 
     @Test
     public void testModelValidatorCRON() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + CRONParserValidator.CRON_TYPE, CRONParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.CRON, CRONParserValidator.class);
     }
 
     @Test
     public void testModelValidatorDatetime() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + DateTimeParserValidator.DATETIME_TYPE,
-                                DateTimeParserValidator.class);
+        String exampleDatetimeModel = ModelType.DATETIME + "(yyyy-MM-dd)";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleDatetimeModel, DateTimeParserValidator.class);
     }
 
     @Test
     public void testModelValidatorList() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + ListParserValidator.LIST_TYPE, ListParserValidator.class);
+        String exampleListModel = ModelType.LIST + "(a,b,c)";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleListModel, ListParserValidator.class);
     }
 
     @Test
     public void testModelValidatorRegexp() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + RegexpParserValidator.REGEXP_TYPE, RegexpParserValidator.class);
+        String exampleRegexpModel = ModelType.REGEXP + "([a-z]+)";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleRegexpModel, RegexpParserValidator.class);
     }
 
     @Test
     public void testSpelValidatorRegexp() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + SPELParserValidator.SPEL_TYPE, SPELParserValidator.class);
+        String exampleSpelModel = ModelType.SPEL + "(#value == 'abc')";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleSpelModel, SPELParserValidator.class);
     }
 
     @Test
     public void testModelValidatorModelFromURL() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + ModelFromURLParserValidator.MODEL_FROM_URL_TYPE,
-                                ModelFromURLParserValidator.class);
+        String exampleSpelModel = ModelType.MODEL_FROM_URL + "(file:///srv/machines_list_model.txt)";
+        createAndCheckValidator(ModelValidator.PREFIX + exampleSpelModel, ModelFromURLParserValidator.class);
     }
 
     @Test
     public void testModelValidatorCatalogObject() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + CatalogObjectParserValidator.CATALOG_OBJECT_TYPE,
-                                CatalogObjectParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.CATALOG_OBJECT, CatalogObjectParserValidator.class);
     }
 
     @Test
     public void testModelValidatorJSON() throws ModelSyntaxException {
-        createAndCheckValidator(ModelValidator.PREFIX + JSONParserValidator.JSON_TYPE, JSONParserValidator.class);
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.JSON, JSONParserValidator.class);
+    }
+
+    @Test
+    public void testModelValidatorNotEmpty() throws ModelSyntaxException {
+        createAndCheckValidator(ModelValidator.PREFIX + ModelType.NOT_EMPTY, NotEmptyParserValidator.class);
     }
 
     public void createAndCheckValidator(String model, Class expectedClass) throws ModelSyntaxException {

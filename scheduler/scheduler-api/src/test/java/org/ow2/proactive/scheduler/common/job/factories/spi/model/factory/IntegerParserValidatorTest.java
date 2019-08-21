@@ -57,19 +57,19 @@ public class IntegerParserValidatorTest {
     @Test
     public void testIntegerParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
         Assert.assertEquals(VALID_INTEGER,
-                            (int) new IntegerParserValidator(IntegerParserValidator.INTEGER_TYPE).parseAndValidate(VALID_INTEGER_STRING));
+                            (int) new IntegerParserValidator(ModelType.INTEGER.name()).parseAndValidate(VALID_INTEGER_STRING));
     }
 
     @Test(expected = ConversionException.class)
     public void testIntegerParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator(IntegerParserValidator.INTEGER_TYPE).parseAndValidate(INVALID_INTEGER_STRING);
+        new IntegerParserValidator(ModelType.INTEGER.name()).parseAndValidate(INVALID_INTEGER_STRING);
     }
 
     @Test
     public void testIntegerParserValidatorLowerRangeOK()
             throws ModelSyntaxException, ValidationException, ConversionException {
         Assert.assertEquals(VALID_INTEGER,
-                            (int) new IntegerParserValidator(IntegerParserValidator.INTEGER_TYPE +
+                            (int) new IntegerParserValidator(ModelType.INTEGER +
                                                              RangeParserValidator.LEFT_RANGE_DELIMITER +
                                                              VALID_LOWER_RANGE +
                                                              RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_INTEGER_STRING));
@@ -78,16 +78,14 @@ public class IntegerParserValidatorTest {
     @Test(expected = ValidationException.class)
     public void testIntegerParserValidatorLowerRangeKO()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator(IntegerParserValidator.INTEGER_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                   VALID_LOWER_RANGE +
+        new IntegerParserValidator(ModelType.INTEGER + RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
                                    RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_INTEGER_OUT_OF_RANGE_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testIntegerParserValidatorInvalidLowerRange()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator(IntegerParserValidator.INTEGER_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                   INVALID_LOWER_RANGE +
+        new IntegerParserValidator(ModelType.INTEGER + RangeParserValidator.LEFT_RANGE_DELIMITER + INVALID_LOWER_RANGE +
                                    RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_INTEGER_STRING);
     }
 
@@ -95,7 +93,7 @@ public class IntegerParserValidatorTest {
     public void testIntegerParserValidatorIntervalOK()
             throws ModelSyntaxException, ValidationException, ConversionException {
         Assert.assertEquals(VALID_INTEGER,
-                            (int) new IntegerParserValidator(IntegerParserValidator.INTEGER_TYPE +
+                            (int) new IntegerParserValidator(ModelType.INTEGER +
                                                              RangeParserValidator.LEFT_RANGE_DELIMITER +
                                                              VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE +
                                                              RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_INTEGER_STRING));
@@ -104,45 +102,44 @@ public class IntegerParserValidatorTest {
     @Test(expected = ValidationException.class)
     public void testIntegerParserValidatorIntervalKO()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator(IntegerParserValidator.INTEGER_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                   VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE +
+        new IntegerParserValidator(ModelType.INTEGER + RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
+                                   "," + VALID_UPPER_RANGE +
                                    RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_INTEGER_OUT_OF_RANGE_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testIntegerParserValidatorInvalidInterval()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator(IntegerParserValidator.INTEGER_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                   VALID_LOWER_RANGE + "," + INVALID_UPPER_RANGE +
+        new IntegerParserValidator(ModelType.INTEGER + RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
+                                   "," + INVALID_UPPER_RANGE +
                                    RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_INTEGER_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testIntegerParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator("ILLEGAL_" +
-                                   IntegerParserValidator.INTEGER_TYPE).parseAndValidate(VALID_INTEGER_STRING);
+        new IntegerParserValidator("ILLEGAL_" + ModelType.INTEGER).parseAndValidate(VALID_INTEGER_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testIntegerParserValidatorInvalidModelRangeInverse()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator((IntegerParserValidator.INTEGER_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                    VALID_UPPER_RANGE + "," + VALID_LOWER_RANGE +
+        new IntegerParserValidator((ModelType.INTEGER + RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_UPPER_RANGE +
+                                    "," + VALID_LOWER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER)).parseAndValidate(VALID_INTEGER_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testIntegerParserValidatorInvalidModelRangeEmpty()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator((IntegerParserValidator.INTEGER_TYPE + "()")).parseAndValidate(VALID_INTEGER_STRING);
+        new IntegerParserValidator((ModelType.INTEGER + "()")).parseAndValidate(VALID_INTEGER_STRING);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testIntegerParserValidatorInvalidModelRangeMoreThanTwo()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new IntegerParserValidator((IntegerParserValidator.INTEGER_TYPE + RangeParserValidator.LEFT_RANGE_DELIMITER +
-                                    VALID_LOWER_RANGE + "," + VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
+        new IntegerParserValidator((ModelType.INTEGER + RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
+                                    "," + VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER)).parseAndValidate(VALID_INTEGER_STRING);
     }
 }

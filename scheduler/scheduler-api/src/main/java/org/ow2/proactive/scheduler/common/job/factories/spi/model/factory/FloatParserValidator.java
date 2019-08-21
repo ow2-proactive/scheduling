@@ -32,27 +32,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Mod
 
 public class FloatParserValidator extends RangeParserValidator<Float> {
 
-    public static final String FLOAT_TYPE = "FLOAT";
-
-    protected static final String FLOAT_TYPE_REGEXP = "[Ff][Ll][Oo][Aa][Tt]";
-
     public FloatParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return FLOAT_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return FLOAT_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return Float.class;
+        super(model, ModelType.FLOAT);
     }
 
     @Override

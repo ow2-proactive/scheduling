@@ -59,23 +59,21 @@ public class DateTimeParserValidatorTest {
     public void testDateTimeParserValidatorOK()
             throws ModelSyntaxException, ValidationException, ConversionException, ParseException {
         Assert.assertEquals(new SimpleDateFormat(VALID_DATE_FORMAT).parse(VALID_DATE),
-                            new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE +
-                                                        DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
+                            new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER +
+                                                        VALID_DATE_FORMAT +
                                                         DateTimeParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_DATE));
     }
 
     @Test(expected = ConversionException.class)
     public void testDateTimeParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    VALID_DATE_FORMAT +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
                                     DateTimeParserValidator.RIGHT_DELIMITER).parseAndValidate(INVALID_DATE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testDateTimeParserValidatorInvalidDateFormat()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    INVALID_DATE_FORMAT +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + INVALID_DATE_FORMAT +
                                     DateTimeParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_DATE);
     }
 
@@ -83,9 +81,8 @@ public class DateTimeParserValidatorTest {
     public void testDateTimeParserValidatorLowerRangeOK()
             throws ModelSyntaxException, ValidationException, ConversionException, ParseException {
         Assert.assertEquals(new SimpleDateFormat(VALID_DATE_FORMAT).parse(VALID_DATE),
-                            new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE +
-                                                        DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
-                                                        DateTimeParserValidator.RIGHT_DELIMITER +
+                            new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER +
+                                                        VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
                                                         RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
                                                         RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE));
     }
@@ -93,8 +90,8 @@ public class DateTimeParserValidatorTest {
     @Test(expected = ValidationException.class)
     public void testDateTimeParserValidatorLowerRangeKO()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
+                                    DateTimeParserValidator.RIGHT_DELIMITER +
                                     RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE_OUT_OF_RANGE);
     }
@@ -102,8 +99,8 @@ public class DateTimeParserValidatorTest {
     @Test(expected = ModelSyntaxException.class)
     public void testDateTimeParserValidatorInvalidLowerRange()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
+                                    DateTimeParserValidator.RIGHT_DELIMITER +
                                     RangeParserValidator.LEFT_RANGE_DELIMITER + INVALID_LOWER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE);
     }
@@ -112,9 +109,8 @@ public class DateTimeParserValidatorTest {
     public void testDateTimeParserValidatorIntervalOK()
             throws ModelSyntaxException, ValidationException, ConversionException, ParseException {
         Assert.assertEquals(new SimpleDateFormat(VALID_DATE_FORMAT).parse(VALID_DATE),
-                            new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE +
-                                                        DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
-                                                        DateTimeParserValidator.RIGHT_DELIMITER +
+                            new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER +
+                                                        VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
                                                         RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE +
                                                         "," + VALID_UPPER_RANGE +
                                                         RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE));
@@ -123,8 +119,8 @@ public class DateTimeParserValidatorTest {
     @Test(expected = ValidationException.class)
     public void testDateTimeParserValidatorIntervalKO()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
+                                    DateTimeParserValidator.RIGHT_DELIMITER +
                                     RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE + "," +
                                     VALID_UPPER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE_OUT_OF_RANGE);
@@ -133,8 +129,8 @@ public class DateTimeParserValidatorTest {
     @Test(expected = ModelSyntaxException.class)
     public void testDateTimeParserValidatorInvalidInterval()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
+                                    DateTimeParserValidator.RIGHT_DELIMITER +
                                     RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE + "," +
                                     INVALID_UPPER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE);
@@ -143,14 +139,14 @@ public class DateTimeParserValidatorTest {
     @Test(expected = ModelSyntaxException.class)
     public void testDateTimeParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator("ILLEGAL_" + DateTimeParserValidator.DATETIME_TYPE).parseAndValidate(VALID_DATE);
+        new DateTimeParserValidator("ILLEGAL_" + ModelType.DATETIME).parseAndValidate(VALID_DATE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testDateTimeParserValidatorInvalidModelRangeMoreThanTwo()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
+                                    DateTimeParserValidator.RIGHT_DELIMITER +
                                     RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_LOWER_RANGE + "," +
                                     VALID_UPPER_RANGE + "," + VALID_UPPER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE);
@@ -159,8 +155,8 @@ public class DateTimeParserValidatorTest {
     @Test(expected = ModelSyntaxException.class)
     public void testDateTimeParserValidatorInvalidModelRangeEmpty()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
+                                    DateTimeParserValidator.RIGHT_DELIMITER +
                                     RangeParserValidator.LEFT_RANGE_DELIMITER +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE);
     }
@@ -168,8 +164,8 @@ public class DateTimeParserValidatorTest {
     @Test(expected = ModelSyntaxException.class)
     public void testDateTimeParserValidatorInvalidModelRangeReverse()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new DateTimeParserValidator(DateTimeParserValidator.DATETIME_TYPE + DateTimeParserValidator.LEFT_DELIMITER +
-                                    VALID_DATE_FORMAT + DateTimeParserValidator.RIGHT_DELIMITER +
+        new DateTimeParserValidator(ModelType.DATETIME + DateTimeParserValidator.LEFT_DELIMITER + VALID_DATE_FORMAT +
+                                    DateTimeParserValidator.RIGHT_DELIMITER +
                                     RangeParserValidator.LEFT_RANGE_DELIMITER + VALID_UPPER_RANGE + "," +
                                     VALID_LOWER_RANGE +
                                     RangeParserValidator.RIGHT_RANGE_DELIMITER).parseAndValidate(VALID_DATE);

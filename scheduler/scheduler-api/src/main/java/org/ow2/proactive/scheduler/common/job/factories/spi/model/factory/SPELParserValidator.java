@@ -35,35 +35,15 @@ import org.springframework.expression.ParseException;
 
 public class SPELParserValidator extends BaseParserValidator<String> {
 
-    public static final String SPEL_TYPE = "SPEL";
-
     public static final String LEFT_DELIMITER = "(";
 
     public static final String RIGHT_DELIMITER = ")";
 
-    protected static final String SPEL_TYPE_REGEXP = "[Ss][Pp][Ee][Ll]";
-
-    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
-
-    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
+    protected static final String SPEL_TYPE_REGEXP = "^" + ignoreCaseRegexp(ModelType.SPEL.name()) + "\\" +
+                                                     LEFT_DELIMITER + "(.+)" + "\\" + RIGHT_DELIMITER + "$";
 
     public SPELParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return SPEL_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return SPEL_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return String.class;
+        super(model, ModelType.SPEL, SPEL_TYPE_REGEXP);
     }
 
     @Override
@@ -73,8 +53,7 @@ public class SPELParserValidator extends BaseParserValidator<String> {
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
-        String spelRegexp = "^" + SPEL_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "(.+)" + RIGHT_DELIMITER_REGEXP + "$";
-        String spelString = parseAndGetOneGroup(model, spelRegexp);
+        String spelString = parseAndGetOneGroup(model, SPEL_TYPE_REGEXP);
         try {
             return new SpelValidator(spelString);
         } catch (ParseException e) {

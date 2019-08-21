@@ -37,12 +37,12 @@ public class CRONParserValidatorTest {
     @Test
     public void testCRONParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "* * * * *";
-        Assert.assertEquals(value, new CRONParserValidator(CRONParserValidator.CRON_TYPE).parseAndValidate(value));
+        Assert.assertEquals(value, new CRONParserValidator(ModelType.CRON.name()).parseAndValidate(value));
     }
 
     @Test(expected = ValidationException.class)
     public void testCRONParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new CRONParserValidator(CRONParserValidator.CRON_TYPE).parseAndValidate("* * * *");
+        new CRONParserValidator(ModelType.CRON.name()).parseAndValidate("* * * *");
     }
 
     @Test(expected = ModelSyntaxException.class)

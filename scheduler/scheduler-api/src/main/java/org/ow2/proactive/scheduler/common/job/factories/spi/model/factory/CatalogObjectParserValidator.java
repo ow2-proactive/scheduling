@@ -39,31 +39,8 @@ import org.springframework.expression.ParseException;
  */
 public class CatalogObjectParserValidator extends BaseParserValidator<String> {
 
-    public static final String CATALOG_OBJECT_TYPE = "CATALOG_OBJECT";
-
-    public static final String CATALOG_OBJECT_TYPE_REGEXP = "[Cc][Aa][Tt][Aa][Ll][Oo][Gg][_][Oo][Bb][Jj][Ee][Cc][Tt]";
-
     public CatalogObjectParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-        String regexep = "^" + CATALOG_OBJECT_TYPE_REGEXP + "$";
-        if (!model.matches(regexep)) {
-            throw new ModelSyntaxException(CATALOG_OBJECT_TYPE + " expression in model does not match " + regexep);
-        }
-    }
-
-    @Override
-    protected String getType() {
-        return CATALOG_OBJECT_TYPE;
-    }
-
-    @Override
-    protected String getTypeRegexp() {
-        return CATALOG_OBJECT_TYPE_REGEXP;
-    }
-
-    @Override
-    protected Class getClassType() {
-        return String.class;
+        super(model, ModelType.CATALOG_OBJECT);
     }
 
     @Override
