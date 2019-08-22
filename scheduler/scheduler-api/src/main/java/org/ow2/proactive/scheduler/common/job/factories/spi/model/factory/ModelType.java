@@ -51,10 +51,13 @@ public enum ModelType {
     SHORT(ShortParserValidator.class, Short.class),
     SPEL(SPELParserValidator.class, String.class),
     URI(URIParserValidator.class, URI.class),
-    URL(URLParserValidator.class, URL.class);
+    URL(URLParserValidator.class, URL.class),
+    HIDDEN(HiddenParserValidator.class, String.class);
 
+    // The parser validator of the model type
     private Class typeParserValidator;
 
+    // The parameter string value is expected to be converted to which class by its parser
     private Class classType;
 
     ModelType(Class typeParserValidator, Class classType) {
