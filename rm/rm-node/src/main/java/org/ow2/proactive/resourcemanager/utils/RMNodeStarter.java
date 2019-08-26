@@ -695,10 +695,16 @@ public class RMNodeStarter {
 
     private void loadSigarIfRunningWithOneJar() {
         if (OneJar.isRunningWithOneJar()) {
+
             String nativeLibraryName = SigarLoader.getNativeLibraryName();
-            String nativeLibraryNameToLoad = nativeLibraryName.replace(SigarLoader.getLibraryExtension(), "")
-                                                              .replace(SigarLoader.getLibraryPrefix(), "");
-            System.loadLibrary(nativeLibraryNameToLoad);
+
+            if (nativeLibraryName != null) {
+                String nativeLibraryNameToLoad = nativeLibraryName.replace(SigarLoader.getLibraryExtension(), "")
+                                                                  .replace(SigarLoader.getLibraryPrefix(), "");
+                System.loadLibrary(nativeLibraryNameToLoad);
+            } else {
+                logger.warn("Sigar will not be loaded, as it is not supported by the underlying OS.");
+            }
         }
     }
 
