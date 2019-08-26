@@ -45,30 +45,55 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
 
     protected String model;
 
-    protected BaseParserValidator(String model) throws ModelSyntaxException {
+    /**
+     * The name of the parser type, e.g., BOOLEAN, INTEGER, etc
+     */
+    protected ModelType type;
+
+    /**
+     * The regexp which defines the allowed model expression.
+     */
+    protected String typeRegexp;
+
+    /**
+     * Construct a parser validator whose model definition should match the parser type (case insensitive)
+     * @param model the model definition
+     * @param type the parser type
+     * @throws ModelSyntaxException
+     */
+    protected BaseParserValidator(String model, ModelType type) throws ModelSyntaxException {
+        // By default, the model expression should match the parser type while ignoring case.
+        this(model, type, "^" + ignoreCaseRegexp(type.name()) + "$");
+    }
+
+    /**
+     * Construct a parser validator with a customized model definition rule.
+     * @param model the model definition
+     * @param type the parser type
+     * @param typeRegexp the expected pattern of the model expression
+     * @throws ModelSyntaxException
+     */
+    protected BaseParserValidator(String model, ModelType type, String typeRegexp) throws ModelSyntaxException {
         if (Strings.isNullOrEmpty(model)) {
             throw new ModelSyntaxException("Model cannot be empty");
         }
         this.model = model.trim();
+        this.type = type;
+        this.typeRegexp = typeRegexp;
+        if (!model.matches(typeRegexp)) {
+            throw new ModelSyntaxException(String.format("Model expression %s doesn't match the expected pattern: %s",
+                                                         model,
+                                                         typeRegexp));
+        }
     }
-
-    /**
-     * Return the name of the parser type
-     * @return type of a parser like BOOLEAN, INTEGER, etc
-     */
-    protected abstract String getType();
-
-    /**
-     * Returns a model regexp  able to match the parser type.
-     * @return regular expression
-     */
-    protected abstract String getTypeRegexp();
 
     /**
      * Returns the class used by this parser to convert string parameter values.
      * @return class
      */
-    protected abstract Class getClassType();
+    protected Class getClassType() {
+        return type.getClassType();
+    }
 
     /**
      * Create a converter used by this parser
@@ -90,7 +115,7 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
     protected String parseAndGetOneGroup(String valueToParse, String regexp) throws ModelSyntaxException {
         List<String> groups = parseAndGetRegexGroups(valueToParse, regexp);
         if (groups.size() != 1) {
-            throw new ModelSyntaxException("Illegal " + getType() + " expression in '" + valueToParse +
+            throw new ModelSyntaxException("Illegal " + type + " expression in '" + valueToParse +
                                            "', model does not match regexp " + regexp);
         }
 
@@ -139,5 +164,9 @@ public abstract class BaseParserValidator<T> implements ParserValidator<T> {
         }
         Converter<T> converter = createConverter(model);
         return createValidator(model, converter).validate(converter.convert(parameterValue), context);
+    }
+
+    public static String ignoreCaseRegexp(String matcher) {
+        return String.format("(?i:%s)", matcher);
     }
 }

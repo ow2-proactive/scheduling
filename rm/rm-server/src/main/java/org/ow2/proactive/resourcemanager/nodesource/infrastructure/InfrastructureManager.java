@@ -94,6 +94,8 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     /** manager's node source */
     protected NodeSource nodeSource;
 
+    protected static final String ELASTIC = "elastic";
+
     /** key to retrieve the deploying nodes URL set (Set<String>) */
     private static final String DEPLOYING_NODES_URL_KEY = "infrastructureManagerDeployingNodes";
 
@@ -145,6 +147,17 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
     private NodeSourceData nodeSourceData;
 
     public InfrastructureManager() {
+    }
+
+    private Map<String, String> meta = new HashMap<>();
+
+    {
+        meta.put(InfrastructureManager.ELASTIC, "false");
+    }
+
+    @Override
+    public Map<String, String> getMeta() {
+        return meta;
     }
 
     /**

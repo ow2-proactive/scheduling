@@ -58,6 +58,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -819,7 +820,9 @@ public class RMCoreTest {
      */
     private void populateRMCore() {
 
-        when(mockedCaller.checkPermission(any(Permission.class), any(String.class))).thenReturn(true);
+        when(mockedCaller.checkPermission(any(Permission.class),
+                                          any(String.class),
+                                          any(Permission.class))).thenReturn(true);
         when(mockedSelectionManager.selectNodes(any(Criteria.class), any(Client.class))).thenReturn(new NodeSet());
 
         nodeSources = new HashMap<String, NodeSource>(1);

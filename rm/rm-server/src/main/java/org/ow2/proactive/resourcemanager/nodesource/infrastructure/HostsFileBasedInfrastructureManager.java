@@ -53,7 +53,7 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
 
     protected static final long DEFAULT_WAIT_TIME_BETWEEN_NODE_DEPLOYMENT_FAILURES = 5000;
 
-    @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts", sectionSelector = 1)
+    @Configurable(fileBrowser = true, description = "Absolute path of the file containing\nthe list of remote hosts", sectionSelector = 1, important = true)
     protected File hostsList;
 
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost", sectionSelector = 3)
@@ -80,8 +80,8 @@ public abstract class HostsFileBasedInfrastructureManager extends Infrastructure
     @Override
     public Map<Integer, String> getSectionDescriptions() {
         Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
-        sectionDescriptions.put(1, "Deployment Parameters");
-        sectionDescriptions.put(3, "Node Parameters");
+        sectionDescriptions.put(1, "Deployment Configuration");
+        sectionDescriptions.put(3, "Node Configuration");
         return sectionDescriptions;
     }
 

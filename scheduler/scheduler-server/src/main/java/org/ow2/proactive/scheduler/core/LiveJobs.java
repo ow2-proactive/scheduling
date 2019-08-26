@@ -480,6 +480,7 @@ class LiveJobs {
                                   new NotificationData<TaskInfo>(SchedulerEvent.TASK_WAITING_FOR_RESTART,
                                                                  new TaskInfoImpl((TaskInfoImpl) task.getTaskInfo())));
 
+        tlogger.info(task.getId(), String.format("wait [%d] milliseconds before restart task on error.", waitTime));
         terminationData.addRestartData(task.getId(), waitTime);
 
         logger.info("END restartTaskOnError");
@@ -631,10 +632,16 @@ class LiveJobs {
                 } else if (numberOfExecutionLeft > 0) {
                     tlogger.info(taskId, "number of execution left is " + numberOfExecutionLeft);
 
+                    long waitTime = 0l;
+                    if (task.getTaskRetryDelayProperty().isSet()) {
+                        waitTime = task.getTaskRetryDelay();
+                    } else {
+                        waitTime = jobData.job.getNextWaitingTime(task.getMaxNumberOfExecution() -
+                                                                  numberOfExecutionLeft);
+                    }
+
                     if (onErrorPolicyInterpreter.requiresPauseTaskOnError(task) || requiresPauseJobOnError) {
 
-                        long waitTime = jobData.job.getNextWaitingTime(task.getMaxNumberOfExecution() -
-                                                                       numberOfExecutionLeft);
                         restartTaskOnError(jobData,
                                            task,
                                            TaskStatus.WAITING_ON_ERROR,
@@ -648,8 +655,6 @@ class LiveJobs {
                     } else {
                         jobData.job.increaseNumberOfFaultyTasks(taskId);
 
-                        long waitTime = jobData.job.getNextWaitingTime(task.getMaxNumberOfExecution() -
-                                                                       numberOfExecutionLeft);
                         restartTaskOnError(jobData,
                                            task,
                                            TaskStatus.WAITING_ON_ERROR,

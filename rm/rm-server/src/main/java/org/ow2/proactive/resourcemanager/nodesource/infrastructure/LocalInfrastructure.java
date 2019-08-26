@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,10 +57,10 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     public static final long DEFAULT_TIMEOUT = 30000;
 
-    @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true, sectionSelector = 1)
+    @Configurable(description = "Absolute path to credentials file\nused to add the node to the Resource Manager", credential = true, sectionSelector = 3)
     private Credentials credentials;
 
-    @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine", sectionSelector = 2)
+    @Configurable(description = "Maximum number of nodes to\nbe deployed on Resource Manager machine", sectionSelector = 1, important = true)
     private int maxNodes = DEFAULT_NODE_NUMBER;
 
     @Configurable(description = "in ms. After this timeout expired\nthe node is considered to be lost", sectionSelector = 3)
@@ -67,6 +68,13 @@ public class LocalInfrastructure extends InfrastructureManager {
 
     @Configurable(description = "Additional ProActive properties", sectionSelector = 3)
     private String paProperties = "";
+
+    private Map<String, String> meta = new HashMap<>();
+
+    {
+        meta.putAll(super.getMeta());
+        meta.put(InfrastructureManager.ELASTIC, "true");
+    }
 
     /**
      * key to retrieve the number of nodes which are acquired in the persisted
@@ -190,7 +198,7 @@ public class LocalInfrastructure extends InfrastructureManager {
         clb.setNodeName(baseNodeName);
         clb.setNumberOfNodes(numberOfNodes);
         try {
-            clb.setCredentialsValueAndNullOthers(new String(this.credentials.getBase64()));
+            clb.setCredentialsValueAndNullOthers(getCredentials());
         } catch (KeyException e) {
             createLostNodes(baseNodeName, numberOfNodes, "Cannot decrypt credentials value", e);
             return;
@@ -251,6 +259,14 @@ public class LocalInfrastructure extends InfrastructureManager {
         }
     }
 
+    private String getCredentials() throws KeyException {
+        if (this.credentials == null) {
+            this.credentials = super.nodeSource.getAdministrator().getCredentials();
+        }
+
+        return new String(this.credentials.getBase64());
+    }
+
     /**
      * Creates a lost node to indicate that the deployment has failed while
      * building the command line.
@@ -277,7 +293,10 @@ public class LocalInfrastructure extends InfrastructureManager {
     protected void configure(Object... args) {
         int index = 0;
         try {
-            this.credentials = Credentials.getCredentialsBase64((byte[]) args[index++]);
+            byte[] possibleCredentials = (byte[]) args[index++];
+            if (possibleCredentials != null && possibleCredentials.length > 0) {
+                this.credentials = Credentials.getCredentialsBase64(possibleCredentials);
+            }
         } catch (KeyException e1) {
             throw new IllegalArgumentException("Cannot decrypt credentials", e1);
         }
@@ -476,5 +495,18 @@ public class LocalInfrastructure extends InfrastructureManager {
     private int getDifferenceBetweenNumberOfHandledAndAcquiredNodesWithLock() {
         return getPersistedInfraVariable(() -> (int) this.persistedInfraVariables.get(NB_HANDLED_NODES_KEY) -
                                                (int) this.persistedInfraVariables.get(NB_ACQUIRED_NODES_KEY));
+    }
+
+    @Override
+    public Map<Integer, String> getSectionDescriptions() {
+        Map<Integer, String> sectionDescriptions = super.getSectionDescriptions();
+        sectionDescriptions.put(1, "Deployment Configuration");
+        sectionDescriptions.put(3, "Node Configuration");
+        return sectionDescriptions;
+    }
+
+    @Override
+    public Map<String, String> getMeta() {
+        return meta;
     }
 }

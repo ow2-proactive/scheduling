@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.security.KeyException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.management.AttributeNotFoundException;
@@ -458,32 +459,69 @@ public interface RMRestInterface {
      * without redundancy, in a friendly JSON format.
      *
      * @param sessionId a valid session
+     * @param nodeJmxUrl mbean server url
+     * @param objectName name of mbean
+     * @param attrs set of mbean attributes
      * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
      *      for each source. Each char can be:<ul>
      *            <li>'a' 1 minute
+     *            <li>'n' 5 minutes
      *            <li>'m' 10 minutes
+     *            <li>'t' 30 minutes
      *            <li>'h' 1 hour
+     *            <li>'j' 2 hours
+     *            <li>'k' 4 hours
      *            <li>'H' 8 hours
      *            <li>'d' 1 day
      *            <li>'w' 1 week
      *            <li>'M' 1 month
      *            <li>'y' 1 year</ul>
      * @return a JSON object containing a key for each source
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws MalformedObjectNameException
-     * @throws NullPointerException
      * @throws NotConnectedException
      */
     @GET
     @GZIP
     @Produces("application/json")
     @Path("node/mbean/history")
-    Object getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
+    String getNodeMBeanHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectName, @QueryParam("attrs") List<String> attrs,
             @QueryParam("range") String range)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
+
+    /**
+     * Return the statistic history of a list of nodes contained in the node RRD database,
+     * without redundancy, in a friendly JSON format.
+     *
+     * @param sessionId a valid session
+     * @param nodesJmxUrl a set of mbean server urls
+     * @param objectName name of mbean
+     * @param attrs set of mbean attributes
+     * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
+     *      for each source. Each char can be:<ul>
+     *            <li>'a' 1 minute
+     *            <li>'n' 5 minutes
+     *            <li>'m' 10 minutes
+     *            <li>'t' 30 minutes
+     *            <li>'h' 1 hour
+     *            <li>'j' 2 hours
+     *            <li>'k' 4 hours
+     *            <li>'H' 8 hours
+     *            <li>'d' 1 day
+     *            <li>'w' 1 week
+     *            <li>'M' 1 month
+     *            <li>'y' 1 year</ul>
+     * @return a Map where each entry containse mbean server url as key and a map of statistic values as value. Each entry has an mbean attribute as key and
+     * list of its mbean values as value.
+     * @throws NotConnectedException
+     */
+    @GET
+    @GZIP
+    @Produces("application/json")
+    @Path("nodes/mbean/history")
+    Map<String, Map<String, Object>> getNodesMBeanHistory(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("nodejmxurl") Set<String> nodesJmxUrl, @QueryParam("objectname") String objectName,
+            @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
 
@@ -549,6 +587,18 @@ public interface RMRestInterface {
     @Path("infrastructures")
     @Produces("application/json")
     Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException;
+
+    /**
+     * @param sessionId a valid session
+     * @return a mapping which for each infrastructure provides list of policies
+     * that can work together with given infrastructure
+     */
+    @GET
+    @GZIP
+    @Path("infrastructures/mapping")
+    @Produces("application/json")
+    Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException;
 
     /**
@@ -626,19 +676,28 @@ public interface RMRestInterface {
      * without redundancy, in a friendly JSON format.
      *
      * The following sources will be queried from the RRD DB :<pre>
-     * 	{ "BusyNodesCount",
-     *    "FreeNodesCount",
-     *    "DownNodesCount",
-     *    "AvailableNodesCount",
-     *    "AverageActivity" }</pre>
+     * 	{ AvailableNodesCount",
+     * 	"FreeNodesCount",
+     * 	"NeededNodesCount",
+     * 	"BusyNodesCount",
+     * 	"DeployingNodesCount",
+     * 	"ConfigNodesCount",
+     * 	"DownNodesCount",
+     * 	"LostNodesCount",
+     * 	"AverageActivity" };
+     * 	</pre>
      *
      *
      * @param sessionId a valid session
-     * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
+     * @param range a String of 9 chars, one for each stat history source, indicating the time range to fetch
      *      for each source. Each char can be:<ul>
      *            <li>'a' 1 minute
      *            <li>'m' 10 minutes
+     *            <li>'n' 5 minutes
+     *            <li>'t' 30 minutes
      *            <li>'h' 1 hour
+     *            <li>'j' 2 hours
+     *            <li>'k' 4 hours
      *            <li>'H' 8 hours
      *            <li>'d' 1 day
      *            <li>'w' 1 week

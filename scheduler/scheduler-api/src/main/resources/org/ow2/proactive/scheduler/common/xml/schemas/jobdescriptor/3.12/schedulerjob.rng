@@ -23,6 +23,9 @@
         <ref name="restartTaskOnError_j"/>
       </optional>
       <optional>
+        <ref name="taskRetryDelay_j"/>
+      </optional>
+      <optional>
         <ref name="numberOfExecution_j"/>
       </optional>
       <optional>
@@ -125,6 +128,15 @@
       </choice>
     </attribute>
   </define>
+  <define name="taskRetryDelay_j">
+    <attribute name="taskRetryDelay">
+      <doc:documentation>For each task, it specifies how long to wait before restarting the task if an error occurred.</doc:documentation>
+      <choice>
+        <ref name="durationPattern"/>
+        <ref name="variableRefType"/>
+      </choice>
+    </attribute>
+  </define>
   <define name="numberOfExecution_j">
     <attribute name="maxNumberOfExecution">
       <doc:documentation>Maximum number of execution for each task (default=1)</doc:documentation>
@@ -202,6 +214,9 @@
       </optional>
       <optional>
         <ref name="restartTaskOnError_t"/>
+      </optional>
+      <optional>
+        <ref name="taskRetryDelay_t"/>
       </optional>
       <optional>
         <ref name="numberOfExecution_t"/>
@@ -339,7 +354,7 @@
     <attribute name="walltime">
       <doc:documentation>Defines walltime - maximum execution time of the task. (patterns are 'ss' OR 'mm:ss' OR 'hh:mm:ss')</doc:documentation>
       <choice>
-        <ref name="walltimePattern"/>
+        <ref name="durationPattern"/>
         <ref name="variableRefType"/>
       </choice>
     </attribute>
@@ -357,6 +372,15 @@
     <attribute name="restartTaskOnError">
       <doc:documentation>Where does the task restart if an error occurred ?</doc:documentation>
       <ref name="restartTaskType"/>
+    </attribute>
+  </define>
+  <define name="taskRetryDelay_t">
+    <attribute name="taskRetryDelay">
+      <doc:documentation>This parameter specifies how long to wait before restarting the task if an error occurred.</doc:documentation>
+      <choice>
+        <ref name="durationPattern"/>
+        <ref name="variableRefType"/>
+      </choice>
     </attribute>
   </define>
   <define name="numberOfExecution_t">
@@ -1013,7 +1037,7 @@
       <param name="pattern">([A-Za-z_$][A-Za-z_0-9$]*\.)*[A-Za-z_$][A-Za-z_0-9$]*</param>
     </data>
   </define>
-  <define name="walltimePattern">
+  <define name="durationPattern">
     <data type="string">
       <param name="pattern">[0-9]*[1-9][0-9]*(:[0-5][0-9]){0,2}</param>
     </data>

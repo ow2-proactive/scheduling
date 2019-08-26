@@ -37,35 +37,15 @@ import com.google.common.collect.ImmutableSet;
 
 public class ListParserValidator extends BaseParserValidator<String> {
 
-    public static final String LIST_TYPE = "LIST";
-
     public static final String LEFT_DELIMITER = "(";
 
     public static final String RIGHT_DELIMITER = ")";
 
-    protected static final String LIST_TYPE_REGEXP = "[Ll][Ii][Ss][Tt]";
-
-    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
-
-    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
+    protected static final String LIST_REGEXP = "^" + ignoreCaseRegexp(ModelType.LIST.name()) + "\\" + LEFT_DELIMITER +
+                                                "([^)]+)" + "\\" + RIGHT_DELIMITER + "$";
 
     public ListParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return LIST_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return LIST_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return String.class;
+        super(model, ModelType.LIST, LIST_REGEXP);
     }
 
     @Override
@@ -75,9 +55,7 @@ public class ListParserValidator extends BaseParserValidator<String> {
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
-        String listRegexp = "^" + LIST_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "([^)]+)" + RIGHT_DELIMITER_REGEXP + "$";
-
-        String commaSeparatedValuesString = parseAndGetOneGroup(model, listRegexp);
+        String commaSeparatedValuesString = parseAndGetOneGroup(model, LIST_REGEXP);
 
         String[] stringValues = commaSeparatedValuesString.split(",");
         ImmutableList.Builder<String> listBuilder = new ImmutableList.Builder<>();

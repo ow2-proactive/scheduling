@@ -46,24 +46,24 @@ public class ListParserValidatorTest {
     @Test
     public void testListParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
         Assert.assertEquals(VALID_VALUE,
-                            new ListParserValidator(ListParserValidator.LIST_TYPE +
+                            new ListParserValidator(ModelType.LIST +
                                                     VALID_MODEL_PARAMETER).parseAndValidate(VALID_VALUE));
     }
 
     @Test(expected = ValidationException.class)
     public void testListParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new ListParserValidator(ListParserValidator.LIST_TYPE + VALID_MODEL_PARAMETER).parseAndValidate(INVALID_VALUE);
+        new ListParserValidator(ModelType.LIST + VALID_MODEL_PARAMETER).parseAndValidate(INVALID_VALUE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testListParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new ListParserValidator("ILLEGAL_" + ListParserValidator.LIST_TYPE).parseAndValidate(VALID_VALUE);
+        new ListParserValidator("ILLEGAL_" + ModelType.LIST).parseAndValidate(VALID_VALUE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testListParserValidatorInvalidList()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new ListParserValidator(ListParserValidator.LIST_TYPE + INVALID_MODEL_PARAMETER).parseAndValidate(VALID_VALUE);
+        new ListParserValidator(ModelType.LIST + INVALID_MODEL_PARAMETER).parseAndValidate(VALID_VALUE);
     }
 }

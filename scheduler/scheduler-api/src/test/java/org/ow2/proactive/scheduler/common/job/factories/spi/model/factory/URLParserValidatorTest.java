@@ -42,13 +42,12 @@ public class URLParserValidatorTest {
             throws ModelSyntaxException, ValidationException, ConversionException, MalformedURLException {
         String value = "file://mysite";
         Assert.assertEquals(new URL(value).toExternalForm(),
-                            new URLParserValidator(URLParserValidator.URL_TYPE).parseAndValidate(value)
-                                                                               .toExternalForm());
+                            new URLParserValidator(ModelType.URL.name()).parseAndValidate(value).toExternalForm());
     }
 
     @Test(expected = ConversionException.class)
     public void testURIParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new URLParserValidator(URLParserValidator.URL_TYPE).parseAndValidate("unknown://protocol");
+        new URLParserValidator(ModelType.URL.name()).parseAndValidate("unknown://protocol");
     }
 
     @Test(expected = ModelSyntaxException.class)

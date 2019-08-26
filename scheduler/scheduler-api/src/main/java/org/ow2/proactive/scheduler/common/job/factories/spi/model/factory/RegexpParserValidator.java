@@ -36,35 +36,15 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Vali
 
 public class RegexpParserValidator extends BaseParserValidator<String> {
 
-    public static final String REGEXP_TYPE = "REGEXP";
-
     public static final String LEFT_DELIMITER = "(";
 
     public static final String RIGHT_DELIMITER = ")";
 
-    protected static final String REGEXP_TYPE_REGEXP = "[Rr][Ee][Gg][Ee][Xx][Pp]";
-
-    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
-
-    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
+    protected static final String REGEXP_REGEXP = "^" + ignoreCaseRegexp(ModelType.REGEXP.name()) + "\\" +
+                                                  LEFT_DELIMITER + "(.+)" + "\\" + RIGHT_DELIMITER + "$";
 
     public RegexpParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return REGEXP_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return REGEXP_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return String.class;
+        super(model, ModelType.REGEXP, REGEXP_REGEXP);
     }
 
     @Override
@@ -74,8 +54,7 @@ public class RegexpParserValidator extends BaseParserValidator<String> {
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
-        String regexpRegexp = "^" + REGEXP_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "(.+)" + RIGHT_DELIMITER_REGEXP + "$";
-        String regexpString = parseAndGetOneGroup(model, regexpRegexp);
+        String regexpString = parseAndGetOneGroup(model, REGEXP_REGEXP);
         try {
             return new RegexpValidator(regexpString);
         } catch (PatternSyntaxException e) {

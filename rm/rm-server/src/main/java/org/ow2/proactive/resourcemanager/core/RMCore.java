@@ -25,9 +25,12 @@
  */
 package org.ow2.proactive.resourcemanager.core;
 
+import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.Permission;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -71,7 +74,9 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.principals.IdentityPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.permissions.MethodCallPermission;
+import org.ow2.proactive.permissions.NodeUserAllPermission;
 import org.ow2.proactive.permissions.PrincipalPermission;
+import org.ow2.proactive.permissions.RMCoreAllPermission;
 import org.ow2.proactive.policy.ClientsPolicy;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthenticationImpl;
@@ -1648,7 +1653,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             NodeSource nodeSourceToRemove = this.deployedNodeSources.get(nodeSourceName);
 
             this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
-                                        this.caller + " is not authorized to remove " + nodeSourceName);
+                                        this.caller + " is not authorized to remove " + nodeSourceName,
+                                        new RMCoreAllPermission());
 
             nodeSourceToRemove.setStatus(NodeSourceStatus.NODES_UNDEPLOYED);
 
@@ -1810,7 +1816,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
                     try {
                         caller.checkPermission(ownerPermission,
                                                caller + " is not authorized to free node " +
-                                                                node.getNodeInformation().getURL());
+                                                                node.getNodeInformation().getURL(),
+                                               new RMCoreAllPermission(),
+                                               new NodeUserAllPermission());
 
                         if (rmnode.isToRemove()) {
                             removeNodeFromCoreAndSource(rmnode, caller);
@@ -2320,7 +2328,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new IllegalArgumentException("Unknown node source " + nodeSourceName);
         }
         this.caller.checkPermission(nodeSourceToRemove.getAdminPermission(),
-                                    this.caller + " is not authorized to remove " + nodeSourceName);
+                                    this.caller + " is not authorized to remove " + nodeSourceName,
+                                    new RMCoreAllPermission());
 
         this.shutDownNodeSourceIfDeployed(nodeSourceName, preempt);
         this.removeDefinedNodeSource(nodeSourceName, nodeSourceToRemove);
@@ -2535,7 +2544,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         final String fullMethodName = RMCore.class.getName() + "." + methodName;
         final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
 
-        client.checkPermission(methodCallPermission, client + " is not authorized to call " + fullMethodName);
+        client.checkPermission(methodCallPermission,
+                               client + " is not authorized to call " + fullMethodName,
+                               new RMCoreAllPermission());
         return client;
     }
 
@@ -2637,10 +2648,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         // a node provider
         try {
             // checking if the caller is an administrator
-            client.checkPermission(nodeSource.getAdminPermission(), errorMessage);
+            client.checkPermission(nodeSource.getAdminPermission(), errorMessage, new RMCoreAllPermission());
         } catch (SecurityException ex) {
             // the caller is not an administrator, so checking if it is a node source provider
-            client.checkPermission(nodeSource.getProviderPermission(), errorMessage);
+            client.checkPermission(nodeSource.getProviderPermission(), errorMessage, new RMCoreAllPermission());
         }
 
         return true;
@@ -2776,7 +2787,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         try {
             caller.checkPermission(rmnode.getAdminPermission(),
                                    caller + " is not authorized to administrate the node " + rmnode.getNodeURL() +
-                                                                " from " + rmnode.getNodeSource().getName());
+                                                                " from " + rmnode.getNodeSource().getName(),
+                                   new RMCoreAllPermission());
         } catch (SecurityException e) {
             // client does not have an access to this node
             logger.debug(e.getMessage());
@@ -2799,7 +2811,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             caller.checkPermission(rmnode.getUserPermission(),
                                    caller + " is not authorized to run computations on the node " +
                                                                rmnode.getNodeURL() + " from " +
-                                                               rmnode.getNodeSource().getName());
+                                                               rmnode.getNodeSource().getName(),
+                                   new NodeUserAllPermission());
         } catch (SecurityException e) {
             // client does not have an access to this node
             logger.debug(e.getMessage());
@@ -2991,6 +3004,32 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public void setNeededNodes(int neededNodes) {
         this.monitoring.setNeededNodes(neededNodes);
+    }
+
+    @Override
+    public Map<String, List<String>> getInfrasToPoliciesMapping() {
+        Map<String, List<String>> mapping = new HashMap<>();
+        String fileName = null;
+        try {
+            fileName = PAResourceManagerProperties.RM_NODESOURCE_INFRA_POLICY_MAPPING.getValueAsString();
+            if (!(new File(fileName).isAbsolute())) {
+                // file path is relative, so we complete the path with the prefix RM_Home constant
+                fileName = PAResourceManagerProperties.RM_HOME.getValueAsString() + File.separator + fileName;
+            }
+
+            mapping = Files.readAllLines(Paths.get(fileName))
+                           .stream()
+                           .map(line -> line.split(","))
+                           .filter(array -> array.length > 1)
+                           .map(Arrays::asList)
+                           .collect(Collectors.toMap(list -> list.get(0).trim(), list -> list.subList(1, list.size())
+                                                                                             .stream()
+                                                                                             .map(String::trim)
+                                                                                             .collect(Collectors.toList())));
+        } catch (Exception e) {
+            logger.error("Error when loading infrastructure definition file : " + fileName, e);
+        }
+        return mapping;
     }
 
     /**
