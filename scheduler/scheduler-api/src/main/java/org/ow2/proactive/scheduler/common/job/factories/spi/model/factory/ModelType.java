@@ -52,7 +52,8 @@ public enum ModelType {
     SPEL(SPELParserValidator.class, String.class),
     URI(URIParserValidator.class, URI.class),
     URL(URLParserValidator.class, URL.class),
-    HIDDEN(HiddenParserValidator.class, String.class);
+    HIDDEN(HiddenParserValidator.class, String.class),
+    CREDENTIAL(CredentialParserValidator.class, String.class);
 
     // The parser validator of the model type
     private Class typeParserValidator;
