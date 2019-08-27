@@ -929,8 +929,7 @@ public class RMNodeStarter {
             }
 
             // Optional help option
-            if (cl.hasOption(OPTION_DISABLE_MONITORING)
-                    || "true".equals(System.getProperty(DISABLE_MONITORING))) {
+            if (cl.hasOption(OPTION_DISABLE_MONITORING) || "true".equals(System.getProperty(DISABLE_MONITORING))) {
                 disabledMonitoring = true;
             }
 
