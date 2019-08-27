@@ -25,6 +25,10 @@
  */
 package org.ow2.proactive.scheduler.common.job.factories.spi.model.validator;
 
+import java.util.Set;
+
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
@@ -36,7 +40,16 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.Val
 public class CredentialValidator implements Validator<String> {
     @Override
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
-        // TODO if parameterValue not exists in 3rd-party credentials, throw ValidationException
+        // if parameterValue not exists in 3rd-party credentials, throw ValidationException
+        try {
+            Set<String> credentialKeys = context.getScheduler().thirdPartyCredentialsKeySet();
+            if (!credentialKeys.contains(parameterValue)) {
+                throw new ValidationException("Expected value should exist in the third-party credentials.");
+            }
+        } catch (NotConnectedException | PermissionException e) {
+            e.printStackTrace(); //TODO
+            throw new ValidationException("Exception during getting the third-party credentials.", e);
+        }
         return parameterValue;
     }
 

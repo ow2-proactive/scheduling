@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi;
 
 import java.io.InputStream;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 
@@ -58,6 +59,6 @@ public interface JobValidatorService {
      * @return if the validator eventually made some modifications to the job, return a new version
      * @throws JobValidationException if the job is not valid
      */
-    TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException;
+    TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler) throws JobValidationException;
 
 }
