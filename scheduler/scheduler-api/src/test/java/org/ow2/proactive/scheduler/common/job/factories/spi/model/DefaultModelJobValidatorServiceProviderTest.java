@@ -59,69 +59,69 @@ public class DefaultModelJobValidatorServiceProviderTest {
 
     @Test
     public void testValidateJobWithJobModelVariableOK() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("true", ModelValidator.PREFIX + ModelType.BOOLEAN));
+        factory.validateJob(createJobWithJobModelVariable("true", ModelValidator.PREFIX + ModelType.BOOLEAN), null);
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithJobModelVariableKO() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("blabla", ModelValidator.PREFIX + ModelType.BOOLEAN));
+        factory.validateJob(createJobWithJobModelVariable("blabla", ModelValidator.PREFIX + ModelType.BOOLEAN), null);
     }
 
     @Test
     public void testValidateJobWithJobModelVariableEmptyModel() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("blabla", "  "));
+        factory.validateJob(createJobWithJobModelVariable("blabla", "  "), null);
     }
 
     @Test
     public void testValidateJobWithJobModelVariableUnknownModel() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("blabla", "UNKNOWN"));
+        factory.validateJob(createJobWithJobModelVariable("blabla", "UNKNOWN"), null);
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithJobModelVariableValidPrefixButUnknownModel()
             throws UserException, JobValidationException {
-        factory.validateJob(createJobWithJobModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"));
+        factory.validateJob(createJobWithJobModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"), null);
     }
 
     @Test
     public void testValidateJobWithSpelModelVariablesOK() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithSpelJobModelVariablesOK());
+        factory.validateJob(createJobWithSpelJobModelVariablesOK(), null);
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithSpelModelVariablesKO() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithSpelJobModelVariablesKO());
+        factory.validateJob(createJobWithSpelJobModelVariablesKO(), null);
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithSpelModelVariablesUnauthorizedType() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithSpelJobModelVariablesUnauthorizedType());
+        factory.validateJob(createJobWithSpelJobModelVariablesUnauthorizedType(), null);
     }
 
     @Test
     public void testValidateJobWithTaskModelVariableOK() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("true", ModelValidator.PREFIX + ModelType.BOOLEAN));
+        factory.validateJob(createJobWithTaskModelVariable("true", ModelValidator.PREFIX + ModelType.BOOLEAN), null);
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithTaskModelVariableKO() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("blabla", ModelValidator.PREFIX + ModelType.BOOLEAN));
+        factory.validateJob(createJobWithTaskModelVariable("blabla", ModelValidator.PREFIX + ModelType.BOOLEAN), null);
     }
 
     @Test
     public void testValidateJobWithTaskModelVariableEmptyModel() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("blabla", "  "));
+        factory.validateJob(createJobWithTaskModelVariable("blabla", "  "), null);
     }
 
     @Test
     public void testValidateJobWithTaskModelVariableUnknownModel() throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("blabla", "UNKNOWN"));
+        factory.validateJob(createJobWithTaskModelVariable("blabla", "UNKNOWN"), null);
     }
 
     @Test(expected = JobValidationException.class)
     public void testValidateJobWithTaskModelVariableValidPrefixButUnknownModel()
             throws UserException, JobValidationException {
-        factory.validateJob(createJobWithTaskModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"));
+        factory.validateJob(createJobWithTaskModelVariable("blabla", ModelValidator.PREFIX + "UNKNOWN"), null);
     }
 
     private TaskFlowJob createJobWithJobModelVariable(String value, String model) throws UserException {

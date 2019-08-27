@@ -27,6 +27,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model;
 
 import java.io.InputStream;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
@@ -51,16 +52,16 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
     }
 
     @Override
-    public TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException {
+    public TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler) throws JobValidationException {
 
-        ModelValidatorContext context = new ModelValidatorContext(job);
+        ModelValidatorContext context = new ModelValidatorContext(job, scheduler);
 
         for (JobVariable jobVariable : job.getVariables().values()) {
             checkVariableFormat(null, jobVariable, context);
             context.updateJobWithContext(job);
         }
         for (Task task : job.getTasks()) {
-            context = new ModelValidatorContext(task);
+            context = new ModelValidatorContext(task, scheduler);
             for (TaskVariable taskVariable : task.getVariables().values()) {
                 checkVariableFormat(task, taskVariable, context);
                 context.updateTaskWithContext(task);

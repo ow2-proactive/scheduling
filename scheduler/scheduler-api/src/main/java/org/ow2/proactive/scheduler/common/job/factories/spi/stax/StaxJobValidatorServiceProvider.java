@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.Schemas;
@@ -75,7 +76,7 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
     }
 
     @Override
-    public TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException {
+    public TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler) throws JobValidationException {
         // validate any job
         return job;
     }
