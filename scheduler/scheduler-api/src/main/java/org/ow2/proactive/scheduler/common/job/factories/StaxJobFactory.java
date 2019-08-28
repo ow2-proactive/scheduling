@@ -192,8 +192,14 @@ public class StaxJobFactory extends JobFactory {
     @Override
     public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
+        return createJob(workflowStream, replacementVariables, replacementGenericInfos, null);
+    }
+
+    @Override
+    public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos, Scheduler scheduler) throws JobCreationException {
         try {
-            return createJobFromInputStream(workflowStream, replacementVariables, replacementGenericInfos, null);
+            return createJobFromInputStream(workflowStream, replacementVariables, replacementGenericInfos, scheduler);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -283,7 +289,6 @@ public class StaxJobFactory extends JobFactory {
      */
     private TaskFlowJob validate(TaskFlowJob job, Scheduler scheduler)
             throws VerifierConfigurationException, JobCreationException {
-
         Map<String, JobValidatorService> factories;
         try {
             factories = JobValidatorRegistry.getInstance().getRegisteredFactories();

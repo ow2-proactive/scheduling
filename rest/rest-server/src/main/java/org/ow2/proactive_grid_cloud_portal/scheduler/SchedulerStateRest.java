@@ -3300,9 +3300,11 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public JobValidationData validate(PathSegment pathSegment, MultipartFormDataInput multipart) {
+    public JobValidationData validate(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart)
+            throws NotConnectedRestException {
         File tmpFile = null;
         try {
+            Scheduler scheduler = checkAccess(sessionId);
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
             String name = formDataMap.keySet().iterator().next();
             InputPart part1 = formDataMap.get(name).get(0);
@@ -3318,12 +3320,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
             }
 
-            return ValidationUtil.validateJobDescriptor(tmpFile, jobVariables);
+            return ValidationUtil.validateJobDescriptor(tmpFile, jobVariables, scheduler);
         } catch (IOException e) {
             JobValidationData validation = new JobValidationData();
             validation.setErrorMessage("Cannot read from the job validation request.");
             validation.setStackTrace(getStackTrace(e));
             return validation;
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedRestException(e);
         } finally {
             if (tmpFile != null) {
                 FileUtils.deleteQuietly(tmpFile);
@@ -3340,7 +3344,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         File tmpWorkflowFile = null;
         try {
-            checkAccess(sessionId);
+            Scheduler scheduler = checkAccess(sessionId);
             String jobXml = downloadWorkflowContent(sessionId, url);
             tmpWorkflowFile = File.createTempFile("job", "d");
             Map<String, String> jobVariables;
@@ -3350,7 +3354,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
             }
 
-            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables);
+            return ValidationUtil.validateJobDescriptor(tmpWorkflowFile, jobVariables, scheduler);
 
         } catch (JobCreationRestException | IOException e) {
             JobValidationData validation = new JobValidationData();
