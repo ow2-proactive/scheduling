@@ -193,7 +193,8 @@ public interface StudioInterface {
     @Path("{path:validate}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart);
+    JobValidationData validate(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            MultipartFormDataInput multipart) throws NotConnectedRestException;
 
     /**
      * Submits a job to the scheduler

@@ -69,6 +69,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
@@ -83,15 +84,17 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 
 public class ValidationUtil {
 
-    public static JobValidationData validateJobDescriptor(File jobDescFile, Map<String, String> jobVariables) {
-        return validateJob(jobDescFile.getAbsolutePath(), jobVariables);
+    public static JobValidationData validateJobDescriptor(File jobDescFile, Map<String, String> jobVariables,
+            Scheduler scheduler) {
+        return validateJob(jobDescFile.getAbsolutePath(), jobVariables, scheduler);
     }
 
-    public static JobValidationData validateJob(String jobFilePath, Map<String, String> jobVariables) {
+    public static JobValidationData validateJob(String jobFilePath, Map<String, String> jobVariables,
+            Scheduler scheduler) {
         JobValidationData data = new JobValidationData();
         try {
             JobFactory factory = JobFactory.getFactory();
-            Job job = factory.createJob(jobFilePath, jobVariables, null);
+            Job job = factory.createJob(jobFilePath, jobVariables, null, scheduler);
 
             if (job instanceof TaskFlowJob) {
                 validateJob((TaskFlowJob) job, data);

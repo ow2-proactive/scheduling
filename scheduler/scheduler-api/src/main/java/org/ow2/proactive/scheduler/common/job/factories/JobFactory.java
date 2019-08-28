@@ -179,4 +179,7 @@ public abstract class JobFactory {
     public abstract Job createJob(InputStream workflowStream, Map<String, String> variables,
             Map<String, String> genericInfos) throws JobCreationException;
 
+    public abstract Job createJob(InputStream workflowStream, Map<String, String> variables,
+            Map<String, String> genericInfos, Scheduler scheduler) throws JobCreationException;
+
 }

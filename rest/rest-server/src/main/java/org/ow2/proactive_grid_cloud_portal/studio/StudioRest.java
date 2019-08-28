@@ -323,8 +323,10 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart) {
-        return scheduler().validate(pathSegment, multipart);
+    public JobValidationData validate(@HeaderParam("sessionid") String sessionId,
+            @PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart)
+            throws NotConnectedRestException {
+        return scheduler().validate(sessionId, pathSegment, multipart);
     }
 
     @Override

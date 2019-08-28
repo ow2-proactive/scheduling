@@ -47,7 +47,6 @@ public class CredentialValidator implements Validator<String> {
                 throw new ValidationException("Expected value should exist in the third-party credentials.");
             }
         } catch (NotConnectedException | PermissionException e) {
-            e.printStackTrace(); //TODO
             throw new ValidationException("Exception during getting the third-party credentials.", e);
         }
         return parameterValue;
