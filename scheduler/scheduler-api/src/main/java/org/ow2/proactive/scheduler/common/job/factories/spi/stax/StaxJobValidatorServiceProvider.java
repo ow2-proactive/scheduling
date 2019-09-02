@@ -76,6 +76,12 @@ public class StaxJobValidatorServiceProvider implements JobValidatorService {
     }
 
     @Override
+    public TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException {
+        // validate any job
+        return job;
+    }
+
+    @Override
     public TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler) throws JobValidationException {
         // validate any job
         return job;

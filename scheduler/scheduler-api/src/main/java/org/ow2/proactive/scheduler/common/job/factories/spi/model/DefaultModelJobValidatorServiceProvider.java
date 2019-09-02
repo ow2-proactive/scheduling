@@ -52,6 +52,11 @@ public class DefaultModelJobValidatorServiceProvider implements JobValidatorServ
     }
 
     @Override
+    public TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException {
+        return validateJob(job, null);
+    }
+
+    @Override
     public TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler) throws JobValidationException {
 
         ModelValidatorContext context = new ModelValidatorContext(job, scheduler);

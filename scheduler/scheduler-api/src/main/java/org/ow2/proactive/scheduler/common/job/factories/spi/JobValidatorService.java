@@ -59,6 +59,18 @@ public interface JobValidatorService {
      * @return if the validator eventually made some modifications to the job, return a new version
      * @throws JobValidationException if the job is not valid
      */
+    TaskFlowJob validateJob(TaskFlowJob job) throws JobValidationException;
+
+    /**
+     * Validate a job object which may contain PA:CREDENTIAL variables, after the job has been parsed by the scheduler.
+     *
+     * Example of use: variable model validation.
+     *
+     * @param job job object to validate
+     * @param scheduler scheduler instance which can give the access to the third-party credentials
+     * @return if the validator eventually made some modifications to the job, return a new version
+     * @throws JobValidationException if the job is not valid
+     */
     TaskFlowJob validateJob(TaskFlowJob job, Scheduler scheduler) throws JobValidationException;
 
 }
