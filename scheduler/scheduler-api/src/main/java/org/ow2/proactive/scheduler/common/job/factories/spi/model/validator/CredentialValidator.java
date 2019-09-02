@@ -44,10 +44,10 @@ public class CredentialValidator implements Validator<String> {
     @Override
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
         if (context == null || context.getScheduler() == null) {
-            // Sometimes the workflow is submitted without scheduler instance (e.g., submitted from catalog).
+            // Sometimes the workflow is parsed and checked without scheduler instance (e.g., submitted from catalog).
             // In this case, we don't have the access of the third-party credentials, so the validity check is passed.
-            logger.warn(String.format("Can't check the validity of the variable value, because missing the access to the scheduler third-party credentials",
-                                      parameterValue));
+            logger.debug(String.format("Can't check the validity of the variable value, because missing the access to the scheduler third-party credentials",
+                                       parameterValue));
             return parameterValue;
         }
 
@@ -55,10 +55,12 @@ public class CredentialValidator implements Validator<String> {
         try {
             Set<String> credentialKeys = context.getScheduler().thirdPartyCredentialsKeySet();
             if (!credentialKeys.contains(parameterValue)) {
-                throw new ValidationException("Expected value should exist in the third-party credentials.");
+                throw new ValidationException(String.format("Could not find the key named [%s] in the third-party credentials. Please add it into the scheduler third-party credentials or change the variable value to a valid key.",
+                                                            parameterValue));
             }
         } catch (NotConnectedException | PermissionException e) {
-            throw new ValidationException("Exception during getting the third-party credentials.", e);
+            throw new ValidationException("Could not read third party-credentials from the scheduler, make sure you are connected and you have permission rights to read third-party credentials.",
+                                          e);
         }
         return parameterValue;
     }
