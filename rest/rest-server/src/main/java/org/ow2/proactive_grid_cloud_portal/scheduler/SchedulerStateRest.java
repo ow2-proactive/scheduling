@@ -3304,7 +3304,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             throws NotConnectedRestException {
         File tmpFile = null;
         try {
-            Scheduler scheduler = checkAccess(sessionId);
+            Scheduler scheduler = null;
+            if (sessionId != null) {
+                scheduler = checkAccess(sessionId);
+            }
             Map<String, List<InputPart>> formDataMap = multipart.getFormDataMap();
             String name = formDataMap.keySet().iterator().next();
             InputPart part1 = formDataMap.get(name).get(0);
