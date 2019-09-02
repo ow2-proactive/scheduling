@@ -1999,17 +1999,23 @@ public interface SchedulerRestInterface {
             UnknownTaskRestException, PermissionRestException;
 
     /**
-     * Validates a job.
-     * 
+     * Validates a job
+     *
+     * @param sessionId
+     *            user session id used to connect to scheduler
+     * @param pathSegment
+     *            variables of the workflow
      * @param multipart
      *            a HTTP multipart form which contains the job-descriptor
      * @return the result of job validation
+     * @throws NotConnectedRestException
      */
     @POST
     @Path("{path:validate}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces("application/json")
-    JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart);
+    JobValidationData validate(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
+            MultipartFormDataInput multipart) throws NotConnectedRestException;
 
     /**
      * Validates a workflow taken from a given URL

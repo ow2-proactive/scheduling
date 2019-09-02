@@ -455,7 +455,8 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
         final String jobContent = getJobContent(currentJobId);
         final Job job = JobFactory.getFactory().createJob(IOUtils.toInputStream(jobContent, Charset.forName("UTF-8")),
                                                           jobVariables,
-                                                          jobGenericInfos);
+                                                          jobGenericInfos,
+                                                          this);
         return submit(job);
     }
 
