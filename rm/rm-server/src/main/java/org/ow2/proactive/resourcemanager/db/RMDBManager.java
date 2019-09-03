@@ -814,4 +814,14 @@ public class RMDBManager {
         return rmdbManagerBuffer;
     }
 
+    public List<NodeHistory> getNodesHistory(long windowStart, long windowEnd) {
+        return executeReadTransaction(session -> {
+            Query query = session.createQuery("FROM NodeHistory " +
+                    "WHERE (:windowStart <= startTime AND startTime <= :windowEnd) " +
+                    "OR (:windowStart <= endTime AND endTime <= :windowEnd)");
+            query.setParameter("windowStart", windowStart);
+            query.setParameter("windowEnd", windowEnd);
+            return query.list();
+        });
+    }
 }

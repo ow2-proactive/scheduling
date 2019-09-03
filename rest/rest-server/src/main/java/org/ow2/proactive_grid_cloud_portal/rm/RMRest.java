@@ -79,6 +79,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
@@ -931,6 +932,12 @@ public class RMRest implements RMRestInterface {
             return exception.getMessage();
         }
         return threadDump;
+    }
+
+    @Override
+    public List<RMNodeHistory> getNodesHistory(String sessionId, long windowStart, long windowEnd) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+        return rm.getNodesHistory(windowStart, windowEnd);
     }
 
     private Object[] getAllInfrastructureParameters(String infrastructureType, String[] infrastructureParameters,
