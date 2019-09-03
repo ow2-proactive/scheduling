@@ -1951,12 +1951,26 @@ public interface SchedulerRestInterface {
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
             LogForwardingRestException, IOException;
 
+    /**
+     * number of available bytes in the stream or -1 if the stream does not
+     * exist.
+     *
+     * @param sessionId a valid session id
+     * @param jobId     the id of the job to retrieve
+     */
     @GET
     @Path("jobs/{jobid}/livelog/available")
     @Produces("application/json")
     int getLiveLogJobAvailable(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException;
 
+    /**
+     * remove the live log object.
+     *
+     * @param sessionId a valid session id
+     * @param jobId     the id of the job to retrieve
+     * @throws NotConnectedRestException
+     */
     @DELETE
     @Path("jobs/{jobid}/livelog")
     @Produces("application/json")
