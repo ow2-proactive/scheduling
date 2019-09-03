@@ -160,7 +160,8 @@ public interface RMRestInterface {
     @Path("monitoring")
     @Produces("application/json")
     RMStateDelta getRMStateDelta(@HeaderParam("sessionid") String sessionId,
-            @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException;
+            @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter)
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * Returns the full state of the RM, which does not include REMOVED node/nodesources
@@ -171,7 +172,8 @@ public interface RMRestInterface {
     @GZIP
     @Path("monitoring/full")
     @Produces("application/json")
-    RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+    RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * Returns true if the resource manager is operational.
@@ -228,7 +230,7 @@ public interface RMRestInterface {
     @Path("nodesource")
     @Produces("application/json")
     List<RMNodeSourceEvent> getExistingNodeSources(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException;
+            throws NotConnectedException, PermissionRestException;
 
     @POST
     @Path("nodesource")
@@ -263,7 +265,8 @@ public interface RMRestInterface {
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
-            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException;
+            @FormParam("policyFileParameters") String[] policyFileParameters)
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String, String, String[], String[],
@@ -279,7 +282,8 @@ public interface RMRestInterface {
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
-            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException;
+            @FormParam("policyFileParameters") String[] policyFileParameters)
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String,String, String[], String[],
@@ -334,7 +338,7 @@ public interface RMRestInterface {
     @Path("nodesource/deploy")
     @Produces("application/json")
     NSState deployNodeSource(@HeaderParam("sessionid") String sessionId,
-            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException;
+            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException, PermissionRestException;
 
     /**
      * Remove the nodes of the node source and keep the node source undeployed
@@ -348,7 +352,7 @@ public interface RMRestInterface {
     @Produces("application/json")
     NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt)
-            throws NotConnectedException;
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * Returns the ping frequency of a node source
@@ -361,7 +365,7 @@ public interface RMRestInterface {
     @Path("nodesource/pingfrequency")
     @Produces("application/json")
     int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
-            @FormParam("sourcename") String sourceName) throws NotConnectedException;
+            @FormParam("sourcename") String sourceName) throws NotConnectedException, PermissionRestException;
 
     /**
      * Release a node
@@ -374,7 +378,7 @@ public interface RMRestInterface {
     @Path("node/release")
     @Produces("application/json")
     boolean releaseNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String url)
-            throws NodeException, NotConnectedException;
+            throws NodeException, NotConnectedException, PermissionRestException;
 
     /**
      * Delete a node
@@ -388,7 +392,7 @@ public interface RMRestInterface {
     @Path("node/remove")
     @Produces("application/json")
     boolean removeNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String nodeUrl,
-            @FormParam("preempt") boolean preempt) throws NotConnectedException;
+            @FormParam("preempt") boolean preempt) throws NotConnectedException, PermissionRestException;
 
     /**
      * Delete a nodesource
@@ -403,7 +407,7 @@ public interface RMRestInterface {
     @Path("nodesource/remove")
     @Produces("application/json")
     boolean removeNodeSource(@HeaderParam("sessionid") String sessionId, @FormParam("name") String sourceName,
-            @FormParam("preempt") boolean preempt) throws NotConnectedException;
+            @FormParam("preempt") boolean preempt) throws NotConnectedException, PermissionRestException;
 
     /**
      * prevent other users from using a set of locked nodes
@@ -419,7 +423,7 @@ public interface RMRestInterface {
     @Path("node/lock")
     @Produces("application/json")
     boolean lockNodes(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurls") Set<String> nodeUrls)
-            throws NotConnectedException;
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * allow other users to use a set of previously locked nodes
@@ -435,7 +439,7 @@ public interface RMRestInterface {
     @Path("node/unlock")
     @Produces("application/json")
     boolean unlockNodes(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurls") Set<String> nodeUrls)
-            throws NotConnectedException;
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * Retrieves attributes of the specified mbean.
@@ -454,7 +458,7 @@ public interface RMRestInterface {
     Object getNodeMBeanInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectName, @QueryParam("attrs") List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            NotConnectedException, MalformedObjectNameException, NullPointerException;
+            NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException;
 
     /**
      * Return the statistic history contained in the node RRD database,
@@ -544,7 +548,7 @@ public interface RMRestInterface {
     Object getNodeMBeansInfo(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectNames, @QueryParam("attrs") List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            NotConnectedException, MalformedObjectNameException, NullPointerException;
+            NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException;
 
     @GET
     @GZIP
@@ -552,9 +556,9 @@ public interface RMRestInterface {
     @Path("node/mbeans/history")
     Object getNodeMBeansHistory(@HeaderParam("sessionid") String sessionId, @QueryParam("nodejmxurl") String nodeJmxUrl,
             @QueryParam("objectname") String objectNames, @QueryParam("attrs") List<String> attrs,
-            @QueryParam("range") String range)
-            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException;
+            @QueryParam("range") String range) throws InstanceNotFoundException, IntrospectionException,
+            ReflectionException, IOException, NotConnectedException, MalformedObjectNameException, NullPointerException,
+            MBeanException, PermissionRestException;
 
     /**
      * Initiate the shutdowns the resource manager. During the shutdown resource
@@ -570,12 +574,14 @@ public interface RMRestInterface {
     @Path("shutdown")
     @Produces("application/json")
     boolean shutdown(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("preempt") @DefaultValue("false") boolean preempt) throws NotConnectedException;
+            @QueryParam("preempt") @DefaultValue("false") boolean preempt)
+            throws NotConnectedException, PermissionRestException;
 
     @GET
     @Path("topology")
     @Produces("application/json")
-    Topology getTopology(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+    Topology getTopology(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * Returns the list of supported node source infrastructures descriptors.
@@ -601,7 +607,7 @@ public interface RMRestInterface {
     @Path("infrastructures/mapping")
     @Produces("application/json")
     Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException;
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * Returns the list of supported node source policies descriptors.
@@ -615,14 +621,14 @@ public interface RMRestInterface {
     @Path("policies")
     @Produces("application/json")
     Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException;
+            throws NotConnectedException, PermissionRestException;
 
     @GET
     @GZIP
     @Path("nodesource/configuration")
     @Produces("application/json")
     NodeSourceConfiguration getNodeSourceConfiguration(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("nodeSourceName") String nodeSourceName) throws NotConnectedException;
+            @QueryParam("nodeSourceName") String nodeSourceName) throws NotConnectedException, PermissionRestException;
 
     /**
      * Returns the attributes <code>attr</code> of the mbean
@@ -643,7 +649,7 @@ public interface RMRestInterface {
     @Produces("application/json")
     Object getMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
             @QueryParam("attr") List<String> attrs) throws InstanceNotFoundException, IntrospectionException,
-            ReflectionException, IOException, NotConnectedException;
+            ReflectionException, IOException, NotConnectedException, PermissionRestException;
 
     /**
      * Set a single JMX attribute of the MBean <code>name</code>.

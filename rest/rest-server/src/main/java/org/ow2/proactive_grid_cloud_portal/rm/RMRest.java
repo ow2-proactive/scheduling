@@ -234,10 +234,11 @@ public class RMRest implements RMRestInterface {
     @Path("monitoring")
     @Produces("application/json")
     public RMStateDelta getRMStateDelta(@HeaderParam("sessionid") String sessionId,
-            @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter) throws NotConnectedException {
+            @HeaderParam("clientCounter") @DefaultValue("-1") String clientCounter)
+            throws NotConnectedException, PermissionRestException {
         checkAccess(sessionId);
         long counter = Integer.valueOf(clientCounter);
-        return RMStateCaching.getRMStateDelta(counter);
+        return orThrowRPE(RMStateCaching.getRMStateDelta(counter));
     }
 
     @Override
@@ -245,9 +246,10 @@ public class RMRest implements RMRestInterface {
     @GZIP
     @Path("monitoring/full")
     @Produces("application/json")
-    public RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+    public RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException, PermissionRestException {
         checkAccess(sessionId);
-        return RMStateCaching.getRMStateFull();
+        return orThrowRPE(RMStateCaching.getRMStateFull());
     }
 
     @Override
@@ -289,9 +291,9 @@ public class RMRest implements RMRestInterface {
     @Path("nodesource")
     @Produces("application/json")
     public List<RMNodeSourceEvent> getExistingNodeSources(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException {
+            throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.getExistingNodeSourcesList();
+        return orThrowRPE(rm.getExistingNodeSourcesList());
     }
 
     @Override
@@ -380,7 +382,8 @@ public class RMRest implements RMRestInterface {
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
-            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException {
+            @FormParam("policyFileParameters") String[] policyFileParameters)
+            throws NotConnectedException, PermissionRestException {
 
         ResourceManager rm = checkAccess(sessionId);
         NSState nsState = new NSState();
@@ -419,16 +422,17 @@ public class RMRest implements RMRestInterface {
             @FormParam("infrastructureParameters") String[] infrastructureParameters,
             @FormParam("infrastructureFileParameters") String[] infrastructureFileParameters,
             @FormParam("policyType") String policyType, @FormParam("policyParameters") String[] policyParameters,
-            @FormParam("policyFileParameters") String[] policyFileParameters) throws NotConnectedException {
-        return createNodeSource(sessionId,
-                                nodeSourceName,
-                                infrastructureType,
-                                infrastructureParameters,
-                                infrastructureFileParameters,
-                                policyType,
-                                policyParameters,
-                                policyFileParameters,
-                                Boolean.TRUE.toString());
+            @FormParam("policyFileParameters") String[] policyFileParameters)
+            throws NotConnectedException, PermissionRestException {
+        return orThrowRPE(createNodeSource(sessionId,
+                                           nodeSourceName,
+                                           infrastructureType,
+                                           infrastructureParameters,
+                                           infrastructureFileParameters,
+                                           policyType,
+                                           policyParameters,
+                                           policyFileParameters,
+                                           Boolean.TRUE.toString()));
     }
 
     @Deprecated
@@ -489,7 +493,7 @@ public class RMRest implements RMRestInterface {
     @Path("nodesource/deploy")
     @Produces("application/json")
     public NSState deployNodeSource(@HeaderParam("sessionid") String sessionId,
-            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException {
+            @FormParam("nodeSourceName") String nodeSourceName) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
         NSState nsState = new NSState();
         try {
@@ -508,7 +512,7 @@ public class RMRest implements RMRestInterface {
     @Produces("application/json")
     public NSState undeployNodeSource(@HeaderParam("sessionid") String sessionId,
             @FormParam("nodeSourceName") String nodeSourceName, @FormParam("preempt") boolean preempt)
-            throws NotConnectedException {
+            throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
         NSState nsState = new NSState();
         try {
@@ -526,9 +530,9 @@ public class RMRest implements RMRestInterface {
     @Path("nodesource/pingfrequency")
     @Produces("application/json")
     public int getNodeSourcePingFrequency(@HeaderParam("sessionid") String sessionId,
-            @FormParam("sourcename") String sourceName) throws NotConnectedException {
+            @FormParam("sourcename") String sourceName) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.getNodeSourcePingFrequency(sourceName).getIntValue();
+        return orThrowRPE(rm.getNodeSourcePingFrequency(sourceName).getIntValue());
     }
 
     @Override
@@ -536,11 +540,11 @@ public class RMRest implements RMRestInterface {
     @Path("node/release")
     @Produces("application/json")
     public boolean releaseNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String url)
-            throws NodeException, NotConnectedException {
+            throws NodeException, NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
         Node n;
         n = NodeFactory.getNode(url);
-        return rm.releaseNode(n).getBooleanValue();
+        return orThrowRPE(rm.releaseNode(n).getBooleanValue());
     }
 
     @Override
@@ -548,9 +552,9 @@ public class RMRest implements RMRestInterface {
     @Path("node/remove")
     @Produces("application/json")
     public boolean removeNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String nodeUrl,
-            @FormParam("preempt") boolean preempt) throws NotConnectedException {
+            @FormParam("preempt") boolean preempt) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.removeNode(nodeUrl, preempt).getBooleanValue();
+        return orThrowRPE(rm.removeNode(nodeUrl, preempt).getBooleanValue());
     }
 
     @Override
@@ -558,9 +562,9 @@ public class RMRest implements RMRestInterface {
     @Path("nodesource/remove")
     @Produces("application/json")
     public boolean removeNodeSource(@HeaderParam("sessionid") String sessionId, @FormParam("name") String sourceName,
-            @FormParam("preempt") boolean preempt) throws NotConnectedException {
+            @FormParam("preempt") boolean preempt) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.removeNodeSource(sourceName, preempt).getBooleanValue();
+        return orThrowRPE(rm.removeNodeSource(sourceName, preempt).getBooleanValue());
     }
 
     @Override
@@ -568,9 +572,9 @@ public class RMRest implements RMRestInterface {
     @Path("node/lock")
     @Produces("application/json")
     public boolean lockNodes(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurls") Set<String> nodeUrls)
-            throws NotConnectedException {
+            throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.lockNodes(nodeUrls).getBooleanValue();
+        return orThrowRPE(rm.lockNodes(nodeUrls).getBooleanValue());
     }
 
     @Override
@@ -578,9 +582,9 @@ public class RMRest implements RMRestInterface {
     @Path("node/unlock")
     @Produces("application/json")
     public boolean unlockNodes(@HeaderParam("sessionid") String sessionId, @FormParam("nodeurls") Set<String> nodeUrls)
-            throws NotConnectedException {
+            throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.unlockNodes(nodeUrls).getBooleanValue();
+        return orThrowRPE(rm.unlockNodes(nodeUrls).getBooleanValue());
     }
 
     @Override
@@ -592,11 +596,11 @@ public class RMRest implements RMRestInterface {
             @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectName,
             @QueryParam("attrs") List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            NotConnectedException, MalformedObjectNameException, NullPointerException {
+            NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException {
 
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
-        return rmProxy.getNodeMBeanInfo(nodeJmxUrl, objectName, attrs);
+        return orThrowRPE(rmProxy.getNodeMBeanInfo(nodeJmxUrl, objectName, attrs));
     }
 
     @Override
@@ -642,11 +646,11 @@ public class RMRest implements RMRestInterface {
             @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectNames,
             @QueryParam("attrs") List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            NotConnectedException, MalformedObjectNameException, NullPointerException {
+            NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException {
 
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
-        return rmProxy.getNodeMBeansInfo(nodeJmxUrl, objectNames, attrs);
+        return orThrowRPE(rmProxy.getNodeMBeansInfo(nodeJmxUrl, objectNames, attrs));
     }
 
     @Override
@@ -658,11 +662,12 @@ public class RMRest implements RMRestInterface {
             @QueryParam("nodejmxurl") String nodeJmxUrl, @QueryParam("objectname") String objectNames,
             @QueryParam("attrs") List<String> attrs, @QueryParam("range") String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
-            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
+            NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException,
+            PermissionRestException {
 
         // checking that still connected to the RM
         RMProxyUserInterface rmProxy = checkAccess(sessionId);
-        return rmProxy.getNodeMBeansHistory(nodeJmxUrl, objectNames, attrs, range);
+        return orThrowRPE(rmProxy.getNodeMBeansHistory(nodeJmxUrl, objectNames, attrs, range));
     }
 
     @Override
@@ -670,18 +675,20 @@ public class RMRest implements RMRestInterface {
     @Path("shutdown")
     @Produces("application/json")
     public boolean shutdown(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("preempt") @DefaultValue("false") boolean preempt) throws NotConnectedException {
+            @QueryParam("preempt") @DefaultValue("false") boolean preempt)
+            throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.shutdown(preempt).getBooleanValue();
+        return orThrowRPE(rm.shutdown(preempt)).getBooleanValue();
     }
 
     @Override
     @GET
     @Path("topology")
     @Produces("application/json")
-    public Topology getTopology(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+    public Topology getTopology(@HeaderParam("sessionid") String sessionId)
+            throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return PAFuture.getFutureValue(rm.getTopology());
+        return orThrowRPE(PAFuture.getFutureValue(rm.getTopology()));
     }
 
     @Override
@@ -692,33 +699,25 @@ public class RMRest implements RMRestInterface {
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
             @HeaderParam("sessionid") String sessionId) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        Collection<PluginDescriptor> result;
-        try {
-            result = rm.getSupportedNodeSourceInfrastructures();
-            PAFuture.getFutureValue(result);
-        } catch (SecurityException e) {
-            throw new PermissionRestException(e);
-        }
-        return result;
+        return orThrowRPE(rm.getSupportedNodeSourceInfrastructures());
     }
 
     @Override
     public Map<String, List<String>> getInfrasToPoliciesMapping(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException {
+            throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
 
-        Collection<PluginDescriptor> supportedInfrastructures = rm.getSupportedNodeSourceInfrastructures();
+        Collection<PluginDescriptor> supportedInfrastructures = orThrowRPE(rm.getSupportedNodeSourceInfrastructures());
 
-        Collection<PluginDescriptor> supportedPolicies = rm.getSupportedNodeSourcePolicies();
+        Collection<PluginDescriptor> supportedPolicies = orThrowRPE(rm.getSupportedNodeSourcePolicies());
 
-        Map<String, List<String>> result = rm.getInfrasToPoliciesMapping().entrySet().stream().filter(entry -> {
-            for (PluginDescriptor supportedInfrastructure : supportedInfrastructures) {
-                if (supportedInfrastructure.getPluginName().equals(entry.getKey())) {
-                    return true;
-                }
-            }
-            return false;
-        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, List<String>> result = orThrowRPE(rm.getInfrasToPoliciesMapping()).entrySet()
+                                                                                      .stream()
+                                                                                      .filter(entry -> supportedInfrastructures.stream()
+                                                                                                                               .anyMatch(infra -> infra.getPluginName()
+                                                                                                                                                       .equals(entry.getKey())))
+                                                                                      .collect(Collectors.toMap(Map.Entry::getKey,
+                                                                                                                Map.Entry::getValue));
 
         return result.entrySet().stream().map(entry -> {
             List<String> policies = entry.getValue()
@@ -730,24 +729,15 @@ public class RMRest implements RMRestInterface {
         }).collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
-    private boolean containsPlugin(String pluginName, Collection<PluginDescriptor> plugins) {
-        for (PluginDescriptor supportedPolicy : plugins) {
-            if (supportedPolicy.getPluginName().equals(pluginName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     @GET
     @GZIP
     @Path("policies")
     @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException {
+            throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.getSupportedNodeSourcePolicies();
+        return orThrowRPE(rm.getSupportedNodeSourcePolicies());
     }
 
     @Override
@@ -756,9 +746,9 @@ public class RMRest implements RMRestInterface {
     @Path("nodesource/configuration")
     @Produces("application/json")
     public NodeSourceConfiguration getNodeSourceConfiguration(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("nodeSourceName") String nodeSourceName) throws NotConnectedException {
+            @QueryParam("nodeSourceName") String nodeSourceName) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.getNodeSourceConfiguration(nodeSourceName);
+        return orThrowRPE(rm.getNodeSourceConfiguration(nodeSourceName));
     }
 
     @Override
@@ -768,16 +758,16 @@ public class RMRest implements RMRestInterface {
     @Produces("application/json")
     public Object getMBeanInfo(@HeaderParam("sessionid") String sessionId, @PathParam("name") ObjectName name,
             @QueryParam("attr") List<String> attrs) throws InstanceNotFoundException, IntrospectionException,
-            ReflectionException, IOException, NotConnectedException {
+            ReflectionException, IOException, NotConnectedException, PermissionRestException {
         RMProxyUserInterface rm = checkAccess(sessionId);
 
         if ((attrs == null) || (attrs.size() == 0)) {
             // no attribute is requested, we return
             // the description of the mbean
-            return rm.getMBeanInfo(name);
+            return orThrowRPE(rm.getMBeanInfo(name));
 
         } else {
-            return rm.getMBeanAttributes(name, attrs.toArray(new String[attrs.size()]));
+            return orThrowRPE(rm.getMBeanAttributes(name, attrs.toArray(new String[attrs.size()])));
         }
     }
 
@@ -829,8 +819,9 @@ public class RMRest implements RMRestInterface {
     @GET
     @Path("version")
     public String getVersion() {
-        return "{ " + "\"rm\" : \"" + RMRest.class.getPackage().getSpecificationVersion() + "\", " + "\"rest\" : \"" +
-               RMRest.class.getPackage().getImplementationVersion() + "\"" + "}";
+        return String.format("{ \"rm\" : \"%s\", \"rest\" : \"%s\"}",
+                             RMRest.class.getPackage().getSpecificationVersion(),
+                             RMRest.class.getPackage().getImplementationVersion());
     }
 
     @Override
@@ -844,10 +835,10 @@ public class RMRest implements RMRestInterface {
 
         RMProxyUserInterface rm = checkAccess(sessionId);
 
-        List<ScriptResult<Object>> results = rm.executeScript(script,
-                                                              scriptEngine,
-                                                              TargetType.NODE_URL.name(),
-                                                              Collections.singleton(nodeUrl));
+        List<ScriptResult<Object>> results = orThrowRPE(rm.executeScript(script,
+                                                                         scriptEngine,
+                                                                         TargetType.NODE_URL.name(),
+                                                                         Collections.singleton(nodeUrl)));
         checkEmptyScriptResults(results);
 
         return results.get(0);
@@ -863,10 +854,10 @@ public class RMRest implements RMRestInterface {
             @FormParam("scriptEngine") String scriptEngine) throws Throwable {
         RMProxyUserInterface rm = checkAccess(sessionId);
 
-        List<ScriptResult<Object>> results = rm.executeScript(script,
-                                                              scriptEngine,
-                                                              TargetType.NODESOURCE_NAME.name(),
-                                                              Collections.singleton(nodeSource));
+        List<ScriptResult<Object>> results = orThrowRPE(rm.executeScript(script,
+                                                                         scriptEngine,
+                                                                         TargetType.NODESOURCE_NAME.name(),
+                                                                         Collections.singleton(nodeSource)));
 
         List<ScriptResult<Object>> awaitedResults = results.stream()
                                                            .map(PAFuture::getFutureValue)
@@ -888,10 +879,10 @@ public class RMRest implements RMRestInterface {
 
         RMProxyUserInterface rm = checkAccess(sessionId);
 
-        List<ScriptResult<Object>> results = rm.executeScript(script,
-                                                              scriptEngine,
-                                                              TargetType.HOSTNAME.name(),
-                                                              Collections.singleton(hostname));
+        List<ScriptResult<Object>> results = orThrowRPE(rm.executeScript(script,
+                                                                         scriptEngine,
+                                                                         TargetType.HOSTNAME.name(),
+                                                                         Collections.singleton(hostname)));
         checkEmptyScriptResults(results);
 
         return results.get(0);
@@ -918,7 +909,7 @@ public class RMRest implements RMRestInterface {
         RMProxyUserInterface rm = checkAccess(sessionId);
         String threadDump;
         try {
-            threadDump = rm.getRMThreadDump().getStringValue();
+            threadDump = orThrowRPE(rm.getRMThreadDump().getStringValue());
         } catch (Exception exception) {
             return exception.getMessage();
         }
@@ -935,7 +926,7 @@ public class RMRest implements RMRestInterface {
         RMProxyUserInterface rm = checkAccess(sessionId);
         String threadDump;
         try {
-            threadDump = rm.getNodeThreadDump(nodeUrl).getStringValue();
+            threadDump = orThrowRPE(rm.getNodeThreadDump(nodeUrl).getStringValue());
         } catch (Exception exception) {
             return exception.getMessage();
         }
@@ -1106,4 +1097,23 @@ public class RMRest implements RMRestInterface {
         }
         return mapper.readValue(jsonString, Map.class);
     }
+
+    private boolean containsPlugin(String pluginName, Collection<PluginDescriptor> plugins) {
+        for (PluginDescriptor supportedPolicy : plugins) {
+            if (supportedPolicy.getPluginName().equals(pluginName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private <T> T orThrowRPE(T future) throws PermissionRestException {
+        try {
+            PAFuture.getFutureValue(future);
+            return future;
+        } catch (SecurityException e) {
+            throw new PermissionRestException(e);
+        }
+    }
+
 }
