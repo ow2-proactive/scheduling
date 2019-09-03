@@ -770,6 +770,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("nodes/history")
     @Produces("application/json")
-    List<RMNodeHistory> getNodesHistory(@HeaderParam("sessionid") String sessionId, @HeaderParam("windowStart") long windowStart,
-                           @HeaderParam("windowEnd") long windowEnd) throws NotConnectedException;
+    List<RMNodeHistory> getNodesHistory(@HeaderParam("sessionid") String sessionId,
+            @HeaderParam("windowStart") long windowStart, @HeaderParam("windowEnd") long windowEnd)
+            throws NotConnectedException;
 }

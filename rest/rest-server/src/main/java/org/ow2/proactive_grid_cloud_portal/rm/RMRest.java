@@ -935,7 +935,8 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public List<RMNodeHistory> getNodesHistory(String sessionId, long windowStart, long windowEnd) throws NotConnectedException {
+    public List<RMNodeHistory> getNodesHistory(String sessionId, long windowStart, long windowEnd)
+            throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
         return rm.getNodesHistory(windowStart, windowEnd);
     }
