@@ -719,12 +719,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * {@inheritDoc}
      */
     @Override
-    @GET
-    @Path("jobs/{jobid}/xml")
-    @Produces("application/xml")
-    public String getJobContent(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
-            SubmissionClosedRestException, JobCreationRestException {
+    public String getJobContent(String sessionId, String jobId) throws NotConnectedRestException,
+            UnknownJobRestException, PermissionRestException, SubmissionClosedRestException, JobCreationRestException {
         try {
             Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/xml");
             return scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
@@ -741,41 +737,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Returns a list of taskState
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the job id
-     * @return a list of task' states of the job <code>jobId</code>
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/taskstates")
-    @Produces("application/json")
-    public RestPage<TaskStateData> getJobTaskStates(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId)
+    public RestPage<TaskStateData> getJobTaskStates(String sessionId, String jobId)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         return getJobTaskStatesPaginated(sessionId, jobId, 0, TASKS_PAGE_SIZE);
     }
 
-    /**
-     * Returns a list of taskState with pagination
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the job id
-     * @param offset    the index of the first TaskState to return
-     * @param limit     the index (non inclusive) of the last TaskState to return
-     * @return a list of task' states of the job <code>jobId</code>
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/taskstates/paginated")
-    @Produces("application/json")
-    public RestPage<TaskStateData> getJobTaskStatesPaginated(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("-1") int limit)
+    public RestPage<TaskStateData> getJobTaskStatesPaginated(String sessionId, String jobId, int offset, int limit)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
@@ -813,22 +782,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Returns a list of taskState of the tasks filtered by a given tag.
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the job id
-     * @param taskTag   the tag used to filter the tasks
-     * @return a list of task' states of the job <code>jobId</code> filtered by
-     * a given tag.
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/taskstates/{tasktag}")
-    @Produces("application/json")
-    public RestPage<TaskStateData> getJobTaskStatesByTag(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
+    public RestPage<TaskStateData> getJobTaskStatesByTag(String sessionId, String jobId, String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/taskstates/" + taskTag);
@@ -849,14 +804,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * {@inheritDoc}
      */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/taskstates/{tasktag}/paginated")
-    @Produces("application/json")
-    public RestPage<TaskStateData> getJobTaskStatesByTagPaginated(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag,
-            @QueryParam("offset") @DefaultValue("0") int offset, @QueryParam("limit") @DefaultValue("-1") int limit)
-            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+    public RestPage<TaskStateData> getJobTaskStatesByTagPaginated(String sessionId, String jobId, String taskTag,
+            int offset, int limit) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
         try {
@@ -875,10 +824,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @QueryParam("offset") @DefaultValue("0") int offset,
-            @QueryParam("limit") @DefaultValue("50") int limit, @PathParam("tasktag") String taskTag,
-            @PathParam("statusFilter") String statusFilter)
+    public RestPage<TaskStateData> getJobTaskStatesByTagByStatusPaginated(String sessionId, String jobId, int offset,
+            int limit, String taskTag, String statusFilter)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         if (limit == -1)
             limit = TASKS_PAGE_SIZE;
@@ -898,13 +845,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/log/full")
-    @Produces("application/json")
-    public InputStream jobFullLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @QueryParam("sessionid") String session) throws NotConnectedRestException, UnknownJobRestException,
-            UnknownTaskRestException, PermissionRestException, IOException {
+    public InputStream jobFullLogs(String sessionId, String jobId, String session)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
 
         if (sessionId == null) {
             sessionId = session;
@@ -918,7 +860,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskState> tasks = jobState.getTasks();
             List<InputStream> streams = new ArrayList<>(tasks.size());
 
-            Collections.sort(tasks, TaskState.COMPARE_BY_FINISHED_TIME_ASC);
+            tasks.sort(TaskState.COMPARE_BY_FINISHED_TIME_ASC);
 
             for (TaskState taskState : tasks) {
 
@@ -968,23 +910,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                         new TaskLoggerRelativePathGenerator(taskId).getRelativePath());
     }
 
-    /**
-     * Return the task state of the task <code>taskname</code> of the job
-     * <code>jobId</code>
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskname  the name of the task
-     * @return the task state of the task <code>taskname</code> of the job
-     * <code>jobId</code>
-     */
     @Override
-    @GET
-    @Path("jobs/{jobid}/tasks/{taskname}")
-    @Produces("application/json")
-    public TaskStateData jobTask(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
-            PermissionRestException, UnknownTaskRestException {
+    public TaskStateData jobTask(String sessionId, String jobId, String taskname) throws NotConnectedRestException,
+            UnknownJobRestException, PermissionRestException, UnknownTaskRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname);
 
@@ -1006,51 +934,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Returns the value of the task result of task <code>taskName</code> of the
-     * job <code>jobId</code> <strong>the result is deserialized before sending
-     * to the client, if the class is not found the content is replaced by the
-     * string 'Unknown value type' </strong>. To get the serialized form of a
-     * given result, one has to call the following restful service
-     * jobs/{jobid}/tasks/{taskname}/result/serializedvalue
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskname  the name of the task
-     * @return the value of the task result
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/result/value")
-    @Produces("*/*")
-    public Serializable valueOfTaskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws Throwable {
+    public Serializable valueOfTaskResult(String sessionId, String jobId, String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
         TaskResult taskResult = s.getTaskResult(jobId, taskname);
         return getTaskResultValueAsStringOrExceptionStackTrace(taskResult);
     }
 
-    /**
-     * Returns the value of the task result for a set of tasks of the job
-     * <code>jobId</code> filtered by a given tag. <strong>the result is
-     * deserialized before sending to the client, if the class is not found the
-     * content is replaced by the string 'Unknown value type' </strong>. To get
-     * the serialized form of a given result, one has to call the following
-     * restful service jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskTag   the tag used to filter the tasks.
-     * @return the value of the task result
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/value")
-    @Produces("application/json")
-    public Map<String, String> valueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
+    public Map<String, String> valueOfTaskResultByTag(String sessionId, String jobId, String taskTag) throws Throwable {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/value");
         List<TaskResult> taskResults = s.getTaskResultsByTag(jobId, taskTag);
         Map<String, String> result = new HashMap<>(taskResults.size());
@@ -1085,48 +977,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return value;
     }
 
-    /**
-     * Returns the metadata of the task result of task <code>taskName</code> of the
-     * job <code>jobId</code>.
-     * <p>
-     * Metadata is a map containing additional information associated with a result. For example a file name if the result represents a file.
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskname  the name of the task
-     * @return the metadata of the task result
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/result/metadata")
-    @Produces("*/*")
-    public Map<String, String> metadataOfTaskResult(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
+    public Map<String, String> metadataOfTaskResult(String sessionId, String jobId, String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/value");
         TaskResult taskResult = s.getTaskResult(jobId, taskname);
         taskResult = PAFuture.getFutureValue(taskResult);
         return taskResult.getMetadata();
     }
 
-    /**
-     * Returns the metadata of the task result of task <code>taskName</code> of the
-     * job <code>jobId</code>filtered by a given tag.
-     * <p>
-     * Metadata is a map containing additional information associated with a result. For example a file name if the result represents a file.
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskTag   the tag used to filter the tasks.
-     * @return a map containing for each task entry, the metadata of the task result
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/metadata")
-    @Produces("application/json")
-    public Map<String, Map<String, String>> metadataOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
+    public Map<String, Map<String, String>> metadataOfTaskResultByTag(String sessionId, String jobId, String taskTag)
+            throws Throwable {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
         List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
         Map<String, Map<String, String>> result = new HashMap<>(trs.size());
@@ -1156,11 +1017,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    // request:  http://localhost:8080/rest/scheduler/jobs/result/precious/metadata?jobsid=102&jobsid=152&jobsid=162
-    // response: {"102":["Groovy_Task"],"152":["Groovy_Task","Task3"]}
     @Override
-    public Map<Long, List<String>> getPreciousTaskNames(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("jobsid") List<String> jobsId) throws NotConnectedRestException, PermissionRestException {
+    public Map<Long, List<String>> getPreciousTaskNames(String sessionId, List<String> jobsId)
+            throws NotConnectedRestException, PermissionRestException {
         Map<Long, List<String>> result = new HashMap<>();
         try {
             Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
@@ -1172,47 +1031,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Returns the value of the task result of the task <code>taskName</code> of
-     * the job <code>jobId</code> This method returns the result as a byte array
-     * whatever the result is.
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskname  the name of the task
-     * @return the value of the task result as a byte array.
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/result/serializedvalue")
-    @Produces("*/*")
-    public byte[] serializedValueOfTaskResult(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("taskname") String taskname) throws Throwable {
+    public byte[] serializedValueOfTaskResult(String sessionId, String jobId, String taskname) throws Throwable {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/serializedvalue");
         TaskResult tr = s.getTaskResult(jobId, taskname);
         tr = PAFuture.getFutureValue(tr);
         return tr.getSerializedValue();
     }
 
-    /**
-     * Returns the values of a set of tasks of the job <code>jobId</code>
-     * filtered by a given tag. This method returns the result as a byte array
-     * whatever the result is.
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskTag   the tag used to filter the tasks.
-     * @return the values of the set of tasks result as a byte array, indexed by
-     * the readable name of the task.
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/serializedvalue")
-    @Produces("application/json")
-    public Map<String, byte[]> serializedValueOfTaskResultByTag(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag) throws Throwable {
+    public Map<String, byte[]> serializedValueOfTaskResultByTag(String sessionId, String jobId, String taskTag)
+            throws Throwable {
         Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag" + taskTag + "/result/serializedvalue");
         List<TaskResult> trs = s.getTaskResultsByTag(jobId, taskTag);
         Map<String, byte[]> result = new HashMap<>(trs.size());
@@ -1223,23 +1052,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return result;
     }
 
-    /**
-     * Returns the task result of the task <code>taskName</code> of the job
-     * <code>jobId</code>
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskname  the name of the task
-     * @return the task result of the task <code>taskName</code>
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/result")
-    @Produces("application/json")
-    public TaskResultData taskResult(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
-            UnknownTaskRestException, PermissionRestException {
+    public TaskResultData taskResult(String sessionId, String jobId, String taskname) throws NotConnectedRestException,
+            UnknownJobRestException, UnknownTaskRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result");
             TaskResult taskResult = s.getTaskResult(jobId, taskname);
@@ -1266,22 +1081,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return mapper.map(PAFuture.getFutureValue(taskResult), TaskResultData.class);
     }
 
-    /**
-     * Returns the task results of the set of task filtered by a given tag and
-     * owned by the job <code>jobId</code>
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskTag   the tag used to filter the tasks.
-     * @return the task results of the set of tasks filtered by the given tag.
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result")
-    @Produces("application/json")
-    public List<TaskResultData> taskResultByTag(@HeaderParam("sessionid") String sessionId,
-            @PathParam("jobid") String jobId, @PathParam("tasktag") String taskTag)
+    public List<TaskResultData> taskResultByTag(String sessionId, String jobId, String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskTag + "/result");
@@ -1303,13 +1104,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/result/log/all")
-    @Produces("application/json")
-    public String taskLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
-            UnknownTaskRestException, PermissionRestException {
+    public String taskLog(String sessionId, String jobId, String taskname) throws NotConnectedRestException,
+            UnknownJobRestException, UnknownTaskRestException, PermissionRestException {
         try {
             return retrieveTaskLogsUsingDatabase(sessionId, jobId, taskname);
         } catch (PermissionException e) {
@@ -1325,7 +1121,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     private String retrieveTaskLogsUsingDatabase(String sessionId, String jobId, String taskName)
             throws NotConnectedRestException, UnknownJobException, UnknownTaskException, NotConnectedException,
-            PermissionException, PermissionRestException {
+            PermissionException {
         Scheduler scheduler = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskName + "/result/log/all");
         StringBuilder allLogs = new StringBuilder();
         List<TaskResult> resultList = scheduler.getTaskResultAllIncarnations(jobId, taskName);
@@ -1339,12 +1135,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/all")
-    @Produces("application/json")
-    public String taskLogByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("tasktag") String taskTag)
+    public String taskLogByTag(String sessionId, String jobId, String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/log/err");
@@ -1366,13 +1157,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/result/log/all")
-    @Produces("application/json")
-    public String jobLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
-            throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
-            PermissionRestException {
+    public String jobLogs(String sessionId, String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/result/log/all");
             JobResult jobResult = s.getJobResult(jobId);
@@ -1397,13 +1183,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/result/log/err")
-    @Produces("application/json")
-    public String taskLogErr(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
-            UnknownTaskRestException, PermissionRestException {
+    public String taskLogErr(String sessionId, String jobId, String taskname) throws NotConnectedRestException,
+            UnknownJobRestException, UnknownTaskRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/log/err");
             StringBuilder errLogs = new StringBuilder();
@@ -1427,12 +1208,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/err")
-    @Produces("application/json")
-    public String taskLogErrByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("tasktag") String taskTag)
+    public String taskLogErrByTag(String sessionId, String jobId, String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/log/err");
@@ -1454,13 +1230,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/result/log/out")
-    @Produces("application/json")
-    public String taskLogout(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
-            UnknownTaskRestException, PermissionRestException {
+    public String taskLogout(String sessionId, String jobId, String taskname) throws NotConnectedRestException,
+            UnknownJobRestException, UnknownTaskRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/result/log/out");
             StringBuilder outLogs = new StringBuilder();
@@ -1484,12 +1255,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/tag/{tasktag}/result/log/out")
-    @Produces("application/json")
-    public String taskLogoutByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("tasktag") String taskTag)
+    public String taskLogoutByTag(String sessionId, String jobId, String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/result/log/out");
@@ -1511,12 +1277,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/result/log/full")
-    @Produces("application/json")
-    public InputStream taskFullLogs(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname, @QueryParam("sessionid") String session)
+    public InputStream taskFullLogs(String sessionId, String jobId, String taskname, String session)
             throws NotConnectedRestException, UnknownJobRestException, UnknownTaskRestException,
             PermissionRestException, IOException {
         try {
@@ -1560,22 +1321,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Returns task server logs
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskname  the name of the task
-     * @return task traces from the scheduler and resource manager
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/{taskname}/log/server")
-    @Produces("application/json")
-    public String taskServerLog(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
-            UnknownTaskRestException, PermissionRestException {
+    public String taskServerLog(String sessionId, String jobId, String taskname) throws NotConnectedRestException,
+            UnknownJobRestException, UnknownTaskRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/log/server");
             return s.getTaskServerLogs(jobId, taskname);
@@ -1590,21 +1338,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Returns server logs for a set of tasks filtered by a given tag.
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @param taskTag   the tag used to filter the tasks in the job.
-     * @return task traces from the scheduler and resource manager
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("jobs/{jobid}/tasks/tag/{tasktag}/log/server")
-    @Produces("application/json")
-    public String taskServerLogByTag(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId,
-            @PathParam("tasktag") String taskTag)
+    public String taskServerLogByTag(String sessionId, String jobId, String taskTag)
             throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/log/server");
@@ -1663,20 +1398,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return checkAccess(sessionId, "");
     }
 
-    /**
-     * Pauses the job represented by jobid
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @return true if success, false if not
-     */
     @Override
-    @PUT
-    @Path("jobs/{jobid}/pause")
-    @Produces("application/json")
-    public boolean pauseJob(@HeaderParam("sessionid")
-    final String sessionId, @PathParam("jobid")
-    final String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+    public boolean pauseJob(String sessionId, String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             final Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/pause");
             return s.pauseJob(jobId);
@@ -1689,20 +1413,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Restart all tasks in error in the job represented by jobid
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @return true if success, false if not
-     */
     @Override
-    @PUT
-    @Path("jobs/{jobid}/restartAllInErrorTasks")
-    @Produces("application/json")
-    public boolean restartAllInErrorTasks(@HeaderParam("sessionid")
-    final String sessionId, @PathParam("jobid")
-    final String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+    public boolean restartAllInErrorTasks(String sessionId, String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/restartAllInErrorTasks");
             return s.restartAllInErrorTasks(jobId);
@@ -1715,20 +1428,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Resumes the job represented by jobid
-     *
-     * @param sessionId a valid session id
-     * @param jobId     the id of the job
-     * @return true if success, false if not
-     */
     @Override
-    @PUT
-    @Path("jobs/{jobid}/resume")
-    @Produces("application/json")
-    public boolean resumeJob(@HeaderParam("sessionid")
-    final String sessionId, @PathParam("jobid")
-    final String jobId) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+    public boolean resumeJob(String sessionId, String jobId)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/resume");
             return s.resumeJob(jobId);
@@ -1741,30 +1443,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Submit job using flat command file
-     *
-     * @param sessionId                valid session id
-     * @param commandFileContent       content of a command file: endline separated native commands
-     * @param jobName                  name of the job to create
-     * @param selectionScriptContent   content of a selection script, or null
-     * @param selectionScriptExtension extension of the selectionscript to determine script engine
-     *                                 ("js", "py", "rb")
-     * @return Id of the submitted job
-     * @throws NotConnectedRestException
-     * @throws IOException
-     * @throws JobCreationRestException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
-     */
     @Override
-    @POST
-    @Path("submitflat")
-    @Produces("application/json")
-    public JobIdData submitFlat(@HeaderParam("sessionid") String sessionId,
-            @FormParam("commandFileContent") String commandFileContent, @FormParam("jobName") String jobName,
-            @FormParam("selectionScriptContent") String selectionScriptContent,
-            @FormParam("selectionScriptExtension") String selectionScriptExtension) throws NotConnectedRestException,
+    public JobIdData submitFlat(String sessionId, String commandFileContent, String jobName,
+            String selectionScriptContent, String selectionScriptExtension) throws NotConnectedRestException,
             IOException, JobCreationRestException, PermissionRestException, SubmissionClosedRestException {
         Scheduler s = checkAccess(sessionId, "submitflat");
 
@@ -1824,28 +1505,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /**
-     * Submits a workflow to the scheduler from a workflow URL, creating hence a
-     * new job resource.
-     *
-     * @param sessionId    a valid session id
-     * @param url          url to the workflow content
-     * @param pathSegment  variables of the workflow
-     * @param contextInfos the context informations (generic parameters,..)
-     * @return the <code>jobid</code> of the newly created job
-     * @throws NotConnectedRestException
-     * @throws IOException
-     * @throws JobCreationRestException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
-     */
     @Override
-    @POST
-    @Path("{path:jobs}")
-    @Produces("application/json")
-    public JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
-            @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos) throws JobCreationRestException,
-            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
+    public JobIdData submitFromUrl(String sessionId, String url, PathSegment pathSegment, UriInfo contextInfos)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
         Scheduler s = checkAccess(sessionId, "jobs");
 
         File tmpWorkflowFile = null;
@@ -1876,30 +1539,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Submits a job to the scheduler
-     *
-     * @param sessionId
-     *            a valid session id
-     * @param pathSegment
-     *            variables of the workflow
-     * @param multipart
-     *            the form data containing : - fileName the name of the file
-     *            that will be created on the DataSpace - fileContent the
-     *            content of the file
-     * @param contextInfos
-     *            the context informations (generic parameters,..)
-     * @return the <code>jobid</code> of the newly created job
-     * @throws IOException if the job was not correctly uploaded/stored
-     */
     @Override
-    @POST
-    @Path("{path:submit}")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
-            MultipartFormDataInput multipart, @Context UriInfo contextInfos) throws JobCreationRestException,
-            NotConnectedRestException, PermissionRestException, SubmissionClosedRestException, IOException {
+    public JobIdData submit(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart,
+            UriInfo contextInfos) throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
         try {
             Scheduler scheduler = checkAccess(sessionId, "submit");
 
@@ -1972,15 +1615,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return filePath;
     }
 
-    @Consumes(MediaType.APPLICATION_JSON)
-    @POST
-    @Path("{path:plannings}")
-    @Produces("application/json")
     @Override
-    public String submitPlannings(@HeaderParam("sessionid") String sessionId,
-            @PathParam("path") PathSegment pathSegment, Map<String, String> jobContentXmlString)
-            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
-            SubmissionClosedRestException, IOException {
+    public String submitPlannings(String sessionId, PathSegment pathSegment, Map<String, String> jobContentXmlString)
+            throws JobCreationRestException, NotConnectedRestException, IOException {
 
         checkAccess(sessionId, "plannings");
 
@@ -2057,23 +1694,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return mapper.map(newJobId, JobIdData.class);
     }
 
-    /**
-     * Pushes a file from the local file system into the given DataSpace
-     *
-     * @param sessionId a valid session id
-     * @param spaceName the name of the DataSpace
-     * @param filePath  the path inside the DataSpace where to put the file e.g.
-     *                  "/myfolder"
-     * @param multipart the form data containing : - fileName the name of the file
-     *                  that will be created on the DataSpace - fileContent the
-     *                  content of the file
-     * @return true if the transfer succeeded
-     * @see org.ow2.proactive.scheduler.common.SchedulerConstants for spaces
-     * names
-     **/
     @Override
-    public boolean pushFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,
-            @PathParam("filePath") String filePath, MultipartFormDataInput multipart)
+    public boolean pushFile(String sessionId, String spaceName, String filePath, MultipartFormDataInput multipart)
             throws IOException, NotConnectedRestException, PermissionRestException {
         try {
             checkAccess(sessionId, "pushFile");
@@ -2128,22 +1750,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Either Pulls a file from the given DataSpace to the local file system or
-     * list the content of a directory if the path refers to a directory In the
-     * case the path to a file is given, the content of this file will be
-     * returns as an input stream In the case the path to a directory is given,
-     * the input stream returned will be a text stream containing at each line
-     * the content of the directory
-     *
-     * @param sessionId a valid session id
-     * @param spaceName the name of the data space involved (GLOBAL or USER)
-     * @param filePath  the path to the file or directory whose content must be
-     *                  received
-     **/
     @Override
-    public InputStream pullFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,
-            @PathParam("filePath") String filePath)
+    public InputStream pullFile(String sessionId, String spaceName, String filePath)
             throws IOException, NotConnectedRestException, PermissionRestException {
 
         checkAccess(sessionId, "pullFile");
@@ -2184,16 +1792,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
-    /**
-     * Deletes a file or recursively delete a directory from the given DataSpace
-     *
-     * @param sessionId a valid session id
-     * @param spaceName the name of the data space involved (GLOBAL or USER)
-     * @param filePath  the path to the file or directory which must be deleted
-     **/
     @Override
-    public boolean deleteFile(@HeaderParam("sessionid") String sessionId, @PathParam("spaceName") String spaceName,
-            @PathParam("filePath") String filePath)
+    public boolean deleteFile(String sessionId, String spaceName, String filePath)
             throws IOException, NotConnectedRestException, PermissionRestException {
         checkAccess(sessionId, "deleteFile");
 
@@ -2225,19 +1825,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return true;
     }
 
-    /**
-     * terminates the session id <code>sessionId</code>
-     *
-     * @param sessionId a valid session id
-     * @throws NotConnectedRestException if the scheduler cannot be contacted
-     * @throws PermissionRestException   if you are not authorized to perform the action
-     */
     @Override
-    @PUT
-    @Path("disconnect")
-    @Produces("application/json")
-    public void disconnect(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public void disconnect(String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             final Scheduler s = checkAccess(sessionId, "disconnect");
             logger.info("disconnection user " + sessionStore.get(sessionId) + " to session " + sessionId);
@@ -2252,20 +1841,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * pauses the scheduler
-     *
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @PUT
-    @Path("pause")
-    @Produces("application/json")
-    public boolean pauseScheduler(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public boolean pauseScheduler(String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "pause");
             return s.pause();
@@ -2276,20 +1853,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * stops the scheduler
-     *
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @PUT
-    @Path("stop")
-    @Produces("application/json")
-    public boolean stopScheduler(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public boolean stopScheduler(String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "stop");
             return s.stop();
@@ -2300,20 +1865,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * resumes the scheduler
-     *
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @PUT
-    @Path("resume")
-    @Produces("application/json")
-    public boolean resumeScheduler(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public boolean resumeScheduler(String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "resume");
             return s.resume();
@@ -2324,24 +1877,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * changes the priority of a job
-     *
-     * @param sessionId    a valid session id
-     * @param jobId        the job id
-     * @param priorityName a string representing the name of the priority
-     * @throws NotConnectedRestException
-     * @throws UnknownJobRestException
-     * @throws PermissionRestException
-     * @throws JobAlreadyFinishedRestException
-     */
     @Override
-    @PUT
-    @Path("jobs/{jobid}/priority/byname/{name}")
-    public void schedulerChangeJobPriorityByName(@HeaderParam("sessionid")
-    final String sessionId, @PathParam("jobid")
-    final String jobId, @PathParam("name") String priorityName) throws NotConnectedRestException,
-            UnknownJobRestException, PermissionRestException, JobAlreadyFinishedRestException {
+    public void schedulerChangeJobPriorityByName(String sessionId, String jobId, String priorityName)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException,
+            JobAlreadyFinishedRestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byname/" + priorityName);
             s.changeJobPriority(jobId, JobPriority.findPriority(priorityName));
@@ -2356,24 +1895,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * changes the priority of a job
-     *
-     * @param sessionId     a valid session id
-     * @param jobId         the job id
-     * @param priorityValue a string representing the value of the priority
-     * @throws NumberFormatException
-     * @throws NotConnectedRestException
-     * @throws UnknownJobRestException
-     * @throws PermissionRestException
-     * @throws JobAlreadyFinishedRestException
-     */
     @Override
-    @PUT
-    @Path("jobs/{jobid}/priority/byvalue/{value}")
-    public void schedulerChangeJobPriorityByValue(@HeaderParam("sessionid")
-    final String sessionId, @PathParam("jobid")
-    final String jobId, @PathParam("value") String priorityValue)
+    public void schedulerChangeJobPriorityByValue(String sessionId, String jobId, String priorityValue)
             throws NumberFormatException, NotConnectedRestException, UnknownJobRestException, PermissionRestException,
             JobAlreadyFinishedRestException {
         try {
@@ -2390,20 +1913,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * freezes the scheduler
-     *
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @PUT
-    @Path("freeze")
-    @Produces("application/json")
-    public boolean freezeScheduler(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public boolean freezeScheduler(String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "freeze");
             return s.freeze();
@@ -2414,20 +1925,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * returns the status of the scheduler
-     *
-     * @param sessionId a valid session id
-     * @return the scheduler status
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @GET
-    @Path("status")
-    @Produces("application/json")
-    public SchedulerStatusData getSchedulerStatus(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public SchedulerStatusData getSchedulerStatus(String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "status");
             return SchedulerStatusData.valueOf(SchedulerStateListener.getInstance().getSchedulerStatus(s).name());
@@ -2438,20 +1938,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * starts the scheduler
-     *
-     * @param sessionId a valid session id
-     * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @PUT
-    @Path("start")
-    @Produces("application/json")
-    public boolean startScheduler(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public boolean startScheduler(String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "start");
             return s.start();
@@ -2462,20 +1950,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * kills and shutdowns the scheduler
-     *
-     * @param sessionId a valid session id
-     * @return true if success, false if not
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @PUT
-    @Path("kill")
-    @Produces("application/json")
-    public boolean killScheduler(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public boolean killScheduler(String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "kill");
             return s.kill();
@@ -2486,21 +1962,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * shutdown the scheduler
-     *
-     * @param sessionId
-     *            a valid session id
-     * @return true if success, false if not
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @PUT
-    @Path("shutdown")
-    @Produces("application/json")
-    public boolean shutdownScheduler(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public boolean shutdownScheduler(String sessionId) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "shutdown");
             return s.shutdown();
@@ -2511,23 +1974,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Reconnect a new Resource Manager to the scheduler. Can be used if the
-     * resource manager has crashed.
-     *
-     * @param sessionId a valid session id
-     * @param rmURL     the url of the resource manager
-     * @return true if success, false otherwise.
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @POST
-    @Path("linkrm")
-    @Produces("application/json")
-    public boolean linkRm(@HeaderParam("sessionid")
-    final String sessionId, @FormParam("rmurl") String rmURL)
-            throws NotConnectedRestException, PermissionRestException {
+    public boolean linkRm(String sessionId, String rmURL) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "linkrm");
             return s.linkResourceManager(rmURL);
@@ -2538,39 +1986,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Tests whether or not the user is connected to the ProActive Scheduler
-     *
-     * @param sessionId the session to test
-     * @return true if the user connected to a Scheduler, false otherwise.
-     * @throws NotConnectedRestException
-     */
     @Override
-    @GET
-    @Path("isconnected")
-    @Produces("application/json")
-    public boolean isConnected(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException {
+    public boolean isConnected(String sessionId) throws NotConnectedRestException {
         Scheduler s = checkAccess(sessionId, "isconnected");
         return s.isConnected();
     }
 
-    /**
-     * Login to the scheduler using a form containing 2 fields (username and
-     * password).
-     *
-     * @param username username
-     * @param password password
-     * @return the session id associated to the login.
-     * @throws LoginException
-     */
     @Override
-    @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Path("login")
-    @Produces("application/json")
-    public String login(@FormParam("username") String username, @FormParam("password") String password)
-            throws LoginException, SchedulerRestException {
+    public String login(String username, String password) throws LoginException, SchedulerRestException {
         try {
             if ((username == null) || (password == null)) {
                 throw new LoginException("Empty login/password");
@@ -2589,12 +2012,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * {@inheritDoc}
      */
     @Override
-    @PUT
-    @Path("session")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("application/json")
-    public String loginOrRenewSession(@HeaderParam("sessionid") String sessionId,
-            @FormParam("username") String username, @FormParam("password") String password)
+    public String loginOrRenewSession(String sessionId, String username, String password)
             throws SchedulerRestException, LoginException, NotConnectedRestException {
         if (sessionId == null || !sessionStore.exists(sessionId)) {
             return login(username, password);
@@ -2608,11 +2026,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * {@inheritDoc}
      */
     @Override
-    @PUT
-    @Path("session")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces("application/json")
-    public String loginOrRenewSession(@HeaderParam("sessionid") String sessionId, @MultipartForm LoginForm multipart)
+    public String loginOrRenewSession(String sessionId, LoginForm multipart)
             throws KeyException, SchedulerRestException, LoginException, NotConnectedRestException {
         if (sessionId == null || !sessionStore.exists(sessionId)) {
             return loginWithCredential(multipart);
@@ -2626,10 +2040,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * {@inheritDoc}
      */
     @Override
-    @GET
-    @Path("logins/sessionid/{sessionId}")
-    @Produces("application/json")
-    public String getLoginFromSessionId(@PathParam("sessionId") String sessionId) {
+    public String getLoginFromSessionId(String sessionId) {
         if (sessionId != null && sessionStore.exists(sessionId)) {
             try {
                 renewSession(sessionId);
@@ -2647,9 +2058,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
      * {@inheritDoc}
      */
     @Override
-    @GET
-    @Path("logins/sessionid/{sessionId}/userdata")
-    @Produces("application/json")
     public UserData getUserDataFromSessionId(@PathParam("sessionId") String sessionId) {
         if (sessionId != null && sessionStore.exists(sessionId)) {
             try {
@@ -2665,23 +2073,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return null;
     }
 
-    /**
-     * Login to the scheduler using a multipart form can be used either by
-     * submitting 2 fields ({@code username} and {@code password}) or by sending
-     * a credential file with field name {@code credential}.
-     *
-     * @return the session id associated to this new connection.
-     * @throws KeyException
-     * @throws LoginException
-     * @throws SchedulerRestException
-     */
     @Override
-    @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Path("login")
-    @Produces("application/json")
-    public String loginWithCredential(@MultipartForm LoginForm multipart)
-            throws LoginException, KeyException, SchedulerRestException {
+    public String loginWithCredential(LoginForm multipart) throws LoginException, KeyException, SchedulerRestException {
         try {
             Session session;
             if (multipart.getCredential() != null) {
@@ -2713,29 +2106,15 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * returns statistics about the scheduler
-     *
-     * @param sessionId the session id associated to this new connection
-     * @return a string containing the statistics
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @GET
-    @Path("stats")
-    @Produces("application/json")
-    public Map<String, String> getStatistics(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public Map<String, String> getStatistics(String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
         SchedulerProxyUserInterface s = checkAccess(sessionId, "stats");
         return s.getMappedInfo("ProActiveScheduler:name=RuntimeData");
     }
 
     @Override
-    @GET
-    @Path("stathistory")
-    @Produces("application/json")
-    public String getStatHistory(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException {
+    public String getStatHistory(String sessionId) throws NotConnectedRestException {
         SchedulerProxyUserInterface s = checkAccess(sessionId, "stats");
         return s.getStatHistory("ProActiveScheduler:name=RuntimeData",
                                 "dddd", // all for ranges for the days
@@ -2743,39 +2122,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                "StalledJobsCount", "InErrorJobsCount" });
     }
 
-    /**
-     * returns a string containing some data regarding the user's account
-     *
-     * @param sessionId the session id associated to this new connection
-     * @return a string containing some data regarding the user's account
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @GET
-    @Path("stats/myaccount")
-    @Produces("application/json")
-    public Map<String, String> getStatisticsOnMyAccount(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public Map<String, String> getStatisticsOnMyAccount(String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
         SchedulerProxyUserInterface s = checkAccess(sessionId, "stats/myaccount");
         return s.getMappedInfo("ProActiveScheduler:name=MyAccount");
     }
 
-    /**
-     * Users currently connected to the scheduler
-     *
-     * @param sessionId the session id associated to this new connection\
-     * @return list of users
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("users")
-    @Produces("application/json")
-    public List<SchedulerUserData> getUsers(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public List<SchedulerUserData> getUsers(String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "users");
             return map(s.getUsers(), SchedulerUserData.class);
@@ -2786,21 +2142,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    /**
-     * Users having jobs in the scheduler
-     *
-     * @param sessionId the session id associated to this new connection\
-     * @return list of users
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @GET
-    @GZIP
-    @Path("userswithjobs")
-    @Produces("application/json")
-    public List<SchedulerUserData> getUsersWithJobs(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public List<SchedulerUserData> getUsersWithJobs(String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler s = checkAccess(sessionId, "userswithjobs");
             return map(s.getUsersWithJobs(), SchedulerUserData.class);
@@ -2823,24 +2167,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     @GET
     @Path("version")
     public String getVersion() {
-        return "{ " + "\"scheduler\" : \"" + SchedulerStateRest.class.getPackage().getSpecificationVersion() + "\", " +
-               "\"rest\" : \"" + SchedulerStateRest.class.getPackage().getImplementationVersion() + "\"" + "}";
+        return String.format("{ \"scheduler\" : \"%s\", \"rest\" : \"%s\"}",
+                             SchedulerStateRest.class.getPackage().getSpecificationVersion(),
+                             SchedulerStateRest.class.getPackage().getImplementationVersion());
     }
 
-    /**
-     * generates a credential file from user provided credentials
-     *
-     * @return the credential file generated by the scheduler
-     * @throws LoginException
-     * @throws SchedulerRestException
-     */
     @Override
-    @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Path("createcredential")
-    @Produces("*/*")
-    public byte[] getCreateCredential(@MultipartForm LoginForm multipart)
-            throws LoginException, SchedulerRestException {
+    public byte[] getCreateCredential(LoginForm multipart) throws LoginException, SchedulerRestException {
 
         String username = multipart.getUsername();
         String password = multipart.getPassword();
@@ -2862,14 +2195,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @GET
-    @Path("usage/myaccount")
-    @Produces("application/json")
     @Override
-    public List<JobUsageData> getUsageOnMyAccount(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("startdate") @DateFormatter.DateFormat() Date startDate,
-            @QueryParam("enddate") @DateFormatter.DateFormat() Date endDate)
-            throws NotConnectedRestException, PermissionRestException {
+    public List<JobUsageData> getUsageOnMyAccount(String sessionId, @DateFormatter.DateFormat() Date startDate,
+            @DateFormatter.DateFormat() Date endDate) throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getMyAccountUsage(startDate, endDate), JobUsageData.class);
@@ -2880,13 +2208,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @GET
-    @Path("usage/account")
-    @Produces("application/json")
     @Override
-    public List<JobUsageData> getUsageOnAccount(@HeaderParam("sessionid") String sessionId,
-            @QueryParam("user") String user, @QueryParam("startdate") @DateFormatter.DateFormat() Date startDate,
-            @QueryParam("enddate") @DateFormatter.DateFormat() Date endDate)
+    public List<JobUsageData> getUsageOnAccount(String sessionId, String user,
+            @DateFormatter.DateFormat() Date startDate, @DateFormatter.DateFormat() Date endDate)
             throws NotConnectedRestException, PermissionRestException {
         try {
             Scheduler scheduler = checkAccess(sessionId);
@@ -2898,12 +2222,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @GET
-    @Path("/userspace")
-    @Produces("application/json")
     @Override
-    public List<String> userspaceURIs(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedRestException, PermissionRestException {
+    public List<String> userspaceURIs(String sessionId) throws NotConnectedRestException, PermissionRestException {
         SchedulerProxyUserInterface proxy = checkAccess(sessionId);
         try {
             return proxy.getUserSpaceURIs();
@@ -2914,12 +2234,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @GET
-    @Path("/globalspace")
-    @Produces("application/json")
     @Override
-    public List<String> globalspaceURIs(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedRestException, PermissionRestException {
+    public List<String> globalspaceURIs(String sessionId) throws NotConnectedRestException, PermissionRestException {
         SchedulerProxyUserInterface proxy = checkAccess(sessionId);
         try {
             return proxy.getGlobalSpaceURIs();
@@ -3282,25 +2598,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         return filteredSorts;
     }
 
-    /**
-     * Change the START_AT generic information at job level and reset the
-     * scheduledAt at task level
-     *
-     * @param sessionId current session
-     * @param jobId     id of the job that needs to be updated
-     * @param startAt   its value should be ISO 8601 compliant
-     * @throws NotConnectedRestException
-     * @throws UnknownJobRestException
-     * @throws PermissionRestException
-     */
     @Override
-    @PUT
-    @Path("jobs/{jobid}/startat/{startAt}")
-    @Produces("application/json")
-    public boolean changeStartAt(@HeaderParam("sessionid")
-    final String sessionId, @PathParam("jobid")
-    final String jobId, @PathParam("startAt")
-    final String startAt) throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
+    public boolean changeStartAt(String sessionId, String jobId, String startAt)
+            throws NotConnectedRestException, UnknownJobRestException, PermissionRestException {
         try {
             final Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/startat/" + startAt);
             return s.changeStartAt(JobIdImpl.makeJobId(jobId), startAt);
@@ -3313,11 +2613,8 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @GET
     @Override
-    @Path("configuration/portal")
-    @Produces("application/json")
-    public Map<Object, Object> getPortalConfiguration(@HeaderParam("sessionid") String sessionId)
+    public Map<Object, Object> getPortalConfiguration(String sessionId)
             throws NotConnectedRestException, PermissionRestException {
         try {
             final Scheduler s = checkAccess(sessionId, "GET configuration/portal");
@@ -3329,12 +2626,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
-    @GET
     @Override
-    @Path("properties")
-    @Produces("application/json")
-    public Map<String, Object> getSchedulerPropertiesFromSessionId(@HeaderParam("sessionid")
-    final String sessionId) throws NotConnectedRestException, PermissionRestException {
+    public Map<String, Object> getSchedulerPropertiesFromSessionId(String sessionId)
+            throws NotConnectedRestException, PermissionRestException {
         SchedulerProxyUserInterface scheduler = checkAccess(sessionId, "properties");
         Map<String, Object> schedulerProperties;
         try {

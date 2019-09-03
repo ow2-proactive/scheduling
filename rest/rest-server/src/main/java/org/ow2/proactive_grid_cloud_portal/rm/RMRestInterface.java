@@ -401,7 +401,6 @@ public interface RMRestInterface {
      * @param sourceName a node source
      * @param preempt if true remove node source immediatly whithout waiting for nodes to be freed
      * @return true if the node is removed successfully, false or exception otherwise
-     * @throws NotConnectedException
      */
     @POST
     @Path("nodesource/remove")
@@ -417,7 +416,6 @@ public interface RMRestInterface {
      * @param nodeUrls
      *            set of node urls to lock
      * @return true when all nodes were free and have been locked
-     * @throws NotConnectedException
      */
     @POST
     @Path("node/lock")
@@ -433,7 +431,6 @@ public interface RMRestInterface {
      * @param nodeUrls
      *            set of node urls to unlock
      * @return true when all nodes were locked and have been unlocked
-     * @throws NotConnectedException
      */
     @POST
     @Path("node/unlock")
@@ -483,7 +480,6 @@ public interface RMRestInterface {
      *            <li>'M' 1 month
      *            <li>'y' 1 year</ul>
      * @return a JSON object containing a key for each source
-     * @throws NotConnectedException
      */
     @GET
     @GZIP
@@ -519,7 +515,6 @@ public interface RMRestInterface {
      *            <li>'y' 1 year</ul>
      * @return a Map where each entry containse mbean server url as key and a map of statistic values as value. Each entry has an mbean attribute as key and
      * list of its mbean values as value.
-     * @throws NotConnectedException
      */
     @GET
     @GZIP
@@ -568,7 +563,6 @@ public interface RMRestInterface {
      * @param sessionId a valid session
      * @param preempt if true shutdown immediatly whithout waiting for nodes to be freed, default value is false
      * @return true if the shutdown process is successfully triggered, runtime exception otherwise
-     * @throws NotConnectedException
      */
     @GET
     @Path("shutdown")
@@ -588,7 +582,6 @@ public interface RMRestInterface {
      *
      * @param sessionId a valid session
      * @return the list of supported node source infrastructures descriptors
-     * @throws NotConnectedException
      */
     @GET
     @GZIP
@@ -614,7 +607,6 @@ public interface RMRestInterface {
      *
      * @param sessionId a valid session
      * @return the list of supported node source policies descriptors
-     * @throws NotConnectedException
      */
     @GET
     @GZIP
@@ -637,11 +629,6 @@ public interface RMRestInterface {
      * @param name mbean's object name
      * @param attrs attributes to enumerate
      * @return returns the attributes of the mbean
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws NotConnectedException
      */
     @GET
     @GZIP
@@ -660,15 +647,6 @@ public interface RMRestInterface {
      * @param type      the type of the attribute to set ('integer' and 'string' are currently supported, see <code>RMProxyUserInterface</code>)
      * @param attr      the name of the attribute to set
      * @param value     the new value of the attribute (defined as a String, it is automatically converted according to <code>type</code>)
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws NotConnectedException
-     * @throws MBeanException
-     * @throws AttributeNotFoundException
-     * @throws InvalidAttributeValueException
-     * @throws IllegalArgumentException
      */
     @POST
     @GZIP
@@ -712,14 +690,6 @@ public interface RMRestInterface {
      *            <li>'M' 1 month
      *            <li>'y' 1 year</ul>
      * @return a JSON object containing a key for each source
-     * @throws InstanceNotFoundException
-     * @throws IntrospectionException
-     * @throws ReflectionException
-     * @throws IOException
-     * @throws MalformedObjectNameException
-     * @throws NullPointerException
-     * @throws InterruptedException
-     * @throws NotConnectedException
      */
     @GET
     @GZIP
