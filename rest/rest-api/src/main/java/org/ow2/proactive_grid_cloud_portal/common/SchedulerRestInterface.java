@@ -1299,10 +1299,6 @@ public interface SchedulerRestInterface {
      *            extension of the selectionscript to determine script engine
      *            ("js", "py", "rb")
      * @return Id of the submitted job
-     * @throws NotConnectedRestException
-     * @throws IOException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
      */
     @POST
     @Path("submitflat")
@@ -1361,11 +1357,6 @@ public interface SchedulerRestInterface {
      * @param pathSegment path param going to be transferred to the variables
      * @param jobContentXmlString job content in xml string
      * @return true if the submission is done sucessfully, false otherwise
-     * @throws JobCreationRestException
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
-     * @throws IOException
      */
     @Consumes(MediaType.APPLICATION_JSON)
     @POST
@@ -1388,11 +1379,6 @@ public interface SchedulerRestInterface {
      * @param contextInfos
      *            the context informations (generic parameters,..)
      * @return the <code>jobid</code> of the newly created job
-     * @throws NotConnectedRestException
-     * @throws IOException
-     * @throws JobCreationRestException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
      */
     @POST
     @Path("jobs")
@@ -1487,8 +1473,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @PUT
     @Path("pause")
@@ -1502,8 +1486,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @PUT
     @Path("stop")
@@ -1517,8 +1499,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @PUT
     @Path("resume")
@@ -1535,10 +1515,6 @@ public interface SchedulerRestInterface {
      *            the job id
      * @param priorityName
      *            a string representing the name of the priority
-     * @throws NotConnectedRestException
-     * @throws org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException
-     * @throws PermissionRestException
-     * @throws org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException
      */
     @PUT
     @Path("jobs/{jobid}/priority/byname/{name}")
@@ -1556,11 +1532,6 @@ public interface SchedulerRestInterface {
      *            the job id
      * @param priorityValue
      *            a string representing the value of the priority
-     * @throws NumberFormatException
-     * @throws NotConnectedRestException
-     * @throws org.ow2.proactive_grid_cloud_portal.scheduler.exception.UnknownJobRestException
-     * @throws PermissionRestException
-     * @throws org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobAlreadyFinishedRestException
      */
     @PUT
     @Path("jobs/{jobid}/priority/byvalue/{value}")
@@ -1576,8 +1547,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @PUT
     @Path("freeze")
@@ -1591,8 +1560,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return the scheduler status
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @GET
     @Path("status")
@@ -1606,8 +1573,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return true if success, false otherwise
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @PUT
     @Path("start")
@@ -1621,8 +1586,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return true if success, false if not
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @PUT
     @Path("kill")
@@ -1636,8 +1599,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            a valid session id
      * @return true if success, false if not
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @PUT
     @Path("shutdown")
@@ -1654,8 +1615,6 @@ public interface SchedulerRestInterface {
      * @param rmURL
      *            the url of the resource manager
      * @return true if success, false otherwise.
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @POST
     @Path("linkrm")
@@ -1686,8 +1645,6 @@ public interface SchedulerRestInterface {
      * @param password
      *            password
      * @return the session id associated to the login
-     * @throws LoginException
-     * @throws SchedulerRestException
      */
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -1707,7 +1664,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            session id identifying a session to renew.
      * @return the new session id to use.
-     * @throws SchedulerRestException
      */
     @PUT
     @Path("session")
@@ -1730,7 +1686,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            session id identifying a session to renew.
      * @return the new session id to use.
-     * @throws SchedulerRestException
      */
     @PUT
     @Path("session")
@@ -1773,9 +1728,6 @@ public interface SchedulerRestInterface {
      * field name 'credential'
      * 
      * @return the session id associated to this new connection
-     * @throws KeyException
-     * @throws LoginException
-     * @throws SchedulerRestException
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -1790,8 +1742,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            the session id associated to this new connection
      * @return list of users
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @GET
     @GZIP
@@ -1818,8 +1768,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            the session id associated to this new connection
      * @return list of users
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @GET
     @GZIP
@@ -1859,8 +1807,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            the session id associated to this new connection
      * @return a string containing some data regarding the user's account
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @GET
     @Path("stats/myaccount")
@@ -1872,8 +1818,6 @@ public interface SchedulerRestInterface {
      * generates a credential file from user provided credentials
      * 
      * @return the credential file generated by the scheduler
-     * @throws SchedulerRestException
-     * @throws LoginException
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -1943,6 +1887,14 @@ public interface SchedulerRestInterface {
             @QueryParam("startdate") Date startDate, @QueryParam("enddate") Date endDate)
             throws NotConnectedRestException, PermissionRestException;
 
+    /**
+     * Stream the output of job identified by the id <code>jobid</code> only
+     * stream currently available logs, call this method several times to get
+     * the complete output.
+     *
+     * @param sessionId a valid session id
+     * @param jobId     the id of the job to retrieve
+     */
     @GET
     @GZIP
     @Path("jobs/{jobid}/livelog")
@@ -1969,7 +1921,6 @@ public interface SchedulerRestInterface {
      *
      * @param sessionId a valid session id
      * @param jobId     the id of the job to retrieve
-     * @throws NotConnectedRestException
      */
     @DELETE
     @Path("jobs/{jobid}/livelog")
@@ -1977,6 +1928,13 @@ public interface SchedulerRestInterface {
     boolean deleteLiveLogJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId)
             throws NotConnectedRestException;
 
+    /**
+     * Restart a task within a job
+     *
+     * @param sessionId current session
+     * @param jobid     id of the job containing the task to kill
+     * @param taskname  name of the task to kill
+     */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/restart")
     @Produces("application/json")
@@ -1984,6 +1942,13 @@ public interface SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException;
 
+    /**
+     * Finish a task, which is in InError state inside a job.
+     *
+     * @param sessionId current session
+     * @param jobid     id of the job containing the task to finish (only when InError state)
+     * @param taskname  name of the task to finish (only when InError state)
+     */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/finishInErrorTask")
     @Produces("application/json")
@@ -1991,6 +1956,13 @@ public interface SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException;
 
+    /**
+     * Restart a pause on error task within a job
+     *
+     * @param sessionId current session
+     * @param jobid     id of the job containing the task to kill
+     * @param taskname  name of the task to kill
+     */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/restartInErrorTask")
     @Produces("application/json")
@@ -1998,6 +1970,15 @@ public interface SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException;
 
+    /**
+     * Preempt a task within a job
+     * <p>
+     * The task will be stopped and restarted later
+     *
+     * @param sessionId current session
+     * @param jobid     id of the job containing the task to preempt
+     * @param taskname  name of the task to preempt
+     */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/preempt")
     @Produces("application/json")
@@ -2005,6 +1986,13 @@ public interface SchedulerRestInterface {
             @PathParam("taskname") String taskname) throws NotConnectedRestException, UnknownJobRestException,
             UnknownTaskRestException, PermissionRestException;
 
+    /**
+     * Kill a task within a job
+     *
+     * @param sessionId current session
+     * @param jobid     id of the job containing the task to kill
+     * @param taskname  name of the task to kill
+     */
     @PUT
     @Path("jobs/{jobid}/tasks/{taskname}/kill")
     @Produces("application/json")
@@ -2022,7 +2010,6 @@ public interface SchedulerRestInterface {
      * @param multipart
      *            a HTTP multipart form which contains the job-descriptor
      * @return the result of job validation
-     * @throws NotConnectedRestException
      */
     @POST
     @Path("{path:validate}")
@@ -2041,11 +2028,6 @@ public interface SchedulerRestInterface {
      * @param pathSegment
      *            variables of the workflow
      * @return the result of job validation
-     * @throws NotConnectedRestException
-     * @throws IOException
-     * @throws JobCreationRestException
-     * @throws PermissionRestException
-     * @throws SubmissionClosedRestException
      */
     @POST
     @Path("{path:validateurl}")
@@ -2081,9 +2063,6 @@ public interface SchedulerRestInterface {
      *            id of the job that needs to be updated
      * @param startAt
      *            its value should be ISO 8601 compliant
-     * @throws NotConnectedRestException
-     * @throws UnknownJobRestException
-     * @throws PermissionRestException
      */
     @PUT
     @Path("jobs/{jobid}/startat/{startAt}")
@@ -2095,10 +2074,6 @@ public interface SchedulerRestInterface {
 
     /**
      * Get portal configuration properties
-     * @param sessionId
-     * @return
-     * @throws NotConnectedRestException 
-     * @throws PermissionRestException 
      */
     @GET
     @Path("configuration/portal")
@@ -2112,8 +2087,6 @@ public interface SchedulerRestInterface {
      * @param sessionId
      *            the session id associated to this new connection
      * @return a map containing the properties
-     * @throws NotConnectedRestException
-     * @throws PermissionRestException
      */
     @GET
     @Path("properties")
@@ -2125,12 +2098,7 @@ public interface SchedulerRestInterface {
      * 
      * Check if the user has the permission to execute the method passed as argument
      * 
-     * @param sessionId
-     * @param jobId
-     * @param method
      * @return true if the user has the permission to execute the java method
-     * @throws NotConnectedRestException
-     * @throws UnknownJobRestException
      */
     @GET
     @Path("job/{jobid}/permission/{method}")
