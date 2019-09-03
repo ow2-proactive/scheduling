@@ -102,6 +102,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
 
 
@@ -689,9 +690,16 @@ public class RMRest implements RMRestInterface {
     @Path("infrastructures")
     @Produces("application/json")
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(
-            @HeaderParam("sessionid") String sessionId) throws NotConnectedException {
+            @HeaderParam("sessionid") String sessionId) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.getSupportedNodeSourceInfrastructures();
+        Collection<PluginDescriptor> result;
+        try {
+            result = rm.getSupportedNodeSourceInfrastructures();
+            PAFuture.getFutureValue(result);
+        } catch (SecurityException e) {
+            throw new PermissionRestException(e);
+        }
+        return result;
     }
 
     @Override
