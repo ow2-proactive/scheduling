@@ -816,12 +816,19 @@ public class RMDBManager {
 
     public List<NodeHistory> getNodesHistory(long windowStart, long windowEnd) {
         return executeReadTransaction(session -> {
-            Query query = session.createQuery("FROM NodeHistory " +
-                                              "WHERE (:windowStart <= startTime AND startTime <= :windowEnd) " +
-                                              "OR (:windowStart <= endTime AND endTime <= :windowEnd)");
+            //            this expression is built as negation to expression that
+            //            retrieves all items that we do not want to have in the response.
+            //            just to clarify the events we include
+            //            we discard only events :
+            //            - ending before the windows start
+            //            - starting after the window start
+            //            we include everything else
+            //            when an event as no endingtime the  value of the endingtime will be 0
+            Query query = session.createQuery("FROM NodeHistory " + "WHERE (endTime = 0 OR :windowStart <= endTime) " +
+                                              "AND ( startTime <= :windowEnd )");
             query.setParameter("windowStart", windowStart);
             query.setParameter("windowEnd", windowEnd);
-            return query.list();
+            return (List<NodeHistory>) query.list();
         });
     }
 }
