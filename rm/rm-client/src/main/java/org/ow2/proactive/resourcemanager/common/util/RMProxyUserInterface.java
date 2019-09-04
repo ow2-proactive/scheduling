@@ -51,6 +51,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -454,6 +455,11 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public Map<String, List<String>> getInfrasToPoliciesMapping() {
         return this.target.getInfrasToPoliciesMapping();
+    }
+
+    @Override
+    public List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd) {
+        return target.getNodesHistory(windowStart, windowEnd);
     }
 
     @Override

@@ -61,6 +61,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
@@ -765,4 +766,11 @@ public interface RMRestInterface {
     String getNodeThreadDump(@HeaderParam("sessionid") String sessionId, @QueryParam("nodeurl") String nodeUrl)
             throws NotConnectedException;
 
+    @GET
+    @GZIP
+    @Path("nodes/history")
+    @Produces("application/json")
+    Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(
+            @HeaderParam("sessionid") String sessionId, @HeaderParam("windowStart") long windowStart,
+            @HeaderParam("windowEnd") long windowEnd) throws NotConnectedException;
 }

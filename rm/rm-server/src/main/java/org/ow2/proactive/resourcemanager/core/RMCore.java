@@ -89,8 +89,10 @@ import org.ow2.proactive.resourcemanager.common.event.RMEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMInitialState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
+import org.ow2.proactive.resourcemanager.core.history.NodeHistory;
 import org.ow2.proactive.resourcemanager.core.history.UserHistory;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXHelper;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -3030,6 +3032,24 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             logger.error("Error when loading infrastructure definition file : " + fileName, e);
         }
         return mapping;
+    }
+
+    @Override
+    public List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd) {
+        List<NodeHistory> nodesHistory = dbManager.getNodesHistory(windowStart, windowEnd);
+
+        return nodesHistory.stream().map(nodeHistory -> {
+            RMNodeHistory rmNodeHistory = new RMNodeHistory();
+            rmNodeHistory.setEndTime(nodeHistory.getEndTime());
+            rmNodeHistory.setHost(nodeHistory.getHost());
+            rmNodeHistory.setNodeSource(nodeHistory.getNodeSource());
+            rmNodeHistory.setNodeState(nodeHistory.getNodeState());
+            rmNodeHistory.setNodeUrl(nodeHistory.getNodeUrl());
+            rmNodeHistory.setProviderName(nodeHistory.getProviderName());
+            rmNodeHistory.setUserName(nodeHistory.getUserName());
+            rmNodeHistory.setStartTime(nodeHistory.getStartTime());
+            return rmNodeHistory;
+        }).collect(Collectors.toList());
     }
 
     /**
