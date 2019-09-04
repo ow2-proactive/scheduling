@@ -935,10 +935,50 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public List<RMNodeHistory> getNodesHistory(String sessionId, long windowStart, long windowEnd)
-            throws NotConnectedException {
+    public Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(String sessionId,
+            long windowStart, long windowEnd) throws NotConnectedException {
         ResourceManager rm = checkAccess(sessionId);
-        return rm.getNodesHistory(windowStart, windowEnd);
+
+        List<RMNodeHistory> rawDataFromRM = rm.getNodesHistory(windowStart, windowEnd);
+
+        // grouped by node source name, host name, and node name
+        Map<String, Map<String, Map<String, List<RMNodeHistory>>>> grouped = rawDataFromRM.stream()
+                                                                                          .collect(Collectors.groupingBy(RMNodeHistory::getNodeSource,
+                                                                                                                         Collectors.groupingBy(RMNodeHistory::getHost,
+                                                                                                                                               Collectors.groupingBy(this::getNodeName))));
+        grouped.values().forEach(a -> a.values().forEach(b -> {
+            b.values().forEach(c -> {
+                c.forEach(nh -> {
+                    // if startTime before window
+                    if (nh.getStartTime() < windowStart) {
+                        nh.setStartTime(windowStart);
+                    }
+
+                    // if endTime after window
+                    if (windowEnd < nh.getEndTime()) {
+                        nh.setEndTime(windowEnd);
+                    }
+
+                    if (nh.getEndTime() == 0) {
+                        nh.setEndTime(windowEnd);
+                    }
+                });
+
+                // sorting by startTime
+                c.sort(Comparator.comparing(RMNodeHistory::getStartTime));
+            });
+        }));
+
+        return grouped;
+    }
+
+    private String getNodeName(RMNodeHistory rmNodeHistory) {
+        String nodeUrl = rmNodeHistory.getNodeUrl();
+        if (nodeUrl.contains("/")) {
+            return nodeUrl.substring(nodeUrl.lastIndexOf("/") + 1);
+        } else {
+            return nodeUrl;
+        }
     }
 
     private Object[] getAllInfrastructureParameters(String infrastructureType, String[] infrastructureParameters,

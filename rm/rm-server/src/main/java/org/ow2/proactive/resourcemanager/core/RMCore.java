@@ -3038,7 +3038,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public List<RMNodeHistory> getNodesHistory(long windowStart, long windowEnd) {
         List<NodeHistory> nodesHistory = dbManager.getNodesHistory(windowStart, windowEnd);
 
-        List<RMNodeHistory> collect = nodesHistory.stream().map(nodeHistory -> {
+        return nodesHistory.stream().map(nodeHistory -> {
             RMNodeHistory rmNodeHistory = new RMNodeHistory();
             rmNodeHistory.setEndTime(nodeHistory.getEndTime());
             rmNodeHistory.setHost(nodeHistory.getHost());
@@ -3050,7 +3050,6 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             rmNodeHistory.setStartTime(nodeHistory.getStartTime());
             return rmNodeHistory;
         }).collect(Collectors.toList());
-        return collect;
     }
 
     /**
