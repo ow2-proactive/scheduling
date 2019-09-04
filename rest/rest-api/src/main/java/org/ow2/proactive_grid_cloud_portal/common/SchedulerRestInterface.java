@@ -1351,7 +1351,7 @@ public interface SchedulerRestInterface {
      * @return the <code>jobid</code> of the newly created job
      */
     @POST
-    @Path("jobs")
+    @Path("{path:jobs}")
     @Produces("application/json")
     JobIdData submitFromUrl(@HeaderParam("sessionid") String sessionId, @HeaderParam("link") String url,
             @PathParam("path") PathSegment pathSegment, @Context UriInfo contextInfos) throws JobCreationRestException,
