@@ -39,6 +39,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.RestMapPage;
 import org.ow2.proactive_grid_cloud_portal.scheduler.dto.UserJobData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 
 
 public class ListJobCommand extends AbstractCommand implements Command {
@@ -85,7 +86,7 @@ public class ListJobCommand extends AbstractCommand implements Command {
     }
 
     private void printJobsList(int index, int offset, ApplicationContext currentContext)
-            throws PermissionRestException, NotConnectedRestException, IOException {
+            throws RestException, IOException {
         RestMapPage<Long, ArrayList<UserJobData>> page = currentContext.getRestClient()
                                                                        .getScheduler()
                                                                        .revisionAndJobsInfo(currentContext.getSessionId(),
