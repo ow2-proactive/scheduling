@@ -25,6 +25,16 @@
  */
 package org.ow2.proactive_grid_cloud_portal.scheduler.exception;
 
+import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
+import org.ow2.proactive.scheduler.common.exception.JobCreationException;
+import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
+import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
+import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
+import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
+
+
 public class RestException extends Exception {
     public RestException(String message) {
         super(message);
@@ -37,4 +47,43 @@ public class RestException extends Exception {
     public RestException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public static RestException wrapExceptionToRest(SchedulerException schedulerException) {
+        if (schedulerException instanceof NotConnectedException) {
+            return new NotConnectedRestException(schedulerException);
+        } else if (schedulerException instanceof PermissionException) {
+            return new PermissionRestException(schedulerException);
+        } else if (schedulerException instanceof UnknownJobException) {
+            return new UnknownJobRestException(schedulerException);
+        } else if (schedulerException instanceof JobAlreadyFinishedException) {
+            return new JobAlreadyFinishedRestException(schedulerException);
+        } else if (schedulerException instanceof SubmissionClosedException) {
+            return new SubmissionClosedRestException(schedulerException);
+        } else if (schedulerException instanceof JobCreationException) {
+            return new JobCreationRestException(schedulerException);
+        } else if (schedulerException instanceof UnknownTaskException) {
+            return new UnknownTaskRestException(schedulerException);
+        }
+        return new UnknownJobRestException(schedulerException);
+    }
+
+    public static SchedulerException unwrapRestException(RestException restException) {
+        if (restException instanceof NotConnectedRestException) {
+            return new NotConnectedException(restException);
+        } else if (restException instanceof PermissionRestException) {
+            return new PermissionException(restException);
+        } else if (restException instanceof UnknownJobRestException) {
+            return new UnknownJobException(restException);
+        } else if (restException instanceof JobAlreadyFinishedRestException) {
+            return new JobAlreadyFinishedException(restException);
+        } else if (restException instanceof SubmissionClosedRestException) {
+            return new SubmissionClosedException(restException);
+        } else if (restException instanceof JobCreationRestException) {
+            return new JobCreationException(restException);
+        } else if (restException instanceof UnknownTaskRestException) {
+            return new UnknownTaskException(restException);
+        }
+        return new UnknownJobException(restException);
+    }
+
 }
