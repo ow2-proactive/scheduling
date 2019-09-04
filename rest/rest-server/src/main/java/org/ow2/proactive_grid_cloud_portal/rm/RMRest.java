@@ -79,6 +79,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
@@ -931,6 +932,53 @@ public class RMRest implements RMRestInterface {
             return exception.getMessage();
         }
         return threadDump;
+    }
+
+    @Override
+    public Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(String sessionId,
+            long windowStart, long windowEnd) throws NotConnectedException {
+        ResourceManager rm = checkAccess(sessionId);
+
+        List<RMNodeHistory> rawDataFromRM = rm.getNodesHistory(windowStart, windowEnd);
+
+        // grouped by node source name, host name, and node name
+        Map<String, Map<String, Map<String, List<RMNodeHistory>>>> grouped = rawDataFromRM.stream()
+                                                                                          .collect(Collectors.groupingBy(RMNodeHistory::getNodeSource,
+                                                                                                                         Collectors.groupingBy(RMNodeHistory::getHost,
+                                                                                                                                               Collectors.groupingBy(this::getNodeName))));
+        grouped.values().forEach(a -> a.values().forEach(b -> {
+            b.values().forEach(c -> {
+                // sorting by startTime
+                c.sort(Comparator.comparing(RMNodeHistory::getStartTime));
+
+                c.forEach(nh -> {
+                    // if startTime before window
+                    if (nh.getStartTime() < windowStart) {
+                        nh.setStartTime(windowStart);
+                    }
+
+                    // if endTime after window
+                    if (windowEnd < nh.getEndTime()) {
+                        nh.setEndTime(windowEnd);
+                    }
+
+                    if (nh.getEndTime() == 0) {
+                        nh.setEndTime(windowEnd);
+                    }
+                });
+            });
+        }));
+
+        return grouped;
+    }
+
+    private String getNodeName(RMNodeHistory rmNodeHistory) {
+        String nodeUrl = rmNodeHistory.getNodeUrl();
+        if (nodeUrl.contains("/")) {
+            return nodeUrl.substring(nodeUrl.lastIndexOf("/") + 1);
+        } else {
+            return nodeUrl;
+        }
     }
 
     private Object[] getAllInfrastructureParameters(String infrastructureType, String[] infrastructureParameters,
