@@ -52,6 +52,7 @@ import org.ow2.proactive.scheduler.common.exception.JobAlreadyFinishedException;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.exception.SubmissionClosedException;
 import org.ow2.proactive.scheduler.common.exception.UnknownJobException;
 import org.ow2.proactive.scheduler.common.exception.UnknownTaskException;
@@ -658,8 +659,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
 
     @Override
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit)
-            throws NotConnectedException, PermissionException {
+            boolean pending, boolean finished, int offset, int limit) throws SchedulerException {
         renewSession();
         return client.getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
     }
@@ -667,13 +667,13 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     @Override
     public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-            throws NotConnectedException, PermissionException {
+            throws SchedulerException {
         renewSession();
         return client.getTaskStates(taskTag, from, to, mytasks, running, pending, finished, offset, limit, sortParams);
     }
 
     @Override
-    public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
+    public JobInfo getJobInfo(String jobId) throws SchedulerException {
         renewSession();
         return client.getJobInfo(jobId);
     }
@@ -686,8 +686,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public String getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException,
-            JobCreationException, NotConnectedException, PermissionException {
+    public String getJobContent(JobId jobId) throws SchedulerException {
         renewSession();
         return client.getJobContent(jobId);
     }
@@ -810,25 +809,25 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
+    public void putThirdPartyCredential(String key, String value) throws SchedulerException {
         renewSession();
         client.putThirdPartyCredential(key, value);
     }
 
     @Override
-    public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
+    public Set<String> thirdPartyCredentialsKeySet() throws SchedulerException {
         renewSession();
         return client.thirdPartyCredentialsKeySet();
     }
 
     @Override
-    public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
+    public void removeThirdPartyCredential(String key) throws SchedulerException {
         renewSession();
         client.removeThirdPartyCredential(key);
     }
 
     @Override
-    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+    public Map<Object, Object> getPortalConfiguration() throws SchedulerException {
         renewSession();
         return client.getPortalConfiguration();
     }
@@ -846,7 +845,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
+    public Map<String, Object> getSchedulerProperties() throws SchedulerException {
         renewSession();
         return client.getSchedulerProperties();
     }
@@ -873,21 +872,18 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
-            throws NotConnectedException, PermissionException {
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException {
         renewSession();
         return client.getJobResultMaps(jobsId);
     }
 
     @Override
-    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
-            throws NotConnectedException, PermissionException {
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws SchedulerException {
         return client.getPreciousTaskNames(jobsId);
     }
 
     @Override
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
-            throws NotConnectedException, UnknownJobException {
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException {
         renewSession();
         return client.checkJobPermissionMethod(sessionId, jobId, method);
     }

@@ -45,6 +45,7 @@ import org.ow2.proactive_grid_cloud_portal.cli.cmd.Command;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 
 
 /**
@@ -171,7 +172,7 @@ public class InstallPackageCommand extends AbstractCommand implements Command {
     }
 
     private Map<String, Object> retrieveSchedulerProperties(ApplicationContext currentContext,
-            SchedulerRestInterface scheduler) throws PermissionRestException, NotConnectedRestException {
+            SchedulerRestInterface scheduler) throws RestException {
         return scheduler.getSchedulerPropertiesFromSessionId(currentContext.getSessionId());
     }
 

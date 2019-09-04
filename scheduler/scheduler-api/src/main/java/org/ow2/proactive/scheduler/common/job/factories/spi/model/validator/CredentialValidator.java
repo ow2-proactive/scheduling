@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.ModelValidatorContext;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ValidationException;
 
@@ -61,6 +62,8 @@ public class CredentialValidator implements Validator<String> {
         } catch (NotConnectedException | PermissionException e) {
             throw new ValidationException("Could not read third party-credentials from the scheduler, make sure you are connected and you have permission rights to read third-party credentials.",
                                           e);
+        } catch (SchedulerException e) {
+            logger.error(e);
         }
         return parameterValue;
     }

@@ -62,6 +62,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorage;
@@ -113,7 +114,7 @@ public class StudioRest implements StudioInterface {
 
     @Override
     public void logout(@HeaderParam("sessionid")
-    final String sessionId) throws PermissionRestException, NotConnectedRestException {
+    final String sessionId) throws RestException {
         logger.info("logout");
         scheduler().disconnect(sessionId);
     }

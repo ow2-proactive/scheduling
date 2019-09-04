@@ -177,7 +177,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return new RestPage<>(ids, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -188,7 +188,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "/scheduler/jobs/" + jobId);
             userHasPermission = s.checkJobPermissionMethod(sessionId, jobId, method);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
         return userHasPermission;
     }
@@ -209,7 +209,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return new RestPage<>(userJobInfoList, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -222,7 +222,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                               .map(jobInfo -> new UserJobData(mapper.map(jobInfo, JobInfoData.class)))
                               .collect(Collectors.toList());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -252,7 +252,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             restMapPage.setSize(page.getSize());
             return restMapPage;
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -272,7 +272,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return mapper.map(js, JobStateData.class);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -327,7 +327,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/result");
             return mapper.map(PAFuture.getFutureValue(s.getJobResult(jobId)), JobResultData.class);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -342,7 +342,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 return getJobResultMapAsString(jobResult.getResultMap());
             }
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -358,7 +358,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                                                      entry -> getJobResultMapAsString(entry.getValue())));
             }
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
         return new HashMap<>();
     }
@@ -383,7 +383,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             return mapper.map(s.getJobInfo(jobId), JobInfoData.class);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -404,7 +404,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return res;
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -414,7 +414,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "DELETE jobs/" + jobId);
             return s.removeJob(jobId);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -424,7 +424,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/log/server");
             return s.getJobServerLogs(jobId);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -434,7 +434,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobId + "/kill");
             return s.killJob(jobId);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -444,7 +444,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/kill");
             return s.killTask(jobid, taskname);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -454,7 +454,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/preempt");
             return s.preemptTask(jobid, taskname, 5);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -464,7 +464,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/restart");
             return s.restartTask(jobid, taskname, 5);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -474,7 +474,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/finishInErrorTask");
             return s.finishInErrorTask(jobid, taskname);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -484,7 +484,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/restartInErrorTask");
             return s.restartInErrorTask(jobid, taskname);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -509,7 +509,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return new RestPage<>(tasksNames, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -528,7 +528,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return new RestPage<>(tasksName, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -551,7 +551,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return new RestPage<>(tasksName, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -562,7 +562,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             return jobState.getTags();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -573,7 +573,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             JobState jobState = s.getJobState(jobId);
             return jobState.getTags(prefix);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -603,7 +603,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler scheduler = checkAccess(sessionId, "/scheduler/jobs/" + jobId + "/xml");
             return scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -623,7 +623,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -638,7 +638,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -652,7 +652,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -671,7 +671,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -687,7 +687,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskStateData> tasks = map(page.getTaskStates(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -720,7 +720,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             // will produce HTTP 204 code if null
             return streams.isEmpty() ? null : new SequenceInputStream(Collections.enumeration(streams));
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -767,7 +767,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             throw new UnknownTaskRestException("task " + taskname + "not found");
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -845,7 +845,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                             .map(TaskId::getReadableName)
                             .collect(Collectors.toList());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -856,7 +856,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler scheduler = checkAccess(sessionId, "metadataOfPreciousResults");
             return scheduler.getPreciousTaskNames(jobsId);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -895,7 +895,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return buildTaskResultData(taskResult);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -916,7 +916,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
             return results;
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -925,7 +925,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             return retrieveTaskLogsUsingDatabase(sessionId, jobId, taskname);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -957,7 +957,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return buf.toString();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -978,7 +978,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return jobOutput.toString();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -996,7 +996,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return errLogs.toString();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1013,7 +1013,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return buf.toString();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1031,7 +1031,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return outLogs.toString();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1048,7 +1048,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return result.toString();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1086,7 +1086,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 return null;
             }
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1096,7 +1096,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + PATH_TASKS + taskname + "/log/server");
             return s.getTaskServerLogs(jobId, taskname);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1106,7 +1106,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/tasks/tag/" + taskTag + "/log/server");
             return s.getTaskServerLogsByTag(jobId, taskTag);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1161,7 +1161,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             final Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/pause");
             return s.pauseJob(jobId);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1171,7 +1171,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/restartAllInErrorTasks");
             return s.restartAllInErrorTasks(jobId);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1181,7 +1181,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/resume");
             return s.resumeJob(jobId);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1225,7 +1225,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         } catch (IOException e) {
             throw new IOException("I/O Error: " + e.getMessage(), e);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1403,7 +1403,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             String jobContent = scheduler.getJobContent(JobIdImpl.makeJobId(jobId));
             FileUtils.write(tmpJobFile, jobContent, Charset.forName("UTF-8"));
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
         // Get the job submission variables
         Map<String, String> jobVariables = workflowVariablesTransformer.getWorkflowVariablesFromPathSegment(pathSegment);
@@ -1557,7 +1557,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             logger.info("disconnection user " + sessionStore.get(sessionId) + " to session " + sessionId);
             s.disconnect();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         } finally {
             sessionStore.terminate(sessionId);
             logger.debug("sessionid " + sessionId + " terminated");
@@ -1570,7 +1570,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "pause");
             return s.pause();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1580,7 +1580,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "stop");
             return s.stop();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1590,7 +1590,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "resume");
             return s.resume();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1601,7 +1601,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byname/" + priorityName);
             s.changeJobPriority(jobId, JobPriority.findPriority(priorityName));
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1612,7 +1612,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/priority/byvalue" + priorityValue);
             s.changeJobPriority(jobId, JobPriority.findPriority(Integer.parseInt(priorityValue)));
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
 
     }
@@ -1623,7 +1623,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "freeze");
             return s.freeze();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1633,7 +1633,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "status");
             return SchedulerStatusData.valueOf(SchedulerStateListener.getInstance().getSchedulerStatus(s).name());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1643,7 +1643,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "start");
             return s.start();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1653,7 +1653,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "kill");
             return s.kill();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1663,7 +1663,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "shutdown");
             return s.shutdown();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1673,7 +1673,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "linkrm");
             return s.linkResourceManager(rmURL);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1825,7 +1825,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "users");
             return map(s.getUsers(), SchedulerUserData.class);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1835,7 +1835,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId, "userswithjobs");
             return map(s.getUsersWithJobs(), SchedulerUserData.class);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1886,7 +1886,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getMyAccountUsage(startDate, endDate), JobUsageData.class);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1897,7 +1897,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getAccountUsage(user, startDate, endDate), JobUsageData.class);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1907,7 +1907,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             return proxy.getUserSpaceURIs();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1917,7 +1917,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             return proxy.getGlobalSpaceURIs();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -1998,7 +1998,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId);
             s.putThirdPartyCredential(key, value);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         } catch (Exception e) {
             throw new SchedulerRestException(e);
         }
@@ -2011,7 +2011,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId);
             s.removeThirdPartyCredential(key);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         } catch (Exception e) {
             throw new SchedulerRestException(e);
         }
@@ -2023,7 +2023,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             Scheduler s = checkAccess(sessionId);
             return s.thirdPartyCredentialsKeySet();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -2093,7 +2093,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
                 }
             });
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         } catch (ActiveObjectCreationException | NodeException e) {
             throw new RuntimeException(e);
         }
@@ -2180,7 +2180,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             }
             return new RestPage<>(taskNames, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -2231,7 +2231,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             List<TaskStateData> tasks = map(page.getList(), TaskStateData.class);
             return new RestPage<>(tasks, page.getSize());
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -2261,7 +2261,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             final Scheduler s = checkAccess(sessionId, "POST jobs/" + jobId + "/startat/" + startAt);
             return s.changeStartAt(JobIdImpl.makeJobId(jobId), startAt);
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -2271,7 +2271,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             final Scheduler s = checkAccess(sessionId, "GET configuration/portal");
             return s.getPortalConfiguration();
         } catch (SchedulerException e) {
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
     }
 
@@ -2284,28 +2284,10 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
         } catch (SchedulerException e) {
             logger.warn("Attempt to retrieve scheduler properties but failed because connection exception", e);
-            throw wrapExceptionToRest(e);
+            throw RestException.wrapExceptionToRest(e);
         }
         return schedulerProperties;
 
     }
 
-    private RestException wrapExceptionToRest(SchedulerException schedulerException) {
-        if (schedulerException instanceof NotConnectedException) {
-            return new NotConnectedRestException(schedulerException);
-        } else if (schedulerException instanceof PermissionException) {
-            return new PermissionRestException(schedulerException);
-        } else if (schedulerException instanceof UnknownJobException) {
-            return new UnknownJobRestException(schedulerException);
-        } else if (schedulerException instanceof JobAlreadyFinishedException) {
-            return new JobAlreadyFinishedRestException(schedulerException);
-        } else if (schedulerException instanceof SubmissionClosedException) {
-            return new SubmissionClosedRestException(schedulerException);
-        } else if (schedulerException instanceof JobCreationException) {
-            return new JobCreationRestException(schedulerException);
-        } else if (schedulerException instanceof UnknownTaskException) {
-            return new UnknownTaskRestException(schedulerException);
-        }
-        return new UnknownJobRestException(schedulerException);
-    }
 }

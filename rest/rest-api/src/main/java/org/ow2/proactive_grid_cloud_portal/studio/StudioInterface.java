@@ -57,6 +57,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 
@@ -78,7 +79,7 @@ public interface StudioInterface {
     @PUT
     @Path("logout")
     void logout(@HeaderParam("sessionid")
-    final String sessionId) throws PermissionRestException, NotConnectedRestException;
+    final String sessionId) throws RestException;
 
     @GET
     @Path("connected")

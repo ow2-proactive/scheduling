@@ -84,8 +84,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      * @throws UnknownJobException
      */
-    boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
-            throws NotConnectedException, UnknownJobException;
+    boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException;
 
     /**
      * Returns the USER DataSpace URIs associated with the current user
@@ -1428,7 +1427,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      */
     Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending,
-            boolean finished, int offset, int limit) throws NotConnectedException, PermissionException;
+            boolean finished, int offset, int limit) throws SchedulerException;
 
     /**
      * Retrieve a taskstates list from the scheduler.
@@ -1461,8 +1460,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws PermissionException
      */
     Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running, boolean pending,
-            boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-            throws NotConnectedException, PermissionException;
+            boolean finished, int offset, int limit, SortSpecifierContainer sortParams) throws SchedulerException;
 
     /**
      * Retrieve a job info by it id.
@@ -1474,7 +1472,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @throws NotConnectedException
      * @throws PermissionException
      */
-    JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException;
+    JobInfo getJobInfo(String jobId) throws SchedulerException;
 
     /**
      * Change the START_AT generic information at job level and reset the
@@ -1495,15 +1493,14 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * @param jobId job id of existing job
      * @return copy of the xml which was submitted to the scheduler
      */
-    String getJobContent(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException,
-            SubmissionClosedException, JobCreationException;
+    String getJobContent(JobId jobId) throws SchedulerException;
 
     /**
      * @return
      * @throws PermissionException 
      * @throws NotConnectedException 
      */
-    Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException;
+    Map<Object, Object> getPortalConfiguration() throws SchedulerException;
 
     /**
      * Returns the user currently connected
@@ -1521,7 +1518,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      * Returns the scheduler properties associated with the user currently connected
      * @return scheduler properties
      */
-    Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException;
+    Map<String, Object> getSchedulerProperties() throws SchedulerException;
 
     /**
      * Return the page of tasks of the given job.<br>
@@ -1546,8 +1543,7 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException;
 
-    Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
-            throws NotConnectedException, PermissionException;
+    Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException;
 
-    Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws NotConnectedException, PermissionException;
+    Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws SchedulerException;
 }
