@@ -72,6 +72,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 
 @Path("/rm")
@@ -588,7 +589,7 @@ public interface RMRestInterface {
     @Path("infrastructures")
     @Produces("application/json")
     Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedException;
+            throws NotConnectedException, PermissionRestException;
 
     /**
      * @param sessionId a valid session
