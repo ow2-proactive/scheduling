@@ -299,6 +299,11 @@ public class AbstractRMNodeTest {
         }
 
         @Override
+        public void setBusy(Client owner, Map<String, String> usageInfo) {
+
+        }
+
+        @Override
         public void setToRemove() {
 
         }

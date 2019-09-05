@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
+import java.util.Map;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -100,6 +102,8 @@ public final class RMNodeEvent extends RMEvent {
 
     private final String nodeLocker;
 
+    private final Map<String, String> usageInfo;
+
     /**
      * ProActive empty constructor
      */
@@ -120,6 +124,7 @@ public final class RMNodeEvent extends RMEvent {
         this.isLocked = false;
         this.lockTime = -1;
         this.nodeLocker = null;
+        this.usageInfo = null;
     }
 
     // for testing purpose RMinitialStateTest
@@ -143,6 +148,7 @@ public final class RMNodeEvent extends RMEvent {
         this.isLocked = false;
         this.lockTime = -1;
         this.nodeLocker = null;
+        this.usageInfo = null;
     }
 
     // for test purpose
@@ -167,6 +173,7 @@ public final class RMNodeEvent extends RMEvent {
         this.isLocked = false;
         this.lockTime = -1;
         this.nodeLocker = null;
+        this.usageInfo = null;
     }
 
     /**
@@ -214,6 +221,7 @@ public final class RMNodeEvent extends RMEvent {
         this.isLocked = rmNode.isLocked();
         this.lockTime = rmNode.getLockTime();
         this.nodeLocker = rmNode.getLockedBy();
+        this.usageInfo = rmNode.getUsageInfo();
     }
 
     public RMNodeEvent(RMEventType eventType, NodeState state) {
@@ -236,6 +244,8 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeLocker = null;
 
         this.nodeState = state;
+        this.usageInfo = null;
+
     }
 
     public RMNodeEvent(RMEventType eventType, NodeState state, NodeState previousState) {
@@ -258,6 +268,8 @@ public final class RMNodeEvent extends RMEvent {
 
         this.nodeState = state;
         this.previousNodeState = previousState;
+        this.usageInfo = null;
+
     }
 
     @Override
@@ -429,4 +441,7 @@ public final class RMNodeEvent extends RMEvent {
         return nodeLocker;
     }
 
+    public Map<String, String> getUsageInfo() {
+        return usageInfo;
+    }
 }

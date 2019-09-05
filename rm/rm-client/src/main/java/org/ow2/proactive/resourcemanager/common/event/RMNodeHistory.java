@@ -26,6 +26,7 @@
 package org.ow2.proactive.resourcemanager.common.event;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.ow2.proactive.resourcemanager.common.NodeState;
 
@@ -49,6 +50,8 @@ public class RMNodeHistory implements Serializable {
     protected long endTime;
 
     protected String defaultJmxUrl;
+
+    protected Map<String, String> usageInfo;
 
     public RMNodeHistory() {
     }
@@ -123,5 +126,13 @@ public class RMNodeHistory implements Serializable {
 
     public void setDefaultJmxUrl(String defaultJmxUrl) {
         this.defaultJmxUrl = defaultJmxUrl;
+    }
+
+    public Map<String, String> getUsageInfo() {
+        return usageInfo;
+    }
+
+    public void setUsageInfo(Map<String, String> usageInfo) {
+        this.usageInfo = usageInfo;
     }
 }

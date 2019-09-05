@@ -76,6 +76,9 @@ public class Criteria implements Serializable {
     // optional set of nodes urls which are acceptable
     private Set<String> setOfAcceptableNodesUrls;
 
+    // meta info about task that will be scheduled on the node(s)
+    private List<Map<String, String>> listUsageInfo;
+
     /**
      * Creates criteria instance
      * 
@@ -217,4 +220,11 @@ public class Criteria implements Serializable {
         this.nodeAccessToken = nodeAccessToken;
     }
 
+    public List<Map<String, String>> getListUsageInfo() {
+        return listUsageInfo;
+    }
+
+    public void setListUsageInfo(List<Map<String, String>> listUsageInfo) {
+        this.listUsageInfo = listUsageInfo;
+    }
 }

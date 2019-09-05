@@ -269,7 +269,12 @@ public final class RMDeployingNode extends AbstractRMNode {
      */
     @Override
     public void setBusy(Client owner) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(); // cause you are deploying
+    }
+
+    @Override
+    public void setBusy(Client owner, Map<String, String> usageInfo) {
+        throw new UnsupportedOperationException(); // cause you are deploying
     }
 
     /**

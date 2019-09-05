@@ -197,6 +197,12 @@ public class RMNodeImpl extends AbstractRMNode {
         this.owner = owner;
     }
 
+    @Override
+    public void setBusy(Client owner, Map<String, String> usageInfo) {
+        this.usageInfo = usageInfo;
+        setBusy(owner);
+    }
+
     /**
      * Changes the state of this node to {@link NodeState#FREE}.
      */
@@ -204,6 +210,7 @@ public class RMNodeImpl extends AbstractRMNode {
     public void setFree() {
         changeState(NodeState.FREE);
         this.owner = null;
+        this.usageInfo = null;
     }
 
     /**

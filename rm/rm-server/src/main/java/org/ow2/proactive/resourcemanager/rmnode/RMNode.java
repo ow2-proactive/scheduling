@@ -276,6 +276,8 @@ public interface RMNode extends Comparable<RMNode> {
      */
     void setBusy(Client owner);
 
+    void setBusy(Client owner, Map<String, String> usageInfo);
+
     /**
      *  * change the node's status to 'to release'.
      */
@@ -351,5 +353,9 @@ public interface RMNode extends Comparable<RMNode> {
     RMNodeEvent createNodeEvent();
 
     long millisSinceStateChanged();
+
+    void setUsageInfo(Map<String, String> usageInfo);
+
+    Map<String, String> getUsageInfo();
 
 }

@@ -2177,6 +2177,10 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
     }
 
+    public void setBusyNode(final String nodeUrl, Client owner) throws NotConnectedException {
+        setBusyNode(nodeUrl, owner, Collections.EMPTY_MAP);
+    }
+
     /**
      * Set a node state to busy. Set the node to busy, and move the node to the
      * internal busy nodes list. An event informing the node state's change is
@@ -2185,7 +2189,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * @param owner
      * @param nodeUrl node to set
      */
-    public void setBusyNode(final String nodeUrl, Client owner) throws NotConnectedException {
+    public void setBusyNode(final String nodeUrl, Client owner, Map<String, String> usageInfo)
+            throws NotConnectedException {
         final RMNode rmNode = this.allNodes.get(nodeUrl);
         if (rmNode == null) {
             logger.error("Unknown node " + nodeUrl);
@@ -2203,7 +2208,8 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         }
         // Get the previous state of the node needed for the event
         final NodeState previousNodeState = rmNode.getState();
-        rmNode.setBusy(owner);
+        rmNode.setBusy(owner, usageInfo);
+
         this.eligibleNodes.remove(rmNode);
 
         persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
@@ -3049,6 +3055,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             rmNodeHistory.setUserName(nodeHistory.getUserName());
             rmNodeHistory.setStartTime(nodeHistory.getStartTime());
             rmNodeHistory.setDefaultJmxUrl(nodeHistory.getDefaultJmxUrl());
+            rmNodeHistory.setUsageInfo(nodeHistory.getUsageInfo());
             return rmNodeHistory;
         }).collect(Collectors.toList());
     }

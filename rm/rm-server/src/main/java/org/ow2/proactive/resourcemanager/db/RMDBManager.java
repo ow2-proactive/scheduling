@@ -404,14 +404,11 @@ public class RMDBManager {
         if (rmdbManagerBuffer.canOperateDatabaseSynchronouslyWithNode(rmNodeData)) {
             try {
                 logger.debug("Update node " + rmNodeData.getName() + IN_DATABASE_STRING);
-                executeReadWriteTransaction(new SessionWork<Void>() {
-                    @Override
-                    public Void doInTransaction(Session session) {
-                        NodeSourceData nodeSourceData = session.load(NodeSourceData.class, nodeSourceName);
-                        rmNodeData.setNodeSource(nodeSourceData);
-                        session.update(rmNodeData);
-                        return null;
-                    }
+                executeReadWriteTransaction((SessionWork<Void>) session -> {
+                    NodeSourceData nodeSourceData = session.load(NodeSourceData.class, nodeSourceName);
+                    rmNodeData.setNodeSource(nodeSourceData);
+                    session.update(rmNodeData);
+                    return null;
                 });
             } catch (RuntimeException e) {
                 throw new RuntimeException("Exception occurred while updating node " + rmNodeData.getName(), e);

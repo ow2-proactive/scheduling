@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
+import java.util.Map;
+
 import org.ow2.proactive.resourcemanager.common.NodeState;
 
 
@@ -59,6 +61,8 @@ public final class RMNodeDescriptor {
     private long lockTime;
 
     private String lockedBy;
+
+    private Map<String, String> usageInfo;
 
     public String getNodeURL() {
         return nodeURL;
@@ -180,4 +184,11 @@ public final class RMNodeDescriptor {
         this.lockedBy = lockedBy;
     }
 
+    public Map<String, String> getUsageInfo() {
+        return usageInfo;
+    }
+
+    public void setUsageInfo(Map<String, String> usageInfo) {
+        this.usageInfo = usageInfo;
+    }
 }
