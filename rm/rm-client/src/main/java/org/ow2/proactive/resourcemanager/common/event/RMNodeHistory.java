@@ -48,6 +48,8 @@ public class RMNodeHistory implements Serializable {
 
     protected long endTime;
 
+    protected String defaultJmxUrl;
+
     public RMNodeHistory() {
     }
 
@@ -113,5 +115,13 @@ public class RMNodeHistory implements Serializable {
 
     public void setEndTime(long endTime) {
         this.endTime = endTime;
+    }
+
+    public String getDefaultJmxUrl() {
+        return defaultJmxUrl;
+    }
+
+    public void setDefaultJmxUrl(String defaultJmxUrl) {
+        this.defaultJmxUrl = defaultJmxUrl;
     }
 }
