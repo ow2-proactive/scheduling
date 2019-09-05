@@ -3048,6 +3048,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             rmNodeHistory.setProviderName(nodeHistory.getProviderName());
             rmNodeHistory.setUserName(nodeHistory.getUserName());
             rmNodeHistory.setStartTime(nodeHistory.getStartTime());
+            rmNodeHistory.setDefaultJmxUrl(nodeHistory.getDefaultJmxUrl());
             return rmNodeHistory;
         }).collect(Collectors.toList());
     }

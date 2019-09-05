@@ -75,6 +75,9 @@ public class NodeHistory {
     @Column(name = "endTime")
     protected long endTime;
 
+    @Column(name = "defaultJmxUrl")
+    protected String defaultJmxUrl;
+
     // indicates that new record in the data base will be created for this event
     @Transient
     private boolean storeInDataBase;
@@ -99,12 +102,13 @@ public class NodeHistory {
         this.nodeState = event.getNodeState();
 
         this.startTime = event.getTimeStamp();
+        this.defaultJmxUrl = event.getDefaultJMXUrl();
 
         storeInDataBase = true;
 
         // do not store TO_BE REMOVED record as it reflects nothing
         //
-        // when the node is removed do not create a new record - 
+        // when the node is removed do not create a new record -
         // just updating the end time of the last state.
         if (NodeState.TO_BE_REMOVED == event.getNodeState() || RMEventType.NODE_REMOVED == event.getEventType()) {
             // new node history event
@@ -183,6 +187,14 @@ public class NodeHistory {
 
     public void setStoreInDataBase(boolean storeInDataBase) {
         this.storeInDataBase = storeInDataBase;
+    }
+
+    public String getDefaultJmxUrl() {
+        return defaultJmxUrl;
+    }
+
+    public void setDefaultJmxUrl(String defaultJmxUrl) {
+        this.defaultJmxUrl = defaultJmxUrl;
     }
 
 }
