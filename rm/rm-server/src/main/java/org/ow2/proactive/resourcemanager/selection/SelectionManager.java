@@ -346,16 +346,23 @@ public abstract class SelectionManager {
 
             try {
 
-                if (criteria.getListUsageInfo().size() == 1) {
-                    // it is mutli node execution, which means we provide the same usage info for every node
-                    // Synchronous call
-                    rmcore.setBusyNode(node.getNodeInformation().getURL(), client, criteria.getListUsageInfo().get(0));
+                if (criteria.getListUsageInfo() != null) {
+                    if (criteria.getListUsageInfo().size() == 1) {
+                        // it is mutli node execution, which means we provide the same usage info for every node
+                        // Synchronous call
+                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
+                                           client,
+                                           criteria.getListUsageInfo().get(0));
+                    } else {
+                        // in this case, we have set of nodes, where will be set of compatible tasks
+                        // Synchronous call
+                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
+                                           client,
+                                           criteria.getListUsageInfo().get(counter));
+                    }
                 } else {
-                    // in this case, we have set of nodes, where will be set of compatible tasks
                     // Synchronous call
-                    rmcore.setBusyNode(node.getNodeInformation().getURL(),
-                                       client,
-                                       criteria.getListUsageInfo().get(counter));
+                    rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
                 }
             } catch (NotConnectedException e) {
                 // client has disconnected during getNodes request
@@ -368,9 +375,17 @@ public abstract class SelectionManager {
         if (selectedNodes.size() > 0 && selectedNodes.getExtraNodes() != null) {
             for (Node node : new LinkedList<>(selectedNodes.getExtraNodes())) {
                 try {
-                    // synchronous call
-                    // here, we believe that it will be called only for multi node execution
-                    rmcore.setBusyNode(node.getNodeInformation().getURL(), client, criteria.getListUsageInfo().get(0));
+
+                    if (criteria.getListUsageInfo() != null) {
+                        // synchronous call
+                        // here, we believe that it will be called only for multi node execution
+                        rmcore.setBusyNode(node.getNodeInformation().getURL(),
+                                           client,
+                                           criteria.getListUsageInfo().get(0));
+                    } else {
+                        // synchronous call
+                        rmcore.setBusyNode(node.getNodeInformation().getURL(), client);
+                    }
                 } catch (NotConnectedException e) {
                     // client has disconnected during getNodes request
                     logger.warn(e.getMessage(), e);
