@@ -478,7 +478,7 @@ createGenerateCredentialTask('Admin', ['-F', 'config/authentication/keys/pub.key
                                        '-l', 'admin', '-p', 'admin', '-o', 'config/authentication/admin_user.cred'])
 
 task generateCredentials
-generateCredentials.dependsOn generateCredentialsAdmin, generateCredentialsScheduler, generateCredentialsRm, generateCredentialsNode
+generateCredentials.dependsOn generateCredentialsAdmin, generateCredentialsScheduler, generateCredentialsRm
 
 def exportedProjects= [
         ":common:common-api",
