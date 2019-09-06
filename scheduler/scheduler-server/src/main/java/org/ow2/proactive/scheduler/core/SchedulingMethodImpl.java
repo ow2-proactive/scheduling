@@ -577,10 +577,10 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
                 }
             } else {
                 for (int i = 0; i < neededResourcesNumber; ++i) {
-                    final EligibleTaskDescriptor etd1 = tasksToSchedule.get(i);
-                    InternalJob currentJob1 = ((JobDescriptorImpl) jobMap.get(etd1.getJobId())).getInternal();
-                    InternalTask internalTask1 = currentJob1.getIHMTasks().get(etd.getTaskId());
-                    listUsageInfo.add(getUsageInfo(internalTask1));
+                    EligibleTaskDescriptor eligibleTaskDescriptor = tasksToSchedule.get(i);
+                    InternalJob internalJob = ((JobDescriptorImpl) jobMap.get(eligibleTaskDescriptor.getJobId())).getInternal();
+                    InternalTask internalTask = internalJob.getIHMTasks().get(eligibleTaskDescriptor.getTaskId());
+                    listUsageInfo.add(getUsageInfo(internalTask));
                 }
             }
 
