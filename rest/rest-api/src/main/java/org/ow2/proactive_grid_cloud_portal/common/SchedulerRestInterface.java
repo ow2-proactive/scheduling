@@ -2059,5 +2059,15 @@ public interface SchedulerRestInterface {
     @Path("job/{jobid}/permission/{method}")
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces("application/json")
-    boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws RestException;
+    boolean checkJobPermissionMethod(@HeaderParam("sessionid") String sessionId, @PathParam("method") String method,
+            @PathParam("jobid") String jobId) throws RestException;
+
+    /**
+     * @return a String representaiton of the server timezone, e.g. "Europe/Paris +02:00"
+     */
+    @GET
+    @Path("servertimezone")
+    @Produces("application/json")
+    String serverTimezone(@HeaderParam("sessionid") String sessionId) throws RestException;
+
 }

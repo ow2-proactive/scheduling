@@ -2290,4 +2290,17 @@ public class SchedulerStateRest implements SchedulerRestInterface {
 
     }
 
+    @Override
+    public String serverTimezone(String sessionId) throws RestException {
+        checkAccess(sessionId, "servertimezone");
+        TimeZone timeZone = Calendar.getInstance().getTimeZone();
+
+        int offsetInMsFromGMT = timeZone.getOffset(new Date().getTime());
+
+        String sign = offsetInMsFromGMT >= 0 ? "+" : "-";
+        int hourseOffsetFromGMT = offsetInMsFromGMT / 3600000;
+        int minutesOffsetFromGMY = (offsetInMsFromGMT % 3600000) / (60 * 1000);
+        String offset = String.format("%s%02d:%02d", sign, hourseOffsetFromGMT, minutesOffsetFromGMY);
+        return String.format("%s %s", timeZone.getID(), offset);
+    }
 }
