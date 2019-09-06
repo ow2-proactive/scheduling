@@ -653,12 +653,14 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
         }
     }
 
-    private Map<String, String> getUsageInfo(InternalTask internalTask0) {
+    private Map<String, String> getUsageInfo(InternalTask internalTask) {
         Map<String, String> metaInfoAboutTask = new HashMap<>();
-        metaInfoAboutTask.put("TASK_ID", internalTask0.getId().value());
-        metaInfoAboutTask.put("TASK_NAME", internalTask0.getId().getReadableName());
-        metaInfoAboutTask.put("JOB_ID", internalTask0.getId().getJobId().value());
-        metaInfoAboutTask.put("JOB_NAME", internalTask0.getId().getJobId().getReadableName());
+        if (internalTask != null) {
+            metaInfoAboutTask.put("TASK_ID", internalTask.getId().value());
+            metaInfoAboutTask.put("TASK_NAME", internalTask.getId().getReadableName());
+            metaInfoAboutTask.put("JOB_ID", internalTask.getId().getJobId().value());
+            metaInfoAboutTask.put("JOB_NAME", internalTask.getId().getJobId().getReadableName());
+        }
         return metaInfoAboutTask;
     }
 
