@@ -491,7 +491,7 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public Map<String, Map<String, Object>> getNodesMBeanHistory(String sessionId, Set<String> nodesJmxUrl,
+    public Map<String, Map<String, Object>> getNodesMBeanHistory(String sessionId, List<String> nodesJmxUrl,
             String objectName, List<String> attrs, String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
