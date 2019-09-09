@@ -3103,7 +3103,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             RMNode rmNode = allNodes.get(nodeUrl);
             rmNode.addToken(token);
         } else {
-            throw new RMException("Unkonwn node " + nodeUrl);
+            throw new RMException("Unknown node " + nodeUrl);
         }
     }
 
@@ -3113,7 +3113,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             RMNode rmNode = allNodes.get(nodeUrl);
             rmNode.removeToken(token);
         } else {
-            throw new RMException("Unkonwn node " + nodeUrl);
+            throw new RMException("Unknown node " + nodeUrl);
         }
     }
 }

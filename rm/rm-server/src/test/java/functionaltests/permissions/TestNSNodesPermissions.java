@@ -27,6 +27,7 @@ package functionaltests.permissions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -394,6 +395,101 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         nsadmin = rmHelper.getResourceManager(TestUsers.NSADMIN);
         criteria.setNodeAccessToken("token1");
         getAndReleaseNodes(nsadmin, "token1 should allow getting nodes", criteria, 1);
+
+        // removing the node source
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        removeNodeSourceAndNodes(nsName, admin, 1);
+
+        RMTHelper.log("Test6.6 - add/remove token dynamically");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "ALL" },
+                               NODES_NOT_RECOVERABLE)
+             .getBooleanValue();
+
+        nodePool = createNodes("node", 1);
+        node = nodePool.remove(0);
+
+        addOneNodeToNodeSource(nsName, node, admin);
+
+        user = rmHelper.getResourceManager(TestUsers.ADMIN);
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 0);
+
+        user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 1);
+
+        user.removeNodeToken(node.getNodeInformation().getURL(), "token1");
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 0);
+
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 0);
+
+        user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 1);
+
+        user.removeNodeToken(node.getNodeInformation().getURL(), "token1");
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 0);
+
+        user = rmHelper.getResourceManager(TestUsers.NSADMIN);
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 0);
+
+        user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 1);
+
+        user.removeNodeToken(node.getNodeInformation().getURL(), "token1");
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 0);
+
+        user = rmHelper.getResourceManager(TestUsers.USER);
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "token1 should allow getting nodes", criteria, 0);
+
+        boolean gotException = false;
+        try {
+            user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+        } catch (SecurityException e) {
+            gotException = true;
+        }
+        assertTrue(gotException);
+        gotException = false;
+
+        try {
+            user.removeNodeToken(node.getNodeInformation().getURL(), "token1");
+        } catch (SecurityException e) {
+            gotException = true;
+        }
+        assertTrue(gotException);
 
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
