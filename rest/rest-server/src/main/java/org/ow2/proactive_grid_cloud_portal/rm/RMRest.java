@@ -92,6 +92,7 @@ import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
 
 
@@ -766,6 +767,32 @@ public class RMRest implements RMRestInterface {
         }));
 
         return grouped;
+    }
+
+    @Override
+    public void addNodeToken(String sessionId, String nodeUrl, String token)
+            throws NotConnectedException, RestException {
+        ResourceManager rm = checkAccess(sessionId);
+        try {
+            rm.addNodeToken(nodeUrl, token);
+        } catch (SecurityException e) {
+            throw new PermissionRestException(e);
+        } catch (RMException e) {
+            throw new RestException(e);
+        }
+    }
+
+    @Override
+    public void removeNodeToken(String sessionId, String nodeUrl, String token)
+            throws NotConnectedException, RestException {
+        ResourceManager rm = checkAccess(sessionId);
+        try {
+            rm.removeNodeToken(nodeUrl, token);
+        } catch (SecurityException e) {
+            throw new PermissionRestException(e);
+        } catch (RMException e) {
+            throw new RestException(e);
+        }
     }
 
     private String getNodeName(RMNodeHistory rmNodeHistory) {

@@ -191,6 +191,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Resource providers have the same permissions as users + an ability to add remove node
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "providers" {
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNodeToken";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.removeNodeToken";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNeededNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
@@ -243,6 +245,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Members of "nsadmins" can create/remove node sources (according to their policies)
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "nsadmins" {
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNodeToken";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.removeNodeToken";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.setNeededNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getAtMostNodes";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.getNodes";
@@ -304,6 +308,8 @@ grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "
 
 // Members of "rmcoreadmins" can call any method of rmcore
 grant principal org.ow2.proactive.authentication.principals.GroupNamePrincipal "rmcoreadmins" {
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.addNodeToken";
+    permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.removeNodeToken";
     permission org.ow2.proactive.permissions.MethodCallPermission "org.ow2.proactive.resourcemanager.core.RMCore.*";
 
     permission org.ow2.proactive.permissions.RMCoreAllPermission;

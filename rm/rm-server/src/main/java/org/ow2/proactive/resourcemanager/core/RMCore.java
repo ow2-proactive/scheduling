@@ -102,6 +102,7 @@ import org.ow2.proactive.resourcemanager.db.RMDBManager;
 import org.ow2.proactive.resourcemanager.db.RMNodeData;
 import org.ow2.proactive.resourcemanager.exception.AddingNodesException;
 import org.ow2.proactive.resourcemanager.exception.NotConnectedException;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoringImpl;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
@@ -3096,4 +3097,25 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return isNodesRecoveryEnabled() && rmNode.getNodeSource().nodesRecoverable();
     }
 
+    @Override
+    public void addNodeToken(String nodeUrl, String token) throws RMException {
+        if (allNodes.containsKey(nodeUrl)) {
+            RMNode rmNode = allNodes.get(nodeUrl);
+            checkNodeAdminPermission(rmNode, caller);
+            rmNode.addToken(token);
+        } else {
+            throw new RMException("Unknown node " + nodeUrl);
+        }
+    }
+
+    @Override
+    public void removeNodeToken(String nodeUrl, String token) throws RMException {
+        if (allNodes.containsKey(nodeUrl)) {
+            RMNode rmNode = allNodes.get(nodeUrl);
+            checkNodeAdminPermission(rmNode, caller);
+            rmNode.removeToken(token);
+        } else {
+            throw new RMException("Unknown node " + nodeUrl);
+        }
+    }
 }

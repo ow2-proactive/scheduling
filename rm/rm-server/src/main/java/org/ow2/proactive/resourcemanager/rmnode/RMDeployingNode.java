@@ -374,6 +374,16 @@ public final class RMDeployingNode extends AbstractRMNode {
         return nodeSource.update(this);
     }
 
+    @Override
+    public void addToken(String token) {
+
+    }
+
+    @Override
+    public void removeToken(String token) {
+
+    }
+
 }
 
 /**

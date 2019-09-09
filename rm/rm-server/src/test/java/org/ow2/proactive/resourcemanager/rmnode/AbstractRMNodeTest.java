@@ -343,6 +343,16 @@ public class AbstractRMNodeTest {
             return 0;
         }
 
+        @Override
+        public void addToken(String token) {
+
+        }
+
+        @Override
+        public void removeToken(String token) {
+
+        }
+
     }
 
 }

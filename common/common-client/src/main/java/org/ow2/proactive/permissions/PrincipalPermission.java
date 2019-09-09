@@ -177,6 +177,18 @@ public class PrincipalPermission extends ClientPermission {
     public boolean hasPrincipal(IdentityPrincipal principal) {
         return principals.contains(principal);
     }
+
+    public void addPermission(IdentityPrincipal tokenPrincipal) {
+        principals.add(tokenPrincipal);
+    }
+
+    public void removePermission(IdentityPrincipal tokenPrincipal) {
+        principals.remove(tokenPrincipal);
+    }
+
+    public boolean isAnyToken() {
+        return principals.stream().anyMatch(p -> p instanceof TokenPrincipal);
+    }
 }
 
 final class PrincipalPermissionCollection extends PermissionCollection implements Serializable {

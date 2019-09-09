@@ -53,6 +53,7 @@ import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
+import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -470,5 +471,15 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     @Override
     public StringWrapper getNodeThreadDump(String nodeUrl) {
         return target.getNodeThreadDump(nodeUrl);
+    }
+
+    @Override
+    public void addNodeToken(String nodeUrl, String token) throws RMException {
+        target.addNodeToken(nodeUrl, token);
+    }
+
+    @Override
+    public void removeNodeToken(String nodeUrl, String token) throws RMException {
+        target.removeNodeToken(nodeUrl, token);
     }
 }

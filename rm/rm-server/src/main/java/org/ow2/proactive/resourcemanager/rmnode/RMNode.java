@@ -348,6 +348,10 @@ public interface RMNode extends Comparable<RMNode> {
      */
     boolean isProtectedByToken();
 
+    void addToken(String token);
+
+    void removeToken(String token);
+
     RMNodeEvent createNodeEvent(RMEventType eventType, NodeState previousNodeState, String initiator);
 
     RMNodeEvent createNodeEvent();
