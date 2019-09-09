@@ -36,6 +36,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.ow2.proactive.authentication.principals.TokenPrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.permissions.PrincipalPermission;
@@ -490,6 +491,25 @@ public class RMNodeImpl extends AbstractRMNode {
     @Override
     public boolean isDeploying() {
         return false;
+    }
+
+    @Override
+    public void addToken(String token) {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        principalPermission.addPermission(new TokenPrincipal(token));
+        updateProtectedByToken();
+    }
+
+    @Override
+    public void removeToken(String token) {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        principalPermission.removePermission(new TokenPrincipal(token));
+        updateProtectedByToken();
+    }
+
+    protected void updateProtectedByToken() {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        protectedByToken = principalPermission.isAnyToken();
     }
 
 }

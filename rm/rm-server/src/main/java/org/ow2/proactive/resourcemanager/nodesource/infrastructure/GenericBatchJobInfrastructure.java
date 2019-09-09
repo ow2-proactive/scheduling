@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;

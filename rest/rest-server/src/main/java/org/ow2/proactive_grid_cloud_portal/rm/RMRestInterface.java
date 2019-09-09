@@ -42,6 +42,7 @@ import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.security.auth.login.LoginException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -73,6 +74,7 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 
 
 @Path("/rm")
@@ -750,4 +752,18 @@ public interface RMRestInterface {
     Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(
             @HeaderParam("sessionid") String sessionId, @HeaderParam("windowStart") long windowStart,
             @HeaderParam("windowEnd") long windowEnd) throws NotConnectedException;
+
+    @POST
+    @GZIP
+    @Path("node/token")
+    @Produces("application/json")
+    void addNodeToken(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
+            @HeaderParam("token") String token) throws NotConnectedException, RestException;
+
+    @DELETE
+    @GZIP
+    @Path("node/token")
+    @Produces("application/json")
+    void removeNodeToken(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
+            @HeaderParam("token") String token) throws NotConnectedException, RestException;
 }
