@@ -753,6 +753,10 @@ public interface RMRestInterface {
             @HeaderParam("sessionid") String sessionId, @HeaderParam("windowStart") long windowStart,
             @HeaderParam("windowEnd") long windowEnd) throws NotConnectedException;
 
+    /**
+     * Add access token to given node
+     * @param token single token
+     */
     @POST
     @GZIP
     @Path("node/token")
@@ -760,6 +764,10 @@ public interface RMRestInterface {
     void addNodeToken(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
             @HeaderParam("token") String token) throws NotConnectedException, RestException;
 
+    /**
+     * Remove access token from given node
+     * @param token single token
+     */
     @DELETE
     @GZIP
     @Path("node/token")

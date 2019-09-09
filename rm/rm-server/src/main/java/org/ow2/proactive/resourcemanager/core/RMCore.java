@@ -3101,6 +3101,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public void addNodeToken(String nodeUrl, String token) throws RMException {
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
+            checkNodeAdminPermission(rmNode, caller);
             rmNode.addToken(token);
         } else {
             throw new RMException("Unknown node " + nodeUrl);
@@ -3111,6 +3112,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     public void removeNodeToken(String nodeUrl, String token) throws RMException {
         if (allNodes.containsKey(nodeUrl)) {
             RMNode rmNode = allNodes.get(nodeUrl);
+            checkNodeAdminPermission(rmNode, caller);
             rmNode.removeToken(token);
         } else {
             throw new RMException("Unknown node " + nodeUrl);
