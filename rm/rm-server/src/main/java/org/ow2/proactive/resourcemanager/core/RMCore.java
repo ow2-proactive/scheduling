@@ -3118,4 +3118,17 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             throw new RMException("Unknown node " + nodeUrl);
         }
     }
+
+    @Override
+    public void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException {
+        if (allNodes.containsKey(nodeUrl)) {
+            RMNode rmNode = allNodes.get(nodeUrl);
+            rmNode.setNodeTokens(nodeUrl, tokens);
+            monitoring.nodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                        rmNode.getState(),
+                                                        rmNode.getProvider().getName()));
+        } else {
+            throw new RMException("Unknown node " + nodeUrl);
+        }
+    }
 }

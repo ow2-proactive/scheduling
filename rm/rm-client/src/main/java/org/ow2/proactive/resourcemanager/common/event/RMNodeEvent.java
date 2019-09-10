@@ -25,6 +25,7 @@
  */
 package org.ow2.proactive.resourcemanager.common.event;
 
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -104,6 +105,8 @@ public final class RMNodeEvent extends RMEvent {
 
     private final Map<String, String> usageInfo;
 
+    private final List<String> tokens;
+
     /**
      * ProActive empty constructor
      */
@@ -125,6 +128,7 @@ public final class RMNodeEvent extends RMEvent {
         this.lockTime = -1;
         this.nodeLocker = null;
         this.usageInfo = null;
+        this.tokens = null;
     }
 
     // for testing purpose RMinitialStateTest
@@ -149,6 +153,7 @@ public final class RMNodeEvent extends RMEvent {
         this.lockTime = -1;
         this.nodeLocker = null;
         this.usageInfo = null;
+        this.tokens = null;
     }
 
     // for test purpose
@@ -174,6 +179,7 @@ public final class RMNodeEvent extends RMEvent {
         this.lockTime = -1;
         this.nodeLocker = null;
         this.usageInfo = null;
+        this.tokens = null;
     }
 
     /**
@@ -222,6 +228,7 @@ public final class RMNodeEvent extends RMEvent {
         this.lockTime = rmNode.getLockTime();
         this.nodeLocker = rmNode.getLockedBy();
         this.usageInfo = rmNode.getUsageInfo();
+        this.tokens = rmNode.getTokens();
     }
 
     public RMNodeEvent(RMEventType eventType, NodeState state) {
@@ -245,7 +252,7 @@ public final class RMNodeEvent extends RMEvent {
 
         this.nodeState = state;
         this.usageInfo = null;
-
+        this.tokens = null;
     }
 
     public RMNodeEvent(RMEventType eventType, NodeState state, NodeState previousState) {
@@ -269,7 +276,7 @@ public final class RMNodeEvent extends RMEvent {
         this.nodeState = state;
         this.previousNodeState = previousState;
         this.usageInfo = null;
-
+        this.tokens = null;
     }
 
     @Override
@@ -443,5 +450,9 @@ public final class RMNodeEvent extends RMEvent {
 
     public Map<String, String> getUsageInfo() {
         return usageInfo;
+    }
+
+    public List<String> getTokens() {
+        return tokens;
     }
 }

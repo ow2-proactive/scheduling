@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.node.Node;
@@ -361,5 +362,9 @@ public interface RMNode extends Comparable<RMNode> {
     void setUsageInfo(Map<String, String> usageInfo);
 
     Map<String, String> getUsageInfo();
+
+    List<String> getNodeTokens();
+
+    void setNodeTokens(String nodeUrl, List<String> tokens);
 
 }

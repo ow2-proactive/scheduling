@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.ow2.proactive.authentication.principals.*;
 
@@ -188,6 +189,19 @@ public class PrincipalPermission extends ClientPermission {
 
     public boolean isAnyToken() {
         return principals.stream().anyMatch(p -> p instanceof TokenPrincipal);
+    }
+
+    public List<String> getAllTokens() {
+        return principals.stream()
+                         .filter(p -> p instanceof TokenPrincipal)
+                         .map(IdentityPrincipal::getName)
+                         .collect(Collectors.toList());
+    }
+
+    public void setAllTokens(List<String> tokens) {
+        principals.removeIf(p -> p instanceof TokenPrincipal);
+
+        tokens.forEach(token -> addPermission(new TokenPrincipal(token)));
     }
 }
 

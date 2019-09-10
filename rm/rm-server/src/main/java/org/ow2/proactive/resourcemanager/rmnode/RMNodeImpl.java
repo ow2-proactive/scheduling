@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -512,4 +513,16 @@ public class RMNodeImpl extends AbstractRMNode {
         protectedByToken = principalPermission.isAnyToken();
     }
 
+    @Override
+    public List<String> getNodeTokens() {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        return principalPermission.getAllTokens();
+    }
+
+    @Override
+    public void setNodeTokens(String nodeUrl, List<String> tokens) {
+        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+        principalPermission.setAllTokens(tokens);
+        updateProtectedByToken();
+    }
 }
