@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.Permission;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -515,8 +516,12 @@ public class RMNodeImpl extends AbstractRMNode {
 
     @Override
     public List<String> getNodeTokens() {
-        PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
-        return principalPermission.getAllTokens();
+        if (getUserPermission() instanceof PrincipalPermission) {
+            PrincipalPermission principalPermission = (PrincipalPermission) getUserPermission();
+            return principalPermission.getAllTokens();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     @Override
