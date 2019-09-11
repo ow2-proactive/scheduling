@@ -482,4 +482,9 @@ public class RMProxyUserInterface extends RMListenerProxy implements ResourceMan
     public void removeNodeToken(String nodeUrl, String token) throws RMException {
         target.removeNodeToken(nodeUrl, token);
     }
+
+    @Override
+    public void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException {
+        target.setNodeTokens(nodeUrl, tokens);
+    }
 }

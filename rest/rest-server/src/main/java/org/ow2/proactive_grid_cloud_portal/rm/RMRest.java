@@ -795,6 +795,19 @@ public class RMRest implements RMRestInterface {
         }
     }
 
+    @Override
+    public void setNodeTokens(String sessionId, String nodeUrl, List<String> tokens)
+            throws NotConnectedException, RestException {
+        ResourceManager rm = checkAccess(sessionId);
+        try {
+            rm.setNodeTokens(nodeUrl, tokens);
+        } catch (SecurityException e) {
+            throw new PermissionRestException(e);
+        } catch (RMException e) {
+            throw new RestException(e);
+        }
+    }
+
     private String getNodeName(RMNodeHistory rmNodeHistory) {
         String nodeUrl = rmNodeHistory.getNodeUrl();
         if (nodeUrl.contains("/")) {

@@ -3103,6 +3103,12 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             RMNode rmNode = allNodes.get(nodeUrl);
             checkNodeAdminPermission(rmNode, caller);
             rmNode.addToken(token);
+
+            persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
+
+            registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                            rmNode.getState(),
+                                                            rmNode.getProvider().getName()));
         } else {
             throw new RMException("Unknown node " + nodeUrl);
         }
@@ -3114,6 +3120,29 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
             RMNode rmNode = allNodes.get(nodeUrl);
             checkNodeAdminPermission(rmNode, caller);
             rmNode.removeToken(token);
+
+            persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
+
+            registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                            rmNode.getState(),
+                                                            rmNode.getProvider().getName()));
+
+        } else {
+            throw new RMException("Unknown node " + nodeUrl);
+        }
+    }
+
+    @Override
+    public void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException {
+        if (allNodes.containsKey(nodeUrl)) {
+            RMNode rmNode = allNodes.get(nodeUrl);
+            rmNode.setNodeTokens(nodeUrl, tokens);
+
+            persistUpdatedRMNodeIfRecoveryEnabled(rmNode);
+
+            registerAndEmitNodeEvent(rmNode.createNodeEvent(RMEventType.NODE_STATE_CHANGED,
+                                                            rmNode.getState(),
+                                                            rmNode.getProvider().getName()));
         } else {
             throw new RMException("Unknown node " + nodeUrl);
         }

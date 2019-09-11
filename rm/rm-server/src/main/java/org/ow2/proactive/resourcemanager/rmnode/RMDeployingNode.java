@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.node.Node;
@@ -384,6 +385,15 @@ public final class RMDeployingNode extends AbstractRMNode {
 
     }
 
+    @Override
+    public List<String> getNodeTokens() {
+        return null;
+    }
+
+    @Override
+    public void setNodeTokens(String nodeUrl, List<String> tokens) {
+
+    }
 }
 
 /**

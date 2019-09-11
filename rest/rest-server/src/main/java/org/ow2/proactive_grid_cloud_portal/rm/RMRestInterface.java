@@ -774,4 +774,15 @@ public interface RMRestInterface {
     @Produces("application/json")
     void removeNodeToken(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
             @HeaderParam("token") String token) throws NotConnectedException, RestException;
+
+    /**
+     * Set all node tokens to given node
+     */
+    @POST
+    @GZIP
+    @Path("node/tokens")
+    @Produces("application/json")
+    void setNodeTokens(@HeaderParam("sessionid") String sessionId, @HeaderParam("nodeurl") String nodeUrl,
+            @QueryParam("tokens") List<String> tokens) throws NotConnectedException, RestException;
+
 }

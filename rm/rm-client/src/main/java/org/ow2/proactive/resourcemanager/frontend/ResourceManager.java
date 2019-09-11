@@ -569,4 +569,7 @@ public interface ResourceManager {
     void addNodeToken(String nodeUrl, String token) throws RMException;
 
     void removeNodeToken(String nodeUrl, String token) throws RMException;
+
+    void setNodeTokens(String nodeUrl, List<String> tokens) throws RMException;
+
 }
