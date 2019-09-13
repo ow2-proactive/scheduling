@@ -493,6 +493,7 @@ def exportedProjects= [
         ":rest:rest-client",
         ":rest:rest-smartproxy",
         ":rm:rm-client",
+        ":rm:rm-server"
 ]
 
 task alljavadoc(type: org.gradle.api.tasks.javadoc.Javadoc) {

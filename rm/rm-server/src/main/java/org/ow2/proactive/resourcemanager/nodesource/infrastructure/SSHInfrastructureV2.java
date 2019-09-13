@@ -321,12 +321,15 @@ public class SSHInfrastructureV2 extends HostsFileBasedInfrastructureManager {
      * Configures the Infrastructure
      *
      * @param parameters
-     *            parameters[4] : ssh server port parameters[5] : ssh username
-     *            parameters[6] : ssh password parameters[7] : ssh private key
-     *            parameters[8] : optional ssh options file parameters[9] : java
-     *            path on the remote machines parameters[10] : Scheduling path on
-     *            remote machines parameters[11] : target OS' type (Linux,
-     *            Windows or Cygwin) parameters[12] : extra java options
+     *            parameters[4] : ssh server port
+     *            parameters[5] : ssh username
+     *            parameters[6] : ssh password
+     *            parameters[7] : ssh private key
+     *            parameters[8] : optional ssh options file
+     *            parameters[9] : java path on the remote machines
+     *            parameters[10] : Scheduling path on remote machines
+     *            parameters[11] : target OS' type (Linux, Windows or Cygwin)
+     *            parameters[12] : extra java options
      * @throws IllegalArgumentException
      *             configuration failed
      */
