@@ -27,6 +27,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.Client;
@@ -93,6 +94,8 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
 
     /** Time stamp of the latest state change */
     protected long stateChangeTime;
+
+    protected Map<String, String> usageInfo;
 
     public AbstractRMNode() {
         this.nodeName = null;
@@ -346,7 +349,8 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         rmNodeDescriptor.setState(getState());
         rmNodeDescriptor.setStateChangeTime(getStateChangeTime());
         rmNodeDescriptor.setVNodeName(getVNodeName());
-
+        rmNodeDescriptor.setUsageInfo(getUsageInfo());
+        rmNodeDescriptor.setTokens(getNodeTokens());
         return rmNodeDescriptor;
     }
 
@@ -360,4 +364,13 @@ public abstract class AbstractRMNode implements RMNode, Serializable {
         return System.currentTimeMillis() - this.stateChangeTime;
     }
 
+    @Override
+    public Map<String, String> getUsageInfo() {
+        return usageInfo;
+    }
+
+    @Override
+    public void setUsageInfo(Map<String, String> usageInfo) {
+        this.usageInfo = usageInfo;
+    }
 }

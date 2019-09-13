@@ -74,6 +74,7 @@ import org.ow2.proactive.resourcemanager.utils.RMStarter;
 import org.ow2.proactive.scheduler.SchedulerFactory;
 import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.exception.InternalSchedulerException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerConfigurationException;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.ScriptHandler;
@@ -182,6 +183,8 @@ public class SchedulerStarter {
         long startTime = System.nanoTime();
 
         ProActiveConfiguration.load(); // force properties loading to find out if PAMR router should be started
+
+        checkConfigureConflict();
 
         if (!commandLine.hasOption(OPTION_NO_ROUTER)) {
             startRouter();
@@ -591,6 +594,20 @@ public class SchedulerStarter {
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_HOME.getName(), schedHome);
         setPropIfNotAlreadySet(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName(),
                                schedHome + "/config/network/server.ini");
+    }
+
+    private static void checkConfigureConflict() throws SchedulerConfigurationException {
+        if (PASchedulerProperties.TASK_FORK.getValueAsStringOrNull() != null) {
+            Boolean taskForkConfig = PASchedulerProperties.TASK_FORK.getValueAsBoolean();
+            boolean runAsMeConfig = PASchedulerProperties.TASK_RUNASME.getValueAsBoolean();
+            if (runAsMeConfig && !taskForkConfig) {
+                throw new SchedulerConfigurationException(String.format("Found scheduler configuration conflict between [%s=%s] and [%s=%s], as RunAsMe mode implies Fork mode.",
+                                                                        PASchedulerProperties.TASK_FORK.getKey(),
+                                                                        PASchedulerProperties.TASK_FORK.getValueAsString(),
+                                                                        PASchedulerProperties.TASK_RUNASME.getKey(),
+                                                                        PASchedulerProperties.TASK_RUNASME.getValueAsString()));
+            }
+        }
     }
 
     protected static void configureSecurityManager() {

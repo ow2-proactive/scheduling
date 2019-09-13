@@ -48,26 +48,24 @@ public class RegexpParserValidatorTest {
     @Test
     public void testRegexpParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
         Assert.assertEquals(VALID_VALUE,
-                            new RegexpParserValidator(RegexpParserValidator.REGEXP_TYPE +
+                            new RegexpParserValidator(ModelType.REGEXP +
                                                       VALID_MODEL_PARAMETER).parseAndValidate(VALID_VALUE));
     }
 
     @Test(expected = ValidationException.class)
     public void testRegexpParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new RegexpParserValidator(RegexpParserValidator.REGEXP_TYPE +
-                                  VALID_MODEL_PARAMETER).parseAndValidate(INVALID_VALUE);
+        new RegexpParserValidator(ModelType.REGEXP + VALID_MODEL_PARAMETER).parseAndValidate(INVALID_VALUE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testRegexpParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new RegexpParserValidator("ILLEGAL_" + RegexpParserValidator.REGEXP_TYPE).parseAndValidate(VALID_VALUE);
+        new RegexpParserValidator("ILLEGAL_" + ModelType.REGEXP).parseAndValidate(VALID_VALUE);
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testRegexpParserValidatorInvalidRegexp()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new RegexpParserValidator(RegexpParserValidator.REGEXP_TYPE +
-                                  INVALID_MODEL_PARAMETER).parseAndValidate(VALID_VALUE);
+        new RegexpParserValidator(ModelType.REGEXP + INVALID_MODEL_PARAMETER).parseAndValidate(VALID_VALUE);
     }
 }

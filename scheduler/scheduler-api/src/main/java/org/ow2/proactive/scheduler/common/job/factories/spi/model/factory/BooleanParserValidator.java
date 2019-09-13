@@ -34,31 +34,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Vali
 
 public class BooleanParserValidator extends BaseParserValidator<Boolean> {
 
-    public static final String BOOLEAN_TYPE = "BOOLEAN";
-
-    protected static final String BOOLEAN_TYPE_REGEXP = "[Bb][Oo][Oo][Ll][Ee][Aa][Nn]";
-
     public BooleanParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-        if (!model.matches("^" + BOOLEAN_TYPE_REGEXP + "$")) {
-            throw new ModelSyntaxException(BOOLEAN_TYPE + " expression in model does not match " + BOOLEAN_TYPE_REGEXP +
-                                           "$");
-        }
-    }
-
-    @Override
-    public String getType() {
-        return BOOLEAN_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return BOOLEAN_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return Boolean.class;
+        super(model, ModelType.BOOLEAN);
     }
 
     @Override

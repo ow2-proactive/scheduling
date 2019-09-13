@@ -58,10 +58,7 @@ import org.ow2.proactive.scheduler.common.job.JobInfo;
 import org.ow2.proactive.scheduler.common.job.JobPriority;
 import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.UserIdentification;
-import org.ow2.proactive.scheduler.common.task.TaskId;
-import org.ow2.proactive.scheduler.common.task.TaskInfo;
-import org.ow2.proactive.scheduler.common.task.TaskState;
-import org.ow2.proactive.scheduler.common.task.TaskStatesPage;
+import org.ow2.proactive.scheduler.common.task.*;
 import org.ow2.proactive.scheduler.core.db.SchedulerDBManager;
 import org.ow2.proactive.scheduler.core.jmx.SchedulerJMXHelper;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
@@ -522,6 +519,45 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 jlogger.trace(job.getId(), job.display());
             } catch (Exception e) {
                 jlogger.error(job.getId(), "Error while displaying the job :", e);
+            }
+        }
+        // check whether job property conflicts with the global configuration
+        for (Task task : job.getTasks()) {
+            if (PASchedulerProperties.TASK_RUNASME.getValueAsBoolean()) {
+                if (!task.isRunAsMe()) {
+                    jlogger.warn(job.getId(),
+                                 String.format("The task [%s] configuration 'runAsMe=%b' is ignored, as it conflicts with the global configuration [%s=%b].",
+                                               task.getName(),
+                                               task.isRunAsMe(),
+                                               PASchedulerProperties.TASK_RUNASME.getKey(),
+                                               PASchedulerProperties.TASK_RUNASME.getValueAsBoolean()));
+                }
+                if (Boolean.FALSE.equals(task.isFork())) {
+                    jlogger.warn(job.getId(),
+                                 String.format("The task [%s] configuration 'fork=%b' is ignored, as it conflicts with the global configuration [%s=%b].",
+                                               task.getName(),
+                                               task.isFork(),
+                                               PASchedulerProperties.TASK_RUNASME.getKey(),
+                                               PASchedulerProperties.TASK_RUNASME.getValueAsBoolean()));
+                }
+            }
+            if (PASchedulerProperties.TASK_FORK.getValueAsStringOrNull() != null) {
+                if (task.isFork() != null && PASchedulerProperties.TASK_FORK.getValueAsBoolean() != task.isFork()) {
+                    jlogger.debug(job.getId(),
+                                  String.format("The task [%s] configuration 'fork=%s' is ignored, as it conflicts with the global configuration [%s=%s].",
+                                                task.getName(),
+                                                task.isFork(),
+                                                PASchedulerProperties.TASK_FORK.getKey(),
+                                                PASchedulerProperties.TASK_FORK.getValueAsStringOrNull()));
+                }
+                if (!PASchedulerProperties.TASK_FORK.getValueAsBoolean() && task.isRunAsMe()) {
+                    jlogger.warn(job.getId(),
+                                 String.format("The task [%s] configuration 'runAsMe=%s' is ignored, as it conflicts with the global configuration [%s=%s].",
+                                               task.getName(),
+                                               task.isRunAsMe(),
+                                               PASchedulerProperties.TASK_FORK.getKey(),
+                                               PASchedulerProperties.TASK_FORK.getValueAsStringOrNull()));
+                }
             }
         }
     }

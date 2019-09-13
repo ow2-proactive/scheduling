@@ -36,30 +36,8 @@ import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Vali
 
 public class URLParserValidator extends BaseParserValidator<URL> {
 
-    public static final String URL_TYPE = "URL";
-
-    protected static final String URL_TYPE_REGEXP = "[Uu][Rr][Ll]";
-
     public URLParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-        if (!model.matches("^" + URL_TYPE_REGEXP + "$")) {
-            throw new ModelSyntaxException(URL_TYPE + " expression in model does not match " + URL_TYPE_REGEXP + "$");
-        }
-    }
-
-    @Override
-    public String getType() {
-        return URL_TYPE;
-    }
-
-    @Override
-    public String getTypeRegexp() {
-        return URL_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return URL.class;
+        super(model, ModelType.URL);
     }
 
     @Override

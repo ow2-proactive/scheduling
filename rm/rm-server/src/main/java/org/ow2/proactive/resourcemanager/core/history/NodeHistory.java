@@ -25,9 +25,13 @@
  */
 package org.ow2.proactive.resourcemanager.core.history;
 
+import java.util.Map;
+
 import javax.persistence.*;
 
 import org.apache.log4j.Logger;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SerializableToBlobType;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
@@ -75,6 +79,13 @@ public class NodeHistory {
     @Column(name = "endTime")
     protected long endTime;
 
+    @Column(name = "defaultJmxUrl")
+    protected String defaultJmxUrl;
+
+    @Column(name = "USAGE_INFO", length = Integer.MAX_VALUE, nullable = true)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @org.hibernate.annotations.Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    protected Map<String, String> usageInfo;
+
     // indicates that new record in the data base will be created for this event
     @Transient
     private boolean storeInDataBase;
@@ -90,21 +101,24 @@ public class NodeHistory {
      */
     public NodeHistory(RMNodeEvent event) {
 
-        this.nodeUrl = event.getNodeUrl();
-        this.host = event.getHostName();
-        this.nodeSource = event.getNodeSource();
+        nodeUrl = event.getNodeUrl();
+        host = event.getHostName();
+        nodeSource = event.getNodeSource();
 
-        this.userName = event.getNodeOwner();
-        this.providerName = event.getNodeProvider();
-        this.nodeState = event.getNodeState();
+        userName = event.getNodeOwner();
+        providerName = event.getNodeProvider();
+        nodeState = event.getNodeState();
 
-        this.startTime = event.getTimeStamp();
+        startTime = event.getTimeStamp();
+        defaultJmxUrl = event.getDefaultJMXUrl();
+
+        usageInfo = event.getUsageInfo();
 
         storeInDataBase = true;
 
         // do not store TO_BE REMOVED record as it reflects nothing
         //
-        // when the node is removed do not create a new record - 
+        // when the node is removed do not create a new record -
         // just updating the end time of the last state.
         if (NodeState.TO_BE_REMOVED == event.getNodeState() || RMEventType.NODE_REMOVED == event.getEventType()) {
             // new node history event
@@ -185,4 +199,19 @@ public class NodeHistory {
         this.storeInDataBase = storeInDataBase;
     }
 
+    public String getDefaultJmxUrl() {
+        return defaultJmxUrl;
+    }
+
+    public void setDefaultJmxUrl(String defaultJmxUrl) {
+        this.defaultJmxUrl = defaultJmxUrl;
+    }
+
+    public Map<String, String> getUsageInfo() {
+        return usageInfo;
+    }
+
+    public void setUsageInfo(Map<String, String> usageInfo) {
+        this.usageInfo = usageInfo;
+    }
 }

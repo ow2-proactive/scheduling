@@ -27,6 +27,7 @@ package functionaltests.permissions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.infrastructure.DefaultInfrastructureManager;
 import org.ow2.proactive.resourcemanager.nodesource.policy.StaticPolicy;
 import org.ow2.proactive.utils.Criteria;
+import org.ow2.proactive.utils.Lambda;
+import org.ow2.proactive.utils.Lambda.RunnableThatThrows;
 import org.ow2.proactive.utils.NodeSet;
 
 import functionaltests.utils.RMFunctionalTest;
@@ -399,6 +402,90 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         removeNodeSourceAndNodes(nsName, admin, 1);
 
+        RMTHelper.log("Test6.6 - add/remove token dynamically");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "ME" },
+                               NODES_NOT_RECOVERABLE)
+             .getBooleanValue();
+
+        nodePool = createNodes("node", 1);
+        node = nodePool.remove(0);
+        final Node finalNode = node;
+
+        addOneNodeToNodeSource(nsName, node, admin);
+
+        user = rmHelper.getResourceManager(TestUsers.ADMIN);
+        user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+        user = rmHelper.getResourceManager(TestUsers.RADMIN);
+        user.addNodeToken(node.getNodeInformation().getURL(), "token2");
+        user.removeNodeToken(node.getNodeInformation().getURL(), "token2");
+
+        // in this case nsadmin does not have rights to call add token
+        // because he is not node source provider
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.NSADMIN)
+                                                  .addNodeToken(finalNode.getNodeInformation().getURL(), "token2"));
+
+        // in this case nsadmin does not have rights to call remove token
+        // because he is not node source provider
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.NSADMIN)
+                                                  .removeNodeToken(finalNode.getNodeInformation().getURL(), "token2"));
+
+        user = rmHelper.getResourceManager(TestUsers.TEST);
+
+        criteria = new Criteria(1);
+        getAndReleaseNodes(user, "super-admin does not care about tokens", criteria, 1);
+
+        user = rmHelper.getResourceManager(TestUsers.USER);
+
+        criteria = new Criteria(1);
+        getAndReleaseNodes(user, "user will not get node because it is protected by token", criteria, 0);
+
+        criteria = new Criteria(1);
+        criteria.setNodeAccessToken("token1");
+        getAndReleaseNodes(user, "all good, node and criteria have right token", criteria, 1);
+
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.USER)
+                                                  .addNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
+
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.USER)
+                                                  .removeNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.PROVIDER)
+                                                  .addNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
+
+        checkThrowSecurityException(() -> rmHelper.getResourceManager(TestUsers.PROVIDER)
+                                                  .removeNodeToken(finalNode.getNodeInformation().getURL(), "token1"));
+
+        // removing the node source
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        removeNodeSourceAndNodes(nsName, admin, 1);
+
+        RMTHelper.log("Test6.7 - check that provider can add/remove token to own node");
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        admin.createNodeSource(nsName,
+                               DefaultInfrastructureManager.class.getName(),
+                               null,
+                               StaticPolicy.class.getName(),
+                               new Object[] { "ALL", "ALL" },
+                               NODES_NOT_RECOVERABLE)
+             .getBooleanValue();
+
+        user = rmHelper.getResourceManager(TestUsers.PROVIDER);
+
+        nodePool = createNodes("node", 1);
+        node = nodePool.remove(0);
+        addOneNodeToNodeSource(nsName, node, user);
+
+        user.addNodeToken(node.getNodeInformation().getURL(), "token1");
+        user.removeNodeToken(node.getNodeInformation().getURL(), "token1");
+
+        // removing the node source
+        admin = rmHelper.getResourceManager(TestUsers.ADMIN);
+        removeNodeSourceAndNodes(nsName, admin, 1);
+
         RMTHelper.log("Test7.1 - excluding specific user");
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         admin.createNodeSource(nsName,
@@ -444,6 +531,17 @@ public class TestNSNodesPermissions extends RMFunctionalTest {
         // removing the node source
         admin = rmHelper.getResourceManager(TestUsers.ADMIN);
         removeNodeSourceAndNodes(nsName, admin, 1);
+    }
+
+    private void checkThrowSecurityException(RunnableThatThrows callable) {
+        try {
+            callable.run();
+        } catch (SecurityException e) {
+            return;
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+        fail();
     }
 
     private void addOneNodeToNodeSource(String nsName, Node node, ResourceManager admin) {

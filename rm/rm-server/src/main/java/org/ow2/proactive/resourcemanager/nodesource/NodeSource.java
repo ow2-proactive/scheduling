@@ -512,7 +512,7 @@ public class NodeSource implements InitActive, RunActive {
         if (rmNodeData.getState().equals(NodeState.BUSY)) {
             logger.info("Node " + rmNodeData.getName() + " was found busy after scheduler recovery with owner " +
                         rmNodeData.getOwner());
-            rmNode.setBusy(rmNodeData.getOwner());
+            rmNode.setBusy(rmNodeData.getOwner(), rmNodeData.getUsageInfo());
         }
         return rmNode;
     }

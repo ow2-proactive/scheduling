@@ -79,6 +79,9 @@ import functionaltests.db.schedulerdb.TestTaskResultData;
 import functionaltests.db.schedulerdb.TestTaskRuntimeData;
 import functionaltests.db.schedulerdb.TestThirdPartyCredentials;
 import functionaltests.db.schedulerdb.TestUsageData;
+import functionaltests.fork.TestTaskForkParameter;
+import functionaltests.fork.TestTaskForkWithGlobalConfigForked;
+import functionaltests.fork.TestTaskForkWithGlobalConfigNonForked;
 import functionaltests.jmx.SchedulerJMXTest;
 import functionaltests.jmx.SchedulerRuntimeDataMBeanTest;
 import functionaltests.job.*;
@@ -221,6 +224,7 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
                       TestWorkflowIterationAwareness.class, TestWorkingDirStaticCommand.class,
                       Test_SCHEDULING_2034.class, TestJobSubmittedParallel.class, TestTaskSynchronization.class,
                       TestMarkedAsFinished.class, RestartAllInErrorTasksTest.class, TestJobWhenSchedulerPaused.class,
+                      TestTaskForkParameter.class,
 
                       // Tests with scheduler restart
                       JobRecoverTest.class, TestForkedTaskWorkingDir.class, TestKillTaskWhileExecutingScripts.class,
@@ -228,7 +232,10 @@ import functionaltests.workflow.variables.Test_SCHEDULING_2034;
 
                       // Tests in non forked mode without scheduler restart
                       TestNonForkedScriptTask.class, TestNonForkedScriptTaskVariablePropagation.class,
-                      TestWorkflowFailedScript.class,
+                      TestWorkflowFailedScript.class, TestTaskForkWithGlobalConfigNonForked.class,
+
+                      //  Tests in forked mode without scheduler restart
+                      TestTaskForkWithGlobalConfigForked.class,
 
                       // Tests with different configurations (and restart)
                       TestCacheSpaceCleaning.class, TestChildProcessOfNodeKilled.class, TestDisabledListenJobLogs.class,

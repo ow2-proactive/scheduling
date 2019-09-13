@@ -567,13 +567,23 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             TopologyDescriptor descriptor = null;
             boolean bestEffort = true;
 
+            List<Map<String, String>> listUsageInfo = new LinkedList<>();
             if (internalTask0.isParallel()) {
+                listUsageInfo.add(getUsageInfo(internalTask0));
                 descriptor = internalTask0.getParallelEnvironment().getTopologyDescriptor();
                 bestEffort = false;
                 if (descriptor == null) {
                     logger.debug("Topology is not defined for the task " + internalTask0.getName());
                 }
+            } else {
+                for (int i = 0; i < neededResourcesNumber; ++i) {
+                    EligibleTaskDescriptor eligibleTaskDescriptor = tasksToSchedule.get(i);
+                    InternalJob internalJob = ((JobDescriptorImpl) jobMap.get(eligibleTaskDescriptor.getJobId())).getInternal();
+                    InternalTask internalTask = internalJob.getIHMTasks().get(eligibleTaskDescriptor.getTaskId());
+                    listUsageInfo.add(getUsageInfo(internalTask));
+                }
             }
+
             if (descriptor == null) {
                 // descriptor is not defined, use default
                 descriptor = TopologyDescriptor.ARBITRARY;
@@ -582,6 +592,7 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             try {
                 schedulingMainLoopTimingLogger.start("setCriteria");
                 Criteria criteria = new Criteria(neededResourcesNumber);
+                criteria.setListUsageInfo(listUsageInfo);
                 criteria.setTopology(descriptor);
                 // resolve script variables (if any) in the list of selection
                 // scripts and then set it as the selection criteria.
@@ -640,6 +651,17 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
             //leave the method by ss failure
             return null;
         }
+    }
+
+    private Map<String, String> getUsageInfo(InternalTask internalTask) {
+        Map<String, String> metaInfoAboutTask = new HashMap<>();
+        if (internalTask != null) {
+            metaInfoAboutTask.put("TASK_ID", internalTask.getId().value());
+            metaInfoAboutTask.put("TASK_NAME", internalTask.getId().getReadableName());
+            metaInfoAboutTask.put("JOB_ID", internalTask.getId().getJobId().value());
+            metaInfoAboutTask.put("JOB_NAME", internalTask.getId().getJobId().getReadableName());
+        }
+        return metaInfoAboutTask;
     }
 
     /**

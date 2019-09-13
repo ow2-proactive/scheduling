@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.common.exception.PermissionException;
+import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 
 
 /**
@@ -45,14 +46,14 @@ public interface ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
-    void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException;
+    void putThirdPartyCredential(String key, String value) throws SchedulerException;
 
     /**
      * @return all third-party credential keys stored for the current user
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
-    Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException;
+    Set<String> thirdPartyCredentialsKeySet() throws SchedulerException;
 
     /**
      *
@@ -60,5 +61,5 @@ public interface ThirdPartyCredentials {
      * @throws NotConnectedException if you are not authenticated.
      * @throws PermissionException if you can't access this particular method.
      */
-    void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException;
+    void removeThirdPartyCredential(String key) throws SchedulerException;
 }

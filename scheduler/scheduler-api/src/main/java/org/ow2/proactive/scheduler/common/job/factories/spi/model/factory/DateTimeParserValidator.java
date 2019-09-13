@@ -40,38 +40,21 @@ import com.google.common.collect.Range;
 
 public class DateTimeParserValidator extends RangeParserValidator<Date> {
 
-    public static final String DATETIME_TYPE = "DATETIME";
-
     public static final String LEFT_DELIMITER = "(";
 
     public static final String RIGHT_DELIMITER = ")";
 
-    protected static final String DATETIME_TYPE_REGEXP = "[Dd][Aa][Tt][Ee][Tt][Ii][Mm][Ee]";
+    // regexp which matches the datetime model format without range, i.e., DATETIME(format)
+    protected static final String DATETYPE_FORMAT_REGEXP = ignoreCaseRegexp(ModelType.DATETIME.name()) + "\\" +
+                                                           LEFT_DELIMITER + "([^)]+)" + "\\" + RIGHT_DELIMITER;
 
-    protected static final String LEFT_DELIMITER_REGEXP = "\\" + LEFT_DELIMITER;
-
-    protected static final String RIGHT_DELIMITER_REGEXP = "\\" + RIGHT_DELIMITER;
-
-    protected static final String DATETYPE_MAIN_REGEXP = DATETIME_TYPE_REGEXP + LEFT_DELIMITER_REGEXP + "([^)]+)" +
-                                                         RIGHT_DELIMITER_REGEXP;
+    // regexp which matches all the allowed datetime model definition, i.e., DATETIME(format) or DATETIME(format)[min,max]
+    protected static final String DATETIME_COMPLETE_REGEXP = String.format("^%s$|^%s$",
+                                                                           DATETYPE_FORMAT_REGEXP,
+                                                                           DATETYPE_FORMAT_REGEXP + RANGE_REGEXP);
 
     public DateTimeParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-    }
-
-    @Override
-    public String getType() {
-        return DATETIME_TYPE;
-    }
-
-    @Override
-    protected String getTypeRegexp() {
-        return DATETIME_TYPE_REGEXP;
-    }
-
-    @Override
-    public Class getClassType() {
-        return Date.class;
+        super(model, ModelType.DATETIME, DATETIME_COMPLETE_REGEXP);
     }
 
     @Override
@@ -96,15 +79,12 @@ public class DateTimeParserValidator extends RangeParserValidator<Date> {
     }
 
     private List<String> getDateModelArguments(String model) throws ModelSyntaxException {
-        String dateTimeMainRegexp = "^" + DATETYPE_MAIN_REGEXP + "$" + "|" + "^" + DATETYPE_MAIN_REGEXP +
-                                    RANGE_MAIN_REGEXP + "$";
-
-        List<String> modelArguments = parseAndGetRegexGroups(model, dateTimeMainRegexp);
+        List<String> modelArguments = parseAndGetRegexGroups(model, DATETIME_COMPLETE_REGEXP);
         if ((modelArguments.size() == 1) || (modelArguments.size() == 2)) {
             return modelArguments;
         } else {
-            throw new ModelSyntaxException("Internal error, regular expression for " + getType() + " '" +
-                                           dateTimeMainRegexp + "' is invalid.");
+            throw new ModelSyntaxException("Internal error, regular expression for " + type + " '" +
+                                           DATETIME_COMPLETE_REGEXP + "' is invalid.");
         }
     }
 }

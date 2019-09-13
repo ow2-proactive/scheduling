@@ -39,15 +39,11 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import javax.security.auth.login.LoginException;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.PathSegment;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.ow2.proactive.authentication.UserData;
@@ -62,6 +58,7 @@ import org.ow2.proactive_grid_cloud_portal.scheduler.dto.JobValidationData;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.JobCreationRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SchedulerRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.SubmissionClosedRestException;
 import org.ow2.proactive_grid_cloud_portal.studio.storage.FileStorage;
@@ -98,28 +95,25 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public String login(@FormParam("username") String username, @FormParam("password") String password)
-            throws KeyException, LoginException, SchedulerRestException {
+    public String login(String username, String password) throws LoginException, SchedulerRestException {
         logger.info("Logging as " + username);
         return scheduler().login(username, password);
     }
 
     @Override
-    public String loginWithCredential(@MultipartForm LoginForm multipart)
-            throws IOException, KeyException, LoginException, SchedulerRestException {
+    public String loginWithCredential(LoginForm multipart) throws KeyException, LoginException, SchedulerRestException {
         logger.info("Logging using credential file");
         return scheduler().loginWithCredential(multipart);
     }
 
     @Override
-    public void logout(@HeaderParam("sessionid")
-    final String sessionId) throws PermissionRestException, NotConnectedRestException {
+    public void logout(String sessionId) throws RestException {
         logger.info("logout");
         scheduler().disconnect(sessionId);
     }
 
     @Override
-    public boolean isConnected(@HeaderParam("sessionid") String sessionId) {
+    public boolean isConnected(String sessionId) {
         try {
             getUserName(sessionId);
             return true;
@@ -129,7 +123,7 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public String currentUser(@HeaderParam("sessionid") String sessionId) {
+    public String currentUser(String sessionId) {
         try {
             return getUserName(sessionId);
         } catch (NotConnectedRestException e) {
@@ -138,102 +132,91 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public UserData currentUserData(@HeaderParam("sessionid") String sessionId) {
+    public UserData currentUserData(String sessionId) {
         return scheduler().getUserDataFromSessionId(sessionId);
     }
 
     @Override
-    public List<Workflow> getWorkflows(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedRestException, IOException {
+    public List<Workflow> getWorkflows(String sessionId) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Reading workflows as " + userName);
         return getFileStorageSupport().getWorkflowStorage(userName).readAll();
     }
 
     @Override
-    public Workflow createWorkflow(@HeaderParam("sessionid") String sessionId, Workflow workflow)
-            throws NotConnectedRestException, IOException {
+    public Workflow createWorkflow(String sessionId, Workflow workflow) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Creating workflow as " + userName);
         return getFileStorageSupport().getWorkflowStorage(userName).store(workflow);
     }
 
     @Override
-    public Workflow getWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId)
-            throws NotConnectedRestException, IOException {
+    public Workflow getWorkflow(String sessionId, String workflowId) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         return getFileStorageSupport().getWorkflowStorage(userName).read(workflowId);
     }
 
     @Override
-    public String getWorkflowXmlContent(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId)
+    public String getWorkflowXmlContent(String sessionId, String workflowId)
             throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         return getFileStorageSupport().getWorkflowStorage(userName).read(workflowId).getXml();
     }
 
     @Override
-    public Workflow updateWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId,
-            Workflow workflow) throws NotConnectedRestException, IOException {
+    public Workflow updateWorkflow(String sessionId, String workflowId, Workflow workflow)
+            throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Updating workflow " + workflowId + " as " + userName);
         return getFileStorageSupport().getWorkflowStorage(userName).update(workflowId, workflow);
     }
 
     @Override
-    public void deleteWorkflow(@HeaderParam("sessionid") String sessionId, @PathParam("id") String workflowId)
-            throws NotConnectedRestException, IOException {
+    public void deleteWorkflow(String sessionId, String workflowId) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         logger.info("Deleting workflow " + workflowId + " as " + userName);
         getFileStorageSupport().getWorkflowStorage(userName).delete(workflowId);
     }
 
     @Override
-    public List<Workflow> getTemplates(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedRestException, IOException {
+    public List<Workflow> getTemplates(String sessionId) throws IOException {
         return getFileStorageSupport().getTemplateStorage().readAll();
     }
 
     @Override
-    public Workflow createTemplate(@HeaderParam("sessionid") String sessionId, Workflow template)
-            throws NotConnectedRestException, IOException {
+    public Workflow createTemplate(String sessionId, Workflow template) throws IOException {
         return getFileStorageSupport().getTemplateStorage().store(template);
     }
 
     @Override
-    public Workflow getTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
-            throws NotConnectedRestException, IOException {
+    public Workflow getTemplate(String sessionId, String templateId) throws IOException {
         return getFileStorageSupport().getTemplateStorage().read(templateId);
     }
 
     @Override
-    public String getTemplateXmlContent(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
-            throws NotConnectedRestException, IOException {
+    public String getTemplateXmlContent(String sessionId, String templateId) throws IOException {
         return getFileStorageSupport().getTemplateStorage().read(templateId).getXml();
     }
 
     @Override
-    public Workflow updateTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId,
-            Workflow template) throws NotConnectedRestException, IOException {
+    public Workflow updateTemplate(String sessionId, String templateId, Workflow template) throws IOException {
         return getFileStorageSupport().getTemplateStorage().update(templateId, template);
     }
 
     @Override
-    public void deleteTemplate(@HeaderParam("sessionid") String sessionId, @PathParam("id") String templateId)
-            throws NotConnectedRestException, IOException {
+    public void deleteTemplate(String sessionId, String templateId) throws IOException {
         getFileStorageSupport().getTemplateStorage().delete(templateId);
     }
 
     @Override
-    public List<Script> getScripts(@HeaderParam("sessionid") String sessionId)
-            throws NotConnectedRestException, IOException {
+    public List<Script> getScripts(String sessionId) throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         return getFileStorageSupport().getScriptStorage(userName).readAll();
     }
 
     @Override
-    public String createScript(@HeaderParam("sessionid") String sessionId, @FormParam("name") String name,
-            @FormParam("content") String content) throws NotConnectedRestException, IOException {
+    public String createScript(String sessionId, String name, String content)
+            throws NotConnectedRestException, IOException {
         String userName = getUserName(sessionId);
         FileStorage<Script> scriptStorage = getFileStorageSupport().getScriptStorage(userName);
         Script storedScript = scriptStorage.store(new Script(name, content));
@@ -241,14 +224,14 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public String updateScript(@HeaderParam("sessionid") String sessionId, @PathParam("name") String name,
-            @FormParam("content") String content) throws NotConnectedRestException, IOException {
+    public String updateScript(String sessionId, String name, String content)
+            throws NotConnectedRestException, IOException {
 
         return createScript(sessionId, name, content);
     }
 
     @Override
-    public ArrayList<String> getClasses(@HeaderParam("sessionid") String sessionId) throws NotConnectedRestException {
+    public ArrayList<String> getClasses(String sessionId) throws NotConnectedRestException {
         String userName = getUserName(sessionId);
         File classesDir = new File(getFileStorageSupport().getWorkflowsDir(userName), "classes");
 
@@ -279,7 +262,7 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public String createClass(@HeaderParam("sessionid") String sessionId, MultipartFormDataInput input)
+    public String createClass(String sessionId, MultipartFormDataInput input)
             throws NotConnectedRestException, IOException {
         try {
             String userName = getUserName(sessionId);
@@ -323,14 +306,15 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public JobValidationData validate(@PathParam("path") PathSegment pathSegment, MultipartFormDataInput multipart) {
-        return scheduler().validate(pathSegment, multipart);
+    public JobValidationData validate(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart)
+            throws NotConnectedRestException {
+        return scheduler().validate(sessionId, pathSegment, multipart);
     }
 
     @Override
-    public JobIdData submit(@HeaderParam("sessionid") String sessionId, @PathParam("path") PathSegment pathSegment,
-            MultipartFormDataInput multipart) throws JobCreationRestException, NotConnectedRestException,
-            PermissionRestException, SubmissionClosedRestException, IOException {
+    public JobIdData submit(String sessionId, PathSegment pathSegment, MultipartFormDataInput multipart)
+            throws JobCreationRestException, NotConnectedRestException, PermissionRestException,
+            SubmissionClosedRestException, IOException {
         return scheduler().submit(sessionId, pathSegment, multipart, null);
     }
 
@@ -342,8 +326,7 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public String getVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId)
-            throws NotConnectedRestException, IOException {
+    public String getVisualization(String sessionId, String jobId) throws IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         if (visualizationFile.exists()) {
             return FileUtils.readFileToString(new File(visualizationFile.getAbsolutePath()),
@@ -353,8 +336,7 @@ public class StudioRest implements StudioInterface {
     }
 
     @Override
-    public boolean updateVisualization(@HeaderParam("sessionid") String sessionId, @PathParam("id") String jobId,
-            @FormParam("visualization") String visualization) throws NotConnectedRestException, IOException {
+    public boolean updateVisualization(String sessionId, String jobId, String visualization) throws IOException {
         File visualizationFile = new File(PortalConfiguration.jobIdToPath(jobId) + ".html");
         Files.deleteIfExists(visualizationFile.toPath());
         FileUtils.write(new File(visualizationFile.getAbsolutePath()), visualization, Charset.forName(FILE_ENCODING));

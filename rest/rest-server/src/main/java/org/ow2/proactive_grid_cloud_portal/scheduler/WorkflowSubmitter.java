@@ -114,7 +114,7 @@ public class WorkflowSubmitter {
 
     private Job createJobObject(File jobFile, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
             throws JobCreationException {
-        return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(), jobVariables, jobGenericInfos);
+        return JobFactory.getFactory().createJob(jobFile.getAbsolutePath(), jobVariables, jobGenericInfos, scheduler);
     }
 
 }

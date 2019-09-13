@@ -53,6 +53,7 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
         PASSWORD("password"),
         FILEBROWSER("fileBrowser"),
         TEXTAREA("textArea"),
+        CHECKBOX("checkbox"),
         NONE("none");
 
         private String name;
@@ -77,13 +78,20 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
 
         public boolean dynamic;
 
+        public int sectionSelector;
+
+        public boolean important;
+
         ConfigurableWrapper() {
         }
 
-        public ConfigurableWrapper(ConfigurableValues type, String desc, boolean dynamic) {
+        public ConfigurableWrapper(ConfigurableValues type, String desc, boolean dynamic, int sectionSelector,
+                boolean important) {
             this.description = desc;
             this.type = type;
             this.dynamic = dynamic;
+            this.sectionSelector = sectionSelector;
+            this.important = important;
         }
     }
 
@@ -100,11 +108,17 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
             type = ConfigurableValues.FILEBROWSER;
         } else if (arg0.textArea()) {
             type = ConfigurableValues.TEXTAREA;
+        } else if (arg0.checkbox()) {
+            type = ConfigurableValues.CHECKBOX;
         } else {
             type = ConfigurableValues.NONE;
         }
 
-        return new ConfigurableWrapper(type, arg0.description(), arg0.dynamic());
+        return new ConfigurableWrapper(type,
+                                       arg0.description(),
+                                       arg0.dynamic(),
+                                       arg0.sectionSelector(),
+                                       arg0.important());
     }
 
     @Override
@@ -146,10 +160,24 @@ public class ConfigurableAdapter extends XmlAdapter<ConfigurableWrapper, Configu
             }
 
             @Override
+            public boolean checkbox() {
+                return arg0.type == ConfigurableValues.CHECKBOX;
+            }
+
+            @Override
             public boolean dynamic() {
                 return arg0.dynamic;
             }
 
+            @Override
+            public int sectionSelector() {
+                return arg0.sectionSelector;
+            }
+
+            @Override
+            public boolean important() {
+                return arg0.important;
+            }
         };
     }
 

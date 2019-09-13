@@ -50,7 +50,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
-import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -198,6 +197,9 @@ public class Job2XMLTransformer {
         setAttribute(rootJob, XMLAttributes.COMMON_NAME, job.getName(), true);
         if (job.getRestartTaskOnErrorProperty().isSet()) {
             setAttribute(rootJob, XMLAttributes.COMMON_RESTART_TASK_ON_ERROR, job.getRestartTaskOnError().toString());
+        }
+        if (job.getTaskRetryDelayProperty().isSet()) {
+            setAttribute(rootJob, XMLAttributes.COMMON_TASK_RETRY_DELAY, formatDate(job.getTaskRetryDelay()));
         }
 
         // *** elements ***
@@ -447,6 +449,9 @@ public class Job2XMLTransformer {
         if (task.getRestartTaskOnErrorProperty().isSet()) {
             setAttribute(taskE, XMLAttributes.COMMON_RESTART_TASK_ON_ERROR, task.getRestartTaskOnError().toString());
         }
+        if (task.getTaskRetryDelayProperty().isSet()) {
+            setAttribute(taskE, XMLAttributes.COMMON_TASK_RETRY_DELAY, formatDate(task.getTaskRetryDelay()));
+        }
 
         // *** task attributes ***
         if (task.getWallTime() != 0) {
@@ -455,6 +460,10 @@ public class Job2XMLTransformer {
 
         if (task.isRunAsMe()) {
             setAttribute(taskE, XMLAttributes.TASK_RUN_AS_ME, "true");
+        }
+
+        if (task.isFork() != null && task.isFork()) {
+            setAttribute(taskE, XMLAttributes.TASK_FORK, "true");
         }
 
         if (task.isPreciousResult()) {

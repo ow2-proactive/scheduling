@@ -39,31 +39,8 @@ import org.springframework.expression.ParseException;
  */
 public class JSONParserValidator extends BaseParserValidator<String> {
 
-    public static final String JSON_TYPE = "JSON";
-
-    public static final String JSON_TYPE_REGEXP = "[Jj][Ss][Oo][Nn]";
-
     public JSONParserValidator(String model) throws ModelSyntaxException {
-        super(model);
-        String regexep = "^" + JSON_TYPE_REGEXP + "$";
-        if (!model.matches(regexep)) {
-            throw new ModelSyntaxException(JSON_TYPE + " expression in model does not match " + regexep);
-        }
-    }
-
-    @Override
-    protected String getType() {
-        return JSON_TYPE;
-    }
-
-    @Override
-    protected String getTypeRegexp() {
-        return JSON_TYPE_REGEXP;
-    }
-
-    @Override
-    protected Class getClassType() {
-        return String.class;
+        super(model, ModelType.JSON);
     }
 
     @Override

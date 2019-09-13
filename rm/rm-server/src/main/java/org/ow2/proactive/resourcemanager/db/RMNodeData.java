@@ -27,6 +27,8 @@ package org.ow2.proactive.resourcemanager.db;
 
 import java.io.Serializable;
 import java.security.Permission;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -92,23 +94,25 @@ public class RMNodeData implements Serializable {
       * e.g. following the pattern: pnp://192.168.1.104:59357/PA_JVM[0-9]* */
     private String jvmName;
 
+    private Map<String, String> usageInfo;
+
     /**
      * Create an instance of {@link RMNodeData} and populate its fields with the content of a node.
      * @param rmNode the object to take the values from
      * @return a new instance of {@link RMNodeData} with the values of the given {@link RMNode}
      */
     public static RMNodeData createRMNodeData(RMNode rmNode) {
-        RMNodeData rmNodeData = new RMNodeData(rmNode.getNodeName(),
-                                               rmNode.getNodeURL(),
-                                               rmNode.getOwner(),
-                                               rmNode.getProvider(),
-                                               rmNode.getUserPermission(),
-                                               rmNode.getState(),
-                                               rmNode.getStateChangeTime(),
-                                               rmNode.getHostName(),
-                                               rmNode.getJmxUrls(),
-                                               rmNode.getDescriptorVMName());
-        return rmNodeData;
+        return new RMNodeData(rmNode.getNodeName(),
+                              rmNode.getNodeURL(),
+                              rmNode.getOwner(),
+                              rmNode.getProvider(),
+                              rmNode.getUserPermission(),
+                              rmNode.getState(),
+                              rmNode.getStateChangeTime(),
+                              rmNode.getHostName(),
+                              rmNode.getJmxUrls(),
+                              rmNode.getDescriptorVMName(),
+                              rmNode.getUsageInfo());
     }
 
     public RMNodeData() {
@@ -127,6 +131,23 @@ public class RMNodeData implements Serializable {
         this.hostname = hostName;
         this.jmxUrls = jmxUrls;
         this.jvmName = jvmName;
+        this.usageInfo = Collections.emptyMap();
+    }
+
+    public RMNodeData(String name, String nodeUrl, Client owner, Client provider, Permission permission,
+            NodeState state, long stateChangeTime, String hostName, String[] jmxUrls, String jvmName,
+            Map<String, String> usageInfo) {
+        this.name = name;
+        this.nodeUrl = nodeUrl;
+        this.owner = owner;
+        this.provider = provider;
+        this.userPermission = permission;
+        this.state = state;
+        this.stateChangeTime = stateChangeTime;
+        this.hostname = hostName;
+        this.jmxUrls = jmxUrls;
+        this.jvmName = jvmName;
+        this.usageInfo = usageInfo;
     }
 
     @Id
@@ -231,6 +252,16 @@ public class RMNodeData implements Serializable {
 
     public void setJvmName(String jvmName) {
         this.jvmName = jvmName;
+    }
+
+    @Column(name = "USAGE_INFO", length = Integer.MAX_VALUE, nullable = true)
+    @Type(type = "org.hibernate.type.SerializableToBlobType", parameters = @Parameter(name = SerializableToBlobType.CLASS_NAME, value = "java.lang.Object"))
+    public Map<String, String> getUsageInfo() {
+        return usageInfo;
+    }
+
+    public void setUsageInfo(Map<String, String> usageInfo) {
+        this.usageInfo = usageInfo;
     }
 
     /**

@@ -117,9 +117,8 @@ public class RMProxy {
         init();
     }
 
-    public NodeSet getNodes(Criteria criteria) throws RMProxyCreationException {
-        NodeSet nodeSet = proxyActiveObject.getNodes(criteria);
-        return nodeSet;
+    public NodeSet getNodes(Criteria criteria) {
+        return proxyActiveObject.getNodes(criteria);
     }
 
     public void releaseNodes(NodeSet nodeSet) {

@@ -28,6 +28,7 @@ package org.ow2.proactive.resourcemanager.rmnode;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.node.Node;
@@ -269,7 +270,12 @@ public final class RMDeployingNode extends AbstractRMNode {
      */
     @Override
     public void setBusy(Client owner) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(); // cause you are deploying
+    }
+
+    @Override
+    public void setBusy(Client owner, Map<String, String> usageInfo) {
+        throw new UnsupportedOperationException(); // cause you are deploying
     }
 
     /**
@@ -369,6 +375,25 @@ public final class RMDeployingNode extends AbstractRMNode {
         return nodeSource.update(this);
     }
 
+    @Override
+    public void addToken(String token) {
+
+    }
+
+    @Override
+    public void removeToken(String token) {
+
+    }
+
+    @Override
+    public List<String> getNodeTokens() {
+        return null;
+    }
+
+    @Override
+    public void setNodeTokens(String nodeUrl, List<String> tokens) {
+
+    }
 }
 
 /**

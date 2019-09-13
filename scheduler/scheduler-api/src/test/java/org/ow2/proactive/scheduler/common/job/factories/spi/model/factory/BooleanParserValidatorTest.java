@@ -36,18 +36,17 @@ public class BooleanParserValidatorTest {
 
     @Test
     public void testBooleanParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
-        Assert.assertEquals(true,
-                            new BooleanParserValidator(BooleanParserValidator.BOOLEAN_TYPE).parseAndValidate("true"));
+        Assert.assertEquals(true, new BooleanParserValidator(ModelType.BOOLEAN.name()).parseAndValidate("true"));
     }
 
     @Test(expected = ConversionException.class)
     public void testBooleanParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
-        new BooleanParserValidator(BooleanParserValidator.BOOLEAN_TYPE).parseAndValidate("blabla");
+        new BooleanParserValidator(ModelType.BOOLEAN.name()).parseAndValidate("blabla");
     }
 
     @Test(expected = ModelSyntaxException.class)
     public void testBooleanParserValidatorInvalidModel()
             throws ModelSyntaxException, ValidationException, ConversionException {
-        new BooleanParserValidator("ILLEGAL_" + BooleanParserValidator.BOOLEAN_TYPE).parseAndValidate("blabla");
+        new BooleanParserValidator("ILLEGAL_" + ModelType.BOOLEAN.name()).parseAndValidate("blabla");
     }
 }

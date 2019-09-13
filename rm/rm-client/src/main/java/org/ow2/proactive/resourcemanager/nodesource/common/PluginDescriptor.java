@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,6 +72,10 @@ public class PluginDescriptor implements Serializable {
 
     private Map<String, String> defaultValues;
 
+    private Map<Integer, String> sectionDescriptions = new HashMap<>();
+
+    private Map<String, String> meta = new HashMap<>();
+
     public PluginDescriptor() {
     }
 
@@ -80,7 +85,9 @@ public class PluginDescriptor implements Serializable {
             pluginName = cls.getName();
             this.defaultValues = defaultValues;
 
+            findSectionDescriptions(cls, instance);
             findConfigurableFileds(cls, instance);
+            findMeta(cls, instance);
 
             Method getDescription = cls.getMethod("getDescription");
             if (getDescription != null) {
@@ -122,6 +129,26 @@ public class PluginDescriptor implements Serializable {
             field.setValue(new String((byte[]) parameterObject));
         } else {
             field.setValue(String.valueOf(parameterObject));
+        }
+    }
+
+    private void findSectionDescriptions(Class<?> cls, Object instance) {
+        try {
+            Method getSectionDescriptions = cls.getMethod("getSectionDescriptions");
+            Map<Integer, String> sectionDescriptions = (Map<Integer, String>) getSectionDescriptions.invoke(instance);
+            this.sectionDescriptions.putAll(sectionDescriptions);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            logger.debug("Could not load `getSectionDescriptions`.", e);
+        }
+    }
+
+    private void findMeta(Class<?> cls, Object instance) {
+        try {
+            Method getMetaMethod = cls.getMethod("getMeta");
+            Map<String, String> metaInfo = (Map<String, String>) getMetaMethod.invoke(instance);
+            this.meta.putAll(metaInfo);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            logger.debug("Could not load `getMeta`.", e);
         }
     }
 
@@ -169,6 +196,10 @@ public class PluginDescriptor implements Serializable {
      */
     public Map<String, String> getDefaultValues() {
         return this.defaultValues;
+    }
+
+    public Map<Integer, String> getSectionDescriptions() {
+        return sectionDescriptions;
     }
 
     /**

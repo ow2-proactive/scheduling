@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.job.JobVariable;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.utils.RestrictedMethodResolver;
@@ -47,33 +48,38 @@ public class ModelValidatorContext {
 
     private final StandardEvaluationContext spelContext;
 
+    private final Scheduler scheduler;
+
     // container for job and task variables
     private SpELVariables spELVariables;
 
-    public ModelValidatorContext(StandardEvaluationContext context) {
+    public ModelValidatorContext(StandardEvaluationContext context, Scheduler scheduler) {
         this.spelContext = context;
-
+        this.scheduler = scheduler;
     }
 
-    private ModelValidatorContext(Map<String, Serializable> variablesValues) {
+    private ModelValidatorContext(Map<String, Serializable> variablesValues, Scheduler scheduler) {
         spELVariables = new SpELVariables(variablesValues);
         spelContext = new StandardEvaluationContext(spELVariables);
         spelContext.setTypeLocator(new RestrictedTypeLocator());
         spelContext.setMethodResolvers(Collections.singletonList(new RestrictedMethodResolver()));
         spelContext.addPropertyAccessor(new RestrictedPropertyAccessor());
+        this.scheduler = scheduler;
     }
 
-    public ModelValidatorContext(Task task) {
+    public ModelValidatorContext(Task task, Scheduler scheduler) {
         this(task.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
                                                            (m, v) -> m.put(v.getName(), v.getValue()),
-                                                           HashMap<String, Serializable>::putAll));
+                                                           HashMap<String, Serializable>::putAll),
+             scheduler);
 
     }
 
-    public ModelValidatorContext(TaskFlowJob job) {
+    public ModelValidatorContext(TaskFlowJob job, Scheduler scheduler) {
         this(job.getVariables().values().stream().collect(HashMap<String, Serializable>::new,
                                                           (m, v) -> m.put(v.getName(), v.getValue()),
-                                                          HashMap<String, Serializable>::putAll));
+                                                          HashMap<String, Serializable>::putAll),
+             scheduler);
 
     }
 
@@ -83,6 +89,10 @@ public class ModelValidatorContext {
 
     public SpELVariables getSpELVariables() {
         return spELVariables;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     /**

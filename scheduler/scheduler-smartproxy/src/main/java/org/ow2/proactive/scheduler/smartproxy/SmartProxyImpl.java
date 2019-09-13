@@ -812,15 +812,14 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
 
     @Override
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit)
-            throws NotConnectedException, PermissionException {
+            boolean pending, boolean finished, int offset, int limit) throws SchedulerException {
         return schedulerProxy.getTaskIds(taskTag, from, to, mytasks, running, pending, finished, offset, limit);
     }
 
     @Override
     public Page<TaskState> getTaskStates(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-            throws NotConnectedException, PermissionException {
+            throws SchedulerException {
         return schedulerProxy.getTaskStates(taskTag,
                                             from,
                                             to,
@@ -834,7 +833,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
+    public JobInfo getJobInfo(String jobId) throws SchedulerException {
         return schedulerProxy.getJobInfo(jobId);
     }
 
@@ -845,13 +844,12 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public String getJobContent(JobId jobId) throws UnknownJobException, SubmissionClosedException,
-            JobCreationException, NotConnectedException, PermissionException {
+    public String getJobContent(JobId jobId) throws SchedulerException {
         return schedulerProxy.getJobContent(jobId);
     }
 
     @Override
-    public Map<Object, Object> getPortalConfiguration() throws NotConnectedException, PermissionException {
+    public Map<Object, Object> getPortalConfiguration() throws SchedulerException {
         return schedulerProxy.getPortalConfiguration();
     }
 
@@ -866,7 +864,7 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Map<String, Object> getSchedulerProperties() throws NotConnectedException, PermissionException {
+    public Map<String, Object> getSchedulerProperties() throws SchedulerException {
         return schedulerProxy.getSchedulerProperties();
     }
 
@@ -889,20 +887,17 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     }
 
     @Override
-    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId)
-            throws NotConnectedException, PermissionException {
+    public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) throws SchedulerException {
         return schedulerProxy.getJobResultMaps(jobsId);
     }
 
     @Override
-    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
-            throws NotConnectedException, PermissionException {
+    public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId) throws SchedulerException {
         return schedulerProxy.getPreciousTaskNames(jobsId);
     }
 
     @Override
-    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
-            throws NotConnectedException, UnknownJobException {
+    public boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws SchedulerException {
         return schedulerProxy.checkJobPermissionMethod(sessionId, jobId, method);
     }
 

@@ -42,13 +42,13 @@ public class JSONParserValidatorTest {
     @Test
     public void testJSONParserValidatorOK() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "{\n" + "  \"type\": \"string\", \n" + "  \"minLength\": 3,\n" + "  \"maxLength\": 7\n" + "}";
-        Assert.assertEquals(value, new JSONParserValidator(JSONParserValidator.JSON_TYPE).parseAndValidate(value));
+        Assert.assertEquals(value, new JSONParserValidator(ModelType.JSON.name()).parseAndValidate(value));
     }
 
     @Test(expected = ValidationException.class)
     public void testJSONParserValidatorKO() throws ModelSyntaxException, ValidationException, ConversionException {
         String value = "\"test\" : 123";
-        new JSONParserValidator(JSONParserValidator.JSON_TYPE).parseAndValidate(value);
+        new JSONParserValidator(ModelType.JSON.name()).parseAndValidate(value);
     }
 
     @Test(expected = ModelSyntaxException.class)

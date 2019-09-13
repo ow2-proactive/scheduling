@@ -54,6 +54,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.apache.log4j.Logger;
 import org.iso_relax.verifier.VerifierConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
+import org.ow2.proactive.scheduler.common.Scheduler;
 import org.ow2.proactive.scheduler.common.exception.JobCreationException;
 import org.ow2.proactive.scheduler.common.exception.JobValidationException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -146,7 +147,19 @@ public class StaxJobFactory extends JobFactory {
     public Job createJob(String filePath, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
         try {
-            return createJob(new File(filePath), replacementVariables, replacementGenericInfos);
+            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, null);
+        } catch (JobCreationException jce) {
+            throw jce;
+        } catch (Exception e) {
+            throw new JobCreationException(e);
+        }
+    }
+
+    @Override
+    public Job createJob(String filePath, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos, Scheduler scheduler) throws JobCreationException {
+        try {
+            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, scheduler);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -163,7 +176,7 @@ public class StaxJobFactory extends JobFactory {
     public Job createJob(URI filePath, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
         try {
-            return createJob(new File(filePath), replacementVariables, replacementGenericInfos);
+            return createJob(new File(filePath), replacementVariables, replacementGenericInfos, null);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -179,8 +192,14 @@ public class StaxJobFactory extends JobFactory {
     @Override
     public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
             Map<String, String> replacementGenericInfos) throws JobCreationException {
+        return createJob(workflowStream, replacementVariables, replacementGenericInfos, null);
+    }
+
+    @Override
+    public Job createJob(InputStream workflowStream, Map<String, String> replacementVariables,
+            Map<String, String> replacementGenericInfos, Scheduler scheduler) throws JobCreationException {
         try {
-            return createJobFromInputStream(workflowStream, replacementVariables, replacementGenericInfos);
+            return createJobFromInputStream(workflowStream, replacementVariables, replacementGenericInfos, scheduler);
         } catch (JobCreationException jce) {
             throw jce;
         } catch (Exception e) {
@@ -189,14 +208,14 @@ public class StaxJobFactory extends JobFactory {
     }
 
     private Job createJob(File file, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos) throws JobCreationException {
+            Map<String, String> replacementGenericInfos, Scheduler scheduler) throws JobCreationException {
         try {
             if (!file.exists()) {
                 throw new FileNotFoundException("This file has not been found: " + file.getAbsolutePath());
             }
             relativePathRoot = file.getParentFile().getAbsolutePath();
             try (InputStream inputStream = new FileInputStream(file)) {
-                return createJobFromInputStream(inputStream, replacementVariables, replacementGenericInfos);
+                return createJobFromInputStream(inputStream, replacementVariables, replacementGenericInfos, scheduler);
             }
         } catch (JobCreationException jce) {
             jce.pushTag(XMLTags.JOB.getXMLName());
@@ -207,7 +226,7 @@ public class StaxJobFactory extends JobFactory {
     }
 
     private Job createJobFromInputStream(InputStream jobInputStream, Map<String, String> replacementVariables,
-            Map<String, String> replacementGenericInfos)
+            Map<String, String> replacementGenericInfos, Scheduler scheduler)
             throws JobCreationException, VerifierConfigurationException, IOException, XMLStreamException {
         long t0 = System.currentTimeMillis();
         byte[] bytes = ValidationUtil.getInputStreamBytes(jobInputStream);
@@ -227,7 +246,7 @@ public class StaxJobFactory extends JobFactory {
 
         makeDependences(job, dependencies);
         long t4 = System.currentTimeMillis();
-        validate((TaskFlowJob) job);
+        validate((TaskFlowJob) job, scheduler);
         long t5 = System.currentTimeMillis();
         long d1 = t1 - t0;
         long d2 = t2 - t1;
@@ -268,8 +287,8 @@ public class StaxJobFactory extends JobFactory {
     /*
      * Validate the given job descriptor
      */
-    private TaskFlowJob validate(TaskFlowJob job) throws VerifierConfigurationException, JobCreationException {
-
+    private TaskFlowJob validate(TaskFlowJob job, Scheduler scheduler)
+            throws VerifierConfigurationException, JobCreationException {
         Map<String, JobValidatorService> factories;
         try {
             factories = JobValidatorRegistry.getInstance().getRegisteredFactories();
@@ -282,7 +301,7 @@ public class StaxJobFactory extends JobFactory {
         try {
 
             for (JobValidatorService factory : factories.values()) {
-                updatedJob = factory.validateJob(updatedJob);
+                updatedJob = factory.validateJob(updatedJob, scheduler);
             }
         } catch (JobValidationException e) {
             throw e;
@@ -469,6 +488,9 @@ public class StaxJobFactory extends JobFactory {
                 job.setProjectName(commonPropertiesHolder.getProjectName());
                 job.setOnTaskError(commonPropertiesHolder.getOnTaskErrorProperty().getValue());
                 job.setRestartTaskOnError(commonPropertiesHolder.getRestartTaskOnError());
+                if (commonPropertiesHolder.getTaskRetryDelayProperty().isSet()) {
+                    job.setTaskRetryDelay(commonPropertiesHolder.getTaskRetryDelay());
+                }
                 job.setMaxNumberOfExecution(commonPropertiesHolder.getMaxNumberOfExecution());
                 job.setGenericInformation(commonPropertiesHolder.getGenericInformation());
                 job.setUnresolvedGenericInformation(commonPropertiesHolder.getUnresolvedGenericInformation());
@@ -519,6 +541,9 @@ public class StaxJobFactory extends JobFactory {
             } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
                 commonPropertiesHolder.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue,
                                                                                          commonPropertiesHolder.getVariablesAsReplacementMap())));
+            } else if (XMLAttributes.COMMON_TASK_RETRY_DELAY.matches(attributeName)) {
+                commonPropertiesHolder.setTaskRetryDelay(Tools.formatDate(replace(attributeValue,
+                                                                                  commonPropertiesHolder.getVariablesAsReplacementMap())));
             } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
                 commonPropertiesHolder.setOnTaskError(OnTaskError.getInstance(replace(attributeValue,
                                                                                       commonPropertiesHolder.getVariablesAsReplacementMap())));
@@ -940,6 +965,9 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
                     tmpTask.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue,
                                                                               tmpTask.getVariablesOverriden(job))));
+                } else if (XMLAttributes.COMMON_TASK_RETRY_DELAY.matches(attributeName)) {
+                    tmpTask.setTaskRetryDelay(Tools.formatDate(replace(attributeValue,
+                                                                       tmpTask.getVariablesOverriden(job))));
                 } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
                     tmpTask.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue,
                                                                              tmpTask.getVariablesOverriden(job))));
@@ -954,6 +982,8 @@ public class StaxJobFactory extends JobFactory {
                 } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attributeName)) {
                     tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue,
                                                                     tmpTask.getVariablesOverriden(job))));
+                } else if (XMLAttributes.TASK_FORK.matches(attributeName)) {
+                    tmpTask.setFork(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
                 }
             }
 
@@ -1035,6 +1065,12 @@ public class StaxJobFactory extends JobFactory {
                     default:
                         // do nothing just cope with sonarqube rule switch must have default
                 }
+            }
+            // check whether task properties has conflicts between "runAsMe" and "fork"
+            if (tmpTask.isRunAsMe() && Boolean.FALSE.equals(tmpTask.isFork())) {
+                throw new JobCreationException(String.format("The task contains conflicting properties between 'runAsMe=%s' and 'fork=%s', because 'runAsMe=true' implies 'fork=true'.",
+                                                             tmpTask.isRunAsMe(),
+                                                             tmpTask.isFork()));
             }
             //fill the real task with common attribute if it is a new one
             autoCopyfields(CommonAttribute.class, tmpTask, toReturn);
@@ -1889,6 +1925,7 @@ public class StaxJobFactory extends JobFactory {
             logger.debug("priority: " + job.getPriority());
             logger.debug("onTaskError: " + job.getOnTaskErrorProperty().getValue().toString());
             logger.debug("restartTaskOnError: " + job.getRestartTaskOnError());
+            logger.debug("TaskRetryDelay: " + job.getTaskRetryDelay());
             logger.debug("maxNumberOfExecution: " + job.getMaxNumberOfExecution());
             logger.debug("inputSpace: " + job.getInputSpace());
             logger.debug("outputSpace: " + job.getOutputSpace());
@@ -1909,6 +1946,7 @@ public class StaxJobFactory extends JobFactory {
                 logger.debug("preciousResult: " + t.isPreciousResult());
                 logger.debug("preciousLogs: " + t.isPreciousLogs());
                 logger.debug("restartTaskOnError: " + t.getRestartTaskOnError());
+                logger.debug("taskRetryDelay: " + t.getTaskRetryDelay());
                 logger.debug("maxNumberOfExecution: " + t.getMaxNumberOfExecution());
                 logger.debug("walltime: " + t.getWallTime());
                 logger.debug("selectionScripts: " + t.getSelectionScripts());
@@ -1941,7 +1979,8 @@ public class StaxJobFactory extends JobFactory {
                     } catch (Exception e) {
                         logger.debug("Cannot get args: " + e.getMessage(), e);
                     }
-                    logger.debug("fork: " + ((JavaTask) t).isFork());
+                    logger.debug("fork: " + t.isFork());
+                    logger.debug("runAsMe: " + t.isRunAsMe());
                 } else if (t instanceof NativeTask) {
                     logger.debug("commandLine: " + Arrays.toString(((NativeTask) t).getCommandLine()));
                 } else if (t instanceof ScriptTask) {

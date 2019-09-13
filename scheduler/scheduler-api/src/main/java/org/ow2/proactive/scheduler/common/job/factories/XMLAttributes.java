@@ -47,6 +47,7 @@ public enum XMLAttributes {
     COMMON_MAX_NUMBER_OF_EXECUTION("maxNumberOfExecution"),
     COMMON_NAME("name"),
     COMMON_RESTART_TASK_ON_ERROR("restartTaskOnError"),
+    COMMON_TASK_RETRY_DELAY("taskRetryDelay"),
     COMMON_VALUE("value"),
 
     // VARIABLE
@@ -61,6 +62,7 @@ public enum XMLAttributes {
     TASK_PRECIOUS_LOGS("preciousLogs"),
     TASK_PRECIOUS_RESULT("preciousResult"),
     TASK_RUN_AS_ME("runAsMe"),
+    TASK_FORK("fork"),
     TASK_WALLTIME("walltime"),
 
     // NATIVE TASK ATTRIBUTES
