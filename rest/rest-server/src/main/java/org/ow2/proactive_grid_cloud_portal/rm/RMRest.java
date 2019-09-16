@@ -106,8 +106,6 @@ public class RMRest implements RMRestInterface {
 
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
         if (sessionId == null) {
             throw new NotConnectedException("you did not provide 'sessionid' in the header");
@@ -886,18 +884,16 @@ public class RMRest implements RMRestInterface {
             return null;
         }
         Map<String, Object> processedJsonMap = new HashMap<>();
-        long currentTime = new Date().getTime() / 1000;
+        long timeStamp = new Date().getTime() / 1000;
         long duration = StatHistory.Range.valueOf(range).getDuration();
-        int size = Optional.ofNullable(((ArrayList) jsonMap.entrySet().iterator().next().getValue()).size()).orElse(0);
+        int size = Optional.ofNullable(((ArrayList) jsonMap.entrySet().iterator().next().getValue()).size()).orElse(1);
         long step = duration / size;
 
-        List<String> labels = new ArrayList<>(size + 1);
+        List<Long> labels = new ArrayList<>(size + 1);
         for (int i = 0; i <= size; i++) {
             //The time instant where the metric is taken
-            long t = currentTime - duration + step * i;
-            Date date = new Date(t * 1000);
-
-            labels.add(DATE_FORMAT.format(date));
+            long t = timeStamp - duration + step * i;
+            labels.add(t * 1000);
         }
         JSONObject measureInfo;
         JSONArray measureInfoList;
