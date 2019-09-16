@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.rm;
+package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.io.IOException;
 import java.security.KeyException;
