@@ -26,7 +26,4 @@ include 'rest:rest-client'
 include 'rest:rest-smartproxy'
 
 include 'war-wrapper'
-include 'rm-api'
 include 'rm:rm-api'
-include 'rm:rm-api'
-findProject(':rm:rm-api')?.name = 'rm-api'
