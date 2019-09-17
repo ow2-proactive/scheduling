@@ -151,7 +151,7 @@ public class RestFuncTHelper {
         // Connect a rm client
         RMAuthentication rmAuth = RMConnection.waitAndJoin(url, TimeUnit.SECONDS.toMillis(120));
         Credentials rmCredentials = getRmCredentials();
-        rm = rmAuth.login(rmCredentials);
+        rm = (ResourceManager) rmAuth.login(rmCredentials);
 
         restServerUrl = "https://localhost:8443/rest/";
         restfulSchedulerUrl = restServerUrl + "scheduler";

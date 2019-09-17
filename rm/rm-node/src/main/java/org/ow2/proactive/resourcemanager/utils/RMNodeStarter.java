@@ -1194,7 +1194,7 @@ public class RMNodeStarter {
 
     private ResourceManager loginToResourceManager(final Credentials credentials, final RMAuthentication auth) {
         try {
-            ResourceManager rm = auth.login(credentials);
+            ResourceManager rm = (ResourceManager) auth.login(credentials);
             if (rm == null) {
                 logger.error(ExitStatus.RM_NULL.description);
                 System.exit(ExitStatus.RM_NULL.exitCode);
@@ -1243,7 +1243,7 @@ public class RMNodeStarter {
                 public boolean checkPermission(Credentials cred) {
                     ResourceManager rm = null;
                     try {
-                        rm = rmAuth.login(cred);
+                        rm = (ResourceManager) rmAuth.login(cred);
                         if (NB_OF_ADD_NODE_ATTEMPTS == 0)
                             return true;
 
@@ -1286,7 +1286,7 @@ public class RMNodeStarter {
             // trying to reconnect to the resource manager
             ResourceManager rm = null;
             RMAuthentication rmAuth = RMConnection.waitAndJoin(rmURL, WAIT_ON_JOIN_TIMEOUT_IN_MS);
-            rm = rmAuth.login(credentials);
+            rm = (ResourceManager) rmAuth.login(credentials);
 
             startMonitoring(rmAuth);
             return rm;

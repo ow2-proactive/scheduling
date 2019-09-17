@@ -29,7 +29,6 @@ import javax.security.auth.login.LoginException;
 
 import org.ow2.proactive.authentication.Authentication;
 import org.ow2.proactive.authentication.crypto.Credentials;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 
 
 /**
@@ -46,5 +45,5 @@ public interface RMAuthentication extends Authentication {
      * @return the resource manager interface if the login is successful
      * @throws LoginException if user does not exist or password is incorrect
      */
-    ResourceManager login(Credentials credentials) throws LoginException;
+    Object login(Credentials credentials) throws LoginException;
 }

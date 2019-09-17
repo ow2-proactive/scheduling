@@ -111,7 +111,7 @@ public class SchedulerStartForFunctionalTest implements Serializable {
                     if (deployLocalNodes) {
                         Credentials credentials = Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString()));
 
-                        ResourceManager rmAdmin = rmAuth.login(credentials);
+                        ResourceManager rmAdmin = (ResourceManager) rmAuth.login(credentials);
                         rmAdmin.createNodeSource(RM_NODE_NAME,
                                                  LocalInfrastructure.class.getName(),
                                                  new Object[] { credentials.getBase64(), RM_NODE_NUMBER,

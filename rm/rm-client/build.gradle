@@ -4,6 +4,7 @@
     compile "org.objectweb.proactive:programming-extension-annotation:${programmingVersion}"
 
     compile project(':common:common-client')
+    compile project(':rm:rm-api')
     testCompile project (':common:common-api').sourceSets.test.output
 }
 task stub(type: StubTask) {

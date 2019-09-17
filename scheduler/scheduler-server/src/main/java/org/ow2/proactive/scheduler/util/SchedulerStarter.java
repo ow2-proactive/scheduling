@@ -569,7 +569,7 @@ public class SchedulerStarter {
     private static void addLocalNodes(RMAuthentication rmAuth, int numberLocalNodes, int nodeTimeoutValue)
             throws LoginException, KeyException, IOException {
         //creating default node source
-        ResourceManager rman = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+        ResourceManager rman = (ResourceManager) rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME,

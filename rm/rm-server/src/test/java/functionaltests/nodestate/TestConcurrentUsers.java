@@ -104,7 +104,7 @@ public class TestConcurrentUsers extends RMFunctionalTest {
                                                                      TestConcurrentUsers.this.rmHelper.getRMAuth()
                                                                                                       .getPublicKey());
 
-                    ResourceManager rm2 = TestConcurrentUsers.this.rmHelper.getRMAuth().login(cred);
+                    ResourceManager rm2 = (ResourceManager) TestConcurrentUsers.this.rmHelper.getRMAuth().login(cred);
                     rm2.releaseNode(ns.get(0)).getBooleanValue();
                     Assert.assertTrue("Should not be able to release foreign node", false);
                 } catch (Exception e) {
@@ -175,7 +175,7 @@ public class TestConcurrentUsers extends RMFunctionalTest {
                     Credentials cred = Credentials.createCredentials(new CredData(TestUsers.TEST.username,
                                                                                   TestUsers.TEST.password),
                                                                      auth.getPublicKey());
-                    ResourceManager rm = auth.login(cred);
+                    ResourceManager rm = (ResourceManager) auth.login(cred);
                     rm.disconnect().getBooleanValue();
                 } catch (Exception e) {
                     e.printStackTrace();

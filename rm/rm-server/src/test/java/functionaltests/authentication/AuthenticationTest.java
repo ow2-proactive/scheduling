@@ -61,7 +61,7 @@ public class AuthenticationTest extends RMFunctionalTest {
 
         Credentials cred = Credentials.createCredentials(new CredData(TestUsers.DEMO.username, TestUsers.DEMO.password),
                                                          auth.getPublicKey());
-        ResourceManager admin = auth.login(cred);
+        ResourceManager admin = (ResourceManager) auth.login(cred);
         admin.disconnect().getBooleanValue();
         log("Passed: successful authentication");
     }
@@ -72,7 +72,7 @@ public class AuthenticationTest extends RMFunctionalTest {
 
         Credentials cred = Credentials.createCredentials(new CredData(TestUsers.USER.username, TestUsers.USER.password),
                                                          auth.getPublicKey());
-        ResourceManager user = auth.login(cred);
+        ResourceManager user = (ResourceManager) auth.login(cred);
         user.disconnect().getBooleanValue();
         log("Passed: successful authentication");
     }

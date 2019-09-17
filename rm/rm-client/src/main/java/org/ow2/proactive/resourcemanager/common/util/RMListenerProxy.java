@@ -110,7 +110,7 @@ public class RMListenerProxy extends RMGroupEventListener {
 
         this.credentials = credentials;
         this.rmAuth = RMConnection.join(url);
-        this.target = rmAuth.login(credentials);
+        this.target = (ResourceManager) rmAuth.login(credentials);
 
         rebindListener();
 

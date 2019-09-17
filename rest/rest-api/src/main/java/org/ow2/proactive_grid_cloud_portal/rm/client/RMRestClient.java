@@ -1,4 +1,46 @@
+/*
+ * ProActive Parallel Suite(TM):
+ * The Open Source library for parallel and distributed
+ * Workflows & Scheduling, Orchestration, Cloud Automation
+ * and Big Data Analysis on Enterprise Grids & Clouds.
+ *
+ * Copyright (c) 2007 - 2017 ActiveEon
+ * Contact: contact@activeeon.com
+ *
+ * This library is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation: version 3 of
+ * the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ */
 package org.ow2.proactive_grid_cloud_portal.rm.client;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -14,24 +56,9 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 import org.ow2.proactive_grid_cloud_portal.common.RMRestInterface;
+import org.ow2.proactive_grid_cloud_portal.common.exceptionmapper.ExceptionToJson;
 
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 
 public class RMRestClient {
 
@@ -50,7 +77,7 @@ public class RMRestClient {
         if (httpEngine == null) {
             setBlindTrustSSLContext();
             SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(sslContext,
-                    NoopHostnameVerifier.INSTANCE);
+                                                                                                   NoopHostnameVerifier.INSTANCE);
             HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sslConnectionSocketFactory).build();
             httpEngine = new ApacheHttpClient4Engine(httpClient);
         }
@@ -62,7 +89,7 @@ public class RMRestClient {
         if (!providerFactory.isRegistered(RMRestClient.JacksonContextResolver.class)) {
             providerFactory.registerProvider(RMRestClient.JacksonContextResolver.class);
         }
-//        registerGzipEncoding(providerFactory);
+        //        registerGzipEncoding(providerFactory);
 
         rm = createRestProxy(providerFactory, restEndpointURL, httpEngine);
     }
@@ -94,7 +121,7 @@ public class RMRestClient {
     }
 
     private static RMRestInterface createRestProxy(ResteasyProviderFactory provider, String restEndpointURL,
-                                                   ClientHttpEngine httpEngine) {
+            ClientHttpEngine httpEngine) {
         ResteasyClient client = buildResteasyClient(provider);
         ResteasyWebTarget target = client.target(restEndpointURL);
         RMRestInterface rmRestInterface = target.proxy(RMRestInterface.class);
@@ -107,10 +134,9 @@ public class RMRestClient {
 
     private static RMRestInterface createExceptionProxy(final RMRestInterface rmRestInterface) {
         return (RMRestInterface) Proxy.newProxyInstance(RMRestInterface.class.getClassLoader(),
-                new Class[] { RMRestInterface.class },
-                new RMRestClient.RestClientExceptionHandler(rmRestInterface));
+                                                        new Class[] { RMRestInterface.class },
+                                                        new RMRestClient.RestClientExceptionHandler(rmRestInterface));
     }
-
 
     private static class RestClientExceptionHandler implements InvocationHandler {
 
@@ -130,7 +156,7 @@ public class RMRestClient {
                     try {
                         ExceptionToJson json = clientException.getResponse().readEntity(ExceptionToJson.class);
                         // here we take the server side exception and recreate it on the client side
-//                        throw rebuildServerSideException(json);
+                        //                        throw rebuildServerSideException(json);
                     } catch (ProcessingException couldNotReadJsonException) {
                         // rethrow server side exception as runtime exception but do not transform it
                         throw clientException;

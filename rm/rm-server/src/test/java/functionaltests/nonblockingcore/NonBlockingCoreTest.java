@@ -98,7 +98,7 @@ public class NonBlockingCoreTest extends RMFunctionalTest {
             public void run() {
                 ResourceManager rm2;
                 try {
-                    rm2 = auth.login(cred);
+                    rm2 = (ResourceManager) auth.login(cred);
                     nodes = rm2.getAtMostNodes(2, sScript);
                 } catch (LoginException e) {
                 }
