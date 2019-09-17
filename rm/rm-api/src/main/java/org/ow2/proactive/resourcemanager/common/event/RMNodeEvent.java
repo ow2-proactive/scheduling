@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.ow2.proactive.resourcemanager.common.NodeState;
 import org.ow2.proactive.resourcemanager.frontend.RMMonitoring;
 
@@ -66,10 +64,8 @@ public final class RMNodeEvent extends RMEvent {
     /** Node source name of the node */
     private final String nodeSource;
 
-    /** {@link ProActiveDescriptor} name of the node */
     private final String PADName;
 
-    /** {@link VirtualNode} name of the node */
     private final String VnName;
 
     /** Host name of the node */
@@ -334,8 +330,6 @@ public final class RMNodeEvent extends RMEvent {
     }
 
     /**
-     * Returns {@link ProActiveDescriptor} name of the node.
-     *
      * @return ProActiveDescriptor name of the node.
      */
     public String getPADName() {
@@ -343,8 +337,6 @@ public final class RMNodeEvent extends RMEvent {
     }
 
     /**
-     * Returns {@link VirtualNode} name of the node.
-     *
      * @return Virtual Node name of the node.
      */
     public String getVnName() {

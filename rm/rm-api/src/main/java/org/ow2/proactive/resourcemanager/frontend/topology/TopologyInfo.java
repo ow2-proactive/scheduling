@@ -31,26 +31,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
 import org.ow2.proactive.topology.descriptor.DistanceFunction;
 
 
-/**
- *
- * Interface represents hosts topology handled by resource manager.
- * Users may receive the topology information using {@code ResourceManager.getTopology()} method.
- */
-@PublicAPI
-public interface Topology extends Serializable {
-
-    /**
-     * Returns the distance between 2 nodes.
-     *
-     * @return the distance between 2 nodes
-     */
-    Long getDistance(Node node, Node node2);
+public interface TopologyInfo extends Serializable {
 
     /**
      * Returns the distance between 2 hosts identified by their inet addresses.
@@ -65,12 +50,6 @@ public interface Topology extends Serializable {
      * @return the distance between 2 nodes
      */
     Long getDistance(String hostName, String hostName2);
-
-    /**
-     * Checks if 2 nodes are on the sane host.
-     * @return true if 2 nodes are on the same hosts, false otherwise
-     */
-    boolean onSameHost(Node node, Node node2);
 
     /**
      * Checks if the information about host is presented in the topology records.
@@ -104,4 +83,5 @@ public interface Topology extends Serializable {
      * @return the list of host clusters
      */
     List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction);
+
 }

@@ -112,7 +112,6 @@ public class RMConnection extends Connection<RMAuthentication> {
      * 			the given URL with RM_NAME appended if URL does not end with RM_NAME
      */
     private static String normalizeRM(String url) {
-        return URIBuilder.buildURI(Connection.normalize(url), RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION)
-                         .toString();
+        return URIBuilder.buildURI(normalize(url), RMConstants.NAME_ACTIVE_OBJECT_RMAUTHENTICATION).toString();
     }
 }

@@ -29,16 +29,13 @@ import java.security.KeyException;
 
 import javax.security.auth.login.LoginException;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive_grid_cloud_portal.common.RMRestInterface;
 
 
 public class RMClientExample {
 
-    public static void main(String[] args)
-            throws LoginException, KeyException, ActiveObjectCreationException, NodeException, RMException {
+    public static void main(String[] args) throws LoginException, KeyException, RMException {
         System.out.println("Hello from example.");
 
         //        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().useSystemProperties();
