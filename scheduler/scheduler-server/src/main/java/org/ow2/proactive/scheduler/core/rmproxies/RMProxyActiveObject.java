@@ -45,8 +45,10 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskId;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
@@ -245,7 +247,11 @@ public class RMProxyActiveObject {
 
             logger.debug("Binding schedulerapi...");
             SchedulerNodeClient client = new SchedulerNodeClient(decrypter, schedulerUrl);
-            handler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, (Serializable) client);
+            handler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, client);
+
+            logger.debug("Binging rmapi...");
+            RMNodeClient rmNodeClient = new RMNodeClient(decrypter.decrypt(), schedulerUrl);
+            handler.addBinding(RMConstants.RM_CLIENT_BINDING_NAME, rmNodeClient);
 
             logger.debug("Binding globalspaceapi...");
             RemoteSpace globalSpaceClient = new DataSpaceNodeClient(client,

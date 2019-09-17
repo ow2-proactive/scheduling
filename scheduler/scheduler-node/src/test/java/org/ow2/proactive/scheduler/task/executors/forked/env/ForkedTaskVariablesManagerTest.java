@@ -43,6 +43,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
+import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
@@ -579,6 +580,8 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
 
         SchedulerNodeClient schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
 
+        RMNodeClient rmNodeClient = forkedTaskVariablesManager.createRMNodeClient(taskContext);
+
         // Execute method which adds bindings
         forkedTaskVariablesManager.addBindingsToScriptHandler(scriptHandler,
                                                               taskContext,
@@ -586,6 +589,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                               resultMap,
                                                               credentials,
                                                               schedulerNodeClient,
+                                                              rmNodeClient,
                                                               forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
                                                                                                                    schedulerNodeClient,
                                                                                                                    IDataSpaceClient.Dataspace.USER),

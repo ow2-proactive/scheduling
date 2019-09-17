@@ -27,9 +27,12 @@ package org.ow2.proactive.scheduler.task.executors.forked.env;
 
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.security.KeyException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.ow2.proactive.resourcemanager.common.RMConstants;
+import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
@@ -66,7 +69,8 @@ public class ForkedTaskVariablesManager implements Serializable {
 
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext, VariablesMap variables,
             Map<String, Serializable> resultMap, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client,
-            RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient, Map<String, String> resultMetadata) {
+            RMNodeClient rmNodeClient, RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient,
+            Map<String, String> resultMetadata) {
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
         scriptHandler.addBinding(SchedulerConstants.RESULT_MAP_BINDING_NAME, resultMap);
@@ -82,6 +86,9 @@ public class ForkedTaskVariablesManager implements Serializable {
             scriptHandler.addBinding(SchedulerConstants.SCHEDULER_CLIENT_BINDING_NAME, client);
             scriptHandler.addBinding(SchedulerConstants.DS_USER_API_BINDING_NAME, userSpaceClient);
             scriptHandler.addBinding(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME, globalSpaceClient);
+        }
+        if (rmNodeClient != null) {
+            scriptHandler.addBinding(RMConstants.RM_CLIENT_BINDING_NAME, rmNodeClient);
         }
         scriptHandler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME,
                                  taskContext.getSynchronizationAPI());
@@ -121,6 +128,17 @@ public class ForkedTaskVariablesManager implements Serializable {
     public SchedulerNodeClient createSchedulerNodeClient(TaskContext container) {
         if (container.getDecrypter() != null && !Strings.isNullOrEmpty(container.getSchedulerRestUrl())) {
             return new SchedulerNodeClient(container.getDecrypter(), container.getSchedulerRestUrl());
+        }
+        return null;
+    }
+
+    public RMNodeClient createRMNodeClient(TaskContext container) {
+        if (container.getDecrypter() != null && !Strings.isNullOrEmpty(container.getSchedulerRestUrl())) {
+            try {
+                return new RMNodeClient(container.getDecrypter().decrypt(), container.getSchedulerRestUrl());
+            } catch (Exception e) {
+                return null;
+            }
         }
         return null;
     }
