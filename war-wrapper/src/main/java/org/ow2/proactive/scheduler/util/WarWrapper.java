@@ -184,7 +184,7 @@ public enum WarWrapper {
 
         try {
             RMAuthentication rmAuthentication = connectToRM();
-            ResourceManager rm = (ResourceManager) rmAuthentication.login(credentials);
+            ResourceManager rm = rmAuthentication.login(credentials);
 
             //Do not kill Runtime when stopping RM
             PAResourceManagerProperties.RM_SHUTDOWN_KILL_RUNTIME.updateProperty("false");

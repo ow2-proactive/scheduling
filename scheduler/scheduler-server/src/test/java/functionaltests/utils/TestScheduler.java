@@ -181,7 +181,7 @@ public class TestScheduler {
                                                                            CredData.parseDomain(TestUsers.DEMO.username),
                                                                            TestUsers.DEMO.password),
                                                               rmAuth.getPublicKey());
-            ResourceManager rm = (ResourceManager) rmAuth.login(creds);
+            ResourceManager rm = rmAuth.login(creds);
             while (rm.getState().getTotalAliveNodesNumber() < SchedulerStartForFunctionalTest.RM_NODE_NUMBER) {
                 Thread.sleep(50);
             }

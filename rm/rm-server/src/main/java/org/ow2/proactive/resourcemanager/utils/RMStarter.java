@@ -151,7 +151,7 @@ public class RMStarter {
             }
 
             if (localNodes && defaultNodesNumber > 0) {
-                ResourceManager resourceManager = (ResourceManager) auth.login(Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
+                ResourceManager resourceManager = auth.login(Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
                 String nodeSourceName = NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME;
 
                 //first im parameter is default rm url

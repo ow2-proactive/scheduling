@@ -45,7 +45,7 @@ public class GetAllNodes {
             Credentials cred = Credentials.createCredentials(new CredData(TestUsers.DEMO.username,
                                                                           TestUsers.DEMO.password),
                                                              auth.getPublicKey());
-            ResourceManager rm = (ResourceManager) auth.login(cred);
+            ResourceManager rm = auth.login(cred);
             NodeSet nodes = rm.getNodes(new Criteria(rm.getState().getFreeNodesNumber()));
             // use nodes to block until the future is available
             System.out.println("Got " + nodes.size());

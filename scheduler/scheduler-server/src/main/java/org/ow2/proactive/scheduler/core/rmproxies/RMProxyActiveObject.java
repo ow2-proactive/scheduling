@@ -94,7 +94,7 @@ public class RMProxyActiveObject {
 
     @ImmediateService
     public void connect(RMAuthentication rmAuth, Credentials creds) throws LoginException {
-        this.rm = (ResourceManager) rmAuth.login(creds);
+        this.rm = rmAuth.login(creds);
     }
 
     @ImmediateService
