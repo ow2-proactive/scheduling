@@ -84,6 +84,11 @@ public class RMNodeClient implements IRMClient, Serializable {
         init(new ConnectionInfo(schedulerRestUrl, userCreds.getLogin(), userCreds.getPassword(), null, true));
     }
 
+    public void connect(String url) throws Exception {
+        schedulerRestUrl = url;
+        connect();
+    }
+
     @Override
     public void init(ConnectionInfo connectionInfo) throws Exception {
         HttpClient client = new HttpClientBuilder().insecure(connectionInfo.isInsecure()).useSystemProperties().build();
@@ -129,8 +134,7 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getState(sessionId);
     }
 
-    public RMStateDelta getRMStateDelta(String clientCounter)
-            throws NotConnectedException, PermissionRestException {
+    public RMStateDelta getRMStateDelta(String clientCounter) throws NotConnectedException, PermissionRestException {
         return rm.getRMStateDelta(sessionId, clientCounter);
     }
 
@@ -150,58 +154,80 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.nodeIsAvailable(sessionId, url);
     }
 
-    public List<RMNodeSourceEvent> getExistingNodeSources()
-            throws NotConnectedException, PermissionRestException {
+    public List<RMNodeSourceEvent> getExistingNodeSources() throws NotConnectedException, PermissionRestException {
         return rm.getExistingNodeSources(sessionId);
     }
 
-    public NSState defineNodeSource(String nodeSourceName, String infrastructureType,
-            String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
-            String[] policyParameters, String[] policyFileParameters, String nodesRecoverable)
-            throws NotConnectedException {
-        return rm.defineNodeSource(sessionId, nodeSourceName, infrastructureType,
-                infrastructureParameters, infrastructureFileParameters, policyType,
-                policyParameters, policyFileParameters, nodesRecoverable);
+    public NSState defineNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
+            String[] infrastructureFileParameters, String policyType, String[] policyParameters,
+            String[] policyFileParameters, String nodesRecoverable) throws NotConnectedException {
+        return rm.defineNodeSource(sessionId,
+                                   nodeSourceName,
+                                   infrastructureType,
+                                   infrastructureParameters,
+                                   infrastructureFileParameters,
+                                   policyType,
+                                   policyParameters,
+                                   policyFileParameters,
+                                   nodesRecoverable);
     }
 
-    public NSState editNodeSource(String nodeSourceName, String infrastructureType,
-            String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
-            String[] policyParameters, String[] policyFileParameters, String nodesRecoverable)
-            throws NotConnectedException {
-        return rm.editNodeSource(sessionId, nodeSourceName, infrastructureType,
-                infrastructureParameters, infrastructureFileParameters, policyType,
-                policyParameters, policyFileParameters, nodesRecoverable);
+    public NSState editNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
+            String[] infrastructureFileParameters, String policyType, String[] policyParameters,
+            String[] policyFileParameters, String nodesRecoverable) throws NotConnectedException {
+        return rm.editNodeSource(sessionId,
+                                 nodeSourceName,
+                                 infrastructureType,
+                                 infrastructureParameters,
+                                 infrastructureFileParameters,
+                                 policyType,
+                                 policyParameters,
+                                 policyFileParameters,
+                                 nodesRecoverable);
     }
 
     public NSState updateDynamicParameters(String nodeSourceName, String infrastructureType,
             String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
             String[] policyParameters, String[] policyFileParameters)
             throws NotConnectedException, PermissionRestException {
-        return rm.updateDynamicParameters(sessionId, nodeSourceName, infrastructureType,
-                infrastructureParameters, infrastructureFileParameters,
-                policyType, policyParameters, policyFileParameters);
+        return rm.updateDynamicParameters(sessionId,
+                                          nodeSourceName,
+                                          infrastructureType,
+                                          infrastructureParameters,
+                                          infrastructureFileParameters,
+                                          policyType,
+                                          policyParameters,
+                                          policyFileParameters);
     }
 
-    public NSState createNodeSource(String nodeSourceName, String infrastructureType,
-            String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
-            String[] policyParameters, String[] policyFileParameters)
-            throws NotConnectedException, PermissionRestException {
-        return rm.createNodeSource(sessionId, nodeSourceName, infrastructureType,
-                infrastructureParameters, infrastructureFileParameters, policyType,
-                policyParameters, policyFileParameters);
+    public NSState createNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
+            String[] infrastructureFileParameters, String policyType, String[] policyParameters,
+            String[] policyFileParameters) throws NotConnectedException, PermissionRestException {
+        return rm.createNodeSource(sessionId,
+                                   nodeSourceName,
+                                   infrastructureType,
+                                   infrastructureParameters,
+                                   infrastructureFileParameters,
+                                   policyType,
+                                   policyParameters,
+                                   policyFileParameters);
     }
 
-    public NSState createNodeSource(String nodeSourceName, String infrastructureType,
-            String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
-            String[] policyParameters, String[] policyFileParameters, String nodesRecoverable)
-            throws NotConnectedException {
-        return rm.createNodeSource(sessionId, nodeSourceName, infrastructureType,
-                infrastructureParameters, infrastructureFileParameters, policyType,
-                policyParameters, policyFileParameters, nodesRecoverable);
+    public NSState createNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
+            String[] infrastructureFileParameters, String policyType, String[] policyParameters,
+            String[] policyFileParameters, String nodesRecoverable) throws NotConnectedException {
+        return rm.createNodeSource(sessionId,
+                                   nodeSourceName,
+                                   infrastructureType,
+                                   infrastructureParameters,
+                                   infrastructureFileParameters,
+                                   policyType,
+                                   policyParameters,
+                                   policyFileParameters,
+                                   nodesRecoverable);
     }
 
-    public NSState deployNodeSource(String nodeSourceName)
-            throws NotConnectedException, PermissionRestException {
+    public NSState deployNodeSource(String nodeSourceName) throws NotConnectedException, PermissionRestException {
         return rm.deployNodeSource(sessionId, nodeSourceName);
     }
 
@@ -210,18 +236,15 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.undeployNodeSource(sessionId, nodeSourceName, preempt);
     }
 
-    public int getNodeSourcePingFrequency(String sourceName)
-            throws NotConnectedException, PermissionRestException {
+    public int getNodeSourcePingFrequency(String sourceName) throws NotConnectedException, PermissionRestException {
         return rm.getNodeSourcePingFrequency(sessionId, sourceName);
     }
 
-    public boolean releaseNode(String url)
-            throws RMNodeException, NotConnectedException, PermissionRestException {
+    public boolean releaseNode(String url) throws RMNodeException, NotConnectedException, PermissionRestException {
         return rm.releaseNode(sessionId, url);
     }
 
-    public boolean removeNode(String nodeUrl, boolean preempt)
-            throws NotConnectedException, PermissionRestException {
+    public boolean removeNode(String nodeUrl, boolean preempt) throws NotConnectedException, PermissionRestException {
         return rm.removeNode(sessionId, nodeUrl, preempt);
     }
 
@@ -230,13 +253,11 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.removeNodeSource(sessionId, sourceName, preempt);
     }
 
-    public boolean lockNodes(Set<String> nodeUrls)
-            throws NotConnectedException, PermissionRestException {
+    public boolean lockNodes(Set<String> nodeUrls) throws NotConnectedException, PermissionRestException {
         return rm.lockNodes(sessionId, nodeUrls);
     }
 
-    public boolean unlockNodes(Set<String> nodeUrls)
-            throws NotConnectedException, PermissionRestException {
+    public boolean unlockNodes(Set<String> nodeUrls) throws NotConnectedException, PermissionRestException {
         return rm.unlockNodes(sessionId, nodeUrls);
     }
 
@@ -246,14 +267,14 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getNodeMBeanInfo(sessionId, nodeJmxUrl, objectName, attrs);
     }
 
-    public String getNodeMBeanHistory(String nodeJmxUrl, String objectName, List<String> attrs,
-            String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+    public String getNodeMBeanHistory(String nodeJmxUrl, String objectName, List<String> attrs, String range)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
         return rm.getNodeMBeanHistory(sessionId, nodeJmxUrl, objectName, attrs, range);
     }
 
-    public Map<String, Map<String, Object>> getNodesMBeanHistory(List<String> nodesJmxUrl,
-            String objectName, List<String> attrs, String range)
+    public Map<String, Map<String, Object>> getNodesMBeanHistory(List<String> nodesJmxUrl, String objectName,
+            List<String> attrs, String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
         return rm.getNodesMBeanHistory(sessionId, nodesJmxUrl, objectName, attrs, range);
@@ -265,8 +286,8 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getNodeMBeanInfo(sessionId, nodeJmxUrl, objectNames, attrs);
     }
 
-    public Object getNodeMBeansHistory(String nodeJmxUrl, String objectNames, List<String> attrs,
-            String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
+    public Object getNodeMBeansHistory(String nodeJmxUrl, String objectNames, List<String> attrs, String range)
+            throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException,
             PermissionRestException {
         return rm.getNodeMBeansHistory(sessionId, nodeJmxUrl, objectNames, attrs, range);
@@ -311,9 +332,8 @@ public class RMNodeClient implements IRMClient, Serializable {
         rm.setMBeanInfo(sessionId, name, type, attr, value);
     }
 
-    public String getStatHistory(String range)
-            throws ReflectionException, InterruptedException, IntrospectionException, NotConnectedException,
-            InstanceNotFoundException, MalformedObjectNameException, IOException {
+    public String getStatHistory(String range) throws ReflectionException, InterruptedException, IntrospectionException,
+            NotConnectedException, InstanceNotFoundException, MalformedObjectNameException, IOException {
         return rm.getStatHistory(sessionId, range);
     }
 
@@ -321,18 +341,16 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getVersion();
     }
 
-    public ScriptResult<Object> executeNodeScript(String nodeUrl, String script, String scriptEngine)
-            throws Throwable {
+    public ScriptResult<Object> executeNodeScript(String nodeUrl, String script, String scriptEngine) throws Throwable {
         return rm.executeNodeScript(sessionId, nodeUrl, script, scriptEngine);
     }
 
-    public List<ScriptResult<Object>> executeNodeSourceScript(String nodeSource, String script,
-            String scriptEngine) throws Throwable {
+    public List<ScriptResult<Object>> executeNodeSourceScript(String nodeSource, String script, String scriptEngine)
+            throws Throwable {
         return rm.executeNodeSourceScript(sessionId, nodeSource, script, scriptEngine);
     }
 
-    public ScriptResult<Object> executeHostScript(String host, String script, String scriptEngine)
-            throws Throwable {
+    public ScriptResult<Object> executeHostScript(String host, String script, String scriptEngine) throws Throwable {
         return rm.executeNodeScript(sessionId, host, script, scriptEngine);
     }
 
@@ -344,23 +362,20 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getNodeThreadDump(sessionId, nodeUrl);
     }
 
-    public Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(long windowStart,
-                                                                                      long windowEnd) throws NotConnectedException {
+    public Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(long windowStart, long windowEnd)
+            throws NotConnectedException {
         return rm.getNodesHistory(sessionId, windowStart, windowEnd);
     }
 
-    public void addNodeToken(String nodeUrl, String token)
-            throws NotConnectedException, RestException {
+    public void addNodeToken(String nodeUrl, String token) throws NotConnectedException, RestException {
         rm.addNodeToken(sessionId, nodeUrl, token);
     }
 
-    public void removeNodeToken(String nodeUrl, String token)
-            throws NotConnectedException, RestException {
+    public void removeNodeToken(String nodeUrl, String token) throws NotConnectedException, RestException {
         rm.removeNodeToken(sessionId, nodeUrl, token);
     }
 
-    public void setNodeTokens(String nodeUrl, List<String> tokens)
-            throws NotConnectedException, RestException {
+    public void setNodeTokens(String nodeUrl, List<String> tokens) throws NotConnectedException, RestException {
         rm.setNodeTokens(sessionId, nodeUrl, tokens);
     }
 }
