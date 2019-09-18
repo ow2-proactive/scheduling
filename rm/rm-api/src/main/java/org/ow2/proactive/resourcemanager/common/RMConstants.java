@@ -58,5 +58,4 @@ public interface RMConstants {
     /** The default name of the static node source created  at Resource manager Startup */
     String DEFAULT_STATIC_SOURCE_NAME = "Default";
 
-    String RM_CLIENT_BINDING_NAME = "rmapi";
 }

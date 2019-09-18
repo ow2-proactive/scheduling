@@ -88,7 +88,7 @@ public class ForkedTaskVariablesManager implements Serializable {
             scriptHandler.addBinding(SchedulerConstants.DS_GLOBAL_API_BINDING_NAME, globalSpaceClient);
         }
         if (rmNodeClient != null) {
-            scriptHandler.addBinding(RMConstants.RM_CLIENT_BINDING_NAME, rmNodeClient);
+            scriptHandler.addBinding(SchedulerConstants.RM_CLIENT_BINDING_NAME, rmNodeClient);
         }
         scriptHandler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME,
                                  taskContext.getSynchronizationAPI());

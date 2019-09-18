@@ -251,7 +251,7 @@ public class RMProxyActiveObject {
 
             logger.debug("Binging rmapi...");
             RMNodeClient rmNodeClient = new RMNodeClient(decrypter.decrypt(), schedulerUrl);
-            handler.addBinding(RMConstants.RM_CLIENT_BINDING_NAME, rmNodeClient);
+            handler.addBinding(SchedulerConstants.RM_CLIENT_BINDING_NAME, rmNodeClient);
 
             logger.debug("Binding globalspaceapi...");
             RemoteSpace globalSpaceClient = new DataSpaceNodeClient(client,

@@ -27,7 +27,7 @@ package org.ow2.proactive.scheduler.rest;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
-import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
+import org.ow2.proactive_grid_cloud_portal.common.RMRestInterface;
 
 
 /**
@@ -38,7 +38,7 @@ import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
  * @author ActiveEon Team
  */
 @PublicAPI
-public interface IRMClient extends ResourceManager {
+public interface IRMClient extends RMRestInterface {
 
     /**
      * Initialize this instance.
