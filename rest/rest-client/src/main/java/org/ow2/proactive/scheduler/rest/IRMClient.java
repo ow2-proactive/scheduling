@@ -38,7 +38,7 @@ import org.ow2.proactive_grid_cloud_portal.common.RMRestInterface;
  * @author ActiveEon Team
  */
 @PublicAPI
-public interface IRMClient extends RMRestInterface {
+public interface IRMClient {
 
     /**
      * Initialize this instance.

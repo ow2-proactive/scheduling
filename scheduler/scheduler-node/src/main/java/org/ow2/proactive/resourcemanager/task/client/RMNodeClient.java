@@ -90,12 +90,6 @@ public class RMNodeClient implements IRMClient, Serializable {
 
         RMRestClient restApiClient = new RMRestClient(connectionInfo.getUrl(), new ApacheHttpClient4Engine(client));
 
-        //        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        //        factory.register(new WildCardTypeReader());
-        //        factory.register(new OctetStreamReader());
-        //        factory.register(new TaskResultReader());
-        //        SchedulerRestClient.registerGzipEncoding(factory);
-
         this.rm = restApiClient.getRm();
 
         this.connectionInfo = connectionInfo;
@@ -103,7 +97,7 @@ public class RMNodeClient implements IRMClient, Serializable {
         renewSession();
     }
 
-    public void renewSession() throws NotConnectedException {
+    public void renewSession() {
         try {
             String sid = rm.rmConnect(connectionInfo.getLogin(), connectionInfo.getPassword());
             setSession(sid);
@@ -127,302 +121,246 @@ public class RMNodeClient implements IRMClient, Serializable {
         return sessionId;
     }
 
-    @Override
-    public String rmConnect(String username, String password) throws KeyException, LoginException, RMException {
-        return rm.rmConnect(username, password);
-    }
-
-    @Override
-    public void rmDisconnect(String sessionId) throws NotConnectedException {
+    public void disconnect() throws NotConnectedException {
         rm.rmDisconnect(sessionId);
     }
 
-    @Override
-    public String loginWithCredential(LoginForm multipart)
-            throws KeyException, IOException, LoginException, RMException {
-        return rm.loginWithCredential(multipart);
-    }
-
-    @Override
-    public String getLoginFromSessionId(String sessionId) {
-        return rm.getLoginFromSessionId(sessionId);
-    }
-
-    @Override
-    public UserData getUserDataFromSessionId(String sessionId) {
-        return rm.getUserDataFromSessionId(sessionId);
-    }
-
-    @Override
-    public RMState getState(String sessionId) throws NotConnectedException {
+    public RMState getState() throws NotConnectedException {
         return rm.getState(sessionId);
     }
 
-    @Override
-    public RMStateDelta getRMStateDelta(String sessionId, String clientCounter)
+    public RMStateDelta getRMStateDelta(String clientCounter)
             throws NotConnectedException, PermissionRestException {
         return rm.getRMStateDelta(sessionId, clientCounter);
     }
 
-    @Override
-    public RMStateFull getRMStateFull(String sessionId) throws NotConnectedException, PermissionRestException {
+    public RMStateFull getRMStateFull() throws NotConnectedException, PermissionRestException {
         return rm.getRMStateFull(sessionId);
     }
 
-    @Override
-    public boolean isActive(String sessionId) throws NotConnectedException {
-        return false;
+    public boolean isActive() throws NotConnectedException {
+        return rm.isActive(sessionId);
     }
 
-    @Override
-    public boolean addNode(String sessionId, String url, String nodesource) throws NotConnectedException {
-        return false;
+    public boolean addNode(String url, String nodesource) throws NotConnectedException {
+        return rm.addNode(sessionId, url, nodesource);
     }
 
-    @Override
-    public boolean nodeIsAvailable(String sessionId, String url) throws NotConnectedException {
-        return false;
+    public boolean nodeIsAvailable(String url) throws NotConnectedException {
+        return rm.nodeIsAvailable(sessionId, url);
     }
 
-    @Override
-    public List<RMNodeSourceEvent> getExistingNodeSources(String sessionId)
+    public List<RMNodeSourceEvent> getExistingNodeSources()
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.getExistingNodeSources(sessionId);
     }
 
-    @Override
-    public NSState defineNodeSource(String sessionId, String nodeSourceName, String infrastructureType,
+    public NSState defineNodeSource(String nodeSourceName, String infrastructureType,
             String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
             String[] policyParameters, String[] policyFileParameters, String nodesRecoverable)
             throws NotConnectedException {
-        return null;
+        return rm.defineNodeSource(sessionId, nodeSourceName, infrastructureType,
+                infrastructureParameters, infrastructureFileParameters, policyType,
+                policyParameters, policyFileParameters, nodesRecoverable);
     }
 
-    @Override
-    public NSState editNodeSource(String sessionId, String nodeSourceName, String infrastructureType,
+    public NSState editNodeSource(String nodeSourceName, String infrastructureType,
             String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
             String[] policyParameters, String[] policyFileParameters, String nodesRecoverable)
             throws NotConnectedException {
-        return null;
+        return rm.editNodeSource(sessionId, nodeSourceName, infrastructureType,
+                infrastructureParameters, infrastructureFileParameters, policyType,
+                policyParameters, policyFileParameters, nodesRecoverable);
     }
 
-    @Override
-    public NSState updateDynamicParameters(String sessionId, String nodeSourceName, String infrastructureType,
+    public NSState updateDynamicParameters(String nodeSourceName, String infrastructureType,
             String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
             String[] policyParameters, String[] policyFileParameters)
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.updateDynamicParameters(sessionId, nodeSourceName, infrastructureType,
+                infrastructureParameters, infrastructureFileParameters,
+                policyType, policyParameters, policyFileParameters);
     }
 
-    @Override
-    public NSState createNodeSource(String sessionId, String nodeSourceName, String infrastructureType,
+    public NSState createNodeSource(String nodeSourceName, String infrastructureType,
             String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
             String[] policyParameters, String[] policyFileParameters)
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.createNodeSource(sessionId, nodeSourceName, infrastructureType,
+                infrastructureParameters, infrastructureFileParameters, policyType,
+                policyParameters, policyFileParameters);
     }
 
-    @Override
-    public NSState createNodeSource(String sessionId, String nodeSourceName, String infrastructureType,
+    public NSState createNodeSource(String nodeSourceName, String infrastructureType,
             String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
             String[] policyParameters, String[] policyFileParameters, String nodesRecoverable)
             throws NotConnectedException {
-        return null;
+        return rm.createNodeSource(sessionId, nodeSourceName, infrastructureType,
+                infrastructureParameters, infrastructureFileParameters, policyType,
+                policyParameters, policyFileParameters, nodesRecoverable);
     }
 
-    @Override
-    public NSState deployNodeSource(String sessionId, String nodeSourceName)
+    public NSState deployNodeSource(String nodeSourceName)
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.deployNodeSource(sessionId, nodeSourceName);
     }
 
-    @Override
-    public NSState undeployNodeSource(String sessionId, String nodeSourceName, boolean preempt)
+    public NSState undeployNodeSource(String nodeSourceName, boolean preempt)
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.undeployNodeSource(sessionId, nodeSourceName, preempt);
     }
 
-    @Override
-    public int getNodeSourcePingFrequency(String sessionId, String sourceName)
+    public int getNodeSourcePingFrequency(String sourceName)
             throws NotConnectedException, PermissionRestException {
-        return 0;
+        return rm.getNodeSourcePingFrequency(sessionId, sourceName);
     }
 
-    @Override
-    public boolean releaseNode(String sessionId, String url)
+    public boolean releaseNode(String url)
             throws RMNodeException, NotConnectedException, PermissionRestException {
-        return false;
+        return rm.releaseNode(sessionId, url);
     }
 
-    @Override
-    public boolean removeNode(String sessionId, String nodeUrl, boolean preempt)
+    public boolean removeNode(String nodeUrl, boolean preempt)
             throws NotConnectedException, PermissionRestException {
-        return false;
+        return rm.removeNode(sessionId, nodeUrl, preempt);
     }
 
-    @Override
-    public boolean removeNodeSource(String sessionId, String sourceName, boolean preempt)
+    public boolean removeNodeSource(String sourceName, boolean preempt)
             throws NotConnectedException, PermissionRestException {
-        return false;
+        return rm.removeNodeSource(sessionId, sourceName, preempt);
     }
 
-    @Override
-    public boolean lockNodes(String sessionId, Set<String> nodeUrls)
+    public boolean lockNodes(Set<String> nodeUrls)
             throws NotConnectedException, PermissionRestException {
-        return false;
+        return rm.lockNodes(sessionId, nodeUrls);
     }
 
-    @Override
-    public boolean unlockNodes(String sessionId, Set<String> nodeUrls)
+    public boolean unlockNodes(Set<String> nodeUrls)
             throws NotConnectedException, PermissionRestException {
-        return false;
+        return rm.unlockNodes(sessionId, nodeUrls);
     }
 
-    @Override
-    public Object getNodeMBeanInfo(String sessionId, String nodeJmxUrl, String objectName, List<String> attrs)
+    public Object getNodeMBeanInfo(String nodeJmxUrl, String objectName, List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException {
-        return null;
+        return rm.getNodeMBeanInfo(sessionId, nodeJmxUrl, objectName, attrs);
     }
 
-    @Override
-    public String getNodeMBeanHistory(String sessionId, String nodeJmxUrl, String objectName, List<String> attrs,
+    public String getNodeMBeanHistory(String nodeJmxUrl, String objectName, List<String> attrs,
             String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
-        return null;
+        return rm.getNodeMBeanHistory(sessionId, nodeJmxUrl, objectName, attrs, range);
     }
 
-    @Override
-    public Map<String, Map<String, Object>> getNodesMBeanHistory(String sessionId, List<String> nodesJmxUrl,
+    public Map<String, Map<String, Object>> getNodesMBeanHistory(List<String> nodesJmxUrl,
             String objectName, List<String> attrs, String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
-        return null;
+        return rm.getNodesMBeanHistory(sessionId, nodesJmxUrl, objectName, attrs, range);
     }
 
-    @Override
-    public Object getNodeMBeansInfo(String sessionId, String nodeJmxUrl, String objectNames, List<String> attrs)
+    public Object getNodeMBeansInfo(String nodeJmxUrl, String objectNames, List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException {
-        return null;
+        return rm.getNodeMBeanInfo(sessionId, nodeJmxUrl, objectNames, attrs);
     }
 
-    @Override
-    public Object getNodeMBeansHistory(String sessionId, String nodeJmxUrl, String objectNames, List<String> attrs,
+    public Object getNodeMBeansHistory(String nodeJmxUrl, String objectNames, List<String> attrs,
             String range) throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException,
             PermissionRestException {
-        return null;
+        return rm.getNodeMBeansHistory(sessionId, nodeJmxUrl, objectNames, attrs, range);
     }
 
-    @Override
-    public boolean shutdown(String sessionId, boolean preempt) throws NotConnectedException, PermissionRestException {
-        return false;
+    public boolean shutdown(boolean preempt) throws NotConnectedException, PermissionRestException {
+        return rm.shutdown(sessionId, preempt);
     }
 
-    @Override
-    public TopologyInfo getTopology(String sessionId) throws NotConnectedException, PermissionRestException {
-        return null;
+    public TopologyInfo getTopology() throws NotConnectedException, PermissionRestException {
+        return rm.getTopology(sessionId);
     }
 
-    @Override
-    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(String sessionId)
+    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures()
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.getSupportedNodeSourceInfrastructures(sessionId);
     }
 
-    @Override
-    public Map<String, List<String>> getInfrasToPoliciesMapping(String sessionId)
+    public Map<String, List<String>> getInfrasToPoliciesMapping()
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.getInfrasToPoliciesMapping(sessionId);
     }
 
-    @Override
-    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(String sessionId)
+    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies()
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.getSupportedNodeSourcePolicies(sessionId);
     }
 
-    @Override
-    public NodeSourceConfiguration getNodeSourceConfiguration(String sessionId, String nodeSourceName)
+    public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName)
             throws NotConnectedException, PermissionRestException {
-        return null;
+        return rm.getNodeSourceConfiguration(sessionId, nodeSourceName);
     }
 
-    @Override
-    public Object getMBeanInfo(String sessionId, ObjectName name, List<String> attrs) throws InstanceNotFoundException,
+    public Object getMBeanInfo(ObjectName name, List<String> attrs) throws InstanceNotFoundException,
             IntrospectionException, ReflectionException, IOException, NotConnectedException, PermissionRestException {
-        return null;
+        return rm.getMBeanInfo(sessionId, name, attrs);
     }
 
-    @Override
-    public void setMBeanInfo(String sessionId, ObjectName name, String type, String attr, String value)
+    public void setMBeanInfo(ObjectName name, String type, String attr, String value)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MBeanException, InvalidAttributeValueException, AttributeNotFoundException {
-
+        rm.setMBeanInfo(sessionId, name, type, attr, value);
     }
 
-    @Override
-    public String getStatHistory(String sessionId, String range)
+    public String getStatHistory(String range)
             throws ReflectionException, InterruptedException, IntrospectionException, NotConnectedException,
             InstanceNotFoundException, MalformedObjectNameException, IOException {
-        return null;
+        return rm.getStatHistory(sessionId, range);
     }
 
-    @Override
     public String getVersion() {
-        return null;
+        return rm.getVersion();
     }
 
-    @Override
-    public ScriptResult<Object> executeNodeScript(String sessionId, String nodeUrl, String script, String scriptEngine)
+    public ScriptResult<Object> executeNodeScript(String nodeUrl, String script, String scriptEngine)
             throws Throwable {
-        return null;
+        return rm.executeNodeScript(sessionId, nodeUrl, script, scriptEngine);
     }
 
-    @Override
-    public List<ScriptResult<Object>> executeNodeSourceScript(String sessionId, String nodeSource, String script,
+    public List<ScriptResult<Object>> executeNodeSourceScript(String nodeSource, String script,
             String scriptEngine) throws Throwable {
-        return null;
+        return rm.executeNodeSourceScript(sessionId, nodeSource, script, scriptEngine);
     }
 
-    @Override
-    public ScriptResult<Object> executeHostScript(String sessionId, String host, String script, String scriptEngine)
+    public ScriptResult<Object> executeHostScript(String host, String script, String scriptEngine)
             throws Throwable {
-        return null;
+        return rm.executeNodeScript(sessionId, host, script, scriptEngine);
     }
 
-    @Override
-    public String getRMThreadDump(String sessionId) throws NotConnectedException {
-        return null;
+    public String getRMThreadDump() throws NotConnectedException {
+        return rm.getRMThreadDump(sessionId);
     }
 
-    @Override
-    public String getNodeThreadDump(String sessionId, String nodeUrl) throws NotConnectedException {
-        return null;
+    public String getNodeThreadDump(String nodeUrl) throws NotConnectedException {
+        return rm.getNodeThreadDump(sessionId, nodeUrl);
     }
 
-    @Override
-    public Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(String sessionId,
-            long windowStart, long windowEnd) throws NotConnectedException {
-        return null;
+    public Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(long windowStart,
+                                                                                      long windowEnd) throws NotConnectedException {
+        return rm.getNodesHistory(sessionId, windowStart, windowEnd);
     }
 
-    @Override
-    public void addNodeToken(String sessionId, String nodeUrl, String token)
+    public void addNodeToken(String nodeUrl, String token)
             throws NotConnectedException, RestException {
-
+        rm.addNodeToken(sessionId, nodeUrl, token);
     }
 
-    @Override
-    public void removeNodeToken(String sessionId, String nodeUrl, String token)
+    public void removeNodeToken(String nodeUrl, String token)
             throws NotConnectedException, RestException {
-
+        rm.removeNodeToken(sessionId, nodeUrl, token);
     }
 
-    @Override
-    public void setNodeTokens(String sessionId, String nodeUrl, List<String> tokens)
+    public void setNodeTokens(String nodeUrl, List<String> tokens)
             throws NotConnectedException, RestException {
-
+        rm.setNodeTokens(sessionId, nodeUrl, tokens);
     }
 }
