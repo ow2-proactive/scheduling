@@ -126,34 +126,75 @@ public class RMNodeClient implements IRMClient, Serializable {
         return sessionId;
     }
 
+    /**
+     * Disconnects from resource manager and releases all the nodes taken by
+     * user for computations.
+     */
     public void disconnect() throws NotConnectedException {
         rm.rmDisconnect(sessionId);
     }
 
+    /**
+     * @return Returns the state of the Resource Manager
+     */
     public RMState getState() throws NotConnectedException {
         return rm.getState(sessionId);
     }
 
+    /**
+     * Returns difference between current state of the resource manager
+     * and state that the client is aware of. Each event that changes state fo the RM
+     * has counter assosiacted to it. Thus client has to provide 'latestCounter',
+     * i.e. latest event he is aware of.
+     * @param clientCounter (optional) is the latest counter client has, if parameter is not provided then
+     *                                 method returns all events
+     * @return the difference between current state and state that client knows
+     */
     public RMStateDelta getRMStateDelta(String clientCounter) throws NotConnectedException, PermissionRestException {
         return rm.getRMStateDelta(sessionId, clientCounter);
     }
 
+    /**
+     * Returns the full state of the RM, which does not include REMOVED node/nodesources
+     * @return the state of the RM, which does not include REMOVED node/nodesources
+     */
     public RMStateFull getRMStateFull() throws NotConnectedException, PermissionRestException {
         return rm.getRMStateFull(sessionId);
     }
 
+    /**
+     * @return true if the resource manager is operational.
+     */
     public boolean isActive() throws NotConnectedException {
         return rm.isActive(sessionId);
     }
 
+    /**
+     * Adds an existing node to the particular node source.
+     *
+     * @param url
+     *            the url of the node
+     * @param nodesource
+     *            the node source, can be null
+     * @return true if new node is added successfully, runtime exception
+     *         otherwise
+     */
     public boolean addNode(String url, String nodesource) throws NotConnectedException {
         return rm.addNode(sessionId, url, nodesource);
     }
 
+    /**
+     * @param url
+     *            the url of the node
+     * @return true if the node nodeUrl is registered (i.e. known by the RM) and not down
+     */
     public boolean nodeIsAvailable(String url) throws NotConnectedException {
         return rm.nodeIsAvailable(sessionId, url);
     }
 
+    /**
+     * @return list of existing Node Sources
+     */
     public List<RMNodeSourceEvent> getExistingNodeSources() throws NotConnectedException, PermissionRestException {
         return rm.getExistingNodeSources(sessionId);
     }
@@ -200,6 +241,10 @@ public class RMNodeClient implements IRMClient, Serializable {
                                           policyFileParameters);
     }
 
+    /**
+     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String, String, String[], String[],
+     * String, String[], String[], String)} and {@link #deployNodeSource(String)}
+     */
     public NSState createNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
             String[] infrastructureFileParameters, String policyType, String[] policyParameters,
             String[] policyFileParameters) throws NotConnectedException, PermissionRestException {
@@ -213,6 +258,33 @@ public class RMNodeClient implements IRMClient, Serializable {
                                    policyFileParameters);
     }
 
+    /**
+     * @deprecated  As of version 8.1, replaced by {@link #defineNodeSource(String,String, String[], String[],
+     * String, String[], String[], String)} and {@link #deployNodeSource(String)}
+     *
+     * Create a NodeSource
+     * <p>
+     *
+     * @param nodeSourceName
+     *            name of the node source to create
+     * @param infrastructureType
+     *            fully qualified class name of the infrastructure to create
+     * @param infrastructureParameters
+     *            String parameters of the infrastructure, without the
+     *            parameters containing files or credentials
+     * @param infrastructureFileParameters
+     *            File or credential parameters
+     * @param policyType
+     *            fully qualified class name of the policy to create
+     * @param policyParameters
+     *            String parameters of the policy, without the parameters
+     *            containing files or credentials
+     * @param policyFileParameters
+     *            File or credential parameters
+     * @param nodesRecoverable
+     *            Whether the nodes can be recovered after a crash of the RM
+     * @return true if a node source has been created
+     */
     public NSState createNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
             String[] infrastructureFileParameters, String policyType, String[] policyParameters,
             String[] policyFileParameters, String nodesRecoverable) throws NotConnectedException {
@@ -227,52 +299,160 @@ public class RMNodeClient implements IRMClient, Serializable {
                                    nodesRecoverable);
     }
 
+    /**
+     * Start the nodes acquisition of the node source
+     *
+     * @param nodeSourceName the name of the node source to start
+     * @return the result of the action, possibly containing the error message
+     */
     public NSState deployNodeSource(String nodeSourceName) throws NotConnectedException, PermissionRestException {
         return rm.deployNodeSource(sessionId, nodeSourceName);
     }
 
+    /**
+     * Remove the nodes of the node source and keep the node source undeployed
+     *
+     * @param nodeSourceName the name of the node source to undeploy
+     * @return the result of the action, possibly containing the error message
+     */
     public NSState undeployNodeSource(String nodeSourceName, boolean preempt)
             throws NotConnectedException, PermissionRestException {
         return rm.undeployNodeSource(sessionId, nodeSourceName, preempt);
     }
 
+    /**
+     * Returns the ping frequency of a node source
+     *
+     * @param sourceName a node source
+     * @return the ping frequency
+     */
     public int getNodeSourcePingFrequency(String sourceName) throws NotConnectedException, PermissionRestException {
         return rm.getNodeSourcePingFrequency(sessionId, sourceName);
     }
 
+    /**
+     * Release a node
+     *
+     * @param url node's URL
+     * @return true of the node has been released
+     */
     public boolean releaseNode(String url) throws RMNodeException, NotConnectedException, PermissionRestException {
         return rm.releaseNode(sessionId, url);
     }
 
+    /**
+     * Delete a node
+     *
+     * @param nodeUrl node's URL
+     * @param preempt if true remove node source immediatly whithout waiting for nodes to be freed
+     * @return true if the node is removed successfully, false or exception otherwise
+     */
     public boolean removeNode(String nodeUrl, boolean preempt) throws NotConnectedException, PermissionRestException {
         return rm.removeNode(sessionId, nodeUrl, preempt);
     }
 
+    /**
+     * Delete a nodesource
+     *
+     * @param sourceName a node source
+     * @param preempt if true remove node source immediatly whithout waiting for nodes to be freed
+     * @return true if the node is removed successfully, false or exception otherwise
+     */
     public boolean removeNodeSource(String sourceName, boolean preempt)
             throws NotConnectedException, PermissionRestException {
         return rm.removeNodeSource(sessionId, sourceName, preempt);
     }
 
+    /**
+     * prevent other users from using a set of locked nodes
+     *
+     * @param nodeUrls
+     *            set of node urls to lock
+     * @return true when all nodes were free and have been locked
+     */
     public boolean lockNodes(Set<String> nodeUrls) throws NotConnectedException, PermissionRestException {
         return rm.lockNodes(sessionId, nodeUrls);
     }
 
+    /**
+     * allow other users to use a set of previously locked nodes
+     *
+     * @param nodeUrls
+     *            set of node urls to unlock
+     * @return true when all nodes were locked and have been unlocked
+     */
     public boolean unlockNodes(Set<String> nodeUrls) throws NotConnectedException, PermissionRestException {
         return rm.unlockNodes(sessionId, nodeUrls);
     }
 
+    /**
+     * Retrieves attributes of the specified mbean.
+     *
+     * @param nodeJmxUrl mbean server url
+     * @param objectName name of mbean
+     * @param attrs set of mbean attributes
+     *
+     * @return mbean attributes values
+     */
     public Object getNodeMBeanInfo(String nodeJmxUrl, String objectName, List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException {
         return rm.getNodeMBeanInfo(sessionId, nodeJmxUrl, objectName, attrs);
     }
 
+    /**
+     * Return the statistic history contained in the node RRD database,
+     * without redundancy, in a friendly JSON format.
+     *
+     * @param nodeJmxUrl mbean server url
+     * @param objectName name of mbean
+     * @param attrs set of mbean attributes
+     * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
+     *      for each source. Each char can be:<ul>
+     *            <li>'a' 1 minute
+     *            <li>'n' 5 minutes
+     *            <li>'m' 10 minutes
+     *            <li>'t' 30 minutes
+     *            <li>'h' 1 hour
+     *            <li>'j' 2 hours
+     *            <li>'k' 4 hours
+     *            <li>'H' 8 hours
+     *            <li>'d' 1 day
+     *            <li>'w' 1 week
+     *            <li>'M' 1 month
+     *            <li>'y' 1 year</ul>
+     * @return a JSON object containing a key for each source
+     */
     public String getNodeMBeanHistory(String nodeJmxUrl, String objectName, List<String> attrs, String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
         return rm.getNodeMBeanHistory(sessionId, nodeJmxUrl, objectName, attrs, range);
     }
 
+    /**
+     * Return the statistic history of a list of nodes contained in the node RRD database,
+     * without redundancy, in a friendly JSON format.
+     *
+     * @param nodesJmxUrl a set of mbean server urls
+     * @param objectName name of mbean
+     * @param attrs set of mbean attributes
+     * @param range a String of 5 chars, one for each stat history source, indicating the time range to fetch
+     *      for each source. Each char can be:<ul>
+     *            <li>'a' 1 minute
+     *            <li>'n' 5 minutes
+     *            <li>'m' 10 minutes
+     *            <li>'t' 30 minutes
+     *            <li>'h' 1 hour
+     *            <li>'j' 2 hours
+     *            <li>'k' 4 hours
+     *            <li>'H' 8 hours
+     *            <li>'d' 1 day
+     *            <li>'w' 1 week
+     *            <li>'M' 1 month
+     *            <li>'y' 1 year</ul>
+     * @return a Map where each entry containse mbean server url as key and a map of statistic values as value. Each entry has an mbean attribute as key and
+     * list of its mbean values as value.
+     */
     public Map<String, Map<String, Object>> getNodesMBeanHistory(List<String> nodesJmxUrl, String objectName,
             List<String> attrs, String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
@@ -280,6 +460,15 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getNodesMBeanHistory(sessionId, nodesJmxUrl, objectName, attrs, range);
     }
 
+    /**
+     * Retrieves attributes of the specified mbeans.
+     *
+     * @param objectNames mbean names (@see ObjectName format)
+     * @param nodeJmxUrl mbean server url
+     * @param attrs set of mbean attributes
+     *
+     * @return mbean attributes values
+     */
     public Object getNodeMBeansInfo(String nodeJmxUrl, String objectNames, List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException {
@@ -293,6 +482,14 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getNodeMBeansHistory(sessionId, nodeJmxUrl, objectNames, attrs, range);
     }
 
+    /**
+     * Initiate the shutdowns the resource manager. During the shutdown resource
+     * manager removed all the nodes and kills them if necessary.
+     * RMEvent(SHUTDOWN) will be send when the shutdown is finished.
+     *
+     * @param preempt if true shutdown immediatly whithout waiting for nodes to be freed, default value is false
+     * @return true if the shutdown process is successfully triggered, runtime exception otherwise
+     */
     public boolean shutdown(boolean preempt) throws NotConnectedException, PermissionRestException {
         return rm.shutdown(sessionId, preempt);
     }
@@ -301,16 +498,26 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getTopology(sessionId);
     }
 
+    /**
+     * @return the list of supported node source infrastructures descriptors
+     */
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures()
             throws NotConnectedException, PermissionRestException {
         return rm.getSupportedNodeSourceInfrastructures(sessionId);
     }
 
+    /**
+     * @return a mapping which for each infrastructure provides list of policies
+     * that can work together with given infrastructure
+     */
     public Map<String, List<String>> getInfrasToPoliciesMapping()
             throws NotConnectedException, PermissionRestException {
         return rm.getInfrasToPoliciesMapping(sessionId);
     }
 
+    /**
+     * @return the list of supported node source policies descriptors
+     */
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies()
             throws NotConnectedException, PermissionRestException {
         return rm.getSupportedNodeSourcePolicies(sessionId);
@@ -321,22 +528,74 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getNodeSourceConfiguration(sessionId, nodeSourceName);
     }
 
+    /**
+     * Returns the attributes <code>attr</code> of the mbean
+     * registered as <code>name</code>.
+     * @param name mbean's object name
+     * @param attrs attributes to enumerate
+     * @return returns the attributes of the mbean
+     */
     public Object getMBeanInfo(ObjectName name, List<String> attrs) throws InstanceNotFoundException,
             IntrospectionException, ReflectionException, IOException, NotConnectedException, PermissionRestException {
         return rm.getMBeanInfo(sessionId, name, attrs);
     }
 
+    /**
+     * Set a single JMX attribute of the MBean <code>name</code>.
+     * Only integer and string attributes are currently supported, see <code>type</code>.
+     *
+     * @param name      the object name of the MBean
+     * @param type      the type of the attribute to set ('integer' and 'string' are currently supported, see <code>RMProxyUserInterface</code>)
+     * @param attr      the name of the attribute to set
+     * @param value     the new value of the attribute (defined as a String, it is automatically converted according to <code>type</code>)
+     */
     public void setMBeanInfo(ObjectName name, String type, String attr, String value)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MBeanException, InvalidAttributeValueException, AttributeNotFoundException {
         rm.setMBeanInfo(sessionId, name, type, attr, value);
     }
 
+    /**
+     * Return the statistic history contained in the RM's RRD database,
+     * without redundancy, in a friendly JSON format.
+     *
+     * The following sources will be queried from the RRD DB :<pre>
+     * 	{ AvailableNodesCount",
+     * 	"FreeNodesCount",
+     * 	"NeededNodesCount",
+     * 	"BusyNodesCount",
+     * 	"DeployingNodesCount",
+     * 	"ConfigNodesCount",
+     * 	"DownNodesCount",
+     * 	"LostNodesCount",
+     * 	"AverageActivity" };
+     * 	</pre>
+     *
+     *
+     * @param range a String of 9 chars, one for each stat history source, indicating the time range to fetch
+     *      for each source. Each char can be:<ul>
+     *            <li>'a' 1 minute
+     *            <li>'m' 10 minutes
+     *            <li>'n' 5 minutes
+     *            <li>'t' 30 minutes
+     *            <li>'h' 1 hour
+     *            <li>'j' 2 hours
+     *            <li>'k' 4 hours
+     *            <li>'H' 8 hours
+     *            <li>'d' 1 day
+     *            <li>'w' 1 week
+     *            <li>'M' 1 month
+     *            <li>'y' 1 year</ul>
+     * @return a JSON object containing a key for each source
+     */
     public String getStatHistory(String range) throws ReflectionException, InterruptedException, IntrospectionException,
             NotConnectedException, InstanceNotFoundException, MalformedObjectNameException, IOException {
         return rm.getStatHistory(sessionId, range);
     }
 
+    /**
+     * @return returns the version of the rest api
+     */
     public String getVersion() {
         return rm.getVersion();
     }
@@ -367,14 +626,25 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.getNodesHistory(sessionId, windowStart, windowEnd);
     }
 
+    /**
+     * Add access token to given node
+     * @param token single token
+     */
     public void addNodeToken(String nodeUrl, String token) throws NotConnectedException, RestException {
         rm.addNodeToken(sessionId, nodeUrl, token);
     }
 
+    /**
+     * Remove access token from given node
+     * @param token single token
+     */
     public void removeNodeToken(String nodeUrl, String token) throws NotConnectedException, RestException {
         rm.removeNodeToken(sessionId, nodeUrl, token);
     }
 
+    /**
+     * Set all node tokens to given node
+     */
     public void setNodeTokens(String nodeUrl, List<String> tokens) throws NotConnectedException, RestException {
         rm.setNodeTokens(sessionId, nodeUrl, tokens);
     }
