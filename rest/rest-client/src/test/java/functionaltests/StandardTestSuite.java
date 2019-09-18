@@ -30,7 +30,7 @@ import org.junit.runners.Suite;
 
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ DataTransferTest.class, SchedulerClientTest.class })
+@Suite.SuiteClasses({ DataTransferTest.class, SchedulerClientTest.class, RMClientTest.class })
 
 /**
  * @author ActiveEon Team
