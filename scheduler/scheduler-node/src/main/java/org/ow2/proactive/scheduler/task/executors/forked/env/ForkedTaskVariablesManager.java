@@ -132,6 +132,9 @@ public class ForkedTaskVariablesManager implements Serializable {
         return null;
     }
 
+    /**
+     * @return craeted RMNodeClient if possible (there should be decrypter and url), otherwise null
+     */
     public RMNodeClient createRMNodeClient(TaskContext container) {
         if (container.getDecrypter() != null && !Strings.isNullOrEmpty(container.getSchedulerRestUrl())) {
             try {

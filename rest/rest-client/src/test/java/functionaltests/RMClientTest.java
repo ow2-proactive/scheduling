@@ -43,10 +43,10 @@ public class RMClientTest extends SchedulerClientTest {
         ISchedulerClient client = clientInstance();
         Job job = nodeClientJob("/functionaltests/descriptors/rm_client_node.groovy", null, null);
         JobId jobId = submitJob(job, client);
-        TaskResult tres = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
-        System.out.println(tres.getOutput().getAllLogs(false));
-        Assert.assertNotNull(tres);
-        Assert.assertTrue(((ArrayList) tres.value()).get(0) instanceof RMNodeEvent);
+        TaskResult tRes = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tRes.getOutput().getAllLogs(false));
+        Assert.assertNotNull(tRes);
+        Assert.assertTrue(((ArrayList) tRes.value()).get(0) instanceof RMNodeEvent);
     }
 
 }

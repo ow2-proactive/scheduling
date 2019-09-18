@@ -82,14 +82,13 @@ public class RMRestClient {
             httpEngine = new ApacheHttpClient4Engine(httpClient);
         }
 
-        this.httpEngine = httpEngine;
+        RMRestClient.httpEngine = httpEngine;
         this.restEndpointURL = restEndpointURL;
 
         providerFactory = ResteasyProviderFactory.getInstance();
         if (!providerFactory.isRegistered(RMRestClient.JacksonContextResolver.class)) {
             providerFactory.registerProvider(RMRestClient.JacksonContextResolver.class);
         }
-        //        registerGzipEncoding(providerFactory);
 
         rm = createRestProxy(providerFactory, restEndpointURL, httpEngine);
     }
