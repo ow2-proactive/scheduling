@@ -52,6 +52,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -99,6 +100,8 @@ public class RMRest implements RMRestInterface {
     protected static final String[] dataSources = { "AvailableNodesCount", "FreeNodesCount", "NeededNodesCount",
                                                     "BusyNodesCount", "DeployingNodesCount", "ConfigNodesCount", // it is Config and not Configuring because RRDDataStore limits name 20 characters
                                                     "DownNodesCount", "LostNodesCount", "AverageActivity" };
+
+    public static final Logger LOGGER = Logger.getLogger(RMRest.class);
 
     private SessionStore sessionStore = SharedSessionStore.getInstance();
 
@@ -516,7 +519,8 @@ public class RMRest implements RMRestInterface {
             try {
                 return processHistoryResult(rmProxy.getNodeMBeanHistory(nodeJmxUrl, objectName, attrs, range), range);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                LOGGER.error(e);
+                return Collections.EMPTY_MAP;
             }
         }));
     }
