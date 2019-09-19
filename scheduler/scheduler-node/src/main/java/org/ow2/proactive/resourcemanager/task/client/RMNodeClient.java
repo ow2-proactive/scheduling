@@ -27,17 +27,14 @@ package org.ow2.proactive.resourcemanager.task.client;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.security.KeyException;
 import java.util.*;
 
 import javax.management.*;
-import javax.security.auth.login.LoginException;
 
 import org.apache.http.client.HttpClient;
 import org.jboss.resteasy.client.jaxrs.engines.ApacheHttpClient4Engine;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
-import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.http.HttpClientBuilder;
 import org.ow2.proactive.resourcemanager.common.NSState;
@@ -46,8 +43,6 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
-import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
-import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyInfo;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
@@ -56,7 +51,6 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.rest.IRMClient;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.RMRestInterface;
-import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.rm.client.RMRestClient;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
@@ -107,9 +101,9 @@ public class RMNodeClient implements IRMClient, Serializable {
         }
     }
 
-    private void checkSessionNoNull() throws NotConnectedException {
+    private void checkNonEmptySession() throws NotConnectedException {
         if (sessionId == null) {
-            throw new NotConnectedException("You are not connected to RM. Call 'connect()' first.");
+            throw new NotConnectedException("You are not connected to the Resource Manager. Call 'connect()' first before using the interface.");
         }
     }
 
@@ -133,7 +127,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * user for computations.
      */
     public void disconnect() throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         rm.rmDisconnect(sessionId);
     }
 
@@ -141,7 +135,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return Returns the state of the Resource Manager
      */
     public RMState getState() throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getState(sessionId);
     }
 
@@ -155,7 +149,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return the difference between current state and state that client knows
      */
     public RMStateDelta getRMStateDelta(String clientCounter) throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getRMStateDelta(sessionId, clientCounter);
     }
 
@@ -164,7 +158,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return the state of the RM, which does not include REMOVED node/nodesources
      */
     public RMStateFull getRMStateFull() throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getRMStateFull(sessionId);
     }
 
@@ -172,7 +166,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return true if the resource manager is operational.
      */
     public boolean isActive() throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.isActive(sessionId);
     }
 
@@ -187,7 +181,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      *         otherwise
      */
     public boolean addNode(String url, String nodesource) throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.addNode(sessionId, url, nodesource);
     }
 
@@ -197,7 +191,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return true if the node nodeUrl is registered (i.e. known by the RM) and not down
      */
     public boolean nodeIsAvailable(String url) throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.nodeIsAvailable(sessionId, url);
     }
 
@@ -205,14 +199,14 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return list of existing Node Sources
      */
     public List<RMNodeSourceEvent> getExistingNodeSources() throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getExistingNodeSources(sessionId);
     }
 
     public NSState defineNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
             String[] infrastructureFileParameters, String policyType, String[] policyParameters,
             String[] policyFileParameters, String nodesRecoverable) throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.defineNodeSource(sessionId,
                                    nodeSourceName,
                                    infrastructureType,
@@ -227,7 +221,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     public NSState editNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
             String[] infrastructureFileParameters, String policyType, String[] policyParameters,
             String[] policyFileParameters, String nodesRecoverable) throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.editNodeSource(sessionId,
                                  nodeSourceName,
                                  infrastructureType,
@@ -243,7 +237,7 @@ public class RMNodeClient implements IRMClient, Serializable {
             String[] infrastructureParameters, String[] infrastructureFileParameters, String policyType,
             String[] policyParameters, String[] policyFileParameters)
             throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.updateDynamicParameters(sessionId,
                                           nodeSourceName,
                                           infrastructureType,
@@ -261,7 +255,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     public NSState createNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
             String[] infrastructureFileParameters, String policyType, String[] policyParameters,
             String[] policyFileParameters) throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.createNodeSource(sessionId,
                                    nodeSourceName,
                                    infrastructureType,
@@ -302,7 +296,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     public NSState createNodeSource(String nodeSourceName, String infrastructureType, String[] infrastructureParameters,
             String[] infrastructureFileParameters, String policyType, String[] policyParameters,
             String[] policyFileParameters, String nodesRecoverable) throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.createNodeSource(sessionId,
                                    nodeSourceName,
                                    infrastructureType,
@@ -321,7 +315,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return the result of the action, possibly containing the error message
      */
     public NSState deployNodeSource(String nodeSourceName) throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.deployNodeSource(sessionId, nodeSourceName);
     }
 
@@ -333,7 +327,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      */
     public NSState undeployNodeSource(String nodeSourceName, boolean preempt)
             throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.undeployNodeSource(sessionId, nodeSourceName, preempt);
     }
 
@@ -344,7 +338,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return the ping frequency
      */
     public int getNodeSourcePingFrequency(String sourceName) throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodeSourcePingFrequency(sessionId, sourceName);
     }
 
@@ -355,7 +349,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return true of the node has been released
      */
     public boolean releaseNode(String url) throws RMNodeException, NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.releaseNode(sessionId, url);
     }
 
@@ -367,7 +361,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return true if the node is removed successfully, false or exception otherwise
      */
     public boolean removeNode(String nodeUrl, boolean preempt) throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.removeNode(sessionId, nodeUrl, preempt);
     }
 
@@ -380,7 +374,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      */
     public boolean removeNodeSource(String sourceName, boolean preempt)
             throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.removeNodeSource(sessionId, sourceName, preempt);
     }
 
@@ -392,7 +386,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return true when all nodes were free and have been locked
      */
     public boolean lockNodes(Set<String> nodeUrls) throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.lockNodes(sessionId, nodeUrls);
     }
 
@@ -404,7 +398,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return true when all nodes were locked and have been unlocked
      */
     public boolean unlockNodes(Set<String> nodeUrls) throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.unlockNodes(sessionId, nodeUrls);
     }
 
@@ -420,7 +414,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     public Object getNodeMBeanInfo(String nodeJmxUrl, String objectName, List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodeMBeanInfo(sessionId, nodeJmxUrl, objectName, attrs);
     }
 
@@ -450,7 +444,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     public String getNodeMBeanHistory(String nodeJmxUrl, String objectName, List<String> attrs, String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodeMBeanHistory(sessionId, nodeJmxUrl, objectName, attrs, range);
     }
 
@@ -482,7 +476,7 @@ public class RMNodeClient implements IRMClient, Serializable {
             List<String> attrs, String range)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodesMBeanHistory(sessionId, nodesJmxUrl, objectName, attrs, range);
     }
 
@@ -498,7 +492,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     public Object getNodeMBeansInfo(String nodeJmxUrl, String objectNames, List<String> attrs)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodeMBeanInfo(sessionId, nodeJmxUrl, objectNames, attrs);
     }
 
@@ -506,7 +500,7 @@ public class RMNodeClient implements IRMClient, Serializable {
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MalformedObjectNameException, NullPointerException, MBeanException,
             PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodeMBeansHistory(sessionId, nodeJmxUrl, objectNames, attrs, range);
     }
 
@@ -519,12 +513,12 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @return true if the shutdown process is successfully triggered, runtime exception otherwise
      */
     public boolean shutdown(boolean preempt) throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.shutdown(sessionId, preempt);
     }
 
     public TopologyInfo getTopology() throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getTopology(sessionId);
     }
 
@@ -533,7 +527,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      */
     public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures()
             throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getSupportedNodeSourceInfrastructures(sessionId);
     }
 
@@ -543,7 +537,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      */
     public Map<String, List<String>> getInfrasToPoliciesMapping()
             throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getInfrasToPoliciesMapping(sessionId);
     }
 
@@ -552,13 +546,13 @@ public class RMNodeClient implements IRMClient, Serializable {
      */
     public Collection<PluginDescriptor> getSupportedNodeSourcePolicies()
             throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getSupportedNodeSourcePolicies(sessionId);
     }
 
     public NodeSourceConfiguration getNodeSourceConfiguration(String nodeSourceName)
             throws NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodeSourceConfiguration(sessionId, nodeSourceName);
     }
 
@@ -571,7 +565,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      */
     public Object getMBeanInfo(ObjectName name, List<String> attrs) throws InstanceNotFoundException,
             IntrospectionException, ReflectionException, IOException, NotConnectedException, PermissionRestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getMBeanInfo(sessionId, name, attrs);
     }
 
@@ -587,7 +581,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     public void setMBeanInfo(ObjectName name, String type, String attr, String value)
             throws InstanceNotFoundException, IntrospectionException, ReflectionException, IOException,
             NotConnectedException, MBeanException, InvalidAttributeValueException, AttributeNotFoundException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         rm.setMBeanInfo(sessionId, name, type, attr, value);
     }
 
@@ -626,7 +620,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      */
     public String getStatHistory(String range) throws ReflectionException, InterruptedException, IntrospectionException,
             NotConnectedException, InstanceNotFoundException, MalformedObjectNameException, IOException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getStatHistory(sessionId, range);
     }
 
@@ -638,34 +632,34 @@ public class RMNodeClient implements IRMClient, Serializable {
     }
 
     public ScriptResult<Object> executeNodeScript(String nodeUrl, String script, String scriptEngine) throws Throwable {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.executeNodeScript(sessionId, nodeUrl, script, scriptEngine);
     }
 
     public List<ScriptResult<Object>> executeNodeSourceScript(String nodeSource, String script, String scriptEngine)
             throws Throwable {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.executeNodeSourceScript(sessionId, nodeSource, script, scriptEngine);
     }
 
     public ScriptResult<Object> executeHostScript(String host, String script, String scriptEngine) throws Throwable {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.executeNodeScript(sessionId, host, script, scriptEngine);
     }
 
     public String getRMThreadDump() throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getRMThreadDump(sessionId);
     }
 
     public String getNodeThreadDump(String nodeUrl) throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodeThreadDump(sessionId, nodeUrl);
     }
 
     public Map<String, Map<String, Map<String, List<RMNodeHistory>>>> getNodesHistory(long windowStart, long windowEnd)
             throws NotConnectedException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         return rm.getNodesHistory(sessionId, windowStart, windowEnd);
     }
 
@@ -674,7 +668,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @param token single token
      */
     public void addNodeToken(String nodeUrl, String token) throws NotConnectedException, RestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         rm.addNodeToken(sessionId, nodeUrl, token);
     }
 
@@ -683,7 +677,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * @param token single token
      */
     public void removeNodeToken(String nodeUrl, String token) throws NotConnectedException, RestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         rm.removeNodeToken(sessionId, nodeUrl, token);
     }
 
@@ -691,7 +685,7 @@ public class RMNodeClient implements IRMClient, Serializable {
      * Set all node tokens to given node
      */
     public void setNodeTokens(String nodeUrl, List<String> tokens) throws NotConnectedException, RestException {
-        checkSessionNoNull();
+        checkNonEmptySession();
         rm.setNodeTokens(sessionId, nodeUrl, tokens);
     }
 }
