@@ -38,8 +38,7 @@ public class RMClientExample {
     public static void main(String[] args) throws LoginException, KeyException, RMException {
         System.out.println("Hello from example.");
 
-        //        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create().useSystemProperties();
-        RMRestClient client = new RMRestClient("http://localhost:8080/rest/", null);//, new ApacheHttpClient4Engine(httpClientBuilder.build()));
+        RMRestClient client = new RMRestClient("http://localhost:8080/rest/", null);
         RMRestInterface rm = client.getRm();
         String sessionId = rm.rmConnect("admin", "admin");
 
