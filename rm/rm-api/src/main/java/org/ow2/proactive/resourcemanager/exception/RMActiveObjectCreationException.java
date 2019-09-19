@@ -23,39 +23,22 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.frontend.topology;
+package org.ow2.proactive.resourcemanager.exception;
 
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+public class RMActiveObjectCreationException extends RMException {
+    public RMActiveObjectCreationException(String message) {
+        super(message);
+    }
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
-import org.ow2.proactive.topology.descriptor.DistanceFunction;
+    public RMActiveObjectCreationException() {
+        super();
+    }
 
+    public RMActiveObjectCreationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-/**
- *
- * Interface represents hosts topology handled by resource manager.
- * Users may receive the topology information using {@code ResourceManager.getTopology()} method.
- */
-@PublicAPI
-public interface Topology extends TopologyInfo {
-
-    /**
-     * Returns the distance between 2 nodes.
-     *
-     * @return the distance between 2 nodes
-     */
-    Long getDistance(Node node, Node node2);
-
-    /**
-     * Checks if 2 nodes are on the sane host.
-     * @return true if 2 nodes are on the same hosts, false otherwise
-     */
-    boolean onSameHost(Node node, Node node2);
-
+    public RMActiveObjectCreationException(Throwable cause) {
+        super(cause);
+    }
 }

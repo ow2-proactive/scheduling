@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,9 +73,11 @@ import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.common.util.RMProxyUserInterface;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
+import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive.resourcemanager.exception.RMNodeException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyInfo;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -85,10 +86,7 @@ import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive.utils.console.MBeanInfoViewer;
-import org.ow2.proactive_grid_cloud_portal.common.Session;
-import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
-import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
+import org.ow2.proactive_grid_cloud_portal.common.*;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
@@ -125,10 +123,16 @@ public class RMRest implements RMRestInterface {
 
     @Override
     public String rmConnect(String username, String password)
-            throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException {
+            throws KeyException, LoginException, RMException, RMActiveObjectCreationException, RMNodeException {
 
         Session session = sessionStore.create(username);
-        session.connectToRM(new CredData(CredData.parseLogin(username), CredData.parseDomain(username), password));
+        try {
+            session.connectToRM(new CredData(CredData.parseLogin(username), CredData.parseDomain(username), password));
+        } catch (ActiveObjectCreationException e) {
+            throw new RMActiveObjectCreationException(e);
+        } catch (NodeException e) {
+            throw new RMNodeException(e);
+        }
         return session.getSessionId();
 
     }
@@ -147,24 +151,31 @@ public class RMRest implements RMRestInterface {
      * proactive_grid_cloud_portal.LoginForm)
      */
     @Override
-    public String loginWithCredential(@MultipartForm LoginForm multipart) throws ActiveObjectCreationException,
-            NodeException, KeyException, IOException, LoginException, RMException {
+    public String loginWithCredential(@MultipartForm LoginForm multipart) throws RMActiveObjectCreationException,
+            RMNodeException, KeyException, IOException, LoginException, RMException {
 
         Session session;
-        if (multipart.getCredential() != null) {
-            session = sessionStore.createUnnamedSession();
-            Credentials credentials = Credentials.getCredentials(multipart.getCredential());
-            session.connectToRM(credentials);
-        } else {
-            session = sessionStore.create(multipart.getUsername());
-            CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
-                                             CredData.parseDomain(multipart.getUsername()),
-                                             multipart.getPassword(),
-                                             multipart.getSshKey());
-            session.connectToRM(credData);
+        try {
 
+            if (multipart.getCredential() != null) {
+                session = sessionStore.createUnnamedSession();
+                Credentials credentials = Credentials.getCredentials(multipart.getCredential());
+                session.connectToRM(credentials);
+            } else {
+                session = sessionStore.create(multipart.getUsername());
+                CredData credData = new CredData(CredData.parseLogin(multipart.getUsername()),
+                                                 CredData.parseDomain(multipart.getUsername()),
+                                                 multipart.getPassword(),
+                                                 multipart.getSshKey());
+                session.connectToRM(credData);
+
+            }
+
+        } catch (ActiveObjectCreationException e) {
+            throw new RMActiveObjectCreationException(e);
+        } catch (NodeException e) {
+            throw new RMNodeException(e);
         }
-
         return session.getSessionId();
     }
 
@@ -434,10 +445,14 @@ public class RMRest implements RMRestInterface {
 
     @Override
     public boolean releaseNode(String sessionId, String url)
-            throws NodeException, NotConnectedException, PermissionRestException {
+            throws RMNodeException, NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
         Node n;
-        n = NodeFactory.getNode(url);
+        try {
+            n = NodeFactory.getNode(url);
+        } catch (NodeException e) {
+            throw new RMNodeException(e);
+        }
         return orThrowRpe(rm.releaseNode(n).getBooleanValue());
     }
 
@@ -534,7 +549,7 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public Topology getTopology(String sessionId) throws NotConnectedException, PermissionRestException {
+    public TopologyInfo getTopology(String sessionId) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
         return orThrowRpe(PAFuture.getFutureValue(rm.getTopology()));
     }

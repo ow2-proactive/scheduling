@@ -23,7 +23,7 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive_grid_cloud_portal.rm;
+package org.ow2.proactive_grid_cloud_portal.common;
 
 import java.io.IOException;
 import java.security.KeyException;
@@ -57,8 +57,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.GZIP;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.node.NodeException;
 import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.resourcemanager.common.NSState;
 import org.ow2.proactive.resourcemanager.common.RMState;
@@ -66,8 +64,10 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
+import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
+import org.ow2.proactive.resourcemanager.exception.RMNodeException;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyInfo;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -88,7 +88,7 @@ public interface RMRestInterface {
     @Path("login")
     @Produces("application/json")
     String rmConnect(@FormParam("username") String username, @FormParam("password") String password)
-            throws KeyException, LoginException, RMException, ActiveObjectCreationException, NodeException;
+            throws KeyException, LoginException, RMException, RMActiveObjectCreationException, RMNodeException;
 
     /**
      * Disconnects from resource manager and releases all the nodes taken by
@@ -106,8 +106,8 @@ public interface RMRestInterface {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("login")
     @Produces("application/json")
-    String loginWithCredential(@MultipartForm LoginForm multipart)
-            throws ActiveObjectCreationException, NodeException, KeyException, IOException, LoginException, RMException;
+    String loginWithCredential(@MultipartForm LoginForm multipart) throws RMActiveObjectCreationException,
+            RMNodeException, KeyException, IOException, LoginException, RMException;
 
     /**
      * Get the login string associated to the {@code sessionId} if it exists
@@ -380,7 +380,7 @@ public interface RMRestInterface {
     @Path("node/release")
     @Produces("application/json")
     boolean releaseNode(@HeaderParam("sessionid") String sessionId, @FormParam("url") String url)
-            throws NodeException, NotConnectedException, PermissionRestException;
+            throws RMNodeException, NotConnectedException, PermissionRestException;
 
     /**
      * Delete a node
@@ -576,7 +576,7 @@ public interface RMRestInterface {
     @GET
     @Path("topology")
     @Produces("application/json")
-    Topology getTopology(@HeaderParam("sessionid") String sessionId)
+    TopologyInfo getTopology(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
     /**
