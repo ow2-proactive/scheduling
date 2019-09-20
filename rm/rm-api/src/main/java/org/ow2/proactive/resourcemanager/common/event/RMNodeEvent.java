@@ -447,4 +447,9 @@ public final class RMNodeEvent extends RMEvent {
     public List<String> getTokens() {
         return tokens;
     }
+
+    // for the sake of resteasy mapping
+    public String getDescription() {
+        return description;
+    }
 }
