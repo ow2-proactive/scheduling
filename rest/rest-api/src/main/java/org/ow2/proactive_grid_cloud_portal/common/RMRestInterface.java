@@ -67,7 +67,7 @@ import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
-import org.ow2.proactive.resourcemanager.frontend.topology.TopologyInfo;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyData;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -576,7 +576,7 @@ public interface RMRestInterface {
     @GET
     @Path("topology")
     @Produces("application/json")
-    TopologyInfo getTopology(@HeaderParam("sessionid") String sessionId)
+    TopologyData getTopology(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
     /**

@@ -25,11 +25,14 @@
  */
 package org.ow2.proactive.utils;
 
+import java.util.AbstractMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 // Sonar does not like that I wrap checked exception into unchecked.
@@ -115,6 +118,20 @@ public class Lambda {
             iteratorWithIndex.forEachWithIndex(nextT, index);
             index++;
         }
+    }
+
+    public static <A, B, C> Map<A, C> mapValues(Map<A, B> map, Function<B, C> mapper) {
+        return map.entrySet()
+                  .stream()
+                  .map(p -> new AbstractMap.SimpleEntry<>(p.getKey(), mapper.apply(p.getValue())))
+                  .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+    }
+
+    public static <A, B, C> Map<B, C> mapKeys(Map<A, C> map, Function<A, B> mapper) {
+        return map.entrySet()
+                  .stream()
+                  .map(p -> new AbstractMap.SimpleEntry<>(mapper.apply(p.getKey()), p.getValue()))
+                  .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 
     public interface IteratorWithIndex<T> {

@@ -43,7 +43,7 @@ import org.ow2.proactive.topology.descriptor.DistanceFunction;
  * Users may receive the topology information using {@code ResourceManager.getTopology()} method.
  */
 @PublicAPI
-public interface Topology extends TopologyInfo {
+public interface Topology extends Serializable {
 
     /**
      * Returns the distance between 2 nodes.
@@ -57,5 +57,52 @@ public interface Topology extends TopologyInfo {
      * @return true if 2 nodes are on the same hosts, false otherwise
      */
     boolean onSameHost(Node node, Node node2);
+
+    /**
+     * Returns the distance between 2 hosts identified by their inet addresses.
+     *
+     * @return the distance between 2 nodes
+     */
+    Long getDistance(InetAddress hostAddress, InetAddress hostAddress2);
+
+    /**
+     * Returns the distance between 2 hosts identified by their domain names.
+     *
+     * @return the distance between 2 nodes
+     */
+    Long getDistance(String hostName, String hostName2);
+
+    /**
+     * Checks if the information about host is presented in the topology records.
+     * @param hostAddress the address of the host
+     * @return true if the host is known, false otherwise
+     */
+    boolean knownHost(InetAddress hostAddress);
+
+    /**
+     * Gets the set of hosts handled by resource manager.
+     *
+     * @return the set of hosts handled by resource manager
+     */
+    Set<InetAddress> getHosts();
+
+    /**
+     * Gets the distances associated to the host.
+     * Note that it does not return information about all hosts handled by the resource manager
+     * but rather the information about hosts added before the one specified.
+     *
+     * @param hostAddress - inet address of the host
+     * @return distances map to nodes added before this one
+     */
+    HashMap<InetAddress, Long> getHostTopology(InetAddress hostAddress);
+
+    /**
+     * Clustirizes hosts into clusters based on their proximity
+     *
+     * @param numberOfClusters the number of clusters to produce
+     * @param distanceFunction the function for distances recalculation
+     * @return the list of host clusters
+     */
+    List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction);
 
 }
