@@ -124,6 +124,10 @@ public class TopologyImpl implements Topology, Cloneable {
         return distances.keySet();
     }
 
+    public HashMap<String, InetAddress> getGetHosts() {
+        return hosts;
+    }
+
     /**
      * Adds host information to the topology.
      * Pass both name and address of host avoiding to do a conversion inside.
@@ -187,5 +191,9 @@ public class TopologyImpl implements Topology, Cloneable {
     public List<Cluster<String>> clusterize(int numberOfClusters, DistanceFunction distanceFunction) {
         HAC hac = new HAC(this, new LinkedList<Node>(), distanceFunction, Long.MAX_VALUE);
         return hac.clusterize(numberOfClusters, hosts.keySet());
+    }
+
+    public HashMap<InetAddress, HashMap<InetAddress, Long>> getDistances() {
+        return distances;
     }
 }

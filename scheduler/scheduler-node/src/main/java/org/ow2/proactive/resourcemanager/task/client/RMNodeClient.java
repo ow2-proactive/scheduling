@@ -44,7 +44,7 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
-import org.ow2.proactive.resourcemanager.frontend.topology.TopologyInfo;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyData;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
@@ -517,7 +517,7 @@ public class RMNodeClient implements IRMClient, Serializable {
         return rm.shutdown(sessionId, preempt);
     }
 
-    public TopologyInfo getTopology() throws NotConnectedException, PermissionRestException {
+    public TopologyData getTopology() throws NotConnectedException, PermissionRestException {
         checkNonEmptySession();
         return rm.getTopology(sessionId);
     }

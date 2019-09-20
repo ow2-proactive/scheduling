@@ -26,8 +26,11 @@
 package org.ow2.proactive_grid_cloud_portal.rm;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.ow2.proactive.utils.Lambda.mapKeys;
+import static org.ow2.proactive.utils.Lambda.mapValues;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyException;
@@ -78,7 +81,8 @@ import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationExcepti
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
-import org.ow2.proactive.resourcemanager.frontend.topology.TopologyInfo;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyData;
+import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -553,9 +557,15 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public TopologyInfo getTopology(String sessionId) throws NotConnectedException, PermissionRestException {
+    public TopologyData getTopology(String sessionId) throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return orThrowRpe(PAFuture.getFutureValue(rm.getTopology()));
+        TopologyImpl topology = (TopologyImpl) orThrowRpe(PAFuture.getFutureValue(rm.getTopology()));
+        TopologyData topologyData = new TopologyData();
+        Map<String, Map<String, Long>> distances = mapValues(mapKeys(topology.getDistances(), InetAddress::toString),
+                                                             map -> mapKeys(map, InetAddress::toString));
+        topologyData.setDistances(distances);
+        topologyData.setHosts(mapValues(topology.getGetHosts(), InetAddress::toString));
+        return topologyData;
     }
 
     @Override
