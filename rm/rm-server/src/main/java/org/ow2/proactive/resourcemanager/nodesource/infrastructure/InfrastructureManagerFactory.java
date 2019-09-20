@@ -85,7 +85,7 @@ public class InfrastructureManagerFactory {
 
     /**
       * Creates a new infrastructure manager and recovers its state thanks to
-      * the variables contained in {@param infrastructureVariables}.
+      * the variables contained in the nodeSourceDescriptor.
       *
       * @param nodeSourceDescriptor the persisted information about the node source
       * @return recovered infrastructure manager

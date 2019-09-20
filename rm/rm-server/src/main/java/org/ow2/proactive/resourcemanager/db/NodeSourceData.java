@@ -70,7 +70,8 @@ public class NodeSourceData implements Serializable {
     private NodeSourceStatus status;
 
     /**
-     * name of the variable --> value of the variable
+     * Map of infrastructure variables
+     * key:name of the variable, value:value of the variable
      */
     private Map<String, Serializable> infrastructureVariables;
 

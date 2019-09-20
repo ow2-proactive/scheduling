@@ -306,10 +306,11 @@ public class SSHInfrastructure extends HostsFileBasedInfrastructureManager {
      *
      * @param parameters
      *            parameters[4] : ssh Options, see {@link SSHClient}
-     *            parameters[5] : java path on the remote machines parameters[6]
-     *            : Scheduling path on remote machines parameters[7] : target
-     *            OS' type (Linux, Windows or Cygwin) parameters[8] : extra java
-     *            options parameters[9] : rm cred
+     *            parameters[5] : java path on the remote machines
+     *            parameters[6] : Scheduling path on remote machines
+     *            parameters[7] : target OS' type (Linux, Windows or Cygwin)
+     *            parameters[8] : extra java options
+     *            parameters[9] : rm cred
      * @throws IllegalArgumentException
      *             configuration failed
      */
