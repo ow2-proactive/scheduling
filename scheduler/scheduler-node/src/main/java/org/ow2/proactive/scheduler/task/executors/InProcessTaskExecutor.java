@@ -46,6 +46,7 @@ import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
 import org.apache.commons.io.FileUtils;
+import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -143,6 +144,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             Map<String, Serializable> resultMap = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
+            RMNodeClient rmNodeClient = forkedTaskVariablesManager.createRMNodeClient(taskContext);
             userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
                                                                                    schedulerNodeClient,
                                                                                    IDataSpaceClient.Dataspace.USER);
@@ -156,6 +158,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
                                                                   resultMap,
                                                                   thirdPartyCredentials,
                                                                   schedulerNodeClient,
+                                                                  rmNodeClient,
                                                                   userSpaceClient,
                                                                   globalSpaceClient,
                                                                   resultMetadata);

@@ -23,39 +23,25 @@
  * If needed, contact us to obtain a release under GPL Version 2 or 3
  * or a different license than the AGPL.
  */
-package org.ow2.proactive.resourcemanager.frontend.topology;
+package org.ow2.proactive_grid_cloud_portal.rm.client;
 
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.security.KeyException;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.node.Node;
-import org.ow2.proactive.resourcemanager.frontend.topology.clustering.Cluster;
-import org.ow2.proactive.topology.descriptor.DistanceFunction;
+import javax.security.auth.login.LoginException;
+
+import org.ow2.proactive.resourcemanager.exception.RMException;
+import org.ow2.proactive_grid_cloud_portal.common.RMRestInterface;
 
 
-/**
- *
- * Interface represents hosts topology handled by resource manager.
- * Users may receive the topology information using {@code ResourceManager.getTopology()} method.
- */
-@PublicAPI
-public interface Topology extends TopologyInfo {
+public class RMClientExample {
 
-    /**
-     * Returns the distance between 2 nodes.
-     *
-     * @return the distance between 2 nodes
-     */
-    Long getDistance(Node node, Node node2);
+    public static void main(String[] args) throws LoginException, KeyException, RMException {
+        System.out.println("Hello from example.");
 
-    /**
-     * Checks if 2 nodes are on the sane host.
-     * @return true if 2 nodes are on the same hosts, false otherwise
-     */
-    boolean onSameHost(Node node, Node node2);
+        RMRestClient client = new RMRestClient("http://localhost:8080/rest/", null);
+        RMRestInterface rm = client.getRm();
+        String sessionId = rm.rmConnect("admin", "admin");
 
+        System.out.println(sessionId);
+    }
 }

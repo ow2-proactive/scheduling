@@ -696,6 +696,7 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
         if (client == null)
             throw new NotConnectedException("Client not connected, call connect() before using the scheduler client");
         client.init(connectionInfo);
+        renewSession();
     }
 
     @Override

@@ -99,6 +99,8 @@ public class SchedulerConstants {
      */
     public static final String SCHEDULER_CLIENT_BINDING_NAME = "schedulerapi";
 
+    public static final String RM_CLIENT_BINDING_NAME = "rmapi";
+
     /**
      * The variable containing a proxy to the key/value store
      */

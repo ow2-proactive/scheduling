@@ -28,18 +28,13 @@ package functionaltests;
 import static functionaltests.RestFuncTHelper.getRestServerUrl;
 import static functionaltests.jobs.SimpleJob.TEST_JOB;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.anyMap;
 
 import java.io.File;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -53,6 +48,7 @@ import org.junit.rules.TemporaryFolder;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -98,7 +94,7 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
     /**
      * Maximum wait time of 5 minutes
      */
-    private static final long MAX_WAIT_TIME = 5 * 60 * 1000;
+    protected static final long MAX_WAIT_TIME = 5 * 60 * 1000;
 
     private static URL jobDescriptor = SchedulerClientTest.class.getResource("/functionaltests/descriptors/Job_get_generic_info.xml");
 
@@ -125,6 +121,17 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         // client should automatically renew the session identifier
         status = client.getStatus();
         assertNotNull(status);
+    }
+
+    @Test(timeout = MAX_WAIT_TIME)
+    public void testRMNodeClient() throws Throwable {
+        ISchedulerClient client = clientInstance();
+        Job job = nodeClientJob("/functionaltests/descriptors/rm_client_node.groovy", null, null);
+        JobId jobId = submitJob(job, client);
+        TaskResult tRes = client.waitForTask(jobId.toString(), "NodeClientTask", TimeUnit.MINUTES.toMillis(5));
+        System.out.println(tRes.getOutput().getAllLogs(false));
+        Assert.assertNotNull(tRes);
+        Assert.assertTrue(((ArrayList) tRes.value()).get(0) instanceof RMNodeEvent);
     }
 
     @Test(timeout = MAX_WAIT_TIME)
@@ -701,13 +708,13 @@ public class SchedulerClientTest extends AbstractRestFuncTestCase {
         client.disconnect();
     }
 
-    private ISchedulerClient clientInstance() throws Exception {
+    protected ISchedulerClient clientInstance() throws Exception {
         ISchedulerClient client = SchedulerClient.createInstance();
         client.init(new ConnectionInfo(getRestServerUrl(), getLogin(), getPassword(), null, true));
         return client;
     }
 
-    private JobId submitJob(Job job, ISchedulerClient client) throws Exception {
+    protected JobId submitJob(Job job, ISchedulerClient client) throws Exception {
         return client.submit(job);
     }
 
