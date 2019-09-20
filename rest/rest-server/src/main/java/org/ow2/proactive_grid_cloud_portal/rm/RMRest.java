@@ -564,7 +564,7 @@ public class RMRest implements RMRestInterface {
         Map<String, Map<String, Long>> distances = mapValues(mapKeys(topology.getDistances(), InetAddress::toString),
                                                              map -> mapKeys(map, InetAddress::toString));
         topologyData.setDistances(distances);
-        topologyData.setHosts(mapValues(topology.getGetHosts(), InetAddress::toString));
+        topologyData.setHosts(mapValues(topology.getHostsMap(), InetAddress::toString));
         return topologyData;
     }
 

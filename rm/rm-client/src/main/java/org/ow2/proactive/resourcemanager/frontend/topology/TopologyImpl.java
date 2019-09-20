@@ -124,7 +124,7 @@ public class TopologyImpl implements Topology, Cloneable {
         return distances.keySet();
     }
 
-    public HashMap<String, InetAddress> getGetHosts() {
+    public HashMap<String, InetAddress> getHostsMap() {
         return hosts;
     }
 
