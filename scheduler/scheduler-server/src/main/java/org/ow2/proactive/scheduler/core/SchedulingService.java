@@ -577,6 +577,10 @@ public class SchedulingService {
         });
     }
 
+    public boolean removeJobs(List<JobId> jobIds) {
+        return false;
+    }
+
     class TerminationDataHandler implements Runnable {
 
         private final TerminationData terminationData;

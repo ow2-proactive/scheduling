@@ -848,6 +848,24 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        // checking permission for each of the job
+        for (JobId jobId : jobIds) {
+            try {
+                frontendState.checkPermissions("removeJob",
+                                               frontendState.getIdentifiedJob(jobId),
+                                               YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
+            } catch (UnknownJobException e) {
+                logger.debug(e);
+            }
+        }
+
+        return schedulingService.removeJobs(jobIds);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
