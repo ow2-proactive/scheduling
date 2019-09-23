@@ -46,7 +46,7 @@ import org.ow2.proactive.scripting.SimpleScript;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteScriptData", query = "delete from ScriptData where taskData.id.jobId = :jobId"),
+@NamedQueries({ @NamedQuery(name = "deleteScriptData", query = "delete from ScriptData where taskData.id.jobId in :ids"),
                 @NamedQuery(name = "deleteScriptDataInBulk", query = "delete from ScriptData where taskData.id.jobId in :jobIdList"),
                 @NamedQuery(name = "countScriptData", query = "select count (*) from ScriptData") })
 @BatchSize(size = 100)

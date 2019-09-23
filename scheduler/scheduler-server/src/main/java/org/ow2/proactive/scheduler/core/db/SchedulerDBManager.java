@@ -625,15 +625,19 @@ public class SchedulerDBManager {
         });
     }
 
-    private void removeJobScripts(Session session, long jobId) {
+    private void removeJobScripts(Session session, List<Long> jobIds) {
         // This query competes with "deleteJobData" query.
         // So Oracle 12c can stuck in deadlock.
         // It is definitely something to improve.
         // For now, we added "additionalDelayRandomized" in TransactionHelper.
-        session.getNamedQuery("updateTaskDataJobScripts").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("updateTaskDataJobScripts").setParameterList("ids", jobIds).executeUpdate();
 
-        session.getNamedQuery("deleteScriptData").setParameter("jobId", jobId).executeUpdate();
-        session.getNamedQuery("deleteSelectionScriptData").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("deleteScriptData").setParameterList("ids", jobIds).executeUpdate();
+        session.getNamedQuery("deleteSelectionScriptData").setParameterList("ids", jobIds).executeUpdate();
+    }
+
+    private void removeJobScripts(Session session, long jobId) {
+        removeJobScripts(session, Collections.singletonList(jobId));
     }
 
     private void removeJobRuntimeData(Session session, long jobId) {
@@ -678,30 +682,34 @@ public class SchedulerDBManager {
     }
 
     public void removeJob(final JobId jobId, final long removedTime, final boolean removeData) {
+        removeJob(Collections.singletonList(jobId), removedTime, removeData);
+    }
+
+    public void removeJob(final List<JobId> jobIds, final long removedTime, final boolean removeData) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
-            long id = jobId(jobId);
+            List<Long> ids = jobIds.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
 
             if (removeData) {
-                session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID = :jobId")
-                       .setParameter("jobId", id)
+                session.createSQLQuery("delete from TASK_DATA_DEPENDENCIES where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
                        .executeUpdate();
-                session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID = :jobId")
-                       .setParameter("jobId", id)
+                session.createSQLQuery("delete from TASK_DATA_JOINED_BRANCHES where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
                        .executeUpdate();
-                session.createSQLQuery("delete from JOB_CONTENT where JOB_ID = :jobId")
-                       .setParameter("jobId", id)
+                session.createSQLQuery("delete from JOB_CONTENT where JOB_ID in (:ids)")
+                       .setParameterList("ids", ids)
                        .executeUpdate();
 
-                session.getNamedQuery("deleteJobDataVariable").setParameter("jobId", id).executeUpdate();
+                session.getNamedQuery("deleteJobDataVariable").setParameterList("ids", ids).executeUpdate();
 
-                removeJobScripts(session, id);
+                removeJobScripts(session, ids);
 
-                session.getNamedQuery("deleteJobData").setParameter("jobId", id).executeUpdate();
+                session.getNamedQuery("deleteJobData").setParameterList("ids", ids).executeUpdate();
             } else {
                 session.getNamedQuery("updateJobDataRemovedTime")
                        .setParameter("removedTime", removedTime)
                        .setParameter("lastUpdatedTime", new Date().getTime())
-                       .setParameter("jobId", id)
+                       .setParameterList("ids", ids)
                        .executeUpdate();
             }
             return null;
