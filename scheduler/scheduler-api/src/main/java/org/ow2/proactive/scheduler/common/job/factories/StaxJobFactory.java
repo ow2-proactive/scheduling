@@ -759,19 +759,6 @@ public class StaxJobFactory extends JobFactory {
         return updatedVariablesMap;
     }
 
-    private TaskVariable getTaskVariable(XMLStreamReader cursorVariables, Map<String, String> variables)
-            throws JobCreationException {
-        TaskVariable taskVariable = new TaskVariable();
-        Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables, variables);
-        taskVariable.setName(attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName()));
-        taskVariable.setValue(attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
-        taskVariable.setModel(attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
-        if (attributesAsMap.containsKey(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())) {
-            taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
-        }
-        return taskVariable;
-    }
-
     private Map<String, String> getAttributesAsMap(XMLStreamReader cursorVariables,
             Map<String, String> replacementVariables) throws JobCreationException {
         final ImmutableMap.Builder<String, String> result = ImmutableMap.builder();
@@ -1018,7 +1005,9 @@ public class StaxJobFactory extends JobFactory {
                 String attributeValue = cursorTask.getAttributeValue(i);
                 delayedTaskAttributes.put(attributeName, attributeValue);
                 if (XMLAttributes.COMMON_NAME.matches(attributeName)) {
+                    // it is currently not possible to use variables in task names (due to the complexity of such feature)
                     taskName = attributeValue;
+                    tmpTask.setName(taskName);
                 }
             }
 
