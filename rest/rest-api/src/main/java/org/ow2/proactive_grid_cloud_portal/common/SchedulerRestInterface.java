@@ -2059,5 +2059,6 @@ public interface SchedulerRestInterface {
     @Path("job/{jobid}/permission/{method}")
     @Consumes(value = MediaType.APPLICATION_JSON)
     @Produces("application/json")
-    boolean checkJobPermissionMethod(String sessionId, String jobId, String method) throws RestException;
+    boolean checkJobPermissionMethod(@HeaderParam("sessionid") String sessionId, @PathParam("method") String method,
+            @PathParam("jobid") String jobId) throws RestException;
 }
