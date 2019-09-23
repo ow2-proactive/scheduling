@@ -32,8 +32,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import groovy.lang.IntRange;
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
 import org.junit.Assert;
@@ -190,7 +190,7 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         task1.setExecutableClassName(TestDummyExecutable.class.getName());
         jobDef.addTask(task1);
 
-        List<InternalJob> jobs = new IntRange(0, 5).stream().map(x -> {
+        List<InternalJob> jobs = IntStream.range(0, 5).boxed().map(x -> {
             try {
                 return defaultSubmitJob(jobDef);
             } catch (Exception e) {
