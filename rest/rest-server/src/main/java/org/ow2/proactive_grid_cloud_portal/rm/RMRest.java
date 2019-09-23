@@ -80,9 +80,12 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
+import org.ow2.proactive.resourcemanager.frontend.ConfigurableFieldData;
+import org.ow2.proactive.resourcemanager.frontend.PluginDescriptorData;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyData;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
+import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableAdapter;
 import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -569,10 +572,32 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(String sessionId)
+    public Collection<PluginDescriptorData> getSupportedNodeSourceInfrastructures(String sessionId)
             throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return orThrowRpe(rm.getSupportedNodeSourceInfrastructures());
+        Collection<PluginDescriptor> pluginDescriptors = orThrowRpe(rm.getSupportedNodeSourceInfrastructures());
+        return pluginDescriptors.stream()
+                .map(pluginDescriptor -> {
+                    PluginDescriptorData pdd = new PluginDescriptorData();
+                    pdd.setDefaultValues(pluginDescriptor.getDefaultValues());
+                    pdd.setMeta(pluginDescriptor.getMeta());
+                    pdd.setPluginDescription(pluginDescriptor.getPluginDescription());
+                    pdd.setPluginName(pluginDescriptor.getPluginName());
+                    pdd.setSectionDescriptions(pluginDescriptor.getSectionDescriptions());
+                    pdd.setConfigurableFields(pluginDescriptor.getConfigurableFields().stream().map(configurableField -> {
+                        ConfigurableFieldData cfd = new ConfigurableFieldData();
+                        cfd.setName(configurableField.getName());
+                        cfd.setValue(configurableField.getValue());
+                        ConfigurableAdapter configurableAdapter = new ConfigurableAdapter();
+                        try {
+                            ConfigurableAdapter.ConfigurableWrapper marshal = configurableAdapter.marshal(configurableField.getMeta());
+                            cfd.setMeta(marshal);
+                        } catch (Exception e) {
+                        }
+                        return cfd;
+                    }).collect(Collectors.toList()));
+                    return pdd;
+                }).collect(Collectors.toList());
     }
 
     @Override

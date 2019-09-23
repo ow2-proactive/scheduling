@@ -295,4 +295,8 @@ public class PluginDescriptor implements Serializable {
 
         return result;
     }
+
+    public Map<String, String> getMeta() {
+        return meta;
+    }
 }

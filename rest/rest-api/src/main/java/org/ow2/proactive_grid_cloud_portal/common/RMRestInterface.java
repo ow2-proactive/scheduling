@@ -67,6 +67,7 @@ import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
+import org.ow2.proactive.resourcemanager.frontend.PluginDescriptorData;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyData;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
 import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
@@ -589,7 +590,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("infrastructures")
     @Produces("application/json")
-    Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
+    Collection<PluginDescriptorData> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
     /**
