@@ -45,20 +45,24 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 @XmlRootElement
 public class RMState implements Serializable {
 
-    private final RMStateNodeUrls rmNodeUrls;
+    private RMStateNodeUrls rmNodeUrls;
 
-    private final Long maxNumberOfNodes;
+    private Long maxNumberOfNodes;
 
     public RMState(RMStateNodeUrls rmNodeUrls, Long maxNumberOfNodes) {
         this.rmNodeUrls = rmNodeUrls;
         this.maxNumberOfNodes = maxNumberOfNodes;
     }
 
+    // for Jackson de-serialization purpose
+    public RMState() {
+    }
+
     public Long getMaxNumberOfNodes() {
         return maxNumberOfNodes;
     }
 
-    protected RMStateNodeUrls getRmNodeUrls() {
+    public RMStateNodeUrls getRmNodeUrls() {
         return rmNodeUrls;
     }
 

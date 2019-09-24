@@ -25,24 +25,16 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.ow2.proactive.resourcemanager.exception.RMException;
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
-import org.ow2.proactive.utils.FileToBytesConverter;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 
 
 /**
@@ -56,6 +48,22 @@ import java.util.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "pluginDescriptor")
 public class PluginDescriptorData implements Serializable {
+
+    // for Jackson de-serialization purpose
+    public PluginDescriptorData() {
+    }
+
+    public PluginDescriptorData(PluginDescriptor pluginDescriptor) {
+        defaultValues = pluginDescriptor.getDefaultValues();
+        meta = pluginDescriptor.getMeta();
+        pluginDescription = pluginDescriptor.getPluginDescription();
+        pluginName = pluginDescriptor.getPluginName();
+        sectionDescriptions = pluginDescriptor.getSectionDescriptions();
+        configurableFields = pluginDescriptor.getConfigurableFields()
+                                             .stream()
+                                             .map(ConfigurableFieldData::new)
+                                             .collect(Collectors.toList());
+    }
 
     private String pluginName;
 

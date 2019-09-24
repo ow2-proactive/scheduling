@@ -44,9 +44,9 @@ import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
+import org.ow2.proactive.resourcemanager.frontend.PluginDescriptorData;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyData;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
-import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scheduler.rest.IRMClient;
 import org.ow2.proactive.scripting.ScriptResult;
@@ -525,7 +525,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     /**
      * @return the list of supported node source infrastructures descriptors
      */
-    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures()
+    public Collection<PluginDescriptorData> getSupportedNodeSourceInfrastructures()
             throws NotConnectedException, PermissionRestException {
         checkNonEmptySession();
         return rm.getSupportedNodeSourceInfrastructures(sessionId);
@@ -544,7 +544,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     /**
      * @return the list of supported node source policies descriptors
      */
-    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies()
+    public Collection<PluginDescriptorData> getSupportedNodeSourcePolicies()
             throws NotConnectedException, PermissionRestException {
         checkNonEmptySession();
         return rm.getSupportedNodeSourcePolicies(sessionId);

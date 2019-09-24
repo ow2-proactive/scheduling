@@ -25,13 +25,13 @@
  */
 package org.ow2.proactive.resourcemanager.frontend;
 
-import org.ow2.proactive.resourcemanager.nodesource.common.Configurable;
-import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableAdapter;
+import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
+
+import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableAdapter;
+import org.ow2.proactive.resourcemanager.nodesource.common.ConfigurableField;
 
 
 /**
@@ -41,11 +41,25 @@ import java.io.Serializable;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ConfigurableFieldData implements Serializable {
+
+    // for Jackson de-serialization purpose
+    public ConfigurableFieldData() {
+    }
+
+    public ConfigurableFieldData(ConfigurableField configurableField) {
+        name = configurableField.getName();
+        value = configurableField.getValue();
+        try {
+            meta = new ConfigurableAdapter().marshal(configurableField.getMeta());
+        } catch (Exception e) {
+        }
+    }
+
     private String name;
 
     private String value;
 
-    private ConfigurableAdapter meta;
+    private ConfigurableAdapter.ConfigurableWrapper meta;
 
     public String getName() {
         return name;
@@ -63,7 +77,7 @@ public class ConfigurableFieldData implements Serializable {
         this.value = value;
     }
 
-    public ConfigurableAdapter getMeta() {
+    public ConfigurableAdapter.ConfigurableWrapper getMeta() {
         return meta;
     }
 
