@@ -96,6 +96,7 @@ public class JobRemoveHandlerTest extends ProActiveTestClean {
         Mockito.when(rmProxiesManager.getRmUrl()).thenReturn(null);
         Mockito.when(dbManager.loadJobWithTasksIfNotRemoved(jobId)).thenReturn(Collections.singletonList(job));
         Mockito.when(job.getJobInfo()).thenReturn(jobInfo);
+        Mockito.when(job.getId()).thenReturn(jobId);
         service = new SchedulingService(infrastructure,
                                         listener,
                                         null,
@@ -110,7 +111,10 @@ public class JobRemoveHandlerTest extends ProActiveTestClean {
         boolean removed = jobRemoveHandler.call();
         assertThat(removed, is(true));
         Mockito.verify(dbManager, Mockito.times(1)).loadJobWithTasksIfNotRemoved(jobId);
-        Mockito.verify(dbManager, Mockito.times(1)).removeJob(org.mockito.Matchers.any(JobId.class),
+        Mockito.verify(dbManager, Mockito.times(1)).removeJob(org.mockito.Matchers.anyListOf(JobId.class),
+                                                              org.mockito.Matchers.anyLong(),
+                                                              org.mockito.Matchers.anyBoolean());
+        Mockito.verify(dbManager, Mockito.times(0)).removeJob(org.mockito.Matchers.any(JobId.class),
                                                               org.mockito.Matchers.anyLong(),
                                                               org.mockito.Matchers.anyBoolean());
         Mockito.verify(listener, Mockito.times(1)).jobStateUpdated(org.mockito.Matchers.anyString(),
