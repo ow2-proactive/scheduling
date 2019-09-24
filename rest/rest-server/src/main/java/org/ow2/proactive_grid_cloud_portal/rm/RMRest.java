@@ -80,6 +80,7 @@ import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
 import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
+import org.ow2.proactive.resourcemanager.frontend.PluginDescriptorData;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyData;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyImpl;
@@ -569,10 +570,11 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(String sessionId)
+    public Collection<PluginDescriptorData> getSupportedNodeSourceInfrastructures(String sessionId)
             throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return orThrowRpe(rm.getSupportedNodeSourceInfrastructures());
+        Collection<PluginDescriptor> pluginDescriptors = orThrowRpe(rm.getSupportedNodeSourceInfrastructures());
+        return pluginDescriptors.stream().map(PluginDescriptorData::new).collect(Collectors.toList());
     }
 
     @Override
@@ -603,10 +605,11 @@ public class RMRest implements RMRestInterface {
     }
 
     @Override
-    public Collection<PluginDescriptor> getSupportedNodeSourcePolicies(String sessionId)
+    public Collection<PluginDescriptorData> getSupportedNodeSourcePolicies(String sessionId)
             throws NotConnectedException, PermissionRestException {
         ResourceManager rm = checkAccess(sessionId);
-        return orThrowRpe(rm.getSupportedNodeSourcePolicies());
+        Collection<PluginDescriptor> pluginDescriptors = orThrowRpe(rm.getSupportedNodeSourcePolicies());
+        return pluginDescriptors.stream().map(PluginDescriptorData::new).collect(Collectors.toList());
     }
 
     @Override

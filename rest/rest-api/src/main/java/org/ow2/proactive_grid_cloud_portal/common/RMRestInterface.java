@@ -67,9 +67,9 @@ import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
 import org.ow2.proactive.resourcemanager.exception.RMActiveObjectCreationException;
 import org.ow2.proactive.resourcemanager.exception.RMException;
 import org.ow2.proactive.resourcemanager.exception.RMNodeException;
+import org.ow2.proactive.resourcemanager.frontend.PluginDescriptorData;
 import org.ow2.proactive.resourcemanager.frontend.topology.TopologyData;
 import org.ow2.proactive.resourcemanager.nodesource.common.NodeSourceConfiguration;
-import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
@@ -589,7 +589,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("infrastructures")
     @Produces("application/json")
-    Collection<PluginDescriptor> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
+    Collection<PluginDescriptorData> getSupportedNodeSourceInfrastructures(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
     /**
@@ -614,7 +614,7 @@ public interface RMRestInterface {
     @GZIP
     @Path("policies")
     @Produces("application/json")
-    Collection<PluginDescriptor> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
+    Collection<PluginDescriptorData> getSupportedNodeSourcePolicies(@HeaderParam("sessionid") String sessionId)
             throws NotConnectedException, PermissionRestException;
 
     @GET

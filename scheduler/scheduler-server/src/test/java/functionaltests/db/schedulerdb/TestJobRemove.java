@@ -56,6 +56,8 @@ import org.ow2.proactive.scripting.SimpleScript;
 
 import com.google.common.collect.ImmutableSet;
 
+import groovy.lang.IntRange;
+
 
 public class TestJobRemove extends BaseSchedulerDBTest {
 

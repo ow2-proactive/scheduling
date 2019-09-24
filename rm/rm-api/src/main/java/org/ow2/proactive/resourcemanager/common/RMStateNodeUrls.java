@@ -31,16 +31,20 @@ import java.util.Set;
 
 public class RMStateNodeUrls implements Serializable {
 
-    private final Set<String> freeNodesUrls;
+    private Set<String> freeNodesUrls;
 
-    private final Set<String> aliveNodesUrls;
+    private Set<String> aliveNodesUrls;
 
-    private final Set<String> allNodesUrls;
+    private Set<String> allNodesUrls;
 
     public RMStateNodeUrls(Set<String> freeNodesUrls, Set<String> aliveNodesUrls, Set<String> allNodesUrls) {
         this.freeNodesUrls = freeNodesUrls;
         this.aliveNodesUrls = aliveNodesUrls;
         this.allNodesUrls = allNodesUrls;
+    }
+
+    // for Jackson de-serialization purpose
+    public RMStateNodeUrls() {
     }
 
     public Set<String> getFreeNodesUrls() {
