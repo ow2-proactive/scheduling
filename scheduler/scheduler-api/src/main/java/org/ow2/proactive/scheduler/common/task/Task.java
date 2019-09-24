@@ -157,6 +157,8 @@ public abstract class Task extends CommonAttribute {
     /** A map to hold task variables */
     protected Map<String, TaskVariable> variables = Collections.synchronizedMap(new LinkedHashMap());
 
+    private Map<String, TaskVariable> unresolvedVariables = Collections.synchronizedMap(new LinkedHashMap());
+
     /**
      * Add a dependence to the task. <font color="red">Warning : the dependence order is very
      * important.</font>
@@ -722,6 +724,35 @@ public abstract class Task extends CommonAttribute {
      */
     public Map<String, TaskVariable> getVariables() {
         return this.variables;
+    }
+
+    /**
+     * Returns the unresolved variable map of this job.
+     *
+     * @return an unresolved variable map
+     */
+    public Map<String, TaskVariable> getUnresolvedVariables() {
+        return this.unresolvedVariables;
+    }
+
+    /**
+     * Sets the unresolved variable map for this job.
+     *
+     * @param unresolvedVariables the unresolved variables map
+     */
+    public void setUnresolvedVariables(Map<String, TaskVariable> unresolvedVariables) {
+        verifyVariableMap(unresolvedVariables);
+        this.unresolvedVariables = Collections.synchronizedMap(new LinkedHashMap(unresolvedVariables));
+    }
+
+    public static void verifyVariableMap(Map<String, ? extends TaskVariable> variables) {
+        for (Map.Entry<String, ? extends TaskVariable> entry : variables.entrySet()) {
+            if (!entry.getKey().equals(entry.getValue().getName())) {
+                throw new IllegalArgumentException("Variables map entry key (" + entry.getKey() +
+                                                   ") is different from variable name (" + entry.getValue().getName() +
+                                                   ")");
+            }
+        }
     }
 
     /**
