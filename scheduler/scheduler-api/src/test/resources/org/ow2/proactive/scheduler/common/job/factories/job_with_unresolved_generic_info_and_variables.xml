@@ -9,9 +9,23 @@
     <description>UpdateVariablesTestJob</description>
     <genericInformation>
         <info name="info1" value="${variable1}"/>
+        <info name="info2" value="${variable1}"/>
+        <info name="info3" value="${variable2}"/>
     </genericInformation>
     <taskFlow>
         <task name="task">
+            <variables>
+                <variable name="task_variable1" value="task_value1" inherited="false"/>
+                <variable name="task_variable2" value="${task_variable1}" inherited="false" />
+                <variable name="variable1" value="${task_variable2}" inherited="true" />
+                <variable name="variable2" value="${task_variable2}" inherited="false" />
+            </variables>
+            <genericInformation>
+                <info name="task_generic_info1" value="gi_${task_variable2}" />
+                <info name="task_generic_info2" value="gi_${variable1}" />
+                <info name="task_generic_info3" value="gi_${variable2}" />
+                <info name="info1" value="gi_${variable2}" />
+            </genericInformation>
             <scriptExecutable>
                 <script>
                     <code language="javascript">
