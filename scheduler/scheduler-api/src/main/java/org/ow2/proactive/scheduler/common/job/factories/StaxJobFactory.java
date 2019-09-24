@@ -39,6 +39,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -660,26 +661,43 @@ public class StaxJobFactory extends JobFactory {
     }
 
     /**
-      * Create a map of variables from XML variables.
-      * Leave the method with the cursor at the end of 'ELEMENT_VARIABLES' tag
-      *
-      * @param cursorVariables the streamReader with the cursor on the 'ELEMENT_VARIABLES' tag.
-      * @return the map in which the variables were added.
-      * @throws JobCreationException
-      */
-    private Map<String, TaskVariable> createTaskVariables(XMLStreamReader cursorVariables,
-            Map<String, String> variables) throws JobCreationException {
-        Map<String, TaskVariable> variablesMap = new HashMap<>();
+     * Create a map of variables from task XML variables.
+     * Leave the method with the cursor at the end of 'ELEMENT_VARIABLES' tag
+     *
+     * @param cursorVariables the streamReader with the cursor on the 'ELEMENT_VARIABLES' tag.
+     * @return the map in which the variables were added (without any resolution).
+     * @throws JobCreationException
+     */
+    private Map<String, TaskVariable> createUnresolvedTaskVariables(XMLStreamReader cursorVariables)
+            throws JobCreationException {
+        HashMap<String, TaskVariable> unresolvedVariablesMap = new LinkedHashMap<>();
         try {
             int eventType;
             while (cursorVariables.hasNext()) {
                 eventType = cursorVariables.next();
-                if (eventType == XMLEvent.START_ELEMENT && XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
-                    TaskVariable taskVariable = getTaskVariable(cursorVariables, variables);
-                    variablesMap.put(taskVariable.getName(), taskVariable);
-                } else if (eventType == XMLEvent.END_ELEMENT &&
-                           XMLTags.VARIABLES.matches(cursorVariables.getLocalName())) {
-                    return variablesMap;
+                switch (eventType) {
+                    case XMLEvent.START_ELEMENT:
+                        if (XMLTags.VARIABLE.matches(cursorVariables.getLocalName())) {
+                            Map<String, String> unresolvedAttributesAsMap = getUnresolvedAttributesAsMap(cursorVariables);
+
+                            TaskVariable taskVariable = new TaskVariable();
+                            String name = unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName());
+                            taskVariable.setName(name);
+                            taskVariable.setValue(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
+                            taskVariable.setModel(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
+                            if (unresolvedAttributesAsMap.containsKey(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())) {
+                                taskVariable.setJobInherited(Boolean.valueOf(unresolvedAttributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
+                            }
+                            unresolvedVariablesMap.put(name, taskVariable);
+                        }
+                        break;
+                    case XMLEvent.END_ELEMENT:
+                        if (XMLTags.VARIABLES.matches(cursorVariables.getLocalName())) {
+                            return unresolvedVariablesMap;
+                        }
+                        break;
+                    default:
+                        // do nothing just cope with sonarqube rule switch must have default
                 }
             }
         } catch (JobCreationException jce) {
@@ -692,20 +710,53 @@ public class StaxJobFactory extends JobFactory {
             }
             throw new JobCreationException(cursorVariables.getLocalName(), attrtmp, e);
         }
-        return variablesMap;
+
+        return unresolvedVariablesMap;
     }
 
-    private TaskVariable getTaskVariable(XMLStreamReader cursorVariables, Map<String, String> variables)
-            throws JobCreationException {
-        TaskVariable taskVariable = new TaskVariable();
-        Map<String, String> attributesAsMap = getAttributesAsMap(cursorVariables, variables);
-        taskVariable.setName(attributesAsMap.get(XMLAttributes.VARIABLE_NAME.getXMLName()));
-        taskVariable.setValue(attributesAsMap.get(XMLAttributes.VARIABLE_VALUE.getXMLName()));
-        taskVariable.setModel(attributesAsMap.get(XMLAttributes.VARIABLE_MODEL.getXMLName()));
-        if (attributesAsMap.containsKey(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())) {
-            taskVariable.setJobInherited(Boolean.valueOf(attributesAsMap.get(XMLAttributes.VARIABLE_JOB_INHERITED.getXMLName())));
+    protected Map<String, TaskVariable> replaceVariablesInTaskVariablesMap(Map<String, TaskVariable> variablesMap,
+            Map<String, String> replacementVariables) throws JobCreationException {
+
+        HashMap<String, String> updatedReplacementVariables = new HashMap<>();
+        HashMap<String, TaskVariable> updatedVariablesMap = new HashMap<>(variablesMap);
+
+        // replacements will include at first variables defined in the job
+        for (TaskVariable variable : updatedVariablesMap.values()) {
+            updatedReplacementVariables.put(variable.getName(), variable.getValue());
         }
-        return taskVariable;
+        if (replacementVariables != null) {
+            // overwritten by variables used at job submission
+            updatedReplacementVariables.putAll(replacementVariables);
+        }
+
+        for (Map.Entry<String, String> replacementVariable : updatedReplacementVariables.entrySet()) {
+            String replacementVariableKey = replacementVariable.getKey();
+            if (updatedVariablesMap.containsKey(replacementVariableKey)) {
+                // if the variable is already defined in the job, overwrite its value by the replacement variable,
+                // eventually using other variables as pattern replacements
+                TaskVariable taskVariable = updatedVariablesMap.get(replacementVariableKey);
+                TaskVariable replacedTaskVariable = new TaskVariable(taskVariable.getName(),
+                                                                     taskVariable.getValue(),
+                                                                     taskVariable.getModel(),
+                                                                     taskVariable.isJobInherited());
+                replacedTaskVariable.setValue(replace(replacementVariable.getValue(), updatedReplacementVariables));
+                if (replacedTaskVariable.getModel() != null) {
+                    // model of an existing variable can use other variables as pattern replacements
+                    replacedTaskVariable.setModel(replace(replacedTaskVariable.getModel(),
+                                                          updatedReplacementVariables));
+                }
+                updatedVariablesMap.put(replacementVariableKey, replacedTaskVariable);
+            } else {
+                // if the variable is not defined in the task, create a new non-inherited task variable with an empty model
+                updatedVariablesMap.put(replacementVariableKey,
+                                        new TaskVariable(replacementVariableKey,
+                                                         replace(replacementVariable.getValue(),
+                                                                 updatedReplacementVariables),
+                                                         null,
+                                                         false));
+            }
+        }
+        return updatedVariablesMap;
     }
 
     private Map<String, String> getAttributesAsMap(XMLStreamReader cursorVariables,
@@ -944,48 +995,24 @@ public class StaxJobFactory extends JobFactory {
             Task toReturn = null;
             Task tmpTask = new Task() {
             };
-            //parse job attributes and fill the temporary one
+
+            // To allow variable replacements on the task attributes, store them until task variables are parsed
+            Map<String, String> delayedTaskAttributes = new HashMap<>();
             int attrLen = cursorTask.getAttributeCount();
-            for (i = 0; i < attrLen; i++) {
+
+            for (; i < attrLen; i++) {
                 String attributeName = cursorTask.getAttributeLocalName(i);
                 String attributeValue = cursorTask.getAttributeValue(i);
-
+                delayedTaskAttributes.put(attributeName, attributeValue);
                 if (XMLAttributes.COMMON_NAME.matches(attributeName)) {
-                    tmpTask.setName(attributeValue);
+                    // it is currently not possible to use variables in task names (due to the complexity of such feature)
                     taskName = attributeValue;
-                } else if (XMLAttributes.TASK_NB_NODES.matches(attributeName)) {
-                    int numberOfNodesNeeded = Integer.parseInt(replace(attributeValue,
-                                                                       tmpTask.getVariablesOverriden(job)));
-                    tmpTask.setParallelEnvironment(new ParallelEnvironment(numberOfNodesNeeded));
-                } else if (XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.matches(attributeName)) {
-                    handleCancelJobOnErrorAttribute(tmpTask, attributeValue);
-                } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
-                    tmpTask.setOnTaskError(OnTaskError.getInstance(replace(attributeValue,
-                                                                           tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
-                    tmpTask.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue,
-                                                                              tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.COMMON_TASK_RETRY_DELAY.matches(attributeName)) {
-                    tmpTask.setTaskRetryDelay(Tools.formatDate(replace(attributeValue,
-                                                                       tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
-                    tmpTask.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue,
-                                                                             tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.TASK_PRECIOUS_RESULT.matches(attributeName)) {
-                    tmpTask.setPreciousResult(Boolean.parseBoolean(replace(attributeValue,
-                                                                           tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.TASK_PRECIOUS_LOGS.matches(attributeName)) {
-                    tmpTask.setPreciousLogs(Boolean.parseBoolean(replace(attributeValue,
-                                                                         tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.TASK_WALLTIME.matches(attributeName)) {
-                    tmpTask.setWallTime(Tools.formatDate(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attributeName)) {
-                    tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue,
-                                                                    tmpTask.getVariablesOverriden(job))));
-                } else if (XMLAttributes.TASK_FORK.matches(attributeName)) {
-                    tmpTask.setFork(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
+                    tmpTask.setName(taskName);
                 }
             }
+
+            // in the XML schema, description is defined after variables for tasks
+            String delayedDescription = null;
 
             int eventType;
             boolean shouldContinue = true;
@@ -1007,11 +1034,18 @@ public class StaxJobFactory extends JobFactory {
                             tmpTask.setGenericInformation(getResolvedGenericInformations(unresolvedGenericInformationDefinedInWorkflow,
                                                                                          jobVariablesWithGenericInfos));
                         } else if (XMLTags.VARIABLES.matches(current)) {
-                            Map<String, TaskVariable> taskVariablesMap = createTaskVariables(cursorTask,
-                                                                                             tmpTask.getVariablesOverriden(job));
+                            // Add resolved task variables using both job and task variables
+                            // the final value of the variable can either be overwritten by a value of the job submission variables map or
+                            // use in a pattern such value
+                            Map<String, TaskVariable> unresolvedTaskVariablesMap = createUnresolvedTaskVariables(cursorTask);
+                            tmpTask.getUnresolvedVariables().putAll(unresolvedTaskVariablesMap);
+
+                            Map<String, TaskVariable> taskVariablesMap = replaceVariablesInTaskVariablesMap(unresolvedTaskVariablesMap,
+                                                                                                            getInitialTaskVariablesOverriden(job,
+                                                                                                                                             unresolvedTaskVariablesMap));
                             tmpTask.setVariables(taskVariablesMap);
                         } else if (XMLTags.COMMON_DESCRIPTION.matches(current)) {
-                            tmpTask.setDescription(getDescription(cursorTask, tmpTask.getVariablesOverriden(job)));
+                            delayedDescription = getDescription(cursorTask, Collections.EMPTY_MAP);
                         } else if (XMLTags.DS_INPUT_FILES.matches(current)) {
                             setIOFIles(cursorTask,
                                        XMLTags.DS_INPUT_FILES.getXMLName(),
@@ -1066,6 +1100,12 @@ public class StaxJobFactory extends JobFactory {
                         // do nothing just cope with sonarqube rule switch must have default
                 }
             }
+
+            // fill the task attributes using variable resolution
+            handleTaskAttributes(tmpTask, job, delayedTaskAttributes);
+
+            tmpTask.setDescription(replace(delayedDescription, tmpTask.getVariablesOverriden(job)));
+
             // check whether task properties has conflicts between "runAsMe" and "fork"
             if (tmpTask.isRunAsMe() && Boolean.FALSE.equals(tmpTask.isFork())) {
                 throw new JobCreationException(String.format("The task contains conflicting properties between 'runAsMe=%s' and 'fork=%s', because 'runAsMe=true' implies 'fork=true'.",
@@ -1103,6 +1143,62 @@ public class StaxJobFactory extends JobFactory {
                 throw new JobCreationException(current, attrtmp, e);
             }
         }
+    }
+
+    private void handleTaskAttributes(Task tmpTask, Job job, Map<String, String> delayedTaskAttributes)
+            throws JobCreationException {
+        for (Map.Entry<String, String> delayedAttribute : delayedTaskAttributes.entrySet()) {
+            String attributeName = delayedAttribute.getKey();
+            String attributeValue = delayedAttribute.getValue();
+
+            if (XMLAttributes.COMMON_NAME.matches(attributeName)) {
+                // it is currently not possible to use variables in task names (due to the complexity of such feature)
+                tmpTask.setName(attributeValue);
+            } else if (XMLAttributes.TASK_NB_NODES.matches(attributeName)) {
+                int numberOfNodesNeeded = Integer.parseInt(replace(attributeValue, tmpTask.getVariablesOverriden(job)));
+                tmpTask.setParallelEnvironment(new ParallelEnvironment(numberOfNodesNeeded));
+            } else if (XMLAttributes.COMMON_CANCEL_JOB_ON_ERROR.matches(attributeName)) {
+                handleCancelJobOnErrorAttribute(tmpTask, attributeValue);
+            } else if (XMLAttributes.COMMON_ON_TASK_ERROR.matches(attributeName)) {
+                tmpTask.setOnTaskError(OnTaskError.getInstance(replace(attributeValue,
+                                                                       tmpTask.getVariablesOverriden(job))));
+            } else if (XMLAttributes.COMMON_RESTART_TASK_ON_ERROR.matches(attributeName)) {
+                tmpTask.setRestartTaskOnError(RestartMode.getMode(replace(attributeValue,
+                                                                          tmpTask.getVariablesOverriden(job))));
+            } else if (XMLAttributes.COMMON_TASK_RETRY_DELAY.matches(attributeName)) {
+                tmpTask.setTaskRetryDelay(Tools.formatDate(replace(attributeValue,
+                                                                   tmpTask.getVariablesOverriden(job))));
+            } else if (XMLAttributes.COMMON_MAX_NUMBER_OF_EXECUTION.matches(attributeName)) {
+                tmpTask.setMaxNumberOfExecution(Integer.parseInt(replace(attributeValue,
+                                                                         tmpTask.getVariablesOverriden(job))));
+            } else if (XMLAttributes.TASK_PRECIOUS_RESULT.matches(attributeName)) {
+                tmpTask.setPreciousResult(Boolean.parseBoolean(replace(attributeValue,
+                                                                       tmpTask.getVariablesOverriden(job))));
+            } else if (XMLAttributes.TASK_PRECIOUS_LOGS.matches(attributeName)) {
+                tmpTask.setPreciousLogs(Boolean.parseBoolean(replace(attributeValue,
+                                                                     tmpTask.getVariablesOverriden(job))));
+            } else if (XMLAttributes.TASK_WALLTIME.matches(attributeName)) {
+                tmpTask.setWallTime(Tools.formatDate(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
+            } else if (XMLAttributes.TASK_RUN_AS_ME.matches(attributeName)) {
+                tmpTask.setRunAsMe(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
+            } else if (XMLAttributes.TASK_FORK.matches(attributeName)) {
+                tmpTask.setFork(Boolean.parseBoolean(replace(attributeValue, tmpTask.getVariablesOverriden(job))));
+            }
+        }
+    }
+
+    private Map<String, String> getInitialTaskVariablesOverriden(Job job,
+            Map<String, TaskVariable> unresolvedTaskVariablesMap) {
+        Map<String, String> taskVariables = new LinkedHashMap<>();
+        if (job != null) {
+            taskVariables.putAll(job.getVariablesAsReplacementMap());
+        }
+        for (TaskVariable variable : unresolvedTaskVariablesMap.values()) {
+            if (!variable.isJobInherited()) {
+                taskVariables.put(variable.getName(), variable.getValue());
+            }
+        }
+        return taskVariables;
     }
 
     /**

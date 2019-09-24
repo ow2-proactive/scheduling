@@ -500,6 +500,44 @@ public class TestStaxJobFactory {
         assertEquals("value1", genericInformation.get("info1"));
     }
 
+    @Test
+    public void testUnresolvedTaskVariables() throws URISyntaxException, JobCreationException {
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(jobDescriptorWithUnresolvedGenericInfoAndVariables);
+        Map<String, TaskVariable> unresolvedVariables = job.getTask("task").getUnresolvedVariables();
+        Map<String, TaskVariable> variables = job.getTask("task").getVariables();
+        // standard task variable definition, no referencing
+        assertEquals("task_value1", unresolvedVariables.get("task_variable1").getValue());
+        assertEquals("task_value1", variables.get("task_variable1").getValue());
+        // task variable references another task variable
+        assertEquals("${task_variable1}", unresolvedVariables.get("task_variable2").getValue());
+        assertEquals("task_value1", variables.get("task_variable2").getValue());
+        // task variable is inherited, has the same name as a job variable, and uses another task variable as default value
+        assertEquals("${task_variable2}", unresolvedVariables.get("variable1").getValue());
+        assertEquals("value1", variables.get("variable1").getValue());
+        // task variable is not inherited, has the same name as a job variable, and uses another task variable as default value
+        assertEquals("${task_variable2}", unresolvedVariables.get("variable2").getValue());
+        assertEquals("task_value1", variables.get("variable2").getValue());
+    }
+
+    @Test
+    public void testUnresolvedTaskGenericInformation() throws URISyntaxException, JobCreationException {
+        TaskFlowJob job = (TaskFlowJob) factory.createJob(jobDescriptorWithUnresolvedGenericInfoAndVariables);
+        Map<String, String> unresolvedGenericInformation = job.getTask("task").getUnresolvedGenericInformation();
+        Map<String, String> genericInformation = job.getTask("task").getGenericInformation();
+        // the gi references a task variable
+        assertEquals("gi_${task_variable2}", unresolvedGenericInformation.get("task_generic_info1"));
+        assertEquals("gi_task_value1", genericInformation.get("task_generic_info1"));
+        // the gi references a task variable which inherits a job variable
+        assertEquals("gi_${variable1}", unresolvedGenericInformation.get("task_generic_info2"));
+        assertEquals("gi_value1", genericInformation.get("task_generic_info2"));
+        // the gi references a task variable which overrides a job variable
+        assertEquals("gi_${variable2}", unresolvedGenericInformation.get("task_generic_info3"));
+        assertEquals("gi_task_value1", genericInformation.get("task_generic_info3"));
+        // the gi overrides a job gi which references a non-inherited task variable (complicated case)
+        assertEquals("gi_${variable2}", unresolvedGenericInformation.get("info1"));
+        assertEquals("gi_task_value1", genericInformation.get("info1"));
+    }
+
     private static <K, V> void assertExpectedKeyValueEntriesMatch(Map<K, V> map) {
         // map variable is assumed to contain attributes name/value parsed from XML
 
