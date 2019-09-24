@@ -422,9 +422,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     public boolean removeJobs(String sessionId, List<String> jobsId) throws RestException {
         try {
             // checking permissions
-            for (String jobId : jobsId) {
-                checkAccess(sessionId, "DELETE jobs/" + jobId);
-            }
+            checkAccess(sessionId, "DELETE jobs/");
 
             Scheduler s = checkAccess(sessionId, "DELETE jobs/" + jobsId.get(0));
             return s.removeJobs(jobsId.stream().map(JobIdImpl::makeJobId).collect(Collectors.toList()));
