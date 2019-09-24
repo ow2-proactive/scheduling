@@ -69,6 +69,7 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
     @Override
     public Boolean call() {
+        boolean allJobsWereRemoved;
         try {
             long start = 0;
 
@@ -86,6 +87,7 @@ public class JobRemoveHandler implements Callable<Boolean> {
                 for (JobId jobId : jobIds) {
                     service.submitTerminationDataHandler(service.getJobs().removeJob(jobId));
                 }
+                allJobsWereRemoved = false;
             } else {
                 long removedTime = System.currentTimeMillis();
 
@@ -114,6 +116,7 @@ public class JobRemoveHandler implements Callable<Boolean> {
                                             new NotificationData<>(SchedulerEvent.JOB_REMOVE_FINISHED,
                                                                    new JobInfoImpl((JobInfoImpl) job.getJobInfo())));
                 }
+                allJobsWereRemoved = true;
             }
 
             service.wakeUpSchedulingThread();
@@ -123,7 +126,7 @@ public class JobRemoveHandler implements Callable<Boolean> {
             throw e;
         }
 
-        return true;
+        return allJobsWereRemoved;
     }
 
 }
