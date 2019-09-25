@@ -83,7 +83,6 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "checkJobExistence", query = "select id from JobData where id = :id"),
                 @NamedQuery(name = "countJobDataFinished", query = "select count (*) from JobData where status = 3"),
                 @NamedQuery(name = "countJobData", query = "select count (*) from JobData"),
-                @NamedQuery(name = "deleteJobData", query = "delete from JobData where id in (:ids)"),
                 @NamedQuery(name = "findUsersWithJobs", query = "select owner, count(owner), max(submittedTime) from JobData group by owner"),
                 @NamedQuery(name = "getJobsNumberWithStatus", query = "select count(*) from JobData where status in (:status) and removedTime = -1"),
                 @NamedQuery(name = "getJobSubmittedTime", query = "select submittedTime from JobData where id = :id"),

@@ -849,6 +849,9 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        if (jobIds.isEmpty()) {
+            return false;
+        }
         // checking permission for each of the job
         for (JobId jobId : jobIds) {
             try {

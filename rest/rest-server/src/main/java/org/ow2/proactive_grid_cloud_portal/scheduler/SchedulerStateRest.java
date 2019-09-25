@@ -423,8 +423,7 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             // checking permissions
             checkAccess(sessionId, "DELETE jobs/");
-
-            Scheduler s = checkAccess(sessionId, "DELETE jobs/" + jobsId.get(0));
+            Scheduler s = checkAccess(sessionId, "DELETE jobs/" + (jobsId.isEmpty() ? "" : jobsId.get(0)));
             return s.removeJobs(jobsId.stream().map(JobIdImpl::makeJobId).collect(Collectors.toList()));
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);

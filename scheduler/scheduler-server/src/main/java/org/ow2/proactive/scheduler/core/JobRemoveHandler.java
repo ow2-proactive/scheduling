@@ -73,6 +73,10 @@ public class JobRemoveHandler implements Callable<Boolean> {
         try {
             long start = 0;
 
+            if (jobIds.isEmpty()) {
+                logger.info("No jobs to remove. You should not create JobRemoveHandler with empty list of ids.");
+                return false;
+            }
             if (logger.isInfoEnabled()) {
                 start = System.currentTimeMillis();
                 logger.info("Removing jobs " + jobIds.stream().map(JobId::value).collect(Collectors.joining(", ")));
@@ -121,8 +125,9 @@ public class JobRemoveHandler implements Callable<Boolean> {
 
             service.wakeUpSchedulingThread();
         } catch (Exception e) {
-            logger.error("Error while removing list of jobs " +
-                         jobIds.stream().map(JobId::value).collect(Collectors.joining(", ")), e);
+            logger.error("Error while removing list of jobs (" +
+                         jobIds.stream().map(JobId::value).collect(Collectors.joining(", ")) + ") due to : " +
+                         e.getMessage(), e);
             throw e;
         }
 
