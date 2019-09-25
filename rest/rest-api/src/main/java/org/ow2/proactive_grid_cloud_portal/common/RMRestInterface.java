@@ -178,6 +178,24 @@ public interface RMRestInterface {
             throws NotConnectedException, PermissionRestException;
 
     /**
+     * Returns a task variable model string containing the list of registered hosts in the resource manager
+     * @return a model containing the list of hosts, including an empty name. e.g. PA:LIST(,hostname1,hostname2)
+     */
+    @GET
+    @Path("model/hosts")
+    @Produces("text/plain")
+    String getModelHosts() throws PermissionRestException;
+
+    /**
+     * Returns a task variable model string containing the list of registered node sources in the resource manager
+     * @return a model containing the list of node sources name, including an empty name and the default node source e.g. PA:LIST(,Default,LocalNodes)
+     */
+    @GET
+    @Path("model/nodesources")
+    @Produces("text/plain")
+    String getModelNodeSources() throws PermissionRestException;
+
+    /**
      * Returns true if the resource manager is operational.
      *
      * @param sessionId

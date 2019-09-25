@@ -32,9 +32,11 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.ow2.proactive.http.CommonHttpResourceDownloader;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.IdentityConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.AcceptAllValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.ModelValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
@@ -75,12 +77,23 @@ public class ModelFromURLParserValidator extends BaseParserValidator<String> {
         String urlString = parseAndGetOneGroup(model, MODEL_FROM_URL_REGEXP);
 
         URL url = null;
+        if (urlString.contains("${") && urlString.contains("}")) {
+            // if the url contains a non-resolved variable, it cannot be validated.
+            return new AcceptAllValidator<>();
+        }
         try {
             url = new URL(urlString);
-            List<String> lines = IOUtils.readLines(url.openStream(), Charset.defaultCharset());
-
             String modelReceivedFromURL = null;
-            modelReceivedFromURL = findFirstNonEmptyLineTrimmed(lines);
+            if (url.getProtocol().equals("http") || url.getProtocol().equals("https")) {
+                CommonHttpResourceDownloader.UrlContent content = CommonHttpResourceDownloader.getInstance()
+                                                                                              .getResourceContent(null,
+                                                                                                                  url.toExternalForm(),
+                                                                                                                  true);
+                modelReceivedFromURL = content.getContent().trim();
+            } else {
+                List<String> lines = IOUtils.readLines(url.openStream(), Charset.defaultCharset());
+                modelReceivedFromURL = findFirstNonEmptyLineTrimmed(lines);
+            }
 
             if (Strings.isNullOrEmpty(modelReceivedFromURL)) {
                 throw new ModelSyntaxException("In " + type + " expression, model received from defined url '" +

@@ -113,6 +113,16 @@ public class ModelFromURLParserValidatorTest {
                                         ModelFromURLParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_VALUE);
     }
 
+    @Test
+    public void testModelFromURLParserValidatorURLContainsSchedulerRestVariable()
+            throws ModelSyntaxException, ValidationException, ConversionException {
+        Assert.assertEquals(VALID_VALUE,
+                            new ModelFromURLParserValidator(ModelType.MODEL_FROM_URL +
+                                                            ModelFromURLParserValidator.LEFT_DELIMITER +
+                                                            "${SOME_VARIABLE}" +
+                                                            ModelFromURLParserValidator.RIGHT_DELIMITER).parseAndValidate(VALID_VALUE));
+    }
+
     @Test(expected = ModelSyntaxException.class)
     public void testModelFromURLParserValidatorInvalidModelInFile()
             throws ModelSyntaxException, ValidationException, ConversionException, IOException {
