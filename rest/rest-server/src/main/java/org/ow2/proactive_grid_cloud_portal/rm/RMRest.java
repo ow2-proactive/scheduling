@@ -76,7 +76,9 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.NSState;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateFull;
@@ -99,6 +101,7 @@ import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 
 @Path("/rm")
@@ -241,6 +244,29 @@ public class RMRest implements RMRestInterface {
     public RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId) throws NotConnectedException {
         checkAccess(sessionId);
         return RMStateCaching.getRMStateFull();
+    }
+
+    @Override
+    public String getModelHosts() throws PermissionRestException {
+        RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
+        return String.format("PA:LIST(,%s)",
+                             state.getNodesEvents()
+                                  .stream()
+                                  .map(RMNodeEvent::getHostName)
+                                  .distinct()
+                                  .collect(Collectors.joining(",")));
+    }
+
+    @Override
+    public String getModelNodeSources() throws PermissionRestException {
+        RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
+        return String.format("PA:LIST(,%s,%s)",
+                             RMConstants.DEFAULT_STATIC_SOURCE_NAME,
+                             "," + state.getNodeSource()
+                                        .stream()
+                                        .map(RMNodeSourceEvent::getNodeSourceName)
+                                        .distinct()
+                                        .collect(Collectors.joining(",")));
     }
 
     @Override
@@ -932,6 +958,15 @@ public class RMRest implements RMRestInterface {
             return parameters.length;
         } else {
             return 0;
+        }
+    }
+
+    private <T> T orThrowRpe(T future) throws PermissionRestException {
+        try {
+            PAFuture.getFutureValue(future);
+            return future;
+        } catch (SecurityException e) {
+            throw new PermissionRestException(e);
         }
     }
 

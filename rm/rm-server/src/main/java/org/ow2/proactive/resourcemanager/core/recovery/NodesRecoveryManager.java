@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.RMCore;
@@ -101,7 +102,7 @@ public class NodesRecoveryManager {
 
         for (NodeSourceData nodeSourceData : nodeSources) {
             String nodeSourceName = nodeSourceData.getName();
-            if (NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceName)) {
+            if (RMConstants.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME.equals(nodeSourceName)) {
                 // will be recreated by SchedulerStarter
                 this.rmCore.getDbManager().removeNodeSource(nodeSourceName);
             } else {

@@ -58,4 +58,7 @@ public interface RMConstants {
     /** The default name of the static node source created  at Resource manager Startup */
     String DEFAULT_STATIC_SOURCE_NAME = "Default";
 
+    /** The default name of the local node source created  at Resource manager Startup */
+    String DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME = "LocalNodes";
+
 }

@@ -46,6 +46,7 @@ import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
@@ -152,7 +153,7 @@ public class RMStarter {
 
             if (localNodes && defaultNodesNumber > 0) {
                 ResourceManager resourceManager = auth.login(Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-                String nodeSourceName = NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME;
+                String nodeSourceName = RMConstants.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME;
 
                 //first im parameter is default rm url
                 byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));

@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.frontend.topology.Topology;
@@ -145,7 +146,7 @@ public class SelectionTest extends RMFunctionalTest {
 
         testNode = rmHelper.createNode(node1, vmProperties);
         String node1URL = testNode.getNode().getNodeInformation().getURL();
-        resourceManager.addNode(node1URL, NodeSource.DEFAULT);
+        resourceManager.addNode(node1URL, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
 
         //wait node adding event
         rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, node1URL);

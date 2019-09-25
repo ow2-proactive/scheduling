@@ -173,4 +173,14 @@ public class RMNodeSourceEvent extends RMEvent {
     public String toString() {
         return this.getEventType() + ((counter > 0) ? " counter: " + counter + " " : "") + "[" + getSourceName() + "]";
     }
+
+    // for the sake of resteasy mapping
+    public String getNodeSourceName() {
+        return nodeSourceName;
+    }
+
+    // for the sake of resteasy mapping
+    public String getNodeSourceDescription() {
+        return nodeSourceDescription;
+    }
 }

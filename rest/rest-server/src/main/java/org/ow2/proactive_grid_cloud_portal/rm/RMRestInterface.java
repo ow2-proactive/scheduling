@@ -70,6 +70,7 @@ import org.ow2.proactive.resourcemanager.nodesource.common.PluginDescriptor;
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive.scripting.ScriptResult;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 
 
 @Path("/rm")
@@ -169,6 +170,24 @@ public interface RMRestInterface {
     @Path("monitoring/full")
     @Produces("application/json")
     RMStateFull getRMStateFull(@HeaderParam("sessionid") String sessionId) throws NotConnectedException;
+
+    /**
+     * Returns a task variable model string containing the list of registered hosts in the resource manager
+     * @return a model containing the list of hosts, including an empty name. e.g. PA:LIST(,hostname1,hostname2)
+     */
+    @GET
+    @Path("model/hosts")
+    @Produces("text/plain")
+    String getModelHosts() throws PermissionRestException;
+
+    /**
+     * Returns a task variable model string containing the list of registered node sources in the resource manager
+     * @return a model containing the list of node sources name, including an empty name and the default node source e.g. PA:LIST(,Default,LocalNodes)
+     */
+    @GET
+    @Path("model/nodesources")
+    @Produces("text/plain")
+    String getModelNodeSources() throws PermissionRestException;
 
     /**
      * Returns true if the resource manager is operational.
