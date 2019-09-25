@@ -98,13 +98,8 @@ public class NodeSource implements InitActive, RunActive {
 
     private int pingFrequency = PAResourceManagerProperties.RM_NODE_SOURCE_PING_FREQUENCY.getValueAsInt();
 
-    /** Default name for NS with local nodes started with the Scheduler by default */
-    public static final String DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME = "LocalNodes";
-
-    /** Default name for NS with local nodes started with the Scheduler by default */
+    /** Default recovery mode for NS with local nodes started with the RM by default */
     public static final boolean DEFAULT_LOCAL_NODES_NODE_SOURCE_RECOVERABLE = false;
-
-    public static final String DEFAULT = "Default";
 
     public static final boolean DEFAULT_RECOVERABLE = true;
 

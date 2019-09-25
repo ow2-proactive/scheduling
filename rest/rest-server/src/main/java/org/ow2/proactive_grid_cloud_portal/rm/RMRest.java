@@ -70,7 +70,9 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.common.NSState;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.RMState;
+import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeHistory;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeSourceEvent;
 import org.ow2.proactive.resourcemanager.common.event.dto.RMStateDelta;
@@ -227,6 +229,29 @@ public class RMRest implements RMRestInterface {
     public RMStateFull getRMStateFull(String sessionId) throws NotConnectedException, PermissionRestException {
         checkAccess(sessionId);
         return orThrowRpe(RMStateCaching.getRMStateFull());
+    }
+
+    @Override
+    public String getModelHosts() throws PermissionRestException {
+        RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
+        return String.format("PA:LIST(,%s)",
+                             state.getNodesEvents()
+                                  .stream()
+                                  .map(RMNodeEvent::getHostName)
+                                  .distinct()
+                                  .collect(Collectors.joining(",")));
+    }
+
+    @Override
+    public String getModelNodeSources() throws PermissionRestException {
+        RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
+        return String.format("PA:LIST(,%s,%s)",
+                             RMConstants.DEFAULT_STATIC_SOURCE_NAME,
+                             "," + state.getNodeSource()
+                                        .stream()
+                                        .map(RMNodeSourceEvent::getNodeSourceName)
+                                        .distinct()
+                                        .collect(Collectors.joining(",")));
     }
 
     @Override

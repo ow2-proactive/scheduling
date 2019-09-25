@@ -41,6 +41,7 @@ import org.ow2.proactive.authentication.crypto.CredData;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.jmx.naming.JMXTransportProtocol;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.core.account.RMAccountsManager;
 import org.ow2.proactive.resourcemanager.core.jmx.RMJMXBeans;
@@ -104,8 +105,8 @@ public final class AddGetDownRemoveTest extends RMFunctionalTest {
         final String nodeURL = node.getNodeInformation().getURL();
         rm.addNode(nodeURL).getBooleanValue();
 
-        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, NodeSource.DEFAULT);
-        rm.setNodeSourcePingFrequency(5000, NodeSource.DEFAULT);
+        rmHelper.waitForNodeSourceEvent(RMEventType.NODESOURCE_CREATED, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+        rm.setNodeSourcePingFrequency(5000, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
 
         // wait for node from configuring to free
         rmHelper.waitForNodeEvent(RMEventType.NODE_ADDED, nodeURL);

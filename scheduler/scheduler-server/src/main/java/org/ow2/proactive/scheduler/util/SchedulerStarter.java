@@ -65,6 +65,7 @@ import org.objectweb.proactive.utils.JVMPropertiesPreloader;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.RMFactory;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
 import org.ow2.proactive.resourcemanager.frontend.ResourceManager;
 import org.ow2.proactive.resourcemanager.nodesource.NodeSource;
@@ -572,7 +573,7 @@ public class SchedulerStarter {
         ResourceManager rman = rmAuth.login(Credentials.getCredentials(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
         //first im parameter is default rm url
         byte[] creds = FileToBytesConverter.convertFileToByteArray(new File(PAResourceManagerProperties.getAbsolutePath(PAResourceManagerProperties.RM_CREDS.getValueAsString())));
-        rman.createNodeSource(NodeSource.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME,
+        rman.createNodeSource(RMConstants.DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME,
                               LocalInfrastructure.class.getName(),
                               new Object[] { creds, numberLocalNodes, nodeTimeoutValue, "" },
                               RestartDownNodesPolicy.class.getName(),

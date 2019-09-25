@@ -860,7 +860,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
      * {@inheritDoc}
      */
     public BooleanWrapper addNode(String nodeUrl) {
-        return addNode(nodeUrl, NodeSource.DEFAULT);
+        return addNode(nodeUrl, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
     }
 
     /**
@@ -873,9 +873,9 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
 
         boolean existingNodeSource = this.deployedNodeSources.containsKey(sourceName);
 
-        if (!existingNodeSource && sourceName.equals(NodeSource.DEFAULT)) {
+        if (!existingNodeSource && sourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME)) {
             // creating the default node source
-            createNodeSource(NodeSource.DEFAULT,
+            createNodeSource(RMConstants.DEFAULT_STATIC_SOURCE_NAME,
                              DefaultInfrastructureManager.class.getName(),
                              null,
                              StaticPolicy.class.getName(),
