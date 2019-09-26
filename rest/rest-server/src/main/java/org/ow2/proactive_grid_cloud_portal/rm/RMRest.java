@@ -234,24 +234,24 @@ public class RMRest implements RMRestInterface {
     @Override
     public String getModelHosts() throws PermissionRestException {
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
-        return String.format("PA:LIST(,%s)",
-                             state.getNodesEvents()
-                                  .stream()
-                                  .map(RMNodeEvent::getHostName)
-                                  .distinct()
-                                  .collect(Collectors.joining(",")));
+        return String.format("PA:LIST(,%s)", state.getNodesEvents()
+                                                  .stream()
+                                                  .map(RMNodeEvent::getHostName)
+                                                  .distinct()
+                                                  .filter(hostName -> !hostName.isEmpty())
+                                                  .collect(Collectors.joining(",")));
     }
 
     @Override
     public String getModelNodeSources() throws PermissionRestException {
         RMStateFull state = orThrowRpe(RMStateCaching.getRMStateFull());
-        return String.format("PA:LIST(,%s,%s)",
-                             RMConstants.DEFAULT_STATIC_SOURCE_NAME,
-                             "," + state.getNodeSource()
-                                        .stream()
-                                        .map(RMNodeSourceEvent::getNodeSourceName)
-                                        .distinct()
-                                        .collect(Collectors.joining(",")));
+        return String.format("PA:LIST(,%s,%s)", RMConstants.DEFAULT_STATIC_SOURCE_NAME, "," + state.getNodeSource()
+                                                                                                   .stream()
+                                                                                                   .map(RMNodeSourceEvent::getNodeSourceName)
+                                                                                                   .distinct()
+                                                                                                   .filter(nodeSourceName -> !nodeSourceName.isEmpty() &&
+                                                                                                                             !nodeSourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME))
+                                                                                                   .collect(Collectors.joining(",")));
     }
 
     @Override
