@@ -585,6 +585,10 @@ public class SchedulingService {
         }
     }
 
+    public boolean killJobs(List<JobId> jobIdsConverted) {
+        return false;
+    }
+
     class TerminationDataHandler implements Runnable {
 
         private final TerminationData terminationData;

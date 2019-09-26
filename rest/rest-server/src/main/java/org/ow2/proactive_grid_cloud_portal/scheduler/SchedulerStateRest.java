@@ -451,6 +451,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public boolean killJobs(String sessionId, List<String> jobsId) throws RestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "PUT jobs/kill");
+            return s.killJobs(jobsId);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
     public boolean killTask(String sessionId, String jobid, String taskname) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobid + PATH_TASKS + taskname + "/kill");

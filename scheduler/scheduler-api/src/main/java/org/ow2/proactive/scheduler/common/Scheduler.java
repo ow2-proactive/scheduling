@@ -870,6 +870,13 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
+     * @return true if all jobs were killed
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to at least one particular job
+     */
+    boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException;
+
+    /**
      * Try to kill the task with the given task name in the given jobId. A user
      * can only kill HIS task.<br>
      * If the job does not exist, an UnknownJobException is sent with the proper

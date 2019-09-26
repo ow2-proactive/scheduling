@@ -1042,6 +1042,11 @@ public abstract class AbstractSmartProxy<T extends JobTracker> implements Schedu
     }
 
     @Override
+    public boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException {
+        return getScheduler().killJobs(jobsId);
+    }
+
+    @Override
     public boolean killTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         return getScheduler().killTask(jobId, taskName);
