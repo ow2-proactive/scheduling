@@ -577,6 +577,14 @@ public class SchedulingService {
         });
     }
 
+    public boolean removeJobs(List<JobId> jobIds) {
+        try {
+            return infrastructure.getClientOperationsThreadPool().submit(new JobRemoveHandler(this, jobIds)).get();
+        } catch (Exception e) {
+            throw handleFutureWaitException(e);
+        }
+    }
+
     class TerminationDataHandler implements Runnable {
 
         private final TerminationData terminationData;

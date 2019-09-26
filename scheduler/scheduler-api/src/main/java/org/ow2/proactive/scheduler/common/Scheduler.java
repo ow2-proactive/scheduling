@@ -354,6 +354,14 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
+     * Remove jobs with given ids
+     * @return true if all jobs with jobIds were removed, otherwise false
+     * @throws NotConnectedException if you are not authenticated
+     * @throws PermissionException if you can't access to at least one of the job
+     */
+    boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException;
+
+    /**
      * Listen for the tasks user logs.
      * <p>
      * A user can only listen to HIS jobs.

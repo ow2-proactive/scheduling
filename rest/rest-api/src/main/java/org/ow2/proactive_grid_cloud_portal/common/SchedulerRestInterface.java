@@ -301,6 +301,16 @@ public interface SchedulerRestInterface {
             throws RestException;
 
     /**
+     * @param jobsId to remove
+     * @return true if all jobs with jobIds were removed, otherwise false
+     */
+    @DELETE
+    @Path("jobs")
+    @Produces("application/json")
+    boolean removeJobs(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
+            throws RestException;
+
+    /**
      * Returns job server logs
      * 
      * @param sessionId

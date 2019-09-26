@@ -194,6 +194,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.removeJobs(jobIds);
+    }
+
+    @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();

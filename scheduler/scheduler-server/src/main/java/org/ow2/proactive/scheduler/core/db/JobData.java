@@ -83,7 +83,6 @@ import com.google.common.collect.Lists;
                 @NamedQuery(name = "checkJobExistence", query = "select id from JobData where id = :id"),
                 @NamedQuery(name = "countJobDataFinished", query = "select count (*) from JobData where status = 3"),
                 @NamedQuery(name = "countJobData", query = "select count (*) from JobData"),
-                @NamedQuery(name = "deleteJobData", query = "delete from JobData where id = :jobId"),
                 @NamedQuery(name = "findUsersWithJobs", query = "select owner, count(owner), max(submittedTime) from JobData group by owner"),
                 @NamedQuery(name = "getJobsNumberWithStatus", query = "select count(*) from JobData where status in (:status) and removedTime = -1"),
                 @NamedQuery(name = "getJobSubmittedTime", query = "select submittedTime from JobData where id = :id"),
@@ -101,7 +100,7 @@ import com.google.common.collect.Lists;
                                                                      "numberOfFailedTasks = :numberOfFailedTasks, numberOfFaultyTasks = :numberOfFaultyTasks, " +
                                                                      "numberOfInErrorTasks = :numberOfInErrorTasks, inErrorTime = :inErrorTime, lastUpdatedTime = :lastUpdatedTime " +
                                                                      "where id = :jobId"),
-                @NamedQuery(name = "updateJobDataRemovedTime", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
+                @NamedQuery(name = "updateJobDataRemovedTime", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where ids in :ids"),
                 @NamedQuery(name = "updateJobDataRemovedTimeInBulk", query = "update JobData set removedTime = :removedTime, lastUpdatedTime = :lastUpdatedTime where id in :jobIdList"),
                 @NamedQuery(name = "updateJobDataSetJobToBeRemoved", query = "update JobData set toBeRemoved = :toBeRemoved, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),
                 @NamedQuery(name = "updateJobDataPriority", query = "update JobData set priority = :priority, lastUpdatedTime = :lastUpdatedTime where id = :jobId"),

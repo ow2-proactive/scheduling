@@ -154,7 +154,7 @@ import org.ow2.proactive.topology.descriptor.TopologyDescriptor;
                                                                      "where task.id.jobId = :jobId " +
                                                                      "and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.IN_ERROR "),
                 @NamedQuery(name = "updateTaskDataJobScripts", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
-                                                                       "cleanScript = null  where id.jobId = :jobId"),
+                                                                       "cleanScript = null  where id.jobId in :ids"),
                 @NamedQuery(name = "updateTaskDataJobScriptsInBulk", query = "update TaskData set envScript = null, preScript = null, postScript = null,flowScript = null," +
                                                                              "cleanScript = null  where id.jobId in :jobIdList"),
                 @NamedQuery(name = "updateTaskDataStatusToPending", query = "update TaskData task set task.taskStatus = :taskStatus " +
