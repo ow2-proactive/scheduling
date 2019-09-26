@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.ow2.proactive.resourcemanager.authentication.Client;
 import org.ow2.proactive.resourcemanager.common.NodeState;
+import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.common.event.RMEventType;
 import org.ow2.proactive.resourcemanager.common.event.RMNodeEvent;
 import org.ow2.proactive.resourcemanager.core.properties.PAResourceManagerProperties;
@@ -643,7 +644,7 @@ public abstract class InfrastructureManager implements NodeSourcePlugin {
      * If the node source data of this infrastructure is not know, it is first
      * fetched in database.
      * The node source data is never persisted if the current infrastructure is
-     * the {@link NodeSource#DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME}.
+     * the {@link RMConstants#DEFAULT_LOCAL_NODES_NODE_SOURCE_NAME}.
      */
     public void persistInfrastructureVariables() {
         if (nodeSource == null) {
