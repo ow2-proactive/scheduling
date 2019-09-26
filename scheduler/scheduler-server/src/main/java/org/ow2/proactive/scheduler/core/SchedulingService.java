@@ -585,10 +585,6 @@ public class SchedulingService {
         }
     }
 
-    public boolean killJobs(List<JobId> jobIdsConverted) {
-        return false;
-    }
-
     class TerminationDataHandler implements Runnable {
 
         private final TerminationData terminationData;
@@ -618,6 +614,25 @@ public class SchedulingService {
                 submitTerminationDataHandler(terminationData);
                 wakeUpSchedulingThread();
                 return jobKilled;
+            }).get();
+
+        } catch (Exception e) {
+            throw handleFutureWaitException(e);
+        }
+    }
+
+    public boolean killJobs(List<JobId> jobIds) {
+        try {
+            if (status.isUnusable()) {
+                return false;
+            }
+
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                TerminationData terminationData = jobs.killJobs(jobIds);
+                //                boolean jobKilled = terminationData.jobTerminated(jobIds);
+                submitTerminationDataHandler(terminationData);
+                wakeUpSchedulingThread();
+                return true;
             }).get();
 
         } catch (Exception e) {

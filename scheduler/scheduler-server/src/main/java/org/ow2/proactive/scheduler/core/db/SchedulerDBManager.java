@@ -1137,6 +1137,90 @@ public class SchedulerDBManager {
         });
     }
 
+    public void killJobs(List<InternalJob> jobs) {
+        executeReadWriteTransaction((SessionWork<Void>) session -> {
+            List<Long> jobIds = jobs.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
+
+            for (InternalJob job : jobs) {
+                long jobId = jobId(job);
+                JobInfo jobInfo = job.getJobInfo();
+                int updateJob = 0;
+                updateJob = session.getNamedQuery("updateJobDataAfterTaskFinished")
+                                   .setParameter("status", jobInfo.getStatus())
+                                   .setParameter("finishedTime", jobInfo.getFinishedTime())
+                                   .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
+                                   .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
+                                   .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                                   .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                                   .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                                   .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                                   .setParameter("lastUpdatedTime", new Date().getTime())
+                                   .setParameter("resultMap",
+                                                 ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                                   .setParameter("jobId", jobId)
+                                   .executeUpdate();
+
+            }
+
+            final int notReStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_RESTARTED " +
+                                                         " where task.jobData.id in :jobIds and task.taskStatus in :taskStatuses ")
+                                            .setParameterList("jobIds", jobIds)
+                                            .setParameterList("taskStatuses",
+                                                              Arrays.asList(TaskStatus.WAITING_ON_ERROR,
+                                                                            TaskStatus.WAITING_ON_FAILURE))
+                                            .executeUpdate();
+
+            final int notStarted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.NOT_STARTED " +
+                                                       " where task.jobData.id in :jobIds and task.taskStatus in :taskStatuses ")
+                                          .setParameterList("jobIds", jobIds)
+                                          .setParameterList("taskStatuses",
+                                                            TaskStatus.allExceptThese(TaskStatus.RUNNING,
+                                                                                      TaskStatus.WAITING_ON_ERROR,
+                                                                                      TaskStatus.WAITING_ON_FAILURE,
+                                                                                      TaskStatus.FAILED,
+                                                                                      TaskStatus.NOT_STARTED,
+                                                                                      TaskStatus.FAULTY,
+                                                                                      TaskStatus.FINISHED,
+                                                                                      TaskStatus.SKIPPED))
+                                          .executeUpdate();
+
+            final int runningToAborted = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
+                                                             " task.finishedTime = :finishedTime where task.jobData.id in :jobIds " +
+                                                             " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                             " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
+                                                .setParameter("finishedTime", System.currentTimeMillis())
+                                                .setParameter("jobIds", jobIds)
+                                                .executeUpdate();
+
+            final int runningToAbortedWithDuration = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
+                                                                         " task.finishedTime = :finishedTime, " +
+                                                                         " task.executionDuration = task.finishedTime - task.startTime " +
+                                                                         " where task.jobData.id in :jobIds " +
+                                                                         " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
+                                                                         " and task.startTime > 0 and task.executionDuration < 0 ")
+                                                            .setParameter("jobIds", jobIds)
+                                                            .setParameter("finishedTime", System.currentTimeMillis())
+                                                            .executeUpdate();
+
+            //            logger.trace(String.format("Kill job %d and tasks: %d %d %d %d %d",
+            //                    jobId,
+            //                    updateJob,
+            //                    notReStarted,
+            //                    notStarted,
+            //                    runningToAborted,
+            //                    runningToAbortedWithDuration));
+
+            session.flush();
+            session.clear();
+            //            if (FINISHED_JOB_STATUSES.contains(job.getStatus())) {
+            //                removeJobRuntimeData(session, jobId);
+            //                logger.trace("Flush after kill for job " + jobId);
+            //            }
+
+            return null;
+        });
+    }
+
     public void updateJobAndTasksState(final InternalJob job) {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
 
