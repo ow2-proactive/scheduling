@@ -1189,7 +1189,7 @@ public class SchedulerDBManager {
                                                              " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
                                                              " and ( task.startTime <= 0 or task.executionDuration >= 0 )")
                                                 .setParameter("finishedTime", System.currentTimeMillis())
-                                                .setParameter("jobIds", jobIds)
+                                                .setParameterList("jobIds", jobIds)
                                                 .executeUpdate();
 
             final int runningToAbortedWithDuration = session.createQuery("update TaskData task set task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.ABORTED, " +
@@ -1198,7 +1198,7 @@ public class SchedulerDBManager {
                                                                          " where task.jobData.id in :jobIds " +
                                                                          " and task.taskStatus = org.ow2.proactive.scheduler.common.task.TaskStatus.RUNNING " +
                                                                          " and task.startTime > 0 and task.executionDuration < 0 ")
-                                                            .setParameter("jobIds", jobIds)
+                                                            .setParameterList("jobIds", jobIds)
                                                             .setParameter("finishedTime", System.currentTimeMillis())
                                                             .executeUpdate();
 
