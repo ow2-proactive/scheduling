@@ -629,7 +629,6 @@ public class SchedulingService {
 
             return infrastructure.getClientOperationsThreadPool().submit(() -> {
                 TerminationData terminationData = jobs.killJobs(jobIds);
-                //                boolean jobKilled = terminationData.jobTerminated(jobIds);
                 submitTerminationDataHandler(terminationData);
                 wakeUpSchedulingThread();
                 return true;
