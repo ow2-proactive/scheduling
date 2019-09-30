@@ -641,13 +641,19 @@ public class SchedulerDBManager {
     }
 
     private void removeJobRuntimeData(Session session, long jobId) {
+        removeJobRuntimeData(session, Collections.singletonList(jobId));
+    }
+
+    private void removeJobRuntimeData(Session session, List<Long> jobId) {
         removeJobScripts(session, jobId);
 
-        session.getNamedQuery("deleteEnvironmentModifierData").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("deleteEnvironmentModifierDataInBulk")
+               .setParameterList("jobIdList", jobId)
+               .executeUpdate();
 
-        session.getNamedQuery("deleteTaskDataVariable").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("deleteTaskDataVariableInBulk").setParameterList("jobIdList", jobId).executeUpdate();
 
-        session.getNamedQuery("deleteSelectorData").setParameter("jobId", jobId).executeUpdate();
+        session.getNamedQuery("deleteSelectorDataInBulk").setParameterList("jobIdList", jobId).executeUpdate();
     }
 
     public void scheduleJobForRemoval(final JobId jobId, final long timeForRemoval, final boolean shouldRemoveFromDb) {
@@ -1141,24 +1147,27 @@ public class SchedulerDBManager {
         executeReadWriteTransaction((SessionWork<Void>) session -> {
             List<Long> jobIds = jobs.stream().map(SchedulerDBManager::jobId).collect(Collectors.toList());
 
+            List<Long> updatedJobsIds = new ArrayList<>(jobs.size());
             for (InternalJob job : jobs) {
                 long jobId = jobId(job);
                 JobInfo jobInfo = job.getJobInfo();
-                int updateJob = 0;
-                updateJob = session.getNamedQuery("updateJobDataAfterTaskFinished")
-                                   .setParameter("status", jobInfo.getStatus())
-                                   .setParameter("finishedTime", jobInfo.getFinishedTime())
-                                   .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
-                                   .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
-                                   .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
-                                   .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
-                                   .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
-                                   .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
-                                   .setParameter("lastUpdatedTime", new Date().getTime())
-                                   .setParameter("resultMap",
-                                                 ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
-                                   .setParameter("jobId", jobId)
-                                   .executeUpdate();
+                int result = session.getNamedQuery("updateJobDataAfterTaskFinished")
+                                    .setParameter("status", jobInfo.getStatus())
+                                    .setParameter("finishedTime", jobInfo.getFinishedTime())
+                                    .setParameter("numberOfPendingTasks", jobInfo.getNumberOfPendingTasks())
+                                    .setParameter("numberOfFinishedTasks", jobInfo.getNumberOfFinishedTasks())
+                                    .setParameter("numberOfRunningTasks", jobInfo.getNumberOfRunningTasks())
+                                    .setParameter("numberOfFailedTasks", jobInfo.getNumberOfFailedTasks())
+                                    .setParameter("numberOfFaultyTasks", jobInfo.getNumberOfFaultyTasks())
+                                    .setParameter("numberOfInErrorTasks", jobInfo.getNumberOfInErrorTasks())
+                                    .setParameter("lastUpdatedTime", new Date().getTime())
+                                    .setParameter("resultMap",
+                                                  ObjectByteConverter.mapOfSerializableToByteArray(job.getResultMap()))
+                                    .setParameter("jobId", jobId)
+                                    .executeUpdate();
+                if (result != 0) {
+                    updatedJobsIds.add(jobId);
+                }
 
             }
 
@@ -1202,20 +1211,20 @@ public class SchedulerDBManager {
                                                             .setParameter("finishedTime", System.currentTimeMillis())
                                                             .executeUpdate();
 
-            //            logger.trace(String.format("Kill job %d and tasks: %d %d %d %d %d",
-            //                    jobId,
-            //                    updateJob,
-            //                    notReStarted,
-            //                    notStarted,
-            //                    runningToAborted,
-            //                    runningToAbortedWithDuration));
+            logger.trace(String.format("Kill jobs (%s) and tasks: %d %d %d %d %d",
+                                       updatedJobsIds.stream().map(Object::toString).collect(Collectors.joining(", ")),
+                                       updatedJobsIds.size(),
+                                       notReStarted,
+                                       notStarted,
+                                       runningToAborted,
+                                       runningToAbortedWithDuration));
 
             session.flush();
             session.clear();
-            //            if (FINISHED_JOB_STATUSES.contains(job.getStatus())) {
-            //                removeJobRuntimeData(session, jobId);
-            //                logger.trace("Flush after kill for job " + jobId);
-            //            }
+
+            removeJobRuntimeData(session, jobIds);
+            logger.trace("Flush after kill for job " +
+                         jobIds.stream().map(Object::toString).collect(Collectors.joining(", ")));
 
             return null;
         });
