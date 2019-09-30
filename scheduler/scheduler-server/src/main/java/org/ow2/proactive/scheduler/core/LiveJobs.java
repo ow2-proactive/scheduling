@@ -1024,8 +1024,8 @@ class LiveJobs {
     public TerminationData killJobs(List<JobId> jobIds) {
         jobIds.forEach(jobId -> jlogger.info(jobId, "killing job"));
         List<JobData> jobDatas = lockJobs(jobIds);
-        if (jobDatas == null) {
-            return null;// TODO emptyData(jobId);
+        if (jobDatas == null || jobDatas.isEmpty()) {
+            return TerminationData.EMPTY;
         }
         try {
             TaskResultImpl taskResult = null;
