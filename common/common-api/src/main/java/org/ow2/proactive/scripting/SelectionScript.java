@@ -33,7 +33,6 @@ import java.io.StringReader;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import javax.script.Bindings;
 
@@ -75,7 +74,7 @@ public class SelectionScript extends Script<Boolean> {
     /**
      * Hash digest of the script
      */
-    protected byte[] id_;
+    protected byte[] hash = null;
 
     /** ProActive needed constructor */
     public SelectionScript() {
@@ -93,7 +92,6 @@ public class SelectionScript extends Script<Boolean> {
      */
     public SelectionScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName, "SelectionScript");
-        buildSelectionScriptId();
     }
 
     /** Directly create a script with a string.
@@ -105,7 +103,6 @@ public class SelectionScript extends Script<Boolean> {
     public SelectionScript(String script, String engineName, boolean dynamic) throws InvalidScriptException {
         super(script, engineName, "SelectionScript");
         this.dynamic = dynamic;
-        buildSelectionScriptId();
     }
 
     /** Directly create a script with a string.
@@ -119,7 +116,6 @@ public class SelectionScript extends Script<Boolean> {
             throws InvalidScriptException {
         super(script, engineName, parameters, "SelectionScript");
         this.dynamic = dynamic;
-        buildSelectionScriptId();
     }
 
     /** Create a selection script from a file.
@@ -129,7 +125,6 @@ public class SelectionScript extends Script<Boolean> {
      */
     public SelectionScript(File file, Serializable[] parameters) throws InvalidScriptException {
         super(file, parameters);
-        buildSelectionScriptId();
     }
 
     /** Create a selection script from a file.
@@ -141,7 +136,6 @@ public class SelectionScript extends Script<Boolean> {
     public SelectionScript(File file, Serializable[] parameters, boolean dynamic) throws InvalidScriptException {
         super(file, parameters);
         this.dynamic = dynamic;
-        buildSelectionScriptId();
     }
 
     /** Create a selection script from an URL.
@@ -218,9 +212,8 @@ public class SelectionScript extends Script<Boolean> {
     public SelectionScript(URL url, String engineName, Serializable[] parameters, boolean dynamic)
             throws InvalidScriptException {
         // Selection scripts cannot use url late binding, i.e. fetchImmediately must be false.
-        super(url, engineName, parameters, true);
+        super(url, engineName, parameters, false);
         this.dynamic = dynamic;
-        buildSelectionScriptId();
     }
 
     /** Create a selection script from another selection script
@@ -230,14 +223,24 @@ public class SelectionScript extends Script<Boolean> {
      */
     public SelectionScript(Script<?> script, boolean dynamic) throws InvalidScriptException {
         super(script);
-        // The script passed in parameter can be defined by its url only, in that case, as late binding is disabled for selection scripts, the url must be resolved immediately.
-        try {
-            fetchUrlIfNeeded();
-        } catch (IOException e) {
-            throw new InvalidScriptException(e);
-        }
         this.dynamic = dynamic;
-        buildSelectionScriptId();
+    }
+
+    public static SelectionScript resolvedSelectionScript(SelectionScript originalScript) {
+        if (originalScript.script == null && originalScript.url != null) {
+            try {
+                SelectionScript newScript = new SelectionScript(originalScript.url,
+                                                                originalScript.parameters,
+                                                                originalScript.dynamic);
+                newScript.fetchUrlIfNeeded();
+                return newScript;
+            } catch (InvalidScriptException | IOException e) {
+                logger.debug("Could not fetch the selection script", e);
+                return originalScript;
+            }
+        } else {
+            return originalScript;
+        }
     }
 
     /**
@@ -245,9 +248,20 @@ public class SelectionScript extends Script<Boolean> {
      * ID is a String made of script_code+script_parameters+type
      *
      */
-    public void buildSelectionScriptId() {
-        //get code of script
-        String stringId = this.script;
+    private void buildSelectionScriptHash() {
+        String stringId;
+        try {
+            //get code of script
+            stringId = fetchScriptWithExceptionHandling();
+        } catch (IOException e) {
+            logger.debug("Error when loading the script content", e);
+            if (url != null) {
+                stringId = url.toExternalForm();
+            } else {
+                // this should never happen
+                throw new IllegalStateException("A script should always have a script content or url");
+            }
+        }
 
         //concatenate the script type (dynamic or static)
         stringId += this.dynamic;
@@ -260,19 +274,18 @@ public class SelectionScript extends Script<Boolean> {
         }
 
         try {
-            this.id_ = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
+            this.hash = MessageDigest.getInstance("SHA-1").digest(stringId.getBytes());
         } catch (NoSuchAlgorithmException e) {
             logger.error("", e);
-            this.id_ = stringId.getBytes();
+            this.hash = stringId.getBytes();
         }
     }
 
-    /**
-     * @see org.ow2.proactive.scripting.Script#getId()
-     */
-    @Override
-    public String getId() {
-        return this.id;
+    private byte[] getHash() {
+        if (hash == null) {
+            buildSelectionScriptHash();
+        }
+        return hash;
     }
 
     @Override
@@ -323,17 +336,14 @@ public class SelectionScript extends Script<Boolean> {
     protected void prepareSpecialBindings(Bindings bindings) {
     }
 
-    /**
-     * @see org.ow2.proactive.scripting.Script#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object o) {
-        if (o == this) {
+    public boolean equals(Object obj) {
+        if (obj == this) {
             return true;
         }
 
-        if (o instanceof SelectionScript) {
-            return compareByteArray(this.id_, ((SelectionScript) o).id_);
+        if (obj instanceof SelectionScript) {
+            return compareByteArray(getHash(), ((SelectionScript) obj).getHash());
         }
         return false;
     }
@@ -343,17 +353,7 @@ public class SelectionScript extends Script<Boolean> {
      */
     @Override
     public int hashCode() {
-        return new String(id_).hashCode();
-    }
-
-    /**
-     * Get MD5 hash value
-     * 
-     * @return MD5 hash value
-     * @throws NoSuchAlgorithmException
-     */
-    public byte[] digest() throws NoSuchAlgorithmException {
-        return MessageDigest.getInstance("MD5").digest(id_);
+        return new String(getHash()).hashCode();
     }
 
     /** Compare two arrays of bytes
@@ -374,29 +374,17 @@ public class SelectionScript extends Script<Boolean> {
     }
 
     /**
-     * Util method to get an hashCode of a list of selection script. Can be used to compare two lists of selectionScript
-     * and see if it is the same.
-     * If the list is empty or null, then the return value will be 0, meaning no selection scripts are provided.
-     *
-     * @param selScriptsList a list of selection scripts
-     * @return 0 if the list is null or empty, otherwise, an hashCode of the list content
+     * Get MD5 hash value
+     * 
+     * @return MD5 hash value
+     * @throws NoSuchAlgorithmException
      */
-    public static int hashCodeFromList(List<SelectionScript> selScriptsList) {
-        if (selScriptsList == null || selScriptsList.size() == 0) {
-            return 0;
-        }
-        int toReturn = 0;
-        for (SelectionScript ss : selScriptsList) {
-            toReturn += ss.hashCode();
-        }
-        return toReturn;
+    public byte[] digest() throws NoSuchAlgorithmException {
+        return MessageDigest.getInstance("MD5").digest(getHash());
     }
 
-    /**
-     * String representation
-     */
+    @Override
     public String toString() {
-        return hashCode() + "\n" + script;
+        return "" + new String(getHash()) + "\n" + (script != null ? script : url);
     }
-
 }

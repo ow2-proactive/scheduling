@@ -26,6 +26,7 @@
 package org.ow2.proactive.scheduler.core;
 
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -86,8 +87,8 @@ public class SchedulingTaskComparator {
             }
             try {
                 digests.add(new String(modifiedScript.digest()));
-            } catch (Exception e) {
-                logger.error("Error while replacing selection script bindings for task " + task.getId(), e);
+            } catch (NoSuchAlgorithmException e) {
+                logger.error("Error while computing selection script digest for task " + task.getId(), e);
             }
         }
     }

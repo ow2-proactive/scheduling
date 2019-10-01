@@ -60,6 +60,7 @@ import functionaltests.nodestate.TestNodesStates;
 import functionaltests.permissions.TestNSAdminPermissions;
 import functionaltests.permissions.TestNSProviderPermissions;
 import functionaltests.selectionscript.DynamicSelectionScriptTest;
+import functionaltests.selectionscript.LateBindingSelectionScriptTest;
 import functionaltests.selectionscript.SelectionWithNodesExclusionTest;
 import functionaltests.selectionscript.SelectionWithSeveralScriptsTest;
 import functionaltests.selectionscript.SelectionWithSeveralScriptsTest2;
@@ -82,8 +83,9 @@ import functionaltests.topology.SelectionTest;
                       TestNodesStates.class, TestNSAdminPermissions.class, TestNSProviderPermissions.class,
                       DynamicSelectionScriptTest.class, SelectionWithNodesExclusionTest.class,
                       SelectionWithSeveralScriptsTest.class, SelectionWithSeveralScriptsTest2.class,
-                      StaticSelectionScriptTest.class, UnauthorizedSelectionScriptTest.class, LocalSelectionTest.class,
-                      SelectionTest.class, SSHInfrastructureV2LifecycleTest.class, TestSSHInfrastructureV2.class,
+                      StaticSelectionScriptTest.class, LateBindingSelectionScriptTest.class,
+                      UnauthorizedSelectionScriptTest.class, LocalSelectionTest.class, SelectionTest.class,
+                      SSHInfrastructureV2LifecycleTest.class, TestSSHInfrastructureV2.class,
                       LocalInfrastructureLifecycleTest.class })
 
 /**
