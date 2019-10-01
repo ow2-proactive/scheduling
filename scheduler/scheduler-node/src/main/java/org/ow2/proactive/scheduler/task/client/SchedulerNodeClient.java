@@ -466,6 +466,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.killJobs(jobsId);
+    }
+
+    @Override
     public boolean killTask(String jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         renewSession();

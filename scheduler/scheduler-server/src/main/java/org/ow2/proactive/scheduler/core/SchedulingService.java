@@ -621,6 +621,24 @@ public class SchedulingService {
         }
     }
 
+    public boolean killJobs(List<JobId> jobIds) {
+        try {
+            if (status.isUnusable()) {
+                return false;
+            }
+
+            return infrastructure.getClientOperationsThreadPool().submit(() -> {
+                TerminationData terminationData = jobs.killJobs(jobIds);
+                submitTerminationDataHandler(terminationData);
+                wakeUpSchedulingThread();
+                return true;
+            }).get();
+
+        } catch (Exception e) {
+            throw handleFutureWaitException(e);
+        }
+    }
+
     void submitTerminationDataHandler(TerminationData terminationData) {
         if (!terminationData.isEmpty()) {
             getInfrastructure().getInternalOperationsThreadPool().submit(new TerminationDataHandler(terminationData));

@@ -341,6 +341,18 @@ public interface SchedulerRestInterface {
     boolean killJob(@HeaderParam("sessionid") String sessionId, @PathParam("jobid") String jobId) throws RestException;
 
     /**
+     * Kill multiple jobs
+     * @param sessionId a valid session id
+     * @param jobsId job ids to kill
+     * @return true if all requested jobs were killed
+     */
+    @PUT
+    @Path("jobs/kill")
+    @Produces("application/json")
+    boolean killJobs(@HeaderParam("sessionid") String sessionId, @QueryParam("jobsid") List<String> jobsId)
+            throws RestException;
+
+    /**
      * Returns a list of the name of the tasks belonging to job
      * <code>jobId</code>
      * 

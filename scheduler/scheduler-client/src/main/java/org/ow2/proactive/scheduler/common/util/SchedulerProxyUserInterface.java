@@ -460,6 +460,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     }
 
     @Override
+    public boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException {
+        return uischeduler.killJobs(jobsId);
+    }
+
+    @Override
     public boolean pauseJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.pauseJob(jobId);
     }

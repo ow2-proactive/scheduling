@@ -31,8 +31,7 @@ import org.ow2.proactive.scheduler.common.task.TaskVariable;
 
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "deleteTaskDataVariable", query = "delete from TaskDataVariable where taskData.id.jobId = :jobId"),
-                @NamedQuery(name = "deleteTaskDataVariableInBulk", query = "delete from TaskDataVariable where taskData.id.jobId in :jobIdList"),
+@NamedQueries({ @NamedQuery(name = "deleteTaskDataVariableInBulk", query = "delete from TaskDataVariable where taskData.id.jobId in :jobIdList"),
                 @NamedQuery(name = "countTaskDataVariable", query = "select count (*) from TaskDataVariable") })
 @Table(name = "TASK_DATA_VARIABLE", indexes = { @Index(name = "TASK_DATA_VARIABLE_JOB_ID", columnList = "JOB_ID"),
                                                 @Index(name = "TASK_DATA_VARIABLE_TASK_ID", columnList = "TASK_ID") })
