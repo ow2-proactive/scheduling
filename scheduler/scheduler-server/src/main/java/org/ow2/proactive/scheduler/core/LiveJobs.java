@@ -1021,6 +1021,10 @@ class LiveJobs {
         return terminateJob(jobId, JobStatus.KILLED);
     }
 
+    /**
+     * @param jobIds terminated jobs with given id
+     * @return return TerminationData which is than used to kill all running tasks
+     */
     public TerminationData killJobs(List<JobId> jobIds) {
         jobIds.forEach(jobId -> jlogger.info(jobId, "killing job"));
         List<JobData> jobDatas = lockJobs(jobIds);
