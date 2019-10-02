@@ -108,56 +108,55 @@ public class ProbablisticSelectionManager extends SelectionManager {
             return nodes;
         }
 
-        try {
-            // finding intersection
-            HashMap<RMNode, Probability> intersectionMap = new LinkedHashMap<>();
-            for (RMNode rmnode : nodes) {
-                boolean intersection = true;
-                double intersectionProbability = 1;
-                for (SelectionScript script : scripts) {
-                    SelectionScript scriptWithReplacedBindings = replaceBindings(script, bindings);
-                    String digest = new String(scriptWithReplacedBindings.digest());
-                    if (probabilities.containsKey(digest) &&
-                        probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
-                        double probability = probabilities.get(digest).get(rmnode.getNodeURL()).value();
-                        if (probability == 0) {
-                            intersection = false;
-                            break;
-                        } else {
-                            intersectionProbability *= probability;
-                        }
+        // finding intersection
+        HashMap<RMNode, Probability> intersectionMap = new LinkedHashMap<>();
+        for (RMNode rmnode : nodes) {
+            boolean intersection = true;
+            double intersectionProbability = 1;
+            for (SelectionScript script : scripts) {
+                SelectionScript scriptWithReplacedBindings = replaceBindings(script, bindings);
+                String digest = "";
+                try {
+                    digest = new String(scriptWithReplacedBindings.digest());
+                } catch (NoSuchAlgorithmException e) {
+                    logger.error(e.getMessage(), e);
+                }
+                if (probabilities.containsKey(digest) && probabilities.get(digest).containsKey(rmnode.getNodeURL())) {
+                    double probability = probabilities.get(digest).get(rmnode.getNodeURL()).value();
+                    if (Math.abs(probability - 0) < 0.0001) {
+                        intersection = false;
+                        break;
                     } else {
-                        intersectionProbability *= Probability.defaultValue();
-                    }
-                }
-
-                if (intersection) {
-                    intersectionMap.put(rmnode, new Probability(intersectionProbability));
-                }
-            }
-
-            // sorting results based on calculated probability
-            Set<RMNode> nodeSet = intersectionMap.keySet();
-            List<RMNode> res = new ArrayList<>(nodeSet.size());
-            res.addAll(nodeSet);
-            Collections.sort(res, new NodeProbabilityComparator(intersectionMap));
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("The following nodes are selected for scripts execution (time is " +
-                             (System.currentTimeMillis() - startTime) + " ms) :");
-                if (res.size() > 0) {
-                    for (RMNode rmnode : res) {
-                        logger.debug(rmnode.getNodeURL() + " : probability " + intersectionMap.get(rmnode));
+                        intersectionProbability *= probability;
                     }
                 } else {
-                    logger.debug("None");
+                    intersectionProbability *= Probability.defaultValue();
                 }
             }
-            return res;
-        } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage(), e);
-            return new ArrayList<>(0);
+
+            if (intersection) {
+                intersectionMap.put(rmnode, new Probability(intersectionProbability));
+            }
         }
+
+        // sorting results based on calculated probability
+        Set<RMNode> nodeSet = intersectionMap.keySet();
+        List<RMNode> res = new ArrayList<>(nodeSet.size());
+        res.addAll(nodeSet);
+        Collections.sort(res, new NodeProbabilityComparator(intersectionMap));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("The following nodes are selected for scripts execution (time is " +
+                         (System.currentTimeMillis() - startTime) + " ms) :");
+            if (res.size() > 0) {
+                res.forEach(rmnode -> {
+                    logger.debug(rmnode.getNodeURL() + " : probability " + intersectionMap.get(rmnode));
+                });
+            } else {
+                logger.debug("None");
+            }
+        }
+        return res;
     }
 
     /**
@@ -274,8 +273,8 @@ public class ProbablisticSelectionManager extends SelectionManager {
     }
 
     private SelectionScript replaceBindings(SelectionScript script, Map<String, Serializable> bindings) {
-        String scriptContent = script.getScript();
-        if (bindings != null) {
+        String scriptContent = script.fetchScript();
+        if (scriptContent != null && bindings != null) {
             for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
                 String reservedKeyword = entry.getKey();
                 Serializable binding = entry.getValue();
@@ -289,10 +288,14 @@ public class ProbablisticSelectionManager extends SelectionManager {
             }
         }
         try {
-            return new SelectionScript(scriptContent,
-                                       script.getEngineName(),
-                                       script.getParameters(),
-                                       script.isDynamic());
+            if (scriptContent != null) {
+                return new SelectionScript(scriptContent,
+                                           script.getEngineName(),
+                                           script.getParameters(),
+                                           script.isDynamic());
+            } else {
+                return script;
+            }
         } catch (InvalidScriptException e) {
             logger.warn("Error when replacing bindings of script (revert to use original script):" +
                         System.lineSeparator() + script.toString(), e);

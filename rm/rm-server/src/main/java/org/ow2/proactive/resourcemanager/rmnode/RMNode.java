@@ -80,7 +80,9 @@ public interface RMNode extends Comparable<RMNode> {
      * Get a map of all selection scripts already tested on this node,
      * and the responses given.
      * @return the map of Script and status
+     * @deprecated it currently returns empty result always. Selection script results are now handled by the {@link org.ow2.proactive.resourcemanager.selection.statistics.ProbablisticSelectionManager}
      */
+    @Deprecated
     HashMap<SelectionScript, Integer> getScriptStatus();
 
     /**

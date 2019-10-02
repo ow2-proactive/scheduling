@@ -705,16 +705,24 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
     public static SelectionScript replaceBindingsInsideScript(SelectionScript script,
             Map<String, Serializable> bindings) {
         String scriptContent = script.fetchScript();
-        if (bindings != null) {
+        if (bindings != null && scriptContent != null) {
             for (Map.Entry<String, Serializable> entry : bindings.entrySet()) {
                 scriptContent = scriptContent.replace(entry.getKey(), entry.getValue().toString());
             }
         }
         try {
-            return new SelectionScript(scriptContent,
-                                       script.getEngineName(),
-                                       script.getParameters(),
-                                       script.isDynamic());
+            if (scriptContent != null) {
+                return new SelectionScript(scriptContent,
+                                           script.getEngineName(),
+                                           script.getParameters(),
+                                           script.isDynamic());
+            } else {
+                return new SelectionScript(script.getScriptUrl(),
+                                           script.getEngineName(),
+                                           script.getParameters(),
+                                           script.isDynamic());
+            }
+
         } catch (InvalidScriptException e) {
             logger.warn("Error when replacing bindings of script (revert to use original script):" +
                         System.lineSeparator() + script.toString(), e);
@@ -908,13 +916,16 @@ public final class SchedulingMethodImpl implements SchedulingMethod {
      */
     public static List<SelectionScript> resolveScriptVariables(List<SelectionScript> selectionScripts,
             Map<String, Serializable> variables) {
+        List<SelectionScript> output = new LinkedList<>();
         if (selectionScripts == null) {
             return null;
         }
         for (SelectionScript script : selectionScripts) {
-            VariableSubstitutor.filterAndUpdate(script, variables);
+            SelectionScript resolved = SelectionScript.resolvedSelectionScript(script);
+            VariableSubstitutor.filterAndUpdate(resolved, variables);
+            output.add(resolved);
         }
-        return selectionScripts;
+        return output;
     }
 
 }
