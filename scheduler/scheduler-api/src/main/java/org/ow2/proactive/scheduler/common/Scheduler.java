@@ -354,6 +354,14 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
     boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException;
 
     /**
+     * Remove jobs with given ids
+     * @return true if all jobs with jobIds were removed, otherwise false
+     * @throws NotConnectedException if you are not authenticated
+     * @throws PermissionException if you can't access to at least one of the job
+     */
+    boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException;
+
+    /**
      * Listen for the tasks user logs.
      * <p>
      * A user can only listen to HIS jobs.
@@ -860,6 +868,13 @@ public interface Scheduler extends SchedulerUsage, ThirdPartyCredentials {
      *             if you can't access to this particular job.
      */
     boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException;
+
+    /**
+     * @return true if all jobs were killed
+     * @throws NotConnectedException if you are not authenticated.
+     * @throws PermissionException if you can't access to at least one particular job
+     */
+    boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException;
 
     /**
      * Try to kill the task with the given task name in the given jobId. A user

@@ -31,11 +31,14 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.hibernate.Session;
 import org.hibernate.metadata.ClassMetadata;
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.proactive.scheduler.common.job.JobState;
 import org.ow2.proactive.scheduler.common.job.JobStatus;
 import org.ow2.proactive.scheduler.common.job.TaskFlowJob;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -175,6 +178,29 @@ public class TestJobRemove extends BaseSchedulerDBTest {
         long start = System.currentTimeMillis();
         dbManager.removeJob(job.getId(), 0, true);
         System.out.println("Remove time (single task)" + (System.currentTimeMillis() - start));
+
+        checkAllEntitiesDeleted();
+    }
+
+    @Test
+    public void testMultipleDataRemoved() throws Exception {
+        TaskFlowJob jobDef = new TaskFlowJob();
+        JavaTask task1 = new JavaTask();
+        task1.setName("task1");
+        task1.setExecutableClassName(TestDummyExecutable.class.getName());
+        jobDef.addTask(task1);
+
+        List<InternalJob> jobs = IntStream.range(0, 5).boxed().map(x -> {
+            try {
+                return defaultSubmitJob(jobDef);
+            } catch (Exception e) {
+                return null;
+            }
+        }).collect(Collectors.toList());
+        System.out.println("Remove jobs");
+        long start = System.currentTimeMillis();
+        dbManager.removeJob(jobs.stream().map(JobState::getId).collect(Collectors.toList()), 0, true);
+        System.out.println("Remove time (5 jobs)" + (System.currentTimeMillis() - start));
 
         checkAllEntitiesDeleted();
     }

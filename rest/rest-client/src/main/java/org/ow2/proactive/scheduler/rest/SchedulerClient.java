@@ -484,15 +484,26 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(JobId jobId) throws NotConnectedException, PermissionException {
         return killJob(jobId.value());
     }
 
     @Override
-    public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean killJob(String jobId) throws NotConnectedException, PermissionException {
         boolean isJobKilled = false;
         try {
             isJobKilled = restApi().killJob(sid, jobId);
+        } catch (Exception e) {
+            throwNCEOrPE(e);
+        }
+        return isJobKilled;
+    }
+
+    @Override
+    public boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException {
+        boolean isJobKilled = false;
+        try {
+            isJobKilled = restApi().killJobs(sid, jobsId);
         } catch (Exception e) {
             throwNCEOrPE(e);
         }
@@ -586,12 +597,24 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
     }
 
     @Override
-    public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJob(JobId jobId) throws NotConnectedException, PermissionException {
         return removeJob(jobId.value());
     }
 
     @Override
-    public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
+    public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        boolean isAllJobsRemoved = false;
+        try {
+            isAllJobsRemoved = restApi().removeJobs(sid,
+                                                    jobIds.stream().map(JobId::value).collect(Collectors.toList()));
+        } catch (RestException e) {
+            throwNCEOrPE(e);
+        }
+        return isAllJobsRemoved;
+    }
+
+    @Override
+    public boolean removeJob(String jobId) throws NotConnectedException, PermissionException {
         boolean isJobRemoved = false;
         try {
             isJobRemoved = restApi().removeJob(sid, jobId);

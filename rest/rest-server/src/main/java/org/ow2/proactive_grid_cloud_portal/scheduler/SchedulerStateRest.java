@@ -419,6 +419,18 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
+    public boolean removeJobs(String sessionId, List<String> jobsId) throws RestException {
+        try {
+            // checking permissions
+            checkAccess(sessionId, "DELETE jobs/");
+            Scheduler s = checkAccess(sessionId, "DELETE jobs/" + (jobsId.isEmpty() ? "" : jobsId.get(0)));
+            return s.removeJobs(jobsId.stream().map(JobIdImpl::makeJobId).collect(Collectors.toList()));
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
     public String jobServerLog(String sessionId, String jobId) throws RestException {
         try {
             Scheduler s = checkAccess(sessionId, PATH_JOBS + jobId + "/log/server");
@@ -433,6 +445,16 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         try {
             Scheduler s = checkAccess(sessionId, "PUT jobs/" + jobId + "/kill");
             return s.killJob(jobId);
+        } catch (SchedulerException e) {
+            throw RestException.wrapExceptionToRest(e);
+        }
+    }
+
+    @Override
+    public boolean killJobs(String sessionId, List<String> jobsId) throws RestException {
+        try {
+            Scheduler s = checkAccess(sessionId, "PUT jobs/kill");
+            return s.killJobs(jobsId);
         } catch (SchedulerException e) {
             throw RestException.wrapExceptionToRest(e);
         }

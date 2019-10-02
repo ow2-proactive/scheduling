@@ -194,6 +194,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     }
 
     @Override
+    public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.removeJobs(jobIds);
+    }
+
+    @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
@@ -457,6 +463,12 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         renewSession();
         return client.killJob(jobId);
+    }
+
+    @Override
+    public boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException {
+        renewSession();
+        return client.killJobs(jobsId);
     }
 
     @Override

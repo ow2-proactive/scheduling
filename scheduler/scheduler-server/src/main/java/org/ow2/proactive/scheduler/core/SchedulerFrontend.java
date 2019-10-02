@@ -848,6 +848,27 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        if (jobIds.isEmpty()) {
+            return false;
+        }
+        // checking permission for each of the job
+        for (JobId jobId : jobIds) {
+            try {
+                frontendState.checkPermissions("removeJob",
+                                               frontendState.getIdentifiedJob(jobId),
+                                               YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
+            } catch (UnknownJobException e) {
+                logger.debug(e);
+            }
+        }
+
+        return schedulingService.removeJobs(jobIds);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
@@ -1179,6 +1200,27 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.killJob(JobIdImpl.makeJobId(jobId));
+    }
+
+    @Override
+    public boolean killJobs(List<String> jobIds) throws NotConnectedException, PermissionException {
+
+        if (jobIds.isEmpty()) {
+            return false;
+        }
+        List<JobId> jobIdsConverted = jobIds.stream().map(JobIdImpl::makeJobId).collect(Collectors.toList());
+        // checking permission for each of the job
+        for (JobId jobId : jobIdsConverted) {
+            try {
+                frontendState.checkPermissions("removeJob",
+                                               frontendState.getIdentifiedJob(jobId),
+                                               YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIS_JOB);
+            } catch (UnknownJobException e) {
+                logger.debug(e);
+            }
+        }
+
+        return schedulingService.killJobs(jobIdsConverted);
     }
 
     /**

@@ -25,16 +25,10 @@
  */
 package org.ow2.proactive.scheduler.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.scheduler.common.JobDescriptor;
@@ -1027,6 +1021,79 @@ class LiveJobs {
         return terminateJob(jobId, JobStatus.KILLED);
     }
 
+    /**
+     * @param jobIds terminated jobs with given id
+     * @return return TerminationData which is than used to kill all running tasks
+     */
+    public TerminationData killJobs(List<JobId> jobIds) {
+        jobIds.forEach(jobId -> jlogger.info(jobId, "killing job"));
+        List<JobData> jobDatas = lockJobs(jobIds);
+        if (jobDatas == null || jobDatas.isEmpty()) {
+            return TerminationData.EMPTY;
+        }
+        try {
+            TaskResultImpl taskResult = null;
+            JobStatus jobStatus = JobStatus.KILLED;
+
+            Set<TaskId> tasksToUpdate = new HashSet<>();
+
+            TerminationData terminationData = TerminationData.newTerminationData();
+
+            for (JobData jobData : jobDatas) {
+
+                JobId jobId = jobData.job.getId();
+
+                jobs.remove(jobId);
+                terminationData.addJobToTerminate(jobId);
+
+                InternalJob job = jobData.job;
+
+                jlogger.info(job.getId(), "ending request");
+
+                for (Iterator<RunningTaskData> i = runningTasksData.values().iterator(); i.hasNext();) {
+                    RunningTaskData taskData = i.next();
+                    if (taskData.getTask().getJobId().equals(jobId)) {
+                        i.remove();
+                        // remove previous read progress
+                        taskData.getTask().setProgress(0);
+                        terminationData.addTaskData(job,
+                                                    taskData,
+                                                    TerminationData.TerminationStatus.ABORTED,
+                                                    taskResult);
+                    }
+                }
+
+                // if job has been killed
+                tasksToUpdate.addAll(job.failed(null, jobStatus));
+            }
+
+            dbManager.killJobs(jobDatas.stream().map(jobData -> jobData.job).collect(Collectors.toList()));
+
+            for (JobData jobData : jobDatas) {
+                InternalJob job = jobData.job;
+
+                updateTasksInSchedulerState(job, tasksToUpdate);
+
+                SchedulerEvent event;
+                if (job.getStatus() == JobStatus.PENDING) {
+                    event = SchedulerEvent.JOB_PENDING_TO_FINISHED;
+                } else {
+                    event = SchedulerEvent.JOB_RUNNING_TO_FINISHED;
+                }
+                // update job and tasks events list and send it to front-end
+                updateJobInSchedulerState(job, event);
+
+                jlogger.info(job.getId(), "finished (" + jobStatus + ")");
+                jlogger.close(job.getId());
+
+            }
+
+            return terminationData;
+        } finally {
+            jobDatas.forEach(JobData::unlock);
+        }
+    }
+
     public TerminationData removeJob(JobId jobId) {
         return terminateJob(jobId, JobStatus.FINISHED);
     }
@@ -1121,6 +1188,30 @@ class LiveJobs {
             jobData.unlock();
             return null;
         }
+    }
+
+    /**
+     * @param jobIds job ids to lock and return its data
+     * @return list of locked jobs for each job id provided, otherwise null
+     */
+    public List<JobData> lockJobs(List<JobId> jobIds) {
+        List<JobData> lockedJobs = new ArrayList<>(jobIds.size());
+
+        for (JobId jobId : jobIds) {
+            JobData jobData = lockJob(jobId);
+            if (jobData != null) {
+                lockedJobs.add(jobData);
+            } else {
+                // we cannot lock at least one job
+                // we should abort this process, and unlock already locked jobs
+                lockedJobs.forEach(JobData::unlock);
+
+                // so we locked nothing
+                return null;
+            }
+        }
+
+        return lockedJobs;
     }
 
     private JobData checkJobAccess(JobId jobId) {

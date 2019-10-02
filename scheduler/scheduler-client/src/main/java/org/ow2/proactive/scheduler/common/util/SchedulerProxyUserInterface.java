@@ -422,7 +422,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkSchedulerConnection();
         return uischeduler.removeJob(jobId);
+    }
 
+    @Override
+    public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
+        checkSchedulerConnection();
+        return uischeduler.removeJobs(jobIds);
     }
 
     @Override
@@ -452,6 +457,11 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @Override
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return uischeduler.killJob(jobId);
+    }
+
+    @Override
+    public boolean killJobs(List<String> jobsId) throws NotConnectedException, PermissionException {
+        return uischeduler.killJobs(jobsId);
     }
 
     @Override
