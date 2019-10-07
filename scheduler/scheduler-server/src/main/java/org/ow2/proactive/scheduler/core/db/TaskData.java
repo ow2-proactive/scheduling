@@ -86,6 +86,7 @@ import org.ow2.proactive.scheduler.task.containers.ScriptExecutableContainer;
 import org.ow2.proactive.scheduler.task.internal.InternalForkedScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalScriptTask;
 import org.ow2.proactive.scheduler.task.internal.InternalTask;
+import org.ow2.proactive.scripting.ForkEnvironmentScript;
 import org.ow2.proactive.scripting.InvalidScriptException;
 import org.ow2.proactive.scripting.SelectionScript;
 import org.ow2.proactive.scripting.TaskScript;
@@ -397,7 +398,7 @@ public class TaskData {
             }
         }
         if (envScript != null) {
-            forkEnv.setEnvScript(envScript.createSimpleScript());
+            forkEnv.setEnvScript(new ForkEnvironmentScript(envScript.createSimpleScript()));
         }
         return forkEnv;
     }
