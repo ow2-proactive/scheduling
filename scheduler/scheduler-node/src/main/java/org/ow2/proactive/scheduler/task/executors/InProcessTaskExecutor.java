@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.task.executors;
 
+import static org.ow2.proactive.scheduler.common.task.ForkEnvironment.DOCKER_FORK_WINDOWS2LINUX;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,6 +49,7 @@ import javax.script.ScriptEngineManager;
 
 import org.apache.commons.io.FileUtils;
 import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.flow.FlowAction;
 import org.ow2.proactive.scheduler.common.task.flow.FlowScript;
@@ -86,6 +89,8 @@ public class InProcessTaskExecutor implements TaskExecutor {
 
     private final TaskContextVariableExtractor taskContextVariableExtractor = new TaskContextVariableExtractor();
 
+    private final static boolean isDockerWindows2Linux = "true".equals(System.getProperty(DOCKER_FORK_WINDOWS2LINUX));
+
     /**
      * Writes a nodes file to disk.
      *
@@ -104,7 +109,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
                 taskContext.getNodeDataSpaceURIs().getScratchURI().isEmpty()) {
                 directory = new File(".");
             } else {
-                directory = new File(taskContext.getNodeDataSpaceURIs().getScratchURI());
+                String scratchUri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+                directory = new File(isDockerWindows2Linux ? ForkEnvironment.convertToLinuxPath(scratchUri)
+                                                           : scratchUri);
             }
             File nodesFile = new File(directory, NODES_FILE_DIRECTORY_NAME + "_" + taskContext.getTaskId());
 
@@ -241,6 +248,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
         } else {
             //Needs to be stored in the local space
             String uri = taskContext.getNodeDataSpaceURIs().getScratchURI();
+            if (isDockerWindows2Linux) {
+                uri = ForkEnvironment.convertToLinuxPath(uri);
+            }
             p = Paths.get(uri, path);
             Path hasParent = p.getParent();
             if (!Files.exists(hasParent)) {

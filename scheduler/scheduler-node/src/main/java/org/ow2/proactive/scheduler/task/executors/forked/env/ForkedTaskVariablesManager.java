@@ -25,6 +25,8 @@
  */
 package org.ow2.proactive.scheduler.task.executors.forked.env;
 
+import static org.ow2.proactive.scheduler.common.task.ForkEnvironment.DOCKER_FORK_WINDOWS2LINUX;
+
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.security.KeyException;
@@ -34,6 +36,7 @@ import java.util.Map;
 import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
+import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
 import org.ow2.proactive.scheduler.common.task.TaskResult;
 import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
@@ -93,24 +96,36 @@ public class ForkedTaskVariablesManager implements Serializable {
         scriptHandler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME,
                                  taskContext.getSynchronizationAPI());
 
+        boolean isDockerWindows2Linux = "true".equals(System.getProperty(DOCKER_FORK_WINDOWS2LINUX));
+
         scriptHandler.addBinding(SchedulerConstants.DS_SCRATCH_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getScratchURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getScratchURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_CACHE_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getCacheURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getCacheURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_INPUT_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getInputURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getInputURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_OUTPUT_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getOutputURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getOutputURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_GLOBAL_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getGlobalURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getGlobalURI()));
         scriptHandler.addBinding(SchedulerConstants.DS_USER_BINDING_NAME,
-                                 taskContext.getNodeDataSpaceURIs().getUserURI());
+                                 convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                        taskContext.getNodeDataSpaceURIs().getUserURI()));
 
         scriptHandler.addBinding(SchedulerConstants.MULTI_NODE_TASK_NODESURL_BINDING_NAME,
                                  taskContext.getOtherNodesURLs());
 
         scriptHandler.addBinding(SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
                                  taskContext.getInitializer().getForkEnvironment());
+    }
+
+    private String convertToLinuxIfNeeded(boolean isDockerWindows2Linux, String uri) {
+        return isDockerWindows2Linux ? ForkEnvironment.convertToLinuxPath(uri) : uri;
     }
 
     public Map<String, String> extractThirdPartyCredentials(TaskContext container) throws Exception {
