@@ -80,6 +80,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
 
     private String[] testPreJaveCommandString = new String[] { "My", "Command" };
 
+    private String[] testPreJaveCommandStringList = new String[] { "His", "Commands" };
+
     private String[] forkEnvJvmArguments = new String[] { "Arg1", "Arg2" };
 
     private String serializedContextAbsolutePath = "/some/absolute/path.file";
@@ -101,7 +103,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
     public void testExecCommandUsesJavaHomeFromSystemProperties() throws Exception {
         javaCommandContainsOrNot(Arrays.asList(new String[] { System.getProperty("java.home") }),
                                  createForkEnvironment(),
-                                 true);
+                                 true,
+                                 false);
     }
 
     @Test
@@ -116,7 +119,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
         // test
         javaCommandContainsOrNot(Arrays.asList(new String[] { "-cp", System.getProperty("java.class.path") }),
                                  createForkEnvironment(),
-                                 true);
+                                 true,
+                                 false);
 
         // after test (reset 'proactive.home')
         System.setProperty(proactiveHomeProperty, proactiveHomeValue);
@@ -124,29 +128,43 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
 
     @Test
     public void testExecCommandContainsJavaCommandPrefix() throws Exception {
-        javaCommandContainsOrNot(Arrays.asList(testPreJaveCommandString), createForkEnvironment(), true);
+        javaCommandContainsOrNot(Arrays.asList(testPreJaveCommandString), createForkEnvironment(), true, true);
+    }
+
+    @Test
+    public void testExecCommandContainsJavaCommandPrefixList() throws Exception {
+        ForkEnvironment forkEnv = createForkEnvironment();
+        for (String arg : testPreJaveCommandStringList) {
+            forkEnv.addPreJavaCommand(arg);
+        }
+        javaCommandContainsOrNot(Arrays.asList(testPreJaveCommandStringList), forkEnv, true, false);
+
+        // when the prefix string is added, it overrides the pre command list
+        javaCommandContainsOrNot(Arrays.asList(testPreJaveCommandString), forkEnv, true, true);
+        javaCommandContainsOrNot(Arrays.asList(testPreJaveCommandStringList), forkEnv, false, true);
+
     }
 
     @Test
     public void testExecCommandContainsJavaArgumentsExtractedFromForkEnvironment() throws Exception {
-        javaCommandContainsOrNot(Arrays.asList(forkEnvJvmArguments), createForkEnvironment(), true);
+        javaCommandContainsOrNot(Arrays.asList(forkEnvJvmArguments), createForkEnvironment(), true, false);
     }
 
     @Test
     public void testExecCommandContainsAbsolutePathOfSerializedContext() throws Exception {
-        javaCommandContainsOrNot(Arrays.asList(serializedContextAbsolutePath), createForkEnvironment(), true);
+        javaCommandContainsOrNot(Arrays.asList(serializedContextAbsolutePath), createForkEnvironment(), true, false);
     }
 
     @Test
     public void testExecCommandContainsAdditionalClasspathSavedInForkEnvironment() throws Exception {
-        javaCommandContainsOrNot(Arrays.asList(additionalClasspath), createForkEnvironment(), true);
+        javaCommandContainsOrNot(Arrays.asList(additionalClasspath), createForkEnvironment(), true, false);
     }
 
     @Test
     public void testExecCommandOverwritesJavaHomeFromForkEnvironment() throws Exception {
         ForkEnvironment forkEnvironment = createForkEnvironment();
         forkEnvironment.setJavaHome(forkenvironmentJavaHome);
-        javaCommandContainsOrNot(Arrays.asList(forkenvironmentJavaHome), forkEnvironment, true);
+        javaCommandContainsOrNot(Arrays.asList(forkenvironmentJavaHome), forkEnvironment, true, false);
     }
 
     @Test
@@ -155,7 +173,8 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
         ForkEnvironment forkEnvironment = createForkEnvironment();
         javaCommandContainsOrNot(Arrays.asList(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + 33648),
                                  forkEnvironment,
-                                 true);
+                                 true,
+                                 false);
     }
 
     @Test
@@ -165,16 +184,20 @@ public class ForkedJvmTaskExecutionCommandCreatorTest extends ProActiveTestClean
         forkEnvironment.addJVMArgument(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + 33649);
         javaCommandContainsOrNot(Arrays.asList(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + 33649),
                                  forkEnvironment,
-                                 true);
+                                 true,
+                                 false);
         javaCommandContainsOrNot(Arrays.asList(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() + 33648),
                                  forkEnvironment,
+                                 false,
                                  false);
     }
 
     private void javaCommandContainsOrNot(List<String> stringsContained, ForkEnvironment forkEnvironment,
-            boolean contains) throws Exception {
+            boolean contains, boolean addJavaPrefix) throws Exception {
         ForkedJvmTaskExecutionCommandCreator forkedJvmTaskExecutionCommandCreator = new ForkedJvmTaskExecutionCommandCreator();
-        replaceJavaPrefixCommandCreatorWithMock(forkedJvmTaskExecutionCommandCreator);
+        if (addJavaPrefix) {
+            replaceJavaPrefixCommandCreatorWithMock(forkedJvmTaskExecutionCommandCreator);
+        }
 
         TaskContext taskContext = createTaskContext();
         taskContext.getInitializer().setForkEnvironment(forkEnvironment);
