@@ -40,7 +40,8 @@ import performancetests.recovery.NodeRecoveryTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
                       // Performance tests
-                      NodeRecoveryTest.class, JobRecoveryTest.class,
+//                      NodeRecoveryTest.class,
+        JobRecoveryTest.class,
 
                       // Metrics
                       TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class,
