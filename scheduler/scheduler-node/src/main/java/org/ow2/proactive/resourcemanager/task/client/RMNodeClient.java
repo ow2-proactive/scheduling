@@ -129,6 +129,7 @@ public class RMNodeClient implements IRMClient, Serializable {
     public void disconnect() throws NotConnectedException {
         checkNonEmptySession();
         rm.rmDisconnect(sessionId);
+        sessionId = null;
     }
 
     /**

@@ -139,6 +139,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
         ScriptHandler scriptHandler = ScriptLoader.createLocalHandler();
         String nodesFile = null;
         SchedulerNodeClient schedulerNodeClient = null;
+        RMNodeClient rmNodeClient = null;
         RemoteSpace userSpaceClient = null;
         RemoteSpace globalSpaceClient = null;
         try {
@@ -151,7 +152,7 @@ public class InProcessTaskExecutor implements TaskExecutor {
             Map<String, Serializable> resultMap = new HashMap<>();
             Map<String, String> thirdPartyCredentials = forkedTaskVariablesManager.extractThirdPartyCredentials(taskContext);
             schedulerNodeClient = forkedTaskVariablesManager.createSchedulerNodeClient(taskContext);
-            RMNodeClient rmNodeClient = forkedTaskVariablesManager.createRMNodeClient(taskContext);
+            rmNodeClient = forkedTaskVariablesManager.createRMNodeClient(taskContext);
             userSpaceClient = forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
                                                                                    schedulerNodeClient,
                                                                                    IDataSpaceClient.Dataspace.USER);
@@ -207,6 +208,21 @@ public class InProcessTaskExecutor implements TaskExecutor {
         } finally {
             if (nodesFile != null && !nodesFile.isEmpty()) {
                 FileUtils.deleteQuietly(new File(nodesFile));
+            }
+            if (schedulerNodeClient != null && schedulerNodeClient.isConnected()) {
+                try {
+                    schedulerNodeClient.disconnect();
+                } catch (Exception ignored) {
+
+                }
+            }
+
+            if (rmNodeClient != null && rmNodeClient.getSession() != null) {
+                try {
+                    rmNodeClient.disconnect();
+                } catch (Exception ignored) {
+
+                }
             }
         }
     }
