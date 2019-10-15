@@ -57,7 +57,7 @@ public class TaskCreationTimeTest extends PerformanceTestBase {
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 20000, 50000 } });
+        return Arrays.asList(new Object[][] { { 20000, 55000 } });
     }
 
     private final int taskNumber;

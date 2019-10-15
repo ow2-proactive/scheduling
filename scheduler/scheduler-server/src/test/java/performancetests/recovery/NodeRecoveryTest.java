@@ -158,6 +158,7 @@ public class NodeRecoveryTest extends PerformanceTestBase {
         final List<Integer> numbersFromLine = LogProcessor.getNumbersFromLine(line);
 
         if (!numbersFromLine.isEmpty()) {
+            // depends on the logger format, and name of the hosts, the idea is to retrive number of nodes
             return numbersFromLine.get(1);
         } else {
             throw new RuntimeException("Cannot retrieve number of nodes recovered from this line: " + line);
