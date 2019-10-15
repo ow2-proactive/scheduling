@@ -158,7 +158,7 @@ public class NodeRecoveryTest extends PerformanceTestBase {
         final List<Integer> numbersFromLine = LogProcessor.getNumbersFromLine(line);
 
         if (!numbersFromLine.isEmpty()) {
-            return numbersFromLine.get(0);
+            return numbersFromLine.get(1);
         } else {
             throw new RuntimeException("Cannot retrieve number of nodes recovered from this line: " + line);
         }
