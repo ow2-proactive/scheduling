@@ -93,6 +93,22 @@ public class ForkEnvironmentScriptExecutor implements Serializable {
 
         ScriptResult scriptResult = scriptHandler.handle(script, outputSink, errorSink);
 
+        if (schedulerNodeClient != null && schedulerNodeClient.isConnected()) {
+            try {
+                schedulerNodeClient.disconnect();
+            } catch (Exception ignored) {
+
+            }
+        }
+
+        if (rmNodeClient != null && rmNodeClient.getSession() != null) {
+            try {
+                rmNodeClient.disconnect();
+            } catch (Exception ignored) {
+
+            }
+        }
+
         if (scriptResult.errorOccured()) {
             throw new Exception("Failed to execute fork environment script", scriptResult.getException());
         }
