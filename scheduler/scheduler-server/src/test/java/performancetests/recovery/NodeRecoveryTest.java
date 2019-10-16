@@ -68,7 +68,7 @@ public class NodeRecoveryTest extends PerformanceTestBase {
      */
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 2000 }, { 100, 5000 }, { 500, 30000 } });
+        return Arrays.asList(new Object[][] { { 10, 5000 }, { 100, 10000 }, { 500, 30000 } });
     }
 
     // number of nodes
