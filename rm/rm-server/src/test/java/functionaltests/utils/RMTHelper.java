@@ -106,7 +106,8 @@ public class RMTHelper {
     private String currentTestConfiguration;
 
     public static void log(String s) {
-        System.out.println("------------------------------ " + s);
+        System.out.println("------------------------------" +
+                           String.format("[%1$tH:%1$tM:%1$tS,%1$tL] ", Calendar.getInstance().getTime()) + s);
     }
 
     /**
