@@ -68,7 +68,7 @@ public class NodeRecoveryTest extends PerformanceTestBase {
      */
     @Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 10, 2000 }, { 100, 5000 }, { 500, 30000 } });
+        return Arrays.asList(new Object[][] { { 10, 5000 }, { 100, 10000 }, { 500, 30000 } });
     }
 
     // number of nodes
@@ -158,7 +158,8 @@ public class NodeRecoveryTest extends PerformanceTestBase {
         final List<Integer> numbersFromLine = LogProcessor.getNumbersFromLine(line);
 
         if (!numbersFromLine.isEmpty()) {
-            return numbersFromLine.get(0);
+            // depends on the logger format, and name of the hosts, the idea is to retrive number of nodes
+            return numbersFromLine.get(1);
         } else {
             throw new RuntimeException("Cannot retrieve number of nodes recovered from this line: " + line);
         }

@@ -25,6 +25,8 @@
  */
 package performancetests.metrics;
 
+import static org.ow2.proactive.utils.Lambda.repeater;
+
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -39,38 +41,28 @@ import functionaltests.utils.SchedulerTHelper;
 import performancetests.recovery.PerformanceTestBase;
 
 
-/**
- * Performance test measures "Task Creation Time".
- * It is basically time to execute scheduler::submit(job) method.
- * This method just submit job, measure, and after kills it.
- * This test does not require to have more than one core.
- */
 @RunWith(Parameterized.class)
-public class TaskCreationTimeTest extends PerformanceTestBase {
-
-    private static final int TASK_DURATION = 10000; // in milliseconds
+public class JobSubmissionTest extends PerformanceTestBase {
 
     /**
-     * @return an array of parameters which is used by JUnit to create objects of TaskCreationTime,
-     * where first value represents number of task in the job, and the second represents limit for TaskCreationTime (TCT).
-     * The lower TCT the better.
+     * @return number of jobs and limit for average job submission time
      */
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { 20000, 55000 } });
+        return Arrays.asList(new Object[][] { { 100, 2000 } });
     }
 
-    private final int taskNumber;
+    private final int jobsNumber;
 
     private final long timeLimit;
 
-    public TaskCreationTimeTest(int taskNumber, long timeLimit) {
-        this.taskNumber = taskNumber;
+    public JobSubmissionTest(int jobsNumber, long timeLimit) {
+        this.jobsNumber = jobsNumber;
         this.timeLimit = timeLimit;
     }
 
     @Test(timeout = 3600000)
-    public void taskCreationRate() throws Exception {
+    public void submitAlotOfJobs() throws Exception {
         ProActiveConfiguration.load();
         RMFactory.setOsJavaProperty();
         schedulerHelper = new SchedulerTHelper(false,
@@ -78,21 +70,19 @@ public class TaskCreationTimeTest extends PerformanceTestBase {
                                                RM_CONFIGURATION_START.getPath(),
                                                null);
 
-        schedulerHelper.createNodeSourceWithInfiniteTimeout("local", 1);
+        TaskFlowJob job = SchedulerEfficiencyMetricsTest.createJob(jobsNumber, 1);
 
-        final TaskFlowJob job = SchedulerEfficiencyMetricsTest.createJob(taskNumber, TASK_DURATION);
+        long start = System.currentTimeMillis();
 
-        final long start = System.currentTimeMillis();
+        repeater.accept(jobsNumber, () -> schedulerHelper.submitJob(job));
 
-        jobId = schedulerHelper.submitJob(job);
+        long anActualTime = System.currentTimeMillis() - start;
 
-        final long anActualTime = System.currentTimeMillis() - start;
-
-        LOGGER.info(makeCSVString(TaskCreationTimeTest.class.getSimpleName(),
-                                  taskNumber,
+        LOGGER.info(makeCSVString(JobSubmissionTest.class.getSimpleName(),
+                                  jobsNumber,
                                   timeLimit,
                                   anActualTime,
-                                  ((anActualTime < timeLimit) ? SUCCESS : FAILURE)));
+                                  ((anActualTime < timeLimit * jobsNumber) ? SUCCESS : FAILURE)));
     }
 
 }

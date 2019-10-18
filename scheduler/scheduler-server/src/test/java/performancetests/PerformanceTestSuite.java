@@ -28,11 +28,7 @@ package performancetests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import performancetests.metrics.GetResultMetricTest;
-import performancetests.metrics.ParallelTaskSchedulingTest;
-import performancetests.metrics.SchedulerEfficiencyMetricsTest;
-import performancetests.metrics.TaskCreationTimeTest;
-import performancetests.metrics.TaskSchedulingTimeTest;
+import performancetests.metrics.*;
 import performancetests.recovery.JobRecoveryTest;
 import performancetests.recovery.NodeRecoveryTest;
 
@@ -44,7 +40,7 @@ import performancetests.recovery.NodeRecoveryTest;
 
                       // Metrics
                       TaskCreationTimeTest.class, GetResultMetricTest.class, SchedulerEfficiencyMetricsTest.class,
-                      ParallelTaskSchedulingTest.class,
+                      ParallelTaskSchedulingTest.class, JobSubmissionTest.class,
 
                       // Test which computes average metrics
                       TaskSchedulingTimeTest.class
