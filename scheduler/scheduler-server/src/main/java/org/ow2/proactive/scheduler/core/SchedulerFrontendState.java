@@ -29,7 +29,10 @@ import static org.ow2.proactive.scheduler.core.properties.PASchedulerProperties.
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
@@ -75,6 +78,7 @@ import org.ow2.proactive.scheduler.permissions.HandleJobsWithGenericInformationP
 import org.ow2.proactive.scheduler.permissions.HandleOnlyMyJobsPermission;
 import org.ow2.proactive.scheduler.util.JobLogger;
 import org.ow2.proactive.scheduler.util.TaskLogger;
+import org.ow2.proactive.utils.Lambda;
 
 
 class SchedulerFrontendState implements SchedulerStateUpdate {
@@ -176,6 +180,22 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /** Stores methods that will be called on clients */
     private static final Map<String, Method> eventMethods;
 
+    /** lock protecting user session changes, when inside a users write lock, state write lock can be acquired,
+     * but when inside a state read or write lock, a users write lock should never be acquired in order to prevent deadlocks.
+     * Similarly when using a users read lock, state write lock should never be acquired */
+    private ReentrantReadWriteLock usersLock = new ReentrantReadWriteLock();
+
+    private ReentrantReadWriteLock.ReadLock usersReadLock = usersLock.readLock();
+
+    private ReentrantReadWriteLock.WriteLock usersWriteLock = usersLock.writeLock();
+
+    /** lock protecting scheduler state changes, see above for lock hierarchy */
+    private ReentrantReadWriteLock stateLock = new ReentrantReadWriteLock();
+
+    private ReentrantReadWriteLock.ReadLock stateReadLock = stateLock.readLock();
+
+    private ReentrantReadWriteLock.WriteLock stateWriteLock = stateLock.writeLock();
+
     static {
         eventMethods = new HashMap<>();
         for (Method m : SchedulerEventListener.class.getMethods()) {
@@ -194,20 +214,20 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     /** List used to mark the user that does not respond anymore */
     private final Set<UniqueID> dirtyList;
 
-    /** Job identification management */
-    private final Map<JobId, IdentifiedJob> jobs;
-
     /** Session timer */
     private final Timer sessionTimer;
 
     /** JMX Helper reference */
     private final SchedulerJMXHelper jmxHelper;
 
+    /** Job identification management */
+    private final Map<JobId, IdentifiedJob> jobs;
+
     /**
      * Scheduler state maintains by this class : avoid charging the core from
      * some request
      */
-    private final SchedulerStateImpl<ClientJobState> sState;
+    private final SchedulerStateImpl<ClientJobState> schedulerState;
 
     private final Map<JobId, ClientJobState> jobsMap;
 
@@ -215,8 +235,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     private SchedulerDBManager dbManager = null;
 
-    SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper) {
-        this.identifications = new HashMap<>();
+    SchedulerFrontendState(SchedulerStateImpl schedulerState, SchedulerJMXHelper jmxHelper) {
+        this.identifications = new ConcurrentHashMap<>();
         this.credentials = new HashMap<>();
         this.dirtyList = new HashSet<>();
         this.jmxHelper = jmxHelper;
@@ -229,12 +249,13 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         };
         this.jobs = new HashMap<>();
         this.sessionTimer = new Timer("SessionTimer");
-        this.sState = sState;
-        recover(sState);
+        this.schedulerState = schedulerState;
+        recover(schedulerState);
     }
 
-    SchedulerFrontendState(SchedulerStateImpl sState, SchedulerJMXHelper jmxHelper, SchedulerDBManager dbManager) {
-        this(sState, jmxHelper);
+    SchedulerFrontendState(SchedulerStateImpl schedulerState, SchedulerJMXHelper jmxHelper,
+            SchedulerDBManager dbManager) {
+        this(schedulerState, jmxHelper);
         this.dbManager = dbManager;
     }
 
@@ -295,18 +316,21 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @throws SchedulerException
      *             If an error occurred during connection with the front-end.
      */
-    synchronized void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
+    void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
-        if (identifications.containsKey(sourceBodyID)) {
-            logger.warn("Active object already connected for this user :" + identification.getUsername());
-            throw new AlreadyConnectedException("This active object is already connected to the scheduler !");
-        }
-        logger.info(identification.getUsername() + " successfully connected !");
-        identifications.put(sourceBodyID, new ListeningUser(identification));
-        credentials.put(sourceBodyID, cred);
-        renewUserSession(sourceBodyID, identification);
-        // add this new user in the list of connected user
-        sState.getUsers().update(identification);
+        Lambda.withLockInterruptible(usersWriteLock, () -> {
+            if (identifications.containsKey(sourceBodyID)) {
+                logger.warn("Active object already connected for this user :" + identification.getUsername());
+                throw new AlreadyConnectedException("This active object is already connected to the scheduler !");
+            }
+            logger.info(identification.getUsername() + " successfully connected !");
+            identifications.put(sourceBodyID, new ListeningUser(identification));
+            credentials.put(sourceBodyID, cred);
+            renewUserSession(sourceBodyID, identification);
+            // add this new user in the list of connected user
+            return true;
+        }, new RuntimeException("Session was interrupted"));
+        Lambda.withLock(stateWriteLock, () -> schedulerState.getUsers().update(identification));
         // send events
         usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, identification));
     }
@@ -342,27 +366,28 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         sessionTimer.schedule(identification.getSession(), USER_SESSION_DURATION);
     }
 
-    synchronized SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
+    SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         // checking permissions
         checkPermission("getStatus", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATUS);
-        return sState.getStatus();
+        return Lambda.withLock(stateReadLock, () -> schedulerState.getStatus());
     }
 
-    synchronized SchedulerState getState() throws NotConnectedException, PermissionException {
+    SchedulerState getState() throws NotConnectedException, PermissionException {
         return getState(false);
     }
 
-    synchronized SchedulerState getStateInternally() {
-        return sState;
+    SchedulerState getStateInternally() {
+        return schedulerState;
     }
 
-    synchronized SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
+    SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         // checking permissions
-        checkPermission("getState", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE);
+        ListeningUser ui = checkPermissionReturningListeningUser("getState",
+                                                                 YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE);
 
-        ListeningUser ui = identifications.get(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID());
-
-        return myJobsOnly ? sState.filterOnUser(ui.getUser().getUsername()) : sState;
+        return Lambda.withLock(stateReadLock,
+                               () -> myJobsOnly ? schedulerState.filterOnUser(ui.getUser().getUsername())
+                                                : schedulerState);
 
     }
 
@@ -378,7 +403,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @throws PermissionException
      *             if permission is denied
      */
-    synchronized void handleOnlyMyJobsPermission(boolean myOnly, UserIdentificationImpl ui, String errorMessage)
+    void handleOnlyMyJobsPermission(boolean myOnly, UserIdentificationImpl ui, String errorMessage)
             throws PermissionException {
         ui.checkPermission(new HandleOnlyMyJobsPermission(myOnly),
                            ui.getUsername() + " does not have permissions to handle other users jobs (" + errorMessage +
@@ -399,19 +424,19 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @throws PermissionException
      *             if permission is denied
      */
-    synchronized void handleJobsWithGenericInformationPermission(Map<String, String> genericInformation,
-            UserIdentificationImpl ui, String errorMessage) throws PermissionException {
+    void handleJobsWithGenericInformationPermission(Map<String, String> genericInformation, UserIdentificationImpl ui,
+            String errorMessage) throws PermissionException {
         ui.checkPermission(new HandleJobsWithGenericInformationPermission(genericInformation),
                            ui.getUsername() + " does not have permissions to handle this job (" + errorMessage + ")");
     }
 
-    synchronized void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
+    void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException {
         addEventListener(sel, myEventsOnly, false, events);
     }
 
-    synchronized SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly,
-            boolean getCurrentState, SchedulerEvent... events) throws NotConnectedException, PermissionException {
+    SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
+            SchedulerEvent... events) throws NotConnectedException, PermissionException {
         // checking permissions
         ListeningUser uIdent = checkPermissionReturningListeningUser("addEventListener",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
@@ -438,28 +463,25 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             // check get state permission
             handleOnlyMyJobsPermission(myEventsOnly, uIdent.getUser(), YOU_DO_NOT_HAVE_PERMISSION_TO_ADD_A_LISTENER);
         }
-        // prepare user for receiving events
-        uIdent.getUser().setUserEvents(events);
-        // set if the user wants to get its events only or every events
-        uIdent.getUser().setMyEventsOnly(myEventsOnly);
-        // add the listener to the list of listener for this user.
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        uIdent.setListener(new ClientRequestHandler(this, id, sel));
-        // cancel timer for this user : session is now managed by events
-        uIdent.getUser().getSession().cancel();
+        Lambda.withLock(usersWriteLock, () -> {
+            // prepare user for receiving events
+            uIdent.getUser().setUserEvents(events);
+            // set if the user wants to get its events only or every events
+            uIdent.getUser().setMyEventsOnly(myEventsOnly);
+            // add the listener to the list of listener for this user.
+            UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
+            uIdent.setListener(new ClientRequestHandler(this, id, sel));
+            // cancel timer for this user : session is now managed by events
+            uIdent.getUser().getSession().cancel();
+        });
         // return to the user
         return currentState;
     }
 
-    synchronized void removeEventListener() throws NotConnectedException, PermissionException {
+    void removeEventListener() throws NotConnectedException, PermissionException {
         // Remove the listener on that user designated by its given UniqueID,
         // then renew its user session as it is no more managed by the listener.
-        UniqueID id = checkAccess();
-        ListeningUser uIdent = identifications.get(id);
-        uIdent.clearListener();
-        // recreate the session for this user which is no more managed by
-        // listener
-        renewUserSession(id, uIdent.getUser());
+        renewSession(true);
     }
 
     private UniqueID checkAccess() throws NotConnectedException {
@@ -471,12 +493,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return id;
     }
 
-    synchronized InternalJob createJob(Job userJob, UserIdentificationImpl ident)
+    InternalJob createJob(Job userJob, UserIdentificationImpl ident)
             throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
         UniqueID id = checkAccess();
 
+        Credentials userCreds = Lambda.withLock(usersReadLock, () -> this.credentials.get(id));
+
         // get the internal job.
-        InternalJob job = InternalJobFactory.createJob(userJob, this.credentials.get(id));
+        InternalJob job = InternalJobFactory.createJob(userJob, userCreds);
 
         // setting job informations
         if (job.getTasks().size() == 0) {
@@ -502,14 +526,15 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return job;
     }
 
-    synchronized void jobSubmitted(InternalJob job, UserIdentificationImpl ident)
-            throws NotConnectedException, PermissionException, SubmissionClosedException, JobCreationException {
+    void jobSubmitted(InternalJob job, UserIdentificationImpl ident) {
         // put the job inside the frontend management list
-        jobs.put(job.getId(), new IdentifiedJob(job.getId(), ident, job.getGenericInformation()));
+        Lambda.withLock(stateWriteLock,
+                        () -> jobs.put(job.getId(),
+                                       new IdentifiedJob(job.getId(), ident, job.getGenericInformation())));
         // increase number of submit for this user
-        ident.addSubmit();
+        Lambda.withLock(usersWriteLock, () -> ident.addSubmit());
         // send update user event
-        usersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident));
+        usersUpdated(new NotificationData<>(SchedulerEvent.USERS_UPDATE, ident));
         jlogger.info(job.getId(),
                      "submitted: name '" + job.getName() + "', tasks '" + job.getTotalNumberOfTasks() + "', owner '" +
 
@@ -562,32 +587,30 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    synchronized ListeningUser checkPermissionReturningListeningUser(String methodName, String permissionMsg)
+    ListeningUser checkPermissionReturningListeningUser(String methodName, String permissionMsg)
             throws NotConnectedException, PermissionException {
-        UniqueID id = checkAccess();
 
-        ListeningUser ident = identifications.get(id);
-        // renew session for this user
-        renewUserSession(id, ident.getUser());
+        Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
 
         final String fullMethodName = SchedulerFrontend.class.getName() + "." + methodName;
         final MethodCallPermission methodCallPermission = new MethodCallPermission(fullMethodName);
 
         try {
-            ident.getUser().checkPermission(methodCallPermission, permissionMsg);
+            userSessionInfo.getRight().checkPermission(methodCallPermission, permissionMsg);
         } catch (PermissionException ex) {
             logger.debug(permissionMsg);
             throw ex;
         }
-        return ident;
+        return userSessionInfo.getLeft();
+
     }
 
-    synchronized UserIdentificationImpl checkPermission(String methodName, String permissionMsg)
+    UserIdentificationImpl checkPermission(String methodName, String permissionMsg)
             throws NotConnectedException, PermissionException {
         return checkPermissionReturningListeningUser(methodName, permissionMsg).getUser();
     }
 
-    synchronized void disconnect() throws NotConnectedException, PermissionException {
+    void disconnect() throws NotConnectedException {
         UniqueID id = checkAccess();
         disconnect(id);
     }
@@ -598,27 +621,32 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
      * @param id
      *            the uniqueID of the user
      */
-    private synchronized void disconnect(UniqueID id) {
-        credentials.remove(id);
-        ListeningUser ident = identifications.remove(id);
-        if (ident != null) {
-            // remove listeners if needed
-            ident.clearListener();
-            // remove this user to the list of connected user if it has not
-            // already been removed
-            ident.getUser().setToRemove();
-            sState.getUsers().update(ident.getUser());
-            // cancel the timer
-            ident.getUser().getSession().cancel();
-            // log and send events
-            String user = ident.getUser().getUsername();
-            logger.info("User '" + user + "' has disconnect the scheduler !");
-            dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE, ident.getUser()),
-                                 false);
-        }
+    private void disconnect(UniqueID id) {
+        Lambda.withLockInterruptible(usersWriteLock, () -> {
+            credentials.remove(id);
+            ListeningUser ident = identifications.remove(id);
+            if (ident != null) {
+                // remove listeners if needed
+                ident.clearListener();
+                // remove this user to the list of connected user if it has not
+                // already been removed
+                ident.getUser().setToRemove();
+                Lambda.withLock(stateWriteLock, () -> schedulerState.getUsers().update(ident.getUser()));
+                // cancel the timer
+                ident.getUser().getSession().cancel();
+                // log and send events
+                String user = ident.getUser().getUsername();
+                logger.info("User '" + user + "' has disconnected from the scheduler.");
+                dispatchUsersUpdated(new NotificationData<UserIdentification>(SchedulerEvent.USERS_UPDATE,
+                                                                              ident.getUser()),
+                                     false);
+            }
+            return true;
+        }, new RuntimeException("session interrupted"));
+
     }
 
-    synchronized boolean isConnected() {
+    boolean isConnected() {
         try {
             checkAccess();
             return true;
@@ -627,34 +655,42 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    synchronized void renewSession() throws NotConnectedException {
+    Pair<ListeningUser, UserIdentificationImpl> renewSession(boolean clearListener) throws NotConnectedException {
         UniqueID id = checkAccess();
-        UserIdentificationImpl ident = identifications.get(id).getUser();
-        // renew session for this user
-        renewUserSession(id, ident);
-    }
-
-    synchronized IdentifiedJob getIdentifiedJob(JobId jobId) throws UnknownJobException {
-        IdentifiedJob identifiedJob = jobs.get(jobId);
-
-        if (identifiedJob == null) {
-
-            ClientJobState clientJobState = getClientJobState(jobId);
-            if (clientJobState != null) {
-                identifiedJob = toIdentifiedJob(clientJobState);
-                identifiedJob.setFinished(true); // because wherenever there is job in jobsMap, but not in jobs, it is always finished
-            } else {
-                String msg = "The job represented by this ID '" + jobId + "' is unknown !";
-                logger.info(msg);
-                throw new UnknownJobException(msg);
+        return Lambda.withLockInterruptible(usersWriteLock, () -> {
+            ListeningUser user = identifications.get(id);
+            UserIdentificationImpl ident = identifications.get(id).getUser();
+            if (clearListener) {
+                user.clearListener();
             }
-        }
-
-        return identifiedJob;
-
+            // renew session for this user
+            renewUserSession(id, ident);
+            return Pair.of(user, ident);
+        }, new NotConnectedException("Session was interrupted"));
     }
 
-    synchronized void checkChangeJobPriority(JobId jobId, JobPriority priority)
+    IdentifiedJob getIdentifiedJob(JobId jobId) throws UnknownJobException {
+        return Lambda.withLockException1(stateReadLock, () -> {
+            IdentifiedJob identifiedJob = jobs.get(jobId);
+
+            if (identifiedJob == null) {
+
+                ClientJobState clientJobState = getClientJobState(jobId);
+                if (clientJobState != null) {
+                    identifiedJob = toIdentifiedJob(clientJobState);
+                    identifiedJob.setFinished(true); // because wherenever there is job in jobsMap, but not in jobs, it is always finished
+                } else {
+                    String msg = "The job represented by this ID '" + jobId + "' is unknown !";
+                    logger.info(msg);
+                    throw new UnknownJobException(msg);
+                }
+            }
+
+            return identifiedJob;
+        }, UnknownJobException.class);
+    }
+
+    void checkChangeJobPriority(JobId jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
 
         checkPermissions("changeJobPriority",
@@ -674,14 +710,14 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             throw ex;
         }
 
-        if (jobs.get(jobId).isFinished()) {
+        if (Lambda.withLock(stateReadLock, () -> jobs.get(jobId).isFinished())) {
             String msg = " is already finished";
             jlogger.info(jobId, msg);
             throw new JobAlreadyFinishedException("Job " + jobId + msg);
         }
     }
 
-    synchronized void checkPermissions(String methodName, IdentifiedJob identifiedJob, String errorMessage)
+    void checkPermissions(String methodName, IdentifiedJob identifiedJob, String errorMessage)
             throws NotConnectedException, UnknownJobException, PermissionException {
         try {
             checkJobOwner(methodName, identifiedJob, errorMessage);
@@ -699,7 +735,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    synchronized void checkJobOwner(String methodName, IdentifiedJob IdentifiedJob, String permissionMsg)
+    void checkJobOwner(String methodName, IdentifiedJob IdentifiedJob, String permissionMsg)
             throws NotConnectedException, UnknownJobException, PermissionException {
         ListeningUser ident = checkPermissionReturningListeningUser(methodName, permissionMsg);
 
@@ -708,87 +744,94 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         }
     }
 
-    synchronized Set<TaskId> getJobTasks(JobId jobId) {
-        JobState jobState = getClientJobState(jobId);
-        synchronized (jobState) {
-            if (jobState == null) {
-                return Collections.emptySet();
-            } else {
-                Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
-                for (TaskState task : jobState.getTasks()) {
-                    tasks.add(task.getId());
+    Set<TaskId> getJobTasks(JobId jobId) {
+        return Lambda.withLock(stateReadLock, () -> {
+            JobState jobState = getClientJobState(jobId);
+            synchronized (jobState) {
+                if (jobState == null) {
+                    return Collections.emptySet();
+                } else {
+                    Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
+                    for (TaskState task : jobState.getTasks()) {
+                        tasks.add(task.getId());
+                    }
+                    return tasks;
                 }
-                return tasks;
             }
-        }
+        });
     }
 
-    synchronized JobState getJobState(JobId jobId)
-            throws NotConnectedException, UnknownJobException, PermissionException {
+    JobState getJobState(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_JOB);
-        ClientJobState jobState = getClientJobState(jobId);
-        ClientJobState jobStateCopy;
-        synchronized (jobState) {
-            try {
-                jobStateCopy = (ClientJobState) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(jobState);
-            } catch (Exception e) {
-                logger.error("Error when copying job state", e);
-                throw new IllegalStateException(e);
+        return Lambda.withLock(stateReadLock, () -> {
+            ClientJobState jobState = getClientJobState(jobId);
+            ClientJobState jobStateCopy;
+            synchronized (jobState) {
+                try {
+                    jobStateCopy = (ClientJobState) ProActiveMakeDeepCopy.WithProActiveObjectStream.makeDeepCopy(jobState);
+                } catch (Exception e) {
+                    logger.error("Error when copying job state", e);
+                    throw new IllegalStateException(e);
+                }
             }
-        }
-        return jobStateCopy;
+            return jobStateCopy;
+        });
     }
 
-    synchronized TaskState getTaskState(JobId jobId, TaskId taskId)
+    TaskState getTaskState(JobId jobId, TaskId taskId)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
-        if (getClientJobState(jobId) == null) {
-            throw new UnknownJobException(jobId);
-        }
-        JobState jobState = getClientJobState(jobId);
-        synchronized (jobState) {
-            TaskState ts = jobState.getHMTasks().get(taskId);
-            if (ts == null) {
-                throw new UnknownTaskException(taskId, jobId);
+        return Lambda.withLockException2(stateReadLock, () -> {
+            JobState jobState = getClientJobState(jobId);
+            if (jobState == null) {
+                throw new UnknownJobException(jobId);
             }
-            return ts;
-        }
+            synchronized (jobState) {
+                TaskState ts = jobState.getHMTasks().get(taskId);
+                if (ts == null) {
+                    throw new UnknownTaskException(taskId, jobId);
+                }
+                return ts;
+            }
+        }, UnknownJobException.class, UnknownTaskException.class);
     }
 
-    synchronized TaskState getTaskState(JobId jobId, String taskName)
+    TaskState getTaskState(JobId jobId, String taskName)
             throws NotConnectedException, UnknownJobException, UnknownTaskException, PermissionException {
 
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),
                          YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_STATE_OF_THIS_TASK);
 
-        if (getClientJobState(jobId) == null) {
-            throw new UnknownJobException(jobId);
-        }
-        TaskId taskId = null;
-        for (TaskId t : getJobTasks(jobId)) {
-            if (t.getReadableName().equals(taskName)) {
-                taskId = t;
+        return Lambda.withLockException2(stateReadLock, () -> {
+            JobState jobState = getClientJobState(jobId);
+            if (jobState == null) {
+                throw new UnknownJobException(jobId);
             }
-        }
-        if (taskId == null) {
-            throw new UnknownTaskException(taskName, jobId);
-        }
-        JobState jobState = getClientJobState(jobId);
-        synchronized (jobState) {
-            TaskState ts = jobState.getHMTasks().get(taskId);
-            if (ts == null) {
-                throw new UnknownTaskException(taskId, jobId);
+            TaskId taskId = null;
+            for (TaskId t : getJobTasks(jobId)) {
+                if (t.getReadableName().equals(taskName)) {
+                    taskId = t;
+                }
             }
-            return ts;
-        }
+            if (taskId == null) {
+                throw new UnknownTaskException(taskName, jobId);
+            }
+            synchronized (jobState) {
+                TaskState ts = jobState.getHMTasks().get(taskId);
+                if (ts == null) {
+                    throw new UnknownTaskException(taskId, jobId);
+                }
+                return ts;
+            }
+        }, UnknownJobException.class, UnknownTaskException.class);
     }
 
-    synchronized TaskId getTaskId(JobId jobId, String taskName) throws UnknownTaskException, UnknownJobException {
+    TaskId getTaskId(JobId jobId, String taskName) throws UnknownTaskException, UnknownJobException {
         if (getClientJobState(jobId) == null) {
             throw new UnknownJobException(jobId);
         }
@@ -804,32 +847,28 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return taskId;
     }
 
-    synchronized void checkChangePolicy() throws NotConnectedException, PermissionException {
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id).getUser();
-        // renew session for this user
-        renewUserSession(id, ident);
+    void checkChangePolicy() throws NotConnectedException, PermissionException {
+        Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
 
         try {
-            ident.checkPermission(new ChangePolicyPermission(),
-                                  ident.getUsername() + " does not have permissions to change the policy of the scheduler");
+            userSessionInfo.getRight()
+                           .checkPermission(new ChangePolicyPermission(),
+                                            userSessionInfo.getRight().getUsername() +
+                                                                          " does not have permissions to change the policy of the scheduler");
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
         }
     }
 
-    synchronized void checkLinkResourceManager() throws NotConnectedException, PermissionException {
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id).getUser();
-        // renew session for this user
-        renewUserSession(id, ident);
+    void checkLinkResourceManager() throws NotConnectedException, PermissionException {
+        Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
 
         try {
-            ident.checkPermission(new ConnectToResourceManagerPermission(),
-                                  ident.getUsername() + " does not have permissions to change RM in the scheduler");
+            userSessionInfo.getRight()
+                           .checkPermission(new ConnectToResourceManagerPermission(),
+                                            userSessionInfo.getRight()
+                                                           .getUsername() + " does not have permissions to change RM in the scheduler");
         } catch (PermissionException ex) {
             logger.info(ex.getMessage());
             throw ex;
@@ -1107,118 +1146,123 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     @Override
-    public synchronized void schedulerStateUpdated(SchedulerEvent eventType) {
-        switch (eventType) {
-            case STARTED:
-                sState.setState(SchedulerStatus.STARTED);
-                break;
-            case STOPPED:
-                sState.setState(SchedulerStatus.STOPPED);
-                break;
-            case PAUSED:
-                sState.setState(SchedulerStatus.PAUSED);
-                break;
-            case FROZEN:
-                sState.setState(SchedulerStatus.FROZEN);
-                break;
-            case RESUMED:
-                sState.setState(SchedulerStatus.STARTED);
-                break;
-            case SHUTTING_DOWN:
-                sState.setState(SchedulerStatus.SHUTTING_DOWN);
-                break;
-            case SHUTDOWN:
-                sState.setState(SchedulerStatus.STOPPED);
-                break;
-            case KILLED:
-                sState.setState(SchedulerStatus.KILLED);
-                break;
-            case DB_DOWN:
-                sState.setState(SchedulerStatus.DB_DOWN);
-                break;
-            case RM_DOWN:
-            case RM_UP:
-            case POLICY_CHANGED:
-                break;
-            default:
-                logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " + eventType);
-                return;
-        }
+    public void schedulerStateUpdated(SchedulerEvent eventType) {
+        Lambda.withLock(stateWriteLock, () -> {
+            switch (eventType) {
+                case STARTED:
+                    schedulerState.setState(SchedulerStatus.STARTED);
+                    break;
+                case STOPPED:
+                    schedulerState.setState(SchedulerStatus.STOPPED);
+                    break;
+                case PAUSED:
+                    schedulerState.setState(SchedulerStatus.PAUSED);
+                    break;
+                case FROZEN:
+                    schedulerState.setState(SchedulerStatus.FROZEN);
+                    break;
+                case RESUMED:
+                    schedulerState.setState(SchedulerStatus.STARTED);
+                    break;
+                case SHUTTING_DOWN:
+                    schedulerState.setState(SchedulerStatus.SHUTTING_DOWN);
+                    break;
+                case SHUTDOWN:
+                    schedulerState.setState(SchedulerStatus.STOPPED);
+                    break;
+                case KILLED:
+                    schedulerState.setState(SchedulerStatus.KILLED);
+                    break;
+                case DB_DOWN:
+                    schedulerState.setState(SchedulerStatus.DB_DOWN);
+                    break;
+                case RM_DOWN:
+                case RM_UP:
+                case POLICY_CHANGED:
+                    break;
+                default:
+                    logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " + eventType);
+                    return;
+            }
+        });
         // send the event for all case, except default
-        dispatchSchedulerStateUpdated(eventType);
+        Lambda.withLock(usersWriteLock, () -> dispatchSchedulerStateUpdated(eventType));
         this.jmxHelper.getSchedulerRuntimeMBean().schedulerStateUpdatedEvent(eventType);
     }
 
     @Override
-    public synchronized void jobSubmitted(JobState job) {
-        ClientJobState storedJobState = new ClientJobState(job);
-        jobsMap.put(job.getId(), storedJobState);
-        sState.update(storedJobState);
-        dispatchJobSubmitted(job);
+    public void jobSubmitted(JobState job) {
+        Lambda.withLock(stateWriteLock, () -> {
+            ClientJobState storedJobState = new ClientJobState(job);
+            jobsMap.put(job.getId(), storedJobState);
+            schedulerState.update(storedJobState);
+        });
+        Lambda.withLock(usersWriteLock, () -> dispatchJobSubmitted(job));
     }
 
     @Override
-    public synchronized void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
-        if (notification.getEventType().equals(SchedulerEvent.JOB_REMOVE_FINISHED)) {
-            // removing jobs from the global list : this job is no more managed
-            sState.removeFinished(notification.getData().getJobId());
-            jobsMap.remove(notification.getData().getJobId());
-            finishedJobsLRUCache.remove(notification.getData().getJobId());
-            jobs.remove(notification.getData().getJobId());
-            logger.debug("HOUSEKEEPING removed the finished job " + notification.getData().getJobId() +
-                         " from the SchedulerFrontEndState");
-            dispatchJobStateUpdated(owner, notification);
-            return;
-        }
-        ClientJobState js = getClientJobState(notification.getData().getJobId());
-
-        boolean withAttachment = false;
-        if (js != null) {
-            synchronized (js) {
-                js.update(notification.getData());
-                switch (notification.getEventType()) {
-                    case JOB_PENDING_TO_RUNNING:
-                        sState.pendingToRunning(js);
-                        break;
-                    case JOB_PAUSED:
-                    case JOB_IN_ERROR:
-                    case JOB_RESUMED:
-                    case JOB_RESTARTED_FROM_ERROR:
-                    case JOB_CHANGE_PRIORITY:
-                    case TASK_REPLICATED:
-                    case TASK_SKIPPED:
-                        break;
-                    case JOB_PENDING_TO_FINISHED:
-                        sState.pendingToFinished(js);
-                        // set this job finished, user can get its result
-                        jobs.remove(notification.getData().getJobId()).setFinished(true);
-                        withAttachment = true;
-                        break;
-                    case JOB_RUNNING_TO_FINISHED:
-                        sState.runningToFinished(js);
-                        // set this job finished, user can get its result
-                        jobs.remove(notification.getData().getJobId()).setFinished(true);
-                        withAttachment = true;
-                        break;
-                    default:
-                        logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
-                                    notification.getEventType());
-                        return;
-                }
-                dispatchJobStateUpdated(owner, notification);
-                new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
+    public void jobStateUpdated(String owner, NotificationData<JobInfo> notification) {
+        Lambda.withLock(stateWriteLock, () -> {
+            if (notification.getEventType().equals(SchedulerEvent.JOB_REMOVE_FINISHED)) {
+                // removing jobs from the global list : this job is no more managed
+                schedulerState.removeFinished(notification.getData().getJobId());
+                jobsMap.remove(notification.getData().getJobId());
+                finishedJobsLRUCache.remove(notification.getData().getJobId());
+                jobs.remove(notification.getData().getJobId());
+                logger.debug("HOUSEKEEPING removed the finished job " + notification.getData().getJobId() +
+                             " from the SchedulerFrontEndState");
+                return;
             }
-        }
+            ClientJobState js = getClientJobState(notification.getData().getJobId());
+
+            boolean withAttachment = false;
+            if (js != null) {
+                synchronized (js) {
+                    js.update(notification.getData());
+                    switch (notification.getEventType()) {
+                        case JOB_PENDING_TO_RUNNING:
+                            schedulerState.pendingToRunning(js);
+                            break;
+                        case JOB_PAUSED:
+                        case JOB_IN_ERROR:
+                        case JOB_RESUMED:
+                        case JOB_RESTARTED_FROM_ERROR:
+                        case JOB_CHANGE_PRIORITY:
+                        case TASK_REPLICATED:
+                        case TASK_SKIPPED:
+                            break;
+                        case JOB_PENDING_TO_FINISHED:
+                            schedulerState.pendingToFinished(js);
+                            // set this job finished, user can get its result
+                            jobs.remove(notification.getData().getJobId()).setFinished(true);
+                            withAttachment = true;
+                            break;
+                        case JOB_RUNNING_TO_FINISHED:
+                            schedulerState.runningToFinished(js);
+                            // set this job finished, user can get its result
+                            jobs.remove(notification.getData().getJobId()).setFinished(true);
+                            withAttachment = true;
+                            break;
+                        default:
+                            logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
+                                        notification.getEventType());
+                            return;
+                    }
+                    new JobEmailNotification(js, notification, dbManager).checkAndSendAsync(withAttachment);
+                }
+            }
+        });
+        Lambda.withLock(usersWriteLock, () -> dispatchJobStateUpdated(owner, notification));
     }
 
     @Override
-    public synchronized void jobUpdatedFullData(JobState jobstate) {
+    public void jobUpdatedFullData(JobState jobstate) {
         ClientJobState storedJobState = new ClientJobState(jobstate);
-        dispatchJobUpdatedFullData(storedJobState);
+        Lambda.withLock(usersWriteLock, () -> dispatchJobUpdatedFullData(storedJobState));
     }
 
     @Override
-    public synchronized void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
+    public void taskStateUpdated(String owner, NotificationData<TaskInfo> notification) {
         JobState jobState = getClientJobState(notification.getData().getJobId());
         synchronized (jobState) {
             jobState.update(notification.getData());
@@ -1230,7 +1274,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                 case TASK_SKIPPED:
                 case TASK_REPLICATED:
                 case TASK_IN_ERROR_TO_FINISHED:
-                    dispatchTaskStateUpdated(owner, notification);
+                    Lambda.withLock(usersWriteLock, () -> dispatchTaskStateUpdated(owner, notification));
                     break;
                 case TASK_PROGRESS:
                     // this event can be sent while task is already finished,
@@ -1238,7 +1282,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
                     // already finished.
                     // so if task is not finished, send event
                     if (notification.getData().getFinishedTime() <= 0) {
-                        dispatchTaskStateUpdated(owner, notification);
+                        Lambda.withLock(usersWriteLock, () -> dispatchTaskStateUpdated(owner, notification));
                     }
                     break;
                 default:
@@ -1249,10 +1293,10 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     @Override
-    public synchronized void usersUpdated(NotificationData<UserIdentification> notification) {
+    public void usersUpdated(NotificationData<UserIdentification> notification) {
         switch (notification.getEventType()) {
             case USERS_UPDATE:
-                dispatchUsersUpdated(notification, true);
+                Lambda.withLock(usersWriteLock, () -> dispatchUsersUpdated(notification, true));
                 break;
             default:
                 logger.warn("**WARNING** - Unconsistent update type received from Scheduler Core : " +
@@ -1261,61 +1305,54 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     public String getCurrentUser() throws NotConnectedException {
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id).getUser();
-        // renew session for this user
-        renewUserSession(id, ident);
-        return ident.getUsername();
+        Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
+        return userSessionInfo.getRight().getUsername();
     }
 
     public UserData getCurrentUserData() throws NotConnectedException {
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id).getUser();
-        // renew session for this user
-        renewUserSession(id, ident);
+        Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
         UserData userData = new UserData();
-        userData.setUserName(ident.getUsername());
-        userData.setGroups(ident.getGroups());
+        userData.setUserName(userSessionInfo.getRight().getUsername());
+        userData.setGroups(userSessionInfo.getRight().getGroups());
         return userData;
     }
 
-    synchronized List<SchedulerUserInfo> getUsers() {
-        List<SchedulerUserInfo> users = new ArrayList<>(identifications.size());
-        for (ListeningUser listeningUser : identifications.values()) {
-            UserIdentificationImpl user = listeningUser.getUser();
-            users.add(new SchedulerUserInfo(user.getHostName(),
-                                            user.getUsername(),
-                                            user.getConnectionTime(),
-                                            user.getLastSubmitTime(),
-                                            user.getSubmitNumber()));
-        }
-        return users;
+    List<SchedulerUserInfo> getUsers() {
+        return Lambda.withLock(usersReadLock, () -> {
+            List<SchedulerUserInfo> users = new ArrayList<>(identifications.size());
+            for (ListeningUser listeningUser : identifications.values()) {
+                UserIdentificationImpl user = listeningUser.getUser();
+                users.add(new SchedulerUserInfo(user.getHostName(),
+                                                user.getUsername(),
+                                                user.getConnectionTime(),
+                                                user.getLastSubmitTime(),
+                                                user.getSubmitNumber()));
+            }
+            return users;
+        });
     }
 
     public Map<String, Object> getSchedulerProperties() throws NotConnectedException {
-        UniqueID id = checkAccess();
-
-        UserIdentificationImpl ident = identifications.get(id).getUser();
-        renewUserSession(id, ident);
+        renewSession(false);
         return PASchedulerProperties.getPropertiesAsHashMap();
     }
 
-    synchronized ClientJobState getClientJobState(JobId jobId) {
-        if (!jobsMap.containsKey(jobId)) {
-            if (!finishedJobsLRUCache.containsKey(jobId)) {
-                List<InternalJob> internalJobs = dbManager.loadInternalJob(jobId.longValue());
-                if (!internalJobs.isEmpty()) {
-                    InternalJob internalJob = internalJobs.get(0);
-                    ClientJobState clientJobState = new ClientJobState(internalJob);
-                    finishedJobsLRUCache.put(jobId, clientJobState);
+    ClientJobState getClientJobState(JobId jobId) {
+        return Lambda.withLock(stateReadLock, () -> {
+            if (!jobsMap.containsKey(jobId)) {
+                if (!finishedJobsLRUCache.containsKey(jobId)) {
+                    List<InternalJob> internalJobs = dbManager.loadInternalJob(jobId.longValue());
+                    if (!internalJobs.isEmpty()) {
+                        InternalJob internalJob = internalJobs.get(0);
+                        ClientJobState clientJobState = new ClientJobState(internalJob);
+                        finishedJobsLRUCache.put(jobId, clientJobState);
+                    }
                 }
+                return finishedJobsLRUCache.get(jobId);
+            } else {
+                return jobsMap.get(jobId);
             }
-            return finishedJobsLRUCache.get(jobId);
-        } else {
-            return jobsMap.get(jobId);
-        }
+        });
     }
 
     IdentifiedJob toIdentifiedJob(ClientJobState clientJobState) {
@@ -1323,7 +1360,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         return new IdentifiedJob(clientJobState.getId(), uIdent, clientJobState.getGenericInformation());
     }
 
-    synchronized TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
+    TaskStatesPage getTaskPaginated(JobId jobId, int offset, int limit)
             throws UnknownJobException, NotConnectedException, PermissionException {
         checkPermissions("getJobState",
                          getIdentifiedJob(jobId),

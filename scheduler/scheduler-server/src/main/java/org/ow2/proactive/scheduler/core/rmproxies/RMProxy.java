@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.ow2.proactive.authentication.crypto.Credentials;
 import org.ow2.proactive.resourcemanager.authentication.RMAuthentication;
@@ -90,14 +91,14 @@ public class RMProxy {
         if (proxyActiveObject == null) {
             return new BooleanWrapper(false);
         }
-        return proxyActiveObject.isActive();
+        return PAFuture.getFutureValue(proxyActiveObject.isActive());
     }
 
     public RMState getState() {
         if (proxyActiveObject == null) {
             throw new RuntimeException("Proxy is not initialized");
         }
-        return proxyActiveObject.getState();
+        return PAFuture.getFutureValue(proxyActiveObject.getState());
     }
 
     public void rebind(URI rmURI) throws RMException, RMProxyCreationException {
@@ -118,7 +119,7 @@ public class RMProxy {
     }
 
     public NodeSet getNodes(Criteria criteria) {
-        return proxyActiveObject.getNodes(criteria);
+        return PAFuture.getFutureValue(proxyActiveObject.getNodes(criteria));
     }
 
     public void releaseNodes(NodeSet nodeSet) {

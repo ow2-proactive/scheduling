@@ -67,9 +67,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -158,6 +158,7 @@ import org.ow2.proactive.scheduler.task.internal.InternalTask;
 import org.ow2.proactive.scheduler.util.SchedulerPortalConfiguration;
 import org.ow2.proactive.scheduler.util.ServerJobAndTaskLogs;
 import org.ow2.proactive.utils.NodeSet;
+import org.ow2.proactive.utils.PAExecutors;
 import org.ow2.proactive.utils.Tools;
 
 
@@ -287,14 +288,23 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
             DataSpaceServiceStarter dsServiceStarter = DataSpaceServiceStarter.getDataSpaceServiceStarter();
             dsServiceStarter.startNamingService();
 
-            ExecutorService clientThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_CLIENT_POOL_NBTHREAD.getValueAsInt(),
-                                                                            new NamedThreadFactory("ClientRequestsThreadPool"));
+            ExecutorService clientThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                                      PASchedulerProperties.SCHEDULER_CLIENT_POOL_NBTHREAD.getValueAsInt(),
+                                                                                      120L,
+                                                                                      TimeUnit.SECONDS,
+                                                                                      new NamedThreadFactory("ClientRequestsThreadPool"));
 
-            ExecutorService internalThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
-                                                                              new NamedThreadFactory("InternalOperationsThreadPool"));
+            ExecutorService internalThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                                        PASchedulerProperties.SCHEDULER_INTERNAL_POOL_NBTHREAD.getValueAsInt(),
+                                                                                        120L,
+                                                                                        TimeUnit.SECONDS,
+                                                                                        new NamedThreadFactory("InternalOperationsThreadPool"));
 
-            ExecutorService taskPingerThreadPool = Executors.newFixedThreadPool(PASchedulerProperties.SCHEDULER_TASK_PINGER_POOL_NBTHREAD.getValueAsInt(),
-                                                                                new NamedThreadFactory("TaskPingerThreadPool"));
+            ExecutorService taskPingerThreadPool = PAExecutors.newCachedBoundedThreadPool(1,
+                                                                                          PASchedulerProperties.SCHEDULER_TASK_PINGER_POOL_NBTHREAD.getValueAsInt(),
+                                                                                          120L,
+                                                                                          TimeUnit.SECONDS,
+                                                                                          new NamedThreadFactory("TaskPingerThreadPool"));
 
             ScheduledExecutorService scheduledThreadPool = new ScheduledThreadPoolExecutor(PASchedulerProperties.SCHEDULER_SCHEDULED_POOL_NBTHREAD.getValueAsInt(),
                                                                                            new NamedThreadFactory("SchedulingServiceTimerThread"));
@@ -439,6 +449,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * @throws AlreadyConnectedException
      *             if the user is already connected
      */
+    @ImmediateService
     public void connect(UniqueID sourceBodyID, UserIdentificationImpl identification, Credentials cred)
             throws AlreadyConnectedException {
         this.frontendState.connect(sourceBodyID, identification, cred);
@@ -449,6 +460,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public JobId reSubmit(JobId currentJobId, Map<String, String> jobVariables, Map<String, String> jobGenericInfos)
             throws NotConnectedException, UnknownJobException, PermissionException, JobCreationException,
             SubmissionClosedException {
@@ -506,6 +518,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public List<String> getUserSpaceURIs() throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("getUserSpaceURIs",
                                                                      "You don't have permissions to read the USER Space URIs");
@@ -516,6 +529,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public List<String> getGlobalSpaceURIs() throws NotConnectedException, PermissionException {
         frontendState.checkPermission("getGlobalSpaceURIs", "You don't have permissions to read the GLOBAL Space URI");
         return this.spacesSupport.getGlobalSpaceURIs();
@@ -834,6 +848,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean removeJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
 
         // checking permissions
@@ -848,6 +863,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     /**
      * {@inheritDoc}
      */
+    @ImmediateService
     public boolean removeJobs(List<JobId> jobIds) throws NotConnectedException, PermissionException {
         if (jobIds.isEmpty()) {
             return false;
@@ -870,6 +886,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public void listenJobLogs(JobId jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         // checking permissions
@@ -888,6 +905,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public void listenJobLogs(String jobId, AppenderProvider appenderProvider)
             throws NotConnectedException, UnknownJobException, PermissionException {
         this.listenJobLogs(JobIdImpl.makeJobId(jobId), appenderProvider);
@@ -897,6 +915,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public SchedulerStatus getStatus() throws NotConnectedException, PermissionException {
         return frontendState.getStatus();
     }
@@ -905,6 +924,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public SchedulerState getState() throws NotConnectedException, PermissionException {
         return getState(false);
     }
@@ -913,6 +933,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public SchedulerState getState(boolean myJobsOnly) throws NotConnectedException, PermissionException {
         return frontendState.getState(myJobsOnly);
     }
@@ -921,6 +942,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public void addEventListener(SchedulerEventListener sel, boolean myEventsOnly, SchedulerEvent... events)
             throws NotConnectedException, PermissionException {
         addEventListener(sel, myEventsOnly, false, events);
@@ -930,6 +952,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public SchedulerState addEventListener(SchedulerEventListener sel, boolean myEventsOnly, boolean getCurrentState,
             SchedulerEvent... events) throws NotConnectedException, PermissionException {
         return frontendState.addEventListener(sel, myEventsOnly, getCurrentState, events);
@@ -939,6 +962,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public void removeEventListener() throws NotConnectedException, PermissionException {
         frontendState.removeEventListener();
     }
@@ -1022,6 +1046,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public void disconnect() throws NotConnectedException, PermissionException {
         frontendState.disconnect();
     }
@@ -1041,6 +1066,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public Map<JobId, JobDescriptor> getJobsToSchedule() throws NotConnectedException, PermissionException {
         Map<JobId, JobDescriptor> jobMap = schedulingService.lockJobsToSchedule();
         schedulingService.unlockJobsToSchedule(jobMap.values());
@@ -1048,6 +1074,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public List<TaskDescriptor> getTasksToSchedule() throws NotConnectedException, PermissionException {
         Policy policy = null;
         List<TaskDescriptor> eligibleTasks = new ArrayList<>();
@@ -1084,7 +1111,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     @Override
     @ImmediateService
     public void renewSession() throws NotConnectedException {
-        frontendState.renewSession();
+        frontendState.renewSession(false);
     }
 
     /**
@@ -1115,6 +1142,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean killJob(JobId jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         frontendState.checkPermissions("killJob",
                                        frontendState.getIdentifiedJob(jobId),
@@ -1126,6 +1154,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public void changeJobPriority(JobId jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         frontendState.checkChangeJobPriority(jobId, priority);
@@ -1146,18 +1175,21 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public TaskStatesPage getTaskPaginated(String jobId, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), offset, limit);
     }
 
     @Override
+    @ImmediateService
     public TaskStatesPage getTaskPaginated(String jobId, String statusFilter, int offset, int limit)
             throws NotConnectedException, UnknownJobException, PermissionException {
         return frontendState.getTaskPaginated(JobIdImpl.makeJobId(jobId), statusFilter, offset, limit);
     }
 
     @Override
+    @ImmediateService
     public List<TaskResult> getPreciousTaskResults(String jobId)
             throws NotConnectedException, PermissionException, UnknownJobException {
         frontendState.checkPermission("getJobResult", YOU_DO_NOT_HAVE_PERMISSION_TO_GET_THE_TASK_RESULT_OF_THIS_JOB);
@@ -1184,11 +1216,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public Map<Long, Map<String, Serializable>> getJobResultMaps(List<String> jobsId) {
         return dbManager.getJobResultMaps(jobsId);
     }
 
     @Override
+    @ImmediateService
     public Map<Long, List<String>> getPreciousTaskNames(List<String> jobsId)
             throws NotConnectedException, PermissionException {
         return dbManager.getPreciousTaskNames(jobsId);
@@ -1198,11 +1232,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean killJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.killJob(JobIdImpl.makeJobId(jobId));
     }
 
     @Override
+    @ImmediateService
     public boolean killJobs(List<String> jobIds) throws NotConnectedException, PermissionException {
 
         if (jobIds.isEmpty()) {
@@ -1236,6 +1272,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean removeJob(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.removeJob(JobIdImpl.makeJobId(jobId));
     }
@@ -1264,6 +1301,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public void changeJobPriority(String jobId, JobPriority priority)
             throws NotConnectedException, UnknownJobException, PermissionException, JobAlreadyFinishedException {
         this.changeJobPriority(JobIdImpl.makeJobId(jobId), priority);
@@ -1273,6 +1311,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public JobState getJobState(String jobId) throws NotConnectedException, UnknownJobException, PermissionException {
         return this.getJobState(JobIdImpl.makeJobId(jobId));
     }
@@ -1498,6 +1537,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public void putThirdPartyCredential(String key, String value) throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("putThirdPartyCredential",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_PUT_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
@@ -1512,6 +1552,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public Set<String> thirdPartyCredentialsKeySet() throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("thirdPartyCredentialsKeySet",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_LIST_THIRD_PARTY_CREDENTIALS_IN_THE_SCHEDULER);
@@ -1519,6 +1560,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public void removeThirdPartyCredential(String key) throws NotConnectedException, PermissionException {
         UserIdentificationImpl ident = frontendState.checkPermission("removeThirdPartyCredential",
                                                                      YOU_DO_NOT_HAVE_PERMISSION_TO_REMOVE_THIRD_PARTY_CREDENTIALS_FROM_THE_SCHEDULER);
@@ -1526,6 +1568,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public Page<TaskId> getTaskIds(String taskTag, long from, long to, boolean mytasks, boolean running,
             boolean pending, boolean finished, int offset, int limit)
             throws NotConnectedException, PermissionException {
@@ -1591,6 +1634,7 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public JobInfo getJobInfo(String jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         return getJobState(JobIdImpl.makeJobId(jobId)).getJobInfo();
     }
@@ -1599,11 +1643,13 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
      * {@inheritDoc}
      */
     @Override
+    @ImmediateService
     public boolean changeStartAt(JobId jobId, String startAt) {
         return schedulingService.changeStartAt(jobId, startAt);
     }
 
     @Override
+    @ImmediateService
     public String getJobContent(JobId jobId) throws UnknownJobException, NotConnectedException, PermissionException {
         frontendState.checkPermissions("getJobContent",
                                        frontendState.getIdentifiedJob(jobId),
@@ -1612,26 +1658,31 @@ public class SchedulerFrontend implements InitActive, Scheduler, RunActive {
     }
 
     @Override
+    @ImmediateService
     public Map<Object, Object> getPortalConfiguration() {
         return schedulerPortalConfiguration.getProperties();
     }
 
     @Override
+    @ImmediateService
     public String getCurrentUser() throws NotConnectedException {
         return frontendState.getCurrentUser();
     }
 
     @Override
+    @ImmediateService
     public UserData getCurrentUserData() throws NotConnectedException {
         return frontendState.getCurrentUserData();
     }
 
     @Override
+    @ImmediateService
     public Map getSchedulerProperties() throws NotConnectedException {
         return frontendState.getSchedulerProperties();
     }
 
     @Override
+    @ImmediateService
     public boolean checkJobPermissionMethod(String sessionId, String jobId, String method)
             throws NotConnectedException, UnknownJobException {
         try {
