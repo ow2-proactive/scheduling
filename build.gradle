@@ -416,6 +416,7 @@ createStartScripts('org.objectweb.proactive.extensions.vfsprovider.gui.ServerBro
 createStartScripts('org.ow2.proactive.authentication.crypto.CreateCredentials', 'proactive-create-cred', 'tools')
 createStartScripts('org.ow2.proactive.authentication.crypto.KeyGen', 'proactive-key-gen', 'tools')
 createStartScripts('org.ow2.proactive.scheduler.authentication.ManageUsers', 'proactive-users', 'tools')
+createStartScripts('org.ow2.proactive.scheduler.util.EncryptCommand', 'encrypt', 'tools')
 createStartScripts('org.ow2.proactive.utils.PAMRRouterStarter', 'proactive-router', 'bin')
 
 subprojects {

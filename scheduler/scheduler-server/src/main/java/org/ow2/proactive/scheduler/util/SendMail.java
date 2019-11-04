@@ -33,6 +33,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.ow2.proactive.addons.email.EmailSender;
+import org.ow2.proactive.core.properties.PropertyDecrypter;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 
 
@@ -107,7 +108,7 @@ class EmailConfiguration {
     }
 
     public Properties getProperties() {
-        Properties props = new Properties();
+        Properties props = PropertyDecrypter.getDecryptableProperties();
         try (InputStream fis = new FileInputStream(getPath())) {
             props.load(fis);
         } catch (IOException e) {
