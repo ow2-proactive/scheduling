@@ -163,6 +163,8 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
 
     private static final String SCHEDULER_STATE_UPDATED_EVENT_METHOD = "schedulerStateUpdatedEvent";
 
+    public static final String PARENT_JOB_ID = "PARENT_JOB_ID";
+
     /** Scheduler logger */
     private static final Logger logger = Logger.getLogger(SchedulingService.class);
 
@@ -523,7 +525,21 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
         // setting the job properties
         job.setOwner(ident.getUsername());
 
+        fillParentJobIdIfExistsInGenInfo(userJob, job);
+
         return job;
+    }
+
+    private void fillParentJobIdIfExistsInGenInfo(Job userJob, InternalJob job) {
+        if (userJob.getGenericInformation().containsKey(PARENT_JOB_ID)) {
+            String parentJobIdString = userJob.getGenericInformation().get(PARENT_JOB_ID);
+            try {
+                long parentJobId = Long.parseLong(parentJobIdString);
+                job.setParentId(parentJobId);
+            } catch (NumberFormatException e) {
+                logger.error("Cannot parse '" + PARENT_JOB_ID + "' in the generic info: " + parentJobIdString);
+            }
+        }
     }
 
     void jobSubmitted(InternalJob job, UserIdentificationImpl ident) {
