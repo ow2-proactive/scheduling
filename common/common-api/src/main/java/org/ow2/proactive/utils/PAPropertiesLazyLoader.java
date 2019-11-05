@@ -131,7 +131,7 @@ public class PAPropertiesLazyLoader {
     }
 
     /**
-     * Set the user java properties to the PASchedulerProperties.
+     * Set the user java properties to the PAProperties.
      * <p>
      * User properties are defined using the -Dname=value in the java command.
      */

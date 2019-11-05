@@ -36,6 +36,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.hsqldb.Server;
 import org.hsqldb.persist.HsqlProperties;
+import org.ow2.proactive.core.properties.PropertyDecrypter;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
@@ -65,7 +66,7 @@ public class HsqldbServer extends AbstractIdleService {
     protected static final String PROP_HIBERNATE_CONNECTION_USERNAME = "hibernate.connection.username";
 
     @SuppressWarnings("squid:S2068")
-    protected static final String PROP_HIBERNATE_CONNECTION_PASSWORD = "hibernate.connection.password";
+    public static final String PROP_HIBERNATE_CONNECTION_PASSWORD = "hibernate.connection.password";
 
     /*
      * HSQLDB properties.
@@ -279,7 +280,7 @@ public class HsqldbServer extends AbstractIdleService {
     }
 
     private static Properties loadProperties(Path configuration) throws IOException {
-        Properties dbProperties = new Properties();
+        Properties dbProperties = PropertyDecrypter.getDecryptableProperties();
 
         try (InputStream stream = Files.newInputStream(configuration)) {
             dbProperties.load(stream);

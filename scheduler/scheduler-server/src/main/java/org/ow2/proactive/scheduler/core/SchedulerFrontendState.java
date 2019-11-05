@@ -749,7 +749,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
             JobState jobState = getClientJobState(jobId);
             synchronized (jobState) {
                 if (jobState == null) {
-                    return Collections.emptySet();
+                    return (Set<TaskId>) new HashSet<TaskId>();
                 } else {
                     Set<TaskId> tasks = new HashSet<>(jobState.getTasks().size());
                     for (TaskState task : jobState.getTasks()) {
