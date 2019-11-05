@@ -531,7 +531,7 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     }
 
     private void fillParentJobIdIfExistsInGenInfo(Job userJob, InternalJob job) {
-        if (userJob.getGenericInformation().containsKey(PARENT_JOB_ID)) {
+        if (userJob.getGenericInformation() != null && userJob.getGenericInformation().containsKey(PARENT_JOB_ID)) {
             String parentJobIdString = userJob.getGenericInformation().get(PARENT_JOB_ID);
             try {
                 long parentJobId = Long.parseLong(parentJobIdString);
