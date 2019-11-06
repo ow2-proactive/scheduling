@@ -1901,9 +1901,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    @GET
+    @Path("usage/myaccount")
+    @Produces("application/json")
     @Override
-    public List<JobUsageData> getUsageOnMyAccount(String sessionId, @DateFormatter.DateFormat() Date startDate,
-            @DateFormatter.DateFormat() Date endDate) throws RestException {
+    public List<JobUsageData> getUsageOnMyAccount(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("startdate") @DateFormatter.DateFormat() Date startDate,
+            @QueryParam("enddate") @DateFormatter.DateFormat() Date endDate) throws RestException {
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getMyAccountUsage(startDate, endDate), JobUsageData.class);
@@ -1912,9 +1916,13 @@ public class SchedulerStateRest implements SchedulerRestInterface {
         }
     }
 
+    @GET
+    @Path("usage/account")
+    @Produces("application/json")
     @Override
-    public List<JobUsageData> getUsageOnAccount(String sessionId, String user,
-            @DateFormatter.DateFormat() Date startDate, @DateFormatter.DateFormat() Date endDate) throws RestException {
+    public List<JobUsageData> getUsageOnAccount(@HeaderParam("sessionid") String sessionId,
+            @QueryParam("user") String user, @QueryParam("startdate") @DateFormatter.DateFormat() Date startDate,
+            @QueryParam("enddate") @DateFormatter.DateFormat() Date endDate) throws RestException {
         try {
             Scheduler scheduler = checkAccess(sessionId);
             return map(scheduler.getAccountUsage(user, startDate, endDate), JobUsageData.class);
