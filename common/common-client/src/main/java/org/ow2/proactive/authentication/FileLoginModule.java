@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.KeyException;
 import java.security.PrivateKey;
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -48,6 +49,10 @@ import org.apache.log4j.Logger;
 import org.ow2.proactive.authentication.crypto.HybridEncryptionUtil;
 import org.ow2.proactive.authentication.principals.GroupNamePrincipal;
 import org.ow2.proactive.authentication.principals.UserNamePrincipal;
+import org.ow2.proactive.core.properties.PASharedProperties;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 
 /**
@@ -62,6 +67,8 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
     private Logger logger = getLogger();
 
     public static final String ENCRYPTED_DATA_SEP = " ";
+
+    private static Multimap<String, Long> failedAttempts = ArrayListMultimap.create();
 
     /**
      *  JAAS call back handler used to get authentication request parameters 
@@ -179,18 +186,33 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
      * check group membership from group file.
      * @param username user's login
      * @param password user's password
-     * @param printErrorMessage if a message should be printed if the password is incorrect.
+     * @param isNotFallbackAuthentication true if this method is not called inside a fallback mechanism
      * @return true user login and password are correct, and requested group is authorized for the user
      * @throws LoginException if authentication or group membership fails.
      */
-    protected boolean logUser(String username, String password, boolean printErrorMessage) throws LoginException {
+    protected boolean logUser(String username, String password, boolean isNotFallbackAuthentication)
+            throws LoginException {
+
+        if (isNotFallbackAuthentication) {
+            removeOldFailedAttempts(username);
+
+            if (tooManyFailedAttempts(username)) {
+                String message = "Too many failed login/attempts, please try again in " +
+                                 retryInHowManyMinutes(username) + " minutes.";
+                logger.warn("[" + FileLoginModule.class.getSimpleName() + "] " + message);
+                throw new FailedLoginException(message);
+            }
+        }
 
         if (!authenticateUserFromFile(username, password)) {
             String message = "[" + FileLoginModule.class.getSimpleName() + "] Incorrect Username/Password";
-            if (printErrorMessage) {
+            if (isNotFallbackAuthentication) {
                 logger.info(message);
             } else {
                 logger.debug(message);
+            }
+            if (isNotFallbackAuthentication) {
+                storeFailedAttempt(username);
             }
             throw new FailedLoginException("Incorrect Username/Password");
         }
@@ -199,6 +221,39 @@ public abstract class FileLoginModule implements Loggable, LoginModule {
         groupMembershipFromFile(username);
         logger.debug("authentication succeeded for user '" + username + "'");
         return true;
+    }
+
+    protected void storeFailedAttempt(String username) {
+        failedAttempts.put(username, (new Date()).getTime());
+    }
+
+    protected void removeOldFailedAttempts(String username) {
+        if (failedAttempts.containsKey(username)) {
+            failedAttempts.get(username)
+                          .removeIf(time -> time < now() -
+                                                   (PASharedProperties.FAILED_LOGIN_RENEW_MINUTES.getValueAsInt() *
+                                                    60000L));
+        }
+    }
+
+    protected boolean tooManyFailedAttempts(String username) {
+        if (PASharedProperties.FAILED_LOGIN_MAX_ATTEMPTS.getValueAsInt() > 0 && failedAttempts.containsKey(username) &&
+            failedAttempts.get(username).size() >= PASharedProperties.FAILED_LOGIN_MAX_ATTEMPTS.getValueAsInt()) {
+            return true;
+        }
+        return false;
+    }
+
+    protected int retryInHowManyMinutes(String username) {
+        if (tooManyFailedAttempts(username)) {
+            return PASharedProperties.FAILED_LOGIN_RENEW_MINUTES.getValueAsInt() -
+                   (int) ((now() - failedAttempts.get(username).stream().min(Long::compare).get()) / 60000);
+        }
+        return 0;
+    }
+
+    private long now() {
+        return (new Date()).getTime();
     }
 
     /**
