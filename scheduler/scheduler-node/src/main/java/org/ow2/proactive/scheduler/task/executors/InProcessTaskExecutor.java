@@ -169,7 +169,9 @@ public class InProcessTaskExecutor implements TaskExecutor {
                                                                   rmNodeClient,
                                                                   userSpaceClient,
                                                                   globalSpaceClient,
-                                                                  resultMetadata);
+                                                                  resultMetadata,
+                                                                  output,
+                                                                  error);
 
             Stopwatch stopwatch = Stopwatch.createUnstarted();
             TaskResultImpl taskResult;

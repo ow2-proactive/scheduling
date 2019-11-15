@@ -29,6 +29,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.isA;
 
+import java.io.File;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.security.KeyException;
@@ -596,7 +598,9 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                               forkedTaskVariablesManager.createDataSpaceNodeClient(taskContext,
                                                                                                                    schedulerNodeClient,
                                                                                                                    IDataSpaceClient.Dataspace.GLOBAL),
-                                                              resultMetadata);
+                                                              resultMetadata,
+                                                              System.out,
+                                                              System.err);
         return scriptHandlerBindings;
     }
 
@@ -610,7 +614,7 @@ public class ForkedTaskVariablesManagerTest extends ProActiveTestClean {
                                                   taskLauncherInitializer,
                                                   previousTasksResults,
                                                   new NodeDataSpacesURIs(null, null, null, null, null, null),
-                                                  null,
+                                                  "dummy",
                                                   new NodeInfo(null, null, null));
         return taskContext;
     }

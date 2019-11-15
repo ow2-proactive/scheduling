@@ -29,11 +29,9 @@ import static org.ow2.proactive.scheduler.common.task.ForkEnvironment.DOCKER_FOR
 
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.security.KeyException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.proactive.resourcemanager.common.RMConstants;
 import org.ow2.proactive.resourcemanager.task.client.RMNodeClient;
 import org.ow2.proactive.scheduler.common.SchedulerConstants;
 import org.ow2.proactive.scheduler.common.task.ForkEnvironment;
@@ -42,6 +40,7 @@ import org.ow2.proactive.scheduler.common.task.dataspaces.RemoteSpace;
 import org.ow2.proactive.scheduler.common.task.util.SerializationUtil;
 import org.ow2.proactive.scheduler.common.util.VariableSubstitutor;
 import org.ow2.proactive.scheduler.rest.ds.IDataSpaceClient;
+import org.ow2.proactive.scheduler.task.SchedulerVars;
 import org.ow2.proactive.scheduler.task.client.DataSpaceNodeClient;
 import org.ow2.proactive.scheduler.task.client.SchedulerNodeClient;
 import org.ow2.proactive.scheduler.task.context.TaskContext;
@@ -50,6 +49,7 @@ import org.ow2.proactive.scripting.Script;
 import org.ow2.proactive.scripting.ScriptHandler;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
 
 
 public class ForkedTaskVariablesManager implements Serializable {
@@ -73,7 +73,17 @@ public class ForkedTaskVariablesManager implements Serializable {
     public void addBindingsToScriptHandler(ScriptHandler scriptHandler, TaskContext taskContext, VariablesMap variables,
             Map<String, Serializable> resultMap, Map<String, String> thirdPartyCredentials, SchedulerNodeClient client,
             RMNodeClient rmNodeClient, RemoteSpace userSpaceClient, RemoteSpace globalSpaceClient,
-            Map<String, String> resultMetadata) {
+            Map<String, String> resultMetadata, PrintStream outputSink, PrintStream errorSink) {
+        boolean isDockerWindows2Linux = "true".equals(System.getProperty(DOCKER_FORK_WINDOWS2LINUX));
+
+        if (isDockerWindows2Linux) {
+            variables.getInheritedMap().replaceAll((k,
+                    v) -> ImmutableSet.of(SchedulerVars.PA_NODESFILE.name(),
+                                          SchedulerVars.PA_SCHEDULER_HOME.name(),
+                                          SchedulerVars.PA_TASK_PROGRESS_FILE.name())
+                                      .contains(k) ? convertToLinuxIfNeeded(isDockerWindows2Linux, (String) v) : v);
+        }
+
         scriptHandler.addBinding(SchedulerConstants.VARIABLES_BINDING_NAME, variables);
 
         scriptHandler.addBinding(SchedulerConstants.RESULT_MAP_BINDING_NAME, resultMap);
@@ -95,8 +105,6 @@ public class ForkedTaskVariablesManager implements Serializable {
         }
         scriptHandler.addBinding(SchedulerConstants.SYNCHRONIZATION_API_BINDING_NAME,
                                  taskContext.getSynchronizationAPI());
-
-        boolean isDockerWindows2Linux = "true".equals(System.getProperty(DOCKER_FORK_WINDOWS2LINUX));
 
         scriptHandler.addBinding(SchedulerConstants.DS_SCRATCH_BINDING_NAME,
                                  convertToLinuxIfNeeded(isDockerWindows2Linux,
@@ -122,6 +130,11 @@ public class ForkedTaskVariablesManager implements Serializable {
 
         scriptHandler.addBinding(SchedulerConstants.FORK_ENVIRONMENT_BINDING_NAME,
                                  taskContext.getInitializer().getForkEnvironment());
+        scriptHandler.addBinding(SchedulerConstants.PROGRESS_BINDING_NAME,
+                                 new TaskProgressImpl(convertToLinuxIfNeeded(isDockerWindows2Linux,
+                                                                             taskContext.getProgressFilePath()),
+                                                      outputSink,
+                                                      errorSink));
     }
 
     private String convertToLinuxIfNeeded(boolean isDockerWindows2Linux, String uri) {
