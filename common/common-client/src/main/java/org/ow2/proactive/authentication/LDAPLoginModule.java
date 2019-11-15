@@ -282,6 +282,14 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
     }
 
     private boolean internalLogUser(String username, String password) throws LoginException {
+
+        removeOldFailedAttempts(username);
+        if (tooManyFailedAttempts(username)) {
+            String message = "Too many failed login/attempts, please try again in " + retryInHowManyMinutes(username) +
+                             " minutes.";
+            logger.warn(message);
+            throw new FailedLoginException(message);
+        }
         // check the user name, get the RDN of the user
         // (null = not found)
         String userDN = null;
@@ -290,11 +298,13 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
             userDN = getLDAPUserDN(username);
         } catch (NamingException e) {
             logger.error("Cannot connect to LDAP server", e);
+            storeFailedAttempt(username);
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
 
         if (userDN == null) {
             logger.info("user entry not found in subtree " + USERS_DN + " for user " + username);
+            storeFailedAttempt(username);
             throw new FailedLoginException("User name doesn't exists");
         } else {
             // Check if the password match the user name
@@ -312,6 +322,7 @@ public abstract class LDAPLoginModule extends FileLoginModule implements Loggabl
         } else {
             // authentication failed
             logger.info("password verification failed for user: " + username);
+            storeFailedAttempt(username);
             throw new FailedLoginException("Password Incorrect");
         }
 

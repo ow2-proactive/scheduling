@@ -46,6 +46,13 @@ public enum PASharedProperties implements PACommonProperties {
     /** reusing existing rm home property **/
     SHARED_HOME("pa.rm.home", PropertyType.STRING),
 
+    /** maximum number of failed attempts accepted in the given time window (to prevent brute force attacks). The mechanism can be disabled
+     * by using a zero or negative value **/
+    FAILED_LOGIN_MAX_ATTEMPTS("pa.shared.failed.max.attempts", PropertyType.INTEGER, "3"),
+
+    /** time window in minutes after which a failed login attempt is forgotten **/
+    FAILED_LOGIN_RENEW_MINUTES("pa.shared.failed.renew.minutes", PropertyType.INTEGER, "10"),
+
     /** Key used when decrypting properties */
     PROPERTIES_CRYPT_KEY("pa.shared.properties.crypt.key", PropertyType.STRING, "activeeon");
 

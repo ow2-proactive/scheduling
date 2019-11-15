@@ -150,6 +150,13 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
 
     private boolean pamLogUser(String username, String password) throws LoginException {
         logger.debug("Authenticating user " + username + " with PAM.");
+        removeOldFailedAttempts(username);
+        if (tooManyFailedAttempts(username)) {
+            String message = "Too many failed login/attempts, please try again in " + retryInHowManyMinutes(username) +
+                             " minutes.";
+            logger.warn(message);
+            throw new FailedLoginException(message);
+        }
         PamReturnValue answer = pam.authenticate(username, password);
         if (answer.equals(PamReturnValue.PAM_SUCCESS)) {
             subject.getPrincipals().add(new UserNamePrincipal(username));
@@ -157,6 +164,7 @@ public abstract class PAMLoginModule extends FileLoginModule implements Loggable
             return true;
         } else {
             logger.info("PAM authentication failed for user " + username + ": " + answer);
+            storeFailedAttempt(username);
             throw new FailedLoginException(answer.toString());
         }
     }
