@@ -33,8 +33,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -123,15 +125,41 @@ public class SelectionScriptSamplesTest {
         }
     }
 
+    /**
+     * Returns the JVM class path containing this project test classes
+     */
+    private static String getTestClassesClassPath() {
+        List<String> matchingEntries = new ArrayList<>();
+        for (String pathEntry : System.getProperty("java.class.path").split("" + File.pathSeparatorChar)) {
+            if (pathEntry.contains("scheduler-node") && pathEntry.contains("classes")) {
+                matchingEntries.add(pathEntry);
+            }
+        }
+        return matchingEntries.stream().collect(Collectors.joining("" + File.pathSeparatorChar));
+    }
+
     private static Process forkEvaluation(Path selectionScript) throws IOException {
         String javaHome = System.getProperty("java.home");
         String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
-        String classpath = System.getProperty("java.class.path");
+        StringBuilder classpathEntries = new StringBuilder();
+        File distLib = new File(PA_SCHEDULER_HOME, "dist/lib").getCanonicalFile();
+
+        File addons = new File(PA_SCHEDULER_HOME, "addons").getCanonicalFile();
+        classpathEntries.append(distLib);
+        classpathEntries.append(File.pathSeparatorChar);
+        classpathEntries.append(new File(distLib, "*"));
+        classpathEntries.append(File.pathSeparatorChar);
+        classpathEntries.append(addons);
+        classpathEntries.append(File.pathSeparatorChar);
+        classpathEntries.append(new File(addons, "*"));
+        classpathEntries.append(File.pathSeparatorChar);
+        classpathEntries.append(getTestClassesClassPath());
+
         String className = SelectionScriptEvaluator.class.getCanonicalName();
 
         ProcessBuilder builder = new ProcessBuilder(javaBin,
                                                     "-cp",
-                                                    classpath,
+                                                    classpathEntries.toString(),
                                                     className,
                                                     selectionScript.toAbsolutePath().toString());
 
