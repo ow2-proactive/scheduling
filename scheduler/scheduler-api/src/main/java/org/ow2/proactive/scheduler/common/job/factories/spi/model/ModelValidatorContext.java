@@ -50,6 +50,8 @@ public class ModelValidatorContext {
 
     private final Scheduler scheduler;
 
+    private String variableName;
+
     // container for job and task variables
     private SpELVariables spELVariables;
 
@@ -58,7 +60,7 @@ public class ModelValidatorContext {
         this.scheduler = scheduler;
     }
 
-    private ModelValidatorContext(Map<String, Serializable> variablesValues, Scheduler scheduler) {
+    public ModelValidatorContext(Map<String, Serializable> variablesValues, Scheduler scheduler) {
         spELVariables = new SpELVariables(variablesValues);
         spelContext = new StandardEvaluationContext(spELVariables);
         spelContext.setTypeLocator(new RestrictedTypeLocator());
@@ -93,6 +95,14 @@ public class ModelValidatorContext {
 
     public Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public String getVariableName() {
+        return variableName;
+    }
+
+    public void setVariableName(String variableName) {
+        this.variableName = variableName;
     }
 
     /**
