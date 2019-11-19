@@ -28,7 +28,7 @@ package org.ow2.proactive.scheduler.common.job.factories.spi.model.factory;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.Converter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.converter.IdentityConverter;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.exceptions.ModelSyntaxException;
-import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.AcceptAllValidator;
+import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.EncryptionValidator;
 import org.ow2.proactive.scheduler.common.job.factories.spi.model.validator.Validator;
 
 
@@ -50,6 +50,6 @@ public class HiddenParserValidator extends BaseParserValidator<String> {
 
     @Override
     protected Validator<String> createValidator(String model, Converter<String> converter) throws ModelSyntaxException {
-        return new AcceptAllValidator<>();
+        return new EncryptionValidator();
     }
 }
