@@ -38,11 +38,10 @@ public class EncryptionValidator implements Validator<String> {
 
     @Override
     public String validate(String parameterValue, ModelValidatorContext context) throws ValidationException {
-        if (parameterValue != null && parameterValue.startsWith("ENC(")) {
+        if (parameterValue != null && parameterValue.startsWith(PropertyDecrypter.ENCRYPTION_PREFIX)) {
             // validating value already encrypted
             try {
-                String encryptedValue = parameterValue.substring(4, parameterValue.length() - 1);
-                PropertyDecrypter.getDefaultEncryptor().decrypt(encryptedValue);
+                PropertyDecrypter.decryptData(parameterValue);
             } catch (Exception e) {
                 throw new ValidationException("Cannot decrypt value: " + parameterValue, e);
             }
@@ -50,8 +49,7 @@ public class EncryptionValidator implements Validator<String> {
             // encrypt value
             String encryptedValue;
             try {
-                encryptedValue = PropertyDecrypter.getDefaultEncryptor().encrypt(parameterValue);
-                encryptedValue = "ENC(" + encryptedValue + ")";
+                encryptedValue = PropertyDecrypter.encryptData(parameterValue);
             } catch (Exception e) {
                 throw new ValidationException("Cannot encrypt value: " + parameterValue, e);
             }
