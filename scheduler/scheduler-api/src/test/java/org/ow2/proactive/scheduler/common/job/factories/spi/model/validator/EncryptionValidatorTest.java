@@ -52,14 +52,16 @@ public class EncryptionValidatorTest {
     @Test
     public void testEncryptedReadOK() throws ValidationException {
         String value = "some_data";
-        String encryptedValue = "ENC(" + PropertyDecrypter.getDefaultEncryptor().encrypt(value) + ")";
+        String encryptedValue = PropertyDecrypter.encryptData(value);
         Assert.assertEquals(encryptedValue, new EncryptionValidator().validate(encryptedValue, context));
     }
 
     @Test(expected = ValidationException.class)
     public void testEncryptedReadKO() throws ValidationException {
         String value = "some_data";
-        String encryptedValue = "ENC(" + PropertyDecrypter.getDefaultEncryptor().encrypt(value) + "blabla)";
+        String encryptedValue = PropertyDecrypter.ENCRYPTION_PREFIX +
+                                PropertyDecrypter.getDefaultEncryptor().encrypt(value) + "blabla" +
+                                PropertyDecrypter.ENCRYPTION_SUFFIX;
         new EncryptionValidator().validate(encryptedValue, context);
     }
 
@@ -68,15 +70,11 @@ public class EncryptionValidatorTest {
         String value = "some_data";
         String encryptedValue = new EncryptionValidator().validate(value, context);
         // decrypt returned string, which uses ENC(crypted_data) format
-        Assert.assertEquals(value,
-                            PropertyDecrypter.getDefaultEncryptor()
-                                             .decrypt(encryptedValue.substring(4, encryptedValue.length() - 1)));
+        Assert.assertEquals(value, PropertyDecrypter.decryptData(encryptedValue));
 
         // decrypt variable stored
         Map<String, Serializable> variables = context.getSpELVariables().getVariables();
         encryptedValue = (String) variables.get(context.getVariableName());
-        Assert.assertEquals(value,
-                            PropertyDecrypter.getDefaultEncryptor()
-                                             .decrypt(encryptedValue.substring(4, encryptedValue.length() - 1)));
+        Assert.assertEquals(value, PropertyDecrypter.decryptData(encryptedValue));
     }
 }
