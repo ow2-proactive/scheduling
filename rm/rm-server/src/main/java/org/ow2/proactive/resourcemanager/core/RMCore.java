@@ -1140,6 +1140,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     public Set<String> setNodesAvailable(Set<String> nodeUrls) {
 
+        checkPermissionAndGetClientIsSuccessful();
         waitForRMCoreToBeInitializedIfNeeded();
 
         if (logger.isTraceEnabled()) {
@@ -2017,6 +2018,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     @ImmediateService
     public StringWrapper getRMThreadDump() {
+        checkPermissionAndGetClientIsSuccessful();
         String threadDump;
         try {
             threadDump = this.nodeRM.getThreadDump();
@@ -2032,6 +2034,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
     @Override
     @ImmediateService
     public StringWrapper getNodeThreadDump(String nodeUrl) {
+        checkPermissionAndGetClientIsSuccessful();
         RMNode node;
         try {
             node = getAliveNodeOrFail(nodeUrl);
@@ -2445,7 +2448,7 @@ public class RMCore implements ResourceManager, InitActive, RunActive {
         return new BooleanWrapper(!toShutDown && clients.containsKey(sourceBodyCaller.getId()));
     }
 
-    private Client checkPermissionAndGetClientIsSuccessful() {
+    protected Client checkPermissionAndGetClientIsSuccessful() {
         final Request currentRequest = PAActiveObject.getContext().getCurrentRequest();
         String methodName = currentRequest.getMethodName();
         return checkMethodCallPermission(methodName, currentRequest.getSourceBodyID());

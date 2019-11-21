@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.apache.commons.vfs2.FileObject;
@@ -86,6 +87,8 @@ import org.ow2.proactive.scheduler.smartproxy.common.AbstractSmartProxy;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedJob;
 import org.ow2.proactive.scheduler.smartproxy.common.AwaitedTask;
 import org.ow2.proactive.scheduler.smartproxy.common.SchedulerEventListenerExtended;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -861,6 +864,11 @@ public class SmartProxyImpl extends AbstractSmartProxy<JobTrackerImpl> implement
     @Override
     public UserData getCurrentUserData() throws NotConnectedException {
         return schedulerProxy.getCurrentUserData();
+    }
+
+    @Override
+    public Subject getSubject() throws NotConnectedException {
+        return schedulerProxy.getSubject();
     }
 
     @Override

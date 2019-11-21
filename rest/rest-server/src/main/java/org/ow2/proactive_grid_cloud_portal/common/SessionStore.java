@@ -31,9 +31,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.ow2.proactive.scheduler.common.exception.NotConnectedException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 
 
 public class SessionStore {
+
+    public static final String YOU_ARE_NOT_CONNECTED_TO_THE_SERVER_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the server, you should log on first";
 
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
 
@@ -58,8 +61,15 @@ public class SessionStore {
         return sessions.containsKey(sessionId);
     }
 
-    public Session get(String sessionId) {
-        return sessions.get(sessionId);
+    public Session get(String sessionId) throws NotConnectedRestException {
+        if (sessionId == null) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SERVER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+        Session session = sessions.get(sessionId);
+        if (session == null) {
+            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SERVER_YOU_SHOULD_LOG_ON_FIRST);
+        }
+        return session;
     }
 
     /** For testing only */

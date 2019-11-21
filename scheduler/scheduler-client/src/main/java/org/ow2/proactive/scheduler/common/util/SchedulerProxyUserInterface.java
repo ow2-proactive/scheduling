@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.security.auth.Subject;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -807,6 +808,12 @@ public class SchedulerProxyUserInterface implements Scheduler, Serializable {
     @ImmediateService
     public UserData getCurrentUserData() throws NotConnectedException {
         return uischeduler.getCurrentUserData();
+    }
+
+    @Override
+    @ImmediateService
+    public Subject getSubject() throws NotConnectedException {
+        return uischeduler.getSubject();
     }
 
     @Override

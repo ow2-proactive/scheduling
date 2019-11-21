@@ -97,6 +97,7 @@ import org.ow2.proactive.utils.console.MBeanInfoViewer;
 import org.ow2.proactive_grid_cloud_portal.common.*;
 import org.ow2.proactive_grid_cloud_portal.common.StatHistoryCaching.StatHistoryCacheEntry;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
+import org.ow2.proactive_grid_cloud_portal.scheduler.exception.NotConnectedRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.PermissionRestException;
 import org.ow2.proactive_grid_cloud_portal.scheduler.exception.RestException;
 import org.ow2.proactive_grid_cloud_portal.webapp.StatHistory;
@@ -115,17 +116,16 @@ public class RMRest implements RMRestInterface {
     private static final Pattern PATTERN = Pattern.compile("^[^:]*:(.*)");
 
     private RMProxyUserInterface checkAccess(String sessionId) throws NotConnectedException {
-        if (sessionId == null) {
-            throw new NotConnectedException("you did not provide 'sessionid' in the header");
-        }
-        Session session = sessionStore.get(sessionId);
-        if (session == null) {
-            throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
+        Session session = null;
+        try {
+            session = sessionStore.get(sessionId);
+        } catch (NotConnectedRestException e) {
+            throw new NotConnectedException(SessionStore.YOU_ARE_NOT_CONNECTED_TO_THE_SERVER_YOU_SHOULD_LOG_ON_FIRST);
         }
         RMProxyUserInterface s = session.getRM();
 
         if (s == null) {
-            throw new NotConnectedException("you are not connected to the scheduler, you should log on first");
+            throw new NotConnectedException("you are not connected to the resource manager, you should log on first");
         }
 
         return session.getRM();
@@ -191,10 +191,12 @@ public class RMRest implements RMRestInterface {
 
     @Override
     public String getLoginFromSessionId(String sessionId) {
-        if (sessionId != null && sessionStore.exists(sessionId)) {
+        try {
             return sessionStore.get(sessionId).getUserName();
+        } catch (Exception e) {
+            LOGGER.debug("Invalid session : " + sessionId);
+            return "";
         }
-        return "";
     }
 
     @Override
@@ -204,9 +206,11 @@ public class RMRest implements RMRestInterface {
                 ResourceManager rm = sessionStore.get(sessionId).getRM();
                 return PAFuture.getFutureValue(rm.getCurrentUserData());
             } catch (Exception e) {
+                LOGGER.debug("Invalid session : " + sessionId);
                 return null;
             }
         } else {
+            LOGGER.debug("Invalid session : " + sessionId);
             return null;
         }
     }
