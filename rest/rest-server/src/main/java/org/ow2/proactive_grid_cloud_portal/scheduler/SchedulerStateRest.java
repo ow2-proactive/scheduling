@@ -1144,10 +1144,6 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     private SchedulerProxyUserInterface checkAccess(String sessionId, String path) throws NotConnectedRestException {
         Session session = sessionStore.get(sessionId);
 
-        if (session == null) {
-            throw new NotConnectedRestException(YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST);
-        }
-
         SchedulerProxyUserInterface schedulerProxy = session.getScheduler();
 
         if (schedulerProxy == null) {

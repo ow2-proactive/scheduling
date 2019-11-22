@@ -50,6 +50,7 @@ import org.ow2.proactive.authentication.UserData;
 import org.ow2.proactive.scheduler.core.properties.PASchedulerProperties;
 import org.ow2.proactive_grid_cloud_portal.common.SchedulerRestInterface;
 import org.ow2.proactive_grid_cloud_portal.common.Session;
+import org.ow2.proactive_grid_cloud_portal.common.SessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.SharedSessionStore;
 import org.ow2.proactive_grid_cloud_portal.common.dto.LoginForm;
 import org.ow2.proactive_grid_cloud_portal.scheduler.SchedulerStateRest;
@@ -69,11 +70,15 @@ import org.ow2.proactive_grid_cloud_portal.webapp.PortalConfiguration;
 
 public class StudioRest implements StudioInterface {
 
+    public static final String YOU_ARE_NOT_CONNECTED_TO_THE_SCHEDULER_YOU_SHOULD_LOG_ON_FIRST = "You are not connected to the scheduler, you should log on first";
+
     private static final Logger logger = Logger.getLogger(StudioRest.class);
 
     private static final String FILE_ENCODING = PASchedulerProperties.FILE_ENCODING.getValueAsString();
 
     private SchedulerStateRest schedulerRest = null;
+
+    private SessionStore sessions = SharedSessionStore.getInstance();
 
     private SchedulerRestInterface scheduler() {
         if (schedulerRest == null) {
@@ -87,11 +92,8 @@ public class StudioRest implements StudioInterface {
     }
 
     private String getUserName(String sessionId) throws NotConnectedRestException {
-        Session ss = SharedSessionStore.getInstance().get(sessionId);
-        if (ss == null) {
-            throw new NotConnectedRestException("you are not connected to the scheduler, you should log on first");
-        }
-        return ss.getUserName();
+        Session session = sessions.get(sessionId);
+        return session.getUserName();
     }
 
     @Override

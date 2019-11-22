@@ -63,6 +63,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import javax.security.auth.Subject;
+
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -1308,6 +1310,11 @@ public class SchedulerClient extends ClientBase implements ISchedulerClient {
             throw new NotConnectedException("Session " + sid + " is not connected");
         }
         return connectedUserData;
+    }
+
+    @Override
+    public Subject getSubject() throws NotConnectedException {
+        throw new UnsupportedOperationException();
     }
 
     @Override

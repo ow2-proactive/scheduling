@@ -32,6 +32,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.security.auth.Subject;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -1323,6 +1325,11 @@ class SchedulerFrontendState implements SchedulerStateUpdate {
     public String getCurrentUser() throws NotConnectedException {
         Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
         return userSessionInfo.getRight().getUsername();
+    }
+
+    public Subject getSubject() throws NotConnectedException {
+        Pair<ListeningUser, UserIdentificationImpl> userSessionInfo = renewSession(false);
+        return userSessionInfo.getRight().getSubject();
     }
 
     public UserData getCurrentUserData() throws NotConnectedException {

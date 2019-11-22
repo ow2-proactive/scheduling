@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import javax.security.auth.Subject;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.extensions.dataspaces.vfs.selector.FileSelector;
 import org.ow2.proactive.authentication.ConnectionInfo;
@@ -727,6 +729,11 @@ public class RestSmartProxyImpl extends AbstractSmartProxy<RestJobTrackerImpl>
     @Override
     public UserData getCurrentUserData() throws NotConnectedException {
         return _getScheduler().getCurrentUserData();
+    }
+
+    @Override
+    public Subject getSubject() throws NotConnectedException {
+        throw new UnsupportedOperationException();
     }
 
     @Override

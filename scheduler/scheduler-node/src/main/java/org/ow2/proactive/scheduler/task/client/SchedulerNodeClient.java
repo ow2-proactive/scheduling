@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
+import javax.security.auth.Subject;
+
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.ow2.proactive.authentication.ConnectionInfo;
 import org.ow2.proactive.authentication.UserData;
@@ -855,6 +857,11 @@ public class SchedulerNodeClient implements ISchedulerClient, Serializable {
     public UserData getCurrentUserData() throws NotConnectedException {
         renewSession();
         return client.getCurrentUserData();
+    }
+
+    @Override
+    public Subject getSubject() throws NotConnectedException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
