@@ -62,7 +62,8 @@ public class PropertyDecrypter {
     }
 
     public static String encryptData(String data) {
-        if (data.startsWith(ENCRYPTION_PREFIX)) {
+        StringEncryptor encryptor = getDefaultEncryptor();
+        if (encryptor == null || data == null || data.isEmpty() || data.startsWith(ENCRYPTION_PREFIX)) {
             return data;
         } else {
             return ENCRYPTION_PREFIX + encryptor.encrypt(data) + ENCRYPTION_SUFFIX;
@@ -70,7 +71,8 @@ public class PropertyDecrypter {
     }
 
     public static String decryptData(String data) {
-        if (data.startsWith(ENCRYPTION_PREFIX)) {
+        StringEncryptor encryptor = getDefaultEncryptor();
+        if ((encryptor != null) && (data != null) && data.startsWith(ENCRYPTION_PREFIX)) {
             return encryptor.decrypt(data.substring(ENCRYPTION_PREFIX.length(),
                                                     data.length() - ENCRYPTION_SUFFIX.length()));
         }
