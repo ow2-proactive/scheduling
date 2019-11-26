@@ -39,6 +39,7 @@ import java.security.PublicKey;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
@@ -2177,26 +2178,40 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public RestPage<String> getTaskIds(String sessionId, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit) throws RestException {
-        return getTaskIdsByTag(sessionId, null, from, to, mytasks, running, pending, finished, offset, limit);
+    public RestPage<String> getTaskIds(String sessionId, long from, long to, boolean mytasks, String statusFilter,
+            int offset, int limit) throws RestException {
+        return getTaskIdsByTag(sessionId, null, from, to, mytasks, statusFilter, offset, limit);
+    }
+
+    @Override
+    public RestPage<TaskStateData> getTaskStates(String sessionId, long from, long to, boolean mytasks,
+            String statusFilter, int offset, int limit, SortSpecifierContainer sortParams) throws RestException {
+        return getTaskStatesByTag(sessionId,
+                                  null,
+                                  from,
+                                  to,
+                                  mytasks,
+                                  statusFilter,
+                                  offset,
+                                  limit,
+                                  mapToDBNamespace(sortParams));
     }
 
     @Override
     public RestPage<String> getTaskIdsByTag(String sessionId, String taskTag, long from, long to, boolean mytasks,
-            boolean running, boolean pending, boolean finished, int offset, int limit) throws RestException {
+            String statusFilter, int offset, int limit) throws RestException {
         Scheduler s = checkAccess(sessionId, "tasks");
 
         PageBoundaries boundaries = Pagination.getTasksPageBoundaries(offset, limit, TASKS_PAGE_SIZE);
 
         try {
+            final Set<TaskStatus> statuses = TaskStatus.expandAggregatedStatusesToRealStatuses(Stream.of(statusFilter.split(";"))
+                                                                                                     .collect(Collectors.toList()));
             Page<TaskId> page = s.getTaskIds(taskTag,
                                              from,
                                              to,
                                              mytasks,
-                                             running,
-                                             pending,
-                                             finished,
+                                             statuses,
                                              boundaries.getOffset(),
                                              boundaries.getLimit());
             List<TaskId> taskIds = page.getList();
@@ -2211,26 +2226,9 @@ public class SchedulerStateRest implements SchedulerRestInterface {
     }
 
     @Override
-    public RestPage<TaskStateData> getTaskStates(String sessionId, long from, long to, boolean mytasks, boolean running,
-            boolean pending, boolean finished, int offset, int limit, SortSpecifierContainer sortParams)
-            throws RestException {
-        return getTaskStatesByTag(sessionId,
-                                  null,
-                                  from,
-                                  to,
-                                  mytasks,
-                                  running,
-                                  pending,
-                                  finished,
-                                  offset,
-                                  limit,
-                                  mapToDBNamespace(sortParams));
-    }
-
-    @Override
     public RestPage<TaskStateData> getTaskStatesByTag(String sessionId, String taskTag, long from, long to,
-            boolean mytasks, boolean running, boolean pending, boolean finished, int offset, int limit,
-            SortSpecifierContainer sortParams) throws RestException {
+            boolean mytasks, String statusFilter, int offset, int limit, SortSpecifierContainer sortParams)
+            throws RestException {
         Scheduler s = checkAccess(sessionId, "tasks/tag/" + taskTag);
 
         PageBoundaries boundaries = Pagination.getTasksPageBoundaries(offset, limit, TASKS_PAGE_SIZE);
@@ -2244,13 +2242,14 @@ public class SchedulerStateRest implements SchedulerRestInterface {
             sortParams = new SortSpecifierContainer();
         }
         try {
+            final Set<TaskStatus> statuses = TaskStatus.expandAggregatedStatusesToRealStatuses(Stream.of(statusFilter.split(";"))
+                                                                                                     .collect(Collectors.toList()));
+
             page = s.getTaskStates(taskTag,
                                    from,
                                    to,
                                    mytasks,
-                                   running,
-                                   pending,
-                                   finished,
+                                   statuses,
                                    boundaries.getOffset(),
                                    boundaries.getLimit(),
                                    sortParams);

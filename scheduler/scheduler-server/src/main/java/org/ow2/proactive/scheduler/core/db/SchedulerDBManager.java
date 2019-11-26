@@ -270,18 +270,15 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskState> getTaskStates(final long from, final long to, final String tag, final int offset,
-            final int limit, final String user, final boolean pending, final boolean running, final boolean finished,
-            SortSpecifierContainer sortParams) {
+            final int limit, final String user, Set<TaskStatus> statusFilter, SortSpecifierContainer sortParams) {
 
-        DBTaskDataParameters parameters = new DBTaskDataParameters(tag,
+        DBTaskDataParameters parameters = new DBTaskDataParameters(user,
+                                                                   tag,
                                                                    from,
                                                                    to,
                                                                    offset,
                                                                    limit,
-                                                                   user,
-                                                                   pending,
-                                                                   running,
-                                                                   finished,
+                                                                   statusFilter,
                                                                    sortParams);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskState> lTasks = executeReadOnlyTransaction(TaskDBUtils.taskStateSessionWork(parameters));
@@ -290,17 +287,15 @@ public class SchedulerDBManager {
     }
 
     public Page<TaskInfo> getTasks(final long from, final long to, final String tag, final int offset, final int limit,
-            final String user, final boolean pending, final boolean running, final boolean finished) {
+            final String user, Set<TaskStatus> statusFilter) {
 
-        DBTaskDataParameters parameters = new DBTaskDataParameters(tag,
+        DBTaskDataParameters parameters = new DBTaskDataParameters(user,
+                                                                   tag,
                                                                    from,
                                                                    to,
                                                                    offset,
                                                                    limit,
-                                                                   user,
-                                                                   pending,
-                                                                   running,
-                                                                   finished,
+                                                                   statusFilter,
                                                                    SortSpecifierContainer.EMPTY_CONTAINER);
         int totalNbTasks = getTotalNumberOfTasks(parameters);
         List<TaskInfo> lTaskInfo = executeReadOnlyTransaction(TaskDBUtils.taskInfoSessionWork(parameters));
