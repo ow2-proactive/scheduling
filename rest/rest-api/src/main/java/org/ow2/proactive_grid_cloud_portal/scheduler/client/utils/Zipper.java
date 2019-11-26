@@ -125,7 +125,7 @@ public class Zipper {
             fileSelector.addIncludes(includes);
             fileSelector.addExcludes(excludes);
 
-            return (ImmutableList<File>) findFiles(root, fileSelector);
+            return ImmutableList.copyOf(findFiles(root, fileSelector));
         }
 
         private static ImmutableList<File> filterEmpty(File root) {
@@ -172,7 +172,7 @@ public class Zipper {
             Closer closer = Closer.create();
             closer.register(is);
             try {
-                logger.trace("Adding zip entry" + zipEntry.toString());
+                logger.trace("Adding zip entry: " + zipEntry.toString());
                 zos.putNextEntry(zipEntry);
                 ByteStreams.copy(is, zos);
                 zos.flush();
