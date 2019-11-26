@@ -266,7 +266,7 @@ public class Zipper {
             if (logger.isTraceEnabled()) {
                 logger.trace("Analysing file " + file + " : " + answer);
             }
-            return !file.isDirectory();
+            return answer;
         }
     }
 }
