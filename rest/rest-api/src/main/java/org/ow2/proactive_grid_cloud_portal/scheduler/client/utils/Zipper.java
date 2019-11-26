@@ -135,8 +135,10 @@ public class Zipper {
 
         public static void zip(File root, List<String> includes, List<String> excludes, OutputStream os)
                 throws IOException {
-            logger.trace("Includes list : " + includes.toString());
-            logger.trace("Excludes list : " + excludes.toString());
+            List<String> logIncludes = nullOrEmpty(includes) ? new ArrayList<>() : includes;
+            List<String> logExcludes = nullOrEmpty(excludes) ? new ArrayList<>() : excludes;
+            logger.trace("Includes list : " + logIncludes.toString());
+            logger.trace("Excludes list : " + logExcludes.toString());
             checkNotNull(root);
             checkNotNull(os);
             ImmutableList<File> fileList = nullOrEmpty(includes) && nullOrEmpty(excludes) ? filterEmpty(root)
